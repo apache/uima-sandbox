@@ -62,7 +62,7 @@ public class SnowballAnnotatorTest extends TestCase
     this.annotTester.performTest(cas);
     
     //define result interested in
-    String[] tofs = {"org.apache.uima.TokenAnnotation", "org.apache.uima.TokenAnnotation:stemm"};
+    String[] tofs = {"org.apache.uima.TokenAnnotation", "org.apache.uima.TokenAnnotation:stem"};
     
     //compare results
     File outputFile = new File(JUnitExtension.getFile("englishRef.txt").getParent(), "englishRef_testoutput.txt") ;

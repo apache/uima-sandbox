@@ -45,8 +45,8 @@
 				<supertypeName>uima.tcas.Annotation</supertypeName>
 				<features>
 					<featureDescription>
-						<name>stemm</name>
-						<description>stemm</description>
+						<name>stem</name>
+						<description>stem</description>
 						<rangeTypeName>uima.cas.String</rangeTypeName>
 					</featureDescription>
 				</features>

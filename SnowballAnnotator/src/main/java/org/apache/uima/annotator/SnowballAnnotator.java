@@ -56,7 +56,7 @@ public class SnowballAnnotator extends JTextAnnotator_ImplBase {
 
   private static final String TOKEN_ANNOTATION_NAME = "org.apache.uima.TokenAnnotation";
 
-  private static final String TOKEN_ANNOTATION_STEMM_FEATURE_NAME = "stemm";
+  private static final String TOKEN_ANNOTATION_STEM_FEATURE_NAME = "stem";
 
   private Type tokenAnnotation;
 
@@ -157,7 +157,7 @@ public class SnowballAnnotator extends JTextAnnotator_ImplBase {
     this.tokenAnnotation = aTypeSystem.getType(TOKEN_ANNOTATION_NAME);
 
     this.tokenAnnotationStemmFeature = aTypeSystem.getFeatureByFullName(TOKEN_ANNOTATION_NAME
-            + TypeSystem.FEATURE_SEPARATOR + TOKEN_ANNOTATION_STEMM_FEATURE_NAME);
+            + TypeSystem.FEATURE_SEPARATOR + TOKEN_ANNOTATION_STEM_FEATURE_NAME);
 
     this.logger.log(Level.INFO, "Snowball annotator typesystem initialized");
   }
