@@ -27,7 +27,7 @@
    <annotatorImplementationName>org.apache.uima.annotator.SnowballAnnotator</annotatorImplementationName>
 
    <analysisEngineMetaData>
-      <name>WhitespaceTokenizer</name>
+      <name>SnowballAnnotator</name>
       <description></description>
       <version>1.0</version>
       <vendor></vendor>
