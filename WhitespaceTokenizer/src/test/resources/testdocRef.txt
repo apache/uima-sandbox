@@ -1,8 +1,8 @@
-SentenceAnnotation(0,9): "License"
+SentenceAnnotation(0,139): "License" shall mean the terms and conditions for use, reproduction,
+and distribution as defined by Sections 1 through 9 of this document.
 TokenAnnotation(0,1): "
 TokenAnnotation(1,8): License
 TokenAnnotation(8,9): "
-SentenceAnnotation(9,54):  shall mean the terms and conditions for use,
 TokenAnnotation(10,15): shall
 TokenAnnotation(16,20): mean
 TokenAnnotation(21,24): the
@@ -12,8 +12,6 @@ TokenAnnotation(35,45): conditions
 TokenAnnotation(46,49): for
 TokenAnnotation(50,53): use
 TokenAnnotation(53,54): ,
-SentenceAnnotation(54,139):  reproduction,
-and distribution as defined by Sections 1 through 9 of this document.
 TokenAnnotation(55,67): reproduction
 TokenAnnotation(67,68): ,
 TokenAnnotation(70,73): and
@@ -29,13 +27,12 @@ TokenAnnotation(122,124): of
 TokenAnnotation(125,129): this
 TokenAnnotation(130,138): document
 TokenAnnotation(138,139): .
-SentenceAnnotation(139,151): 
-"Licensor"
+SentenceAnnotation(139,257): 
+"Licensor" shall mean the copyright owner or entity authorized by
+the copyright owner that is granting the License.
 TokenAnnotation(141,142): "
 TokenAnnotation(142,150): Licensor
 TokenAnnotation(150,151): "
-SentenceAnnotation(151,257):  shall mean the copyright owner or entity authorized by
-the copyright owner that is granting the License.
 TokenAnnotation(152,157): shall
 TokenAnnotation(158,162): mean
 TokenAnnotation(163,166): the
@@ -54,14 +51,14 @@ TokenAnnotation(236,244): granting
 TokenAnnotation(245,248): the
 TokenAnnotation(249,256): License
 TokenAnnotation(256,257): .
-SentenceAnnotation(257,273): 
-"Legal Entity"
+SentenceAnnotation(257,419): 
+"Legal Entity" shall mean the union of the acting entity and all
+other entities that control, are controlled by, or are under common
+control with that entity.
 TokenAnnotation(259,260): "
 TokenAnnotation(260,265): Legal
 TokenAnnotation(266,272): Entity
 TokenAnnotation(272,273): "
-SentenceAnnotation(273,353):  shall mean the union of the acting entity and all
-other entities that control,
 TokenAnnotation(274,279): shall
 TokenAnnotation(280,284): mean
 TokenAnnotation(285,288): the
@@ -77,13 +74,10 @@ TokenAnnotation(331,339): entities
 TokenAnnotation(340,344): that
 TokenAnnotation(345,352): control
 TokenAnnotation(352,353): ,
-SentenceAnnotation(353,372):  are controlled by,
 TokenAnnotation(354,357): are
 TokenAnnotation(358,368): controlled
 TokenAnnotation(369,371): by
 TokenAnnotation(371,372): ,
-SentenceAnnotation(372,419):  or are under common
-control with that entity.
 TokenAnnotation(373,375): or
 TokenAnnotation(376,379): are
 TokenAnnotation(380,385): under
@@ -93,8 +87,11 @@ TokenAnnotation(402,406): with
 TokenAnnotation(407,411): that
 TokenAnnotation(412,418): entity
 TokenAnnotation(418,419): .
-SentenceAnnotation(419,467):  For the purposes of this definition,
-"control"
+SentenceAnnotation(419,720):  For the purposes of this definition,
+"control" means (i) the power, direct or indirect, to cause the
+direction or management of such entity, whether by contract or
+otherwise, or (ii) ownership of fifty percent (50%) or more of the
+outstanding shares, or (iii) beneficial ownership of such entity.
 TokenAnnotation(420,423): For
 TokenAnnotation(424,427): the
 TokenAnnotation(428,436): purposes
@@ -105,22 +102,17 @@ TokenAnnotation(455,456): ,
 TokenAnnotation(458,459): "
 TokenAnnotation(459,466): control
 TokenAnnotation(466,467): "
-SentenceAnnotation(467,477):  means (i)
 TokenAnnotation(468,473): means
 TokenAnnotation(474,475): (
 TokenAnnotation(475,476): i
 TokenAnnotation(476,477): )
-SentenceAnnotation(477,488):  the power,
 TokenAnnotation(478,481): the
 TokenAnnotation(482,487): power
 TokenAnnotation(487,488): ,
-SentenceAnnotation(488,508):  direct or indirect,
 TokenAnnotation(489,495): direct
 TokenAnnotation(496,498): or
 TokenAnnotation(499,507): indirect
 TokenAnnotation(507,508): ,
-SentenceAnnotation(508,562):  to cause the
-direction or management of such entity,
 TokenAnnotation(509,511): to
 TokenAnnotation(512,517): cause
 TokenAnnotation(518,521): the
@@ -131,20 +123,16 @@ TokenAnnotation(547,549): of
 TokenAnnotation(550,554): such
 TokenAnnotation(555,561): entity
 TokenAnnotation(561,562): ,
-SentenceAnnotation(562,597):  whether by contract or
-otherwise,
 TokenAnnotation(563,570): whether
 TokenAnnotation(571,573): by
 TokenAnnotation(574,582): contract
 TokenAnnotation(583,585): or
 TokenAnnotation(587,596): otherwise
 TokenAnnotation(596,597): ,
-SentenceAnnotation(597,605):  or (ii)
 TokenAnnotation(598,600): or
 TokenAnnotation(601,602): (
 TokenAnnotation(602,604): ii
 TokenAnnotation(604,605): )
-SentenceAnnotation(605,638):  ownership of fifty percent (50%)
 TokenAnnotation(606,615): ownership
 TokenAnnotation(616,618): of
 TokenAnnotation(619,624): fifty
@@ -153,8 +141,6 @@ TokenAnnotation(633,634): (
 TokenAnnotation(634,636): 50
 TokenAnnotation(636,637): %
 TokenAnnotation(637,638): )
-SentenceAnnotation(638,674):  or more of the
-outstanding shares,
 TokenAnnotation(639,641): or
 TokenAnnotation(642,646): more
 TokenAnnotation(647,649): of
@@ -162,12 +148,10 @@ TokenAnnotation(650,653): the
 TokenAnnotation(655,666): outstanding
 TokenAnnotation(667,673): shares
 TokenAnnotation(673,674): ,
-SentenceAnnotation(674,683):  or (iii)
 TokenAnnotation(675,677): or
 TokenAnnotation(678,679): (
 TokenAnnotation(679,682): iii
 TokenAnnotation(682,683): )
-SentenceAnnotation(683,720):  beneficial ownership of such entity.
 TokenAnnotation(684,694): beneficial
 TokenAnnotation(695,704): ownership
 TokenAnnotation(705,707): of
@@ -432,44 +416,13 @@ TokenAnnotation(1330,1331): B
 TokenAnnotation(1331,1332): .
 TokenAnnotation(1332,1333): I
 TokenAnnotation(1333,1334): .
-SentenceAnnotation(1334,1432):  
+SentenceAnnotation(1334,1902):  
 Apache 2.0.40 Red Hat Linux
 
 Phone numbers and dates:
 +1 023 555-5355
 1-555-555-0037
-(029)
-TokenAnnotation(1337,1343): Apache
-TokenAnnotation(1344,1345): 2
-TokenAnnotation(1345,1346): .
-TokenAnnotation(1346,1347): 0
-TokenAnnotation(1347,1348): .
-TokenAnnotation(1348,1350): 40
-TokenAnnotation(1351,1354): Red
-TokenAnnotation(1355,1358): Hat
-TokenAnnotation(1359,1364): Linux
-TokenAnnotation(1368,1373): Phone
-TokenAnnotation(1374,1381): numbers
-TokenAnnotation(1382,1385): and
-TokenAnnotation(1386,1391): dates
-TokenAnnotation(1391,1392): :
-TokenAnnotation(1394,1395): +
-TokenAnnotation(1395,1396): 1
-TokenAnnotation(1397,1400): 023
-TokenAnnotation(1401,1404): 555
-TokenAnnotation(1404,1405): -
-TokenAnnotation(1405,1409): 5355
-TokenAnnotation(1411,1412): 1
-TokenAnnotation(1412,1413): -
-TokenAnnotation(1413,1416): 555
-TokenAnnotation(1416,1417): -
-TokenAnnotation(1417,1420): 555
-TokenAnnotation(1420,1421): -
-TokenAnnotation(1421,1425): 0037
-TokenAnnotation(1427,1428): (
-TokenAnnotation(1428,1431): 029
-TokenAnnotation(1431,1432): )
-SentenceAnnotation(1432,1514):  555 2554 
+(029) 555 2554 
 03/20/2006
 20.03.2006
 11/2006
@@ -477,42 +430,7 @@ SentenceAnnotation(1432,1514):  555 2554
 0,12
 12,0
 ,,,
-1,000 1,
-TokenAnnotation(1433,1436): 555
-TokenAnnotation(1437,1441): 2554
-TokenAnnotation(1444,1446): 03
-TokenAnnotation(1446,1447): /
-TokenAnnotation(1447,1449): 20
-TokenAnnotation(1449,1450): /
-TokenAnnotation(1450,1454): 2006
-TokenAnnotation(1456,1458): 20
-TokenAnnotation(1458,1459): .
-TokenAnnotation(1459,1461): 03
-TokenAnnotation(1461,1462): .
-TokenAnnotation(1462,1466): 2006
-TokenAnnotation(1468,1470): 11
-TokenAnnotation(1470,1471): /
-TokenAnnotation(1471,1475): 2006
-TokenAnnotation(1477,1479): 02
-TokenAnnotation(1479,1480): -
-TokenAnnotation(1480,1482): 03
-TokenAnnotation(1482,1483): -
-TokenAnnotation(1483,1487): 2005
-TokenAnnotation(1489,1490): 0
-TokenAnnotation(1490,1491): ,
-TokenAnnotation(1491,1493): 12
-TokenAnnotation(1495,1497): 12
-TokenAnnotation(1497,1498): ,
-TokenAnnotation(1498,1499): 0
-TokenAnnotation(1501,1502): ,
-TokenAnnotation(1502,1503): ,
-TokenAnnotation(1503,1504): ,
-TokenAnnotation(1506,1507): 1
-TokenAnnotation(1507,1508): ,
-TokenAnnotation(1508,1511): 000
-TokenAnnotation(1512,1513): 1
-TokenAnnotation(1513,1514): ,
-SentenceAnnotation(1514,1902):  0
+1,000 1, 0
 12%
 12$
 $12
@@ -550,6 +468,70 @@ my–address 2013
 my—address 2014
 
 
+TokenAnnotation(1337,1343): Apache
+TokenAnnotation(1344,1345): 2
+TokenAnnotation(1345,1346): .
+TokenAnnotation(1346,1347): 0
+TokenAnnotation(1347,1348): .
+TokenAnnotation(1348,1350): 40
+TokenAnnotation(1351,1354): Red
+TokenAnnotation(1355,1358): Hat
+TokenAnnotation(1359,1364): Linux
+TokenAnnotation(1368,1373): Phone
+TokenAnnotation(1374,1381): numbers
+TokenAnnotation(1382,1385): and
+TokenAnnotation(1386,1391): dates
+TokenAnnotation(1391,1392): :
+TokenAnnotation(1394,1395): +
+TokenAnnotation(1395,1396): 1
+TokenAnnotation(1397,1400): 023
+TokenAnnotation(1401,1404): 555
+TokenAnnotation(1404,1405): -
+TokenAnnotation(1405,1409): 5355
+TokenAnnotation(1411,1412): 1
+TokenAnnotation(1412,1413): -
+TokenAnnotation(1413,1416): 555
+TokenAnnotation(1416,1417): -
+TokenAnnotation(1417,1420): 555
+TokenAnnotation(1420,1421): -
+TokenAnnotation(1421,1425): 0037
+TokenAnnotation(1427,1428): (
+TokenAnnotation(1428,1431): 029
+TokenAnnotation(1431,1432): )
+TokenAnnotation(1433,1436): 555
+TokenAnnotation(1437,1441): 2554
+TokenAnnotation(1444,1446): 03
+TokenAnnotation(1446,1447): /
+TokenAnnotation(1447,1449): 20
+TokenAnnotation(1449,1450): /
+TokenAnnotation(1450,1454): 2006
+TokenAnnotation(1456,1458): 20
+TokenAnnotation(1458,1459): .
+TokenAnnotation(1459,1461): 03
+TokenAnnotation(1461,1462): .
+TokenAnnotation(1462,1466): 2006
+TokenAnnotation(1468,1470): 11
+TokenAnnotation(1470,1471): /
+TokenAnnotation(1471,1475): 2006
+TokenAnnotation(1477,1479): 02
+TokenAnnotation(1479,1480): -
+TokenAnnotation(1480,1482): 03
+TokenAnnotation(1482,1483): -
+TokenAnnotation(1483,1487): 2005
+TokenAnnotation(1489,1490): 0
+TokenAnnotation(1490,1491): ,
+TokenAnnotation(1491,1493): 12
+TokenAnnotation(1495,1497): 12
+TokenAnnotation(1497,1498): ,
+TokenAnnotation(1498,1499): 0
+TokenAnnotation(1501,1502): ,
+TokenAnnotation(1502,1503): ,
+TokenAnnotation(1503,1504): ,
+TokenAnnotation(1506,1507): 1
+TokenAnnotation(1507,1508): ,
+TokenAnnotation(1508,1511): 000
+TokenAnnotation(1512,1513): 1
+TokenAnnotation(1513,1514): ,
 TokenAnnotation(1515,1516): 0
 TokenAnnotation(1518,1520): 12
 TokenAnnotation(1520,1521): %

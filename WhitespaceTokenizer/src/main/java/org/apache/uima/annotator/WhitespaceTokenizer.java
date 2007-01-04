@@ -154,7 +154,7 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
         }
 
         // check next token type so see if we have a sentence end
-        if ((nextCharType == CH_WHITESPACE) || (nextCharType == CH_NEWLINE)
+        if (((nextCharType == CH_WHITESPACE) || (nextCharType == CH_NEWLINE))
                 && (punctuations.contains(new String(new char[] { currentChar })))) {
           // terminate sentence
           createAnnotation(this.sentenceType, sentenceStart, currentCharPos + 1);
