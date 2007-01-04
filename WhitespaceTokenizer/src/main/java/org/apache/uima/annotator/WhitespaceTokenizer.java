@@ -262,10 +262,8 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
 
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.ibm.uima.analysis_engine.annotator.BaseAnnotator#initialize(com.ibm.uima.analysis_engine.annotator.AnnotatorContext)
+  /* (non-Javadoc)
+   * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#initialize(org.apache.uima.analysis_engine.annotator.AnnotatorContext)
    */
   public void initialize(AnnotatorContext aContext) throws AnnotatorInitializationException,
           AnnotatorConfigurationException {
@@ -280,10 +278,8 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
     this.logger.log(Level.INFO, "Whitespace tokenizer successfully initialized");
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.ibm.uima.analysis_engine.annotator.BaseAnnotator#typeSystemInit(com.ibm.uima.cas.TypeSystem)
+  /* (non-Javadoc)
+   * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#typeSystemInit(org.apache.uima.cas.TypeSystem)
    */
   public void typeSystemInit(TypeSystem aTypeSystem) throws AnnotatorInitializationException,
           AnnotatorConfigurationException {
