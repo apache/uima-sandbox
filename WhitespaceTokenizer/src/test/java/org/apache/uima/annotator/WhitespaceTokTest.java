@@ -23,7 +23,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
-import org.apache.uima.cas.text.TCAS;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.test.junit_extension.AnnotatorTester;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 
@@ -58,7 +58,7 @@ public class WhitespaceTokTest extends TestCase
 		String text = AnnotatorTester.readFileContent(JUnitExtension.getFile("testdoc.txt"), "UTF-8");
 		
 		//execute sample text
-		TCAS cas = this.annotTester.performTest(text,"en");
+		CAS cas = this.annotTester.performTest(text,"en");
 		
 		//define result interested in
 		String[] tofs = {"org.apache.uima.TokenAnnotation", "org.apache.uima.SentenceAnnotation"};
@@ -74,7 +74,7 @@ public class WhitespaceTokTest extends TestCase
     String text = AnnotatorTester.readFileContent(JUnitExtension.getFile("english.txt"), "UTF-8");
     
     //execute sample text
-    TCAS cas = this.annotTester.performTest(text,"en");
+    CAS cas = this.annotTester.performTest(text,"en");
     
     //define result interested in
     String[] tofs = {"org.apache.uima.TokenAnnotation", "org.apache.uima.SentenceAnnotation"};
