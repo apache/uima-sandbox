@@ -1,0 +1,136 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.uima.caseditor.ui.wizards;
+
+
+import org.apache.uima.caseditor.core.model.NlpProject;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+
+/**
+ * New wizard for nlp projects. TODO: exception handling TODO: refactor this
+ * wizard
+ * 
+ * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+ * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
+ */
+final public class NlpProjectWizard extends Wizard implements INewWizard
+{
+    /**
+     * The ID of the new nlp porject wizard.
+     */
+    public static final String ID = "net.sf.tae.wizards.NLPProjectWizard";
+    
+    private WizardNewProjectCreationPage mMainPage;
+    
+    /**
+     * Initializes the <code>NLPProjectWizard</code>.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection selection)
+    {
+        // setForcePreviousAndNextButtons(false); // remove comment later
+        setWindowTitle("New NLP project");
+    }
+    
+    /**
+     * Adds the project wizard page to the wizard.
+     */
+    @Override
+    public void addPages()
+    {
+        mMainPage = new WizardNewProjectCreationPage("NLPProject");
+        mMainPage.setTitle("Create a NLP project");
+        mMainPage.setDescription("Create a NLP project in the workspace");
+        addPage(mMainPage);
+    }
+    
+    /**
+     * Creates the nlp project.
+     */
+    @Override
+    public boolean performFinish()
+    {
+        // TODO: only return true if everyting goes well
+        IProject newNLPProject = mMainPage.getProjectHandle();
+        
+        createProject(newNLPProject, mMainPage.getLocationPath());
+        
+        
+        try
+        {
+            NlpProject.addNLPNature(newNLPProject);
+        }
+        catch (CoreException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        return true;
+    }
+    
+    private static void createProject(IProject project, IPath location)
+    {
+        if (!project.exists())
+        {
+            IProjectDescription projectDescribtion = project.getWorkspace()
+                    .newProjectDescription(project.getName());
+            
+            if (Platform.getLocation().equals(location))
+            {
+                location = null;
+            }
+            
+            projectDescribtion.setLocation(location);
+            
+            try
+            {
+                project.create(projectDescribtion, null);
+            }
+            catch (CoreException e)
+            {
+                // TODO: show error message
+                e.printStackTrace();
+            }
+            
+        }
+        
+        if (!project.isOpen())
+        {
+            try
+            {
+                project.open(null);
+            }
+            catch (CoreException e)
+            {
+                // TODO: show error message
+                e.printStackTrace();
+            }
+        }
+    }
+}

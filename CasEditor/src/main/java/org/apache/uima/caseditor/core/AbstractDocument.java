@@ -1,0 +1,200 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.uima.caseditor.core;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+
+import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.core.util.Span;
+import org.apache.uima.caseditor.core.util.UimaUtil;
+
+/**
+ * Abstract base class for document implementations.
+ * 
+ * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+ * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:25 $
+ */
+public abstract class AbstractDocument implements IDocument {
+  /**
+   * Contains the change listener objects.
+   */
+  private Set<IDocumentListener> mListener = new HashSet<IDocumentListener>();
+
+  /**
+   * Registers a change listerner.
+   * 
+   * @param listener
+   */
+  public void addChangeListener(final IDocumentListener listener) {
+    mListener.add(listener);
+  }
+
+  /**
+   * Unregisters a change listener.
+   * 
+   * @param listener
+   */
+  public void removeChangeListener(IDocumentListener listener) {
+    mListener.remove(listener);
+  }
+
+  public void addAnnotations(Collection<AnnotationFS> annotations) {
+    addFeatureStructures(UimaUtil.cast(annotations));
+  }
+
+  public void removeAnnotations(Collection<AnnotationFS> annotationsToRemove) {
+    removeFeatureStructures(UimaUtil.cast(annotationsToRemove));
+  }
+
+  public void updateAnnotations(Collection<AnnotationFS> annotations) {
+    updateFeatureStructure(UimaUtil.cast(annotations));
+  }
+
+  /**
+   * Sends an added message to registered listeners.
+   * 
+   * @param annotation
+   */
+  protected void fireAddedAnnotation(FeatureStructure annotation) {
+    for (IDocumentListener listener : mListener) {
+      listener.added(annotation);
+    }
+  }
+
+  /**
+   * Sends an added message to registered listeners.
+   * 
+   * @param annotations
+   */
+  protected void fireAddedAnnotation(Collection<FeatureStructure> annotations) {
+    for (IDocumentListener listener : mListener) {
+      listener.added(annotations);
+    }
+  }
+
+  /**
+   * Sends a removed message to registered listeners.
+   * 
+   * @param annotation
+   */
+  protected void fireRemovedAnnotation(FeatureStructure annotation) {
+    for (IDocumentListener listener : mListener) {
+      listener.removed(annotation);
+    }
+  }
+
+  /**
+   * Sends a removed message to registered listeners.
+   * 
+   * @param annotations
+   */
+  protected void fireRemovedAnnotations(Collection<FeatureStructure> annotations) {
+    for (IDocumentListener listener : mListener) {
+      listener.removed(annotations);
+    }
+  }
+
+  /**
+   * Sends an updated message to registered listeners.
+   * 
+   * @param annotation
+   */
+  protected void fireUpdatedFeatureStructure(FeatureStructure annotation) {
+    for (IDocumentListener listener : mListener) {
+      listener.updated(annotation);
+    }
+  }
+
+  /**
+   * Sends an updated message to registered listeners.
+   * 
+   * @param annotations
+   */
+  protected void fireUpdatedFeatureStructures(Collection<FeatureStructure> annotations) {
+    for (IDocumentListener listener : mListener) {
+      listener.updated(annotations);
+    }
+  }
+
+  /**
+   * Retrives the view map.
+   */
+  public Map<Integer, AnnotationFS> getView(Type annotationType) {
+    Collection<AnnotationFS> annotations = getAnnotations(annotationType);
+
+    HashMap<Integer, AnnotationFS> viewMap = new HashMap<Integer, AnnotationFS>();
+
+    for (AnnotationFS annotation : annotations) {
+      for (int i = annotation.getBegin(); i <= annotation.getEnd() - 1; i++) {
+        viewMap.put(i, annotation);
+      }
+    }
+
+    return viewMap;
+  }
+
+  /**
+   * Retrives the text in the given bounds.
+   */
+  public String getText(int start, int end) {
+    return getText().substring(start, end);
+  }
+
+  /**
+   * Retrives annotions of the given type in the given bounds.
+   */
+  public Collection<AnnotationFS> getAnnotation(Type type, Span span) {
+    Map<Integer, AnnotationFS> view = getView(type);
+
+    LinkedList<AnnotationFS> annotations = new LinkedList<AnnotationFS>();
+
+    for (int i = span.getStart(); i < span.getEnd(); i++) {
+      AnnotationFS annotation = view.get(i);
+
+      if (annotation == null) {
+        continue;
+      }
+
+      if (!annotation.getType().equals(type)) {
+        continue;
+      }
+
+      annotations.addLast(annotation);
+
+    }
+
+    TreeSet<AnnotationFS> set = new TreeSet<AnnotationFS>();
+
+    for (AnnotationFS annotation : annotations) {
+      set.add(annotation);
+    }
+
+    return set;
+  }
+}

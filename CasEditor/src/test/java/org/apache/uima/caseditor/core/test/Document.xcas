@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CAS>
+    <uima.cas.Sofa _indexed="0" _id="1" sofaNum="1"
+        sofaID="_InitialView" mimeType="text" sofaString="On March 15, there was an accident near Munich. The driver got badly&#xd;&#xa;injured. Driving alone not far from her home, the middle-aged woman&#xd;&#xa;crashed at high speed into a tree. A resident, who lives near the&#xd;&#xa;street where the accident took place, called instantly the police. He &#xd;&#xa;reported what had happened and gave his name and address to the officer.&#xd;&#xa;He's called Peter Schubert and he lives at Max-Löw-Straße 13 in&#xd;&#xa;84630 Gauting. The police arrived ten minutes later and brought&#xd;&#xa;the woman into hospital. Although she had multiple trauma, she's &#xd;&#xa;out of mortal danger.&#xd;&#xa;"/>
+    <uima.tcas.DocumentAnnotation _indexed="1" _id="12" _ref_sofa="1"
+        begin="0" end="572" language="x-unspecified"/>
+    <net.sf.tae.Token _indexed="1" _id="17" _ref_sofa="1" begin="0"
+        end="2" pos="IN"/>
+    <net.sf.tae.Token _indexed="1" _id="22" _ref_sofa="1" begin="9"
+        end="11" pos="CD"/>
+    <net.sf.tae.Token _indexed="1" _id="27" _ref_sofa="1" begin="11"
+        end="12" pos=","/>
+    <net.sf.tae.Token _indexed="1" _id="32" _ref_sofa="1" begin="13"
+        end="18" pos="EX"/>
+    <net.sf.tae.Token _indexed="1" _id="37" _ref_sofa="1" begin="19"
+        end="22" pos="VBD"/>
+    <net.sf.tae.Token _indexed="1" _id="42" _ref_sofa="1" begin="23"
+        end="25" pos="DT"/>
+    <net.sf.tae.Token _indexed="1" _id="47" _ref_sofa="1" begin="26"
+        end="34" pos="NN"/>
+    <net.sf.tae.Token _indexed="1" _id="52" _ref_sofa="1" begin="35"
+        end="39" pos="IN"/>
+    <net.sf.tae.Token _indexed="1" _id="57" _ref_sofa="1" begin="40"
+        end="46" pos="NNP"/>
+    <net.sf.tae.Token _indexed="1" _id="62" _ref_sofa="1" begin="46"
+        end="47" pos="."/>
+    <net.sf.tae.Token _indexed="1" _id="67" _ref_sofa="1" begin="48"
+        end="51" pos="DT"/>
+    <net.sf.tae.Token _indexed="1" _id="72" _ref_sofa="1" begin="52"
+        end="58" pos="NN"/>
+    <net.sf.tae.Token _indexed="1" _id="77" _ref_sofa="1" begin="59"
+        end="62" pos="VBD"/>
+    <net.sf.tae.Token _indexed="1" _id="82" _ref_sofa="1" begin="63"
+        end="68" pos="RB"/>
+    <net.sf.tae.Token _indexed="1" _id="87" _ref_sofa="1" begin="70"
+        end="77" pos="VBN"/>
+    <net.sf.tae.Token _indexed="1" _id="92" _ref_sofa="1" begin="77"
+        end="78" pos="."/>
+    <net.sf.tae.Token _indexed="1" _id="97" _ref_sofa="1" begin="79"
+        end="86" pos="VBG"/>
+    <net.sf.tae.Token _indexed="1" _id="102" _ref_sofa="1" begin="93"
+        end="96" pos="RB"/>
+    <net.sf.tae.Token _indexed="1" _id="107" _ref_sofa="1" begin="97"
+        end="100" pos="RB"/>
+    <net.sf.tae.Token _indexed="1" _id="112" _ref_sofa="1" begin="101"
+        end="105" pos="IN"/>
+    <net.sf.tae.Token _indexed="1" _id="117" _ref_sofa="1" begin="106"
+        end="109" pos="PRP$"/>
+    <net.sf.tae.Token _indexed="1" _id="122" _ref_sofa="1" begin="110"
+        end="114" pos="NN"/>
+    <net.sf.tae.Token _indexed="1" _id="127" _ref_sofa="1" begin="114"
+        end="115" pos=","/>
+    <net.sf.tae.Token _indexed="1" _id="132" _ref_sofa="1" begin="116"
+        end="119" pos="DT"/>
+    <net.sf.tae.Token _indexed="1" _id="137" _ref_sofa="1" begin="120"
+        end="131" pos="JJ"/>
+    <net.sf.tae.Token _indexed="1" _id="142" _ref_sofa="1" begin="132"
+        end="137" pos="NN"/>
+    <net.sf.tae.Token _indexed="1" _id="147" _ref_sofa="1" begin="147"
+        end="149" pos="IN"/>
+    <net.sf.tae.Token _indexed="1" _id="152" _ref_sofa="1" begin="139"
+        end="146" pos="VBD"/>
+    <net.sf.tae.Sentence _indexed="1" _id="157" _ref_sofa="1" begin="0" end="47"/>
+    <net.sf.tae.Sentence _indexed="1" _id="161" _ref_sofa="1" begin="48" end="78"/>
+    <net.sf.tae.Sentence _indexed="1" _id="165" _ref_sofa="1" begin="79" end="173"/>
+    <net.sf.tae.City _indexed="1" _id="169" _ref_sofa="1" begin="40" end="46"/>
+    <net.sf.tae.Address _indexed="1" _id="173" _ref_person="305"
+        _ref_street="301" _ref_city="297" _ref_zip="293"/>
+    <net.sf.tae.Parse _indexed="1" _id="178" _ref_sofa="1" begin="3"
+        end="11" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="183" _ref_sofa="1" begin="0"
+        end="11" type="PP"/>
+    <net.sf.tae.Parse _indexed="1" _id="188" _ref_sofa="1" begin="13"
+        end="18" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="193" _ref_sofa="1" begin="23"
+        end="34" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="198" _ref_sofa="1" begin="40"
+        end="46" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="203" _ref_sofa="1" begin="35"
+        end="46" type="PP"/>
+    <net.sf.tae.Parse _indexed="1" _id="208" _ref_sofa="1" begin="23"
+        end="46" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="213" _ref_sofa="1" begin="19"
+        end="46" type="VP"/>
+    <net.sf.tae.Parse _indexed="1" _id="218" _ref_sofa="1" begin="0"
+        end="47" type="S"/>
+    <net.sf.tae.Parse _indexed="1" _id="223" _ref_sofa="1" begin="48"
+        end="58" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="228" _ref_sofa="1" begin="63"
+        end="68" type="ADVP"/>
+    <net.sf.tae.Parse _indexed="1" _id="233" _ref_sofa="1" begin="70"
+        end="77" type="VP"/>
+    <net.sf.tae.Parse _indexed="1" _id="238" _ref_sofa="1" begin="59"
+        end="77" type="VP"/>
+    <net.sf.tae.Parse _indexed="1" _id="243" _ref_sofa="1" begin="48"
+        end="78" type="S"/>
+    <net.sf.tae.Parse _indexed="1" _id="248" _ref_sofa="1" begin="106"
+        end="114" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="253" _ref_sofa="1" begin="101"
+        end="114" type="PP"/>
+    <net.sf.tae.Parse _indexed="1" _id="258" _ref_sofa="1" begin="93"
+        end="114" type="ADVP"/>
+    <net.sf.tae.Parse _indexed="1" _id="263" _ref_sofa="1" begin="79"
+        end="114" type="VP"/>
+    <net.sf.tae.Parse _indexed="1" _id="268" _ref_sofa="1" begin="79"
+        end="114" type="S"/>
+    <net.sf.tae.Parse _indexed="1" _id="273" _ref_sofa="1" begin="116"
+        end="137" type="NP"/>
+    <net.sf.tae.Parse _indexed="1" _id="278" _ref_sofa="1" begin="147"
+        end="172" type="PP"/>
+    <net.sf.tae.Parse _indexed="1" _id="283" _ref_sofa="1" begin="139"
+        end="172" type="VP"/>
+    <net.sf.tae.Parse _indexed="1" _id="288" _ref_sofa="1" begin="79"
+        end="173" type="S"/>
+    <net.sf.tae.Zip _id="293" _ref_sofa="1" begin="417" end="422"/>
+    <net.sf.tae.City _id="297" _ref_sofa="1" begin="423" end="430"/>
+    <net.sf.tae.Street _id="301" _ref_sofa="1" begin="395" end="412"/>
+    <net.sf.tae.Person _id="305" _ref_sofa="1" begin="364" end="378"/>
+</CAS>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension 
+		point="org.eclipse.core.resources.natures" 
+		id="NLPProject"
+		name="NLP Nature">
+		<runtime>
+			<run class="org.apache.uima.caseditor.core.model.NlpProject"/>
+		</runtime>
+	</extension>
+	
+	 <extension
+	       id="problem"
+	       name="Problem"
+	       point="org.eclipse.core.resources.markers">
+		<super type="org.eclipse.core.resources.problemmarker"/>
+	    <persistent value="false"/>
+	 </extension>
+</plugin>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<typeSystemDescription xmlns="http://uima.watson.ibm.com/resourceSpecifier">
+	<name>TutorialTypeSystemTutorialTypeSystem</name>
+	<description>Sample project typesystem</description>
+	<version>1.0</version>
+	<vendor>IBM</vendor>
+	<types>
+		<typeDescription>
+			<name>net.sf.tae.Test</name>
+			<description>a test</description>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+		</typeDescription>
+</types>
+</typeSystemDescription>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<fsIndexDescription>
+	<label>TOPIndex</label>
+	<typeName>uima.cas.TOP</typeName>
+	<kind>sorted</kind>
+</fsIndexDescription>

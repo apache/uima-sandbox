@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collectionReaderDescription  xmlns="http://uima.watson.ibm.com/resourceSpecifier">
+	<frameworkImplementation>com.ibm.uima.java</frameworkImplementation>
+	<implementationName>net.sf.tae.uima.CorporaCollectionReader</implementationName>
+	<processingResourceMetaData>
+		<name>Corpora Collection Reader</name>
+		<description></description>
+		<version>1.0</version>
+		<vendor>Calcucare GmbH</vendor>
+	</processingResourceMetaData>
+</collectionReaderDescription>
