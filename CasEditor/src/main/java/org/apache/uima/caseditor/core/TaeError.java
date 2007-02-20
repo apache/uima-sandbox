@@ -21,9 +21,6 @@ package org.apache.uima.caseditor.core;
 
 /**
  * A general {@link RuntimeException} which is thrown if something unexpected happens.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public class TaeError extends RuntimeException {
   /**

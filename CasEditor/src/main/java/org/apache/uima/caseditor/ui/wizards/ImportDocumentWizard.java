@@ -27,9 +27,6 @@ import org.eclipse.ui.IWorkbench;
 /**
  * read files, convert them and save them in the folder select project select
  * dst folder select src
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 public final class ImportDocumentWizard extends Wizard implements IImportWizard
 {

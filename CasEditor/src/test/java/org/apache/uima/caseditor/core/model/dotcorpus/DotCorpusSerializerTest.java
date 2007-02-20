@@ -19,21 +19,23 @@
 
 package org.apache.uima.caseditor.core.model.dotcorpus;
 
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
 import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpus;
 import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpusSerializer;
+import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle.Style;
 import org.eclipse.core.runtime.CoreException;
+import org.junit.Test;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public class DotCorpusSerializerTest {
   /**

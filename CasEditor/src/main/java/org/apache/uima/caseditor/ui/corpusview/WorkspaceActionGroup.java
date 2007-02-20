@@ -21,9 +21,8 @@ package org.apache.uima.caseditor.ui.corpusview;
 
 import java.util.Iterator;
 
-
-import org.apache.uima.caseditor.ui.Images;
-import org.apache.uima.caseditor.ui.TaeUiPlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
@@ -41,9 +40,6 @@ import org.eclipse.ui.ide.IDEActionFactory;
 
 /**
  * This group contains workspace actions.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class WorkspaceActionGroup extends ActionGroup
 {
@@ -102,11 +98,11 @@ final class WorkspaceActionGroup extends ActionGroup
         mRetargetRefreshAction = ActionFactory.REFRESH.create(window);
         
         mRetargetRefreshAction.setImageDescriptor(
-                TaeUiPlugin.getTaeImageDescriptor(
+                CasEditorPlugin.getTaeImageDescriptor(
                 Images.EXPLORER_E_REFRESH));
 
         mRetargetRefreshAction.setDisabledImageDescriptor(
-                TaeUiPlugin.getTaeImageDescriptor(
+                CasEditorPlugin.getTaeImageDescriptor(
                 Images.EXPLORER_D_REFRESH));
     }
     

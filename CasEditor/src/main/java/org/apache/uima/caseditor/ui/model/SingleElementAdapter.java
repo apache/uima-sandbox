@@ -20,15 +20,12 @@
 package org.apache.uima.caseditor.ui.model;
 
 
-import org.apache.uima.caseditor.ui.Images;
-import org.apache.uima.caseditor.ui.TaeUiPlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * The <code>IWorkbenchAdapter</code> for the <code>AnnotatorElement</code>.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 class SingleElementAdapter extends
         AbstractElementAdapter
@@ -48,6 +45,6 @@ class SingleElementAdapter extends
      */
     public ImageDescriptor getImageDescriptor(Object object)
     {
-        return TaeUiPlugin.getTaeImageDescriptor(Images.MODEL_DOCUMENT);
+        return CasEditorPlugin.getTaeImageDescriptor(Images.MODEL_DOCUMENT);
     }
 }

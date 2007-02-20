@@ -27,9 +27,6 @@ import org.eclipse.core.runtime.PlatformObject;
 
 /**
  * The abstract base class of all nlp element implementations.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public abstract class AbstractNlpElement extends PlatformObject implements INlpElement {
   /**

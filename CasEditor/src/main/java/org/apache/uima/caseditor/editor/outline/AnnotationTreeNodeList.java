@@ -24,16 +24,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 15:00:58 $
  */
 public class AnnotationTreeNodeList {
   private List<AnnotationTreeNode> mElements = new ArrayList<AnnotationTreeNode>();
@@ -66,7 +62,7 @@ public class AnnotationTreeNodeList {
     if (mElements.contains(node)) {
       // insert childs in the list
       // remove the node from the list
-      AnnotationTreeNode nodeFromList = mElements.get(mElements.indexOf(node));
+      // AnnotationTreeNode nodeFromList = mElements.get(mElements.indexOf(node));
     } else {
       // search the node
     }

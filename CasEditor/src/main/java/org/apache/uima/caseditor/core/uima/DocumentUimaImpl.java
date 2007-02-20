@@ -19,16 +19,19 @@
 
 package org.apache.uima.caseditor.core.uima;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.ConstraintFactory;
@@ -43,8 +46,9 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.XCASDeserializer;
 import org.apache.uima.cas.impl.XCASSerializer;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.AbstractDocument;
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.util.Span;
 import org.eclipse.core.runtime.CoreException;
@@ -52,14 +56,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.xml.sax.SAXException;
 
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+
 /**
  * TODO: add javdoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public class DocumentUimaImpl extends AbstractDocument {
   private CAS mCAS;
+private DocumentElement mDocumentElement;
 
   /**
    * Initializes a new instance.
@@ -71,14 +76,14 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Retrives the {@link TCAS}.
+   * Retrives the {@link CAS}.
    */
   public CAS getCAS() {
     return mCAS;
   }
 
   /**
-   * Adds the given annotation to the {@link TCAS}.
+   * Adds the given annotation to the {@link CAS}.
    */
   public void addFeatureStructure(FeatureStructure annotation) {
     mCAS.getIndexRepository().addFS(annotation);
@@ -103,7 +108,7 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Internally removes an annoation from the {@link TCAS}.
+   * Internally removes an annoation from the {@link CAS}.
    * 
    * @param featureStructure
    */
@@ -112,7 +117,7 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Removes the annoations from the {@link TCAS}.
+   * Removes the annoations from the {@link CAS}.
    */
   public void removeFeatureStructure(FeatureStructure annotation) {
     removeAnnotationInternal(annotation);
@@ -121,7 +126,7 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Removes the given annotations from the {@link TCAS}.
+   * Removes the given annotations from the {@link CAS}.
    */
   public void removeFeatureStructures(Collection<FeatureStructure> annotationsToRemove) {
     for (FeatureStructure annotationToRemove : annotationsToRemove) {
@@ -146,7 +151,7 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Retrives annoations of the given type from the {@link TCAS}.
+   * Retrives annoations of the given type from the {@link CAS}.
    */
   public Collection<AnnotationFS> getAnnotations(Type type) {
     FSIndex annotationIndex = mCAS.getAnnotationIndex(type);
@@ -239,19 +244,19 @@ public class DocumentUimaImpl extends AbstractDocument {
     } catch (IOException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     } catch (ParserConfigurationException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     } catch (SAXException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }
@@ -261,21 +266,47 @@ public class DocumentUimaImpl extends AbstractDocument {
    * Serializes the {@link CAS} to the given {@link OutputStream} in the XCAS format.
    */
   public void serialize(OutputStream out) throws CoreException {
-    
+    XCASSerializer xcasSerializer = new XCASSerializer(mCAS.getTypeSystem());
+
+    OutputStreamWriter writer;
+
     try {
-      XCASSerializer.serialize(mCAS, out);
+      writer = new OutputStreamWriter(out, "UTF-8");
+    } catch (UnsupportedEncodingException e1) {
+      // TODO: handle this exception
+      throw new RuntimeException(e1);
+    }
+
+    XMLSerializer xmlSerialzer = new XMLSerializer(writer, new OutputFormat("XML", "UTF-8", true));
+
+    try {
+      xcasSerializer.serialize(mCAS, xmlSerialzer);
     } catch (IOException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     } catch (SAXException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }
   }
+
+  public void save() throws CoreException {
+	    ByteArrayOutputStream outStream = new ByteArrayOutputStream(40000);
+	    
+	    serialize(outStream);
+	    
+	    InputStream stream = new ByteArrayInputStream(outStream.toByteArray());
+
+	    mDocumentElement.getResource().setContents(stream, true, false, null);
+  }
+  
+	public void setDocumentElement(DocumentElement element) {
+		mDocumentElement = element;
+	}
 }

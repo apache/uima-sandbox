@@ -30,8 +30,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -46,9 +45,6 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
  * This class is responsible to read and write {@link DotCorpus} objects from or to a byte stream.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public class DotCorpusSerializer {
   private static final String CHARSET = "UTF-8";
@@ -96,7 +92,7 @@ public class DotCorpusSerializer {
     } catch (ParserConfigurationException e) {
       String message = ("This should never happen:" + e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }
@@ -108,13 +104,13 @@ public class DotCorpusSerializer {
     } catch (SAXException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     } catch (IOException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }
@@ -172,7 +168,7 @@ public class DotCorpusSerializer {
       } else {
         String message = ("Unexpected element: " + corporaChildElement.getNodeName());
 
-        IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, null);
+        IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, null);
 
         throw new CoreException(s);
       }
@@ -198,7 +194,7 @@ public class DotCorpusSerializer {
     } catch (UnsupportedEncodingException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }
@@ -263,7 +259,7 @@ public class DotCorpusSerializer {
     } catch (SAXException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }

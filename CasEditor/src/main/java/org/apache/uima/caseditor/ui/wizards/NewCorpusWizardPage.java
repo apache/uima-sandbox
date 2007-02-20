@@ -29,9 +29,6 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class NewCorpusWizardPage extends WizardPage
 {

@@ -19,13 +19,14 @@
 
 package org.apache.uima.caseditor.core.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.apache.uima.caseditor.core.util.Span;
+import org.junit.Test;
 
 /**
  * Unit test for the <code>Span</code> class.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public class SpanTest {
   /**

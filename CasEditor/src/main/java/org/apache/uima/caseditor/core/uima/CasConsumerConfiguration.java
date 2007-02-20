@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.core.uima;
 
 import java.net.MalformedURLException;
 
-
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.caseditor.core.model.ConsumerElement;
@@ -35,9 +34,6 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public final class CasConsumerConfiguration {
   private CasConsumerDescription mCasConsumerDescriptor;

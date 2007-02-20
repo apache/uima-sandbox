@@ -23,12 +23,6 @@ package org.apache.uima.caseditor.editor.properties;
 import org.apache.uima.cas.ByteArrayFS;
 import org.apache.uima.caseditor.editor.ModelFeatureStructure;
 
-/**
- * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:57 $
- */
 class ByteArrayPropertySource extends AbstractArrayPropertySource {
   ByteArrayPropertySource(ModelFeatureStructure structure) {
     super(structure);

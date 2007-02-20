@@ -25,9 +25,6 @@ import org.apache.uima.caseditor.editor.ModelFeatureStructure;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:57 $
  */
 public class FloatArrayPropertySource extends AbstractArrayPropertySource {
   FloatArrayPropertySource(ModelFeatureStructure structure) {

@@ -27,9 +27,6 @@ import org.apache.uima.cas.text.AnnotationFS;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public class UimaUtil {
   /**

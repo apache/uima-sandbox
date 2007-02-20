@@ -19,9 +19,7 @@
 
 package org.apache.uima.caseditor.ui.corpusview;
 
-
-
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -52,9 +50,6 @@ import org.eclipse.ui.views.navigator.LocalSelectionTransfer;
 /**
  * The corpus explorer is a view which knows how to display and handle the nlp
  * model elements.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:37:51 $
  */
 public final class CorpusExplorerView extends ViewPart
 {
@@ -62,7 +57,7 @@ public final class CorpusExplorerView extends ViewPart
     /**
      * The ID of the <code>CorpusExplorerView</code>.
      */
-    public final static String ID = "net.sf.tae.corpusview";
+    public final static String ID = "org.apache.uima.caseditor.corpusview";
     
     private TreeViewer mTreeViewer;
     
@@ -90,12 +85,12 @@ public final class CorpusExplorerView extends ViewPart
         
         initContextMenu();
         
-        mTreeViewer.setInput(TaeCorePlugin.getNlpModel());
+        mTreeViewer.setInput(CasEditorPlugin.getNlpModel());
         
         mModelChangeListener = new ModelChangeListener(
                 mTreeViewer);
         
-        TaeCorePlugin.getNlpModel().addNlpModelChangeListener(mModelChangeListener);
+        CasEditorPlugin.getNlpModel().addNlpModelChangeListener(mModelChangeListener);
         
         mTreeViewer.setSorter(new CorpusSorter());
         

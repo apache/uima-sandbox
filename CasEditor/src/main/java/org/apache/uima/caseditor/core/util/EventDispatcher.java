@@ -25,8 +25,6 @@ import java.util.Map;
 /**
  * The EventDispatcher routs received events to the registered handler objects.
  * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:26 $
  * @param <K>
  *          the key type
  * @param <E>

@@ -27,10 +27,6 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
-/**
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:57 $
- */
 abstract class AbstractArrayPropertySource implements IPropertySource {
   private ModelFeatureStructure mStructure;
 

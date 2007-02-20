@@ -26,9 +26,6 @@ import org.apache.uima.cas.Type;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public class EditorAnnotationStatus {
   private Type mMode;

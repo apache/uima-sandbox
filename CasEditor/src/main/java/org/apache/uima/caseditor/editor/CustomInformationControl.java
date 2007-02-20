@@ -35,9 +35,6 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:55 $
  */
 public class CustomInformationControl implements IInformationControl, IInformationControlExtension2 {
   private Shell mShell;

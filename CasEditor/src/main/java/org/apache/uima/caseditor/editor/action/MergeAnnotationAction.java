@@ -32,9 +32,6 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
  * 
  * TODO: also merge features - if one is null or primitive has default value take the the other one -
  * in conflict case do nothing
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:53 $
  */
 public class MergeAnnotationAction extends BaseSelectionListenerAction {
   private IDocument mDocument;

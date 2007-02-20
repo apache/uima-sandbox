@@ -19,23 +19,17 @@
 
 package org.apache.uima.caseditor.editor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.INlpElement;
-import org.eclipse.core.filebuffers.manipulation.ContainerCreator;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -46,9 +40,6 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.4 $, $Date: 2007/01/04 15:08:52 $
  */
 public class AnnotationDocumentProvider extends FileDocumentProvider implements
         IDocumentProviderExtension {
@@ -68,7 +59,7 @@ public class AnnotationDocumentProvider extends FileDocumentProvider implements
 
     IFile file = ((IFileEditorInput) editorInput).getFile();
 
-    INlpElement element = TaeCorePlugin.getNlpModel().findMember(file);
+    INlpElement element = CasEditorPlugin.getNlpModel().findMember(file);
 
     if (!(element instanceof DocumentElement)) {
       IStatus status = new Status(IStatus.INFO, PlatformUI.PLUGIN_ID, IStatus.OK,
@@ -88,7 +79,7 @@ public class AnnotationDocumentProvider extends FileDocumentProvider implements
     org.apache.uima.caseditor.core.IDocument workingCopy;
 
     try {
-      workingCopy = documentElement.getWorkingCopy();
+      workingCopy = documentElement.getDocument();
     } catch (CoreException e) {
       IStatus status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.OK,
               "There is a problem with the typesystem, document could "
@@ -116,16 +107,10 @@ public class AnnotationDocumentProvider extends FileDocumentProvider implements
       IFileEditorInput input = (IFileEditorInput) element;
 
       FileInfo info = (FileInfo) getElementInfo(element);
+      
       IFile file = input.getFile();
 
       AnnotationDocument annotationDocument = (AnnotationDocument) document;
-
-      ByteArrayOutputStream outStream = new ByteArrayOutputStream(40000);
-      annotationDocument.serialize(outStream);
-
-      InputStream stream = new ByteArrayInputStream(outStream.toByteArray());
-
-      if (file.exists()) {
 
         if (info != null && !overwrite) {
           checkSynchronizationState(info.fModificationStamp, file);
@@ -133,7 +118,8 @@ public class AnnotationDocumentProvider extends FileDocumentProvider implements
 
         fireElementStateChanging(element);
         try {
-          file.setContents(stream, overwrite, true, monitor);
+          // file.setContents(stream, overwrite, true, monitor);
+        	annotationDocument.save();
         } catch (CoreException e) {
           fireElementStateChangeFailed(element);
           throw e;
@@ -149,18 +135,6 @@ public class AnnotationDocumentProvider extends FileDocumentProvider implements
           info.fModificationStamp = computeModificationStamp(file);
         }
 
-      } else {
-        try {
-          monitor.beginTask("saving", 2000);
-          ContainerCreator creator = 
-                  new ContainerCreator(file.getWorkspace(), file.getParent()
-                  .getFullPath());
-          creator.createContainer(new SubProgressMonitor(monitor, 1000));
-          file.create(stream, false, new SubProgressMonitor(monitor, 1000));
-        } finally {
-          monitor.done();
-        }
-      }
     } else {
       super.doSaveDocument(monitor, element, document, overwrite);
     }

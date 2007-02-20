@@ -28,9 +28,6 @@ import org.apache.uima.cas.text.AnnotationFS;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public class ContainingConstraint implements FSMatchConstraint {
   private static final long serialVersionUID = 1;

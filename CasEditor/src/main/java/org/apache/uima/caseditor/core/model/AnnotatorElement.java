@@ -21,10 +21,9 @@ package org.apache.uima.caseditor.core.model;
 
 import java.io.File;
 
-
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.analysis_engine.TaeDescription;
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
 import org.apache.uima.caseditor.core.util.MarkerUtil;
@@ -39,9 +38,6 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public class AnnotatorElement extends AbstractNlpElement {
   private UimaConfigurationElement mParent;
@@ -50,24 +46,35 @@ public class AnnotatorElement extends AbstractNlpElement {
 
   private AnnotatorConfiguration mAnnotatorConfig;
 
-  AnnotatorElement(UimaConfigurationElement config, IFile annotatorFile) throws CoreException {
+  /**
+   * Initializes the current instance.
+   * 
+   * @param config
+   * @param annotatorFile
+   */
+  AnnotatorElement(UimaConfigurationElement config, IFile annotatorFile) {
     mParent = config;
     mAnnotatorResource = annotatorFile;
 
     mAnnotatorConfig = createAnnotatorConfiguration();
   }
 
+  /**
+   * Retrives the {@link AnnotatorConfiguration}.
+   * 
+   * @return the {@link AnnotatorConfiguration}
+   */
   public AnnotatorConfiguration getAnnotatorConfiguration() {
     return mAnnotatorConfig;
   }
 
-  private AnnotatorConfiguration createAnnotatorConfiguration() throws CoreException {
+  private AnnotatorConfiguration createAnnotatorConfiguration() {
     Runnable clearMarkers = new Runnable() {
       public void run() {
         try {
           MarkerUtil.clearMarkers(mAnnotatorResource, MarkerUtil.PROBLEM_MARKER);
         } catch (CoreException e) {
-          TaeCorePlugin.log(e);
+          CasEditorPlugin.log(e);
         }
       }
     };
@@ -82,7 +89,7 @@ public class AnnotatorElement extends AbstractNlpElement {
           try {
             MarkerUtil.clearMarkers(mAnnotatorResource, e2.getMessage());
           } catch (CoreException e) {
-            TaeCorePlugin.log(e);
+            CasEditorPlugin.log(e);
           }
         }
       };
@@ -99,8 +106,8 @@ public class AnnotatorElement extends AbstractNlpElement {
         public void run() {
           try {
             MarkerUtil.createMarker(mAnnotatorResource, e.getMessage());
-          } catch (CoreException e) {
-            TaeCorePlugin.log(e);
+          } catch (CoreException e2) {
+            CasEditorPlugin.log(e2);
           }
         }
       };
@@ -111,7 +118,7 @@ public class AnnotatorElement extends AbstractNlpElement {
 
     // TODO: refactor here
     AnnotatorConfiguration annotatorConfiguration = new AnnotatorConfiguration(
-            (TaeDescription) specifier);
+            (AnalysisEngineDescription) specifier); // cast is unsafe !!!
 
     annotatorConfiguration.setBaseFolder((IFolder) mParent.getResource());
 
@@ -137,18 +144,30 @@ public class AnnotatorElement extends AbstractNlpElement {
     // just do nothing, no childs
   }
 
+  /**
+   * Retrives the name.
+   */
   public String getName() {
     return getResource().getName();
   }
 
+  /**
+   * Retrives the nlp projects.
+   */
   public NlpProject getNlpProject() {
     return getParent().getNlpProject();
   }
 
+  /**
+   * Retrives the parent.
+   */
   public INlpElement getParent() {
     return mParent;
   }
 
+  /**
+   * Retrives the underlying resoruce.
+   */
   public IResource getResource() {
     return mAnnotatorResource;
   }

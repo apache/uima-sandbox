@@ -30,9 +30,6 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
  * 
  * TODO: create a FeatureStructreSelection class (AnnotationSelection) should then extend it and use
  * it for this class
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:53 $
  */
 public class DeleteFeatureStructureAction extends BaseSelectionListenerAction {
   private IDocument mDocument;

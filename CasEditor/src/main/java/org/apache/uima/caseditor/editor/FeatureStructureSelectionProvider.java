@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.IDocument;
@@ -38,9 +37,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 /**
  * This class is a {@link ISelectionProvider} and informs its listeners about the currently selected
  * {@link FeatureStructure}s.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:55 $
  */
 class FeatureStructureSelectionProvider implements ISelectionProvider {
 

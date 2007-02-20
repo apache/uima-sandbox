@@ -27,15 +27,12 @@ import org.xml.sax.SAXParseException;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public final class MarkerUtil {
   /**
    * ID of the problem marker.
    */
-  public static final String PROBLEM_MARKER = "net.sf.tae.core.problem";
+  public static final String PROBLEM_MARKER = "org.apache.uima.caseditor.core.problem";
 
   private MarkerUtil() {
     // util class

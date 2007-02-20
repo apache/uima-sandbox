@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Vector;
 
-
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
@@ -38,9 +37,6 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * This {@link IPropertySource} Source provides information about a {@link FeatureStructure}.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:57 $
  */
 class FeatureStructurePropertySource implements IPropertySource {
   private ModelFeatureStructure mStructure;
@@ -64,7 +60,7 @@ class FeatureStructurePropertySource implements IPropertySource {
    * @return null
    */
   public Object getEditableValue() {
-    return "test";
+    return null;
   }
 
   public IPropertyDescriptor[] getPropertyDescriptors() {

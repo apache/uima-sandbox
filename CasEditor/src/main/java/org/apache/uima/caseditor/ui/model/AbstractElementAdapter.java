@@ -26,9 +26,6 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * The abstract base class for all NLPElement based
  * <code>IWorkbenchAdapter</code>s.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 abstract class AbstractElementAdapter implements IWorkbenchAdapter
 {

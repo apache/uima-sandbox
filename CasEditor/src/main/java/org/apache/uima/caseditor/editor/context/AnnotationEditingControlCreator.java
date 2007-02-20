@@ -29,11 +29,16 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:58 $
  */
 public class AnnotationEditingControlCreator implements IInformationControlCreator {
+  
+  /**
+   * Creates the information control.
+   * 
+   * @param parent 
+   * 
+   * @return the new control
+   */
   public IInformationControl createInformationControl(Shell parent) {
     final ICustomInformationControlContentHandler contentHandler = new ICustomInformationControlContentHandler() {
 

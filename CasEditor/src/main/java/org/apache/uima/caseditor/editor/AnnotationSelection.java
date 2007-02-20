@@ -20,13 +20,14 @@
 package org.apache.uima.caseditor.editor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
-
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.uima.AnnotationComparator;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 
@@ -35,15 +36,28 @@ import org.eclipse.jface.viewers.StructuredSelection;
  * {@link IStructuredSelection}.
  * 
  * Its also possible to retrive the frist and last annotation
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:54 $
  */
 public class AnnotationSelection {
-  private List<AnnotationFS> mAnnotations;
 
+  private List<AnnotationFS> mAnnotations;
+  
   /**
-   * Initializes a the current instance with all AnnotationFS obejct that are contained in the
+   * Initializes the current instance.
+   * 
+   * @param structures
+   */
+  public AnnotationSelection(Collection<FeatureStructure> structures) {
+    mAnnotations = new ArrayList<AnnotationFS>(structures.size());
+    
+    for (FeatureStructure structure : structures) {
+      add(structure);
+    }
+    
+    Collections.sort(mAnnotations, new AnnotationComparator());
+  }
+  
+  /**
+   * Initializes a the current instance with all AnnotationFS object that are contained in the
    * {@link StructuredSelection}.
    * 
    * Note: {@link AnnotationFS} instances will be sorted in this selection, the natural odering of
@@ -52,41 +66,41 @@ public class AnnotationSelection {
    * @param selection
    */
   public AnnotationSelection(IStructuredSelection selection) {
+
     mAnnotations = new ArrayList<AnnotationFS>(selection.size());
 
-    for (Object item : selection.toList()) {
-      AnnotationFS annotation = null;
-
-      if (item instanceof IAdaptable) {
-        annotation = (AnnotationFS) ((IAdaptable) item).getAdapter(AnnotationFS.class);
-      }
-
-      if (annotation != null) {
-        mAnnotations.add(annotation);
-      }
+    for (Iterator<FeatureStructure> it = new FeatureStructureSelectionIterator(selection); 
+        it.hasNext();) {
+      add(it.next());
     }
-
+    
     Collections.sort(mAnnotations, new AnnotationComparator());
   }
 
+  private void add(FeatureStructure structure) {
+    if (structure instanceof AnnotationFS) {
+      mAnnotations.add((AnnotationFS) structure);
+    }
+  }
+  
   /**
-   * Retrives the size of the selection.
+   * Indicates that the selection is empty.
+   * 
+   * @return true if emtpy
+   */
+  public boolean isEmpty() {
+    return size() == 0;
+  }
+  
+  /**
+   * Retrives the size of the collection.
    * 
    * @return the size
    */
   public int size() {
     return mAnnotations.size();
   }
-
-  /**
-   * Indicates that the selection contains no elements.
-   * 
-   * @return true if empty
-   */
-  public boolean isEmtpy() {
-    return size() == 0;
-  }
-
+  
   /**
    * Retrives the first selected element.
    * 
@@ -95,7 +109,7 @@ public class AnnotationSelection {
    * @return the last element
    */
   public AnnotationFS getFirst() {
-    return mAnnotations.isEmpty() ? null : mAnnotations.get(0);
+    return isEmpty() ? null : mAnnotations.get(0);
   }
 
   /**
@@ -106,7 +120,7 @@ public class AnnotationSelection {
    * @return the last element
    */
   public AnnotationFS getLast() {
-    return mAnnotations.isEmpty() ? null : mAnnotations.get(size() - 1);
+    return isEmpty() ? null : mAnnotations.get(size() - 1);
   }
 
   /**
@@ -117,6 +131,15 @@ public class AnnotationSelection {
    * @return all selected {@link AnnotationFS} objects
    */
   public List<AnnotationFS> toList() {
-    return Collections.unmodifiableList(mAnnotations);
+    return (List<AnnotationFS>) Collections.unmodifiableList(mAnnotations);
+  }
+  
+  /**
+   * Retrives a human readable string.
+   * @return humand readable string
+   */
+  @Override
+  public String toString() {
+    return mAnnotations.toString();
   }
 }

@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.ui.corpusview;
 
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.delta.INlpModelChangeListener;
@@ -34,9 +33,6 @@ import org.eclipse.swt.widgets.Display;
 /**
  * The ModelChangeListener listens for changes on the nlp
  * model and updates the workspace tree.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 class ModelChangeListener implements
         INlpModelChangeListener

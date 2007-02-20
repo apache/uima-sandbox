@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.ui.property;
 import java.awt.Color;
 import java.util.Vector;
 
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
@@ -52,9 +51,6 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * This is the <code>AnnotationPropertyPage</code>. this page configures 
  * the project dependent and type dependent annotation appaereance in the 
  * <code>AnnotationEditor</code>.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 public class AnnotationPropertyPage extends PropertyPage
 {

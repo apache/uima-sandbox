@@ -31,9 +31,6 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * Provide the labels for the given {@link FeatureStructure}s.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:57 $
  */
 public final class FeatureStructureLabelProvider implements ILabelProvider {
   public String getText(Object element) {

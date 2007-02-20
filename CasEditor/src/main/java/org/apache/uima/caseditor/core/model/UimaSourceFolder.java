@@ -30,9 +30,6 @@ import org.eclipse.core.runtime.IAdaptable;
 /**
  * The UimaSourceFolder contains folders, each of these folders can contain uima consumer or
  * annoatator configurations.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public class UimaSourceFolder extends AbstractNlpElement implements IAdaptable {
   private NlpProject mProject;

@@ -30,9 +30,6 @@ import org.eclipse.ui.IPerspectiveFactory;
 /**
  * This <code>PerspectiveFactory</code> generates the intial layout
  * for the NLP perspective.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.1 $, $Date: 2007/01/04 14:37:53 $
  */
 public class NlpPerspectiveFactory implements IPerspectiveFactory
 {

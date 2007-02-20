@@ -42,9 +42,6 @@ import org.eclipse.ui.ide.IDEActionFactory;
 
 /**
  * Main corpus explorer action group.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class CorpusExplorerActionGroup extends ActionGroup implements
         ICorpusExplorerActionGroup

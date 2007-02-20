@@ -26,9 +26,6 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:53 $
  */
 public class CellEditorValidatorFacotory {
   private static Map<Class, ICellEditorValidator> sValidatorMap = new HashMap<Class, ICellEditorValidator>();

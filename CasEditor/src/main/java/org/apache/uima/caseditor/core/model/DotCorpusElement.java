@@ -25,9 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 
-
 import org.apache.uima.cas.Type;
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
 import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpus;
 import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpusSerializer;
@@ -40,12 +39,7 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * The <code>DotCorpus</code> is responseibil to load/store the project dependent configuration.
- * It has serveral methods to set and retrive configuration parameters. TODO: What can be done if
- * the dot corpus file is missing or not parsebale att all ?. How should the error be reported ? How
- * do the guys from jdt do this ?
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7.2.2 $, $Date: 2007/01/04 14:56:25 $
+ * It has serveral methods to set and retrive configuration parameters.
  */
 public class DotCorpusElement extends AbstractNlpElement {
   private DotCorpus mDotCorpus;
@@ -286,19 +280,24 @@ public class DotCorpusElement extends AbstractNlpElement {
    */
   @Override
   public boolean equals(Object object) {
+    
+    boolean result;
+    
     if (this == object) {
-      return true;
+      result = true;
     }
-
-    if (object != null && object instanceof DotCorpusElement) {
+    else if (object instanceof DotCorpusElement) {
 
       DotCorpusElement element = (DotCorpusElement) object;
 
-      return mDotCorpus.equals(element.mDotCorpus) && mResource.equals(element.mResource)
+      result = mDotCorpus.equals(element.mDotCorpus) && mResource.equals(element.mResource)
               && mNlpProject.equals(element.mNlpProject);
     }
-
-    return false;
+    else {
+      result = false;
+    }
+    
+    return result;
   }
 
   /**
@@ -319,7 +318,7 @@ public class DotCorpusElement extends AbstractNlpElement {
           try {
             MarkerUtil.clearMarkers(file, MarkerUtil.PROBLEM_MARKER);
           } catch (CoreException e) {
-            TaeCorePlugin.log(e);
+            CasEditorPlugin.log(e);
           }
         }
       };
@@ -333,7 +332,7 @@ public class DotCorpusElement extends AbstractNlpElement {
             try {
               MarkerUtil.createMarker(file, e.getMessage());
             } catch (CoreException e2) {
-              TaeCorePlugin.log(e2);
+              CasEditorPlugin.log(e2);
             }
           }
         };

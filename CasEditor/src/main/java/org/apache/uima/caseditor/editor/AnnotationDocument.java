@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
@@ -42,9 +41,6 @@ import org.eclipse.jface.text.DocumentEvent;
  * (needed for the editor).
  * 
  * Note: Befor an instance can be used, the project and document must be set.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6.2.2 $, $Date: 2007/01/04 15:00:55 $
  */
 public class AnnotationDocument extends Document implements IDocument {
   private IDocument mDocument;
@@ -244,8 +240,8 @@ public class AnnotationDocument extends Document implements IDocument {
    * @param out
    * @throws CoreException
    */
-  public void serialize(OutputStream out) throws CoreException {
-    mDocument.serialize(out);
+  public void save() throws CoreException {
+    mDocument.save();
   }
 
   /**

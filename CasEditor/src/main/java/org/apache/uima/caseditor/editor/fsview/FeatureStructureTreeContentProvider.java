@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIndex;
 import org.apache.uima.cas.FSIterator;
@@ -42,10 +41,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
- * .
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7.2.2 $, $Date: 2007/01/04 15:00:57 $
+ * TODO: add javadoc here
  */
 final class FeatureStructureTreeContentProvider implements ITreeContentProvider {
   private AnnotationDocument mDocument;

@@ -21,9 +21,8 @@ package org.apache.uima.caseditor.core.model;
 
 import java.io.File;
 
-
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.uima.CasConsumerConfiguration;
 import org.apache.uima.caseditor.core.util.MarkerUtil;
@@ -39,9 +38,6 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * The ConsumerELement containts the uima consumer descriptor.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public class ConsumerElement extends AbstractNlpElement {
   private UimaConfigurationElement mParent;
@@ -66,9 +62,6 @@ public class ConsumerElement extends AbstractNlpElement {
   }
 
   /**
-   * TODO: if something goes wrong ... then mark the resource with a problem in the correct line if
-   * resource changes resynchronize it ...
-   * 
    * @return the configuration
    * 
    * @throws CoreException
@@ -79,7 +72,7 @@ public class ConsumerElement extends AbstractNlpElement {
         try {
           MarkerUtil.clearMarkers(mConsumerResource, MarkerUtil.PROBLEM_MARKER);
         } catch (CoreException e) {
-          TaeCorePlugin.log(e);
+          CasEditorPlugin.log(e);
         }
       }
     };
@@ -91,6 +84,7 @@ public class ConsumerElement extends AbstractNlpElement {
     CasConsumerDescription casConsumerDesciptor;
 
     try {
+    	// TODO: this throws a class cast eception if the fiel has an other descripter, check it
       casConsumerDesciptor = (CasConsumerDescription) xmlParser.parse(inCasConsumer);
     } catch (final InvalidXMLException e) {
       Runnable createMarker = new Runnable() {
@@ -98,7 +92,7 @@ public class ConsumerElement extends AbstractNlpElement {
           try {
             MarkerUtil.createMarker(mConsumerResource, e);
           } catch (CoreException e2) {
-            TaeCorePlugin.log(e2);
+            CasEditorPlugin.log(e2);
           }
         }
       };
@@ -111,7 +105,7 @@ public class ConsumerElement extends AbstractNlpElement {
           try {
             MarkerUtil.createMarker(mConsumerResource, "This file must contain a cas consumer!");
           } catch (CoreException e2) {
-            TaeCorePlugin.log(e2);
+            CasEditorPlugin.log(e2);
           }
         }
       };

@@ -32,9 +32,6 @@ import org.eclipse.ui.actions.OpenWithMenu;
  * The OpenActionGroup contains the Open Action and the Open With Menu. This
  * class is resonsible to add the action and the menu to the context menu
  * depending on the current selection.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class OpenActionGroup extends ActionGroup implements
         ICorpusExplorerActionGroup

@@ -24,21 +24,19 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.util.Span;
 import org.eclipse.core.runtime.CoreException;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public interface IDocument {
+	
   /**
    * Adds a given change listener.
    * 
@@ -197,5 +195,5 @@ public interface IDocument {
    * @param out
    * @throws CoreException
    */
-  void serialize(OutputStream out) throws CoreException;
+  void save() throws CoreException;
 }

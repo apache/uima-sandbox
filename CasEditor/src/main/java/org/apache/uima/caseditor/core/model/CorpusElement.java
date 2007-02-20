@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.core.model;
 import java.util.Collection;
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.eclipse.core.resources.IFile;
@@ -35,9 +34,6 @@ import org.eclipse.core.runtime.IAdaptable;
  * The CorpusElement is a container for {@link IDocument}s.
  * 
  * TODO: do not include defective elements!
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public final class CorpusElement extends AbstractNlpElement implements INlpElement, IAdaptable {
   private NlpProject mParentElement;

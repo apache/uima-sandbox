@@ -19,15 +19,15 @@
 
 package org.apache.uima.caseditor.core.model.dotcorpus;
 
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Color;
 
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
+import org.junit.Test;
 
 /**
  * Unit test for the {@link AnnotationStyle} class.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public class AnnotationStyleTest {
   /**

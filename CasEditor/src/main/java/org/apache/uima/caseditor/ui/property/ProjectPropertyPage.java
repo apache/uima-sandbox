@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.ui.property;
 
 import java.io.IOException;
 
-
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.eclipse.core.resources.IProject;
@@ -32,9 +31,6 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 public class ProjectPropertyPage extends NlpProjectFieldEditorPage
 {

@@ -31,8 +31,6 @@ import org.eclipse.swt.graphics.Point;
 
 /**
  * TODO: move this class to external file.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
  */
 class AnnotationInformationProvider implements IInformationProvider, IInformationProviderExtension {
   private AnnotationEditor mEditor;

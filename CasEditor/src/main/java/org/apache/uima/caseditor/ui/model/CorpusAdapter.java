@@ -20,16 +20,14 @@
 package org.apache.uima.caseditor.ui.model;
 
 
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.DocumentElement;
-import org.apache.uima.caseditor.ui.Images;
-import org.apache.uima.caseditor.ui.TaeUiPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * This is the IWorkbenchAdapter for the CorpusElement.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
  */
 class CorpusAdapter extends
         AbstractElementAdapter
@@ -53,6 +51,6 @@ class CorpusAdapter extends
      */
     public ImageDescriptor getImageDescriptor(Object object)
     {
-        return TaeUiPlugin.getTaeImageDescriptor(Images.MODEL_CORPUS);
+        return CasEditorPlugin.getTaeImageDescriptor(Images.MODEL_CORPUS);
     }
 }

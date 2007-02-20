@@ -26,9 +26,6 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
  * {@link Integer}.
  * 
  * For validation {@link Integer#parseInt(String)} is used.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:53 $
  */
 class IntegerCellEditorValidator implements ICellEditorValidator {
   /**

@@ -32,13 +32,10 @@ import org.eclipse.ui.dialogs.WizardNewFolderMainPage;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 public final class NewCorpusWizard extends Wizard implements INewWizard
 {
-    public static String ID = "net.sf.tae.wizards.NewDocumentWizard";
+    public static String ID = "org.apache.uima.caseditor.wizards.NewDocumentWizard";
     
     private WizardNewFolderMainPage mMainPage;
     

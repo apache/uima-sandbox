@@ -24,9 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 public class ComboFieldEditor extends FieldEditor
 {

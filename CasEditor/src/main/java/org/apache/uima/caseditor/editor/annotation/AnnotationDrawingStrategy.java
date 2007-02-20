@@ -32,9 +32,6 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * The AnnotationDrawingStrategy of this editor.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:56 $
  */
 public class AnnotationDrawingStrategy implements
         org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy {

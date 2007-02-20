@@ -30,9 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-
 import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
@@ -98,9 +96,6 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  * add an action to increase right side of an annotation 
  * add an action to decrease left side on an annotation 
  * add an action to decrease right side on an annotation
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.12.2.2 $, $Date: 2007/01/04 15:00:54 $
  */
 public final class AnnotationEditor extends TextEditor implements ISelectionListener,
         ITextEditorExtension2 {
@@ -224,14 +219,15 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
       IAnnotationModelExtension annotationModel = (IAnnotationModelExtension) getDocumentProvider()
               .getAnnotationModel(getEditorInput());
 
-      Map<org.eclipse.jface.text.source.Annotation, Position> annotationMap = new HashMap<org.eclipse.jface.text.source.Annotation, Position>();
+      Map<org.eclipse.jface.text.source.Annotation, Position> annotationMap = 
+              new HashMap<org.eclipse.jface.text.source.Annotation, Position>();
 
       for (AnnotationFS annotation : annotations) {
         int start = annotation.getBegin();
         int length = annotation.getEnd() - start;
 
         EclipseAnnotationPeer eclipseAnnotation = new EclipseAnnotationPeer(
-                "net.sf.tae.Annotation", false, "test");
+                ECLIPSE_ANNOTATION_TYPE, false, "test");
 
         eclipseAnnotation.setAnnotation(annotation);
 
@@ -252,8 +248,8 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
       IAnnotationModelExtension annotationModel = (IAnnotationModelExtension) getDocumentProvider()
               .getAnnotationModel(getEditorInput());
 
-      org.eclipse.jface.text.source.Annotation[] annotations = new org.eclipse.jface.text.source.Annotation[deletedAnnotations
-              .size()];
+      org.eclipse.jface.text.source.Annotation[] annotations =
+              new org.eclipse.jface.text.source.Annotation[deletedAnnotations.size()];
 
       int i = 0;
       for (AnnotationFS deletedAnnotation : deletedAnnotations) {
@@ -275,25 +271,18 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
      * 
      * @param annotations
      */
-    public void updatedAnnotation(Collection<AnnotationFS> featureStructres) {
-      Collection<AnnotationFS> annotations = new ArrayList<AnnotationFS>(featureStructres.size());
-
-      for (FeatureStructure featureStructre : featureStructres) {
-        if (featureStructre instanceof AnnotationFS) {
-          AnnotationFS annotation = (AnnotationFS) featureStructre;
-
-          annotations.add(annotation);
-
-          selectionChanged(getSite().getPage().getActivePart(), new StructuredSelection(
-                  new ModelFeatureStructure(getDocument(), annotation)));
-        }
-      }
-
-      // TODO: if remove and add is done before selection,
-      // than the annotation is not updated in editor, why ?
+    public void updatedAnnotation(Collection<AnnotationFS> annotations) {
+      
       removedAnnotation(annotations);
       addedAnnotation(annotations);
-
+      
+      List<ModelFeatureStructure> structures = new LinkedList<ModelFeatureStructure>();
+      
+      for (AnnotationFS annotation : annotations) {
+        structures.add((new ModelFeatureStructure(getDocument(), annotation)));
+      }
+      
+      selectionChanged(getSite().getPage().getActivePart(), new StructuredSelection(structures));
     }
   }
 
@@ -446,7 +435,9 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
    */
   private IContentOutlinePage mOutlinePage;
 
-  private HashMap<AnnotationFS, org.eclipse.jface.text.source.Annotation> mAnnotationToEclipseAnnotationMap = new HashMap<AnnotationFS, org.eclipse.jface.text.source.Annotation>();
+  private HashMap<AnnotationFS, org.eclipse.jface.text.source.Annotation> 
+        mAnnotationToEclipseAnnotationMap = new HashMap<AnnotationFS, 
+        org.eclipse.jface.text.source.Annotation>();
 
   private IAnnotationEditorModifyListener mEditorListener;
 
@@ -460,7 +451,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
   /**
    * The type of the annotation for eclipse-annotations
    */
-  public static final String ECLIPSE_ANNOTATION_TYPE = "net.sf.tae.Annotation";
+  public static final String ECLIPSE_ANNOTATION_TYPE = "org.apache.uima.caseditor.Annotation";
 
   private Collection<Type> mTypesToDisplay = new HashSet<Type>();
 
@@ -498,6 +489,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
     }
   }
 
+  
   @Override
   protected SourceViewerDecorationSupport getSourceViewerDecorationSupport(ISourceViewer viewer) {
     // lazy intialize fSourceViewerDecorationSupport
@@ -772,18 +764,19 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
    * 
    */
   private void syncAnnotations() {
-    Collection<org.eclipse.jface.text.source.Annotation> annotationsToRemoveCollection = mAnnotationToEclipseAnnotationMap
-            .values();
+    Collection<org.eclipse.jface.text.source.Annotation> annotationsToRemoveCollection = 
+            mAnnotationToEclipseAnnotationMap.values();
 
-    org.eclipse.jface.text.source.Annotation[] annotationsToRemove = new org.eclipse.jface.text.source.Annotation[annotationsToRemoveCollection
-            .size()];
+    org.eclipse.jface.text.source.Annotation[] annotationsToRemove = 
+            new org.eclipse.jface.text.source.Annotation[annotationsToRemoveCollection.size()];
 
     annotationsToRemoveCollection.toArray(annotationsToRemove);
 
     mAnnotationToEclipseAnnotationMap.clear();
 
     // add new
-    HashMap<org.eclipse.jface.text.source.Annotation, Position> annotationsToAdd = new HashMap<org.eclipse.jface.text.source.Annotation, Position>();
+    HashMap<org.eclipse.jface.text.source.Annotation, Position> annotationsToAdd = 
+            new HashMap<org.eclipse.jface.text.source.Annotation, Position>();
 
     // create a set of annoation types to display
     // get enabled annoations
@@ -801,7 +794,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
     }
 
     for (AnnotationFS annotation : annotations) {
-      EclipseAnnotationPeer eclipseAnnotation = new EclipseAnnotationPeer("net.sf.tae.Annotation",
+      EclipseAnnotationPeer eclipseAnnotation = new EclipseAnnotationPeer(ECLIPSE_ANNOTATION_TYPE,
               false, "");
 
       eclipseAnnotation.setAnnotation(annotation);
@@ -844,11 +837,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
   private void highlight(int start, int length) {
     ISourceViewer sourceViewer = getSourceViewer();
 
-    if (sourceViewer == null) {
-      // TODO: investigate this further
-      // this happen if editor gets closed or opened ?
-      return;
-    }
+    assert sourceViewer != null;
 
     StyledText text = sourceViewer.getTextWidget();
 
@@ -931,7 +920,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
 
       // only process these selection if the annotations belong
       // to the current editor instance
-      if (getSite().getPage().getActiveEditor() == this && !annotations.isEmtpy()) {
+      if (getSite().getPage().getActiveEditor() == this && !annotations.isEmpty()) {
         highlight(annotations.getFirst().getBegin(), annotations.getLast().getEnd()
                 - annotations.getFirst().getBegin());
 
@@ -951,20 +940,10 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
     return getSourceViewer().getTextWidget().getSelectionCount() != 0;
   }
 
-  /**
-   * Synchronizes uima and eclipse annotations.
-   */
-  public void synchronize() {
-    syncAnnotations();
-
-    // TODO: what is this here ???
-    fireAnnotationTypeChanged(mCurrentAnnotationType);
-    getDocument().fireDocumentChanged();
-  }
-
   private void setProjectEditorStatus() {
     // TODO: do not replace if equal ... check this
-    EditorAnnotationStatus status = new EditorAnnotationStatus(getAnnotationMode(), mTypesToDisplay);
+    EditorAnnotationStatus status = new EditorAnnotationStatus(getAnnotationMode(), 
+            mTypesToDisplay);
     getDocument().getProject().setEditorAnnotationStatus(status);
   }
 
@@ -994,7 +973,8 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
     setActionActivationCode(IWorkbenchActionDefinitionIds.DELETE, (char) 0, SWT.CR, SWT.NONE);
 
     // create show annotation context editing action
-    ShowAnnotationContextEditAction annotationContextEditAction = new ShowAnnotationContextEditAction();
+    ShowAnnotationContextEditAction annotationContextEditAction = 
+            new ShowAnnotationContextEditAction();
 
     annotationContextEditAction.setActionDefinitionId(ITextEditorActionDefinitionIds.QUICK_ASSIST);
 

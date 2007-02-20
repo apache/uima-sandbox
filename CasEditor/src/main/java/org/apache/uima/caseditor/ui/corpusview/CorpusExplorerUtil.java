@@ -22,19 +22,11 @@ package org.apache.uima.caseditor.ui.corpusview;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 
-
-/**
- * TODO: add javadoc here.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:51 $
- */
 final class CorpusExplorerUtil
 {
     /**

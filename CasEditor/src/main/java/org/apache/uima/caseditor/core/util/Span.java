@@ -22,9 +22,6 @@ package org.apache.uima.caseditor.core.util;
 /**
  * This class usually specifies an continus are of text. This area has an start and end index. The
  * difference of the end and start is the length of the area.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public class Span implements Comparable {
   /**

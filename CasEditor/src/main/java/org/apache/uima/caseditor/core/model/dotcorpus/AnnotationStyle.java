@@ -24,9 +24,6 @@ import java.awt.Color;
 /**
  * The <code>AnnotationStyle</code> describes the look of an certain annotation type in the
  * <code>AnnotationEditor</code>.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public final class AnnotationStyle {
   /**

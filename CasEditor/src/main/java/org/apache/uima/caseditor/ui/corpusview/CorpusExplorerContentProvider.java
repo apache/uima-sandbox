@@ -20,7 +20,7 @@
 package org.apache.uima.caseditor.ui.corpusview;
 
 
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -31,9 +31,6 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 public class CorpusExplorerContentProvider implements
         ITreeContentProvider
@@ -81,7 +78,7 @@ public class CorpusExplorerContentProvider implements
                 
                 try
                 {
-                    result = TaeCorePlugin.getNlpModel().getParent(resource);
+                    result = CasEditorPlugin.getNlpModel().getParent(resource);
                 }
                 catch (CoreException e)
                 {

@@ -28,12 +28,14 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * TODO: add javadoch here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:58 $
  */
 public class AnnotationEditingControl extends Composite {
 
+  /**
+   * Initializes the current instance.
+   * 
+   * @param parent
+   */
   public AnnotationEditingControl(Composite parent) {
     super(parent, SWT.NONE);
 
@@ -47,6 +49,8 @@ public class AnnotationEditingControl extends Composite {
 
   /**
    * Display this feature structure.
+   * 
+   * @param structure 
    */
   public void displayFeatureStructure(FeatureStructure structure) {
     Feature hack = structure.getType().getFeatureByBaseName("byte");

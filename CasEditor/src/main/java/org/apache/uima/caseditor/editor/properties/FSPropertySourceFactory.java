@@ -30,11 +30,6 @@ import org.apache.uima.cas.StringArrayFS;
 import org.apache.uima.caseditor.editor.ModelFeatureStructure;
 import org.eclipse.ui.views.properties.IPropertySource;
 
-/**
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:57 $
- */
 public class FSPropertySourceFactory {
   public static IPropertySource create(ModelFeatureStructure structure) {
     if (structure.getStructre() instanceof ByteArrayFS) {

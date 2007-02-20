@@ -31,11 +31,9 @@ import org.apache.uima.cas.TypeSystem;
 /**
  * This Annotator does nothing. You can use it when you need to supply a valid TextAnnotator
  * implementation, but not need a TextAnnotator.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:01:27 $
  */
 public class DummyAnnotator implements TextAnnotator {
+	
   /**
    * Dummy process method, does nothing.
    */

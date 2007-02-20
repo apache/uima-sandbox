@@ -22,6 +22,7 @@ package org.apache.uima.caseditor.ui.property;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.caseditor.core.model.DocumentElement;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -33,9 +34,6 @@ import org.eclipse.ui.dialogs.PropertyPage;
 /**
  * This is the <code>DocumentElement</code> property page.
  * It shows information about the selected document.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 public class DocumentPropertyPage extends PropertyPage
 {
@@ -48,7 +46,12 @@ public class DocumentPropertyPage extends PropertyPage
     {
         DocumentElement document = (DocumentElement) getElement();
         
-        mCAS = document.getCAS();
+        try {
+			mCAS = document.getDocument().getCAS();
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         Composite base = new Composite(parent, SWT.NONE);
         

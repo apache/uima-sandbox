@@ -28,15 +28,12 @@ import org.eclipse.ui.texteditor.StatusLineContributionItem;
  * The <code>AnnotationEditor</code> action contributor.
  * 
  * Contributes the "annotation mode" status item to the status bar.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:54 $
  */
 public class AnnotationEditorActionContributor extends TextEditorActionContributor {
   /**
    * ID of the status item.
    */
-  public static final String ID = "net.sf.tae.editor.mode.status";
+  public static final String ID = "org.apache.uima.caseditor.editor.mode.status";
 
   private AnnotationEditor mActiveEditorPart;
 

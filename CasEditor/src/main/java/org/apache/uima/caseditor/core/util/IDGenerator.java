@@ -29,9 +29,6 @@ import java.util.Random;
  * Attention: The maximal number of generateable IDs is Long.MAX_VALUE. If there are more than
  * Long.MAX_VALUE calls to nextUniqueID() an IllegalStateException will be thrown.
  * </p>
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public class IDGenerator {
   private long sStartValue;

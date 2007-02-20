@@ -22,9 +22,8 @@ package org.apache.uima.caseditor.core.model;
 import java.util.Collection;
 import java.util.LinkedList;
 
-
 import org.apache.uima.cas.CAS;
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.dotcorpus.EditorAnnotationStatus;
 import org.eclipse.core.resources.IFile;
@@ -38,16 +37,13 @@ import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * TODO: add comment
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.9.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public final class NlpProject extends AbstractNlpElement implements IProjectNature, INlpElement,
         IAdaptable {
   /**
    * The ID of the <code>NLPProject</code>
    */
-  public static final String ID = "net.sf.tae.core.NLPProject";
+  public static final String ID = "org.apache.uima.caseditor.NLPProject";
 
   private static final String DOT_CORPUS_FILENAME = ".corpus";
 
@@ -444,7 +440,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
       initialize();
 
-      TaeCorePlugin.getNlpModel().fireRefreshEvent(this);
+      CasEditorPlugin.getNlpModel().fireRefreshEvent(this);
     }
   }
 

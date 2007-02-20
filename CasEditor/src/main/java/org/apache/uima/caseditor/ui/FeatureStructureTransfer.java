@@ -22,9 +22,6 @@ package org.apache.uima.caseditor.ui;
 /**
  * This class is able to transfer a {@link com.ibm.uima.cas.FeatureStructure}
  * objects.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:53 $
  */
 public class FeatureStructureTransfer extends ObjectTransfer
 {

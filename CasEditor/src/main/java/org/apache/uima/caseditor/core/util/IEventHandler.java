@@ -25,8 +25,6 @@ package org.apache.uima.caseditor.core.util;
  * 
  * @param <E>
  *          the event object type
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public interface IEventHandler<E> {
   /**

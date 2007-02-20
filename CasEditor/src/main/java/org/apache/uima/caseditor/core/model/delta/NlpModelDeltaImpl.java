@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.core.model.delta;
 import java.util.Collection;
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -31,9 +30,6 @@ import org.eclipse.core.resources.IResourceDelta;
  * The internal implementation of the nlp model delta interface.
  * 
  * TODO: Add a filter to avoid node with Kind.NOTHING.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public final class NlpModelDeltaImpl implements INlpElementDelta {
   private IResourceDelta mResourceDelta;

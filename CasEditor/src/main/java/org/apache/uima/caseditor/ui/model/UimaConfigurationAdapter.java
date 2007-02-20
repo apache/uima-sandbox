@@ -22,18 +22,15 @@ package org.apache.uima.caseditor.ui.model;
 import java.util.Collection;
 import java.util.LinkedList;
 
-
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.apache.uima.caseditor.core.model.UimaConfigurationElement;
-import org.apache.uima.caseditor.ui.Images;
-import org.apache.uima.caseditor.ui.TaeUiPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * The <code>IWorkbenchAdapter</code> for the
  * <code>UIMAConfigurationElement</code>.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
  */
 class UimaConfigurationAdapter extends
         AbstractElementAdapter
@@ -71,7 +68,7 @@ class UimaConfigurationAdapter extends
      */
     public ImageDescriptor getImageDescriptor(Object object)
     {
-        return TaeUiPlugin.getTaeImageDescriptor(
+        return CasEditorPlugin.getTaeImageDescriptor(
                 Images.MODEL_CONFIG_FOLDER);
     }
 }

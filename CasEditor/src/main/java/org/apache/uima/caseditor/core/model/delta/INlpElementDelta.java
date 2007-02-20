@@ -26,9 +26,6 @@ import org.eclipse.core.resources.IResource;
 /**
  * A element delta represents changes in the state of a element tree between two discrete points in
  * time.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public interface INlpElementDelta {
   /**

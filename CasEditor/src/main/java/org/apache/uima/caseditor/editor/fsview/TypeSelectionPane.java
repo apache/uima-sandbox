@@ -38,11 +38,7 @@ import org.eclipse.swt.widgets.Label;
  * The <code>TypeSelctionPane</code> notfies a listener about the selected type. Types are
  * retrived formt he type system.
  * 
- * TODO: Should be a types set to default ??? Should type be the same on all instances for one
- * project ?
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 15:00:57 $
+ * TODO: Should be a types set to default ?
  */
 final class TypeSelectionPane extends Composite {
   private static String[] filterTypes = new String[] { CAS.TYPE_NAME_ARRAY_BASE,

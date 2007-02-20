@@ -24,10 +24,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.apache.uima.caseditor.core.AbstractAnnotationDocumentListener;
 import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.NlpModel;
@@ -36,8 +37,6 @@ import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.AnnotationSelection;
 import org.apache.uima.caseditor.editor.IAnnotationEditorModifyListener;
-import org.apache.uima.caseditor.editor.Images;
-import org.apache.uima.caseditor.editor.TaeEditorPlugin;
 import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;
 import org.apache.uima.caseditor.editor.action.LowerLeftAnnotationSideAction;
 import org.apache.uima.caseditor.editor.action.LowerRightAnnotationSideAction;
@@ -67,7 +66,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
@@ -80,9 +78,6 @@ import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 /**
  * This outline view displays all <code>AnnotationFS</code>s of the current mode/type from the
  * binded editor.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.12.2.2 $, $Date: 2007/01/04 15:00:58 $
  */
 public final class AnnotationOutline extends ContentOutlinePage implements ISelectionListener {
   /**
@@ -311,8 +306,6 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
   private TreeViewer mTableViewer;
 
-  private TableItem mLastSelectedItem;
-
   /**
    * The <code>AnnotationEditor</code> which is bound to this outline view.
    */
@@ -401,7 +394,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     WideLeftAnnotationSideAction wideLeftAnnotationSideAction = new WideLeftAnnotationSideAction(
             mEditor.getDocument());
     wideLeftAnnotationSideAction.setText("Wides the left annotation side");
-    wideLeftAnnotationSideAction.setImageDescriptor(TaeEditorPlugin
+    wideLeftAnnotationSideAction.setImageDescriptor(CasEditorPlugin
             .getTaeImageDescriptor(Images.WIDE_LEFT_SIDE));
 
     getSite().getSelectionProvider().addSelectionChangedListener(wideLeftAnnotationSideAction);
@@ -412,7 +405,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     LowerLeftAnnotationSideAction lowerLeftAnnotationSideAction = new LowerLeftAnnotationSideAction(
             mEditor.getDocument());
     lowerLeftAnnotationSideAction.setText("Lowers the left annotation side");
-    lowerLeftAnnotationSideAction.setImageDescriptor(TaeEditorPlugin
+    lowerLeftAnnotationSideAction.setImageDescriptor(CasEditorPlugin
             .getTaeImageDescriptor(Images.LOWER_LEFT_SIDE));
 
     getSite().getSelectionProvider().addSelectionChangedListener(lowerLeftAnnotationSideAction);
@@ -423,7 +416,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     LowerRightAnnotationSideAction lowerRightAnnotionSideAction = new LowerRightAnnotationSideAction(
             mEditor.getDocument());
     lowerRightAnnotionSideAction.setText("Lowers the right annotation side");
-    lowerRightAnnotionSideAction.setImageDescriptor(TaeEditorPlugin
+    lowerRightAnnotionSideAction.setImageDescriptor(CasEditorPlugin
             .getTaeImageDescriptor(Images.LOWER_RIGHT_SIDE));
 
     getSite().getSelectionProvider().addSelectionChangedListener(lowerRightAnnotionSideAction);
@@ -435,7 +428,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
             mEditor.getDocument());
     wideRightAnnotationSideAction.setText("Wides the right annotation side");
 
-    wideRightAnnotationSideAction.setImageDescriptor(TaeEditorPlugin
+    wideRightAnnotationSideAction.setImageDescriptor(CasEditorPlugin
             .getTaeImageDescriptor(Images.WIDE_RIGHT_SIDE));
 
     getSite().getSelectionProvider().addSelectionChangedListener(wideRightAnnotationSideAction);
@@ -445,7 +438,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     // merge action
     MergeAnnotationAction mergeAction = new MergeAnnotationAction(mEditor.getDocument());
     getSite().getSelectionProvider().addSelectionChangedListener(mergeAction);
-    mergeAction.setImageDescriptor(TaeEditorPlugin.getTaeImageDescriptor(Images.MERGE));
+    mergeAction.setImageDescriptor(CasEditorPlugin.getTaeImageDescriptor(Images.MERGE));
 
     toolBarManager.add(mergeAction);
 
@@ -538,7 +531,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
       if (selection instanceof StructuredSelection) {
         AnnotationSelection annotations = new AnnotationSelection((StructuredSelection) selection);
 
-        if (!annotations.isEmtpy()) {
+        if (!annotations.isEmpty()) {
           ISelection tableSelection = new StructuredSelection(new AnnotationTreeNode(mEditor
                   .getDocument(), annotations.getFirst()));
 

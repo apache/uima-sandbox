@@ -22,7 +22,7 @@ package org.apache.uima.caseditor.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.IDocument;
@@ -30,10 +30,10 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 
 /**
- * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:54 $
+ * TODO:
+ * set feature value to null
+ * delete feature value structure
+ * create feature value structure
  */
 public class ModelFeatureStructure implements IAdaptable {
   private IDocument mDocument;
@@ -59,6 +59,23 @@ public class ModelFeatureStructure implements IAdaptable {
     return mFeatureStructre;
   }
 
+  public void setFeatureNull(Feature feature) {
+    mFeatureStructre.setFeatureValue(feature, null);
+  }
+  
+  public void deleteFeatureValue(Feature feature) {
+    // get value and call remove
+  }
+  
+  public void createFeatureValue(Feature feature) {
+    // create, add and link
+  }
+
+  public void createFeatureValueArray(Feature feature, int size) {
+    // create add and link
+  }
+  
+  
   public static List<ModelFeatureStructure> create(IDocument document,
           List<AnnotationFS> annotations) {
     List<ModelFeatureStructure> structres = new ArrayList<ModelFeatureStructure>(annotations.size());

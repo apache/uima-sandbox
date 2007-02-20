@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
-
 import org.apache.uima.caseditor.core.model.DotCorpusElement;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
@@ -33,9 +32,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 
 /**
  * TODO: add javdoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
 {

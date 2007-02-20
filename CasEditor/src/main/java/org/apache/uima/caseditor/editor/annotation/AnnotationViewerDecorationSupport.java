@@ -33,9 +33,6 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 /**
  * This ia a custom SourceViewerDecorationSupport to support drawing of annoations with dynamically
  * (not configured in plugin.xml) chaning types. These annotations can have configured appeareance.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:56 $
  */
 public class AnnotationViewerDecorationSupport extends SourceViewerDecorationSupport {
   private NlpProject mProject;

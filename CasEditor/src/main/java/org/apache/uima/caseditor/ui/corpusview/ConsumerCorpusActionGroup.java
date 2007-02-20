@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.model.ConsumerElement;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
@@ -39,9 +38,6 @@ import org.eclipse.ui.actions.ActionGroup;
 
 /**
  * This is an action group for cas consumer actions.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class ConsumerCorpusActionGroup extends ActionGroup
 {

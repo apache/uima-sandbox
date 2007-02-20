@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.ui.model;
 import java.util.Collections;
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,8 +34,6 @@ import org.eclipse.ui.ide.IDE.SharedImages;
 
 /**
  * The <code>IWorkbenchAdapter</code> for the <code>NLPProject</code>.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
  */
 class ProjectAdapter extends
         AbstractElementAdapter

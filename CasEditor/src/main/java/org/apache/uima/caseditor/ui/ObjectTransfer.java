@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.ui;
 
 import java.util.Arrays;
 
-
 import org.apache.uima.caseditor.core.util.IDGenerator;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
@@ -29,9 +28,6 @@ import org.eclipse.swt.dnd.TransferData;
 /**
  * This class is able to transfer an {@link Object} object. The object gets
  * saved and only an Id is transfered. 
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:53 $
  */
 public abstract class ObjectTransfer extends ByteArrayTransfer
 {

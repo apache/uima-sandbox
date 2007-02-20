@@ -27,9 +27,6 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * This <code>OutlineLabelProvider</code> returns the covered text of an <code>AnnotationFS</code>.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:58 $
  */
 class OutlineLabelProvider extends LabelProvider implements ITableLabelProvider {
   public Image getColumnImage(Object element, int columnIndex) {

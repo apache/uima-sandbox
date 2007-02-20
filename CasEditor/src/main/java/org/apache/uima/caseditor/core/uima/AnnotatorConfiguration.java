@@ -21,10 +21,9 @@ package org.apache.uima.caseditor.core.uima;
 
 import java.net.MalformedURLException;
 
-
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.analysis_engine.TaeDescription;
-import org.apache.uima.analysis_engine.TextAnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -34,12 +33,9 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * TODO: add java doc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public class AnnotatorConfiguration {
-  private TaeDescription mDescriptor;
+  private AnalysisEngineDescription mDescriptor;
 
   private IPath mResourceBasePath;
 
@@ -48,7 +44,7 @@ public class AnnotatorConfiguration {
    * 
    * @param descriptor
    */
-  public AnnotatorConfiguration(TaeDescription descriptor) {
+  public AnnotatorConfiguration(AnalysisEngineDescription descriptor) {
     mDescriptor = descriptor;
   }
 
@@ -69,13 +65,11 @@ public class AnnotatorConfiguration {
    * @return the text analysis engine
    * @throws ResourceInitializationException
    */
-  public TextAnalysisEngine createAnnotator() throws ResourceInitializationException {
+  public AnalysisEngine createAnnotator() throws ResourceInitializationException {
     ResourceManager resourceManager = UIMAFramework.newDefaultResourceManager();
 
     if (mResourceBasePath != null) {
       try {
-        // resourceManager.setExtensionClassPath(
-        // mResourceBasePath.toOSString(), true);
         resourceManager.setDataPath(mResourceBasePath.toOSString());
       } catch (MalformedURLException e) {
         // this will not happen
@@ -83,7 +77,7 @@ public class AnnotatorConfiguration {
       }
     }
 
-    return UIMAFramework.produceTAE(mDescriptor, resourceManager, null);
+    return UIMAFramework.produceAnalysisEngine(mDescriptor, resourceManager, null);
   }
 
   /**

@@ -21,9 +21,6 @@ package org.apache.uima.caseditor.core.model.delta;
 
 /**
  * The listener is used to visit the given delta.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public interface INlpModelDeltaVisitor {
   /**

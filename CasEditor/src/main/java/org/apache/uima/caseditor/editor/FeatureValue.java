@@ -29,12 +29,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.ui.views.properties.IPropertySource;
 
-/**
- * 
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 15:00:55 $
- */
 public final class FeatureValue implements IAdaptable {
   private FeatureStructure mStructure;
 

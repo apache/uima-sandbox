@@ -26,9 +26,6 @@ import org.apache.uima.cas.FeatureStructure;
 /**
  * This enumeration contains all primitves and some util methods. TODO: remove all array and list
  * types, thats are FeatureStructures !!!
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public enum Primitives {
 

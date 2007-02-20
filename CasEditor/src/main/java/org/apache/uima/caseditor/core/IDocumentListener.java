@@ -25,9 +25,6 @@ import org.apache.uima.cas.FeatureStructure;
 
 /**
  * This interface is used to notifies clients about {@link FeatureStructure} changes.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public interface IDocumentListener {
   /**

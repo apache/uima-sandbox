@@ -24,12 +24,6 @@ import org.apache.uima.caseditor.editor.properties.FSPropertySourceFactory;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
 
-/**
- * 
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:55 $
- */
 public class PropertySourceAdapterFactory implements IAdapterFactory {
   public Object getAdapter(Object adaptableObject, Class adapterType) {
     ModelFeatureStructure structure = (ModelFeatureStructure) adaptableObject;

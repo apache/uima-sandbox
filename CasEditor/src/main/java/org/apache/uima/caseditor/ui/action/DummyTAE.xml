@@ -2,12 +2,12 @@
 <taeDescription xmlns="http://uima.watson.ibm.com/resourceSpecifier">
 	<frameworkImplementation>com.ibm.uima.java</frameworkImplementation>
 	<primitive>true</primitive>
-	<annotatorImplementationName>net.sf.tae.uima.DummyAnnotator</annotatorImplementationName>
+	<annotatorImplementationName>org.apache.uima.caseditor.uima.DummyAnnotator</annotatorImplementationName>
 	<analysisEngineMetaData>
 		<name>DummyAnnotator</name>
 		<description></description>
 		<version>1.0</version>
-		<vendor>sourceforge.net/projects/tae</vendor>
+		<vendor>The Apache Software Foundation</vendor>
 		<capabilities>
 			<capability>
 				<inputs/>

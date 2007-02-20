@@ -19,8 +19,7 @@
 
 package org.apache.uima.caseditor.ui.property;
 
-
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
@@ -34,9 +33,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:52 $
  */
 class FileSelectionFieldEditor extends StringButtonFieldEditor
 {
@@ -83,7 +79,7 @@ class FileSelectionFieldEditor extends StringButtonFieldEditor
                     }
                 }
                 
-                return new Status(IStatus.ERROR, TaeCorePlugin.ID, 0,
+                return new Status(IStatus.ERROR, CasEditorPlugin.ID, 0,
                         "Please select a file!", null);
             }
         });

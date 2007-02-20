@@ -26,8 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.AbstractResourceDelta;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.delta.INlpModelChangeListener;
@@ -44,11 +43,9 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+
 /**
  * The root element of nlp workbench. Contains NLPProjects Contains IProject s
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public final class NlpModel extends AbstractNlpElement {
   private final class ResourceChangeListener implements IResourceChangeListener {
@@ -139,7 +136,7 @@ public final class NlpModel extends AbstractNlpElement {
      * Executes the current action.
      */
     public void handle(NlpModelDeltaImpl delta) {
-      TaeCorePlugin.getNlpModel().addInternal(delta.getResource());
+      CasEditorPlugin.getNlpModel().addInternal(delta.getResource());
 
       /*
        * Note: If a projcet is added, it is closed (isOpen() == false). Tough, the .project file is
@@ -147,7 +144,7 @@ public final class NlpModel extends AbstractNlpElement {
        */
 
       // set nlp element here
-      delta.setNlpElement(TaeCorePlugin.getNlpModel().findMember(delta.getResource()));
+      delta.setNlpElement(CasEditorPlugin.getNlpModel().findMember(delta.getResource()));
 
       processChildEvents(delta);
     }
@@ -168,7 +165,7 @@ public final class NlpModel extends AbstractNlpElement {
      */
     public void handle(NlpModelDeltaImpl delta) {
       // set nlp element here
-      delta.setNlpElement(TaeCorePlugin.getNlpModel().findMember(delta.getResource()));
+      delta.setNlpElement(CasEditorPlugin.getNlpModel().findMember(delta.getResource()));
 
       processChildEvents(delta);
 
@@ -176,7 +173,7 @@ public final class NlpModel extends AbstractNlpElement {
         INlpElement parent = delta.getNlpElement().getParent();
 
         if (parent != null) {
-          TaeCorePlugin.getNlpModel().removeInternal(delta.getResource());
+          CasEditorPlugin.getNlpModel().removeInternal(delta.getResource());
         }
       }
     }
@@ -331,19 +328,19 @@ public final class NlpModel extends AbstractNlpElement {
       }
 
       // set nlp element here
-      delta.setNlpElement(TaeCorePlugin.getNlpModel().findMember(delta.getResource()));
+      delta.setNlpElement(CasEditorPlugin.getNlpModel().findMember(delta.getResource()));
 
       processChildEvents(delta);
 
       INlpElement parent;
       try {
-        parent = TaeCorePlugin.getNlpModel().getParent(delta.getResource());
+        parent = CasEditorPlugin.getNlpModel().getParent(delta.getResource());
 
         if (parent != null) {
-          TaeCorePlugin.getNlpModel().changeInternal(delta);
+          CasEditorPlugin.getNlpModel().changeInternal(delta);
         }
       } catch (CoreException e) {
-        TaeCorePlugin.log(e);
+        CasEditorPlugin.log(e);
       }
     }
   }
@@ -376,7 +373,7 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   private void handleExceptionDuringResoruceChange(CoreException e) {
-    TaeCorePlugin.log(e);
+    CasEditorPlugin.log(e);
   }
 
   void changeInternal(INlpElementDelta delta) {

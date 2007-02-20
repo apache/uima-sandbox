@@ -21,12 +21,6 @@ package org.apache.uima.caseditor.editor;
 
 import org.apache.uima.cas.Type;
 
-/**
- * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:54 $
- */
 public interface IAnnotationEditorModifyListener {
   /**
    * Called if the editor annotation mode changed.

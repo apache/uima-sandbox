@@ -33,8 +33,7 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.rtf.RTFEditorKit;
 
-
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.uima.DocumentUimaImpl;
 import org.eclipse.core.resources.IProject;
@@ -47,9 +46,6 @@ import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class DocumentImportStructureProvider implements IImportStructureProvider
 {
@@ -225,7 +221,7 @@ final class DocumentImportStructureProvider implements IImportStructureProvider
     
     private InputStream getDocument(String text)
     {
-        NlpProject nlpProject = (NlpProject) TaeCorePlugin.getNlpModel()
+        NlpProject nlpProject = (NlpProject) CasEditorPlugin.getNlpModel()
                 .findMember(mProject);
         
         DocumentUimaImpl gateDocument = new DocumentUimaImpl(nlpProject);

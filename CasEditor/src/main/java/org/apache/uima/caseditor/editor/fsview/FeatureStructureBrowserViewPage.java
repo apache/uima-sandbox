@@ -23,9 +23,9 @@ package org.apache.uima.caseditor.editor.fsview;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
-import org.apache.uima.caseditor.editor.Images;
-import org.apache.uima.caseditor.editor.TaeEditorPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -41,10 +41,8 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.Page;
 
 /**
- * TODO: add javadoc here TODO: update if annotation model was changed TODO: use
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5.2.2 $, $Date: 2007/01/04 15:00:57 $
+ * TODO: add javadoc here 
+ * TODO: update if annotation model was changed
  */
 public final class FeatureStructureBrowserViewPage extends Page {
   private class CreateAction extends Action {
@@ -196,7 +194,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     // create
     Action createAction = new CreateAction();
     createAction.setText("Create");
-    createAction.setImageDescriptor(TaeEditorPlugin.getTaeImageDescriptor(Images.ADD));
+    createAction.setImageDescriptor(CasEditorPlugin.getTaeImageDescriptor(Images.ADD));
     toolBarManager.add(createAction);
 
     // delete

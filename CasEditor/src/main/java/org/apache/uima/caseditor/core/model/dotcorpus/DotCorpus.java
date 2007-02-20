@@ -30,9 +30,6 @@ import org.apache.uima.cas.Type;
 /**
  * This class contains all project specific configuration parameters. Note: Use DotCorpusSerialzer
  * to read or write an instance of this class to or from a byte stream.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public class DotCorpus {
   /**
@@ -202,22 +199,27 @@ public class DotCorpus {
    */
   @Override
   public boolean equals(Object obj) {
+	  
+	boolean result;  
+	  
     if (obj == this) {
-      return true;
+    	result = true;
     }
-
-    if (obj != null && obj instanceof DotCorpus) {
+    else if (obj instanceof DotCorpus) {
 
       DotCorpus corpus = (DotCorpus) obj;
 
-      return isEqual(mTypeSystemFileName, corpus.mTypeSystemFileName)
+      result = isEqual(mTypeSystemFileName, corpus.mTypeSystemFileName)
               && isEqual(mCorpusFolders, corpus.mCorpusFolders)
               && isEqual(mUimaConfigFolder, corpus.mUimaConfigFolder)
               && isEqual(mStyleMap, corpus.mStyleMap)
               && isEqual(mEditorLineLengthHint, corpus.mEditorLineLengthHint);
     }
-
-    return false;
+    else {
+    	result = false;
+    }
+    
+    return result;
   }
 
   /**

@@ -31,9 +31,6 @@ import org.eclipse.jface.viewers.ViewerSorter;
  * <code>AnnotationComparator</code>.
  * 
  * @see AnnotationComparator
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 15:00:58 $
  */
 class OutlineTableSorter extends ViewerSorter {
   private AnnotationComparator mComperator = new AnnotationComparator();

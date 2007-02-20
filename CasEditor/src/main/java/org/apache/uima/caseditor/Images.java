@@ -17,15 +17,47 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.editor;
+package org.apache.uima.caseditor;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:55 $
  */
 public enum Images {
+  /**
+   * The corpus image.
+   */
+  MODEL_CORPUS("model/corpus.gif"),
+  
+  /**
+   * The document image.
+   */
+  MODEL_DOCUMENT("model/document.png"),
+  
+  /**
+   * The source folder image.
+   */
+  MODEL_SOURCE_FOLDER("model/uima-source-folder.png"),
+  
+  /**
+   * The config folder image.
+   */
+  MODEL_CONFIG_FOLDER("model/config.png"),
+  
+  /**
+   * Image for the typesystem element.
+   */
+  MODEL_TYPESYSTEM("t_s.gif"),
+  
+  /**
+   * The enabled refresh icon.
+   */
+  EXPLORER_E_REFRESH("eceview16/refresh_nav.gif"),
+  
+  /**
+   * The disabled refresh icon.
+   */
+  EXPLORER_D_REFRESH("dceview16/refresh_nav.gif"),
+  
   /**
    * The wide left side image.
    */

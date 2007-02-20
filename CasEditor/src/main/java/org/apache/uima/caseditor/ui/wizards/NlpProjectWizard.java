@@ -35,16 +35,13 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 /**
  * New wizard for nlp projects. TODO: exception handling TODO: refactor this
  * wizard
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final public class NlpProjectWizard extends Wizard implements INewWizard
 {
     /**
      * The ID of the new nlp porject wizard.
      */
-    public static final String ID = "net.sf.tae.wizards.NLPProjectWizard";
+    public static final String ID = "org.apache.uima.caseditor.wizards.NLPProjectWizard";
     
     private WizardNewProjectCreationPage mMainPage;
     

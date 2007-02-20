@@ -24,9 +24,8 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
-
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.analysis_engine.TextAnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
@@ -54,9 +53,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
  * This action launches the cpm with the configured cas consumer.
  * 
  * TODO: move over to core plugin
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.1 $, $Date: 2007/01/04 14:37:53 $
  */
 public class ConsumerActionRunnable implements IRunnableWithProgress
 {
@@ -143,12 +139,12 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         XMLParser xmlParser = UIMAFramework.getXMLParser();
         
         InputStream inIndex = getClass().getClassLoader().getResourceAsStream(
-                "net/sf/tae/core/Index.xml");
+                "org/apache/uima/caseditor/core/Index.xml");
 
         if (inIndex == null)
         {
             throw new InvocationTargetException(null, 
-                    "net/sf/tae/ui/action/Index.xml"
+                    "org/apache/uima/caseditor/ui/action/Index.xml"
                     + " is missing on the classpath");
         }
         
@@ -200,11 +196,11 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
             throw new InvocationTargetException(e);
         }
         
-        TextAnalysisEngine textAnalysisEngine;
+        AnalysisEngine textAnalysisEngine;
         try
         {
             textAnalysisEngine = UIMAFramework
-            .produceTAE(textAnalysisEngineSpecifier);
+                    .produceAnalysisEngine(textAnalysisEngineSpecifier);
         }
         catch (ResourceInitializationException e)
         {

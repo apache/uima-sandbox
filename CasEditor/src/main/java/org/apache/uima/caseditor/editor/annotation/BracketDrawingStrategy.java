@@ -29,9 +29,6 @@ import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * Draws brackets arround an annotation.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:56 $
  */
 public class BracketDrawingStrategy implements IDrawingStrategy {
   private static final int BRACKET_WIDTH = 3;

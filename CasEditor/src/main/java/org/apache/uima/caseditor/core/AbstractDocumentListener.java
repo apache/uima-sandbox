@@ -26,11 +26,12 @@ import org.apache.uima.cas.FeatureStructure;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public abstract class AbstractDocumentListener implements IDocumentListener {
+  
+  /**
+   * Forwards the call.
+   */
   public void added(FeatureStructure newAnnotation) {
     Collection<FeatureStructure> structures = new ArrayList<FeatureStructure>(1);
 
@@ -39,6 +40,9 @@ public abstract class AbstractDocumentListener implements IDocumentListener {
     added(structures);
   }
 
+  /**
+   * Forwards the call.
+   */
   public void removed(FeatureStructure deletedAnnotation) {
     Collection<FeatureStructure> structures = new ArrayList<FeatureStructure>(1);
 
@@ -47,6 +51,9 @@ public abstract class AbstractDocumentListener implements IDocumentListener {
     removed(structures);
   }
 
+  /**
+   * Forwards the call.
+   */
   public void updated(FeatureStructure annotation) {
     Collection<FeatureStructure> structures = new ArrayList<FeatureStructure>(1);
 

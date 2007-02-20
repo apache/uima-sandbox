@@ -26,9 +26,6 @@ import org.apache.uima.cas.Type;
 
 /**
  * Matches all annoations of an added type.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 14:56:24 $
  */
 public class StrictTypeConstraint implements FSConstraint, FSMatchConstraint {
   private static final long serialVersionUID = 1;

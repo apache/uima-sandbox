@@ -23,9 +23,6 @@ import org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy;
 
 /**
  * An enumertation of all available {@link IDrawingStrategy}.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:56 $
  */
 public enum DrawingStyle {
   /**

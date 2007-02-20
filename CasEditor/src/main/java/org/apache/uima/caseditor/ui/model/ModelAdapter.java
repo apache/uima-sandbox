@@ -22,15 +22,12 @@ package org.apache.uima.caseditor.ui.model;
 import java.util.Collections;
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.model.NlpModel;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * The <code>IWorkbenchAdapter</code> for the <code>NLPModel</code>.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
  */
 class ModelAdapter extends
         AbstractElementAdapter

@@ -24,9 +24,6 @@ import org.eclipse.jface.action.Action;
 
 /**
  * The {@link ChangeModeAction} changes the editor annotation mode to the newly selected one.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:54 $
  */
 final class ChangeModeAction extends Action {
   /**

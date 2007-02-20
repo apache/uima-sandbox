@@ -21,9 +21,8 @@ package org.apache.uima.caseditor.ui.action;
 
 import java.lang.reflect.InvocationTargetException;
 
-
 import org.apache.uima.UIMAException;
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
@@ -36,9 +35,6 @@ import org.eclipse.ui.progress.IProgressService;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:53 $
  */
 public class RunnableAction extends Action
 {
@@ -88,13 +84,13 @@ public class RunnableAction extends Action
                 
                 Object[] argument = uimaException.getArguments();
                 
-                    status = new Status(IStatus.ERROR, TaeCorePlugin.ID, 0,
+                    status = new Status(IStatus.ERROR, CasEditorPlugin.ID, 0,
                             argument.length > 0 ? argument[0].toString() : 
                             "Unkown error, see log.", cause);
             }
             else
             {
-                status = new Status(IStatus.ERROR, TaeCorePlugin.ID, 0,
+                status = new Status(IStatus.ERROR, CasEditorPlugin.ID, 0,
                         cause.getMessage() != null ? cause.getMessage() : 
                             "Unkown error, see log.", cause);
             }

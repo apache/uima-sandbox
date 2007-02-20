@@ -17,42 +17,43 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.editor;
+package org.apache.uima.caseditor;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.core.model.NlpModel;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 15:00:54 $
  */
-public class TaeEditorPlugin extends AbstractUIPlugin {
-  private static final String ID = "net.sf.tae.editor";
+public class CasEditorPlugin extends AbstractUIPlugin {
+  public static final String ID = "org.apache.uima.caseditor";
 
   private static final String ICONS_PATH = "icons/";
 
   /**
    * The shared instance.
    */
-  private static TaeEditorPlugin sPlugin;
+  private static CasEditorPlugin sPlugin;
 
   /**
    * Resource bundle.
    */
   private ResourceBundle mResourceBundle;
+  
+  private static NlpModel sNLPModel;
 
   /**
    * The constructor.
    */
-  public TaeEditorPlugin() {
+  public CasEditorPlugin() {
     super();
 
     sPlugin = this;
@@ -88,7 +89,7 @@ public class TaeEditorPlugin extends AbstractUIPlugin {
    * 
    * @return the TaePlugin
    */
-  public static TaeEditorPlugin getDefault() {
+  public static CasEditorPlugin getDefault() {
     return sPlugin;
   }
 
@@ -99,7 +100,7 @@ public class TaeEditorPlugin extends AbstractUIPlugin {
    * @return resource string
    */
   public static String getResourceString(String key) {
-    ResourceBundle bundle = TaeCorePlugin.getDefault().getResourceBundle();
+    ResourceBundle bundle = getDefault().getResourceBundle();
 
     try {
       return (bundle != null) ? bundle.getString(key) : key;
@@ -126,6 +127,33 @@ public class TaeEditorPlugin extends AbstractUIPlugin {
   }
 
   /**
+   * Retrives the nlp model.
+   * 
+   * @return the nlp model
+   */
+  public static NlpModel getNlpModel() {
+    if (sNLPModel == null) {
+      try {
+        sNLPModel = new NlpModel();
+      } catch (CoreException e) {
+        // TODO: This should not happen, return an emtpy Model
+        log(e);
+      }
+    }
+
+    return sNLPModel;
+  }
+  
+  /**
+   * Log the throwable.
+   * 
+   * @param t
+   */
+  public static void log(Throwable t) {
+    getDefault().getLog().log(new Status(IStatus.ERROR, ID, IStatus.OK, t.getMessage(), t));
+  }
+  
+  /**
    * Retrives an image.
    * 
    * @param image
@@ -133,5 +161,14 @@ public class TaeEditorPlugin extends AbstractUIPlugin {
    */
   public static ImageDescriptor getTaeImageDescriptor(Images image) {
     return imageDescriptorFromPlugin(ID, ICONS_PATH + image.getPath());
+  }
+  
+  /**
+   * Destroy the nlp model, only for testing.
+   */
+  public static void destroyNlpModelForTesting() {
+    sNLPModel.destroyForTesting();
+
+    sNLPModel = null;
   }
 }

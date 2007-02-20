@@ -22,9 +22,8 @@ package org.apache.uima.caseditor.ui.action;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
-
+import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.analysis_engine.TextAnalysisEngine;
 import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
@@ -36,9 +35,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 /**
  * TODO: synchronize filesystem after annotator run.
  * TODO: move this over to core plugin
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.1 $, $Date: 2007/01/04 14:37:53 $
  */
 public final class AnnotatorActionRunnable implements IRunnableWithProgress
 {
@@ -71,7 +67,7 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress
         monitor.subTask("Initializing tagger, "
                 + "please stand by.");
         
-        TextAnalysisEngine annotatorInstance;
+        AnalysisEngine annotatorInstance;
         
         try
         {
@@ -85,8 +81,16 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress
         
         monitor.subTask("Tagging, please stand by.");
         
-        for (IDocument document : mDocuments)
+        for (DocumentElement element : mDocuments)
         {
+        	
+        	IDocument document = null;
+			try {
+				document = element.getDocument();
+			} catch (CoreException e1) {
+				e1.printStackTrace();
+			}
+        	
             try
             {
                 annotatorInstance.process(document.getCAS());
@@ -94,12 +98,13 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress
             catch (AnalysisEngineProcessException e)
             {
                 throw new InvocationTargetException(e);
-            }
+            } 
             
-            // TODO: refactor here, add working copy support
+            // TODO: save it and notify other about changes
+            
             try
             {
-                ((DocumentElement) document).writeToFile();
+                element.saveDocument();
             }
             catch (CoreException e)
             {

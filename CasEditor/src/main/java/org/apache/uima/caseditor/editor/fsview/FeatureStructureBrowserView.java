@@ -31,15 +31,12 @@ import org.eclipse.ui.part.PageBookView;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:57 $
  */
 public final class FeatureStructureBrowserView extends PageBookView {
   /**
    * The ID of the feature structure view.
    */
-  public final String ID = "net.sf.tae.fsview";
+  public final String ID = "org.apache.uima.caseditor.fsview";
 
   @Override
   protected IPage createDefaultPage(PageBook book) {

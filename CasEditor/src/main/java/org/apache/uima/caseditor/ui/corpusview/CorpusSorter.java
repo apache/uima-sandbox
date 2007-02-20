@@ -28,9 +28,6 @@ import org.eclipse.jface.viewers.ViewerSorter;
 
 /**
  * This is a sorter for the corpus explorer tree.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class CorpusSorter extends ViewerSorter
 {

@@ -31,9 +31,6 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 /**
  * The main page of the ImportDocumentWizard.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class ImportDocumentWizardPage extends
         WizardFileSystemResourceImportPage1

@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-
 import org.apache.uima.caseditor.core.model.AnnotatorElement;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.DocumentElement;
@@ -41,9 +40,6 @@ import org.eclipse.ui.actions.ActionGroup;
 
 /**
  * This is an action group for annotator actions.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 final class AnnotatorActionGroup extends ActionGroup
 {

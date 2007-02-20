@@ -30,17 +30,14 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 /**
  * Wides the right side of the currently selected annotation by one.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 15:00:53 $
  */
 public final class WideRightAnnotationSideAction extends BaseSelectionListenerAction {
   private IDocument mDocument;
 
   /**
    * Initializes a new instance.
-   * 
-   * @param editor
+   *
+   * @param document 
    */
   public WideRightAnnotationSideAction(IDocument document) {
     super("WideRightAnnotationSide");

@@ -21,9 +21,6 @@ package org.apache.uima.caseditor.core.model.delta;
 
 /**
  * The kind of the {@link INlpElementDelta}.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 14:56:26 $
  */
 public enum Kind {
   /**

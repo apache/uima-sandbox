@@ -32,9 +32,6 @@ import org.eclipse.ui.IWorkbench;
  * Notes:
  * If two files have the same name but a differnt file extension. The
  * second file gets a number attached.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 public class ImportDocumentWizard2 extends Wizard implements IImportWizard
 {

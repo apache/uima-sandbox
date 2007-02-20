@@ -20,13 +20,13 @@
 package org.apache.uima.caseditor.core;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
@@ -36,9 +36,6 @@ import org.apache.uima.caseditor.core.util.UimaUtil;
 
 /**
  * Abstract base class for document implementations.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public abstract class AbstractDocument implements IDocument {
   /**
@@ -64,14 +61,23 @@ public abstract class AbstractDocument implements IDocument {
     mListener.remove(listener);
   }
 
+  /**
+   * Add notification.
+   */
   public void addAnnotations(Collection<AnnotationFS> annotations) {
     addFeatureStructures(UimaUtil.cast(annotations));
   }
 
+  /**
+   * Remove notification.
+   */
   public void removeAnnotations(Collection<AnnotationFS> annotationsToRemove) {
     removeFeatureStructures(UimaUtil.cast(annotationsToRemove));
   }
 
+  /**
+   * Update notification.
+   */
   public void updateAnnotations(Collection<AnnotationFS> annotations) {
     updateFeatureStructure(UimaUtil.cast(annotations));
   }
@@ -94,7 +100,7 @@ public abstract class AbstractDocument implements IDocument {
    */
   protected void fireAddedAnnotation(Collection<FeatureStructure> annotations) {
     for (IDocumentListener listener : mListener) {
-      listener.added(annotations);
+      listener.added(Collections.unmodifiableCollection(annotations));
     }
   }
 
@@ -116,7 +122,7 @@ public abstract class AbstractDocument implements IDocument {
    */
   protected void fireRemovedAnnotations(Collection<FeatureStructure> annotations) {
     for (IDocumentListener listener : mListener) {
-      listener.removed(annotations);
+      listener.removed(Collections.unmodifiableCollection(annotations));
     }
   }
 
@@ -138,7 +144,7 @@ public abstract class AbstractDocument implements IDocument {
    */
   protected void fireUpdatedFeatureStructures(Collection<FeatureStructure> annotations) {
     for (IDocumentListener listener : mListener) {
-      listener.updated(annotations);
+      listener.updated(Collections.unmodifiableCollection(annotations));
     }
   }
 
@@ -156,7 +162,7 @@ public abstract class AbstractDocument implements IDocument {
       }
     }
 
-    return viewMap;
+    return Collections.unmodifiableMap(viewMap);
   }
 
   /**
@@ -195,6 +201,6 @@ public abstract class AbstractDocument implements IDocument {
       set.add(annotation);
     }
 
-    return set;
+    return Collections.unmodifiableSet(set);
   }
 }

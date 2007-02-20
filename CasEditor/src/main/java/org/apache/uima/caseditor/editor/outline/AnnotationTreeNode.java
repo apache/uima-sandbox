@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.editor.outline;
 
 import java.util.List;
 
-
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.IDocument;
@@ -33,9 +32,6 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4.2.2 $, $Date: 2007/01/04 15:00:58 $
  */
 public class AnnotationTreeNode implements IAdaptable {
   private AnnotationTreeNode mParent;

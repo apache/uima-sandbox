@@ -28,9 +28,6 @@ import org.apache.uima.cas.text.AnnotationFS;
 /**
  * This listener listens only for {@link AnnotationFS} change events. All other change events for
  * {@link FeatureStructure}s are filtered.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2.2.2 $, $Date: 2007/01/04 14:56:25 $
  */
 public abstract class AbstractAnnotationDocumentListener extends AbstractDocumentListener {
   private Collection<AnnotationFS> filterAnnotations(Collection<FeatureStructure> strcutres) {
@@ -45,6 +42,9 @@ public abstract class AbstractAnnotationDocumentListener extends AbstractDocumen
     return annotations;
   }
 
+  /**
+   * Add notification.
+   */
   public void added(Collection<FeatureStructure> structres) {
     Collection<AnnotationFS> annotations = filterAnnotations(structres);
 
@@ -53,6 +53,9 @@ public abstract class AbstractAnnotationDocumentListener extends AbstractDocumen
     }
   }
 
+  /**
+   * Remove notification.
+   */
   public void removed(Collection<FeatureStructure> structres) {
     Collection<AnnotationFS> annotations = filterAnnotations(structres);
 
@@ -61,6 +64,9 @@ public abstract class AbstractAnnotationDocumentListener extends AbstractDocumen
     }
   }
 
+  /**
+   * Update notification.
+   */
   public void updated(Collection<FeatureStructure> structres) {
     Collection<AnnotationFS> annotations = filterAnnotations(structres);
 

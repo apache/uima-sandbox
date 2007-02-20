@@ -22,11 +22,10 @@ package org.apache.uima.caseditor.core.model;
 import java.io.File;
 import java.io.InputStream;
 
-
 import org.apache.uima.ResourceSpecifierFactory;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.caseditor.core.TaeCorePlugin;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.util.MarkerUtil;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -45,8 +44,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 /**
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3.2.2 $, $Date: 2007/01/04 14:56:25 $
+ * TODO: add javadoc
  */
 public class TypesystemElement extends AbstractNlpElement {
   private IFile mTypesytemFile;
@@ -71,7 +69,7 @@ public class TypesystemElement extends AbstractNlpElement {
         try {
           MarkerUtil.clearMarkers(mTypesytemFile, MarkerUtil.PROBLEM_MARKER);
         } catch (CoreException e) {
-          TaeCorePlugin.log(e);
+          CasEditorPlugin.log(e);
         }
       }
     };
@@ -85,7 +83,7 @@ public class TypesystemElement extends AbstractNlpElement {
           try {
             MarkerUtil.createMarker(mTypesytemFile, e.getMessage());
           } catch (CoreException e2) {
-            TaeCorePlugin.log(e2);
+            CasEditorPlugin.log(e2);
           }
         }
       };
@@ -121,7 +119,7 @@ public class TypesystemElement extends AbstractNlpElement {
 
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }
@@ -129,10 +127,10 @@ public class TypesystemElement extends AbstractNlpElement {
     TypePriorities typePriorities = resourceSpecifierFactory.createTypePriorities();
 
     InputStream inIndex = getClass().getClassLoader().getResourceAsStream(
-            "net/sf/tae/core/Index.xml");
+            "org/apache/uima/caseditor/core/Index.xml");
 
     if (inIndex == null) {
-      throw new NoClassDefFoundError("net/sf/tae/core/Index.xml" + " is missing on the classpath");
+      throw new NoClassDefFoundError("org/apache/uima/caseditor/core/Index.xml" + " is missing on the classpath");
     }
 
     XMLInputSource xmlIndexSource = new XMLInputSource(inIndex, new File(""));
@@ -146,7 +144,7 @@ public class TypesystemElement extends AbstractNlpElement {
     } catch (InvalidXMLException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }
@@ -158,7 +156,7 @@ public class TypesystemElement extends AbstractNlpElement {
     } catch (ResourceInitializationException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, TaeCorePlugin.ID, IStatus.OK, message, e);
+      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     }

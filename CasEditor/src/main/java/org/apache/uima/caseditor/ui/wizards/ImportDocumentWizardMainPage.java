@@ -26,9 +26,6 @@ import org.eclipse.ui.dialogs.WizardResourceImportPage;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.1 $, $Date: 2007/01/04 14:37:51 $
  */
 public class ImportDocumentWizardMainPage extends WizardResourceImportPage
 {

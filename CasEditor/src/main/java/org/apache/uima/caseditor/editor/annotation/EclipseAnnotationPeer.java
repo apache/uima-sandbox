@@ -24,9 +24,6 @@ import org.apache.uima.cas.text.AnnotationFS;
 
 /**
  * TODO: add javadoc here
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1.2.2 $, $Date: 2007/01/04 15:00:56 $
  */
 public class EclipseAnnotationPeer extends org.eclipse.jface.text.source.Annotation {
   private AnnotationFS mAnnotation;
