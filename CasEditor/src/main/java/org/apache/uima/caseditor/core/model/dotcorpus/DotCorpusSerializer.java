@@ -209,14 +209,14 @@ public class DotCorpusSerializer {
     ContentHandler xmlSerHandler = xmlSerializer.getContentHandler();
     try {
       xmlSerHandler.startDocument();
-      xmlSerHandler.startElement("", COPORA_ELEMENT, "", null);
+      xmlSerHandler.startElement("", COPORA_ELEMENT, COPORA_ELEMENT, null);
 
       for (String corpusFolder : dotCorpus.getCorpusFolderNameList()) {
         AttributesImpl corpusFolderAttributes = new AttributesImpl();
         corpusFolderAttributes.addAttribute("", CORPUS_FOLDER_ATTRIBUTE, "", "", corpusFolder);
 
-        xmlSerHandler.startElement("", CORPUS_ELEMENT, "", corpusFolderAttributes);
-        xmlSerHandler.endElement("", CORPUS_ELEMENT, "");
+        xmlSerHandler.startElement("", CORPUS_ELEMENT, CORPUS_ELEMENT, corpusFolderAttributes);
+        xmlSerHandler.endElement("", CORPUS_ELEMENT, CORPUS_ELEMENT);
       }
 
       for (AnnotationStyle style : dotCorpus.getAnnotationStyles()) {
@@ -229,8 +229,8 @@ public class DotCorpusSerializer {
         Integer color = style.getColor().getRGB();
         corpusFolderAttributes.addAttribute("", STYLE_COLOR_ATTRIBUTE, "", "", color.toString());
 
-        xmlSerHandler.startElement("", STYLE_ELEMENT, "", corpusFolderAttributes);
-        xmlSerHandler.endElement("", STYLE_ELEMENT, "");
+        xmlSerHandler.startElement("", STYLE_ELEMENT, STYLE_ELEMENT, corpusFolderAttributes);
+        xmlSerHandler.endElement("", STYLE_ELEMENT, STYLE_ELEMENT);
 
       }
 
@@ -239,8 +239,8 @@ public class DotCorpusSerializer {
         typeSystemFileAttributes.addAttribute("", TYPESYTEM_FILE_ATTRIBUTE, "", "", dotCorpus
                 .getTypeSystemFileName());
 
-        xmlSerHandler.startElement("", TYPESYSTEM_ELEMENT, "", typeSystemFileAttributes);
-        xmlSerHandler.endElement("", TYPESYSTEM_ELEMENT, "");
+        xmlSerHandler.startElement("", TYPESYSTEM_ELEMENT, TYPESYSTEM_ELEMENT, typeSystemFileAttributes);
+        xmlSerHandler.endElement("", TYPESYSTEM_ELEMENT, TYPESYSTEM_ELEMENT);
       }
 
       if (dotCorpus.getUimaConfigFolder() != null) {
@@ -248,8 +248,8 @@ public class DotCorpusSerializer {
         taggerConfigAttributes.addAttribute("", TAGGER_FOLDER_ATTRIBUTE, "", "", dotCorpus
                 .getUimaConfigFolder());
 
-        xmlSerHandler.startElement("", TAGGER_ELEMENT, "", taggerConfigAttributes);
-        xmlSerHandler.endElement("", TAGGER_ELEMENT, "");
+        xmlSerHandler.startElement("", TAGGER_ELEMENT, TAGGER_ELEMENT, taggerConfigAttributes);
+        xmlSerHandler.endElement("", TAGGER_ELEMENT, TAGGER_ELEMENT);
       }
 
       if (dotCorpus.getEditorLineLengthHint() != DotCorpus.EDITOR_LINE_LENGTH_HINT_DEFAULT) {
@@ -257,11 +257,11 @@ public class DotCorpusSerializer {
         editorLineLengthHintAttributes.addAttribute("", EDITOR_LINE_LENGTH_ATTRIBUTE, "", "",
                 Integer.toString(dotCorpus.getEditorLineLengthHint()));
 
-        xmlSerHandler.startElement("", EDITOR_ELEMENT, "", editorLineLengthHintAttributes);
-        xmlSerHandler.endElement("", EDITOR_ELEMENT, "");
+        xmlSerHandler.startElement("", EDITOR_ELEMENT, EDITOR_ELEMENT, editorLineLengthHintAttributes);
+        xmlSerHandler.endElement("", EDITOR_ELEMENT, EDITOR_ELEMENT);
       }
 
-      xmlSerHandler.endElement("", COPORA_ELEMENT, "");
+      xmlSerHandler.endElement("", COPORA_ELEMENT, COPORA_ELEMENT);
       xmlSerHandler.endDocument();
     } catch (SAXException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
