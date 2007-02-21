@@ -31,17 +31,19 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.util.XMLSerializer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+
 
 /**
  * This class is responsible to read and write {@link DotCorpus} objects from or to a byte stream.
@@ -187,29 +189,34 @@ public class DotCorpusSerializer {
    * @throws CoreException
    */
   public static void serialize(DotCorpus dotCorpus, OutputStream out) throws CoreException {
-    OutputStreamWriter writer;
+// NOTE: don't need to use a Writer.  XMLSerializer can write to an OutputStream
+// directly, in whatever encoding you specify
+//
+//    OutputStreamWriter writer;
+//
+//    try {
+//      writer = new OutputStreamWriter(out, CHARSET);
+//    } catch (UnsupportedEncodingException e) {
+//      String message = (e.getMessage() != null ? e.getMessage() : "");
+//
+//      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
+//
+//      throw new CoreException(s);
+//    }
 
+    XMLSerializer xmlSerializer = new XMLSerializer(out, true);
+    xmlSerializer.setOutputProperty("encoding", CHARSET);
+    ContentHandler xmlSerHandler = xmlSerializer.getContentHandler();
     try {
-      writer = new OutputStreamWriter(out, CHARSET);
-    } catch (UnsupportedEncodingException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
-
-      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
-
-      throw new CoreException(s);
-    }
-
-    XMLSerializer xmlSerialzer = new XMLSerializer(writer, new OutputFormat("XML", CHARSET, true));
-    try {
-      xmlSerialzer.startDocument();
-      xmlSerialzer.startElement(COPORA_ELEMENT, null);
+      xmlSerHandler.startDocument();
+      xmlSerHandler.startElement("", COPORA_ELEMENT, "", null);
 
       for (String corpusFolder : dotCorpus.getCorpusFolderNameList()) {
         AttributesImpl corpusFolderAttributes = new AttributesImpl();
         corpusFolderAttributes.addAttribute("", CORPUS_FOLDER_ATTRIBUTE, "", "", corpusFolder);
 
-        xmlSerialzer.startElement("", CORPUS_ELEMENT, "", corpusFolderAttributes);
-        xmlSerialzer.endElement(CORPUS_ELEMENT);
+        xmlSerHandler.startElement("", CORPUS_ELEMENT, "", corpusFolderAttributes);
+        xmlSerHandler.endElement("", CORPUS_ELEMENT, "");
       }
 
       for (AnnotationStyle style : dotCorpus.getAnnotationStyles()) {
@@ -222,8 +229,8 @@ public class DotCorpusSerializer {
         Integer color = style.getColor().getRGB();
         corpusFolderAttributes.addAttribute("", STYLE_COLOR_ATTRIBUTE, "", "", color.toString());
 
-        xmlSerialzer.startElement("", STYLE_ELEMENT, "", corpusFolderAttributes);
-        xmlSerialzer.endElement(STYLE_ELEMENT);
+        xmlSerHandler.startElement("", STYLE_ELEMENT, "", corpusFolderAttributes);
+        xmlSerHandler.endElement("", STYLE_ELEMENT, "");
 
       }
 
@@ -232,8 +239,8 @@ public class DotCorpusSerializer {
         typeSystemFileAttributes.addAttribute("", TYPESYTEM_FILE_ATTRIBUTE, "", "", dotCorpus
                 .getTypeSystemFileName());
 
-        xmlSerialzer.startElement("", TYPESYSTEM_ELEMENT, "", typeSystemFileAttributes);
-        xmlSerialzer.endElement(TYPESYSTEM_ELEMENT);
+        xmlSerHandler.startElement("", TYPESYSTEM_ELEMENT, "", typeSystemFileAttributes);
+        xmlSerHandler.endElement("", TYPESYSTEM_ELEMENT, "");
       }
 
       if (dotCorpus.getUimaConfigFolder() != null) {
@@ -241,8 +248,8 @@ public class DotCorpusSerializer {
         taggerConfigAttributes.addAttribute("", TAGGER_FOLDER_ATTRIBUTE, "", "", dotCorpus
                 .getUimaConfigFolder());
 
-        xmlSerialzer.startElement("", TAGGER_ELEMENT, "", taggerConfigAttributes);
-        xmlSerialzer.endElement(TAGGER_ELEMENT);
+        xmlSerHandler.startElement("", TAGGER_ELEMENT, "", taggerConfigAttributes);
+        xmlSerHandler.endElement("", TAGGER_ELEMENT, "");
       }
 
       if (dotCorpus.getEditorLineLengthHint() != DotCorpus.EDITOR_LINE_LENGTH_HINT_DEFAULT) {
@@ -250,12 +257,12 @@ public class DotCorpusSerializer {
         editorLineLengthHintAttributes.addAttribute("", EDITOR_LINE_LENGTH_ATTRIBUTE, "", "",
                 Integer.toString(dotCorpus.getEditorLineLengthHint()));
 
-        xmlSerialzer.startElement("", EDITOR_ELEMENT, "", editorLineLengthHintAttributes);
-        xmlSerialzer.endElement(EDITOR_ELEMENT);
+        xmlSerHandler.startElement("", EDITOR_ELEMENT, "", editorLineLengthHintAttributes);
+        xmlSerHandler.endElement("", EDITOR_ELEMENT, "");
       }
 
-      xmlSerialzer.endElement(COPORA_ELEMENT);
-      xmlSerialzer.endDocument();
+      xmlSerHandler.endElement("", COPORA_ELEMENT, "");
+      xmlSerHandler.endDocument();
     } catch (SAXException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 

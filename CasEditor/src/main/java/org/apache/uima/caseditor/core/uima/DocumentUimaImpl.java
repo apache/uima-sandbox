@@ -51,13 +51,11 @@ import org.apache.uima.caseditor.core.AbstractDocument;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.util.Span;
+import org.apache.uima.util.XMLSerializer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.xml.sax.SAXException;
-
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 
 /**
  * TODO: add javdoc here
@@ -268,19 +266,22 @@ private DocumentElement mDocumentElement;
   public void serialize(OutputStream out) throws CoreException {
     XCASSerializer xcasSerializer = new XCASSerializer(mCAS.getTypeSystem());
 
-    OutputStreamWriter writer;
+//  NOTE: don't need to use a Writer.  XMLSerializer can write to an OutputStream
+//  directly, in whatever encoding you specify
+//    OutputStreamWriter writer;
+//
+//    try {
+//      writer = new OutputStreamWriter(out, "UTF-8");
+//    } catch (UnsupportedEncodingException e1) {
+//      // TODO: handle this exception
+//      throw new RuntimeException(e1);
+//    }
+
+    //Note XMLSerializer uses UTF-8 encoding by default
+    XMLSerializer xmlSerialzer = new XMLSerializer(out, true);
 
     try {
-      writer = new OutputStreamWriter(out, "UTF-8");
-    } catch (UnsupportedEncodingException e1) {
-      // TODO: handle this exception
-      throw new RuntimeException(e1);
-    }
-
-    XMLSerializer xmlSerialzer = new XMLSerializer(writer, new OutputFormat("XML", "UTF-8", true));
-
-    try {
-      xcasSerializer.serialize(mCAS, xmlSerialzer);
+      xcasSerializer.serialize(mCAS, xmlSerialzer.getContentHandler());
     } catch (IOException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
