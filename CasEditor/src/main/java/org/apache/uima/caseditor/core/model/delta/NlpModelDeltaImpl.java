@@ -64,7 +64,9 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
     IResourceDelta deltas[] = mResourceDelta.getAffectedChildren();
 
     for (int i = 0; i < deltas.length; i++) {
-      mChildren.add(new NlpModelDeltaImpl(this, deltas[i]));
+      if (deltas[i].getFlags() != IResourceDelta.MARKERS) {
+        mChildren.add(new NlpModelDeltaImpl(this, deltas[i]));
+      }
     }
   }
 

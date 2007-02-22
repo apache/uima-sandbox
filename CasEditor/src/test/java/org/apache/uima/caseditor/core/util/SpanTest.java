@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.core.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import org.apache.uima.caseditor.core.util.Span;
 import org.junit.Test;
 
 /**

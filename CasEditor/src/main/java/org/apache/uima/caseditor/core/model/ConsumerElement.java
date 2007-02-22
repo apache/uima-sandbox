@@ -33,7 +33,6 @@ import org.apache.uima.util.XMLParser;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
 /**
@@ -129,9 +128,7 @@ public class ConsumerElement extends AbstractNlpElement {
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) throws CoreException {
-    if ((delta.getFlags() & IResourceDelta.CONTENT) != 0) {
       mConsumerConfiguration = createConsumerConfiguration();
-    }
   }
 
   @Override

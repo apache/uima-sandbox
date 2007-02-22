@@ -32,7 +32,7 @@ public final class MarkerUtil {
   /**
    * ID of the problem marker.
    */
-  public static final String PROBLEM_MARKER = "org.apache.uima.caseditor.core.problem";
+  public static final String PROBLEM_MARKER = "org.apache.uima.caseditor.problem";
 
   private MarkerUtil() {
     // util class

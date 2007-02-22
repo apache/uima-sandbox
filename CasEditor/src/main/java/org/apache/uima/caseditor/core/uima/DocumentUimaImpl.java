@@ -264,18 +264,6 @@ private DocumentElement mDocumentElement;
   public void serialize(OutputStream out) throws CoreException {
     XCASSerializer xcasSerializer = new XCASSerializer(mCAS.getTypeSystem());
 
-//  NOTE: don't need to use a Writer.  XMLSerializer can write to an OutputStream
-//  directly, in whatever encoding you specify
-//    OutputStreamWriter writer;
-//
-//    try {
-//      writer = new OutputStreamWriter(out, "UTF-8");
-//    } catch (UnsupportedEncodingException e1) {
-//      // TODO: handle this exception
-//      throw new RuntimeException(e1);
-//    }
-
-    //Note XMLSerializer uses UTF-8 encoding by default
     XMLSerializer xmlSerialzer = new XMLSerializer(out, true);
 
     try {

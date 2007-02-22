@@ -40,13 +40,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-
 /**
  * This class is responsible to read and write {@link DotCorpus} objects from or to a byte stream.
  */
 public class DotCorpusSerializer {
-  private static final String CHARSET = "UTF-8";
-
   private static final String COPORA_ELEMENT = "copora";
 
   private static final String CORPUS_ELEMENT = "corpus";
@@ -185,31 +182,17 @@ public class DotCorpusSerializer {
    * @throws CoreException
    */
   public static void serialize(DotCorpus dotCorpus, OutputStream out) throws CoreException {
-// NOTE: don't need to use a Writer.  XMLSerializer can write to an OutputStream
-// directly, in whatever encoding you specify
-//
-//    OutputStreamWriter writer;
-//
-//    try {
-//      writer = new OutputStreamWriter(out, CHARSET);
-//    } catch (UnsupportedEncodingException e) {
-//      String message = (e.getMessage() != null ? e.getMessage() : "");
-//
-//      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
-//
-//      throw new CoreException(s);
-//    }
 
     XMLSerializer xmlSerializer = new XMLSerializer(out, true);
-    xmlSerializer.setOutputProperty("encoding", CHARSET);
     ContentHandler xmlSerHandler = xmlSerializer.getContentHandler();
+    
     try {
       xmlSerHandler.startDocument();
       xmlSerHandler.startElement("", COPORA_ELEMENT, COPORA_ELEMENT, null);
 
       for (String corpusFolder : dotCorpus.getCorpusFolderNameList()) {
         AttributesImpl corpusFolderAttributes = new AttributesImpl();
-        corpusFolderAttributes.addAttribute("", CORPUS_FOLDER_ATTRIBUTE, "", "", corpusFolder);
+        corpusFolderAttributes.addAttribute("", "",CORPUS_FOLDER_ATTRIBUTE, "", corpusFolder);
 
         xmlSerHandler.startElement("", CORPUS_ELEMENT, CORPUS_ELEMENT, corpusFolderAttributes);
         xmlSerHandler.endElement("", CORPUS_ELEMENT, CORPUS_ELEMENT);
@@ -218,12 +201,12 @@ public class DotCorpusSerializer {
       for (AnnotationStyle style : dotCorpus.getAnnotationStyles()) {
         AttributesImpl corpusFolderAttributes = new AttributesImpl();
         corpusFolderAttributes
-                .addAttribute("", STYLE_TYPE_ATTRIBUTE, "", "", style.getAnnotation());
-        corpusFolderAttributes.addAttribute("", STYLE_STYLE_ATTRIBUTE, "", "", style.getStyle()
+                .addAttribute("", "", STYLE_TYPE_ATTRIBUTE, "", style.getAnnotation());
+        corpusFolderAttributes.addAttribute("", "", STYLE_STYLE_ATTRIBUTE, "", style.getStyle()
                 .name());
 
         Integer color = style.getColor().getRGB();
-        corpusFolderAttributes.addAttribute("", STYLE_COLOR_ATTRIBUTE, "", "", color.toString());
+        corpusFolderAttributes.addAttribute("", "", STYLE_COLOR_ATTRIBUTE, "", color.toString());
 
         xmlSerHandler.startElement("", STYLE_ELEMENT, STYLE_ELEMENT, corpusFolderAttributes);
         xmlSerHandler.endElement("", STYLE_ELEMENT, STYLE_ELEMENT);
@@ -232,7 +215,7 @@ public class DotCorpusSerializer {
 
       if (dotCorpus.getTypeSystemFileName() != null) {
         AttributesImpl typeSystemFileAttributes = new AttributesImpl();
-        typeSystemFileAttributes.addAttribute("", TYPESYTEM_FILE_ATTRIBUTE, "", "", dotCorpus
+        typeSystemFileAttributes.addAttribute("", "", TYPESYTEM_FILE_ATTRIBUTE, "", dotCorpus
                 .getTypeSystemFileName());
 
         xmlSerHandler.startElement("", TYPESYSTEM_ELEMENT, TYPESYSTEM_ELEMENT, typeSystemFileAttributes);
@@ -241,7 +224,7 @@ public class DotCorpusSerializer {
 
       if (dotCorpus.getUimaConfigFolder() != null) {
         AttributesImpl taggerConfigAttributes = new AttributesImpl();
-        taggerConfigAttributes.addAttribute("", TAGGER_FOLDER_ATTRIBUTE, "", "", dotCorpus
+        taggerConfigAttributes.addAttribute("", "", TAGGER_FOLDER_ATTRIBUTE, "", dotCorpus
                 .getUimaConfigFolder());
 
         xmlSerHandler.startElement("", TAGGER_ELEMENT, TAGGER_ELEMENT, taggerConfigAttributes);
@@ -250,7 +233,7 @@ public class DotCorpusSerializer {
 
       if (dotCorpus.getEditorLineLengthHint() != DotCorpus.EDITOR_LINE_LENGTH_HINT_DEFAULT) {
         AttributesImpl editorLineLengthHintAttributes = new AttributesImpl();
-        editorLineLengthHintAttributes.addAttribute("", EDITOR_LINE_LENGTH_ATTRIBUTE, "", "",
+        editorLineLengthHintAttributes.addAttribute("", "", EDITOR_LINE_LENGTH_ATTRIBUTE, "",
                 Integer.toString(dotCorpus.getEditorLineLengthHint()));
 
         xmlSerHandler.startElement("", EDITOR_ELEMENT, EDITOR_ELEMENT, editorLineLengthHintAttributes);

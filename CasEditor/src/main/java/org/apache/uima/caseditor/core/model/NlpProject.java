@@ -255,6 +255,12 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
           return this;
         }
       }
+      
+      if (mTypesystem != null) {
+    	  if (mTypesystem.getResource().equals(resource)) {
+    		  return this;
+    	  }
+      }
 
       for (IResource candiadte : getResources()) {
         if (candiadte.equals(resource)) {

@@ -26,10 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-
-import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
-import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpus;
-import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpusSerializer;
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle.Style;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;

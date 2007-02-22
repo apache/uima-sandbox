@@ -23,7 +23,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.awt.Color;
 
-import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
 import org.junit.Test;
 
 /**
