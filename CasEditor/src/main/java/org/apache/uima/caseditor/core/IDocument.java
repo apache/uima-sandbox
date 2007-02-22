@@ -20,7 +20,6 @@
 package org.apache.uima.caseditor.core;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -28,7 +27,6 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.util.Span;
 import org.eclipse.core.runtime.CoreException;
 

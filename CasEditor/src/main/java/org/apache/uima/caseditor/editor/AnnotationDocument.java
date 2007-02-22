@@ -20,7 +20,6 @@
 package org.apache.uima.caseditor.editor;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 

@@ -23,8 +23,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,8 +39,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 
 
 /**
