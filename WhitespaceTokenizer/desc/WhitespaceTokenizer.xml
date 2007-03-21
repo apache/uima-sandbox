@@ -74,9 +74,11 @@
 		<capabilities>
 			<capability>
 				<inputs />
-
-				<outputs></outputs>
-
+				<outputs>
+					<type>org.apache.uima.TokenAnnotation</type>
+					<feature>org.apache.uima.TokenAnnotation:tokentype</feature>
+					<type>org.apache.uima.SentenceAnnotation</type>
+				</outputs>
 				<languagesSupported>
 					<language>x-unspecified</language>
 				</languagesSupported>
