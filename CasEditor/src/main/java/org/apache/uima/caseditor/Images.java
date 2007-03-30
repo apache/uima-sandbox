@@ -19,34 +19,43 @@
 
 package org.apache.uima.caseditor;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+
 /**
- * TODO: add javadoc here
+ * All images in the cas editor are referenced here. 
+ * 
+ * Call {@link CasEditorPlugin#getTaeImageDescriptor(Images)} to retrive
+ * an actual {@link ImageDescriptor}.
  */
 public enum Images {
+  
+  MODEL_PROJECT_OPEN("tango/project-open.png"),
+  
+  MODEL_PROJECT_CLOSED("tango/project-closed.png"),
+  
+  MODEL_FILE("tango/file.png"),
+  
+  MODEL_FOLDER("tango/folder.png"),
+  
   /**
    * The corpus image.
    */
-  MODEL_CORPUS("model/corpus.gif"),
+  MODEL_CORPUS("tango/corpus.png"),
   
   /**
    * The document image.
    */
-  MODEL_DOCUMENT("model/document.png"),
+  MODEL_DOCUMENT("tango/document.png"),
   
   /**
    * The source folder image.
    */
-  MODEL_SOURCE_FOLDER("model/uima-source-folder.png"),
-  
-  /**
-   * The config folder image.
-   */
-  MODEL_CONFIG_FOLDER("model/config.png"),
+  MODEL_PROCESSOR_FOLDER("tango/processor.png"),
   
   /**
    * Image for the typesystem element.
    */
-  MODEL_TYPESYSTEM("t_s.gif"),
+  MODEL_TYPESYSTEM("model/typesystem.gif"),
   
   /**
    * The enabled refresh icon.
@@ -61,22 +70,22 @@ public enum Images {
   /**
    * The wide left side image.
    */
-  WIDE_LEFT_SIDE("WideLeftSide.bmp"),
+  WIDE_LEFT_SIDE("WideLeftSide.png"),
 
   /**
    * The lower left side image.
    */
-  LOWER_LEFT_SIDE("LowerLeftSide.bmp"),
+  LOWER_LEFT_SIDE("LowerLeftSide.png"),
 
   /**
    * The wide right side image.
    */
-  WIDE_RIGHT_SIDE("WideRightSide.bmp"),
+  WIDE_RIGHT_SIDE("WideRightSide.png"),
 
   /**
    * The lower right side image.
    */
-  LOWER_RIGHT_SIDE("LowerRightSide.bmp"),
+  LOWER_RIGHT_SIDE("LowerRightSide.png"),
 
   /**
    * The merge image.

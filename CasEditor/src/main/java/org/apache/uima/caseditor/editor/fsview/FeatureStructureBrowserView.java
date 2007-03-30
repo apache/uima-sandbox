@@ -36,7 +36,7 @@ public final class FeatureStructureBrowserView extends PageBookView {
   /**
    * The ID of the feature structure view.
    */
-  public final String ID = "org.apache.uima.caseditor.fsview";
+  public static final String ID = "org.apache.uima.caseditor.fsview";
 
   @Override
   protected IPage createDefaultPage(PageBook book) {

@@ -39,13 +39,13 @@ import org.eclipse.core.runtime.CoreException;
  * The ConsumerELement containts the uima consumer descriptor.
  */
 public class ConsumerElement extends AbstractNlpElement {
-  private UimaConfigurationElement mParent;
+  private CasProcessorFolder mParent;
 
   private IFile mConsumerResource;
 
   private CasConsumerConfiguration mConsumerConfiguration;
 
-  ConsumerElement(UimaConfigurationElement config, IFile consumer) throws CoreException {
+  ConsumerElement(CasProcessorFolder config, IFile consumer) throws CoreException {
     mParent = config;
     mConsumerResource = consumer;
     mConsumerConfiguration = createConsumerConfiguration();

@@ -19,9 +19,10 @@
 
 package org.apache.uima.caseditor.editor;
 
+import org.apache.uima.cas.Type;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.editors.text.TextEditorActionContributor;
+import org.eclipse.ui.part.EditorActionBarContributor;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
 
 /**
@@ -29,7 +30,7 @@ import org.eclipse.ui.texteditor.StatusLineContributionItem;
  * 
  * Contributes the "annotation mode" status item to the status bar.
  */
-public class AnnotationEditorActionContributor extends TextEditorActionContributor {
+public class AnnotationEditorActionContributor extends EditorActionBarContributor {
   /**
    * ID of the status item.
    */
@@ -52,9 +53,12 @@ public class AnnotationEditorActionContributor extends TextEditorActionContribut
       mActiveEditorPart = (AnnotationEditor) part;
 
       mActiveEditorPart.setStatusField(mStatusLineModeItem, ID);
-
-      // TODO: how todo this right ???
-      mStatusLineModeItem.setText(mActiveEditorPart.getAnnotationMode().getShortName());
+      
+      Type annotationType = mActiveEditorPart.getAnnotationMode(); 
+      
+      if (annotationType != null) {
+    	  mStatusLineModeItem.setText(annotationType.getShortName());
+      }
     }
   }
 

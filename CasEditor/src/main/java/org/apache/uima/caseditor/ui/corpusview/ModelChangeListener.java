@@ -60,14 +60,17 @@ class ModelChangeListener implements
         
         // INlpElementDelta childs[] = delta.getAffectedChildren();
         
-        
         INlpModelDeltaVisitor visitor = new INlpModelDeltaVisitor()
         {
             public boolean visit(INlpElementDelta delta)
             {
+              if (delta.getResource().getName().equals(".corpus")) {
+                return true;
+              }
+              
                 //if (delta.getKind() == IResourceDelta.OPEN
-                //        || delta.getKind() == IResourceDelta.CONTENT)
-                
+                //        || delta.getKind() == IResourceDelta.CONTENT)                
+             
                 if(delta.getKind().equals(Kind.CHANGED))
                 {
                     if (delta.isNlpElement())

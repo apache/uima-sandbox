@@ -44,12 +44,6 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
 
   private Set<ISelectionChangedListener> mListeners = new HashSet<ISelectionChangedListener>();
 
-  private IDocument mDocument;
-
-  public FeatureStructureSelectionProvider(IDocument document) {
-    mDocument = document;
-  }
-
   /**
    * Adds an {@link ISelectionChangedListener} to this provider.
    * 
@@ -109,7 +103,7 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
       throw new IllegalArgumentException("annotation must not be null!");
     }
 
-    setSelection(new StructuredSelection(new ModelFeatureStructure(mDocument, annotation)));
+    setSelection(new StructuredSelection(new ModelFeatureStructure(document, annotation)));
   }
 
   public void setSelection(IDocument document, List<AnnotationFS> selection) {

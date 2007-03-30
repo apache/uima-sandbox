@@ -69,7 +69,7 @@ public class BracketDrawingStrategy implements IDrawingStrategy {
             gc.drawLine(bounds.x + bounds.width, bounds.y + bounds.height - 1, bounds.x
                     + bounds.width - BRACKET_WIDTH, bounds.y + bounds.height - 1);
 
-            gc.drawLine(bounds.x + bounds.width, bounds.y, bounds.x + bounds.width, bounds.y
+            gc.drawLine(bounds.x + bounds.width - 1, bounds.y, bounds.x + bounds.width - 1, bounds.y
                     + bounds.height - 1);
 
             gc.drawLine(bounds.x + bounds.width, bounds.y, bounds.x + bounds.width - BRACKET_WIDTH,

@@ -36,32 +36,22 @@ import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.actions.CloseResourceAction;
 import org.eclipse.ui.actions.OpenResourceAction;
 import org.eclipse.ui.actions.RefreshAction;
-import org.eclipse.ui.ide.IDEActionFactory;
 
 /**
  * This group contains workspace actions.
  */
 final class WorkspaceActionGroup extends ActionGroup
 {
+  
     /**
      * The action to actually open resources.
      */
     private OpenResourceAction mOpenProjectAction;
-    
-    /**
-     * The retarget action to open a project.
-     */
-    private IAction mRetargetOpenProjectAction;
-    
+      
     /**
      * The action to actually close resources.
      */
     private CloseResourceAction mCloseProjectAction;
-    
-    /**
-     * The retarget action to close.
-     */
-    private IAction mRetargetCloseAction;
     
     /**
      * Action to actually refresh resources.
@@ -82,15 +72,11 @@ final class WorkspaceActionGroup extends ActionGroup
     WorkspaceActionGroup(Shell shell, IWorkbenchWindow window)
     {
         // open
+        // mOpenProjectAction = new OpenResourceAction(shell);
         mOpenProjectAction = new OpenResourceAction(shell);
-        
-        mRetargetOpenProjectAction = IDEActionFactory.OPEN_PROJECT
-                .create(window);
         
         // close
         mCloseProjectAction = new CloseResourceAction(shell);
-        
-        mRetargetCloseAction = IDEActionFactory.CLOSE_PROJECT.create(window);
         
         // refresh
         mRefreshAction = new RefreshAction(shell);
@@ -123,8 +109,6 @@ final class WorkspaceActionGroup extends ActionGroup
         
         boolean isEverythingKnown = false;
         
-        // iterate over resources until they are all consumed
-        // or we know already which operations could be run
         Iterator resources = selection.iterator();
         
         while (resources.hasNext() && !isEverythingKnown)
@@ -160,24 +144,25 @@ final class WorkspaceActionGroup extends ActionGroup
             menu.add(mRetargetRefreshAction);
         }
         
-        if (!hasOnlyProjectSelections)
+        // do not run project open/close actions if anyting
+        // else than a project is selected
+        if (hasOnlyProjectSelections)
         {
-            // do not run project open/close actions if anyting
-            // else than a project is selected
-            
-            return;
-        }
-        
+          
         if (hasOpenProjects)
         {
             // open projects can be closed
-            menu.add(mRetargetCloseAction);
+            menu.add(mCloseProjectAction);
         }
         
         if (hasClosedProjects)
         {
-            menu.add(mRetargetOpenProjectAction);
+            menu.add(mOpenProjectAction);
         }
+          
+            return;
+        }
+        
     }
     
     /**
@@ -186,11 +171,11 @@ final class WorkspaceActionGroup extends ActionGroup
     @Override
     public void fillActionBars(IActionBars actionBars)
     {
-        actionBars.setGlobalActionHandler(
-                IDEActionFactory.OPEN_PROJECT.getId(), mOpenProjectAction);
+        // actionBars.setGlobalActionHandler(
+        //        IDEActionFactory.OPEN_PROJECT.getId(), mOpenProjectAction);
         
-        actionBars.setGlobalActionHandler(IDEActionFactory.CLOSE_PROJECT
-                .getId(), mCloseProjectAction);
+        // actionBars.setGlobalActionHandler(IDEActionFactory.CLOSE_PROJECT
+        //        .getId(), mCloseProjectAction);
         
         actionBars.setGlobalActionHandler(ActionFactory.REFRESH.getId(),
                 mRefreshAction);

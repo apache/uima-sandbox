@@ -19,10 +19,6 @@
 
 package org.apache.uima.caseditor.ui.corpusview;
 
-import javax.swing.text.DefaultEditorKit.CopyAction;
-import javax.swing.text.DefaultEditorKit.PasteAction;
-
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.Clipboard;
@@ -33,12 +29,13 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.actions.RenameResourceAction;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 /**
  * This group contains refactoring actions.
  */
-final class RefactorGroup extends ActionGroup
-{
+final class RefactorGroup extends ActionGroup {
+  
     /**
      * The Clipboard for the copy/paste actions. Must be diposed!
      */
@@ -52,7 +49,7 @@ final class RefactorGroup extends ActionGroup
     /**
      * The copy retarget action
      */
-    private IAction mRetargetCopyAction;
+    private IWorkbenchAction mRetargetCopyAction;
     
     /**
      * Actin that actually paste the resource.
@@ -62,7 +59,7 @@ final class RefactorGroup extends ActionGroup
     /**
      * The paste retarget action.
      */
-    private IAction mRetargetPasteAction;
+    private IWorkbenchAction mRetargetPasteAction;
     
     /**
      * Action that actually delete the resource.
@@ -72,7 +69,7 @@ final class RefactorGroup extends ActionGroup
     /**
      * The delete retarget action.
      */
-    private IAction mRetargetDeleteAction;
+    private IWorkbenchAction mRetargetDeleteAction;
     
     /**
      * Action that actually rename the resource.
@@ -82,7 +79,7 @@ final class RefactorGroup extends ActionGroup
     /**
      * The rename retarget action.
      */
-    private IAction mRetargetRenameAction;
+    private IWorkbenchAction mRetargetRenameAction;
     
     /**
      * Initializes a new instance.
@@ -90,17 +87,16 @@ final class RefactorGroup extends ActionGroup
      * @param shell
      * @param window
      */
-    RefactorGroup(Shell shell, IWorkbenchWindow window)
-    {
-        mClipboard = new Clipboard(shell.getDisplay());
-        
-        // copy action
-        //mCopyAction = new CopyAction(mClipboard);
+  RefactorGroup(Shell shell, IWorkbenchWindow window) {
+    mClipboard = new Clipboard(shell.getDisplay());
+
+    // copy action
+        mCopyAction = new CopyAction(mClipboard);
         
         mRetargetCopyAction = ActionFactory.COPY.create(window);
         
         // paste action
-        //mPasteAction = new PasteAction(shell, mClipboard);
+        mPasteAction = new PasteAction(shell, mClipboard);
         
         mRetargetPasteAction = ActionFactory.PASTE.create(window);
         
@@ -118,93 +114,83 @@ final class RefactorGroup extends ActionGroup
     /**
      * Fills the context menu with actions.
      */
-    @Override
-    public void fillContextMenu(IMenuManager menu)
-    {
-        IStructuredSelection selection = CorpusExplorerUtil
-                .convertNLPElementsToResources((IStructuredSelection) getContext()
-                        .getSelection());
-        
-        boolean isAResourceSelected = !selection.isEmpty();
-        
-        // Order as in "Eclipse User Interface Guidelines":
-        
-        // 1. Cut
-        
-        // 2. Copy
-        menu.add(mRetargetCopyAction);
-        
-        // 3. Paste
-        menu.add(mRetargetPasteAction);
-        
-        // 4. Delete
-        if (isAResourceSelected)
-        {
-            menu.add(mRetargetDeleteAction);
-        }
-        
-        // 5. Move
-        // menu.add(ActionFactory.MOVE.create(mWindow));
-        
-        // 6. Rename
-        if (selection.size() == 1)
-        {
-            menu.add(mRetargetRenameAction);
-        }
-        
-        // 7. other refactoring commands
+  @Override
+  public void fillContextMenu(IMenuManager menu) {
+    IStructuredSelection selection = CorpusExplorerUtil
+            .convertNLPElementsToResources((IStructuredSelection) getContext().getSelection());
+
+    boolean isAResourceSelected = !selection.isEmpty();
+
+    // Order as in "Eclipse User Interface Guidelines":
+
+    // 1. Cut
+
+    // 2. Copy
+    menu.add(mRetargetCopyAction);
+
+    // 3. Paste
+    menu.add(mRetargetPasteAction);
+
+    // 4. Delete
+    if (isAResourceSelected) {
+      menu.add(mRetargetDeleteAction);
     }
+
+    // 5. Move
+    // menu.add(ActionFactory.MOVE.create(mWindow));
+
+    // 6. Rename
+    if (selection.size() == 1) {
+      menu.add(mRetargetRenameAction);
+    }
+
+    // 7. other refactoring commands
+  }
     
-    /**
-     * Fill the ActionBars with defined actions.
-     */
-    @Override
-    public void fillActionBars(IActionBars actionBars)
-    {
-        actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(),
-                mDeleteAction);
-        
-        //actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(),
-        //        mCopyAction);
-        
-        //actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(),
-        //        mPasteAction);
-        
-        actionBars.setGlobalActionHandler(ActionFactory.RENAME.getId(),
-                mRenameAction);
-        
-        actionBars.updateActionBars();
-    }
+ /**
+   * Fill the ActionBars with defined actions.
+   */
+  @Override
+  public void fillActionBars(IActionBars actionBars) {
+    actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), mDeleteAction);
+
+    actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), mCopyAction);
+
+    actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), mPasteAction);
+
+    actionBars.setGlobalActionHandler(ActionFactory.RENAME.getId(), mRenameAction);
+
+    actionBars.updateActionBars();
+  }
     
     /**
      * Update the selction of the actions.
      */
-    @Override
-    public void updateActionBars()
-    {
-        super.updateActionBars();
+  @Override
+  public void updateActionBars() {
+    super.updateActionBars();
+
+    IStructuredSelection selection = CorpusExplorerUtil
+            .convertNLPElementsToResources((IStructuredSelection) getContext().getSelection());
         
-        IStructuredSelection selection = CorpusExplorerUtil
-                .convertNLPElementsToResources((IStructuredSelection) getContext()
-                        .getSelection());
-        
-        //mCopyAction.selectionChanged(selection);
-        //mPasteAction.selectionChanged(selection);
+        mCopyAction.selectionChanged(selection);
+        mPasteAction.selectionChanged(selection);
         mDeleteAction.selectionChanged(selection);
         mRenameAction.selectionChanged(selection);
     }
     
     /**
-     * Destroy all swt elements which where created by this instance.
-     */
-    @Override
-    public void dispose()
-    {
-        if (mClipboard != null)
-        {
-            mClipboard.dispose();
-        }
-        
-        super.dispose();
-    }
+   * Destroy all swt elements which where created by this instance.
+   */
+  @Override
+  public void dispose() {
+      
+    mClipboard.dispose();
+    mRetargetCopyAction.dispose();
+    mRetargetPasteAction.dispose();
+    mRetargetDeleteAction.dispose();
+    mRetargetRenameAction.dispose();
+    
+    super.dispose();
+  }
 }

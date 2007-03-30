@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <collectionReaderDescription  xmlns="http://uima.watson.ibm.com/resourceSpecifier">
-	<frameworkImplementation>com.ibm.uima.java</frameworkImplementation>
+	<frameworkImplementation>org.apache.uima.java</frameworkImplementation>
 	<implementationName>org.apache.uima.caseditor.uima.CorporaCollectionReader</implementationName>
 	<processingResourceMetaData>
 		<name>Corpora Collection Reader</name>

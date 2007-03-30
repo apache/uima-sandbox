@@ -458,7 +458,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
   /**
    * Adds the these actions to the global action handler: {@link DeleteFeatureStructureAction}
-   * SelectAllAction // TODO: implement it
+   * SelectAllAction
    * 
    * @param actionBars
    */

@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.CoreException;
  * TODO: add javadoc here
  */
 public class AnnotatorElement extends AbstractNlpElement {
-  private UimaConfigurationElement mParent;
+  private CasProcessorFolder mParent;
 
   private IFile mAnnotatorResource;
 
@@ -51,7 +51,7 @@ public class AnnotatorElement extends AbstractNlpElement {
    * @param config
    * @param annotatorFile
    */
-  AnnotatorElement(UimaConfigurationElement config, IFile annotatorFile) {
+  AnnotatorElement(CasProcessorFolder config, IFile annotatorFile) {
     mParent = config;
     mAnnotatorResource = annotatorFile;
 

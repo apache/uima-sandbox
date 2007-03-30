@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.editor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -35,12 +34,12 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.AbstractAnnotationDocumentListener;
+import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
 import org.apache.uima.caseditor.core.model.dotcorpus.EditorAnnotationStatus;
 import org.apache.uima.caseditor.core.uima.AnnotationComparator;
 import org.apache.uima.caseditor.core.util.Span;
 import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;
-import org.apache.uima.caseditor.editor.annotation.AnnotationViewerDecorationSupport;
-import org.apache.uima.caseditor.editor.annotation.EclipseAnnotationPeer;
+import org.apache.uima.caseditor.editor.annotation.DrawingStyle;
 import org.apache.uima.caseditor.editor.context.AnnotationEditingControlCreator;
 import org.apache.uima.caseditor.editor.outline.AnnotationOutline;
 import org.apache.uima.caseditor.ui.FeatureStructureTransfer;
@@ -50,10 +49,12 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.information.InformationPresenter;
-import org.eclipse.jface.text.source.IAnnotationModelExtension;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.AnnotationPainter;
+import org.eclipse.jface.text.source.IAnnotationAccess;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -80,12 +81,10 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.IStatusField;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
-import org.eclipse.ui.texteditor.ITextEditorExtension2;
 import org.eclipse.ui.texteditor.IWorkbenchActionDefinitionIds;
-import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.texteditor.StatusTextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 /**
@@ -97,12 +96,9 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  * add an action to decrease left side on an annotation 
  * add an action to decrease right side on an annotation
  */
-public final class AnnotationEditor extends TextEditor implements ISelectionListener,
-        ITextEditorExtension2 {
+public final class AnnotationEditor extends StatusTextEditor implements ISelectionListener {
   /**
    * This action annotates the selected text with a defined tag.
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private class AnnotateAction extends Action {
     private StyledText mTextWidget;
@@ -152,8 +148,6 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
 
   /**
    * Shows the annotation editing context for the active annoation.
-   * 
-   * @author <a href="mailto:jkottmann@calcucare.com">Joern Kottmann </a>
    */
   private class ShowAnnotationContextEditAction extends Action {
     private InformationPresenter mPresenter;
@@ -206,8 +200,6 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
   /**
    * This <code>IDocumentChangeListener</code> is responsible to synchronize annotation in the
    * document with the annotations in eclipse.
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private class DocumentListener extends AbstractAnnotationDocumentListener {
     /**
@@ -215,28 +207,8 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
      * 
      * @param annotations
      */
-    public void addedAnnotation(Collection<AnnotationFS> annotations) {
-      IAnnotationModelExtension annotationModel = (IAnnotationModelExtension) getDocumentProvider()
-              .getAnnotationModel(getEditorInput());
-
-      Map<org.eclipse.jface.text.source.Annotation, Position> annotationMap = 
-              new HashMap<org.eclipse.jface.text.source.Annotation, Position>();
-
-      for (AnnotationFS annotation : annotations) {
-        int start = annotation.getBegin();
-        int length = annotation.getEnd() - start;
-
-        EclipseAnnotationPeer eclipseAnnotation = new EclipseAnnotationPeer(
-                ECLIPSE_ANNOTATION_TYPE, false, "test");
-
-        eclipseAnnotation.setAnnotation(annotation);
-
-        annotationMap.put(eclipseAnnotation, new Position(start, length));
-
-        mAnnotationToEclipseAnnotationMap.put(annotation, eclipseAnnotation);
-      }
-
-      annotationModel.replaceAnnotations(null, annotationMap);
+    public void addedAnnotation(Collection<AnnotationFS> annotations) {    	
+    	mPainter.paint(AnnotationPainter.CONFIGURATION);
     }
 
     /**
@@ -245,19 +217,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
      * @param deletedAnnotations
      */
     public void removedAnnotation(Collection<AnnotationFS> deletedAnnotations) {
-      IAnnotationModelExtension annotationModel = (IAnnotationModelExtension) getDocumentProvider()
-              .getAnnotationModel(getEditorInput());
-
-      org.eclipse.jface.text.source.Annotation[] annotations =
-              new org.eclipse.jface.text.source.Annotation[deletedAnnotations.size()];
-
-      int i = 0;
-      for (AnnotationFS deletedAnnotation : deletedAnnotations) {
-        annotations[i++] = mAnnotationToEclipseAnnotationMap.get(deletedAnnotation);
-      }
-
-      annotationModel.replaceAnnotations(annotations, null);
-
+    	
       if (getSite().getPage().getActivePart() == AnnotationEditor.this) {
         mFeatureStructureSelectionProvider.clearSelection();
       } else {
@@ -265,6 +225,8 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
       }
 
       highlight(0, 0); // TODO: only if removed annotation was selected
+      
+      mPainter.paint(AnnotationPainter.CONFIGURATION);
     }
 
     /**
@@ -287,9 +249,6 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
   }
 
   /**
-   * .
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private static abstract class TypeMenu extends ContributionItem {
     private Type mParentType;
@@ -353,8 +312,6 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
 
   /**
    * Creates the mode context submenu.
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private class ModeMenu extends TypeMenu {
     /**
@@ -363,8 +320,8 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
      * @param type
      * @param typeSystem
      */
-    ModeMenu(Type type, TypeSystem typeSystem) {
-      super(type, typeSystem);
+    ModeMenu(TypeSystem typeSystem) {
+      super(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION), typeSystem);
     }
 
     @Override
@@ -386,18 +343,21 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
 
   /**
    * Creates the show annotations context submenu.
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private class ShowAnnotationsMenu extends TypeMenu {
+	 
+	 private Collection<Type> mTypesToDisplay = new HashSet<Type>();
+	  
     /**
      * Initializes a new instance.
      * 
      * @param type
      * @param typeSystem
      */
-    ShowAnnotationsMenu(Type type, TypeSystem typeSystem) {
-      super(type, typeSystem);
+    ShowAnnotationsMenu(EditorAnnotationStatus status, TypeSystem typeSystem) {
+      super(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION), typeSystem);
+      
+      mTypesToDisplay.addAll(status.getDisplayAnnotations());
     }
 
     @Override
@@ -426,167 +386,14 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
         }
       });
     }
-  }
-
-  private Type mCurrentAnnotationType;
-
-  /**
-   * The outline page belonging to this editor.
-   */
-  private IContentOutlinePage mOutlinePage;
-
-  private HashMap<AnnotationFS, org.eclipse.jface.text.source.Annotation> 
-        mAnnotationToEclipseAnnotationMap = new HashMap<AnnotationFS, 
-        org.eclipse.jface.text.source.Annotation>();
-
-  private IAnnotationEditorModifyListener mEditorListener;
-
-  /**
-   * TODO: Do we realy need this pos variable ?
-   */
-  private int mCursorPosition;
-
-  private AnnotationDocument mDocument;
-
-  /**
-   * The type of the annotation for eclipse-annotations
-   */
-  public static final String ECLIPSE_ANNOTATION_TYPE = "org.apache.uima.caseditor.Annotation";
-
-  private Collection<Type> mTypesToDisplay = new HashSet<Type>();
-
-  boolean mIsSomethingHighlighted = false;
-
-  private StyleRange mCurrentStyleRange;
-
-  private FeatureStructureSelectionProvider mFeatureStructureSelectionProvider;
-
-  /**
-   * Creates an new AnnotationEditor object.
-   */
-  public AnnotationEditor() {
-    setDocumentProvider(new AnnotationDocumentProvider());
-  }
-
-  /**
-   * Retrives annotation editor adapters.
-   * 
-   * @param adapter
-   * @return an adapter or null
-   */
-  @Override
-  public Object getAdapter(Class adapter) {
-    if (IContentOutlinePage.class.equals(adapter)) {
-      if (mOutlinePage == null) {
-        mOutlinePage = new AnnotationOutline(this);
-      }
-
-      return mOutlinePage;
-    } else if (CAS.class.equals(adapter)) {
-      return getDocument().getCAS();
-    } else {
-      return super.getAdapter(adapter);
+    
+    Collection<Type> getSelectedTypes() {
+    	return Collections.unmodifiableCollection(mTypesToDisplay);
     }
-  }
-
-  
-  @Override
-  protected SourceViewerDecorationSupport getSourceViewerDecorationSupport(ISourceViewer viewer) {
-    // lazy intialize fSourceViewerDecorationSupport
-    if (fSourceViewerDecorationSupport == null) {
-      fSourceViewerDecorationSupport = new AnnotationViewerDecorationSupport(viewer,
-              getOverviewRuler(), getAnnotationAccess(), getSharedColors(), this);
-
-      configureSourceViewerDecorationSupport(fSourceViewerDecorationSupport);
-    }
-
-    return fSourceViewerDecorationSupport;
-  }
-
-  @Override
-  protected ISourceViewer createSourceViewer(Composite parent,
-          org.eclipse.jface.text.source.IVerticalRuler ruler, int styles) {
-    ISourceViewer sourceViewer = super.createSourceViewer(parent, ruler, styles);
-
-    sourceViewer.setEditable(false);
-
-    return sourceViewer;
-  }
-
-  /**
-   * Configures the editor.
-   * 
-   * @param parent
-   */
-  @Override
-  public void createPartControl(Composite parent) {
-    super.createPartControl(parent);
-
-    /*
-     * this is a workaround for the quickdiff assertion if nothing was changed, how to do this
-     * better ? is this the right way ?
-     */
-    showChangeInformation(false);
-
-    getDocument().addChangeListener(new DocumentListener());
-
-    getSourceViewer().getTextWidget().addKeyListener(new KeyListener() {
-      public void keyPressed(KeyEvent e) {
-        int newCaretOffset = getSourceViewer().getTextWidget().getCaretOffset();
-
-        if (newCaretOffset != mCursorPosition) {
-          mCursorPosition = newCaretOffset;
-          cursorPositionChanged();
-        }
-      }
-
-      public void keyReleased(KeyEvent e) {
-        // not implemented
-      }
-
-    });
-
-    getSourceViewer().getTextWidget().addMouseListener(new MouseListener() {
-      public void mouseDown(MouseEvent e) {
-        int newCaretOffset = getSourceViewer().getTextWidget().getCaretOffset();
-
-        if (newCaretOffset != mCursorPosition) {
-          mCursorPosition = newCaretOffset;
-          cursorPositionChanged();
-        }
-      }
-
-      public void mouseDoubleClick(MouseEvent e) {
-        // not needed
-      }
-
-      public void mouseUp(MouseEvent e) {
-        // not needed
-      }
-
-    });
-
-    DragSource dragSource = new DragSource(getSourceViewer().getTextWidget(), DND.DROP_COPY);
-
-    Transfer[] types = new Transfer[] { FeatureStructureTransfer.getInstance() };
-
-    dragSource.setTransfer(types);
-
-    dragSource.addDragListener(new FeatureStructureDragListener(getSourceViewer().getTextWidget()));
-
-    getSite().getPage().addSelectionListener(this);
-
-    getSourceViewer().getTextWidget().setEditable(false);
-    getSourceViewer().setEditable(false);
-
-    getSite().setSelectionProvider(mFeatureStructureSelectionProvider);
   }
 
   /**
    * Sometimes the wrong annoation is selected ... ????
-   * 
-   * @author joern
-   * 
    */
   private class FeatureStructureDragListener implements DragSourceListener {
     private boolean mIsActive;
@@ -647,6 +454,169 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
     public void dragFinished(DragSourceEvent event) {
     }
   }
+  
+  private Type mCurrentAnnotationType;
+
+  /**
+   * The outline page belonging to this editor.
+   */
+  private IContentOutlinePage mOutlinePage;
+
+  private IAnnotationEditorModifyListener mEditorListener;
+
+  /**
+   * TODO: Do we realy need this pos variable ?
+   */
+  private int mCursorPosition;
+
+  private AnnotationDocument mDocument;
+
+  boolean mIsSomethingHighlighted = false;
+
+  private StyleRange mCurrentStyleRange;
+
+  private FeatureStructureSelectionProvider mFeatureStructureSelectionProvider;
+
+  private AnnotationPainter mPainter;
+
+//  private IAnnotationModel mAnnotationModel;
+
+  private ShowAnnotationsMenu mShowAnnotationsMenu;
+  
+  /**
+   * Creates an new AnnotationEditor object.
+   */
+  public AnnotationEditor() {
+    setDocumentProvider(new CasDocumentProvider());
+  }
+
+  /**
+   * Retrives annotation editor adapters.
+   * 
+   * @param adapter
+   * @return an adapter or null
+   */
+  @Override
+  public Object getAdapter(Class adapter) {
+    if (IContentOutlinePage.class.equals(adapter)) {
+      if (mOutlinePage == null) {
+        mOutlinePage = new AnnotationOutline(this);
+      }
+
+      return mOutlinePage;
+    } else if (CAS.class.equals(adapter)) {
+      return getDocument().getCAS();
+    } else {
+      return super.getAdapter(adapter);
+    }
+  }
+
+  @Override
+  protected ISourceViewer createSourceViewer(Composite parent,
+          org.eclipse.jface.text.source.IVerticalRuler ruler, int styles) {
+	  SourceViewer sourceViewer = new SourceViewer(parent, ruler, styles);
+    
+    sourceViewer.setEditable(false);
+    
+	mPainter = new AnnotationPainter(sourceViewer, new IAnnotationAccess() {
+
+		public Object getType(Annotation annotation) {
+			return null;
+		}
+
+		public boolean isMultiLine(Annotation annotation) {
+			return false;
+		}
+
+		public boolean isTemporary(Annotation annotation) {
+			return false;
+		}
+		
+	});
+	sourceViewer.addPainter(mPainter);
+    
+	// mPainter.modelChanged(mAnnotationModel); // realy nessesary ?
+	
+    return sourceViewer;
+  }
+
+  /**
+   * Configures the editor.
+   * 
+   * @param parent
+   */
+  @Override
+  public void createPartControl(Composite parent) {
+    super.createPartControl(parent);
+    
+    /*
+     * this is a workaround for the quickdiff assertion if nothing was changed, how to do this
+     * better ? is this the right way ?
+     */
+    showChangeInformation(false);
+
+    getSourceViewer().getTextWidget().addKeyListener(new KeyListener() {
+      public void keyPressed(KeyEvent e) {
+        int newCaretOffset = getSourceViewer().getTextWidget().getCaretOffset();
+
+        if (newCaretOffset != mCursorPosition) {
+          mCursorPosition = newCaretOffset;
+          cursorPositionChanged();
+        }
+      }
+
+      public void keyReleased(KeyEvent e) {
+        // not implemented
+      }
+
+    });
+
+    getSourceViewer().getTextWidget().addMouseListener(new MouseListener() {
+      public void mouseDown(MouseEvent e) {
+        int newCaretOffset = getSourceViewer().getTextWidget().getCaretOffset();
+
+        if (newCaretOffset != mCursorPosition) {
+          mCursorPosition = newCaretOffset;
+          cursorPositionChanged();
+        }
+      }
+
+      public void mouseDoubleClick(MouseEvent e) {
+        // not needed
+      }
+
+      public void mouseUp(MouseEvent e) {
+        // not needed
+      }
+
+    });
+
+    DragSource dragSource = new DragSource(getSourceViewer().getTextWidget(), DND.DROP_COPY);
+
+    Transfer[] types = new Transfer[] { FeatureStructureTransfer.getInstance() };
+
+    dragSource.setTransfer(types);
+
+    dragSource.addDragListener(new FeatureStructureDragListener(getSourceViewer().getTextWidget()));
+
+    getSite().getPage().addSelectionListener(this);
+
+    getSourceViewer().getTextWidget().setEditable(false);
+    getSourceViewer().setEditable(false);
+
+    getSite().setSelectionProvider(mFeatureStructureSelectionProvider);
+    
+    if (mDocument != null) {
+	    mShowAnnotationsMenu = new ShowAnnotationsMenu(
+	    		mDocument.getProject().getEditorAnnotationStatus(), 
+	    		getDocument().getCAS().getTypeSystem());
+	    
+		EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
+		setAnnotationType(status.getMode());
+    }
+    
+
+  }
 
   // TODO: still not called always, e.g. on mouse selection
   private void cursorPositionChanged() {
@@ -669,15 +639,11 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
 
     mDocument = (AnnotationDocument) getDocumentProvider().getDocument(input);
 
-    EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
-
-    setAnnotationType(status.getMode());
-    mTypesToDisplay.clear();
-    mTypesToDisplay.addAll(status.getDisplayAnnotations());
-
-    syncAnnotations();
-
-    mFeatureStructureSelectionProvider = new FeatureStructureSelectionProvider(mDocument);
+    if (mDocument != null) {
+    	// mAnnotationModel = getDocumentProvider().getAnnotationModel(input);
+    	
+    	getDocument().addChangeListener(new DocumentListener());
+    }
   }
 
   @Override
@@ -686,17 +652,15 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
 
     TypeSystem typeSytem = getDocument().getCAS().getTypeSystem();
 
-    Type annotation = typeSytem.getType(CAS.TYPE_NAME_ANNOTATION);
-
     // mode menu
     MenuManager modeMenu = new MenuManager("Mode");
     menu.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, modeMenu);
-    modeMenu.add(new ModeMenu(annotation, typeSytem));
+    modeMenu.add(new ModeMenu(typeSytem));
 
     // annotation menu
     MenuManager showAnnotationMenu = new MenuManager("Show Annotations");
     menu.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, showAnnotationMenu);
-    showAnnotationMenu.add(new ShowAnnotationsMenu(annotation, typeSytem));
+    showAnnotationMenu.add(mShowAnnotationsMenu);
   }
 
   /**
@@ -760,56 +724,31 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
     mEditorListener.annotationModeChanged(type);
   }
 
+  private void showAnnotationType(Type type) {
+		AnnotationStyle style = mDocument.getProject().getDotCorpus().getAnnotation(type);
+		mPainter.addDrawingStrategy(type.getName(), 
+				DrawingStyle.valueOf(style.getStyle().name()).getStrategy());
+		mPainter.addAnnotationType(type.getName(), type.getName());
+		mPainter.setAnnotationTypeColor(type.getName(), style.getColor());
+  }
+  
   /**
    * 
    */
   private void syncAnnotations() {
-    Collection<org.eclipse.jface.text.source.Annotation> annotationsToRemoveCollection = 
-            mAnnotationToEclipseAnnotationMap.values();
 
-    org.eclipse.jface.text.source.Annotation[] annotationsToRemove = 
-            new org.eclipse.jface.text.source.Annotation[annotationsToRemoveCollection.size()];
-
-    annotationsToRemoveCollection.toArray(annotationsToRemove);
-
-    mAnnotationToEclipseAnnotationMap.clear();
-
-    // add new
-    HashMap<org.eclipse.jface.text.source.Annotation, Position> annotationsToAdd = 
-            new HashMap<org.eclipse.jface.text.source.Annotation, Position>();
-
-    // create a set of annoation types to display
-    // get enabled annoations
-    // get current annotation
-
-    Collection<AnnotationFS> annotations = new LinkedList<AnnotationFS>();
-
-    for (Type type : mTypesToDisplay) {
-      annotations.addAll(getDocument().getAnnotations(type));
-    }
+	mPainter.removeAllAnnotationTypes();
+	
+	for (Type displayType : mShowAnnotationsMenu.getSelectedTypes()) {
+		showAnnotationType(displayType);
+	}
 
     // if not contained in types add current mode annotations
-    if (!mTypesToDisplay.contains(mCurrentAnnotationType)) {
-      annotations.addAll(getDocument().getAnnotations(mCurrentAnnotationType));
+    if (!mShowAnnotationsMenu.getSelectedTypes().contains(mCurrentAnnotationType)) {
+    	showAnnotationType(mCurrentAnnotationType);
     }
 
-    for (AnnotationFS annotation : annotations) {
-      EclipseAnnotationPeer eclipseAnnotation = new EclipseAnnotationPeer(ECLIPSE_ANNOTATION_TYPE,
-              false, "");
-
-      eclipseAnnotation.setAnnotation(annotation);
-
-      int start = annotation.getBegin();
-      int length = annotation.getEnd() - start;
-
-      annotationsToAdd.put(eclipseAnnotation, new Position(start, length));
-      mAnnotationToEclipseAnnotationMap.put(annotation, eclipseAnnotation);
-    }
-
-    IAnnotationModelExtension annotationModel = (IAnnotationModelExtension) getDocumentProvider()
-            .getAnnotationModel(getEditorInput());
-
-    annotationModel.replaceAnnotations(annotationsToRemove, annotationsToAdd);
+	mPainter.paint(AnnotationPainter.CONFIGURATION);
   }
 
   /**
@@ -943,7 +882,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
   private void setProjectEditorStatus() {
     // TODO: do not replace if equal ... check this
     EditorAnnotationStatus status = new EditorAnnotationStatus(getAnnotationMode(), 
-            mTypesToDisplay);
+            mShowAnnotationsMenu.getSelectedTypes());
     getDocument().getProject().setEditorAnnotationStatus(status);
   }
 
@@ -953,6 +892,10 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
   @Override
   protected void createActions() {
     super.createActions();
+    
+    
+    mFeatureStructureSelectionProvider = new FeatureStructureSelectionProvider();
+    getSite().setSelectionProvider(mFeatureStructureSelectionProvider);
 
     // create annotate action
     AnnotateAction annotateAction = new AnnotateAction(getSourceViewer().getTextWidget());
@@ -960,13 +903,15 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
     annotateAction.setActionDefinitionId(ITextEditorActionDefinitionIds.SMART_ENTER);
 
     setAction(ITextEditorActionDefinitionIds.SMART_ENTER, annotateAction);
-    setActionActivationCode(ITextEditorActionDefinitionIds.SMART_ENTER, (char) 0, SWT.CR,
+    setActionActivationCode(ITextEditorActionDefinitionIds.SMART_ENTER, (char) '\r', SWT.CR,
             SWT.DEFAULT);
 
     // create delete action
     DeleteFeatureStructureAction deleteAnnotationAction = new DeleteFeatureStructureAction(
             getDocument());
-    mFeatureStructureSelectionProvider.addSelectionChangedListener(deleteAnnotationAction);
+    
+    getSite().getSelectionProvider().addSelectionChangedListener(deleteAnnotationAction);
+    
     deleteAnnotationAction.setActionDefinitionId(IWorkbenchActionDefinitionIds.DELETE);
 
     setAction(IWorkbenchActionDefinitionIds.DELETE, deleteAnnotationAction);
@@ -980,7 +925,7 @@ public final class AnnotationEditor extends TextEditor implements ISelectionList
 
     setAction(ITextEditorActionDefinitionIds.QUICK_ASSIST, annotationContextEditAction);
   }
-
+  
   @Override
   public void dispose() {
     // remove selection listener

@@ -24,6 +24,8 @@ import java.io.IOException;
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.widgets.Composite;
@@ -36,9 +38,9 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
 {
     private DotCorpusPreferenceStore mDotCorpusPropertyStore;
     
-    private FileSelectionFieldEditor mTypeSystemFile;
+    private FileFieldEditor mTypeSystemFile;
     
-    private FolderFieldEditor mUimaConfigFolder;
+    private FolderPathEditor mCasProcessorFolders;
     
     private FolderPathEditor mCorpusFolders;
     
@@ -55,8 +57,6 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
     @Override
     protected void createFieldEditors()
     {
-        IProject project = (IProject) getProject().getResource();
-        
         NlpProject nlpProject = ((INlpElement) getElement()).getNlpProject();
         
         mDotCorpusPropertyStore = new DotCorpusPreferenceStore(nlpProject
@@ -65,25 +65,26 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
         Composite parent = getFieldEditorParent();
         
         // uima config folder
-        mUimaConfigFolder = new FolderFieldEditor(
+        mCasProcessorFolders = new FolderPathEditor(
                 DotCorpusPreferenceStore.Key.TAGGER_CONFIG_FOLDER.name(),
-                "Uima Config", parent, project);
-        mUimaConfigFolder.setChangeButtonText("Browse...");
-        mUimaConfigFolder.setPreferenceStore(mDotCorpusPropertyStore);
-        addField(mUimaConfigFolder);
+                "Processor Folders", "Processor folder selection", "Select the processor folder", 
+                parent, nlpProject);
+        mCasProcessorFolders.setPreferenceStore(mDotCorpusPropertyStore);
+        addField(mCasProcessorFolders);
         
         // corpus folder
         mCorpusFolders = new FolderPathEditor(
                 DotCorpusPreferenceStore.Key.CORPUS_FOLDERS.name(),
-                "CorpusFolders", "folderChooserLabel", parent, project);
+                "Corpus Folders", "Corpus folder selection", "Select the corpus folder", 
+                parent, nlpProject);
         
         mCorpusFolders.setPreferenceStore(mDotCorpusPropertyStore);
         addField(mCorpusFolders);
         
         // type system file
-        mTypeSystemFile = new FileSelectionFieldEditor(
-                DotCorpusPreferenceStore.Key.TYPE_SYSTEM_FILE.name(),
-                "Typesystem", parent, project);
+        mTypeSystemFile = new FileFieldEditor(
+                DotCorpusPreferenceStore.Key.TYPE_SYSTEM_FILE.name(), "Typesystem", 
+                "Typesystem file selection", "Select the typesystem file", parent, nlpProject);
         mTypeSystemFile.setChangeButtonText("Browse...");
         mTypeSystemFile.setPreferenceStore(mDotCorpusPropertyStore);
         addField(mTypeSystemFile);
@@ -101,7 +102,7 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
     {
         mTypeSystemFile.store();
         mCorpusFolders.store();
-        mUimaConfigFolder.store();
+        mCasProcessorFolders.store();
         mEditorLineLengthHint.store();
         
         try
@@ -111,10 +112,11 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
         catch (IOException e)
         {
             // TODO: show error message with save error
-            e.printStackTrace();
+            MessageDialog.openError(getShell(), "Unable to save settings!", 
+                    "Unable to save settings:" + e.getMessage());
             return false;
         }
-        
+
         return true;
     }
     
@@ -123,7 +125,7 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
     {
         mTypeSystemFile.loadDefault();
         mCorpusFolders.loadDefault();
-        mUimaConfigFolder.loadDefault();
+        mCasProcessorFolders.loadDefault();
         mEditorLineLengthHint.loadDefault();
     }
 }

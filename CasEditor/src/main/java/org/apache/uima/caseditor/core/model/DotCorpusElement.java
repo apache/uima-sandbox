@@ -195,26 +195,39 @@ public class DotCorpusElement extends AbstractNlpElement {
    * 
    * @return - config folder name
    */
-  public IFolder getUimaConfigFolder() {
-    IFolder result;
+  public Collection<IFolder> getCasProcessorFolders() {
+    
+    
+    Collection<IFolder> casProcessorFolders = new LinkedList<IFolder>();
 
-    if (mDotCorpus.getUimaConfigFolder() != null) {
-      result = getFolder(mDotCorpus.getUimaConfigFolder());
-    } else {
-      result = null;
+    for (String corpusFolderString : mDotCorpus.getCasProcessorFolderNames()) {
+      casProcessorFolders.add(getFolder(corpusFolderString));
+    }
+
+    return Collections.unmodifiableCollection(casProcessorFolders);
+  }
+
+  public boolean isCasProcessorFolder(IFolder folder) {
+    boolean result = false;
+
+    for (IFolder candidate : getCasProcessorFolders()) {
+      if (candidate.equals(folder)) {
+        result = true;
+        break;
+      }
     }
 
     return result;
   }
-
+  
   /**
    * Returns true if the given folder is a uima config folder.
    * 
    * @param folder
    * @return true if is config folder
    */
-  public boolean isUimaConfigFolder(IFolder folder) {
-    return getUimaConfigFolder() != null ? getUimaConfigFolder().equals(folder) : false;
+  public void addCasProcessorFolder(String folder) {
+    mDotCorpus.addCasProcessorFolder(folder);
   }
 
   /**
@@ -223,8 +236,8 @@ public class DotCorpusElement extends AbstractNlpElement {
    * @param name -
    *          the new name
    */
-  public void setUimaConfigFolderName(String name) {
-    mDotCorpus.setUimaConfigFolderName(name);
+  public void removeCasProcessorFolder(String name) {
+    mDotCorpus.removeCasProcessorFolder(name);
   }
 
   private IFile getFile(String name) {

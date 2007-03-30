@@ -44,7 +44,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * This class is responsible to read and write {@link DotCorpus} objects from or to a byte stream.
  */
 public class DotCorpusSerializer {
-  private static final String COPORA_ELEMENT = "copora";
+  private static final String CONFIG_ELEMENT = "config";
 
   private static final String CORPUS_ELEMENT = "corpus";
 
@@ -62,9 +62,9 @@ public class DotCorpusSerializer {
 
   private static final String TYPESYTEM_FILE_ATTRIBUTE = "file";
 
-  private static final String TAGGER_ELEMENT = "config";
+  private static final String CAS_PROCESSOR_ELEMENT = "processor";
 
-  private static final String TAGGER_FOLDER_ATTRIBUTE = "folder";
+  private static final String CAS_PROCESSOR_FOLDER_ATTRIBUTE = "folder";
 
   private static final String EDITOR_ELEMENT = "editor";
 
@@ -113,14 +113,14 @@ public class DotCorpusSerializer {
     DotCorpus dotCorpus = new DotCorpus();
 
     // get corpora root element
-    Element corporaElement = dotCorpusDOM.getDocumentElement();
+    Element configElement = dotCorpusDOM.getDocumentElement();
 
-    if (COPORA_ELEMENT.equals(corporaElement.getNodeName())) {
+    if (CONFIG_ELEMENT.equals(configElement.getNodeName())) {
       // TODO:
       // throw exception
     }
 
-    NodeList corporaChildNodes = corporaElement.getChildNodes();
+    NodeList corporaChildNodes = configElement.getChildNodes();
 
     for (int i = 0; i < corporaChildNodes.getLength(); i++) {
       Node corporaChildNode = corporaChildNodes.item(i);
@@ -146,13 +146,14 @@ public class DotCorpusSerializer {
 
         int colorInteger = Integer.parseInt(colorString);
 
+        Color color = new Color(colorInteger);
         AnnotationStyle style = new AnnotationStyle(type, AnnotationStyle.Style
-                .valueOf(styleString), new Color(colorInteger));
+                .valueOf(styleString), new org.eclipse.swt.graphics.Color(null, color.getRed(), 
+                color.getGreen(), color.getBlue()));
 
         dotCorpus.setStyle(style);
-      } else if (TAGGER_ELEMENT.equals(corporaChildElement.getNodeName())) {
-        dotCorpus
-                .setUimaConfigFolderName(corporaChildElement.getAttribute(TAGGER_FOLDER_ATTRIBUTE));
+      } else if (CAS_PROCESSOR_ELEMENT.equals(corporaChildElement.getNodeName())) {
+        dotCorpus.addCasProcessorFolder(corporaChildElement.getAttribute(CAS_PROCESSOR_FOLDER_ATTRIBUTE));
       } else if (EDITOR_ELEMENT.equals(corporaChildElement.getNodeName())) {
         String lineLengthHintString = corporaChildElement
                 .getAttribute(EDITOR_LINE_LENGTH_ATTRIBUTE);
@@ -188,7 +189,7 @@ public class DotCorpusSerializer {
     
     try {
       xmlSerHandler.startDocument();
-      xmlSerHandler.startElement("", COPORA_ELEMENT, COPORA_ELEMENT, null);
+      xmlSerHandler.startElement("", CONFIG_ELEMENT, CONFIG_ELEMENT, null);
 
       for (String corpusFolder : dotCorpus.getCorpusFolderNameList()) {
         AttributesImpl corpusFolderAttributes = new AttributesImpl();
@@ -205,12 +206,12 @@ public class DotCorpusSerializer {
         corpusFolderAttributes.addAttribute("", "", STYLE_STYLE_ATTRIBUTE, "", style.getStyle()
                 .name());
 
-        Integer color = style.getColor().getRGB();
-        corpusFolderAttributes.addAttribute("", "", STYLE_COLOR_ATTRIBUTE, "", color.toString());
+        org.eclipse.swt.graphics.Color color = style.getColor();
+        Integer colorInt = new Color(color.getRed(), color.getGreen(), color.getBlue()).getRGB();
+        corpusFolderAttributes.addAttribute("", "", STYLE_COLOR_ATTRIBUTE, "", colorInt.toString());
 
         xmlSerHandler.startElement("", STYLE_ELEMENT, STYLE_ELEMENT, corpusFolderAttributes);
         xmlSerHandler.endElement("", STYLE_ELEMENT, STYLE_ELEMENT);
-
       }
 
       if (dotCorpus.getTypeSystemFileName() != null) {
@@ -222,13 +223,12 @@ public class DotCorpusSerializer {
         xmlSerHandler.endElement("", TYPESYSTEM_ELEMENT, TYPESYSTEM_ELEMENT);
       }
 
-      if (dotCorpus.getUimaConfigFolder() != null) {
+      for (String folder : dotCorpus.getCasProcessorFolderNames()) {
         AttributesImpl taggerConfigAttributes = new AttributesImpl();
-        taggerConfigAttributes.addAttribute("", "", TAGGER_FOLDER_ATTRIBUTE, "", dotCorpus
-                .getUimaConfigFolder());
-
-        xmlSerHandler.startElement("", TAGGER_ELEMENT, TAGGER_ELEMENT, taggerConfigAttributes);
-        xmlSerHandler.endElement("", TAGGER_ELEMENT, TAGGER_ELEMENT);
+        taggerConfigAttributes.addAttribute("", "", CAS_PROCESSOR_FOLDER_ATTRIBUTE, "", folder);
+        
+        xmlSerHandler.startElement("", CAS_PROCESSOR_ELEMENT, CAS_PROCESSOR_ELEMENT, taggerConfigAttributes);
+        xmlSerHandler.endElement("", CAS_PROCESSOR_ELEMENT, CAS_PROCESSOR_ELEMENT);
       }
 
       if (dotCorpus.getEditorLineLengthHint() != DotCorpus.EDITOR_LINE_LENGTH_HINT_DEFAULT) {
@@ -240,7 +240,7 @@ public class DotCorpusSerializer {
         xmlSerHandler.endElement("", EDITOR_ELEMENT, EDITOR_ELEMENT);
       }
 
-      xmlSerHandler.endElement("", COPORA_ELEMENT, COPORA_ELEMENT);
+      xmlSerHandler.endElement("", CONFIG_ELEMENT, CONFIG_ELEMENT);
       xmlSerHandler.endDocument();
     } catch (SAXException e) {
       String message = (e.getMessage() != null ? e.getMessage() : "");

@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.uima.DocumentUimaImpl;
@@ -31,6 +32,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.swt.browser.StatusTextListener;
+import org.eclipse.ui.texteditor.StatusTextEditor;
+
+import com.sun.org.apache.bcel.internal.generic.ISTORE;
 
 /**
  * The document element contains the uima cas document.
@@ -94,16 +101,21 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
    */
   public IDocument getDocument() throws CoreException {
    
+    NlpProject project = (NlpProject) mParent.getParent();
+    
+    if (project.getTypesystemElement() == null) {
+      mWorkingCopy = null;
+      throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID, 
+              0, "Typesystem not available!", null));
+    }
+    
 	  DocumentUimaImpl document = mWorkingCopy.get();
 	  
     if (document == null) {
+    	
     	InputStream in = mDocumentFile.getContents();
     	
-    	document  = 
-    			new DocumentUimaImpl((NlpProject) mParent.getParent());
-    	
-    	document.setContent(in);
-    	document.setDocumentElement(this);
+    	document  = new DocumentUimaImpl(project, this, in);
     	
     	mWorkingCopy = new SoftReference<DocumentUimaImpl>(document);
     }
@@ -115,14 +127,14 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
    * Writes the document element to the file system.
    * 
    * TODO: move it to the document, maybe the document gets not
-   * saved if the caller lost the reference to it, befor the this call
+   * saved if the caller lost the reference to it, befor this call
    * 
    * @throws CoreException
    */
   public void saveDocument() throws CoreException {
     ByteArrayOutputStream outStream = new ByteArrayOutputStream(40000);
     
-    // getDocument().serialize(outStream);
+    ((DocumentUimaImpl) getDocument()).serialize(outStream);
 
     InputStream stream = new ByteArrayInputStream(outStream.toByteArray());
 
@@ -148,7 +160,6 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) {
-	  
 	// TODO: What should happen if the doucment is changed externally 
 	// e.g. with a texteditor ?
     mWorkingCopy = new SoftReference<DocumentUimaImpl>(null);

@@ -55,7 +55,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   private Collection<CorpusElement> mCopora = new LinkedList<CorpusElement>();
 
-  private Collection<UimaSourceFolder> mUimaSourceFolder = new LinkedList<UimaSourceFolder>();
+  private Collection<CasProcessorFolder> mUimaSourceFolder = new LinkedList<CasProcessorFolder>();
 
   private boolean mIsDotCorpusDirty;
 
@@ -88,18 +88,18 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       corpus.initialize();
     }
 
-    createUimaSourceFolder();
+    createCasProcessorFolders();
 
-    for (UimaSourceFolder sourceFolder : getUimaSourceFolder()) {
-      sourceFolder.initialize();
-    }
+    //for (CasProcessorFolder sourceFolder : getCasProcessorFolders()) {
+    //  sourceFolder.initialize();
+    //}
 
     if (getDotCorpus().getTypeSystemFile() != null) {
       mTypesystem = new TypesystemElement(getDotCorpus().getTypeSystemFile(), this);
     }
 
-    if (getTypesystem() != null && getTypesystem().getCAS() != null) {
-      mEditorAnnotationStatus = new EditorAnnotationStatus(getTypesystem().getCAS().getTypeSystem()
+    if (getTypesystemElement() != null && getTypesystemElement().getTypeSystem() != null) {
+      mEditorAnnotationStatus = new EditorAnnotationStatus(getTypesystemElement().getTypeSystem()
               .getType(CAS.TYPE_NAME_ANNOTATION), null);
     }
   }
@@ -223,10 +223,8 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
         if (mDotCorpusElement.isCorpusFolder((IFolder) resources[i])) {
           continue;
         }
-
-        IFolder configFolderName = mDotCorpusElement.getUimaConfigFolder();
-
-        if (configFolderName != null && configFolderName.equals(resources[i])) {
+        
+        if (mDotCorpusElement.isCasProcessorFolder((IFolder) resources[i])) {
           continue;
         }
       }
@@ -276,7 +274,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
         }
       }
 
-      for (UimaSourceFolder sourceFolder : getUimaSourceFolder()) {
+      for (CasProcessorFolder sourceFolder : getCasProcessorFolders()) {
         INlpElement element = sourceFolder.getParent(resource);
 
         if (element != null) {
@@ -298,8 +296,11 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       if (DOT_CORPUS_FILENAME.equals(resource.getName())) {
         return mDotCorpusElement;
       }
-
-      for (UimaSourceFolder sourceFolder : getUimaSourceFolder()) {
+      else if (mTypesystem != null && mTypesystem.findMember(resource) != null) {
+    	  return mTypesystem.findMember(resource);
+      }
+      
+      for (CasProcessorFolder sourceFolder : getCasProcessorFolders()) {
         boolean isElementFound = sourceFolder.findMember(resource) != null;
 
         if (isElementFound) {
@@ -324,17 +325,18 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
    * 
    * @return the UimaSourceFolder
    */
-  public Collection<UimaSourceFolder> getUimaSourceFolder() {
+  public Collection<CasProcessorFolder> getCasProcessorFolders() {
     return mUimaSourceFolder;
   }
 
-  private void createUimaSourceFolder() {
-    IFolder configSourceFolderName = getDotCorpus().getUimaConfigFolder();
+  private void createCasProcessorFolders() throws CoreException {
+    for (IFolder processorFolder : mDotCorpusElement.getCasProcessorFolders()) {
+      if (processorFolder.exists()) {
+        CasProcessorFolder processorElement = 
+            new CasProcessorFolder(processorFolder, this);
 
-    if (configSourceFolderName != null && configSourceFolderName.exists()) {
-      IFolder configSourceFolder = configSourceFolderName;
-
-      mUimaSourceFolder.add(new UimaSourceFolder(configSourceFolder, this));
+        mUimaSourceFolder.add(processorElement);
+      }
     }
   }
 
@@ -369,7 +371,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   /**
    * Adds a resource to the current project instance.
    */
-  public void addResource(IResource resource) {
+  public void addResource(IResource resource) throws CoreException {
     if (resource instanceof IFile) {
       IFile file = (IFile) resource;
 
@@ -384,8 +386,8 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       // corpus
       if (mDotCorpusElement.isCorpusFolder((IFolder) resource)) {
         mCopora.add(new CorpusElement(getNlpProject(), (IFolder) resource));
-      } else if (mDotCorpusElement.isUimaConfigFolder((IFolder) resource)) {
-        mUimaSourceFolder.add(new UimaSourceFolder((IFolder) resource, getNlpProject()));
+      } else if (mDotCorpusElement.isCasProcessorFolder((IFolder) resource)) {
+        mUimaSourceFolder.add(new CasProcessorFolder((IFolder) resource, getNlpProject()));
       }
     }
   }
@@ -406,7 +408,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       }
     }
 
-    for (UimaSourceFolder sourceFolder : mUimaSourceFolder) {
+    for (CasProcessorFolder sourceFolder : mUimaSourceFolder) {
       if (sourceFolder.getResource().equals(resource)) {
         mUimaSourceFolder.remove(resource);
         break;
@@ -429,6 +431,11 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
     if (mTypesystem != null && resource.equals(mTypesystem.getResource())) {
       mTypesystem.changedResource(resource, delta);
+      
+      if (getTypesystemElement().getTypeSystem() != null) {
+          mEditorAnnotationStatus = new EditorAnnotationStatus(getTypesystemElement().getTypeSystem()
+                  .getType(CAS.TYPE_NAME_ANNOTATION), null);
+        }
     }
   }
 
@@ -499,7 +506,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
    * 
    * @return typesystem
    */
-  public TypesystemElement getTypesystem() {
+  public TypesystemElement getTypesystemElement() {
     return mTypesystem;
   }
 }

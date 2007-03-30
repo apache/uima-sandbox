@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.editor.fsview;
 
-
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.util.Primitives;
@@ -34,10 +33,18 @@ import org.eclipse.swt.graphics.Image;
  */
 public final class FeatureStructureLabelProvider implements ILabelProvider {
   public String getText(Object element) {
-    if (element instanceof IAdaptable
-            && ((IAdaptable) element).getAdapter(AnnotationFS.class) != null) {
-      FeatureStructure structure = (AnnotationFS) ((IAdaptable) element)
-              .getAdapter(AnnotationFS.class);
+    if (element instanceof IAdaptable) {
+      
+      FeatureStructure structure = null;
+      
+      if (((IAdaptable) element).getAdapter(AnnotationFS.class) != null) {
+        structure = (AnnotationFS) ((IAdaptable) element)
+                .getAdapter(AnnotationFS.class);
+      }
+
+      if (structure == null) {
+        structure = (FeatureStructure) ((IAdaptable) element).getAdapter(FeatureStructure.class);
+      }
 
       return structure.getType().getShortName();
     } else if (element instanceof FeatureValue) {

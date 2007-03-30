@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.ui.corpusview;
 
-
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -35,10 +34,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionContext;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionGroup;
-import org.eclipse.ui.actions.ExportResourcesAction;
 import org.eclipse.ui.actions.ImportResourcesAction;
 import org.eclipse.ui.dialogs.PropertyDialogAction;
-import org.eclipse.ui.ide.IDEActionFactory;
 
 /**
  * Main corpus explorer action group.
@@ -52,7 +49,7 @@ final class CorpusExplorerActionGroup extends ActionGroup implements
     
     protected ImportResourcesAction mImportAction;
     
-    protected ExportResourcesAction mExportAction;
+//    protected ExportResourcesAction mExportAction;
     
     private WorkspaceActionGroup mWorkspaceGroup;
     
@@ -84,9 +81,9 @@ final class CorpusExplorerActionGroup extends ActionGroup implements
         
         mImportAction = new ImportResourcesAction(mWindow);
         
-        mExportAction = new ExportResourcesAction(mWindow);
+//        mExportAction = new ExportResourcesAction(mWindow);
         
-        mWorkspaceGroup = new WorkspaceActionGroup(shell, mWindow);
+       mWorkspaceGroup = new WorkspaceActionGroup(shell, mWindow);
         
         mAnnotatorActionGroup = new AnnotatorActionGroup(shell);
         
@@ -110,7 +107,9 @@ final class CorpusExplorerActionGroup extends ActionGroup implements
         // For action order see "Eclipse User Interface Guidelines"
         
         // 1. New actions
-        menu.add(IDEActionFactory.NEW_WIZARD_DROP_DOWN.create(mWindow));
+        IAction newAction = ActionFactory.NEW.create(mWindow);
+        newAction.setText("New");
+        menu.add(newAction);
         menu.add(new Separator());
         
         // 2. Open actions
@@ -126,7 +125,7 @@ final class CorpusExplorerActionGroup extends ActionGroup implements
         // 4.2
         menu.add(ActionFactory.IMPORT.create(mWindow));
         
-        menu.add(ActionFactory.EXPORT.create(mWindow));
+//        menu.add(ActionFactory.EXPORT.create(mWindow));
         
         menu.add(new Separator());
         
@@ -198,8 +197,8 @@ final class CorpusExplorerActionGroup extends ActionGroup implements
         super.setContext(context);
         
         mOpenActionGroup.setContext(context);
-        mRefactorGroup.setContext(context);
-        mWorkspaceGroup.setContext(context);
+       mRefactorGroup.setContext(context);
+       mWorkspaceGroup.setContext(context);
         mAnnotatorActionGroup.setContext(context);
         mConsumerCorpusActionGroup.setContext(context);
     }
@@ -209,15 +208,13 @@ final class CorpusExplorerActionGroup extends ActionGroup implements
      */
     public void executeDefaultAction(IStructuredSelection selection)
     {
-        if (selection.getFirstElement() instanceof INlpElement)
-        {
+        if (selection.getFirstElement() instanceof INlpElement) {
             INlpElement nlpElement = (INlpElement) selection.getFirstElement();
             
             mOpenActionGroup.executeDefaultAction(new StructuredSelection(
                     nlpElement.getResource()));
         }
-        else
-        {
+        else {
             mOpenActionGroup.executeDefaultAction(selection);
         }
     }
@@ -233,7 +230,7 @@ final class CorpusExplorerActionGroup extends ActionGroup implements
         mOpenActionGroup.dispose();
         mRefactorGroup.dispose();
         mImportAction.dispose();
-        mExportAction.dispose();
+//        mExportAction.dispose();
         mWorkspaceGroup.dispose();
         mAnnotatorActionGroup.dispose();
         mConsumerCorpusActionGroup.dispose();

@@ -370,8 +370,16 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
         
         if (Key.TAGGER_CONFIG_FOLDER.equals(key))
         {
-            return mDotCorpusElement.getUimaConfigFolder() != null ? mDotCorpusElement
-                    .getUimaConfigFolder().getName() : "";
+          StringBuilder pathStringBuilder = new StringBuilder();
+          
+          for (IFolder folderName : mDotCorpusElement
+                  .getCasProcessorFolders())
+          {
+              pathStringBuilder.append(folderName.getName());
+              pathStringBuilder.append(File.pathSeparator);
+          }
+          
+          return pathStringBuilder.toString();
         }
         else if (Key.TYPE_SYSTEM_FILE.equals(key))
         {
@@ -380,12 +388,10 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
         }
         else if (Key.CORPUS_FOLDERS.equals(key))
         {
-            Collection<IFolder> corpusFolderNames = mDotCorpusElement
-                    .getCorpusFolderNameList();
-            
             StringBuilder pathStringBuilder = new StringBuilder();
             
-            for (IFolder folderName : corpusFolderNames)
+            for (IFolder folderName : mDotCorpusElement
+                    .getCorpusFolderNameList())
             {
                 pathStringBuilder.append(folderName.getName());
                 pathStringBuilder.append(File.pathSeparator);
@@ -408,13 +414,18 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
         
         if (Key.TAGGER_CONFIG_FOLDER.equals(key))
         {
-            if (value.length() != 0)
-            {
-                mDotCorpusElement.setUimaConfigFolderName(value);
+            StringTokenizer tokenizer = new StringTokenizer(value, 
+                    File.pathSeparator);
+
+            // delete all corpus folders
+            for (IFolder folder : mDotCorpusElement.getCasProcessorFolders())
+            {                
+              mDotCorpusElement.removeCasProcessorFolder(folder.getName());
             }
-            else
+            
+            while (tokenizer.hasMoreTokens())
             {
-                mDotCorpusElement.setUimaConfigFolderName(null);
+                mDotCorpusElement.addCasProcessorFolder(tokenizer.nextToken());
             }
         }
         else if (Key.TYPE_SYSTEM_FILE.equals(key))

@@ -146,7 +146,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     typePaneData.horizontalAlignment = SWT.FILL;
     mTypePane.setLayoutData(typePaneData);
 
-    mFSList = new ListViewer(mInstanceComposite, SWT.MULTI);
+    mFSList = new ListViewer(mInstanceComposite, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
     GridData instanceListData = new GridData();
     instanceListData.grabExcessHorizontalSpace = true;
     instanceListData.grabExcessVerticalSpace = true;

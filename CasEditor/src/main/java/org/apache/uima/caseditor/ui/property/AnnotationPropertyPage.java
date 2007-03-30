@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.ui.property;
 
-import java.awt.Color;
 import java.util.Vector;
 
 import org.apache.uima.cas.CAS;
@@ -37,12 +36,14 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
@@ -74,17 +75,15 @@ public class AnnotationPropertyPage extends PropertyPage
     {
         mProject = ((INlpElement) getElement()).getNlpProject();
         
-        TypesystemElement typesystem = mProject.getTypesystem();
+        TypesystemElement typesystem = mProject.getTypesystemElement();
         
         if (typesystem == null)
         {
-            Text message = new Text(parent, SWT.READ_ONLY);
+            Label message = new Label(parent, SWT.NONE);
             message.setText("Please set a valid typesystem file first.");
             
             return message;
         }
-        
-        CAS cas = mProject.getTypesystem().getCAS();
         
         mDotCorpusElement = mProject.getDotCorpus();
 
@@ -94,7 +93,7 @@ public class AnnotationPropertyPage extends PropertyPage
         base.setLayout(layout);
         
         // type text
-        Text typeText = new Text(base, SWT.READ_ONLY);
+        Label typeText = new Label(base, SWT.NONE);
         typeText.setText("Annotation types:");
         
         GridData typeTextGridData = new GridData();
@@ -111,7 +110,7 @@ public class AnnotationPropertyPage extends PropertyPage
         mTypeList.setLayoutData(typeListGridData);
         
         
-        TypeSystem typeSytstem = cas.getTypeSystem();
+        TypeSystem typeSytstem = mProject.getTypesystemElement().getTypeSystem();
 
         Type annotationType = typeSytstem.getType(CAS.TYPE_NAME_ANNOTATION);
         
@@ -146,7 +145,7 @@ public class AnnotationPropertyPage extends PropertyPage
         settingsComposite.setLayout(settingsLayout);
         
         // text style combo
-        Text styleText = new Text(settingsComposite, SWT.READ_ONLY);
+        Label styleText = new Label(settingsComposite, SWT.READ_ONLY);
         
         styleText.setText("Style:");
         
@@ -174,7 +173,7 @@ public class AnnotationPropertyPage extends PropertyPage
         }
         
         // text color label
-        Text colorText = new Text(settingsComposite, SWT.READ_ONLY);
+        Label colorText = new Label(settingsComposite, SWT.NONE);
         colorText.setText("Color:");
         
         mColorSelector = new ColorSelector(settingsComposite);
@@ -206,8 +205,7 @@ public class AnnotationPropertyPage extends PropertyPage
         
         RGB colorRGB = mColorSelector.getColorValue();
         
-        Color color = new Color(colorRGB.red, colorRGB.green, 
-                colorRGB.blue);
+        Color color = new Color(null, colorRGB);
         
         mCurrentSelectedAnnotation = new AnnotationStyle(
                 mCurrentSelectedAnnotation.getAnnotation(), 
@@ -237,7 +235,7 @@ public class AnnotationPropertyPage extends PropertyPage
         String name = 
             mTypeList.getItem(mTypeList.getSelectionIndex());
         
-        TypeSystem typesystem = mProject.getTypesystem().getCAS().getTypeSystem();
+        TypeSystem typesystem = mProject.getTypesystemElement().getTypeSystem();
         
         AnnotationStyle style = mDotCorpusElement.getAnnotation(
                 typesystem.getType(name));
@@ -254,10 +252,7 @@ public class AnnotationPropertyPage extends PropertyPage
         mStyleCombo.setText(style.getStyle().name());
         mStyleCombo.setEnabled(true);
         
-        java.awt.Color color = style.getColor();
-        
-        mColorSelector.setColorValue(new RGB(color.getRed(), 
-                color.getGreen(), color.getBlue()));
+        mColorSelector.setColorValue(style.getColor().getRGB());
         mColorSelector.setEnabled(true);
     }
     
@@ -275,9 +270,8 @@ public class AnnotationPropertyPage extends PropertyPage
     public boolean performOk()
     {
         // workaround for typesystem not present problem
-        CAS cas = mProject.getTypesystem().getCAS();
-        
-        if (cas == null)
+        if (mProject.getTypesystemElement() == null || 
+                mProject.getTypesystemElement().getTypeSystem() == null)
         {
             return true;
         }

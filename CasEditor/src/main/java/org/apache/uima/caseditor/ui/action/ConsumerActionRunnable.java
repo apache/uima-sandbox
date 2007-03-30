@@ -138,8 +138,8 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         
         XMLParser xmlParser = UIMAFramework.getXMLParser();
         
-        InputStream inIndex = getClass().getClassLoader().getResourceAsStream(
-                "org/apache/uima/caseditor/core/Index.xml");
+        InputStream inIndex = getClass().getResourceAsStream(
+                "Index.xml");
 
         if (inIndex == null)
         {
@@ -150,8 +150,6 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         
         XMLInputSource xmlIndexSource = new XMLInputSource(inIndex,
                 new File(""));
-        
-        xmlIndexSource = new XMLInputSource(inIndex, new File(""));
         
         FsIndexDescription indexDesciptor;
         

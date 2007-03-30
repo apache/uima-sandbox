@@ -19,61 +19,60 @@
 
 package org.apache.uima.caseditor.ui.model;
 
-
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.NlpModel;
 import org.apache.uima.caseditor.core.model.NlpProject;
-import org.apache.uima.caseditor.core.model.UimaConfigurationElement;
-import org.apache.uima.caseditor.core.model.UimaSourceFolder;
+import org.apache.uima.caseditor.core.model.TypesystemElement;
+import org.apache.uima.caseditor.core.model.CasProcessorFolder;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-/**
- * TODO: add javadoc here
- */
-public class ElementWorkbenchAdapterFactory implements IAdapterFactory
-{
-    private IWorkbenchAdapter mModelAdapter = new ModelAdapter();
-    private IWorkbenchAdapter mProjectAdapter = new ProjectAdapter();
-    private IWorkbenchAdapter mCorpusAdapter = new CorpusAdapter();
-    private IWorkbenchAdapter mUimaSourceFolderAdapter = 
-        new UimaSourceFolderAdapter();
-    private IWorkbenchAdapter mUimaConfigurationAdapter = 
-        new UimaConfigurationAdapter();
-    private IWorkbenchAdapter mSingleElementAdapter = 
-        new SingleElementAdapter();
-    
-    public Object getAdapter(Object adaptableObject, Class adapterType)
-    {
-        if (adaptableObject instanceof NlpModel)
-        {
-            return mModelAdapter;
-        }
-        else if (adaptableObject instanceof NlpProject)
-        {
-            return mProjectAdapter;
-        }
-        else if (adaptableObject instanceof CorpusElement)
-        {
-            return mCorpusAdapter;
-        }
-        else if (adaptableObject instanceof UimaSourceFolder)
-        {
-            return mUimaSourceFolderAdapter;
-        }
-        else if (adaptableObject instanceof UimaConfigurationElement)
-        {
-            return mUimaConfigurationAdapter;
-        }
-        else
-        {
-            return mSingleElementAdapter;
-        }
-    }
+public class ElementWorkbenchAdapterFactory implements IAdapterFactory {
+  private IWorkbenchAdapter mModelAdapter = new ModelAdapter();
 
-    public Class[] getAdapterList()
-    {
-        return new Class[] {IWorkbenchAdapter.class};
+  private IWorkbenchAdapter mProjectAdapter = new ProjectAdapter();
 
+  private IWorkbenchAdapter mCorpusAdapter = new CorpusAdapter();
+
+  private IWorkbenchAdapter mUimaSourceFolderAdapter = new ProcessorFolderAdapter();
+
+  private IWorkbenchAdapter mSingleElementAdapter = new SingleElementAdapter();
+
+  private IWorkbenchAdapter mTypesystemAdapter = new TypesystemAdapter();
+
+  private IWorkbenchAdapter mFileAdapter = new FileAdapter();
+
+  private IWorkbenchAdapter mFolderAdapter = new FolderAdpater();
+
+  private IWorkbenchAdapter mSimpleProject = new SimpleProjectAdapter();
+  
+  public Object getAdapter(Object adaptableObject, Class adapterType) {
+    if (adaptableObject instanceof NlpModel) {
+      return mModelAdapter;
+    } else if (adaptableObject instanceof NlpProject) {
+      return mProjectAdapter;
+    } else if (adaptableObject instanceof CorpusElement) {
+      return mCorpusAdapter;
+    } else if (adaptableObject instanceof CasProcessorFolder) {
+      return mUimaSourceFolderAdapter;
+    } else if (adaptableObject instanceof TypesystemElement) {
+      return mTypesystemAdapter;
+    } else if (adaptableObject instanceof IFile) {
+      return mFileAdapter;
+    } else if (adaptableObject instanceof IFolder) {
+      return mFolderAdapter;
+    } else if (adaptableObject instanceof IProject) {
+      return mSimpleProject;
+    } else {
+      return mSingleElementAdapter;
     }
+  }
+
+  public Class[] getAdapterList() {
+    return new Class[] { IWorkbenchAdapter.class };
+
+  }
 }

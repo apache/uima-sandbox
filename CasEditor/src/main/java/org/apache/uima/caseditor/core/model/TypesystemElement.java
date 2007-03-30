@@ -25,6 +25,7 @@ import java.io.InputStream;
 import org.apache.uima.ResourceSpecifierFactory;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.util.MarkerUtil;
@@ -32,6 +33,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.FsIndexDescription;
 import org.apache.uima.resource.metadata.TypePriorities;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
+import org.apache.uima.resource.metadata.impl.FsIndexDescription_impl;
 import org.apache.uima.util.CasCreationUtils;
 import org.apache.uima.util.InvalidXMLException;
 import org.apache.uima.util.XMLInputSource;
@@ -57,10 +59,15 @@ public class TypesystemElement extends AbstractNlpElement {
     getCAS();
   }
 
+  public TypeSystem getTypeSystem() {
+	  return getCAS().getTypeSystem();
+  }
+  
   /**
    * Retrives the {@link CAS}.
    * 
    * @return the {@link CAS}
+   * @deprecated
    */
   public CAS getCAS() {
     Runnable clearMarkers = new Runnable() {
@@ -125,28 +132,10 @@ public class TypesystemElement extends AbstractNlpElement {
 
     TypePriorities typePriorities = resourceSpecifierFactory.createTypePriorities();
 
-    InputStream inIndex = getClass().getClassLoader().getResourceAsStream(
-            "org/apache/uima/caseditor/core/Index.xml");
-
-    if (inIndex == null) {
-      throw new NoClassDefFoundError("org/apache/uima/caseditor/core/Index.xml" + " is missing on the classpath");
-    }
-
-    XMLInputSource xmlIndexSource = new XMLInputSource(inIndex, new File(""));
-
-    xmlIndexSource = new XMLInputSource(inIndex, new File(""));
-
-    FsIndexDescription indexDesciptor;
-
-    try {
-      indexDesciptor = (FsIndexDescription) xmlParser.parse(xmlIndexSource);
-    } catch (InvalidXMLException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
-
-      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
-
-      throw new CoreException(s);
-    }
+    FsIndexDescription indexDesciptor = new FsIndexDescription_impl();
+    indexDesciptor.setLabel("TOPIndex");
+    indexDesciptor.setTypeName("uima.cas.TOP");
+    indexDesciptor.setKind(FsIndexDescription.KIND_SORTED);
 
     CAS cas;
     try {

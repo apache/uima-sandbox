@@ -17,39 +17,16 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.ui.wizards;
+package org.apache.uima.caseditor.ui.property;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.dialogs.WizardResourceImportPage;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 
-/**
- * TODO: add javadoc here
- */
-public class ImportDocumentWizardMainPage extends WizardResourceImportPage
-{
+public class FolderElementFilter extends ViewerFilter {
 
-    protected ImportDocumentWizardMainPage(String name, IStructuredSelection selection)
-    {
-        super(name, selection);
-    }
-
-    @Override
-    protected void createSourceGroup(Composite parent)
-    {
-    }
-
-    @Override
-    protected ITreeContentProvider getFileProvider()
-    {
-        return null;
-    }
-
-    @Override
-    protected ITreeContentProvider getFolderProvider()
-    {
-        return null;
-    }
-    
+  @Override
+  public boolean select(Viewer viewer, Object parentElement, Object element) {
+    return element instanceof IFolder;
+  }
 }

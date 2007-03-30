@@ -27,9 +27,6 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 /**
  * Deletes all selected annotations.
- * 
- * TODO: create a FeatureStructreSelection class (AnnotationSelection) should then extend it and use
- * it for this class
  */
 public class DeleteFeatureStructureAction extends BaseSelectionListenerAction {
   private IDocument mDocument;

@@ -27,8 +27,7 @@ import org.apache.uima.caseditor.core.model.AnnotatorElement;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
-import org.apache.uima.caseditor.core.model.UimaConfigurationElement;
-import org.apache.uima.caseditor.core.model.UimaSourceFolder;
+import org.apache.uima.caseditor.core.model.CasProcessorFolder;
 import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
 import org.apache.uima.caseditor.ui.action.AnnotatorActionRunnable;
 import org.apache.uima.caseditor.ui.action.RunnableAction;
@@ -41,106 +40,76 @@ import org.eclipse.ui.actions.ActionGroup;
 /**
  * This is an action group for annotator actions.
  */
-final class AnnotatorActionGroup extends ActionGroup
-{
-    private Shell mShell;
-    
-    /**
-     * Initializes a new instance with the given shell.
-     * 
-     * @param shell
-     */
-    AnnotatorActionGroup(Shell shell)
-    {
-        mShell = shell;
-    }
-    
-    /**
-     * Adds for each uima annotator an appropriate configured 
-     * <code>AnnotatorAction</code> to the given menu.
-     * 
-     * Note: The action appears only in the menu if a document or 
-     * corpus is selected.
-     * 
-     * @param menu - the context menu manager // hier auf listen ???
-     */
-    @Override
-    public void fillContextMenu(IMenuManager menu)
-    {
-        IStructuredSelection selection = (IStructuredSelection) getContext()
-                .getSelection();
-        
-        LinkedList<DocumentElement> documentElements = new LinkedList<DocumentElement>();
-        
-        if (!CorpusExplorerUtil
-                .isContaingNLPProjectOrNonNLPResources(selection))
-        {
-            Iterator resources = selection.iterator();
-            while (resources.hasNext())
-            {
-                Object resource = resources.next();
-                
-                if (resource instanceof CorpusElement)
-                {
-                    documentElements.addAll(((CorpusElement) resource)
-                            .getDocuments());
-                }
-                
-                if (resource instanceof DocumentElement)
-                {
-                    documentElements.add(((DocumentElement) resource));
-                }
-            }
+final class AnnotatorActionGroup extends ActionGroup {
+  private Shell mShell;
+
+  /**
+   * Initializes a new instance with the given shell.
+   * 
+   * @param shell
+   */
+  AnnotatorActionGroup(Shell shell) {
+    mShell = shell;
+  }
+
+  /**
+   * Adds for each uima annotator an appropriate configured <code>AnnotatorAction</code> to the
+   * given menu.
+   * 
+   * Note: The action appears only in the menu if a document or corpus is selected.
+   * 
+   * @param menu -
+   *          the context menu manager // hier auf listen ???
+   */
+  @Override
+  public void fillContextMenu(IMenuManager menu) {
+    IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
+
+    LinkedList<DocumentElement> documentElements = new LinkedList<DocumentElement>();
+
+    if (!CorpusExplorerUtil.isContaingNLPProjectOrNonNLPResources(selection)) {
+      Iterator resources = selection.iterator();
+      while (resources.hasNext()) {
+        Object resource = resources.next();
+
+        if (resource instanceof CorpusElement) {
+          documentElements.addAll(((CorpusElement) resource).getDocuments());
         }
-        
-        // TODO: refactor this
-        // how to retrive the project of the selected elements ?
-        // what happends if someone selectes DocumentElements form
-        // different projects ?
-        if (!documentElements.isEmpty())
-        {
-            DocumentElement aDocument = documentElements.getFirst();
-            
-            NlpProject project = aDocument.getNlpProject();
-            
-            Collection<UimaSourceFolder> sourceFolders = 
-                    project.getUimaSourceFolder();
-            
-            
-            for (UimaSourceFolder sourceFolder : sourceFolders)
-            {
-                Collection<UimaConfigurationElement> configElements = 
-                    sourceFolder.getUimaConfigurationElements();
-                
-                for (UimaConfigurationElement element : configElements)
-                {
-                    
-                    Collection<AnnotatorElement> annotators = element
-                            .getAnnotators();
-                    
-                    for (AnnotatorElement annotator : annotators)
-                    {
-                        AnnotatorConfiguration config = 
-                                annotator.getAnnotatorConfiguration();
-                        
-                        if (config != null)
-                        {
-                            IRunnableWithProgress annotatorRunnableAction = 
-                                    new AnnotatorActionRunnable(
-                                    config, documentElements);
-                            
-                            
-                            RunnableAction annotatorAction = 
-                                    new RunnableAction(mShell, 
-                                    annotator.getName(),
-                                    annotatorRunnableAction);
-                            
-                            
-                            menu.add(annotatorAction);
-                        }
-                    }
-                }
-            }
+
+        if (resource instanceof DocumentElement) {
+          documentElements.add(((DocumentElement) resource));
         }
+      }
     }
+
+    // TODO: refactor this
+    // how to retrive the project of the selected elements ?
+    // what happends if someone selectes DocumentElements form
+    // different projects ?
+    if (!documentElements.isEmpty()) {
+      DocumentElement aDocument = documentElements.getFirst();
+
+      NlpProject project = aDocument.getNlpProject();
+
+      Collection<CasProcessorFolder> sourceFolders = project.getCasProcessorFolders();
+
+      for (CasProcessorFolder sourceFolder : sourceFolders) {
+        Collection<AnnotatorElement> annotators = sourceFolder.getAnnotators();
+
+        for (AnnotatorElement annotator : annotators) {
+          AnnotatorConfiguration config = annotator.getAnnotatorConfiguration();
+
+          if (config != null) {
+            IRunnableWithProgress annotatorRunnableAction = new AnnotatorActionRunnable(config,
+                    documentElements);
+
+            RunnableAction annotatorAction = new RunnableAction(mShell, annotator.getName(),
+                    annotatorRunnableAction);
+
+            menu.add(annotatorAction);
+          }
+        }
+      }
+    }
+  }
 }

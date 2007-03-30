@@ -34,8 +34,8 @@ import org.apache.uima.util.Progress;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * This is a collection reader which reads the documents from
- * a {@link Collection} of {@link CorpusElement}s.
+ * This is a collection reader which reads the documents from a {@link Collection} of
+ * {@link CorpusElement}s.
  */
 public class CorporaCollectionReader extends CollectionReader_ImplBase {
   private Iterator mDocumentIterator;
@@ -66,13 +66,13 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
     DocumentElement document = (DocumentElement) mDocumentIterator.next();
 
     CAS documentCas = null;
-    
-	try {
-		documentCas = document.getDocument().getCAS();
-	} catch (CoreException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+
+    try {
+      documentCas = document.getDocument().getCAS();
+    } catch (CoreException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     CasConverter converter = new CasConverter();
 
@@ -87,8 +87,7 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
   public boolean hasNext() {
     if (mDocumentIterator != null) {
       return mDocumentIterator.hasNext();
-    } 
-    else {
+    } else {
       return false;
     }
   }

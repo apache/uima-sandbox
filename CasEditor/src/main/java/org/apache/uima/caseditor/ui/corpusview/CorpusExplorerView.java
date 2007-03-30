@@ -34,18 +34,14 @@ import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionContext;
+import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.part.PluginTransfer;
-import org.eclipse.ui.part.ResourceTransfer;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.views.navigator.LocalSelectionTransfer;
 
 /**
  * The corpus explorer is a view which knows how to display and handle the nlp
@@ -74,14 +70,14 @@ public final class CorpusExplorerView extends ViewPart
         parent.setLayout(new FillLayout());
         
         mTreeViewer = new TreeViewer(parent);
-        mTreeViewer.setContentProvider(new CorpusExplorerContentProvider());
+        mTreeViewer.setContentProvider(new BaseWorkbenchContentProvider());
         
         mTreeViewer.setLabelProvider(new DecoratingLabelProvider(
                 new WorkbenchLabelProvider(), PlatformUI.getWorkbench()
                         .getDecoratorManager().getLabelDecorator()));
         
         // performence optimization
-        mTreeViewer.setUseHashlookup(false); // TODO: change back to true
+        mTreeViewer.setUseHashlookup(true); // TODO: change back to true
         
         initContextMenu();
         
@@ -184,9 +180,9 @@ public final class CorpusExplorerView extends ViewPart
     {
         int ops = DND.DROP_COPY | DND.DROP_MOVE;
         
-        Transfer[] transfers = new Transfer[]
-        { LocalSelectionTransfer.getInstance(), ResourceTransfer.getInstance(),
-                FileTransfer.getInstance(), PluginTransfer.getInstance() };
+        //Transfer[] transfers = new Transfer[]
+        //{ LocalSelectionTransfer.getInstance(), ResourceTransfer.getInstance(),
+        //        FileTransfer.getInstance(), PluginTransfer.getInstance() };
         
         //mTreeViewer
         //        .addDragSupport(ops, transfers, new CorpusExplorerDragAdapter(

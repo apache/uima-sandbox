@@ -23,11 +23,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.apache.uima.caseditor.core.model.CasProcessorFolder;
 import org.apache.uima.caseditor.core.model.ConsumerElement;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
-import org.apache.uima.caseditor.core.model.UimaConfigurationElement;
-import org.apache.uima.caseditor.core.model.UimaSourceFolder;
 import org.apache.uima.caseditor.core.uima.CasConsumerConfiguration;
 import org.apache.uima.caseditor.ui.action.ConsumerActionRunnable;
 import org.apache.uima.caseditor.ui.action.RunnableAction;
@@ -39,85 +38,60 @@ import org.eclipse.ui.actions.ActionGroup;
 /**
  * This is an action group for cas consumer actions.
  */
-final class ConsumerCorpusActionGroup extends ActionGroup
-{
-    private Shell mShell;
-    
-    ConsumerCorpusActionGroup(Shell shell)
-    {
-        mShell = shell;
-    }
-    /**
-     * Adds for each uima cas consumer an appropriate configured 
-     * <code>CasConsumerAction</code> to the given menu.
-     * The action apears only in the menu if a document or corpus is selected. 
-     */
-    @Override
-    public void fillContextMenu(IMenuManager menu)
-    {
-        IStructuredSelection selection = (IStructuredSelection) getContext()
-                .getSelection();
+final class ConsumerCorpusActionGroup extends ActionGroup {
+  private Shell mShell;
 
-        if (!CorpusExplorerUtil
-                .isContaingNLPProjectOrNonNLPResources(selection))
-        {
-            // TODO: add here also single documents
-            LinkedList<CorpusElement> corpora = new LinkedList<CorpusElement>();
+  ConsumerCorpusActionGroup(Shell shell) {
+    mShell = shell;
+  }
 
-            
-            for (Iterator resources = selection.iterator();
-                    resources.hasNext();)
-            {
-                Object resource = resources.next();
+  /**
+   * Adds for each uima cas consumer an appropriate configured <code>CasConsumerAction</code> to
+   * the given menu. The action apears only in the menu if a document or corpus is selected.
+   */
+  @Override
+  public void fillContextMenu(IMenuManager menu) {
+    IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 
-                if (resource instanceof CorpusElement)
-                {
-                    corpora.add((CorpusElement) resource);
-                }
-            }
+    if (!CorpusExplorerUtil.isContaingNLPProjectOrNonNLPResources(selection)) {
+      // TODO: add here also single documents
+      LinkedList<CorpusElement> corpora = new LinkedList<CorpusElement>();
 
-            // TODO: refactor this here
-            if (!corpora.isEmpty())
-            {
-                CorpusElement aCorpus = corpora.getFirst();
-                NlpProject project = aCorpus.getNlpProject();
+      for (Iterator resources = selection.iterator(); resources.hasNext();) {
+        Object resource = resources.next();
 
-                Collection<UimaSourceFolder> sourceFolders = 
-                        project.getUimaSourceFolder();
-
-                for (UimaSourceFolder sourceFolder : sourceFolders)
-                {
-                    Collection<UimaConfigurationElement> configElements = 
-                            sourceFolder.getUimaConfigurationElements();
-
-                    for (UimaConfigurationElement element : configElements)
-                    {
-                        Collection<ConsumerElement> consumers = 
-                                element.getConsumers();
-                        
-                        for (ConsumerElement consumer : consumers)
-                        {
-                            CasConsumerConfiguration config = 
-                                    consumer.getConsumerConfiguration();
-                            
-                            if (config != null)
-                            {
-                                ConsumerActionRunnable consumerRunnableAction = 
-                                        new ConsumerActionRunnable(config, 
-                                        corpora);
-    
-                                RunnableAction consumerAction = 
-                                        new RunnableAction(mShell, 
-                                        consumer.getName(),
-                                        consumerRunnableAction);
-
-                                menu.add(consumerAction);
-                                
-                            }
-                        }
-                    }
-                }
-            }
+        if (resource instanceof CorpusElement) {
+          corpora.add((CorpusElement) resource);
         }
+      }
+
+      // TODO: refactor this here
+      if (!corpora.isEmpty()) {
+        CorpusElement aCorpus = corpora.getFirst();
+        NlpProject project = aCorpus.getNlpProject();
+
+        Collection<CasProcessorFolder> sourceFolders = project.getCasProcessorFolders();
+
+        for (CasProcessorFolder sourceFolder : sourceFolders) {
+
+          Collection<ConsumerElement> consumers = sourceFolder.getConsumers();
+
+          for (ConsumerElement consumer : consumers) {
+            CasConsumerConfiguration config = consumer.getConsumerConfiguration();
+
+            if (config != null) {
+              ConsumerActionRunnable consumerRunnableAction = new ConsumerActionRunnable(config,
+                      corpora);
+
+              RunnableAction consumerAction = new RunnableAction(mShell, consumer.getName(),
+                      consumerRunnableAction);
+
+              menu.add(consumerAction);
+
+            }
+          }
+        }
+      }
     }
+  }
 }

@@ -59,16 +59,31 @@ import org.xml.sax.SAXException;
  * TODO: add javdoc here
  */
 public class DocumentUimaImpl extends AbstractDocument {
+ 
+  private DocumentElement mDocumentElement;
+  private TypeSystem mTypeSystem;
   private CAS mCAS;
-private DocumentElement mDocumentElement;
 
   /**
    * Initializes a new instance.
    * 
    * @param project
    */
-  public DocumentUimaImpl(NlpProject project) {
-    mCAS = project.getTypesystem().getCAS();
+  public DocumentUimaImpl(NlpProject project, DocumentElement element, InputStream in) 
+  	throws CoreException{
+    
+	  mTypeSystem = project.getTypesystemElement().getTypeSystem();
+    
+	if (mTypeSystem == null) {
+		throw new CoreException(new Status(IStatus.INFO, CasEditorPlugin.ID, 
+				IStatus.ERROR, "Invalid typesystem!", null));
+	}
+	
+	mCAS = project.getTypesystemElement().getCAS();
+	
+	mDocumentElement = element;
+
+	setContent(in);
   }
 
   /**
@@ -125,11 +140,14 @@ private DocumentElement mDocumentElement;
    * Removes the given annotations from the {@link CAS}.
    */
   public void removeFeatureStructures(Collection<FeatureStructure> annotationsToRemove) {
-    for (FeatureStructure annotationToRemove : annotationsToRemove) {
+    
+	for (FeatureStructure annotationToRemove : annotationsToRemove) {
       removeAnnotationInternal(annotationToRemove);
     }
 
-    fireRemovedAnnotations(annotationsToRemove);
+	if (annotationsToRemove.size() > 0) {
+		fireRemovedAnnotations(annotationsToRemove);
+	}
   }
 
   /**
@@ -226,8 +244,9 @@ private DocumentElement mDocumentElement;
   /**
    * Sets the content. The XCAS {@link InputStream} gets parsed.
    */
-  public void setContent(InputStream content) throws CoreException {
-    XCASDeserializer dezerializer = new XCASDeserializer(mCAS.getTypeSystem());
+  private void setContent(InputStream content) throws CoreException {
+	  
+    XCASDeserializer dezerializer = new XCASDeserializer(mTypeSystem);
 
     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
     saxParserFactory.setValidating(false);
@@ -292,8 +311,4 @@ private DocumentElement mDocumentElement;
 
 	    mDocumentElement.getResource().setContents(stream, true, false, null);
   }
-  
-	public void setDocumentElement(DocumentElement element) {
-		mDocumentElement = element;
-	}
 }

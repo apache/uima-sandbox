@@ -21,6 +21,17 @@
 -->
 
 <plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.apache.uima.caseditor.Application">
+         </run>
+      </application>
+   </extension>
+
 	<extension 
 		point="org.eclipse.core.resources.natures" 
 		id="NLPProject"
@@ -47,10 +58,11 @@
 		<view id="org.apache.uima.caseditor.corpusview"
 			name="Corpus Explorer"
 			class="org.apache.uima.caseditor.ui.corpusview.CorpusExplorerView"
-			icon="icons\UIMA_logo_50.png"
+			icon="icons/tango/explorer.png"
 			category="org.apache.uima.caseditor.ui.views"/>
+		
 	</extension>
-	
+
 	<extension
 		point="org.eclipse.ui.newWizards">
 		
@@ -61,33 +73,43 @@
 		<wizard
         canFinishEarly="false"
         category="org.apache.uima.caseditor.ui.wizards"
-        class="org.apache.uima.caseditor.ui.wizards.NlpProjectWizard"
+        class="org.apache.uima.caseditor.ui.wizards.NewNlpProjectWizard"
         descriptionImage="icons/nlp.gif"
         finalPerspective="org.apache.uima.caseditor.perspective.NLP"
         hasPages="true"
         icon="icons/nlp.gif"
         id="org.apache.uima.caseditor.wizards.NLPProjectWizard"
-        name="NLP Project"
+        name="Project"
         preferredPerspectives="org.apache.uima.caseditor.perspective.NLP"
         project="true">
 			<description>
             	Create a NLP project
          	</description>
 		</wizard>
-      	
-      	<!--
-		<wizard
-			category="Annotator.ui"
-			class="com.calcucare.annotator.wizards.NewCorpusWizard"
-			icon="icon/book.gif"
-			id="Annotator.NewCorpusWizard"
-			name="Corpus">
-        	
-			<description>
-				Create a Corups
-			</description>
-		</wizard> -->
-		
+<!--		
+  <wizard
+        canFinishEarly="false"
+        category="org.apache.uima.caseditor.ui.wizards"
+        class="org.apache.uima.caseditor.ui.wizards.WizardNewFileCreation"
+        finalPerspective="org.apache.uima.caseditor.perspective.NLP"
+        hasPages="true"
+        icon="icons/nlp.gif"
+        id="org.apache.uima.caseditor.ui.wizards.WizardNewFileCreation"
+        name="File"
+        preferredPerspectives="org.apache.uima.caseditor.perspective.NLP"
+        project="true"/>
+        
+  <wizard
+        canFinishEarly="false"
+        category="org.apache.uima.caseditor.ui.wizards"
+        class="org.apache.uima.caseditor.ui.wizards.WizardNewFolderCreation"
+        finalPerspective="org.apache.uima.caseditor.perspective.NLP"
+        hasPages="true"
+        icon="icons/nlp.gif"
+        id="org.apache.uima.caseditor.ui.wizards.WizardNewFolderCreation"
+        name="Folder"
+        preferredPerspectives="org.apache.uima.caseditor.perspective.NLP"
+        project="true"/> -->
 	</extension>
 	
 	<extension point="org.eclipse.ui.importWizards">
@@ -105,13 +127,12 @@
 	<extension point="org.eclipse.ui.perspectives">
 		<perspective
         class="org.apache.uima.caseditor.ui.NlpPerspectiveFactory"
-        fixed="false"
+        fixed="true"
         icon="icons\UIMA_logo_50.png"
         id="org.apache.uima.caseditor.perspective.NLP"
         name="NLP">
 		</perspective>
 	</extension>
-	
       
 	<extension point="org.eclipse.ui.propertyPages"> 
 		<page
@@ -172,17 +193,26 @@
        <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
     </factory>
     <factory
-          adaptableType="org.apache.uima.caseditor.core.model.UimaSourceFolder"
+          adaptableType="org.apache.uima.caseditor.core.model.CasProcessorFolder"
           class="org.apache.uima.caseditor.ui.model.ElementWorkbenchAdapterFactory">
        <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
     </factory>
     <factory
-          adaptableType="org.apache.uima.caseditor.core.model.UimaConfigurationElement"
+          adaptableType="org.eclipse.core.resources.IFile"
+          class="org.apache.uima.caseditor.ui.model.ElementWorkbenchAdapterFactory">
+       <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
+    </factory>
+        <factory
+          adaptableType="org.eclipse.core.resources.IFolder"
+          class="org.apache.uima.caseditor.ui.model.ElementWorkbenchAdapterFactory">
+       <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
+    </factory>
+            <factory
+          adaptableType="org.eclipse.core.resources.IProject"
           class="org.apache.uima.caseditor.ui.model.ElementWorkbenchAdapterFactory">
        <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
     </factory>
  </extension>
-	 
 	 
 	 
 	 <!-- editor extensions -->
@@ -195,6 +225,13 @@
 			id="org.apache.uima.caseditor.editor"
 			extensions="xcas">
 		</editor>
+		
+		<editor
+			icon="icons/UIMA_logo_50.png"
+			class="org.apache.uima.caseditor.editor.SimpleTextEditor"
+			name="Text Editor"
+			id="org.apache.uima.caseditor.texteditor"
+			default="true"/>
    </extension>
    
 	<extension point="org.eclipse.ui.editors.annotationTypes">
@@ -250,19 +287,29 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="org.eclipse.ui.ide.workbench"
+            application="org.apache.uima.caseditor.application"
             name="caseditor">
          <property
                name="aboutText"
                value="about dialog"/>
-         <property
-               name="startupProgressRect"
-               value="80,500,300,50"/>
                
          <property
                name="preferenceCustomization"
                value="preferences.ini"/>
+         <property
+               name="startupProgressRect"
+               value="0,0,0,0"/>
+         <property
+               name="startupMessageRect"
+               value="0,0,0,0"/>
+         <property
+               name="startupForegroundColor"
+               value="000000"/>
       </product>
    </extension>
+   
+    <extension point="org.eclipse.ui.elementFactories">
+    <factory id="org.apache.uima.caseditor.FileEditorInputFactory" class="org.apache.uima.caseditor.FileEditorInputFactory" /> 
+ </extension>
  
 </plugin>

@@ -20,9 +20,11 @@
 package org.apache.uima.caseditor.ui;
 
 
+import org.apache.uima.caseditor.editor.fsview.FeatureStructureBrowserView;
 import org.apache.uima.caseditor.ui.corpusview.CorpusExplorerView;
-import org.apache.uima.caseditor.ui.wizards.NewCorpusWizard;
-import org.apache.uima.caseditor.ui.wizards.NlpProjectWizard;
+import org.apache.uima.caseditor.ui.wizards.NewNlpProjectWizard;
+import org.apache.uima.caseditor.ui.wizards.WizardNewFileCreation;
+import org.apache.uima.caseditor.ui.wizards.WizardNewFolderCreation;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -51,10 +53,10 @@ public class NlpPerspectiveFactory implements IPerspectiveFactory
     private void defineActions(IPageLayout layout)
     {
         // add "new wizards"
-        layout.addNewWizardShortcut(NlpProjectWizard.ID);
-        layout.addNewWizardShortcut(NewCorpusWizard.ID);
-        layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");
-        layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
+        layout.addNewWizardShortcut(NewNlpProjectWizard.ID);
+//        layout.addNewWizardShortcut(NewCorpusWizard.ID);
+        layout.addNewWizardShortcut(WizardNewFolderCreation.ID);
+        layout.addNewWizardShortcut(WizardNewFileCreation.ID);
         
         // layout.addNewWizardShortcut("Annotator.NewDocumentWizard");
         
@@ -75,12 +77,16 @@ public class NlpPerspectiveFactory implements IPerspectiveFactory
         IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT,
                 0.19f, editorArea);
         left.addView(CorpusExplorerView.ID);
+        left.addView(CorpusExplorerView.ID + "s");
+        
         
         // right views
         IFolderLayout right = layout.createFolder("right", IPageLayout.RIGHT,
                 0.70f, editorArea);
         
         right.addView(IPageLayout.ID_OUTLINE);
+        right.addView(FeatureStructureBrowserView.ID);
+        right.addView("org.eclipse.pde.runtime.LogView");
         
         // bottom views
         IFolderLayout bottom = layout.createFolder("rightBottom",

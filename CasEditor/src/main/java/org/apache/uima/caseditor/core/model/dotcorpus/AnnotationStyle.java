@@ -19,7 +19,7 @@
 
 package org.apache.uima.caseditor.core.model.dotcorpus;
 
-import java.awt.Color;
+import org.eclipse.swt.graphics.Color;
 
 /**
  * The <code>AnnotationStyle</code> describes the look of an certain annotation type in the
@@ -59,7 +59,7 @@ public final class AnnotationStyle {
   /**
    * The default drawing color.
    */
-  public static final java.awt.Color DEFAULT_COLOR = java.awt.Color.RED;
+  public static final Color DEFAULT_COLOR = new Color(null, 0xff, 0, 0);
 
   private String mAnnotation;
 

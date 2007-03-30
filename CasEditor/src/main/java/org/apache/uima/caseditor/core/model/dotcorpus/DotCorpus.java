@@ -50,7 +50,7 @@ public class DotCorpus {
   /**
    * Names of the configuration source folders
    */
-  private String mUimaConfigFolder;
+  private Set<String> mCasProcessorFolders = new HashSet<String>();
 
   /**
    * Length hint of the lines in the editor.
@@ -86,8 +86,8 @@ public class DotCorpus {
    * 
    * @return uima config folder name parameter.
    */
-  public String getUimaConfigFolder() {
-    return mUimaConfigFolder;
+  public Collection<String> getCasProcessorFolderNames() {
+    return Collections.unmodifiableCollection(mCasProcessorFolders);
   }
 
   /**
@@ -96,8 +96,12 @@ public class DotCorpus {
    * @param folder
    *          uima config folder name parameter.
    */
-  public void setUimaConfigFolderName(String folder) {
-    mUimaConfigFolder = folder;
+  public void addCasProcessorFolder(String folder) {
+    mCasProcessorFolders.add(folder);
+  }
+  
+  public void removeCasProcessorFolder(String folder) {
+    mCasProcessorFolders.remove(folder);
   }
 
   /**
@@ -211,7 +215,7 @@ public class DotCorpus {
 
       result = isEqual(mTypeSystemFileName, corpus.mTypeSystemFileName)
               && isEqual(mCorpusFolders, corpus.mCorpusFolders)
-              && isEqual(mUimaConfigFolder, corpus.mUimaConfigFolder)
+              && isEqual(mCasProcessorFolders, corpus.mCasProcessorFolders)
               && isEqual(mStyleMap, corpus.mStyleMap)
               && isEqual(mEditorLineLengthHint, corpus.mEditorLineLengthHint);
     }

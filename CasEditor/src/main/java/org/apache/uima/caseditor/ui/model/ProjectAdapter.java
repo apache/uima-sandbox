@@ -22,15 +22,13 @@ package org.apache.uima.caseditor.ui.model;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE.SharedImages;
 
 /**
  * The <code>IWorkbenchAdapter</code> for the <code>NLPProject</code>.
@@ -53,9 +51,9 @@ class ProjectAdapter extends
             
             childrenList.addAll(nlpProject.getCorpora());
             
-            if (nlpProject.getTypesystem() != null)
+            if (nlpProject.getTypesystemElement() != null)
             {
-                childrenList.add(nlpProject.getTypesystem());
+                childrenList.add(nlpProject.getTypesystemElement());
             }
             
             IResource[] resources;
@@ -65,8 +63,7 @@ class ProjectAdapter extends
             }
             catch (CoreException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                // TODO just log it
                 return new Object[]{};
             }
             
@@ -75,7 +72,7 @@ class ProjectAdapter extends
                 Collections.addAll(childrenList, resources);
             }
             
-            childrenList.addAll(nlpProject.getUimaSourceFolder());
+            childrenList.addAll(nlpProject.getCasProcessorFolders());
             
             result = childrenList.toArray();
 
@@ -102,22 +99,13 @@ class ProjectAdapter extends
         
         IProject project = nlpProject.getProject();
         
-        IWorkbench workbench = PlatformUI.getWorkbench();
-        ISharedImages sharedImages = workbench.getSharedImages();
-        
-        ImageDescriptor result;
-        
         if (project.isOpen())
         {
-            result = sharedImages
-                   .getImageDescriptor(SharedImages.IMG_OBJ_PROJECT);
+          return CasEditorPlugin.getTaeImageDescriptor(Images.MODEL_PROJECT_OPEN);
         }
         else
         {
-            result = sharedImages.getImageDescriptor(
-                    SharedImages.IMG_OBJ_PROJECT_CLOSED);
+          return CasEditorPlugin.getTaeImageDescriptor(Images.MODEL_PROJECT_CLOSED);
         }
-        
-        return result;
     }
 }

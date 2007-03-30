@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.editor;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -326,15 +325,5 @@ public class AnnotationDocument extends Document implements IDocument {
    */
   public Type getType(String type) {
     return mDocument.getType(type);
-  }
-
-  /**
-   * Call is forwared to the set document.
-   * 
-   * @param contentStream
-   * @throws CoreException
-   */
-  public void setContent(InputStream contentStream) throws CoreException {
-    mDocument.setContent(contentStream);
   }
 }

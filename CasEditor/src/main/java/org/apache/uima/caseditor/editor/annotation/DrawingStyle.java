@@ -51,7 +51,7 @@ public enum DrawingStyle {
     mStrategy = strategy;
   }
 
-  IDrawingStrategy getStrategy() {
+  public IDrawingStrategy getStrategy() {
     return mStrategy;
   }
 }

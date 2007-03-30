@@ -19,86 +19,50 @@
 
 package org.apache.uima.caseditor.ui.corpusview;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.actions.ActionGroup;
-import org.eclipse.ui.actions.OpenFileAction;
-import org.eclipse.ui.actions.OpenWithMenu;
 
 /**
- * The OpenActionGroup contains the Open Action and the Open With Menu. This
- * class is resonsible to add the action and the menu to the context menu
- * depending on the current selection.
+ * The OpenActionGroup contains the Open Action.
  */
-final class OpenActionGroup extends ActionGroup implements
-        ICorpusExplorerActionGroup
-{
-    /**
-     * The editor WorkbenchPage.
-     */
-    private IWorkbenchPage mPage;
-    
-    /**
-     * The cached OpenFileAction instance.
-     */
-    private OpenFileAction mOpenFileAction;
-    
-    /**
-     * Initializes a new instance.
-     * 
-     * @param page
-     */
-    OpenActionGroup(IWorkbenchPage page)
-    {
-        mPage = page;
-        mOpenFileAction = new OpenFileAction(mPage);
-    }
-    
-    /**
-     * TODO: add javadoc comment
-     */
-    @Override
-    public void fillContextMenu(IMenuManager menu)
-    {
-        IStructuredSelection selection = CorpusExplorerUtil
-                .convertNLPElementsToResources((IStructuredSelection) getContext()
-                        .getSelection());
-        
-        mOpenFileAction.selectionChanged(selection);
-        menu.add(mOpenFileAction);
-        
-        fillOpenWithMenu(menu, selection);
-    }
-    
-    private void fillOpenWithMenu(IMenuManager menu,
-            IStructuredSelection selection)
-    {
-        if (selection.size() != 1)
-        {
-            return;
-        }
-        
-        Object element = selection.getFirstElement();
-        if (!(element instanceof IFile))
-        {
-            return;
-        }
-        
-        MenuManager submenu = new MenuManager("Open With");
-        submenu.add(new OpenWithMenu(mPage, (IFile) element));
-        
-        menu.add(submenu);
-    }
-    
-    /**
-     * Executes the default action.
-     */
-    public void executeDefaultAction(IStructuredSelection selection)
-    {
-        mOpenFileAction.selectionChanged(selection);
-        mOpenFileAction.run();
-    }
+final class OpenActionGroup extends ActionGroup implements ICorpusExplorerActionGroup {
+
+  /**
+   * The editor WorkbenchPage.
+   */
+  private IWorkbenchPage mPage;
+
+  /**
+   * The cached OpenFileAction instance.
+   */
+  private OpenAction mOpenFileAction;
+
+  /**
+   * Initializes a the current instance.
+   * 
+   * @param page
+   */
+  OpenActionGroup(IWorkbenchPage page) {
+    mPage = page;
+    mOpenFileAction = new OpenAction(mPage);
+  }
+
+  @Override
+  public void fillContextMenu(IMenuManager menu) {
+    IStructuredSelection selection = CorpusExplorerUtil
+            .convertNLPElementsToResources((IStructuredSelection) getContext().getSelection());
+
+    mOpenFileAction.selectionChanged(selection);
+    menu.add(mOpenFileAction);
+  }
+
+  /**
+   * Executes the default action.
+   */
+  public void executeDefaultAction(IStructuredSelection selection) {
+    mOpenFileAction.selectionChanged(selection);
+    mOpenFileAction.run();
+  }
 }

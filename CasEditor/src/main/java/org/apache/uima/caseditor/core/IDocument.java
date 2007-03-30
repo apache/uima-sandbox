@@ -180,14 +180,6 @@ public interface IDocument {
   Type getType(String type);
 
   /**
-   * Sets the content of this document.
-   * 
-   * @param content
-   * @throws CoreException
-   */
-  void setContent(InputStream content) throws CoreException;
-
-  /**
    * Serializes the doucment to the given OutputStream.
    * 
    * @param out

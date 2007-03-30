@@ -20,8 +20,8 @@
 package org.apache.uima.caseditor.ui.property;
 
 import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.core.model.NlpProject;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.StringButtonFieldEditor;
@@ -34,58 +34,44 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 /**
  * TODO: add javadoc here
  */
-class FolderFieldEditor extends StringButtonFieldEditor
-{
-    private IProject mProject;
-    
-    FolderFieldEditor(String name, String labelText, Composite parent,
-            IProject project)
-    {
-        super(name, labelText, parent);
-        
-        mProject = project;
-    }
-    
-    @Override
-    protected String changePressed()
-    {
-        // TODO: preselect entered text entry
-        
-        final ElementTreeSelectionDialog folderSelectionDialog = new ElementTreeSelectionDialog(
-                getShell(), new WorkbenchLabelProvider(),
-                new BaseWorkbenchContentProvider());
-        
-        folderSelectionDialog.setInput(mProject);
-        folderSelectionDialog.setTitle("testTitle");
-        folderSelectionDialog.setMessage("testMessage");
-        folderSelectionDialog.setValidator(new ISelectionStatusValidator()
-        {
-            public IStatus validate(Object[] selection)
-            {
-                if (selection.length == 1)
-                {
-                    if (selection[0] instanceof IFolder)
-                    {
-                        return Status.OK_STATUS;
-                    }
-                }
-                
-                return new Status(IStatus.ERROR, CasEditorPlugin.ID, 0,
-                        "Please select a folder!", null);
-            }
-        });
-        
-        folderSelectionDialog.open();
-        
-        Object[] results = folderSelectionDialog.getResult();
-        
-        if (results.length != 1)
-        {
-            return null;
+class FolderFieldEditor extends StringButtonFieldEditor {
+  private NlpProject mProject;
+
+  FolderFieldEditor(String name, String labelText, Composite parent, NlpProject project) {
+    super(name, labelText, parent);
+
+    mProject = project;
+  }
+
+  @Override
+  protected String changePressed() {
+    // TODO: preselect entered text entry
+
+    final ElementTreeSelectionDialog folderSelectionDialog = new ElementTreeSelectionDialog(
+            getShell(), new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
+
+    folderSelectionDialog.setInput(mProject);
+    folderSelectionDialog.setTitle(getLabelText());
+    folderSelectionDialog.setMessage(getPreferenceName());
+    folderSelectionDialog.setValidator(new ISelectionStatusValidator() {
+      public IStatus validate(Object[] selection) {
+        if (selection.length == 1 && selection[0] instanceof IFolder) {
+          return new Status(IStatus.OK, CasEditorPlugin.ID, 0, "", null);
         }
-        
-        return ((IFolder) results[0]).getFullPath().removeFirstSegments(1)
-                .toString();
+
+        return new Status(IStatus.ERROR, CasEditorPlugin.ID, 0, "Please select a folder!", null);
+      }
+    });
+
+    folderSelectionDialog.open();
+
+    Object[] results = folderSelectionDialog.getResult();
+
+    if (results.length != 1) {
+      return null;
     }
-    
+
+    return ((IFolder) results[0]).getFullPath().removeFirstSegments(1).toString();
+  }
+
 }
