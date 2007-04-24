@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<project name="PearPackagingTask" default="pearPackagingSample" basedir=".">
+
+	<!-- define the classpath settings for the pear packaging task. 
+		 uimaj-pear-task.jar and uima-core.jar is needed -->
+	<path id="pearTask.classpath">
+	    <fileset dir="/home/apache-uima/lib/" includes="uimaj-pear-task.jar"/>
+		<fileset dir="/home/apache-uima/lib/" includes="uima-core.jar"/>
+	</path>
+	
+	<!-- pear packaging sample target -->
+	<target name="pearPackagingSample">
+	  	
+		<!-- Define pear packaging task -->
+		<taskdef name="packagePear" 
+	  		        classname="org.apache.uima.pear.tools.PearPackagingAntTask"
+			  		classpathref="pearTask.classpath"/>
+
+		<!-- Sample pear packaging -->
+	    <packagePear componentID="SampleAnnotator"
+	    	mainComponentDesc="desc/mainComponentDesc.xml" 
+	    	classpath="$main_root/pearClasspahtEntry;$main_root/anotherPearClasspahtEntry" 
+	    	datapath="$main_root/resources"
+	    	mainComponentDir="/home/user/workspace/SampeAnntotator" 
+	    	targetDir="/home/user/pearArchive">
+	    	<envVar name="ENV_VAR_NO1" value="value1"/>
+	    	<envVar name="ENV_VAR_NO2" value="value2"/>
+		</packagePear>
+	  </target>
+
+</project>
