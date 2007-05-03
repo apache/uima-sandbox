@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<project name="PearPackagingTask" default="pearPackagingSample" basedir=".">
+
+	<!-- define the classpath settings for the pear packaging ANT task. 
+		 uimaj-pear-task.jar and uima-core.jar is necessary -->
+	<path id="pearTask.classpath">
+	    <fileset dir="/home/apache-uima/lib/" includes="uimaj-pear-task.jar"/>
+		<fileset dir="/home/apache-uima/lib/" includes="uima-core.jar"/>
+	</path>
+	
+	<!-- pear packaging example target -->
+	<target name="pearPackagingSample">
+	  	
+		<!-- Define custom pear packaging ANT task using 'packagePear' as task name -->
+		<taskdef name="packagePear" 
+	  		        classname="org.apache.uima.pear.tools.PearPackagingAntTask"
+			  		classpathref="pearTask.classpath"/>
+
+		<!-- Example pear packaging 
+			componentID = the main component ID of the UIMA component that should be packaged
+			mainComponentDesc = main component descriptor that should be used to run the pear package content
+			classpath = specify the classpath that must be used to run the pear package content - use $main_root macros
+			datapath = sepcify the datapath that must be set to run the pear package content - use $main_root macros
+			mainComponentDir = main component directory that contains the pear package content
+			targetDir = target directory where the created pear package is written to
+
+			optionally specify some environment variable <envVar> settings that must be set to run the pear package content
+		-->
+	    <packagePear componentID="SampleAnnotator"
+	    	mainComponentDesc="desc/mainComponentDesc.xml" 
+	    	classpath="$main_root/pearClasspahtEntry;$main_root/anotherPearClasspahtEntry" 
+	    	datapath="$main_root/resources"
+	    	mainComponentDir="/home/user/workspace/SampeAnntotator" 
+	    	targetDir="/home/user/pearArchive">
+	    	<envVar name="ENV_VAR_NO1" value="value1"/>
+	    	<envVar name="ENV_VAR_NO2" value="value2"/>
+		</packagePear>
+
+		<!-- the pear package was created in the target directory with the filename <componetID>.pear -->
+	  </target>
+
+</project>
