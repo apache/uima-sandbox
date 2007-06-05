@@ -157,7 +157,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     }
 
     /**
-     * Retrives all childs of the {@link NlpModel}. That are the {@link NlpProject}s and
+     * Retrives all children of the {@link NlpModel}. That are the {@link NlpProject}s and
      * {@link IProject}s.
      * 
      * @param inputElement
@@ -173,7 +173,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     }
 
     /**
-     * Adds the added annoations to the viewer.
+     * Adds the added annotations to the viewer.
      * 
      * @param annotations
      */
@@ -299,6 +299,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     @Override
     public void run() {
       mTableViewer.getTree().selectAll();
+      mTableViewer.setSelection(mTableViewer.getSelection());
     }
   }
 
@@ -509,7 +510,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     textColumn.setText("Text");
     textColumn.setWidth(130);
 
-    // performence optimization, the table can contain many items
+    // performance optimization, the table can contain many items
     mTableViewer.setUseHashlookup(false);
 
     mTableViewer.setContentProvider(new OutlineContentProvider());
