@@ -19,8 +19,6 @@
 
 package org.apache.uima.caseditor.ui.property;
 
-import java.util.Vector;
-
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
@@ -45,12 +43,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 /**
  * This is the <code>AnnotationPropertyPage</code>. this page configures 
- * the project dependent and type dependent annotation appaereance in the 
+ * the project dependent and type dependent annotation appearance in the 
  * <code>AnnotationEditor</code>.
  */
 public class AnnotationPropertyPage extends PropertyPage
@@ -101,7 +98,7 @@ public class AnnotationPropertyPage extends PropertyPage
         typeText.setLayoutData(typeTextGridData);
         
         // type list
-        mTypeList = new List(base, SWT.SINGLE | SWT.BORDER);
+        mTypeList = new List(base, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
         GridData typeListGridData = new GridData();
         typeListGridData.horizontalAlignment = SWT.FILL;
         typeListGridData.grabExcessVerticalSpace = true;
@@ -114,7 +111,8 @@ public class AnnotationPropertyPage extends PropertyPage
 
         Type annotationType = typeSytstem.getType(CAS.TYPE_NAME_ANNOTATION);
         
-        Vector types = typeSytstem.getDirectlySubsumedTypes(annotationType);
+        java.util.List types = typeSytstem.getProperlySubsumedTypes(annotationType);
+        // Vector types = typeSytstem.getDirectlySubsumedTypes(annotationType);
         
         for (Object typeObject : types)
         {
