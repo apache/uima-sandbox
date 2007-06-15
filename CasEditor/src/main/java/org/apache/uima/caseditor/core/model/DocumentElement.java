@@ -34,10 +34,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.swt.browser.StatusTextListener;
-import org.eclipse.ui.texteditor.StatusTextEditor;
 
-import com.sun.org.apache.bcel.internal.generic.ISTORE;
 
 /**
  * The document element contains the uima cas document.
