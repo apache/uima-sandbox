@@ -482,6 +482,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 //  private IAnnotationModel mAnnotationModel;
 
   private ShowAnnotationsMenu mShowAnnotationsMenu;
+
+private DocumentListener mAnnotationSynchronizer;
   
   /**
    * Creates an new AnnotationEditor object.
@@ -518,7 +520,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     
     sourceViewer.setEditable(false);
     
-	mPainter = new AnnotationPainter(sourceViewer, new IAnnotationAccess() {
+    mPainter = new AnnotationPainter(sourceViewer, new IAnnotationAccess() {
 
 		public Object getType(Annotation annotation) {
 			return null;
@@ -642,7 +644,9 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     if (mDocument != null) {
     	// mAnnotationModel = getDocumentProvider().getAnnotationModel(input);
     	
-    	getDocument().addChangeListener(new DocumentListener());
+      mAnnotationSynchronizer = new DocumentListener();
+      
+    	getDocument().addChangeListener(mAnnotationSynchronizer);
     }
   }
 
@@ -930,5 +934,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   public void dispose() {
     // remove selection listener
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
+    
+    getDocument().removeChangeListener(mAnnotationSynchronizer);
   }
 }
