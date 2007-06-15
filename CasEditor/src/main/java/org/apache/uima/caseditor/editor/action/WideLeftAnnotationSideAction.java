@@ -66,7 +66,9 @@ public final class WideLeftAnnotationSideAction extends BaseSelectionListenerAct
     Type annotationType = annotation.getType();
     Feature beginFeature = annotationType.getFeatureByBaseName("begin");
 
-    annotation.setIntValue(beginFeature, annotation.getBegin() - 1);
+    if (annotation.getBegin() > 0) {
+      annotation.setIntValue(beginFeature, annotation.getBegin() - 1);
+    }
 
     mDocument.update(annotation);
   }

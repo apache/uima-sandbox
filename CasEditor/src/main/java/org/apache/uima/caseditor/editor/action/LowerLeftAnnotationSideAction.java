@@ -67,7 +67,9 @@ public final class LowerLeftAnnotationSideAction extends BaseSelectionListenerAc
     Type annotationType = annotation.getType();
     Feature beginFeature = annotationType.getFeatureByBaseName("begin");
 
-    annotation.setIntValue(beginFeature, annotation.getBegin() + 1);
+    if (annotation.getBegin() < annotation.getEnd()) {
+      annotation.setIntValue(beginFeature, annotation.getBegin() + 1);
+    }
 
     mDocument.update(annotation);
   }

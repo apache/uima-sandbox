@@ -66,7 +66,9 @@ public final class LowerRightAnnotationSideAction extends BaseSelectionListenerA
     Type annotationType = annotation.getType();
     Feature endFeature = annotationType.getFeatureByBaseName("end");
 
-    annotation.setIntValue(endFeature, annotation.getEnd() - 1);
+    if (annotation.getBegin() < annotation.getEnd()) {
+      annotation.setIntValue(endFeature, annotation.getEnd() - 1);
+    }
 
     mDocument.update(annotation);
   }
