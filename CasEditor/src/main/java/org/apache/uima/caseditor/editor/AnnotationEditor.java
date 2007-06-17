@@ -34,6 +34,7 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.AbstractAnnotationDocumentListener;
+import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
 import org.apache.uima.caseditor.core.model.dotcorpus.EditorAnnotationStatus;
 import org.apache.uima.caseditor.core.uima.AnnotationComparator;
@@ -935,6 +936,10 @@ private DocumentListener mAnnotationSynchronizer;
     // remove selection listener
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
     
-    getDocument().removeChangeListener(mAnnotationSynchronizer);
+    IDocument document = getDocument();
+    
+    if (document != null) {
+      document.removeChangeListener(mAnnotationSynchronizer);
+    }
   }
 }
