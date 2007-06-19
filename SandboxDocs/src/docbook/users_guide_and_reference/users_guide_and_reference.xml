@@ -102,5 +102,6 @@ under the License.
 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sandboxOverview.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="casEditor.xml"/> 
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="fsVariables.xml"/> 
 
 </book>
