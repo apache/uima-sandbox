@@ -21,7 +21,7 @@
 
 <!-- set the basedir value to point to the top level of the project -->
 
-<project name="name of book to build" default="all" basedir=".">
+<project name="Apache UIMA Sandbox Documentation" default="all" basedir=".">
   
   <property name="book_name" value="users_guide_and_reference"/>
   

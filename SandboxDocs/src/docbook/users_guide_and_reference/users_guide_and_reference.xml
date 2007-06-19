@@ -23,12 +23,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 <book lang="en">
-  <title>UIMA CAS Editor</title>
+  <title>Apache UIMA Sandbox Documentation</title>
 <bookinfo>
 
-    <releaseinfo>Version x.x</releaseinfo>
+    <releaseinfo>Version 2.2</releaseinfo>
 
-    <productname>UIMA CAS Editor</productname>
+    <productname>Apache UIMA Sandbox</productname>
 
     <authorgroup>
       <corpauthor>Authors: The Apache UIMA Development Community</corpauthor>
@@ -100,7 +100,7 @@ under the License.
     <pubdate>June, 2007</pubdate>
   </bookinfo>
 
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="testPart.xml" />
-  <!--xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="etc.xml"/--> 
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sandboxOverview.xml" />
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="casEditor.xml"/> 
 
 </book>
