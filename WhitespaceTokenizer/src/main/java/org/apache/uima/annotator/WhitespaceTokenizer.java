@@ -54,9 +54,11 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
 
   private static final int INVALID_CHAR = 0;
 
-  private static final String TOKEN_ANNOTATION_NAME = "org.apache.uima.TokenAnnotation";
+  public static final String TOKEN_ANNOTATION_NAME = "org.apache.uima.TokenAnnotation";
 
-  private static final String SENTENCE_ANNOTATION_NAME = "org.apache.uima.SentenceAnnotation";
+  public static final String SENTENCE_ANNOTATION_NAME = "org.apache.uima.SentenceAnnotation";
+  
+  public static final String TOKEN_TYPE_FEATURE_NAME = "tokenType";
 
   private Type tokenType;
 
