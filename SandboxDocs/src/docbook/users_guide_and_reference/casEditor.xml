@@ -35,7 +35,7 @@ under the License.
 		<screenshot>
 			<mediaobject>
 				<imageobject>
-					<imagedata width="700px" format="PNG"
+					<imagedata scale="100" format="PNG"
 						fileref="&imgroot;CasEditor.png" />
 				</imageobject>
 			</mediaobject>
@@ -135,7 +135,7 @@ under the License.
 				<screenshot>
 					<mediaobject>
 						<imageobject>
-							<imagedata width="257px" format="PNG"
+							<imagedata scale="100" format="PNG"
 								fileref="&imgroot;CorpusExplorer.png" />
 						</imageobject>
 						<textobject>
@@ -174,7 +174,7 @@ under the License.
 			<screenshot>
 				<mediaobject>
 					<imageobject>
-						<imagedata width="400px" format="PNG"
+						<imagedata scale="100"  format="PNG"
 							fileref="&imgroot;Properties.png" />
 					</imageobject>
 				</mediaobject>
@@ -241,7 +241,7 @@ under the License.
 				<screenshot>
 					<mediaobject>
 						<imageobject>
-							<imagedata width="500px" format="PNG"
+							<imagedata scale="100" format="PNG"
 								fileref="&imgroot;Editor.png" />
 						</imageobject>
 					</mediaobject>
@@ -261,7 +261,7 @@ under the License.
 				<screenshot>
 					<mediaobject>
 						<imageobject>
-							<imagedata width="260px" format="PNG"
+							<imagedata scale="100" format="PNG"
 								fileref="&imgroot;Outline.png" />
 						</imageobject>
 					</mediaobject>
@@ -281,7 +281,7 @@ under the License.
 				<screenshot>
 					<mediaobject>
 						<imageobject>
-							<imagedata width="400px" format="PNG"
+							<imagedata scale="100" format="PNG"
 								fileref="&imgroot;PropertiesView.png" />
 						</imageobject>
 					</mediaobject>
@@ -300,7 +300,7 @@ under the License.
 				<screenshot>
 					<mediaobject>
 						<imageobject>
-							<imagedata width="300px" format="PNG"
+							<imagedata scale="100" format="PNG"
 								fileref="&imgroot;FSView.png" />
 						</imageobject>
 					</mediaobject>
