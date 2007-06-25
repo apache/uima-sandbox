@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY imgroot "../images/users_guide_and_reference/casEditor/" >
+<!ENTITY imgroot "../images/users_guide_and_reference/" >
 ]>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -22,9 +22,317 @@ specific language governing permissions and limitations
 under the License.
 -->
 <chapter id="sandbox.casEditor">
-  <title>The CAS Editor</title>
-  
-  <para>The CAS Editor is an Eclipse plugin that allows the manual and automatic creation of
-  text annotations.
-  </para>
+	<title>CAS Editor</title>
+
+	<para>
+		The
+		<emphasis>CAS Editor</emphasis>
+		is an annotation tool which supports manual and automatic
+		annotation of CAS files. The CAS Editor can visualize and edit
+		FeatureStructure, annotations can be viewed and edited directly
+		on text. Currently only text based CAS are supported.
+
+		<screenshot>
+			<mediaobject>
+				<imageobject>
+					<imagedata width="700px" format="PNG"
+						fileref="&imgroot;CasEditor.png" />
+				</imageobject>
+			</mediaobject>
+		</screenshot>
+
+	</para>
+
+	<section id="ugr.tools.cas_editor.projects">
+		<title>Projects</title>
+		<para>
+			The CAS Editor organizes all artifacts in a project. It is
+			not possible to open artifacts which are located outside of
+			the project.
+		</para>
+
+		<section id="ugr.tools.cas_editor.pojects.structure">
+			<title>Project structure</title>
+
+			<para>
+				The project can be composed of these elements:
+
+				<itemizedlist>
+
+					<listitem>
+						<para>
+							<emphasis>Typesystem</emphasis>
+							The typesystem must be present for opening a
+							CAS file or running a CAS processor.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis>Corpus folder</emphasis>
+							A corpus folder is a collection of CAS
+							files in the project. A project can have
+							multiple corpus folders.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis>CAS file</emphasis>
+							The CAS itself, it must be located in a
+							corpus folder and must end with ".xcas" to
+							be recognized as a CAS file. Currently only
+							xcas files are supported.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis>CAS Processor folder</emphasis>
+							A processor folder contains the Analysis
+							Engine and Consumer Descriptor files. The
+							CAS processor folder is also the data path
+							for the processors. A project can have
+							multiple processor folders.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis>
+								Analysis Engine Descriptor
+							</emphasis>
+							Configuration for an Analysis Engine which
+							can be used to annotate CAS files in a
+							corpus folder. To be recognized as Analysis
+							Engine Descriptor the file must end with
+							".ann" and must be placed in a processor folder.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis>Consumer Descriptor</emphasis>
+							Configuration for a Consumer which can be
+							fed with the CAS files in a corpus. To be
+							recognized as Consumer Descriptor the file
+							must end with ".con" and must be placed in a
+							processor folder.
+						</para>
+					</listitem>
+				</itemizedlist>
+
+				These elements are shown differently than normal files
+				and folders in the corpus explorer view. In addition to
+				the listed elements a project can also contain files and
+				folders e.g. for documentation.
+				If one of these special elements contains an
+				error a marker which describes the problem is
+				added to the file.
+
+				The corpus explorer with a project looks like this:
+
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata width="257px" format="PNG"
+								fileref="&imgroot;CorpusExplorer.png" />
+						</imageobject>
+						<textobject>
+							<phrase>
+								Screenshot of corpus explorer
+							</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+			</para>
+
+		</section>
+	</section>
+
+	<section id="ugr.tools.cas_editor.add_typesystem">
+		<title>Add a typesystem</title>
+		<para>
+			Its strongly recommended to first add a valid typesystem to
+			the project other functions are only available if the
+			typesystem is present. Use copy and paste to import an
+			existing typesystem. Editing of the typesystem is currently
+			not supported inside the CAS Editor.
+
+			<note>
+				<para>
+					If an external text editor is used to modify the
+					typesystem close all editors inside the CAS Editor
+					and run the refresh action.
+				</para>
+			</note>
+
+			After the typesystem file is added make the CAS Editor aware
+			of its existence. To do this open the Properties dialog for
+			the project and then select the typesystem as shown here:
+
+			<screenshot>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="400px" format="PNG"
+							fileref="&imgroot;Properties.png" />
+					</imageobject>
+				</mediaobject>
+			</screenshot>
+
+			Now the new type system element can be seen in the project
+			tree of the corpus explorer.
+		</para>
+	</section>
+
+	<section id="ugr.tools.cas_editor.add_corpus">
+		<title>Add corpus folder</title>
+		<para>
+			To add a corpus folder first create a new folder. Then open
+			the Properties dialog and add the folder to the list of corpus
+			folders. It than appears as corpus folder in the corpus
+			explorer.
+
+			The corpus explorer automatically hides all non CAS files in
+			the corpus folder. The CAS files are organized in a flat
+			hierarchy sub folders which contain CAS files are not
+			recognized.
+		</para>
+
+	</section>
+
+	<section id="ugr.tools.cas_editor.annotation_editor">
+		<title>Annotation editor</title>
+		<para>
+			The annotation editor shows the text with annotations and
+			provides different views to show aspects of the CAS.
+		</para>
+
+		<section id="ugr.tools.cas_editor.annotation_editor.editor">
+			<title>Editor</title>
+			<para>
+				The editor has a edit mode. By default the editor only
+				shows annotation of this type. Actions and views are
+				sensitive to the edit mode. To switch the type of edit mode use the
+				"Mode" menu in the editor context menu. The editor can
+				also show other annotation which have not the type of
+				the edit mode. For this use the "Show" menu in the
+				context menu. The annotation renderer can be changed in
+				the Properties dialog. After the change all editors
+				should be re-opened.
+			</para>
+			<para>
+				The editor automatically selects annotations near the
+				cursor of the edit mode. This selection is then
+				synchronized or displayed in other views.
+			</para>
+			<para>
+				To create an annotation mark a piece of text and then
+				press the enter key. The annotation now has the bounds
+				of the selection and the type of the edit mode.
+			</para>
+			<para>
+				To delete an annotation select it and press the delete
+				key. Only annotations of the edit mode can be selected.
+			</para>
+
+			<para>
+
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata width="500px" format="PNG"
+								fileref="&imgroot;Editor.png" />
+						</imageobject>
+					</mediaobject>
+				</screenshot>
+
+			</para>
+		</section>
+
+		<section id="ugr.tools.cas_editor.annotation_editor.outline">
+			<title>Outline view</title>
+			<para>
+				The outline lists the annotations of the current edit
+				mode of the editor. There are actions to increase or decrease
+				the bounds of the selected annotation. There is also an
+				action to merge all selected annotations.
+
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata width="260px" format="PNG"
+								fileref="&imgroot;Outline.png" />
+						</imageobject>
+					</mediaobject>
+				</screenshot>
+			</para>
+		</section>
+
+		<section
+			id="ugr.tools.cas_editor.annotation_editor.properties_view">
+			<title>Properties View</title>
+			<para>
+				The Properties View shows details about the currently
+				selected annotations or feature structures. It is possible
+				to change primitive values in this view. Creation of
+				feature structures is not possible.
+
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata width="400px" format="PNG"
+								fileref="&imgroot;PropertiesView.png" />
+						</imageobject>
+					</mediaobject>
+				</screenshot>
+
+			</para>
+		</section>
+
+		<section id="ugr.tools.cas_editor.annotation_editor.fs_view">
+			<title>FeatureStructure View</title>
+			<para>
+				The FeatureStructure View list all feature structures of
+				a certain type. The type is selected in the type
+				combobox.
+
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata width="300px" format="PNG"
+								fileref="&imgroot;FSView.png" />
+						</imageobject>
+					</mediaobject>
+				</screenshot>
+			</para>
+		</section>
+	</section>
+
+	<section id="ugr.tools.cas_editor.cas_processor_integration">
+		<title>Cas processor integration</title>
+		<para>
+			The Analysis Engine can be run aginst a whole corpus or a
+			few CAS files. To do this select a corpus or CAS files and
+			then choose in the context menu the correct Analysis Engine.
+			The filename of the Analysis Engine must end with ".ann"
+			otherwise it is not recognized as an Analysis Engine.
+		</para>
+
+		<para>
+			The Consumer can be fed with the CAS files inside a corpus.
+			To do this select a corpus and then select the consumer in
+			the context menu. To add a Consumer Descriptor paste a file
+			into the processor folder. The filename must end with ".con"
+			otherwise it is not recognized as consumer.
+
+			<note>
+				<para>
+					If the CAS Consumer writes or modify files on the
+					data path run the refresh action to synchronize the
+					changes.
+				</para>
+			</note>
+		</para>
+	</section>
 </chapter>
