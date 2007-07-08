@@ -30,6 +30,9 @@ public final class AnnotationStyle {
    * The styles that can be used to draw an annotation.
    */
   public enum Style {
+    
+    TEXT_COLOR,
+    
     /**
      * The squiggles style.
      */

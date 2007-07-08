@@ -25,6 +25,9 @@ import org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy;
  * An enumertation of all available {@link IDrawingStrategy}.
  */
 public enum DrawingStyle {
+  
+  TEXT_COLOR(new TextColorDrawingStrategy()),
+  
   /**
    * The squiggles {@link IDrawingStrategy}.
    */
