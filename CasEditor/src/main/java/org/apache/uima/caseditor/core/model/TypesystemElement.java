@@ -60,13 +60,20 @@ public class TypesystemElement extends AbstractNlpElement {
   }
 
   public TypeSystem getTypeSystem() {
-	  return getCAS().getTypeSystem();
+    
+    CAS cas = getCAS();
+    
+    if (cas != null) {
+      return cas.getTypeSystem();
+    }
+    
+	  return null;
   }
   
   /**
-   * Retrives the {@link CAS}.
+   * Retrieves the {@link CAS}. 
    * 
-   * @return the {@link CAS}
+   * @return the {@link CAS} or null if there is an error in the type system.
    * @deprecated
    */
   public CAS getCAS() {
@@ -94,6 +101,7 @@ public class TypesystemElement extends AbstractNlpElement {
         }
       };
       ((NlpModel) mProject.getParent()).asyncExcuteQueue(createMarker);
+      
       return null;
     }
   }
@@ -153,28 +161,28 @@ public class TypesystemElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the name.
+   * Retrieves the name.
    */
   public String getName() {
     return "Typesystem";
   }
 
   /**
-   * Retrives the nlp project.
+   * Retrieves the nlp project.
    */
   public NlpProject getNlpProject() {
     return mProject;
   }
 
   /**
-   * Rerives the parent.
+   * Retrieves the parent.
    */
   public INlpElement getParent() {
     return mProject;
   }
 
   /**
-   * Retrives the resource.
+   * Retrieves the resource.
    */
   public IResource getResource() {
     return mTypesytemFile;

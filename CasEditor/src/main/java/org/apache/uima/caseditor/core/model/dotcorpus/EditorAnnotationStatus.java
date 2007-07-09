@@ -21,6 +21,7 @@ package org.apache.uima.caseditor.core.model.dotcorpus;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 
 import org.apache.uima.cas.Type;
 
@@ -30,7 +31,7 @@ import org.apache.uima.cas.Type;
 public class EditorAnnotationStatus {
   private Type mMode;
 
-  private Collection<Type> mDisplayAnnotations;
+  private Collection<Type> mDisplayAnnotations = new HashSet<Type>();
 
   /**
    * Initializes a new instance.
@@ -46,10 +47,8 @@ public class EditorAnnotationStatus {
     mMode = mode;
 
     if (displayAnnotations != null) {
-      mDisplayAnnotations = Collections.unmodifiableCollection(displayAnnotations);
-    } else {
-      mDisplayAnnotations = Collections.emptyList();
-    }
+      mDisplayAnnotations.addAll(displayAnnotations);
+    } 
   }
 
   /**

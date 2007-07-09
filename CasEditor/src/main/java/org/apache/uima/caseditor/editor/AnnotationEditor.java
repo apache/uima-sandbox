@@ -124,7 +124,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         // get old annotations of current type for this area
         // if there is something ... the delete them and add
         Collection<AnnotationFS> oldAnnotations = getDocument().getAnnotation(
-                mCurrentAnnotationType, new Span(selection.x, selection.y));
+                mAnnotationMode, new Span(selection.x, selection.y));
 
         if (!oldAnnotations.isEmpty()) {
           getDocument().removeAnnotations(oldAnnotations);
@@ -133,7 +133,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         int start = selection.x;
         int end = start + selection.y;
 
-        AnnotationFS annotation = getDocument().getCAS().createAnnotation(mCurrentAnnotationType,
+        AnnotationFS annotation = getDocument().getCAS().createAnnotation(mAnnotationMode,
                 start, end);
 
         getDocument().addFeatureStructure(annotation);
@@ -168,7 +168,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
 
     /**
-     * Executes this action, showse context information.
+     * Executes this action, shows context information.
      */
     @Override
     public void run() {
@@ -341,14 +341,14 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       });
     }
   }
-
+  
   /**
    * Creates the show annotations context submenu.
    */
   private class ShowAnnotationsMenu extends TypeMenu {
 	 
-	 private Collection<Type> mTypesToDisplay = new HashSet<Type>();
-	  
+    private Collection<Type> mTypesToDisplay = new HashSet<Type>();
+ 
     /**
      * Initializes a new instance.
      * 
@@ -384,6 +384,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
           // TODO: only synchronize annotation which
           // must be removed/addeded
           syncAnnotations();
+          
+          EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
+          
+          mDocument.getProject().setEditorAnnotationStatus(
+                  new EditorAnnotationStatus(status.getMode(), getSelectedTypes()));
         }
       });
     }
@@ -391,10 +396,15 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     Collection<Type> getSelectedTypes() {
     	return Collections.unmodifiableCollection(mTypesToDisplay);
     }
+    
+    void setSelectedTypes(Collection<Type> types) {
+      mTypesToDisplay = new HashSet<Type>();
+      mTypesToDisplay.addAll(types);
+    }
   }
 
   /**
-   * Sometimes the wrong annoation is selected ... ????
+   * Sometimes the wrong annotation is selected ... ????
    */
   private class FeatureStructureDragListener implements DragSourceListener {
     private boolean mIsActive;
@@ -426,7 +436,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
             // try to get the position inside the text
             int offset = textWidget.getOffsetAtLocation(new Point(e.x, e.y));
 
-            Map<Integer, AnnotationFS> view = getDocument().getView(mCurrentAnnotationType);
+            Map<Integer, AnnotationFS> view = getDocument().getView(mAnnotationMode);
 
             mCandidate = view.get(offset);
 
@@ -456,7 +466,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
   }
   
-  private Type mCurrentAnnotationType;
+  private Type mAnnotationMode;
 
   /**
    * The outline page belonging to this editor.
@@ -466,7 +476,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   private IAnnotationEditorModifyListener mEditorListener;
 
   /**
-   * TODO: Do we realy need this pos variable ?
+   * TODO: Do we really need this pos variable ?
    */
   private int mCursorPosition;
 
@@ -614,11 +624,11 @@ private DocumentListener mAnnotationSynchronizer;
 	    		mDocument.getProject().getEditorAnnotationStatus(), 
 	    		getDocument().getCAS().getTypeSystem());
 	    
-		EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
-		setAnnotationType(status.getMode());
+	    EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
+      
+      
+	    setAnnotationType(status.getMode());
     }
-    
-
   }
 
   // TODO: still not called always, e.g. on mouse selection
@@ -677,7 +687,7 @@ private DocumentListener mAnnotationSynchronizer;
 
     // can be null directly after doSetInput()
     if (statusField != null) {
-      statusField.setText(mCurrentAnnotationType.getShortName());
+      statusField.setText(mAnnotationMode.getShortName());
     }
   }
 
@@ -696,7 +706,7 @@ private DocumentListener mAnnotationSynchronizer;
    * @return - current annotation type
    */
   public Type getAnnotationMode() {
-    return mCurrentAnnotationType;
+    return mAnnotationMode;
   }
 
   /**
@@ -707,7 +717,7 @@ private DocumentListener mAnnotationSynchronizer;
   protected void setAnnotationType(Type type) {
     // TODO: check if this type is a subtype of Annotation
 
-    mCurrentAnnotationType = type;
+    mAnnotationMode = type;
 
     setProjectEditorStatus();
 
@@ -715,7 +725,7 @@ private DocumentListener mAnnotationSynchronizer;
 
     syncAnnotations();
 
-    fireAnnotationTypeChanged(mCurrentAnnotationType);
+    fireAnnotationTypeChanged(mAnnotationMode);
   }
 
   /**
@@ -749,8 +759,8 @@ private DocumentListener mAnnotationSynchronizer;
 	}
 
     // if not contained in types add current mode annotations
-    if (!mShowAnnotationsMenu.getSelectedTypes().contains(mCurrentAnnotationType)) {
-    	showAnnotationType(mCurrentAnnotationType);
+    if (!mShowAnnotationsMenu.getSelectedTypes().contains(mAnnotationMode)) {
+    	showAnnotationType(mAnnotationMode);
     }
 
 	mPainter.paint(AnnotationPainter.CONFIGURATION);
@@ -817,7 +827,7 @@ private DocumentListener mAnnotationSynchronizer;
       Span selecectedSpan = new Span(selectedText.x, selectedText.y);
 
       Collection<AnnotationFS> selectedAnnotations = getDocument().getAnnotation(
-              mCurrentAnnotationType, selecectedSpan);
+              mAnnotationMode, selecectedSpan);
 
       for (AnnotationFS annotation : selectedAnnotations) {
         selection.add(annotation);
@@ -825,7 +835,7 @@ private DocumentListener mAnnotationSynchronizer;
 
       Collections.sort(selection, new AnnotationComparator());
     } else {
-      Map<Integer, AnnotationFS> view = getDocument().getView(mCurrentAnnotationType);
+      Map<Integer, AnnotationFS> view = getDocument().getView(mAnnotationMode);
 
       AnnotationFS annotation = view.get(mCursorPosition);
 

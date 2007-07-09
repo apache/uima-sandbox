@@ -94,8 +94,10 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
     //  sourceFolder.initialize();
     //}
 
-    if (getDotCorpus().getTypeSystemFile() != null) {
-      mTypesystem = new TypesystemElement(getDotCorpus().getTypeSystemFile(), this);
+    IFile typeSystemFile = getDotCorpus().getTypeSystemFile();
+    
+    if (typeSystemFile != null && typeSystemFile.exists()) {
+      mTypesystem = new TypesystemElement(typeSystemFile, this);
     }
 
     if (getTypesystemElement() != null && getTypesystemElement().getTypeSystem() != null) {
