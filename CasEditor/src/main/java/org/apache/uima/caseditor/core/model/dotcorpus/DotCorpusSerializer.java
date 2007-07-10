@@ -189,7 +189,7 @@ public class DotCorpusSerializer {
     
     try {
       xmlSerHandler.startDocument();
-      xmlSerHandler.startElement("", CONFIG_ELEMENT, CONFIG_ELEMENT, null);
+      xmlSerHandler.startElement("", CONFIG_ELEMENT, CONFIG_ELEMENT, new AttributesImpl());
 
       for (String corpusFolder : dotCorpus.getCorpusFolderNameList()) {
         AttributesImpl corpusFolderAttributes = new AttributesImpl();
