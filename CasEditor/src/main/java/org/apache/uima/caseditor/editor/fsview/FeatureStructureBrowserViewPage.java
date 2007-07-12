@@ -19,32 +19,256 @@
 
 package org.apache.uima.caseditor.editor.fsview;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Vector;
 
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.FSIndex;
+import org.apache.uima.cas.FSIterator;
+import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.Images;
+import org.apache.uima.caseditor.core.AbstractAnnotationDocumentListener;
+import org.apache.uima.caseditor.core.uima.StrictTypeConstraint;
+import org.apache.uima.caseditor.core.util.Primitives;
+import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
+import org.apache.uima.caseditor.editor.FeatureValue;
+import org.apache.uima.caseditor.editor.ModelFeatureStructure;
+import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;
+import org.apache.uima.jcas.cas.StringArray;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.Page;
 
 /**
- * TODO: add javadoc here 
- * TODO: update if annotation model was changed
+ * TODO: add javadoc here TODO: update if annotation model was changed
  */
 public final class FeatureStructureBrowserViewPage extends Page {
+
+  final class FeatureStructureTreeContentProvider extends AbstractAnnotationDocumentListener
+          implements ITreeContentProvider {
+
+    private AnnotationDocument mDocument;
+
+    private CAS mCAS;
+
+    private Type mCurrentType;
+
+    FeatureStructureTreeContentProvider(AnnotationDocument document, CAS tcas) {
+      mCAS = tcas;
+      mDocument = document;
+    }
+
+    public Object[] getElements(Object inputElement) {
+      if (mCurrentType == null) {
+        return new Object[] {};
+      }
+
+      FSIndex index = mCAS.getIndexRepository().getIndex("TOPIndex");
+
+      assert index != null : "Unable to retrive the TOPIndex!";
+
+      StrictTypeConstraint typeConstrain = new StrictTypeConstraint(mCurrentType);
+
+      FSIterator strictTypeIterator = mCAS.createFilteredIterator(index.iterator(), typeConstrain);
+
+      LinkedList<ModelFeatureStructure> featureStrucutreList = new LinkedList<ModelFeatureStructure>();
+
+      for (int i = 0; strictTypeIterator.hasNext(); i++) {
+        featureStrucutreList.add(new ModelFeatureStructure(mDocument,
+                (FeatureStructure) strictTypeIterator.next()));
+      }
+
+      ModelFeatureStructure[] featureStructureArray = new ModelFeatureStructure[featureStrucutreList
+              .size()];
+
+      featureStrucutreList.toArray(featureStructureArray);
+
+      return featureStructureArray;
+    }
+
+    public void dispose() {
+    }
+
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      
+      if (oldInput != null) {
+        mDocument.removeChangeListener(this);
+      }
+      
+      if (newInput == null) {
+        
+        mCurrentType = null;
+        return;
+      }
+
+      mCurrentType = (Type) newInput;
+      
+      mDocument.addChangeListener(this);
+      
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          mFSList.refresh();
+        }
+      });
+    }
+
+    /**
+     * Retrives children for a FeatureStrcuture and for FeatureValues if they have childs.
+     * 
+     * @param parentElement
+     * @return the childs
+     */
+    public Object[] getChildren(Object parentElement) {
+      Collection<Object> childs = new LinkedList<Object>();
+
+      FeatureStructure featureStructure;
+
+      if (parentElement instanceof ModelFeatureStructure) {
+        featureStructure = ((ModelFeatureStructure) parentElement).getStructre();
+      } else if (parentElement instanceof FeatureValue) {
+        FeatureValue value = (FeatureValue) parentElement;
+
+        if (parentElement instanceof StringArray) {
+          StringArray array = (StringArray) parentElement;
+          return array.toArray();
+        }
+
+        featureStructure = (FeatureStructure) value.getValue();
+      } else {
+        assert false : "Unexpected element!";
+
+        return new Object[] {};
+      }
+
+      Type type = featureStructure.getType();
+
+      Vector featureTypes = type.getAppropriateFeatures();
+
+      Iterator featuresItertor = featureTypes.iterator();
+
+      while (featuresItertor.hasNext()) {
+        Feature feature = (Feature) featuresItertor.next();
+
+        if (Primitives.isPrimitive(feature)) {
+          // create a new pair
+          // feature and value
+          // add string
+          childs.add(new FeatureValue(mDocument, featureStructure, feature));
+        } else {
+          childs.add(new FeatureValue(mDocument, featureStructure, feature));
+        }
+      }
+
+      assert childs.size() > 0;
+
+      return childs.toArray();
+    }
+
+    public Object getParent(Object element) {
+      return null;
+    }
+
+    public boolean hasChildren(Object element) {
+      if (element instanceof IAdaptable
+              && ((IAdaptable) element).getAdapter(FeatureStructure.class) != null) {
+        return true;
+      } else if (element instanceof FeatureValue) {
+        FeatureValue featureValue = (FeatureValue) element;
+
+        if (Primitives.isPrimitive(featureValue.getFeature())) {
+          Object value = featureValue.getValue();
+
+          if (value == null) {
+            return false;
+          }
+
+          if (value instanceof StringArray) {
+            StringArray array = (StringArray) featureValue.getValue();
+
+            if (array.size() > 0) {
+              return true;
+            } else {
+              return false;
+            }
+          }
+
+          return false;
+        } else {
+          return featureValue.getValue() != null ? true : false;
+        }
+      } else {
+        assert false : "Unexpected element";
+
+        return false;
+      }
+    }
+
+    @Override
+    protected void addedAnnotation(Collection<AnnotationFS> annotations) {
+
+      final LinkedList<ModelFeatureStructure> featureStrucutreList = 
+        new LinkedList<ModelFeatureStructure>();
+
+      for (AnnotationFS annotation : annotations) {
+        if (annotation.getType() == mCurrentType) {
+          featureStrucutreList.add(new ModelFeatureStructure(mDocument, annotation));
+        }
+      }
+
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          mFSList.add(featureStrucutreList.toArray());
+        }
+      });
+    }
+
+    @Override
+    protected void removedAnnotation(Collection<AnnotationFS> annotations) {
+
+      final LinkedList<ModelFeatureStructure> featureStrucutreList = 
+        new LinkedList<ModelFeatureStructure>();
+
+      for (AnnotationFS annotation : annotations) {
+        if (annotation.getType() == mCurrentType) {
+          featureStrucutreList.add(new ModelFeatureStructure(mDocument, annotation));
+        }
+      }
+
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          mFSList.remove(featureStrucutreList.toArray());
+        }
+      });
+
+    }
+
+    @Override
+    protected void updatedAnnotation(Collection<AnnotationFS> annotations) {
+      // ignore
+    }
+  }
+
   private class CreateAction extends Action {
     // TOOD: extract it and add setType(...)
     public void run() {
@@ -66,29 +290,6 @@ public final class FeatureStructureBrowserViewPage extends Page {
     }
   }
 
-  private class DeleteAction extends Action {
-    @Override
-    public void run() {
-      // mEditor.getDocument().fireDocumentChanged();
-
-      // get current selected feature structure
-      /*
-       * TreeItem[] selectedItems = mInstanceTree.getList().getSelection();
-       * 
-       * for (int i = 0; i < selectedItems.length; i++) { TreeItem item = selectedItems[i];
-       * 
-       * FeatureStructure structure = (FeatureStructure) ((IAdaptable) item
-       * .getData()).getAdapter(FeatureStructure.class);
-       * 
-       * if (structure == null) { continue; }
-       * 
-       * mCAS.getIndexRepository().removeFS(structure); }
-       * 
-       * mInstanceTree.refresh();
-       */
-    }
-  }
-
   private class SelectAllAction extends Action {
     @Override
     public void run() {
@@ -106,7 +307,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
   private Type mCurrentType;
 
-  private Action mDeleteAction;
+  private DeleteFeatureStructureAction mDeleteAction;
 
   private Action mSelectAllAction;
 
@@ -119,7 +320,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     mCAS = editor.getDocument().getCAS();
     mEditor = editor;
 
-    mDeleteAction = new DeleteAction();
+    mDeleteAction = new DeleteFeatureStructureAction(editor.getDocument());
 
     mSelectAllAction = new SelectAllAction();
 
@@ -158,7 +359,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     mFSList.setLabelProvider(new FeatureStructureLabelProvider());
 
     mFSList.setUseHashlookup(true);
-
+    
     mTypePane.setListener(new ITypePaneListener() {
       public void typeChanged(Type newType) {
         mCurrentType = newType;
@@ -208,6 +409,8 @@ public final class FeatureStructureBrowserViewPage extends Page {
    */
   public void setActionBars(IActionBars actionBars) {
     actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), mDeleteAction);
+
+    getSite().getSelectionProvider().addSelectionChangedListener(mDeleteAction);
 
     actionBars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), mSelectAllAction);
 

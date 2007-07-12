@@ -100,4 +100,24 @@ public class ModelFeatureStructure implements IAdaptable {
   public void update() {
     mDocument.update(mFeatureStructre);
   }
+  
+  @Override
+  public boolean equals(Object obj) {
+    
+    if (obj == this) {
+      return true;
+    }
+    else if (obj instanceof ModelFeatureStructure) {
+      ModelFeatureStructure foreignFS = (ModelFeatureStructure) obj;
+      
+      return mFeatureStructre.equals(foreignFS.mFeatureStructre);
+    }
+     
+    return false;
+  }
+  
+  @Override
+  public int hashCode() {
+    return mFeatureStructre.hashCode();
+  }
 }
