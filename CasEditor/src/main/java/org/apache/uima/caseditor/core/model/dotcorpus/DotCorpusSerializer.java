@@ -148,8 +148,7 @@ public class DotCorpusSerializer {
 
         Color color = new Color(colorInteger);
         AnnotationStyle style = new AnnotationStyle(type, AnnotationStyle.Style
-                .valueOf(styleString), new org.eclipse.swt.graphics.Color(null, color.getRed(), 
-                color.getGreen(), color.getBlue()));
+                .valueOf(styleString), color);
 
         dotCorpus.setStyle(style);
       } else if (CAS_PROCESSOR_ELEMENT.equals(corporaChildElement.getNodeName())) {
@@ -206,7 +205,7 @@ public class DotCorpusSerializer {
         corpusFolderAttributes.addAttribute("", "", STYLE_STYLE_ATTRIBUTE, "", style.getStyle()
                 .name());
 
-        org.eclipse.swt.graphics.Color color = style.getColor();
+        Color color = style.getColor();
         Integer colorInt = new Color(color.getRed(), color.getGreen(), color.getBlue()).getRGB();
         corpusFolderAttributes.addAttribute("", "", STYLE_COLOR_ATTRIBUTE, "", colorInt.toString());
 

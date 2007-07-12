@@ -71,6 +71,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -744,7 +745,9 @@ private DocumentListener mAnnotationSynchronizer;
 		mPainter.addDrawingStrategy(type.getName(), 
 				DrawingStyle.valueOf(style.getStyle().name()).getStrategy());
 		mPainter.addAnnotationType(type.getName(), type.getName());
-		mPainter.setAnnotationTypeColor(type.getName(), style.getColor());
+    java.awt.Color color = style.getColor();
+		mPainter.setAnnotationTypeColor(type.getName(), new Color(null, color.getRed(), 
+            color.getGreen(), color.getBlue()));
   }
   
   /**

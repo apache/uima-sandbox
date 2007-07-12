@@ -21,9 +21,9 @@ package org.apache.uima.caseditor.core.model.dotcorpus;
 
 import static org.junit.Assert.assertEquals;
 
+import java.awt.Color;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
+
 import org.junit.Test;
 
 /**
@@ -35,9 +35,9 @@ public class AnnotationStyleTest {
    */
   @Test
   public void testEquals() {
-    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(null, 255, 255, 0));
+    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
 
-    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(null, 255, 255, 0));
+    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
 
     assertEquals(a, b);
   }
@@ -47,9 +47,9 @@ public class AnnotationStyleTest {
    * 
    */
   public void testHashCode() {
-    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(null, 255, 255, 0));
+    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
 
-    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(null, 255, 255, 0));
+    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
 
     assertEquals(a.hashCode(), b.hashCode());
   }

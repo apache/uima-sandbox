@@ -98,7 +98,7 @@ public class DefectiveNlpModelTest {
     mProject.getDocument().setContents(new ByteArrayInputStream(new byte[0]), true, true, null);
 
     assertTrue(((DocumentElement) CasEditorPlugin.getNlpModel().findMember(mProject.getDocument()))
-            .getCAS() == null);
+            .getDocument().getCAS() == null);
   }
 
   @Test

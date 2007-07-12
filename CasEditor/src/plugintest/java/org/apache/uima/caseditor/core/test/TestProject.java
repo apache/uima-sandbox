@@ -171,7 +171,7 @@ public class TestProject {
     DotCorpus dotCorpus = new DotCorpus();
 
     dotCorpus.addCorpusFolder(mCorpusFolder.getName());
-    dotCorpus.setUimaConfigFolderName(mSourceFolder.getName());
+    dotCorpus.addCasProcessorFolder(mSourceFolder.getName());
     dotCorpus.setTypeSystemFilename(mTypesystem.getName());
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();

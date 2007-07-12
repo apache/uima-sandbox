@@ -19,6 +19,8 @@
 
 package org.apache.uima.caseditor.ui.property;
 
+import java.awt.Color;
+
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
@@ -34,7 +36,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -203,7 +204,7 @@ public class AnnotationPropertyPage extends PropertyPage
         
         RGB colorRGB = mColorSelector.getColorValue();
         
-        Color color = new Color(null, colorRGB);
+        Color color = new Color(colorRGB.red, colorRGB.green, colorRGB.blue);
         
         mCurrentSelectedAnnotation = new AnnotationStyle(
                 mCurrentSelectedAnnotation.getAnnotation(), 
@@ -250,7 +251,9 @@ public class AnnotationPropertyPage extends PropertyPage
         mStyleCombo.setText(style.getStyle().name());
         mStyleCombo.setEnabled(true);
         
-        mColorSelector.setColorValue(style.getColor().getRGB());
+        Color color = style.getColor();
+        mColorSelector.setColorValue(new RGB(color.getRed(), color.getGreen(), 
+                color.getBlue()));
         mColorSelector.setEnabled(true);
     }
     

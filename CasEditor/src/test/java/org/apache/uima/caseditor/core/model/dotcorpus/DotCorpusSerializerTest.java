@@ -21,13 +21,13 @@ package org.apache.uima.caseditor.core.model.dotcorpus;
 
 import static org.junit.Assert.assertEquals;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle.Style;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.graphics.Color;
 import org.junit.Test;
 
 /**
@@ -44,7 +44,7 @@ public class DotCorpusSerializerTest {
     DotCorpus original = new DotCorpus();
     original.setTypeSystemFilename("typesystem");
     original.addCasProcessorFolder("uima processor folder");
-    original.setStyle(new AnnotationStyle("test", Style.BRACKET, new Color(null, 255, 255, 0)));
+    original.setStyle(new AnnotationStyle("test", Style.BRACKET, new Color(255, 255, 0)));
     original.addCorpusFolder("corpus");
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
