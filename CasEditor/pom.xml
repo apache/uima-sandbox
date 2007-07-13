@@ -24,7 +24,7 @@
 	<groupId>org.apache.uima</groupId>
 	<artifactId>org.apache.uima.caseditor</artifactId>
 	<packaging>jar</packaging>
-	<version>2.1.0.incubating-SNAPSHOOT</version>
+	<version>2.2.0.incubating-SNAPSHOOT</version>
 	<name>UIMA CAS Editor</name>
 	<url>http://incubator.apache.org/uima</url>
 	<parent>
@@ -135,7 +135,7 @@
 								</descriptor>
 							</descriptors>
 							<finalName>
-								org.apache.uima.caseditor.2.1.0.incubating-SNAPSHOT
+								org.apache.uima.caseditor.2.2.0.incubating-SNAPSHOT
 							</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
