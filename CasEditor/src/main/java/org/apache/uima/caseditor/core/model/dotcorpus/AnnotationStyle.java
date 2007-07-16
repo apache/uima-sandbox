@@ -34,6 +34,8 @@ public final class AnnotationStyle {
     
     TEXT_COLOR,
     
+    TOKEN,
+    
     /**
      * The squiggles style.
      */

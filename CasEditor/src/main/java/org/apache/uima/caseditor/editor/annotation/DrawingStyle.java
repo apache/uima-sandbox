@@ -28,6 +28,8 @@ public enum DrawingStyle {
   
   TEXT_COLOR(new TextColorDrawingStrategy()),
   
+  TOKEN(new TokenDrawingStrategy()),
+  
   /**
    * The squiggles {@link IDrawingStrategy}.
    */
