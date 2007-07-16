@@ -628,7 +628,7 @@ private DocumentListener mAnnotationSynchronizer;
 	    EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
       
       
-	    setAnnotationType(status.getMode());
+	    setAnnotationMode(status.getMode());
     }
   }
 
@@ -715,11 +715,13 @@ private DocumentListener mAnnotationSynchronizer;
    * 
    * @param type
    */
-  protected void setAnnotationType(Type type) {
+  protected void setAnnotationMode(Type type) {
     // TODO: check if this type is a subtype of Annotation
 
     mAnnotationMode = type;
 
+    highlight(0, 0);
+    
     setProjectEditorStatus();
 
     updateStatusLineModeItem();
@@ -877,11 +879,12 @@ private DocumentListener mAnnotationSynchronizer;
 
       // only process these selection if the annotations belong
       // to the current editor instance
-      if (getSite().getPage().getActiveEditor() == this && !annotations.isEmpty()) {
+      if (getSite().getPage().getActiveEditor() == this && !annotations.isEmpty() 
+              && annotations.getFirst().getType() == mAnnotationMode) {
         highlight(annotations.getFirst().getBegin(), annotations.getLast().getEnd()
                 - annotations.getFirst().getBegin());
 
-        // move caret to new positon when selected outside of the editor
+        // move caret to new position when selected outside of the editor
         if (AnnotationEditor.this != part)
         // TODO: replace with this == part and test it
         {

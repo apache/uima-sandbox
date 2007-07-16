@@ -66,7 +66,7 @@ final class ChangeModeAction extends Action {
   @Override
   public void run() {
     if (mEditor != null) {
-      mEditor.setAnnotationType(mMode);
+      mEditor.setAnnotationMode(mMode);
     }
   }
 }
