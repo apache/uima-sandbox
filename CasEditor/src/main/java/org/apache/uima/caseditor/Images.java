@@ -29,43 +29,39 @@ import org.eclipse.jface.resource.ImageDescriptor;
  */
 public enum Images {
   
-  MODEL_PROJECT_OPEN("tango/project-open.png"),
+  MODEL_PROJECT_OPEN("svgicons/project-open.png"),
   
-  MODEL_PROJECT_CLOSED("tango/project-closed.png"),
-  
-  MODEL_FILE("tango/file.png"),
-  
-  MODEL_FOLDER("tango/folder.png"),
+  MODEL_PROJECT_CLOSED("svgicons/project-closed.png"),
   
   /**
    * The corpus image.
    */
-  MODEL_CORPUS("tango/corpus.png"),
+  MODEL_CORPUS("svgicons/corpus.png"),
   
   /**
    * The document image.
    */
-  MODEL_DOCUMENT("tango/document.png"),
+  MODEL_DOCUMENT("svgicons/document.png"),
   
   /**
    * The source folder image.
    */
-  MODEL_PROCESSOR_FOLDER("tango/processor.png"),
+  MODEL_PROCESSOR_FOLDER("svgicons/processor.png"),
   
   /**
-   * Image for the typesystem element.
+   * Image for the type system element.
    */
-  MODEL_TYPESYSTEM("model/typesystem.gif"),
+  MODEL_TYPESYSTEM("typesystem.gif"),
   
   /**
    * The enabled refresh icon.
    */
-  EXPLORER_E_REFRESH("eceview16/refresh_nav.gif"),
+  EXPLORER_E_REFRESH("svgicons/refresh.png"),
   
   /**
    * The disabled refresh icon.
    */
-  EXPLORER_D_REFRESH("dceview16/refresh_nav.gif"),
+  EXPLORER_D_REFRESH("svgicons/refresh.png"),
   
   /**
    * The wide left side image.
@@ -95,7 +91,7 @@ public enum Images {
   /**
    * The add image.
    */
-  ADD("add.png");
+  ADD("svgicons/add.png");
 
   private String mPath;
 

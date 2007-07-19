@@ -58,7 +58,7 @@
 		<view id="org.apache.uima.caseditor.corpusview"
 			name="Corpus Explorer"
 			class="org.apache.uima.caseditor.ui.corpusview.CorpusExplorerView"
-			icon="icons/tango/explorer.png"
+			icon="icons/svgicons/explorer.png"
 			category="org.apache.uima.caseditor.ui.views"/>
 		
 	</extension>
@@ -271,7 +271,7 @@
 		<view id="org.apache.uima.caseditor.fsview"
 			name="FeatureStructure View"
 			class="org.apache.uima.caseditor.editor.fsview.FeatureStructureBrowserView"
-			icon="icons\UIMA_logo_50.png"
+			icon="icons/svgicons/fsview.png"
 			category="org.apache.uima.caseditor.ui.views"/>
 	</extension>
  <extension point="org.eclipse.core.runtime.adapters">
