@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,6 +35,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -49,7 +50,7 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param annotator
    * @param documents
    * @param shell
@@ -65,7 +66,7 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
    */
   private AnnotationEditor[] getAnnotationEditors() {
 
-    ArrayList dirtyParts = new ArrayList();
+    ArrayList<AnnotationEditor> dirtyParts = new ArrayList<AnnotationEditor>();
     IWorkbenchWindow windows[] = PlatformUI.getWorkbench().getWorkbenchWindows();
     for (IWorkbenchWindow element : windows) {
       IWorkbenchPage pages[] = element.getPages();
@@ -81,7 +82,7 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
       }
     }
 
-    return (AnnotationEditor[]) dirtyParts.toArray(new AnnotationEditor[dirtyParts.size()]);
+    return dirtyParts.toArray(new AnnotationEditor[dirtyParts.size()]);
   }
 
   /**
@@ -102,20 +103,20 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
 
     monitor.subTask("Tagging, please stand by.");
 
-    Map<DocumentElement, AnnotationEditor> editorMap = 
+    Map<DocumentElement, AnnotationEditor> editorMap =
         new HashMap<DocumentElement, AnnotationEditor>();
 
     for (AnnotationEditor annotationEditor : getAnnotationEditors()) {
       editorMap.put(annotationEditor.getDocument().getDocumentElement(), annotationEditor);
     }
-    
+
     for (DocumentElement element : mDocuments) {
 
-      IDocument document = null;
+      final IDocument document;
       try {
         document = element.getDocument(); // retrieve the working copy
       } catch (CoreException e1) {
-        e1.printStackTrace();
+        throw new InvocationTargetException(e1);
       }
 
       try {
@@ -124,7 +125,14 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
         throw new InvocationTargetException(e);
       }
 
-      document.changed();
+      // currently all updates are made from the ui thread, just post this call to change
+      // to the ui job queue
+
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          document.changed();
+        }
+      });
 
       try {
 

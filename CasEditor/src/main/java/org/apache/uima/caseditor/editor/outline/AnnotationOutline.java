@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -85,8 +85,8 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
    */
   protected class EditorListener implements IAnnotationEditorModifyListener {
     /**
-     * Called if the editor annoation mode was changed.
-     * 
+     * Called if the editor annotation mode was changed.
+     *
      * @param newMode
      */
     public void annotationModeChanged(Type newMode) {
@@ -104,7 +104,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     private AnnotationTreeNodeList mAnnotationNodeList;
 
-    private Map<AnnotationFS, AnnotationTreeNode> mParentNodeLookup = 
+    private Map<AnnotationFS, AnnotationTreeNode> mParentNodeLookup =
       new HashMap<AnnotationFS, AnnotationTreeNode>();
 
     /**
@@ -117,7 +117,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     /**
      * Gets called if the viewer input was changed. In this case, this only happens once if the
      * {@link AnnotationOutline} is initialized.
-     * 
+     *
      * @param viewer
      * @param oldInput
      * @param newInput
@@ -143,19 +143,14 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
         // TODO:
         // create a recursive method to fill the parent lookup table
 
-        Display.getDefault().syncExec(new Runnable() {
-          public void run() {
-            mTableViewer.refresh();
-          }
-        });
+        mTableViewer.refresh();
       }
-
     }
 
     /**
      * Retrieves all children of the {@link NlpModel}. That are the {@link NlpProject}s and
      * {@link IProject}s.
-     * 
+     *
      * @param inputElement
      *          the {@link NlpModel}
      * @return the nlp-projects and non-nlp projects
@@ -170,7 +165,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     /**
      * Adds the added annotations to the viewer.
-     * 
+     *
      * @param annotations
      */
     @Override
@@ -197,7 +192,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     /**
      * Removes the removed annoations from the viewer.
-     * 
+     *
      * @param deletedAnnotations
      */
     @Override
@@ -214,7 +209,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
         i++;
       }
 
-      
+
       Display.getDefault().syncExec(new Runnable() {
         public void run() {
           mTableViewer.remove(items);
@@ -224,7 +219,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     /**
      * Updates the given annoation in the viewer.
-     * 
+     *
      * @param annotations
      */
     @Override
@@ -259,7 +254,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     }
 
     public void changed() {
-      
+
       Collection<AnnotationFS> annotations = mEditor.getDocument().getAnnotations(
               mEditor.getAnnotationMode());
 
@@ -267,14 +262,14 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
               .getDocument(), annotations) : null;
 
       mParentNodeLookup.clear();
-      
+
       Display.getDefault().syncExec(new Runnable() {
         public void run() {
           mTableViewer.refresh();
         }
       });
     }
-    
+
     public Object[] getChildren(Object parentElement) {
       AnnotationTreeNode node = (AnnotationTreeNode) parentElement;
 
@@ -319,7 +314,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
   /**
    * Creates a new <code>AnnotationOutline</code> object.
-   * 
+   *
    * @param editor -
    *          the editor to bind
    */
@@ -335,7 +330,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
   /**
    * Creates the outline table control.
-   * 
+   *
    * @param parent
    */
   @Override
@@ -388,7 +383,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
   /**
    * Adds the actions to the tool bar.
-   * 
+   *
    * @param menuManager
    * @param toolBarManager
    * @param statusLineManager
@@ -419,7 +414,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     toolBarManager.add(lowerLeftAnnotationSideAction);
 
     // lower right annotation side action
-    LowerRightAnnotationSideAction lowerRightAnnotionSideAction = 
+    LowerRightAnnotationSideAction lowerRightAnnotionSideAction =
       new LowerRightAnnotationSideAction(mEditor.getDocument());
     lowerRightAnnotionSideAction.setText("Lowers the right annotation side");
     lowerRightAnnotionSideAction.setImageDescriptor(CasEditorPlugin
@@ -454,7 +449,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
   /**
    * Retrives the control.
-   * 
+   *
    * @return the control
    */
   @Override
@@ -465,7 +460,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
   /**
    * Adds the these actions to the global action handler: {@link DeleteFeatureStructureAction}
    * SelectAllAction
-   * 
+   *
    * @param actionBars
    */
   @Override
