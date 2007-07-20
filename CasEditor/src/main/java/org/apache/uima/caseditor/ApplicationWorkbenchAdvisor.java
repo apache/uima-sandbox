@@ -34,6 +34,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
   private static final String PERSPECTIVE_ID = "org.apache.uima.caseditor.perspective.NLP";
 
+  @Override
   public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
     return new ApplicationWorkbenchWindowAdvisor(configurer);
   }
@@ -43,6 +44,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     configurer.setSaveAndRestore(true);
   }
 
+  @Override
   public String getInitialWindowPerspectiveId() {
     return PERSPECTIVE_ID;
   }

@@ -51,6 +51,8 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
   private SoftReference<DocumentUimaImpl> mWorkingCopy = 
 	  new SoftReference<DocumentUimaImpl>(null);
 
+  private boolean isSavingWorkingCopy;
+
   /**
    * Initializes a new instance.
    * 
@@ -69,14 +71,14 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
   }
 
   /**
-   * Retrives the coresponding resource.
+   * Retrieves the corresponding resource.
    */
   public IFile getResource() {
     return mDocumentFile;
   }
 
   /**
-   * Retrives the name.
+   * Retrieves the name.
    */
   public String getName() {
     return mDocumentFile.getName();
@@ -84,14 +86,14 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
 
   /**
-   * Retrives the parent.
+   * Retrieves the parent.
    */
   public INlpElement getParent() {
     return mParent;
   }
 
   /**
-   * Retrives the working copy.
+   * Retrieves the working copy.
    * 
    * @return the working copy
    * @throws CoreException
@@ -129,6 +131,9 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
    * @throws CoreException
    */
   public void saveDocument() throws CoreException {
+    
+    isSavingWorkingCopy = true;
+    
     ByteArrayOutputStream outStream = new ByteArrayOutputStream(40000);
     
     ((DocumentUimaImpl) getDocument()).serialize(outStream);
@@ -139,7 +144,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
   }
 
   /**
-   * Retrives the coresponding {@link NlpProject} instance.
+   * Retrieves the corresponding {@link NlpProject} instance.
    * 
    * @return the {@link NlpProject} instance
    */
@@ -157,9 +162,17 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) {
-	// TODO: What should happen if the doucment is changed externally 
-	// e.g. with a texteditor ?
-    mWorkingCopy = new SoftReference<DocumentUimaImpl>(null);
+	// TODO: What should happen if the document is changed externally 
+	// e.g. with a text editor ?
+    
+    // if saveDocument() was called, we receive a changedResource event
+    // in this case do not remove a reference to the working copy, cause its in sync
+    if (!isSavingWorkingCopy) {
+      mWorkingCopy = new SoftReference<DocumentUimaImpl>(null);
+    } else {
+      isSavingWorkingCopy = false;
+    }
+    
   }
 
   /**

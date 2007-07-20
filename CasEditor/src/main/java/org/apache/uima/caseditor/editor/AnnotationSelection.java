@@ -131,7 +131,7 @@ public class AnnotationSelection {
    * @return all selected {@link AnnotationFS} objects
    */
   public List<AnnotationFS> toList() {
-    return (List<AnnotationFS>) Collections.unmodifiableList(mAnnotations);
+    return Collections.unmodifiableList(mAnnotations);
   }
   
   /**

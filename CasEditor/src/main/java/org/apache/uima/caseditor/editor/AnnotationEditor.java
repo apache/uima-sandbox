@@ -209,6 +209,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      * 
      * @param annotations
      */
+    @Override
     public void addedAnnotation(Collection<AnnotationFS> annotations) {    	
     	mPainter.paint(AnnotationPainter.CONFIGURATION);
     }
@@ -218,6 +219,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      * 
      * @param deletedAnnotations
      */
+    @Override
     public void removedAnnotation(Collection<AnnotationFS> deletedAnnotations) {
     	
       if (getSite().getPage().getActivePart() == AnnotationEditor.this) {
@@ -235,6 +237,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      * 
      * @param annotations
      */
+    @Override
     public void updatedAnnotation(Collection<AnnotationFS> annotations) {
       
       removedAnnotation(annotations);
@@ -247,6 +250,14 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       }
       
       selectionChanged(getSite().getPage().getActivePart(), new StructuredSelection(structures));
+    }
+    
+    public void changed() {
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          syncAnnotations();
+        }
+      });
     }
   }
 
@@ -924,7 +935,7 @@ private DocumentListener mAnnotationSynchronizer;
     annotateAction.setActionDefinitionId(ITextEditorActionDefinitionIds.SMART_ENTER);
 
     setAction(ITextEditorActionDefinitionIds.SMART_ENTER, annotateAction);
-    setActionActivationCode(ITextEditorActionDefinitionIds.SMART_ENTER, (char) '\r', SWT.CR,
+    setActionActivationCode(ITextEditorActionDefinitionIds.SMART_ENTER, '\r', SWT.CR,
             SWT.DEFAULT);
 
     // create delete action
@@ -957,5 +968,9 @@ private DocumentListener mAnnotationSynchronizer;
     if (document != null) {
       document.removeChangeListener(mAnnotationSynchronizer);
     }
+  }
+  
+  public void setDirty() {
+    getDocument().fireDocumentChanged();
   }
 }

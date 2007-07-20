@@ -28,6 +28,7 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.IDocumentListener;
+import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.util.Span;
 import org.eclipse.core.runtime.CoreException;
@@ -38,7 +39,7 @@ import org.eclipse.jface.text.DocumentEvent;
  * The <code>AnnotationDocument</code> adapts the annotation document to the eclipse Document
  * (needed for the editor).
  * 
- * Note: Befor an instance can be used, the project and document must be set.
+ * Note: Before an instance can be used, the project and document must be set.
  */
 public class AnnotationDocument extends Document implements IDocument {
   private IDocument mDocument;
@@ -67,7 +68,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Retrives the project.
+   * Retrieves the project.
    * 
    * @return the project
    */
@@ -76,7 +77,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotation
    */
@@ -87,7 +88,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotations
    */
@@ -98,7 +99,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotations
    */
@@ -109,7 +110,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    */
   public void removeAnnotation() {
     mDocument.removeAnnotation();
@@ -118,7 +119,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotation
    */
@@ -129,7 +130,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotationsToRemove
    */
@@ -140,7 +141,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotationsToRemove
    */
@@ -151,7 +152,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotation
    */
@@ -162,7 +163,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotations
    */
@@ -173,7 +174,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotations
    */
@@ -183,8 +184,15 @@ public class AnnotationDocument extends Document implements IDocument {
     fireDocumentChanged();
   }
 
+  
+  public void changed() {
+    mDocument.changed();
+    
+    fireDocumentChanged();   
+  }
+  
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param type
    * @return the annotations
@@ -194,7 +202,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param annotationType
    * @return the view map
@@ -204,7 +212,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param listener
    */
@@ -213,7 +221,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param listener
    */
@@ -222,7 +230,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param type
    * @param span
@@ -233,7 +241,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param out
    * @throws CoreException
@@ -283,7 +291,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @return the text
    */
@@ -298,7 +306,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param start
    * @param end
@@ -309,7 +317,7 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @return the TCAS
    */
@@ -318,12 +326,16 @@ public class AnnotationDocument extends Document implements IDocument {
   }
 
   /**
-   * Call is forwared to the set document.
+   * Call is forwarded to the set document.
    * 
    * @param type
    * @return the type
    */
   public Type getType(String type) {
     return mDocument.getType(type);
+  }
+  
+  public DocumentElement getDocumentElement() {
+    return mDocument.getDocumentElement();
   }
 }

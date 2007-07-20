@@ -20,7 +20,6 @@
 package org.apache.uima.caseditor.core.model.dotcorpus;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 
 import org.apache.uima.cas.Type;

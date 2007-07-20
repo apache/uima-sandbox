@@ -19,8 +19,6 @@
 
 package org.apache.uima.caseditor.core.uima;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,35 +57,37 @@ import org.xml.sax.SAXException;
  * TODO: add javdoc here
  */
 public class DocumentUimaImpl extends AbstractDocument {
- 
-  private DocumentElement mDocumentElement;
-  private TypeSystem mTypeSystem;
-  private CAS mCAS;
+
+  private final DocumentElement mDocumentElement;
+
+  private final TypeSystem mTypeSystem;
+
+  private final CAS mCAS;
 
   /**
    * Initializes a new instance.
    * 
    * @param project
    */
-  public DocumentUimaImpl(NlpProject project, DocumentElement element, InputStream in) 
-  	throws CoreException{
-    
-	  mTypeSystem = project.getTypesystemElement().getTypeSystem();
-    
-	if (mTypeSystem == null) {
-		throw new CoreException(new Status(IStatus.INFO, CasEditorPlugin.ID, 
-				IStatus.ERROR, "Invalid typesystem!", null));
-	}
-	
-	mCAS = project.getTypesystemElement().getCAS();
-	
-	mDocumentElement = element;
+  public DocumentUimaImpl(NlpProject project, DocumentElement element, InputStream in)
+          throws CoreException {
 
-	setContent(in);
+    mTypeSystem = project.getTypesystemElement().getTypeSystem();
+
+    if (mTypeSystem == null) {
+      throw new CoreException(new Status(IStatus.INFO, CasEditorPlugin.ID, IStatus.ERROR,
+              "Invalid typesystem!", null));
+    }
+
+    mCAS = project.getTypesystemElement().getCAS();
+
+    mDocumentElement = element;
+
+    setContent(in);
   }
 
   /**
-   * Retrives the {@link CAS}.
+   * Retrieves the {@link CAS}.
    */
   public CAS getCAS() {
     return mCAS;
@@ -119,7 +119,7 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Internally removes an annoation from the {@link CAS}.
+   * Internally removes an annotation from the {@link CAS}.
    * 
    * @param featureStructure
    */
@@ -128,7 +128,7 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Removes the annoations from the {@link CAS}.
+   * Removes the annotations from the {@link CAS}.
    */
   public void removeFeatureStructure(FeatureStructure annotation) {
     removeAnnotationInternal(annotation);
@@ -140,14 +140,14 @@ public class DocumentUimaImpl extends AbstractDocument {
    * Removes the given annotations from the {@link CAS}.
    */
   public void removeFeatureStructures(Collection<FeatureStructure> annotationsToRemove) {
-    
-	for (FeatureStructure annotationToRemove : annotationsToRemove) {
+
+    for (FeatureStructure annotationToRemove : annotationsToRemove) {
       removeAnnotationInternal(annotationToRemove);
     }
 
-	if (annotationsToRemove.size() > 0) {
-		fireRemovedAnnotations(annotationsToRemove);
-	}
+    if (annotationsToRemove.size() > 0) {
+      fireRemovedAnnotations(annotationsToRemove);
+    }
   }
 
   /**
@@ -164,8 +164,12 @@ public class DocumentUimaImpl extends AbstractDocument {
     fireUpdatedFeatureStructures(annotations);
   }
 
+  public void changed() {
+    fireChanged();
+  }
+
   /**
-   * Retrives annoations of the given type from the {@link CAS}.
+   * Retrieves annotations of the given type from the {@link CAS}.
    */
   public Collection<AnnotationFS> getAnnotations(Type type) {
     FSIndex annotationIndex = mCAS.getAnnotationIndex(type);
@@ -190,7 +194,7 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Retrives the annotations in the given span.
+   * Retrieves the annotations in the given span.
    */
   @Override
   public Collection<AnnotationFS> getAnnotation(Type type, Span span) {
@@ -228,14 +232,14 @@ public class DocumentUimaImpl extends AbstractDocument {
   }
 
   /**
-   * Retrives the given type from the {@link TypeSystem}.
+   * Retrieves the given type from the {@link TypeSystem}.
    */
   public Type getType(String type) {
     return getCAS().getTypeSystem().getType(type);
   }
 
   /**
-   * Retrvies the text.
+   * Retrieves the text.
    */
   public String getText() {
     return mCAS.getDocumentText();
@@ -245,7 +249,7 @@ public class DocumentUimaImpl extends AbstractDocument {
    * Sets the content. The XCAS {@link InputStream} gets parsed.
    */
   private void setContent(InputStream content) throws CoreException {
-	  
+
     XCASDeserializer dezerializer = new XCASDeserializer(mTypeSystem);
 
     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
@@ -302,13 +306,11 @@ public class DocumentUimaImpl extends AbstractDocument {
     }
   }
 
-  public void save() throws CoreException {
-	    ByteArrayOutputStream outStream = new ByteArrayOutputStream(40000);
-	    
-	    serialize(outStream);
-	    
-	    InputStream stream = new ByteArrayInputStream(outStream.toByteArray());
+  public DocumentElement getDocumentElement() {
+    return mDocumentElement;
+  }
 
-	    mDocumentElement.getResource().setContents(stream, true, false, null);
+  public void save() throws CoreException {
+    getDocumentElement().saveDocument();
   }
 }

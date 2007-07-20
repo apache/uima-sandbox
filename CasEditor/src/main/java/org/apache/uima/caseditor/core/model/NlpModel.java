@@ -411,6 +411,7 @@ public final class NlpModel extends AbstractNlpElement {
     }
   }
 
+  @Override
   void addResource(IResource resource) throws CoreException {
     if (resource instanceof IProject) {
       IProject project = (IProject) resource;
@@ -434,6 +435,7 @@ public final class NlpModel extends AbstractNlpElement {
     }
   }
 
+  @Override
   void removeResource(IResource resource) {
     for (NlpProject project : mNlpProjects) {
       if (project.getResource().equals(resource)) {
@@ -517,6 +519,7 @@ public final class NlpModel extends AbstractNlpElement {
   /**
    * Retrives the parent of the given resource.
    */
+  @Override
   public INlpElement getParent(IResource resource) throws CoreException {
     INlpElement result = super.getParent(resource);
 
@@ -542,6 +545,7 @@ public final class NlpModel extends AbstractNlpElement {
   /**
    * Search the {@link INlpElement} for the given resoruce.
    */
+  @Override
   public INlpElement findMember(IResource resource) {
     INlpElement result = super.findMember(resource);
 

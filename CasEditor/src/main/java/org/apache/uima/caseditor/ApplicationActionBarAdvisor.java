@@ -49,6 +49,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     super(configurer);
   }
 
+  @Override
   protected void makeActions(IWorkbenchWindow window) {
 
     this.window = window;
@@ -99,6 +100,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 //    openWorkspaceAction = new OpenWorkspaceAction(window);
   }
 
+  @Override
   protected void fillMenuBar(IMenuManager menuBar) {
 
     // File menu

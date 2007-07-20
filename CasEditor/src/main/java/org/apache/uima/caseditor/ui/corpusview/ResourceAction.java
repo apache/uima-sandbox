@@ -102,8 +102,8 @@ public abstract class ResourceAction extends BaseSelectionListenerAction {
       return false;
     }
 
-    for (Iterator e = getSelectedResources().iterator(); e.hasNext();) {
-      IResource next = (IResource) e.next();
+    for (Object element : getSelectedResources()) {
+      IResource next = (IResource) element;
       if (!resourceIsType(next, resourceMask)) {
         return false;
       }

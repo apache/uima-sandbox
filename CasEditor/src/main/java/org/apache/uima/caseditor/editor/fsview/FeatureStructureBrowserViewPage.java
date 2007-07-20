@@ -267,10 +267,15 @@ public final class FeatureStructureBrowserViewPage extends Page {
     protected void updatedAnnotation(Collection<AnnotationFS> annotations) {
       // ignore
     }
+    
+    public void changed() {
+      mFSList.refresh();
+    }
   }
 
   private class CreateAction extends Action {
     // TOOD: extract it and add setType(...)
+    @Override
     public void run() {
       // TODO: check if an AnnotationFS was created, if so
       // add it to the document
@@ -407,6 +412,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
    * 
    * @param actionBars
    */
+  @Override
   public void setActionBars(IActionBars actionBars) {
     actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), mDeleteAction);
 

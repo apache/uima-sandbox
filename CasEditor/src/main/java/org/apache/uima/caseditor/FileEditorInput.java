@@ -83,6 +83,7 @@ public class FileEditorInput implements IEditorInput, IPathEditorInput, IPersist
     return mFile.hashCode();
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

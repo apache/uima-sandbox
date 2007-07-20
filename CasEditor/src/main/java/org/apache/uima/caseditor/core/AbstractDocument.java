@@ -44,7 +44,7 @@ public abstract class AbstractDocument implements IDocument {
   private Set<IDocumentListener> mListener = new HashSet<IDocumentListener>();
 
   /**
-   * Registers a change listerner.
+   * Registers a change listener.
    * 
    * @param listener
    */
@@ -148,8 +148,14 @@ public abstract class AbstractDocument implements IDocument {
     }
   }
 
+  protected void fireChanged() {
+    for (IDocumentListener listener : mListener) {
+      listener.changed();
+    }
+  }
+  
   /**
-   * Retrives the view map.
+   * Retrieves the view map.
    */
   public Map<Integer, AnnotationFS> getView(Type annotationType) {
     Collection<AnnotationFS> annotations = getAnnotations(annotationType);
@@ -166,14 +172,14 @@ public abstract class AbstractDocument implements IDocument {
   }
 
   /**
-   * Retrives the text in the given bounds.
+   * Retrieves the text in the given bounds.
    */
   public String getText(int start, int end) {
     return getText().substring(start, end);
   }
 
   /**
-   * Retrives annotions of the given type in the given bounds.
+   * Retrieves annotations of the given type in the given bounds.
    */
   public Collection<AnnotationFS> getAnnotation(Type type, Span span) {
     Map<Integer, AnnotationFS> view = getView(type);

@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.ui.property;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.StringTokenizer;
 
 import org.apache.uima.caseditor.core.model.DotCorpusElement;

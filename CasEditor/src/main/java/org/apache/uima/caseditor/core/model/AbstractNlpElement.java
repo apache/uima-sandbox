@@ -44,6 +44,7 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   /**
    * Retrives the {@link IResource} of the current instance.
    */
+  @Override
   public Object getAdapter(Class adapter) {
     Object result;
 

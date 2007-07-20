@@ -76,6 +76,7 @@ public class TypesystemElement extends AbstractNlpElement {
    * @return the {@link CAS} or null if there is an error in the type system.
    * @deprecated
    */
+  @Deprecated
   public CAS getCAS() {
     Runnable clearMarkers = new Runnable() {
       public void run() {

@@ -72,4 +72,12 @@ public interface IDocumentListener {
    * @param featureStructure
    */
   void updated(Collection<FeatureStructure> featureStructure);
+  
+  /**
+   * This method is called if {@link FeatureStructure}s in the 
+   * document are changed.
+   * 
+   * Note: The text can not be changed
+   */
+  void changed();
 }

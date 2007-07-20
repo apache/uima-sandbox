@@ -69,6 +69,7 @@ final class CorpusExplorerUtil
      * 
      * @deprecated 
      */
+    @Deprecated
     static boolean isContaingNLPProjectOrNonNLPResources(
             IStructuredSelection selection)
     {

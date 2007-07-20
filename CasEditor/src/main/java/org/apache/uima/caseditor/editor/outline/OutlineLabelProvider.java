@@ -52,17 +52,17 @@ class OutlineLabelProvider extends LabelProvider implements ITableLabelProvider 
 
     char stringChars[] = string.toCharArray();
 
-    for (int i = 0; i < stringChars.length; i++) {
-      if ((stringChars[i] == '\r')) {
+    for (char element : stringChars) {
+      if ((element == '\r')) {
         continue;
       }
 
-      if (stringChars[i] == '\n') {
+      if (element == '\n') {
         stringBuilder.append(' ');
         continue;
       }
 
-      stringBuilder.append(stringChars[i]);
+      stringBuilder.append(element);
     }
 
     return stringBuilder.toString();

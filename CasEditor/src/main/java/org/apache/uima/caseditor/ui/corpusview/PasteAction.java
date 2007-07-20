@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.ui.corpusview;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -94,8 +93,8 @@ final class PasteAction  extends ResourceAction
         CopyFilesAndFoldersOperation operation = new CopyFilesAndFoldersOperation(mShell);
         operation.copyResources(resourceData, getNewParent());
       } else {
-        for (int i = 0; i < resourceData.length; i++) {
-            new CopyProjectOperation(mShell).copyProject((IProject) resourceData[i]);
+        for (IResource element : resourceData) {
+            new CopyProjectOperation(mShell).copyProject((IProject) element);
         }
       }
 

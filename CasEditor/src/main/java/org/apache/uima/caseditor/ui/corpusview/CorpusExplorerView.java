@@ -101,7 +101,7 @@ public final class CorpusExplorerView extends ViewPart
         mActions.fillActionBars(getViewSite().getActionBars());
         
         mActions.setContext(new ActionContext(
-                (IStructuredSelection) mTreeViewer.getSelection()));
+                mTreeViewer.getSelection()));
         
         mActions.updateActionBars();
     }

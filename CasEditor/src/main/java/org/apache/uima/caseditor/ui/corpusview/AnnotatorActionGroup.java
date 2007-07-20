@@ -83,8 +83,8 @@ final class AnnotatorActionGroup extends ActionGroup {
     }
 
     // TODO: refactor this
-    // how to retrive the project of the selected elements ?
-    // what happends if someone selectes DocumentElements form
+    // how to retrieve the project of the selected elements ?
+    // what happens if someone selects DocumentElements form
     // different projects ?
     if (!documentElements.isEmpty()) {
       DocumentElement aDocument = documentElements.getFirst();

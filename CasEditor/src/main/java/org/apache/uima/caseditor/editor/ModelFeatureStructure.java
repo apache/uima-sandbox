@@ -91,7 +91,7 @@ public class ModelFeatureStructure implements IAdaptable {
     if (FeatureStructure.class.equals(adapter)) {
       return getStructre();
     } else if (AnnotationFS.class.equals(adapter) && getStructre() instanceof AnnotationFS) {
-      return (AnnotationFS) getStructre();
+      return getStructre();
     } else {
       return Platform.getAdapterManager().getAdapter(this, adapter);
     }

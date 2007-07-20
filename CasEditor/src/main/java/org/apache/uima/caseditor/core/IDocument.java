@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.core;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -27,11 +26,22 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.util.Span;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * TODO: add javadoc here
+ * The {@link IDocument} represents texts with meta information.
+ * 
+ * A {@link IDocument} allows manipulation of its meta information
+ * the text must not be changed.  
+ * 
+ * Meta information can be retrieved over the {@link CAS} object.
+ * 
+ * Note: All changes to meta information should be done with
+ * calls to the manipulation methods of the document. 
+ * If this is not possible, change the {@link CAS} and after
+ * the change call the {@link IDocument#changed()} method.
  */
 public interface IDocument {
 	
@@ -50,7 +60,7 @@ public interface IDocument {
   void removeChangeListener(IDocumentListener listener);
 
   /**
-   * Retrives the CAS.
+   * Retrieves the CAS.
    * 
    * @return the CAS
    */
@@ -105,6 +115,7 @@ public interface IDocument {
    * 
    * @deprecated
    */
+  @Deprecated
   void removeAnnotation();
 
   /**
@@ -129,6 +140,11 @@ public interface IDocument {
   void updateAnnotations(Collection<AnnotationFS> annotations);
 
   /**
+   * The document was changed. Its unknown what changed.
+   */
+  void changed();
+  
+  /**
    * Returns all <code>Annotation</code>s of the given type.
    * 
    * @param type -
@@ -139,7 +155,7 @@ public interface IDocument {
   Collection<AnnotationFS> getAnnotations(Type type);
 
   /**
-   * Retrives the view map.
+   * Retrieves the view map.
    * 
    * @param annotationType
    * @return the view map
@@ -147,7 +163,7 @@ public interface IDocument {
   Map<Integer, AnnotationFS> getView(Type annotationType);
 
   /**
-   * Retrives the annotations of the given type inside the given span.
+   * Retrieves the annotations of the given type inside the given span.
    * 
    * @param type
    * @param span
@@ -156,14 +172,14 @@ public interface IDocument {
   Collection<AnnotationFS> getAnnotation(Type type, Span span);
 
   /**
-   * Retrvies the text.
+   * Retrieves the text.
    * 
    * @return the text as string
    */
   String getText();
 
   /**
-   * Retrives the text betweene start and end offstes.
+   * Retrieves the text between start and end offsets.
    * 
    * @param start
    * @param end
@@ -172,7 +188,7 @@ public interface IDocument {
   String getText(int start, int end);
 
   /**
-   * Retrives the requested type.
+   * Retrieves the requested type.
    * 
    * @param type
    * @return the type
@@ -180,10 +196,15 @@ public interface IDocument {
   Type getType(String type);
 
   /**
-   * Serializes the doucment to the given OutputStream.
+   * Serializes the document to the given OutputStream.
    * 
    * @param out
    * @throws CoreException
    */
   void save() throws CoreException;
+  
+  /**
+   * Retrieves the document element belonging to the document.
+   */
+  DocumentElement getDocumentElement();
 }

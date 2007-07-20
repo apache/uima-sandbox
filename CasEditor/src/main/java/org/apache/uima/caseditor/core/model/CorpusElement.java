@@ -142,6 +142,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
    * Retrives the nlp element for the given resource. If contained by the current element or one of
    * its childs.
    */
+  @Override
   public INlpElement findMember(IResource resource) {
     if (mCorpusFolder.equals(resource)) {
       return this;
@@ -176,6 +177,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
    * 
    * @param resource
    */
+  @Override
   void addResource(IResource resource) {
     if (resource instanceof IFile) {
       mDocuments.add(new DocumentElement(this, (IFile) resource));
@@ -197,6 +199,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
    * 
    * @param resource
    */
+  @Override
   void removeResource(IResource resource) {
     for (DocumentElement document : mDocuments) {
       if (document.getResource().equals(resource)) {

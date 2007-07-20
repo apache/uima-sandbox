@@ -216,26 +216,26 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
     LinkedList<IResource> resourceList = new LinkedList<IResource>();
 
-    for (int i = 0; i < resources.length; i++) {
-      if (isSpecialResource(resources[i])) {
+    for (IResource element : resources) {
+      if (isSpecialResource(element)) {
         continue;
       }
 
-      if (resources[i] instanceof IFolder) {
-        if (mDotCorpusElement.isCorpusFolder((IFolder) resources[i])) {
+      if (element instanceof IFolder) {
+        if (mDotCorpusElement.isCorpusFolder((IFolder) element)) {
           continue;
         }
         
-        if (mDotCorpusElement.isCasProcessorFolder((IFolder) resources[i])) {
+        if (mDotCorpusElement.isCasProcessorFolder((IFolder) element)) {
           continue;
         }
       }
 
-      if (mTypesystem != null && mTypesystem.getResource().equals(resources[i])) {
+      if (mTypesystem != null && mTypesystem.getResource().equals(element)) {
         continue;
       }
 
-      resourceList.add(resources[i]);
+      resourceList.add(element);
     }
 
     IResource[] filteredResources = new IResource[resourceList.size()];
@@ -246,6 +246,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   /**
    * Retrives the parent element for the given resource.
    */
+  @Override
   public INlpElement getParent(IResource resource) throws CoreException {
     INlpElement result = super.getParent(resource);
 
@@ -291,6 +292,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   /**
    * Searchs the {@link INlpElement} for the given resource.
    */
+  @Override
   public INlpElement findMember(IResource resource) {
     INlpElement result = super.findMember(resource);
 
@@ -361,8 +363,8 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   private boolean isSpecialResource(IResource resource) {
     String specialResource[] = { ".project", DOT_CORPUS_FILENAME };
 
-    for (int i = 0; i < specialResource.length; i++) {
-      if (resource.getName().equals(specialResource[i])) {
+    for (String element : specialResource) {
+      if (resource.getName().equals(element)) {
         return true;
       }
     }
@@ -373,6 +375,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   /**
    * Adds a resource to the current project instance.
    */
+  @Override
   public void addResource(IResource resource) throws CoreException {
     if (resource instanceof IFile) {
       IFile file = (IFile) resource;
@@ -397,6 +400,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   /**
    * Removes a resource form the current porject instance.
    */
+  @Override
   public void removeResource(IResource resource) {
     if (resource instanceof IFile) {
       IFile file = (IFile) resource;

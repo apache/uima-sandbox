@@ -9,6 +9,7 @@ public class TypesystemAdapter extends SingleElementAdapter {
     /**
      * Retrives the document element <code>ImageDescriptor</code>.
      */
+    @Override
     public ImageDescriptor getImageDescriptor(Object object) {
         return CasEditorPlugin.getTaeImageDescriptor(Images.MODEL_TYPESYSTEM);
     }
