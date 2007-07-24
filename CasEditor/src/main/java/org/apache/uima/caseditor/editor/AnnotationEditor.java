@@ -192,7 +192,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       // to avoid this behavior this action is reposted
       // to the END of the ui thread queue
 
-      // this does not happen if for the action is no key explict
+      // this does not happen if for the action is no key explicit
       // configured with setActivationKey(...)
 
       // TODO:
@@ -292,7 +292,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
       Menu newSubMenu;
 
-      // has this type subtypes ?
+      // has this type sub types ?
       // yes
       if (childs.size() != 0) {
         MenuItem subMenuItem = new MenuItem(parentMenu, SWT.CASCADE);
@@ -352,11 +352,17 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   }
 
   /**
-   * Creates the show annotations context submenu.
+   * Creates the show annotations context sub menu.
    */
   private class ShowAnnotationsMenu extends TypeMenu {
 
-    private Collection<Type> mTypesToDisplay = new HashSet<Type>();
+    /**
+     * This collection contains all type names which are displayed in
+     * the editor.
+     */
+    private Collection<String> mTypesToDisplay = new HashSet<String>();
+
+    private final TypeSystem typeSystem;
 
     /**
      * Initializes a new instance.
@@ -367,7 +373,14 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     ShowAnnotationsMenu(EditorAnnotationStatus status, TypeSystem typeSystem) {
       super(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION), typeSystem);
 
-      mTypesToDisplay.addAll(status.getDisplayAnnotations());
+      this.typeSystem = typeSystem;
+
+      Collection<Type> displayAnnotations = status.getDisplayAnnotations();
+
+      for (Type type : displayAnnotations) {
+        mTypesToDisplay.add(type.getName());
+      }
+
     }
 
     @Override
@@ -375,7 +388,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       final MenuItem actionItem = new MenuItem(parentMenu, SWT.CHECK);
       actionItem.setText(type.getShortName());
 
-      if (mTypesToDisplay.contains(type)) {
+      if (mTypesToDisplay.contains(type.getName())) {
         actionItem.setSelection(true);
       }
 
@@ -384,14 +397,14 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       actionItem.addListener(SWT.Selection, new Listener() {
         public void handleEvent(Event e) {
           if (actionItem.getSelection()) {
-            mTypesToDisplay.add(type);
+            mTypesToDisplay.add(type.getName());
 
           } else {
-            mTypesToDisplay.remove(type);
+            mTypesToDisplay.remove(type.getName());
           }
 
           // TODO: only synchronize annotation which
-          // must be removed/addeded
+          // must be removed/added
           syncAnnotations();
 
           EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
@@ -403,12 +416,21 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
 
     Collection<Type> getSelectedTypes() {
-    	return Collections.unmodifiableCollection(mTypesToDisplay);
+      Collection<Type> selectedTypes = new LinkedList<Type>();
+
+      for (String typeName : mTypesToDisplay) {
+        selectedTypes.add(typeSystem.getType(typeName));
+      }
+
+    	return Collections.unmodifiableCollection(selectedTypes);
     }
 
     void setSelectedTypes(Collection<Type> types) {
-      mTypesToDisplay = new HashSet<Type>();
-      mTypesToDisplay.addAll(types);
+      mTypesToDisplay = new HashSet<String>();
+
+      for (Type type : types) {
+        mTypesToDisplay.add(type.getName());
+      }
     }
   }
 

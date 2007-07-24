@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,8 +21,11 @@ package org.apache.uima.caseditor.core.model;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.dotcorpus.EditorAnnotationStatus;
@@ -65,7 +68,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Initializes the current nlp project instance.
-   * 
+   *
    * @param model
    */
   void setNlpModel(NlpModel model) {
@@ -76,7 +79,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
    * Initializes the current instance. This method is called before this instance can be used.
    * Currently it recognizes and loads all nlp resources. Node: This method should only be called
    * during static {@link NlpModel} creation.
-   * 
+   *
    * @throws CoreException
    */
   void initialize() throws CoreException {
@@ -95,33 +98,40 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
     //}
 
     IFile typeSystemFile = getDotCorpus().getTypeSystemFile();
-    
+
     if (typeSystemFile != null && typeSystemFile.exists()) {
       mTypesystem = new TypesystemElement(typeSystemFile, this);
     }
 
     if (getTypesystemElement() != null && getTypesystemElement().getTypeSystem() != null) {
-      mEditorAnnotationStatus = new EditorAnnotationStatus(getTypesystemElement().getTypeSystem()
-              .getType(CAS.TYPE_NAME_ANNOTATION), null);
+
+      TypeSystem typeSystem = getTypesystemElement().getTypeSystem();
+
+      Type annotationType = typeSystem.getType(CAS.TYPE_NAME_ANNOTATION);
+
+      List<Type> displayTypes = typeSystem.getProperlySubsumedTypes(annotationType);
+
+      mEditorAnnotationStatus = new EditorAnnotationStatus(
+              annotationType, displayTypes);
     }
   }
 
   /**
-   * Retrvies the name.
+   * Retrieves the name.
    */
   public String getName() {
     return mProject.getName();
   }
 
   /**
-   * Retrives the resource.
+   * Retrieves the resource.
    */
   public IResource getResource() {
     return getProject();
   }
 
   /**
-   * Retrives the parent element {@link NlpModel}.
+   * Retrieves the parent element {@link NlpModel}.
    */
   public INlpElement getParent() {
     return mModel;
@@ -142,7 +152,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the {@link IProject}.
+   * Retrieves the {@link IProject}.
    */
   public IProject getProject() {
     return mProject;
@@ -156,8 +166,8 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the {@link EditorAnnotationStatus} for the current project instance.
-   * 
+   * Retrieves the {@link EditorAnnotationStatus} for the current project instance.
+   *
    * @return status
    */
   public EditorAnnotationStatus getEditorAnnotationStatus() {
@@ -166,7 +176,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Sets the {@link EditorAnnotationStatus} for the current project instance.
-   * 
+   *
    * @param status
    */
   public void setEditorAnnotationStatus(EditorAnnotationStatus status) {
@@ -186,7 +196,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Retrives the corporas.
-   * 
+   *
    * @return the corpus collection
    */
   public Collection<CorpusElement> getCorpora() {
@@ -205,7 +215,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Retrives all non-nlp resources of the current instance.
-   * 
+   *
    * @return the resources
    * @throws CoreException
    */
@@ -225,7 +235,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
         if (mDotCorpusElement.isCorpusFolder((IFolder) element)) {
           continue;
         }
-        
+
         if (mDotCorpusElement.isCasProcessorFolder((IFolder) element)) {
           continue;
         }
@@ -256,7 +266,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
           return this;
         }
       }
-      
+
       if (mTypesystem != null) {
     	  if (mTypesystem.getResource().equals(resource)) {
     		  return this;
@@ -303,7 +313,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       else if (mTypesystem != null && mTypesystem.findMember(resource) != null) {
     	  return mTypesystem.findMember(resource);
       }
-      
+
       for (CasProcessorFolder sourceFolder : getCasProcessorFolders()) {
         boolean isElementFound = sourceFolder.findMember(resource) != null;
 
@@ -326,7 +336,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Retrives the UimaSourceFolder
-   * 
+   *
    * @return the UimaSourceFolder
    */
   public Collection<CasProcessorFolder> getCasProcessorFolders() {
@@ -336,7 +346,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   private void createCasProcessorFolders() throws CoreException {
     for (IFolder processorFolder : mDotCorpusElement.getCasProcessorFolders()) {
       if (processorFolder.exists()) {
-        CasProcessorFolder processorElement = 
+        CasProcessorFolder processorElement =
             new CasProcessorFolder(processorFolder, this);
 
         mUimaSourceFolder.add(processorElement);
@@ -346,7 +356,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Retrives the {@link DotCorpusElement}.
-   * 
+   *
    * @return the {@link DotCorpusElement}
    */
   public DotCorpusElement getDotCorpus() {
@@ -437,7 +447,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
     if (mTypesystem != null && resource.equals(mTypesystem.getResource())) {
       mTypesystem.changedResource(resource, delta);
-      
+
       if (getTypesystemElement().getTypeSystem() != null) {
           mEditorAnnotationStatus = new EditorAnnotationStatus(getTypesystemElement().getTypeSystem()
                   .getType(CAS.TYPE_NAME_ANNOTATION), null);
@@ -491,10 +501,10 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Adds a NLP nature to a project.
-   * 
+   *
    * @param project -
    *          the project to add the nature
-   * 
+   *
    * @throws CoreException
    */
   public static void addNLPNature(IProject project) throws CoreException {
@@ -509,7 +519,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Retrives the typesystem.
-   * 
+   *
    * @return typesystem
    */
   public TypesystemElement getTypesystemElement() {
