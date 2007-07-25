@@ -21,8 +21,6 @@
 -->
 
 <plugin>
-   <extension-point id="splashExtension" name="Splash Extensions" schema="schema/splashExtension.exsd"/>
-
 	<extension id="application"
 		point="org.eclipse.core.runtime.applications">
 		<application>
@@ -46,7 +44,6 @@
 
 
 	<!-- ui extensions-->
-
 	<extension point="org.eclipse.ui.views">
 		<category id="org.apache.uima.caseditor.ui.views" name="NLP" />
 
@@ -276,44 +273,4 @@
 		<factory id="org.apache.uima.caseditor.FileEditorInputFactory"
 			class="org.apache.uima.caseditor.FileEditorInputFactory" />
 	</extension>
- <extension
-       point="org.eclipse.ui.splashHandlers">
-    <splashHandler
-          class="org.apache.uima.caseditor.splashHandlers.ExtensibleSplashHandler"
-          id="org.apache.uima.caseditor.splashHandlers.extensible">
-    </splashHandler>
-    <splashHandler
-          class="org.apache.uima.caseditor.splashHandlers.InteractiveSplashHandler"
-          id="org.apache.uima.caseditor.splashHandlers.interactive">
-    </splashHandler>
- </extension>
- <extension
-       point="org.apache.uima.caseditor.splashExtension">
-    <splashExtension
-          icon="icons/af.png"
-          id="af"
-          tooltip="Application Framework">
-    </splashExtension>
-    <splashExtension
-          icon="icons/embedded.png"
-          id="embedded"
-          tooltip="Embedded">
-    </splashExtension>
-    <splashExtension
-          icon="icons/enterprise.png"
-          id="enterprise"
-          tooltip="Enterprise">
-    </splashExtension>
-    <splashExtension
-          icon="icons/languages.png"
-          id="languages"
-          tooltip="Languages">
-    </splashExtension>
-    <splashExtension
-          icon="icons/rcp.png"
-          id="rcp"
-          tooltip="RCP">
-    </splashExtension>
- </extension>
-
 </plugin>
