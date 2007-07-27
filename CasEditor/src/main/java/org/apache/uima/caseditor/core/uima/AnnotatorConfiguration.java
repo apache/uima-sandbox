@@ -28,6 +28,7 @@ import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
+import org.apache.uima.resource.ResourceSpecifier;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IPath;
 
@@ -35,7 +36,7 @@ import org.eclipse.core.runtime.IPath;
  * TODO: add java doc here
  */
 public class AnnotatorConfiguration {
-  private AnalysisEngineDescription mDescriptor;
+  private ResourceSpecifier mDescriptor;
 
   private IPath mResourceBasePath;
 
@@ -44,19 +45,8 @@ public class AnnotatorConfiguration {
    * 
    * @param descriptor
    */
-  public AnnotatorConfiguration(AnalysisEngineDescription descriptor) {
+  public AnnotatorConfiguration(ResourceSpecifier descriptor) {
     mDescriptor = descriptor;
-  }
-
-  /**
-   * Retrives the annotator name.
-   * 
-   * @return name of the annotator
-   */
-  public String getAnnotatorName() {
-    AnalysisEngineMetaData analysisEngineMetaData = mDescriptor.getAnalysisEngineMetaData();
-
-    return analysisEngineMetaData.getName();
   }
 
   /**
