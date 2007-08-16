@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,47 +22,47 @@ package org.apache.uima.caseditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
- * All images in the cas editor are referenced here. 
- * 
+ * All images in the cas editor are referenced here.
+ *
  * Call {@link CasEditorPlugin#getTaeImageDescriptor(Images)} to retrive
  * an actual {@link ImageDescriptor}.
  */
 public enum Images {
-  
+
   MODEL_PROJECT_OPEN("svgicons/project-open.png"),
-  
+
   MODEL_PROJECT_CLOSED("svgicons/project-closed.png"),
-  
+
   /**
    * The corpus image.
    */
   MODEL_CORPUS("svgicons/corpus.png"),
-  
+
   /**
    * The document image.
    */
   MODEL_DOCUMENT("svgicons/document.png"),
-  
+
   /**
    * The source folder image.
    */
   MODEL_PROCESSOR_FOLDER("svgicons/processor.png"),
-  
+
   /**
    * Image for the type system element.
    */
   MODEL_TYPESYSTEM("typesystem.gif"),
-  
+
   /**
    * The enabled refresh icon.
    */
   EXPLORER_E_REFRESH("svgicons/refresh.png"),
-  
+
   /**
    * The disabled refresh icon.
    */
   EXPLORER_D_REFRESH("svgicons/refresh.png"),
-  
+
   /**
    * The wide left side image.
    */
@@ -91,7 +91,9 @@ public enum Images {
   /**
    * The add image.
    */
-  ADD("svgicons/add.png");
+  ADD("svgicons/add.png"),
+
+  PIN("svgicons/pin.png");
 
   private String mPath;
 
@@ -100,8 +102,8 @@ public enum Images {
   }
 
   /**
-   * Retrives the Path. The path is a handel for the shared image.
-   * 
+   * Retrieves the Path. The path is a handle for the shared image.
+   *
    * @return the id
    */
   String getPath() {

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -34,22 +34,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public final class FeatureStructureLabelProvider implements ILabelProvider {
   public String getText(Object element) {
-    if (element instanceof IAdaptable) {
-      
-      FeatureStructure structure = null;
-      
-      if (((IAdaptable) element).getAdapter(AnnotationFS.class) != null) {
-        structure = (AnnotationFS) ((IAdaptable) element)
-                .getAdapter(AnnotationFS.class);
-      }
-
-      if (structure == null) {
-        structure = (FeatureStructure) ((IAdaptable) element).getAdapter(FeatureStructure.class);
-      }
-
-      return structure.getType().getShortName() + " (id=" + 
-      		((FeatureStructureImpl) structure).getAddress() + ")";
-    } else if (element instanceof FeatureValue) {
+    if (element instanceof FeatureValue) {
       FeatureValue featureValue = (FeatureValue) element;
       Object value = featureValue.getValue();
 
@@ -62,7 +47,24 @@ public final class FeatureStructureLabelProvider implements ILabelProvider {
       }
 
       return featureValue.getFeature().getShortName();
-    } else {
+    }
+    else if (element instanceof IAdaptable) {
+
+      FeatureStructure structure = null;
+
+      if (((IAdaptable) element).getAdapter(AnnotationFS.class) != null) {
+        structure = (AnnotationFS) ((IAdaptable) element)
+                .getAdapter(AnnotationFS.class);
+      }
+
+      if (structure == null) {
+        structure = (FeatureStructure) ((IAdaptable) element).getAdapter(FeatureStructure.class);
+      }
+
+      return structure.getType().getShortName() + " (id=" +
+      		((FeatureStructureImpl) structure).getAddress() + ")";
+    }
+    else {
       assert false : "Unexpected element!";
 
       return element.toString();

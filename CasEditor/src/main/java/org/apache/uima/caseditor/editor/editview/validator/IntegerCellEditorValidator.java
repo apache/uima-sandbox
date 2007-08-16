@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,29 +17,32 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.editor.properties;
+package org.apache.uima.caseditor.editor.editview.validator;
 
+import org.eclipse.jface.viewers.ICellEditorValidator;
 
-import org.apache.uima.cas.ShortArrayFS;
-import org.apache.uima.caseditor.editor.ModelFeatureStructure;
+/**
+ * This {@link ICellEditorValidator} validates {@link String} values which represents a
+ * {@link Integer}.
+ *
+ * For validation {@link Integer#parseInt(String)} is used.
+ */
+class IntegerCellEditorValidator implements ICellEditorValidator {
+  /**
+   * Checks if the given value is a valid {@link Integer}.
+   *
+   * @param value
+   * @return null if valid otherwise an error message
+   */
+  public String isValid(Object value) {
+    assert value instanceof String;
 
-public class ShortArrayPropertySource extends AbstractArrayPropertySource {
-  ShortArrayPropertySource(ModelFeatureStructure structure) {
-    super(structure);
-  }
+    try {
+      Integer.parseInt((String) value);
+    } catch (NumberFormatException e) {
+      return "Not an integer!";
+    }
 
-  @Override
-  protected String get(int i) {
-    return Short.toString(((ShortArrayFS) mArray).get(i));
-  }
-
-  @Override
-  protected Class<Short> getPrimitiveType() {
-    return Short.class;
-  }
-
-  @Override
-  protected void set(int i, String value) {
-    ((ShortArrayFS) mArray).set(i, Short.parseShort(value));
+    return null;
   }
 }

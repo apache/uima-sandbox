@@ -43,7 +43,7 @@
 	</extension>
 
 
-	<!-- ui extensions-->
+	<!-- ui extensions -->
 	<extension point="org.eclipse.ui.views">
 		<category id="org.apache.uima.caseditor.ui.views" name="NLP" />
 
@@ -53,6 +53,17 @@
 			icon="icons/svgicons/explorer.png"
 			category="org.apache.uima.caseditor.ui.views" />
 
+		<view id="org.apache.uima.caseditor.editview"
+			name="Edit View"
+			class="org.apache.uima.caseditor.editor.editview.EditView"
+			icon="icons/svgicons/explorer.png"
+			category="org.apache.uima.caseditor.ui.views" />
+			
+		<view id="org.apache.uima.caseditor.editview2"
+			name="Edit View"
+			class="org.apache.uima.caseditor.editor.editview.EditView"
+			icon="icons/svgicons/explorer.png"
+			category="org.apache.uima.caseditor.ui.views" />			
 	</extension>
 
 	<extension point="org.eclipse.ui.newWizards">

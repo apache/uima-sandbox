@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -61,7 +61,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.Page;
 
 /**
- * TODO: add javadoc here TODO: update if annotation model was changed
+ * TODO: add javadoc here
  */
 public final class FeatureStructureBrowserViewPage extends Page {
 
@@ -111,21 +111,21 @@ public final class FeatureStructureBrowserViewPage extends Page {
     }
 
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      
+
       if (oldInput != null) {
         mDocument.removeChangeListener(this);
       }
-      
+
       if (newInput == null) {
-        
+
         mCurrentType = null;
         return;
       }
 
       mCurrentType = (Type) newInput;
-      
+
       mDocument.addChangeListener(this);
-      
+
       Display.getDefault().syncExec(new Runnable() {
         public void run() {
           mFSList.refresh();
@@ -134,10 +134,10 @@ public final class FeatureStructureBrowserViewPage extends Page {
     }
 
     /**
-     * Retrives children for a FeatureStrcuture and for FeatureValues if they have childs.
-     * 
+     * Retrieves children for a FeatureStrcuture and for FeatureValues if they have children.
+     *
      * @param parentElement
-     * @return the childs
+     * @return the children
      */
     public Object[] getChildren(Object parentElement) {
       Collection<Object> childs = new LinkedList<Object>();
@@ -227,7 +227,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     @Override
     protected void addedAnnotation(Collection<AnnotationFS> annotations) {
 
-      final LinkedList<ModelFeatureStructure> featureStrucutreList = 
+      final LinkedList<ModelFeatureStructure> featureStrucutreList =
         new LinkedList<ModelFeatureStructure>();
 
       for (AnnotationFS annotation : annotations) {
@@ -246,7 +246,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     @Override
     protected void removedAnnotation(Collection<AnnotationFS> annotations) {
 
-      final LinkedList<ModelFeatureStructure> featureStrucutreList = 
+      final LinkedList<ModelFeatureStructure> featureStrucutreList =
         new LinkedList<ModelFeatureStructure>();
 
       for (AnnotationFS annotation : annotations) {
@@ -267,7 +267,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     protected void updatedAnnotation(Collection<AnnotationFS> annotations) {
       // ignore
     }
-    
+
     public void changed() {
       mFSList.refresh();
     }
@@ -318,7 +318,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param editor
    */
   public FeatureStructureBrowserViewPage(AnnotationEditor editor) {
@@ -364,7 +364,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     mFSList.setLabelProvider(new FeatureStructureLabelProvider());
 
     mFSList.setUseHashlookup(true);
-    
+
     mTypePane.setListener(new ITypePaneListener() {
       public void typeChanged(Type newType) {
         mCurrentType = newType;
@@ -377,8 +377,8 @@ public final class FeatureStructureBrowserViewPage extends Page {
   }
 
   /**
-   * Retrives the control
-   * 
+   * Retrieves the control
+   *
    * @return the control
    */
   @Override
@@ -389,7 +389,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
   /**
    * Adds the following actions to the toolbar: {@link CreateAction} {@link DereferenceAction}
    * {@link DeleteAction}
-   * 
+   *
    * @param menuManager
    * @param toolBarManager
    * @param statusLineManager
@@ -409,7 +409,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
   /**
    * Sets global action handlers for: delete select all
-   * 
+   *
    * @param actionBars
    */
   @Override

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: UIMA CAS Editor
 Bundle-SymbolicName: org.apache.uima.caseditor;singleton:=true
-Bundle-Version: 2.1.0.incubating-SNAPSHOOT
+Bundle-Version: 2.2.0.incubating-SNAPSHOOT
 Bundle-Activator: org.apache.uima.caseditor.CasEditorPlugin
 Eclipse-LazyStart: true
 Bundle-Vendor: The Apache Software Foundation

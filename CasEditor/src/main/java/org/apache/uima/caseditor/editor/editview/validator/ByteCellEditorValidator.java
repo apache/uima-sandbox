@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,29 +17,32 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.editor.properties;
+package org.apache.uima.caseditor.editor.editview.validator;
 
+import org.eclipse.jface.viewers.ICellEditorValidator;
 
-import org.apache.uima.cas.IntArrayFS;
-import org.apache.uima.caseditor.editor.ModelFeatureStructure;
+/**
+ * This {@link ICellEditorValidator} validates {@link String} values which represents a {@link Byte}.
+ *
+ * For validation {@link Byte#parseByte(String)} is used.
+ */
+public class ByteCellEditorValidator implements ICellEditorValidator {
 
-public class IntegerArrayPropertySource extends AbstractArrayPropertySource {
-  IntegerArrayPropertySource(ModelFeatureStructure structure) {
-    super(structure);
-  }
+  /**
+   * Checks if the given value is a valid {@link Byte}.
+   *
+   * @param value
+   * @return null if valid otherwise an error message
+   */
+  public String isValid(Object value) {
+    assert value instanceof String;
 
-  @Override
-  protected String get(int i) {
-    return Integer.toString(((IntArrayFS) mArray).get(i));
-  }
+    try {
+      Byte.parseByte((String) value);
+    } catch (NumberFormatException e) {
+      return "Not a byte!";
+    }
 
-  @Override
-  protected Class<Integer> getPrimitiveType() {
-    return Integer.class;
-  }
-
-  @Override
-  protected void set(int i, String value) {
-    ((IntArrayFS) mArray).set(i, Integer.parseInt(value));
+    return null;
   }
 }

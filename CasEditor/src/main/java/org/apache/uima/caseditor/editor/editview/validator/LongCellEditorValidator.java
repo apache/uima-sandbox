@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,20 +17,20 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.editor.properties.validator;
+package org.apache.uima.caseditor.editor.editview.validator;
 
 import org.eclipse.jface.viewers.ICellEditorValidator;
 
 /**
- * This {@link ICellEditorValidator} validates {@link String} values which represents a {@link Byte}.
- * 
- * For validation {@link Byte#parseByte(String)} is used.
+ * This {@link ICellEditorValidator} validates {@link String} values which represents a {@link Long}.
+ *
+ * For validation {@link Long#parseLong(String)} is used.
  */
-public class ByteCellEditorValidator implements ICellEditorValidator {
+public class LongCellEditorValidator implements ICellEditorValidator {
 
   /**
-   * Checks if the given value is a valid {@link Byte}.
-   * 
+   * Checks if the given value is a valid {@link Long}.
+   *
    * @param value
    * @return null if valid otherwise an error message
    */
@@ -38,9 +38,9 @@ public class ByteCellEditorValidator implements ICellEditorValidator {
     assert value instanceof String;
 
     try {
-      Byte.parseByte((String) value);
+      Long.parseLong((String) value);
     } catch (NumberFormatException e) {
-      return "Not a byte!";
+      return "Not a long!";
     }
 
     return null;

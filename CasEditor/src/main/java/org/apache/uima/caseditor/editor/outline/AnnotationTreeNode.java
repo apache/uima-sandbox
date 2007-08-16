@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,11 +24,8 @@ import java.util.List;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.IDocument;
-import org.apache.uima.caseditor.editor.ModelFeatureStructure;
-import org.apache.uima.caseditor.editor.properties.FSPropertySourceFactory;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * TODO: add javadoc here
@@ -66,7 +63,7 @@ public class AnnotationTreeNode implements IAdaptable {
 
   /**
    * Checks if the given node is completly contained by the current node instance.
-   * 
+   *
    * @param node
    * @return true if completly contained otherwise false
    */
@@ -91,9 +88,8 @@ public class AnnotationTreeNode implements IAdaptable {
 
     if (AnnotationFS.class.equals(adapter) || FeatureStructure.class.equals(adapter)) {
       return getAnnotation();
-    } else if (IPropertySource.class.equals(adapter)) {
-      return FSPropertySourceFactory.create(new ModelFeatureStructure(mDocument, getAnnotation()));
-    } else {
+    }
+    else {
       return null;
     }
   }

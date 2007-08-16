@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,7 +24,8 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 
 /**
- * This enumeration contains all primitves and some util methods. TODO: remove all array and list
+ * This enumeration contains all primitives and some util methods.
+ * TODO: remove all array and list
  * types, thats are FeatureStructures !!!
  */
 public enum Primitives {
@@ -79,8 +80,8 @@ public enum Primitives {
   }
 
   /**
-   * Retrives the uima name of the type.
-   * 
+   * Retrieves the uima name of the type.
+   *
    * @return the uima name.
    */
   public String getTypeName() {
@@ -88,8 +89,8 @@ public enum Primitives {
   }
 
   /**
-   * Retrives the type.
-   * 
+   * Retrieves the type.
+   *
    * @return the type
    */
   public Class getType() {
@@ -98,7 +99,7 @@ public enum Primitives {
 
   /**
    * Checks if the given feature has the same type.
-   * 
+   *
    * @param feature
    * @return true if type is the same otherwise false
    */
@@ -108,9 +109,9 @@ public enum Primitives {
 
   /**
    * Checks if a given <code>Feature</code> has a primitive type.
-   * 
+   *
    * @param f
-   * @return true if primitiv otherwise false
+   * @return true if primitive otherwise false
    */
   public static boolean isPrimitive(Feature f) {
     if (f == null) {
@@ -122,7 +123,7 @@ public enum Primitives {
 
   /**
    * Checks if the given typeName is a primitive.
-   * 
+   *
    * @param typeName
    * @return true if primitive otherwise false.
    */
@@ -135,8 +136,8 @@ public enum Primitives {
   }
 
   /**
-   * Retrives the {@link Class} for the current primitive.
-   * 
+   * Retrieves the {@link Class} for the current primitive.
+   *
    * @param f
    * @return the class
    */
@@ -147,10 +148,10 @@ public enum Primitives {
   }
 
   /**
-   * Retrives a primitive by name.
-   * 
+   * Retrieves a primitive by name.
+   *
    * @param typeName
-   * @return the prmitive or null if none
+   * @return the primitive or null if none
    */
   public static Primitives getPrimitive(String typeName) {
     for (Primitives primitive : values()) {
@@ -163,8 +164,8 @@ public enum Primitives {
   }
 
   /**
-   * Retrives the primitive value.
-   * 
+   * Retrieves the primitive value.
+   *
    * @param structure
    * @param feature
    * @return the primitive value as object

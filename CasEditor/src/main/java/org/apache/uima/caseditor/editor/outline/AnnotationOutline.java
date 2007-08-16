@@ -346,14 +346,12 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     changeAnnotationMode();
 
-    // TODO: cretate a listener interface ... for editor listener
+    // TODO: create a listener interface ... for editor listener
     mEditor.addAnnotationListener(new EditorListener());
 
     DragSource source = new DragSource(mTableViewer.getTree(), DND.DROP_COPY);
 
-    Transfer[] types = new Transfer[] { FeatureStructureTransfer.getInstance() };
-
-    source.setTransfer(types);
+    source.setTransfer(new Transfer[] { FeatureStructureTransfer.getInstance() });
 
     source.addDragListener(new DragSourceListener() {
       TreeItem dragSourceItem = null;

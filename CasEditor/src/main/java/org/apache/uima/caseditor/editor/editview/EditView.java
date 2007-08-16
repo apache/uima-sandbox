@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.editor.fsview;
+package org.apache.uima.caseditor.editor.editview;
 
 
 import org.apache.uima.caseditor.editor.AnnotationEditor;
@@ -25,15 +25,18 @@ import org.apache.uima.caseditor.editor.AnnotationEditorView;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
+ * TODO: add javadoc here
  */
-public final class FeatureStructureBrowserView extends AnnotationEditorView {
+public final class EditView extends AnnotationEditorView {
   /**
    * The ID of the feature structure view.
    */
-  public static final String ID = "org.apache.uima.caseditor.fsview";
+  public static final String ID = "org.apache.uima.caseditor.editview";
+  public static final String ID_2 = "org.apache.uima.caseditor.editview2";
 
-  public FeatureStructureBrowserView() {
-    super("The instance view is currently not available.");
+
+  public EditView() {
+    super("The edit view is currently not available.");
   }
 
   @Override
@@ -43,7 +46,7 @@ public final class FeatureStructureBrowserView extends AnnotationEditorView {
     if ((part instanceof AnnotationEditor)) {
       AnnotationEditor editor = (AnnotationEditor) part;
 
-      FeatureStructureBrowserViewPage page = new FeatureStructureBrowserViewPage(editor);
+      EditViewPage page = new EditViewPage(editor);
       initPage(page);
       page.createControl(getPageBook());
 

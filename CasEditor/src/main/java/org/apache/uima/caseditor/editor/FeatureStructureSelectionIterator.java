@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,54 +33,54 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 public class FeatureStructureSelectionIterator implements Iterator<FeatureStructure> {
 
   private Iterator mSelectionIterator;
-  
+
   private FeatureStructure mNext;
-  
+
   /**
    * Initializes the current instance.
-   * 
+   *
    * @param selection
    */
   public FeatureStructureSelectionIterator(IStructuredSelection selection) {
     mSelectionIterator = selection.iterator();
   }
-  
+
   /**
    * Check if there is one more element.
-   * 
+   *
    * @return true if there is one more element.
    */
   public boolean hasNext() {
     while (mSelectionIterator.hasNext() && mNext == null) {
       Object item = mSelectionIterator.next();
-      
+
       if (item instanceof IAdaptable) {
         mNext = (FeatureStructure) ((IAdaptable) item).getAdapter(AnnotationFS.class);
-      } 
+      }
     }
 
     return mNext != null;
   }
 
   /**
-   * Retrives the next element.
-   * 
+   * Retrieves the next element.
+   *
    * @return the next element.
    */
   public FeatureStructure next() {
     if (!hasNext()) {
       throw new NoSuchElementException();
     }
-    
+
     FeatureStructure result = mNext;
     mNext = null;
-    
+
     return result;
   }
 
   /**
    * Not supported, it throws an {@link UnsupportedOperationException}.
-   * 
+   *
    * @throws UnsupportedOperationException
    */
   public void remove() {
