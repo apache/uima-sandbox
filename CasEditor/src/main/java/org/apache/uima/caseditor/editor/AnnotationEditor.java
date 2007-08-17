@@ -150,7 +150,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   }
 
   /**
-   * Shows the annotation editing context for the active annoation.
+   * Shows the annotation editing context for the active annotation.
    */
   private class ShowAnnotationContextEditAction extends Action {
     private InformationPresenter mPresenter;
@@ -321,7 +321,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   }
 
   /**
-   * Creates the mode context submenu.
+   * Creates the mode context sub menu.
    */
   private class ModeMenu extends TypeMenu {
     /**
@@ -465,7 +465,16 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         public void mouseMove(MouseEvent e) {
           if (mIsActive) {
             // try to get the position inside the text
-            int offset = textWidget.getOffsetAtLocation(new Point(e.x, e.y));
+
+            int offset;
+
+            // Workaround: It is possible check that is text under the cursor ?
+            try {
+            offset = textWidget.getOffsetAtLocation(new Point(e.x, e.y));
+            }
+            catch (IllegalArgumentException e2) {
+              return;
+            }
 
             Map<Integer, AnnotationFS> view = getDocument().getView(mAnnotationMode);
 
@@ -507,7 +516,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   private IAnnotationEditorModifyListener mEditorListener;
 
   /**
-   * TODO: Do we really need this pos variable ?
+   * TODO: Do we really need this position variable ?
    */
   private int mCursorPosition;
 
@@ -535,7 +544,7 @@ private DocumentListener mAnnotationSynchronizer;
   }
 
   /**
-   * Retrives annotation editor adapters.
+   * Retrieves annotation editor adapters.
    *
    * @param adapter
    * @return an adapter or null
@@ -936,7 +945,7 @@ private DocumentListener mAnnotationSynchronizer;
   }
 
   /**
-   * Creates custom annoation actions.
+   * Creates custom annotation actions.
    */
   @Override
   protected void createActions() {
