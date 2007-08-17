@@ -244,6 +244,24 @@ public final class FeatureStructureBrowserViewPage extends Page {
     }
 
     @Override
+    public void added(Collection<FeatureStructure> structres) {
+      final LinkedList<ModelFeatureStructure> featureStrucutreList =
+        new LinkedList<ModelFeatureStructure>();
+
+      for (FeatureStructure structure : structres) {
+        if (structure.getType() == mCurrentType) {
+          featureStrucutreList.add(new ModelFeatureStructure(mDocument, structure));
+        }
+      }
+
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          mFSList.add(featureStrucutreList.toArray());
+        }
+      });
+    }
+
+    @Override
     protected void removedAnnotation(Collection<AnnotationFS> annotations) {
 
       final LinkedList<ModelFeatureStructure> featureStrucutreList =
@@ -261,6 +279,24 @@ public final class FeatureStructureBrowserViewPage extends Page {
         }
       });
 
+    }
+
+    @Override
+    public void removed(Collection<FeatureStructure> structres) {
+      final LinkedList<ModelFeatureStructure> featureStrucutreList =
+        new LinkedList<ModelFeatureStructure>();
+
+      for (FeatureStructure structure : structres) {
+        if (structure.getType() == mCurrentType) {
+          featureStrucutreList.add(new ModelFeatureStructure(mDocument, structure));
+        }
+      }
+
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          mFSList.remove(featureStrucutreList.toArray());
+        }
+      });
     }
 
     @Override

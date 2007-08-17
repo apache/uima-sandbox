@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,7 +21,7 @@ package org.apache.uima.caseditor.editor.action;
 
 
 import org.apache.uima.caseditor.core.IDocument;
-import org.apache.uima.caseditor.editor.AnnotationSelection;
+import org.apache.uima.caseditor.editor.FeatureStructureSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
@@ -33,7 +33,7 @@ public class DeleteFeatureStructureAction extends BaseSelectionListenerAction {
 
   /**
    * Initializes the current instance.
-   * 
+   *
    * @param document
    */
   public DeleteFeatureStructureAction(IDocument document) {
@@ -46,9 +46,10 @@ public class DeleteFeatureStructureAction extends BaseSelectionListenerAction {
 
   @Override
   protected boolean updateSelection(IStructuredSelection selection) {
-    AnnotationSelection annotation = new AnnotationSelection(selection);
+    FeatureStructureSelection featureStructures =
+      new FeatureStructureSelection(selection);
 
-    return annotation.size() > 0;
+    return featureStructures.size() > 0;
   }
 
   /**
@@ -56,8 +57,10 @@ public class DeleteFeatureStructureAction extends BaseSelectionListenerAction {
    */
   @Override
   public void run() {
-    AnnotationSelection annotations = new AnnotationSelection(getStructuredSelection());
 
-    mDocument.removeAnnotations(annotations.toList());
+    FeatureStructureSelection featureStructures =
+      new FeatureStructureSelection(getStructuredSelection());
+
+    mDocument.removeFeatureStructures(featureStructures.toList());
   }
 }
