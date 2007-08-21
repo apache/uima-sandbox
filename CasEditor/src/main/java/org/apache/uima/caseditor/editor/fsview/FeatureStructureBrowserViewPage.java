@@ -335,6 +335,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     @Override
     public void run() {
       mFSList.getList().selectAll();
+      mFSList.setSelection(mFSList.getSelection());
     }
   }
 
