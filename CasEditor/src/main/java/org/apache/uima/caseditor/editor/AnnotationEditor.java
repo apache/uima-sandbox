@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
@@ -284,22 +283,28 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      */
     @Override
     public void fill(Menu menu, int index) {
-      fillTypeMenu(mParentType, menu);
+      fillTypeMenu(mParentType, menu, false);
     }
 
-    private void fillTypeMenu(Type parentType, Menu parentMenu) {
-      Vector childs = mTypeSystem.getDirectlySubsumedTypes(parentType);
+    private void fillTypeMenu(Type parentType, Menu parentMenu, boolean isParentIncluded) {
+      List childs = mTypeSystem.getProperlySubsumedTypes(parentType);
 
       Menu newSubMenu;
 
       // has this type sub types ?
       // yes
       if (childs.size() != 0) {
-        MenuItem subMenuItem = new MenuItem(parentMenu, SWT.CASCADE);
-        subMenuItem.setText(parentType.getShortName());
 
-        newSubMenu = new Menu(subMenuItem);
-        subMenuItem.setMenu(newSubMenu);
+        if (isParentIncluded) {
+          MenuItem  subMenuItem = new MenuItem(parentMenu, SWT.CASCADE);
+          subMenuItem.setText(parentType.getShortName());
+
+          newSubMenu = new Menu(subMenuItem);
+          subMenuItem.setMenu(newSubMenu);
+        }
+        else {
+          newSubMenu = parentMenu;
+        }
 
         insertAction(parentType, newSubMenu);
 
@@ -308,7 +313,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         while (childsIterator.hasNext()) {
           Type child = (Type) childsIterator.next();
 
-          fillTypeMenu(child, newSubMenu);
+          fillTypeMenu(child, newSubMenu, true);
         }
       }
       // no
@@ -316,7 +321,6 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         insertAction(parentType, parentMenu);
       }
     }
-
     protected abstract void insertAction(final Type type, Menu parentMenu);
   }
 
