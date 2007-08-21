@@ -287,7 +287,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
 
     private void fillTypeMenu(Type parentType, Menu parentMenu, boolean isParentIncluded) {
-      List childs = mTypeSystem.getProperlySubsumedTypes(parentType);
+      List childs = mTypeSystem.getDirectSubtypes(parentType);
 
       Menu newSubMenu;
 
@@ -829,7 +829,7 @@ private DocumentListener mAnnotationSynchronizer;
   }
 
   /**
-   * Hightligts the given range in the editor.
+   * Highlights the given range in the editor.
    *
    * @param start
    * @param length
@@ -858,11 +858,11 @@ private DocumentListener mAnnotationSynchronizer;
   }
 
   /**
-   * Retrives the currently selected annotation.
+   * Retrieves the currently selected annotation.
    *
    * TODO: make this private ??? clients can use selections for this ...
    *
-   * @return the selected anotation or null if none
+   * @return the selected annotation or null if none
    */
   public List<AnnotationFS> getSelectedAnnotations() {
     List<AnnotationFS> selection = new ArrayList<AnnotationFS>();
@@ -920,14 +920,12 @@ private DocumentListener mAnnotationSynchronizer;
 
       // only process these selection if the annotations belong
       // to the current editor instance
-      if (getSite().getPage().getActiveEditor() == this && !annotations.isEmpty()
-              && annotations.getFirst().getType() == mAnnotationMode) {
+      if (getSite().getPage().getActiveEditor() == this && !annotations.isEmpty()) {
         highlight(annotations.getFirst().getBegin(), annotations.getLast().getEnd()
                 - annotations.getFirst().getBegin());
 
         // move caret to new position when selected outside of the editor
         if (AnnotationEditor.this != part)
-        // TODO: replace with this == part and test it
         {
           getSourceViewer().getTextWidget().setCaretOffset(annotations.getLast().getEnd());
         }
