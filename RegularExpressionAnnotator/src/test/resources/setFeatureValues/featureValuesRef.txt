@@ -1,0 +1,7 @@
+TestAnnot1(0,13): RuleRegex12.4
+DocumentAnnotation(0,13): RuleRegex12.4  { language=RuleRegex12.4 Test }
+TestAnnot(0,13): RuleRegex12.4  { confidenceValue=1.0, ruleId=ID1, testFeature0=RuleRegex12.4, testFeature1=RuleRegex1, testFeature2=Regex with additions, testFeature3=value only, testFeature4=frist RuleRegex12.4, testFeature5=TestAnnot1 "RuleRegex12.4"
+   sofa: _InitialView
+   begin: 0
+   end: 13
+, testFeature6=2343.34, testFeature7=2.4, testFeature8=12345, testFeature9=1 }

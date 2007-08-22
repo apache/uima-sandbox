@@ -1,0 +1,11 @@
+Apache UIMA RegularExpression annotator software component
+Copyright 2007 The Apache Software Foundation
+
+This Apache UIMA software component includes code that was developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+This software is based on the UIMA Apache project (http://incubator.apache.org/uima).
+Licensed under the Apache License 2.0 (see http://incubator.apache.org/uima/license.html).
+
+This software contains parts of the Apache XMLBeans project which is also licensed under 
+the Apache License 2.0. For details please refer to the NOTICE file of the xbean.jar.
