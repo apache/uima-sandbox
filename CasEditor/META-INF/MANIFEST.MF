@@ -7,7 +7,6 @@ Bundle-Activator: org.apache.uima.caseditor.CasEditorPlugin
 Eclipse-LazyStart: true
 Bundle-Vendor: The Apache Software Foundation
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-Localization: plugin
 Eclipse-RegisterBuddy: org.apache.uima.runtime
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -20,4 +19,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.core.filesystem,
  com.ibm.icu
-Bundle-ClassPath: .
+Bundle-ClassPath: ./target/classes
