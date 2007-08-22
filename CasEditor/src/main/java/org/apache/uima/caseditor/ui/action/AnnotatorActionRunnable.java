@@ -127,7 +127,6 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
 
       // currently all updates are made from the ui thread, just post this call to change
       // to the ui job queue
-
       Display.getDefault().syncExec(new Runnable() {
         public void run() {
           document.changed();
@@ -152,6 +151,13 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
+    }
+
+    try {
+      annotatorInstance.collectionProcessComplete();
+    }
+    catch (AnalysisEngineProcessException e) {
+      throw new InvocationTargetException(e);
     }
 
     annotatorInstance.destroy();
