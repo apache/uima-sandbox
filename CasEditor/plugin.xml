@@ -277,6 +277,18 @@
 			<property name="aboutImage"
 				value="icons/UIMA_logo_50.gif">
 			</property>
+   <property
+         name="startupForegroundColor"
+         value="000000">
+   </property>
+   <property
+         name="startupMessageRect"
+         value="7,200,180,50">
+   </property>
+   <property
+         name="startupProgressRect"
+         value="7,265,195,25">
+   </property>
 		</product>
 	</extension>
 
