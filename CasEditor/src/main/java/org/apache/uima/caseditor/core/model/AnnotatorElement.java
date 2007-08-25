@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.core.model;
 import java.io.File;
 
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
@@ -47,7 +46,7 @@ public class AnnotatorElement extends AbstractNlpElement {
 
   /**
    * Initializes the current instance.
-   * 
+   *
    * @param config
    * @param annotatorFile
    */
@@ -59,8 +58,8 @@ public class AnnotatorElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the {@link AnnotatorConfiguration}.
-   * 
+   * Retrieves the {@link AnnotatorConfiguration}.
+   *
    * @return the {@link AnnotatorConfiguration}
    */
   public AnnotatorConfiguration getAnnotatorConfiguration() {
@@ -68,6 +67,8 @@ public class AnnotatorElement extends AbstractNlpElement {
   }
 
   private AnnotatorConfiguration createAnnotatorConfiguration() {
+
+
     Runnable clearMarkers = new Runnable() {
       public void run() {
         try {
@@ -81,7 +82,8 @@ public class AnnotatorElement extends AbstractNlpElement {
 
     XMLInputSource inAnnotator;
     try {
-      inAnnotator = new XMLInputSource(mAnnotatorResource.getContents(), new File(""));
+      String dataPath = ((IFolder) mParent.getResource()).getLocation().toOSString();
+      inAnnotator = new XMLInputSource(mAnnotatorResource.getContents(), new File(dataPath));
     } catch (final CoreException e2) {
       Runnable createMarker = new Runnable() {
         public void run() {
@@ -127,7 +129,7 @@ public class AnnotatorElement extends AbstractNlpElement {
 
   @Override
   void addResource(IResource resource) {
-    // just do nothing, no childs
+    // just do nothing, no children
   }
 
   @Override
@@ -137,32 +139,32 @@ public class AnnotatorElement extends AbstractNlpElement {
 
   @Override
   void removeResource(IResource resource) {
-    // just do nothing, no childs
+    // just do nothing, no children
   }
 
   /**
-   * Retrives the name.
+   * Retrieves the name.
    */
   public String getName() {
     return getResource().getName();
   }
 
   /**
-   * Retrives the nlp projects.
+   * Retrieves the nlp projects.
    */
   public NlpProject getNlpProject() {
     return getParent().getNlpProject();
   }
 
   /**
-   * Retrives the parent.
+   * Retrieves the parent.
    */
   public INlpElement getParent() {
     return mParent;
   }
 
   /**
-   * Retrives the underlying resoruce.
+   * Retrieves the underlying resource.
    */
   public IResource getResource() {
     return mAnnotatorResource;

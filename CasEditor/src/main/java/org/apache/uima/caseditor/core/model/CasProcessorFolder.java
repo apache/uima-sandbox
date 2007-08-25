@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * The UimaSourceFolder contains folders, each of these folders can contain uima consumer or
- * annoatator configurations.
+ * annotator configurations.
  */
 public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable {
   private IFolder mConfigFolder;
@@ -45,7 +45,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param configFolder
    * @param sourceFolder
    * @param project
@@ -60,8 +60,8 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Retrives the {@link AnnotatorConfiguration}.
-   * 
+   * Retrieves the {@link AnnotatorConfiguration}.
+   *
    * @return the {@link AnnotatorConfiguration}
    */
   public Collection<AnnotatorElement> getAnnotators() {
@@ -82,8 +82,8 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Retrives the consumers.
-   * 
+   * Retrieves the consumers.
+   *
    * @return consumers
    */
   public Collection<ConsumerElement> getConsumers() {
@@ -105,8 +105,8 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Retrives all containted {@link IFile} and {@link IFolder} resources.
-   * 
+   * Retrieves all contained {@link IFile} and {@link IFolder} resources.
+   *
    * @return {@link IFile}s and {@link IFolder}s
    * @throws CoreException
    */
@@ -126,8 +126,8 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Retrives the {@link NlpProject}.
-   * 
+   * Retrieves the {@link NlpProject}.
+   *
    * @return the {@link NlpProject}
    */
   public NlpProject getNlpProject() {
@@ -167,8 +167,8 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Retrives the parent.
-   * 
+   * Retrieves the parent.
+   *
    * @return the parent
    */
   public INlpElement getParent() {
@@ -176,14 +176,14 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Retrives the resource.
+   * Retrieves the resource.
    */
   public IResource getResource() {
     return mConfigFolder;
   }
 
   /**
-   * Retrives the parent of the given resource.
+   * Retrieves the parent of the given resource.
    */
   @Override
   public INlpElement getParent(IResource resource) throws CoreException {
@@ -199,7 +199,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Retrvies the name.
+   * Retrieves the name.
    */
   public String getName() {
     return mConfigFolder.getName();

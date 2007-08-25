@@ -145,7 +145,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Not implemented, called to deconfigure the project
+   * Not implemented, called to de-configure the project
    */
   public void deconfigure() throws CoreException {
     // not implemented
@@ -195,7 +195,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the corporas.
+   * Retrieves the corpora.
    *
    * @return the corpus collection
    */
@@ -214,7 +214,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives all non-nlp resources of the current instance.
+   * Retrieves all non-nlp resources of the current instance.
    *
    * @return the resources
    * @throws CoreException
@@ -254,7 +254,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the parent element for the given resource.
+   * Retrieves the parent element for the given resource.
    */
   @Override
   public INlpElement getParent(IResource resource) throws CoreException {
@@ -300,7 +300,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Searchs the {@link INlpElement} for the given resource.
+   * Searches the {@link INlpElement} for the given resource.
    */
   @Override
   public INlpElement findMember(IResource resource) {
@@ -335,7 +335,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the UimaSourceFolder
+   * Retrieves the UimaSourceFolder
    *
    * @return the UimaSourceFolder
    */
@@ -355,7 +355,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the {@link DotCorpusElement}.
+   * Retrieves the {@link DotCorpusElement}.
    *
    * @return the {@link DotCorpusElement}
    */
@@ -364,7 +364,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the {@link NlpProject}.
+   * Retrieves the {@link NlpProject}.
    */
   public NlpProject getNlpProject() {
     return this;
@@ -393,7 +393,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       if (DOT_CORPUS_FILENAME.equals(file.getName())) {
         mIsDotCorpusDirty = true;
       }
-      // check if file is typesystem
+      // check if file is type system
       else if (mDotCorpusElement.getTypeSystemFile() != null) {
         mTypesystem = new TypesystemElement((IFile) resource, this);
       }
@@ -408,7 +408,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Removes a resource form the current porject instance.
+   * Removes a resource form the current project instance.
    */
   @Override
   public void removeResource(IResource resource) {
@@ -518,9 +518,9 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   }
 
   /**
-   * Retrives the typesystem.
+   * Retrieves the type system.
    *
-   * @return typesystem
+   * @return type system
    */
   public TypesystemElement getTypesystemElement() {
     return mTypesystem;

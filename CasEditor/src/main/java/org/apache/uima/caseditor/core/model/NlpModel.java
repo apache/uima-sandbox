@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -108,9 +108,7 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   /**
-   * The default handler is only called if an unkown event is handled. The event will be logged.
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+   * The default handler is only called if an unknown event is handled. The event will be logged.
    */
   private static final class DefaultEventHandler implements IEventHandler<NlpModelDeltaImpl> {
     /**
@@ -124,8 +122,6 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Handles add events.
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private static final class AddHandler extends AbstractEventHandler {
     protected AddHandler(EventDispatcher<Kind, NlpModelDeltaImpl> handler) {
@@ -139,7 +135,7 @@ public final class NlpModel extends AbstractNlpElement {
       CasEditorPlugin.getNlpModel().addInternal(delta.getResource());
 
       /*
-       * Note: If a projcet is added, it is closed (isOpen() == false). Tough, the .project file is
+       * Note: If a project is added, it is closed (isOpen() == false). Tough, the .project file is
        * then added to the closed project.
        */
 
@@ -152,8 +148,6 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Handles remove events..
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private static final class RemoveHandler extends AbstractEventHandler {
     RemoveHandler(EventDispatcher<Kind, NlpModelDeltaImpl> handler) {
@@ -181,8 +175,6 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Handles change events.
-   * 
-   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
    */
   private static final class ChangedHandler extends AbstractEventHandler {
     ChangedHandler(EventDispatcher<Kind, NlpModelDeltaImpl> handler) {
@@ -245,7 +237,7 @@ public final class NlpModel extends AbstractNlpElement {
             delta.setKind(Kind.REMOVED);
             mEventDispatcher.notify(delta.getKind(), delta);
 
-            // add the closed project resoure
+            // add the closed project resource
             IResourceDelta removeProjectResourceDelta = new AbstractResourceDelta() {
               @Override
               public IResource getResource() {
@@ -357,7 +349,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @throws CoreException
    */
   public NlpModel() throws CoreException {
@@ -446,8 +438,8 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   /**
-   * Retrives all nlp projects.
-   * 
+   * Retrieves all nlp projects.
+   *
    * @return the nlp projects
    */
   public NlpProject[] getNlpProjects() {
@@ -477,8 +469,8 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the resource projects in the workspace wihtout a nlp nature.
-   * 
+   * Retrieves the resource projects in the workspace without a nlp nature.
+   *
    * @return array of projects
    * @throws CoreException
    */
@@ -503,21 +495,21 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the resource.
+   * Retrieves the resource.
    */
   public IResource getResource() {
     return mWorkspaceRoot;
   }
 
   /**
-   * Retrives the name.
+   * Retrieves the name.
    */
   public String getName() {
     return mWorkspaceRoot.getName();
   }
 
   /**
-   * Retrives the parent of the given resource.
+   * Retrieves the parent of the given resource.
    */
   @Override
   public INlpElement getParent(IResource resource) throws CoreException {
@@ -543,7 +535,7 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   /**
-   * Search the {@link INlpElement} for the given resoruce.
+   * Search the {@link INlpElement} for the given resource.
    */
   @Override
   public INlpElement findMember(IResource resource) {
@@ -563,8 +555,8 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   /**
-   * Checks if the givfen element is a {@link INlpElement}.
-   * 
+   * Checks if the given element is a {@link INlpElement}.
+   *
    * @param resource
    * @return true if it is a {@link INlpElement} otherwise false.
    */
@@ -574,7 +566,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * The {@link NlpModel} does not have a parent.
-   * 
+   *
    * @return null
    */
   public INlpElement getParent() {
@@ -590,7 +582,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Registers a model change listener.
-   * 
+   *
    * @param listener
    */
   public void addNlpModelChangeListener(INlpModelChangeListener listener) {
@@ -599,7 +591,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Removes a model change listener.
-   * 
+   *
    * @param listener
    */
   public void removeNlpModelChangeListener(INlpModelChangeListener listener) {
@@ -627,9 +619,9 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   /**
-   * Asynchronly executes the workers on the queue. This method can be used to post resource tree
+   * Asynchrony executes the workers on the queue. This method can be used to post resource tree
    * changes inside the event handler, where the resource tree is locked.
-   * 
+   *
    * @param worker
    */
   void asyncExcuteQueue(Runnable worker) {

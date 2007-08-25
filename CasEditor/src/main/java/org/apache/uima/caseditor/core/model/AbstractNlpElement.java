@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -42,7 +42,7 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   }
 
   /**
-   * Retrives the {@link IResource} of the current instance.
+   * Retrieves the {@link IResource} of the current instance.
    */
   @Override
   public Object getAdapter(Class adapter) {
@@ -60,7 +60,7 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   /**
    * Checks if the given resource equals the current elements resource, if so it returns the parent
    * of the current element, otherwise null.
-   * 
+   *
    * @throws CoreException
    */
   public INlpElement getParent(IResource resource) throws CoreException {
@@ -77,7 +77,7 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
 
   /**
    * Adds resources after the element was initialized.
-   * 
+   *
    * @param resource
    *          the added resource
    * @throws CoreException
@@ -85,8 +85,8 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   abstract void addResource(IResource resource) throws CoreException;
 
   /**
-   * Removes resouces after the element was initialized.
-   * 
+   * Removes resources after the element was initialized.
+   *
    * @param resource
    *          the removed resource
    * @throws CoreException
@@ -94,8 +94,8 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   abstract void removeResource(IResource resource) throws CoreException;
 
   /**
-   * Changed resoure after the element was initialized.
-   * 
+   * Changed resource after the element was initialized.
+   *
    * @param resource
    */
   @SuppressWarnings("all")
@@ -103,7 +103,7 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   }
 
   /**
-   * Retrives the human-readable name.
+   * Retrieves the human-readable name.
    */
   @Override
   public String toString() {

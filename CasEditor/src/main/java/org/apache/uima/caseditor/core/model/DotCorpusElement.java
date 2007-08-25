@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,8 +38,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * The <code>DotCorpus</code> is responseibil to load/store the project dependent configuration.
- * It has serveral methods to set and retrive configuration parameters.
+ * The <code>DotCorpus</code> is responsible to load/store the project dependent configuration.
+ * It has several methods to set and retrieve configuration parameters.
  */
 public class DotCorpusElement extends AbstractNlpElement {
   private DotCorpus mDotCorpus;
@@ -51,7 +51,7 @@ public class DotCorpusElement extends AbstractNlpElement {
   /**
    * The creation of the DotCorpus class is controlled by the factory method
    * <code>createDefaultDotCorpus(...)</code>.
-   * 
+   *
    * @param resource
    *          internal use only
    * @param nlpProject
@@ -64,8 +64,8 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the name of the type system file.
-   * 
+   * Retrieves the name of the type system file.
+   *
    * @return - type system file name
    */
   public IFile getTypeSystemFile() {
@@ -82,7 +82,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Returns true if the given file is the type system file.
-   * 
+   *
    * @param file
    * @return true if type system file otherwise false
    */
@@ -92,7 +92,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Sets the type system file name.
-   * 
+   *
    * @param filename -
    *          type system file name
    */
@@ -101,8 +101,8 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the corpus folder names.
-   * 
+   * Retrieves the corpus folder names.
+   *
    * @return - corpus folder names
    */
   public Collection<IFolder> getCorpusFolderNameList() {
@@ -117,7 +117,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Adds a corpus folder.
-   * 
+   *
    * @param name
    *          the corpus folder.
    */
@@ -127,7 +127,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Removes the given corpus folder;
-   * 
+   *
    * @param folder
    */
   public void removeCorpusFolder(IFolder folder) {
@@ -136,7 +136,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Returns true if the given folder is a corpus folder.
-   * 
+   *
    * @param folder
    * @return - true if corpus folder otherwise false
    */
@@ -154,9 +154,9 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the annotation styles.
-   * 
-   * @return - the annoation styles
+   * Retrieves the annotation styles.
+   *
+   * @return - the annotation styles
    */
   Collection<AnnotationStyle> getAnnotationStyles() {
     return mDotCorpus.getAnnotationStyles();
@@ -164,7 +164,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Adds an AnnotationStyle. TODO: move style stuff to nlp project
-   * 
+   *
    * @param style
    */
   public void setStyle(AnnotationStyle style) {
@@ -173,7 +173,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Removes an AnnotationStyle for the given name, does nothing if not existent.
-   * 
+   *
    * @param name
    */
   public void removeStyle(String name) {
@@ -181,8 +181,8 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the AnnotationStyle for the given type or null if not available.
-   * 
+   * Retrieves the AnnotationStyle for the given type or null if not available.
+   *
    * @param type
    * @return the requested style or null if none
    */
@@ -191,13 +191,13 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the config folder name.
-   * 
+   * Retrieves the config folder name.
+   *
    * @return - config folder name
    */
   public Collection<IFolder> getCasProcessorFolders() {
-    
-    
+
+
     Collection<IFolder> casProcessorFolders = new LinkedList<IFolder>();
 
     for (String corpusFolderString : mDotCorpus.getCasProcessorFolderNames()) {
@@ -219,10 +219,10 @@ public class DotCorpusElement extends AbstractNlpElement {
 
     return result;
   }
-  
+
   /**
    * Returns true if the given folder is a uima config folder.
-   * 
+   *
    * @param folder
    * @return true if is config folder
    */
@@ -232,7 +232,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Sets the config folder name
-   * 
+   *
    * @param name -
    *          the new name
    */
@@ -253,8 +253,8 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the line length hint of the editor.
-   * 
+   * Retrieves the line length hint of the editor.
+   *
    * @return line length hint of the current editor, 0 means disabled
    */
   public int getEditorLineLengthHint() {
@@ -263,7 +263,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Sets the line length hint of the current editor.
-   * 
+   *
    * @param lineLengthHint -
    *          line length hint of the current editor, 0 means disabled
    */
@@ -273,7 +273,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Serializes the <code>DotCorpus</code> instance to the given <code>IFile</code>.
-   * 
+   *
    * @throws CoreException
    */
   public void serialize() throws CoreException {
@@ -293,9 +293,9 @@ public class DotCorpusElement extends AbstractNlpElement {
    */
   @Override
   public boolean equals(Object object) {
-    
+
     boolean result;
-    
+
     if (this == object) {
       result = true;
     }
@@ -309,7 +309,7 @@ public class DotCorpusElement extends AbstractNlpElement {
     else {
       result = false;
     }
-    
+
     return result;
   }
 
@@ -317,7 +317,7 @@ public class DotCorpusElement extends AbstractNlpElement {
    * Creates a new <code>DotCorpus</code> object from an <code>IFile</code> object. If creation
    * fails, the default dotCorpus is returned and if possible markers are added to the invalid
    * .corpus resource.
-   * 
+   *
    * @param file
    * @param project
    * @return - the new <code>DotCorpus</code> instance.
@@ -357,28 +357,28 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the parent.
+   * Retrieves the parent.
    */
   public INlpElement getParent() {
     return mNlpProject;
   }
 
   /**
-   * Retrives the dot corpus resoruce.
+   * Retrieves the dot corpus resource.
    */
   public IResource getResource() {
     return mResource;
   }
 
   /**
-   * Retrives the nlp project
+   * Retrieves the nlp project
    */
   public NlpProject getNlpProject() {
     return mNlpProject;
   }
 
   /**
-   * Retrives the dot corpus name
+   * Retrieves the dot corpus name
    */
   public String getName() {
     // TODO: this name is not hardcoded .... look at NlpProject

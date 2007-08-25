@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * The CorpusElement is a container for {@link IDocument}s.
- * 
+ *
  * TODO: do not include defective elements!
  */
 public final class CorpusElement extends AbstractNlpElement implements INlpElement, IAdaptable {
@@ -44,7 +44,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Creates a new <code>CorpusElement</code> object.
-   * 
+   *
    * @param nlpProject
    * @param corpusFolder
    */
@@ -63,7 +63,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Checks if the current document still exists.
-   * 
+   *
    * @return true if exists
    */
   public boolean exists() {
@@ -71,8 +71,8 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
   }
 
   /**
-   * Retrives all documents contained in the current corpus instance.
-   * 
+   * Retrieves all documents contained in the current corpus instance.
+   *
    * @return the documents
    */
   public Collection<DocumentElement> getDocuments() {
@@ -81,7 +81,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Returns all <code>DocumentElement</code>s inside this corpus.
-   * 
+   *
    * @throws CoreException
    */
   private void createDocuments() throws CoreException {
@@ -95,21 +95,21 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
   }
 
   /**
-   * Retrives the resouce of the current instance.
+   * Retrieves the resource of the current instance.
    */
   public IResource getResource() {
     return getCorpusFolder();
   }
 
   /**
-   * Retrives the parent of the current instance.
+   * Retrieves the parent of the current instance.
    */
   public INlpElement getParent() {
     return mParentElement;
   }
 
   /**
-   * Retrives the parent for the given resource or null if not found.
+   * Retrieves the parent for the given resource or null if not found.
    */
   @Override
   public INlpElement getParent(IResource resource) throws CoreException {
@@ -130,8 +130,8 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
   }
 
   /**
-   * Retrvies the name of the current instance.
-   * 
+   * Retrieves the name of the current instance.
+   *
    * @return the name
    */
   public String getName() {
@@ -139,8 +139,8 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
   }
 
   /**
-   * Retrives the nlp element for the given resource. If contained by the current element or one of
-   * its childs.
+   * Retrieves the nlp element for the given resource. If contained by the current element or one of
+   * its children.
    */
   @Override
   public INlpElement findMember(IResource resource) {
@@ -166,7 +166,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
   }
 
   /**
-   * Retrives the top level project.
+   * Retrieves the top level project.
    */
   public NlpProject getNlpProject() {
     return (NlpProject) getParent();
@@ -174,7 +174,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Adds the given resource.
-   * 
+   *
    * @param resource
    */
   @Override
@@ -196,7 +196,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Removes the given resource.
-   * 
+   *
    * @param resource
    */
   @Override
@@ -218,7 +218,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
   }
 
   /**
-   * Chekcs if the given object is equal to the current instance.
+   * Checks if the given object is equal to the current instance.
    */
   @Override
   public boolean equals(Object obj) {

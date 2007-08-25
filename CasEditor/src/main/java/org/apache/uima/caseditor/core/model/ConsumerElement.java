@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,7 +36,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * The ConsumerELement containts the uima consumer descriptor.
+ * The ConsumerELement contains the uima consumer descriptor.
  */
 public class ConsumerElement extends AbstractNlpElement {
   private CasProcessorFolder mParent;
@@ -52,8 +52,8 @@ public class ConsumerElement extends AbstractNlpElement {
   }
 
   /**
-   * Retrives the {@link CasConsumerConfiguration}.
-   * 
+   * Retrieves the {@link CasConsumerConfiguration}.
+   *
    * @return the configuration
    */
   public CasConsumerConfiguration getConsumerConfiguration() {
@@ -62,7 +62,7 @@ public class ConsumerElement extends AbstractNlpElement {
 
   /**
    * @return the configuration
-   * 
+   *
    * @throws CoreException
    */
   private CasConsumerConfiguration createConsumerConfiguration() throws CoreException {
@@ -77,13 +77,15 @@ public class ConsumerElement extends AbstractNlpElement {
     };
     ((NlpModel) getNlpProject().getParent()).asyncExcuteQueue(clearMarkers);
 
-    XMLInputSource inCasConsumer = new XMLInputSource(mConsumerResource.getContents(), new File(""));
+    String dataPath = ((IFolder) mParent.getResource()).getLocation().toOSString();
+    XMLInputSource inCasConsumer = new XMLInputSource(mConsumerResource.getContents(),
+            new File(dataPath));
 
     XMLParser xmlParser = UIMAFramework.getXMLParser();
     CasConsumerDescription casConsumerDesciptor;
 
     try {
-    	// TODO: this throws a class cast eception if the fiel has an other descripter, check it
+    	// TODO: this throws a class cast exception if the file has an other descriptor, check it
       casConsumerDesciptor = (CasConsumerDescription) xmlParser.parse(inCasConsumer);
     } catch (final InvalidXMLException e) {
       Runnable createMarker = new Runnable() {
@@ -123,7 +125,7 @@ public class ConsumerElement extends AbstractNlpElement {
 
   @Override
   void addResource(IResource resource) {
-    // just do nothing, no childs
+    // just do nothing, no children
   }
 
   @Override
@@ -133,32 +135,32 @@ public class ConsumerElement extends AbstractNlpElement {
 
   @Override
   void removeResource(IResource resource) {
-    // just do nothing, no childs
+    // just do nothing, no children
   }
 
   /**
-   * Retrives the name.
+   * Retrieves the name.
    */
   public String getName() {
     return getResource().getName();
   }
 
   /**
-   * Retrives the parent {@link NlpProject} instance.
+   * Retrieves the parent {@link NlpProject} instance.
    */
   public NlpProject getNlpProject() {
     return getParent().getNlpProject();
   }
 
   /**
-   * Retrives the direct parent.
+   * Retrieves the direct parent.
    */
   public INlpElement getParent() {
     return mParent;
   }
 
   /**
-   * Retrvives the {@link IResource} object belonging to the current instance.
+   * Retrieves the {@link IResource} object belonging to the current instance.
    */
   public IResource getResource() {
     return mConsumerResource;

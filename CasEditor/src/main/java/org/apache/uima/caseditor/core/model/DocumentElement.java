@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -48,24 +48,24 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
    * The working copy of the document. This instance is
    * shared by everyone who wants to edit the document.
    */
-  private SoftReference<DocumentUimaImpl> mWorkingCopy = 
+  private SoftReference<DocumentUimaImpl> mWorkingCopy =
 	  new SoftReference<DocumentUimaImpl>(null);
 
   private boolean isSavingWorkingCopy;
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param corpus
    * @param documentFile
    */
   DocumentElement(CorpusElement corpus, IFile documentFile) {
-	  
+
 	if (corpus == null || documentFile == null) {
 	  throw new IllegalArgumentException("Parameters must not be null!");
-		  
+
 	}
-	
+
     mParent = corpus;
     mDocumentFile = documentFile;
   }
@@ -94,48 +94,48 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   /**
    * Retrieves the working copy.
-   * 
+   *
    * @return the working copy
    * @throws CoreException
    */
   public IDocument getDocument() throws CoreException {
-   
+
     NlpProject project = (NlpProject) mParent.getParent();
-    
+
     if (project.getTypesystemElement() == null) {
       mWorkingCopy = null;
-      throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID, 
+      throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID,
               0, "Typesystem not available!", null));
     }
-    
+
 	  DocumentUimaImpl document = mWorkingCopy.get();
-	  
+
     if (document == null) {
-    	
+
     	InputStream in = mDocumentFile.getContents();
-    	
+
     	document  = new DocumentUimaImpl(project, this, in);
-    	
+
     	mWorkingCopy = new SoftReference<DocumentUimaImpl>(document);
     }
-    
+
     return document;
   }
-  
+
   /**
    * Writes the document element to the file system.
-   * 
+   *
    * TODO: move it to the document, maybe the document gets not
-   * saved if the caller lost the reference to it, befor this call
-   * 
+   * saved if the caller lost the reference to it, before this call
+   *
    * @throws CoreException
    */
   public void saveDocument() throws CoreException {
-    
+
     isSavingWorkingCopy = true;
-    
+
     ByteArrayOutputStream outStream = new ByteArrayOutputStream(40000);
-    
+
     ((DocumentUimaImpl) getDocument()).serialize(outStream);
 
     InputStream stream = new ByteArrayInputStream(outStream.toByteArray());
@@ -145,7 +145,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   /**
    * Retrieves the corresponding {@link NlpProject} instance.
-   * 
+   *
    * @return the {@link NlpProject} instance
    */
   public NlpProject getNlpProject() {
@@ -162,9 +162,9 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) {
-	// TODO: What should happen if the document is changed externally 
+	// TODO: What should happen if the document is changed externally
 	// e.g. with a text editor ?
-    
+
     // if saveDocument() was called, we receive a changedResource event
     // in this case do not remove a reference to the working copy, cause its in sync
     if (!isSavingWorkingCopy) {
@@ -172,7 +172,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
     } else {
       isSavingWorkingCopy = false;
     }
-    
+
   }
 
   /**
