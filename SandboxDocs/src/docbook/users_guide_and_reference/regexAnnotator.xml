@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY imgroot "../images/users_guide_and_reference/regexAnnotator/" >
+]>
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+-->
+<chapter id="sandbox.regexAnnotator">
+	<title>Regular Expression Annotator</title>
+
+	<para>
+		The Regular Expression Annotator (RegexAnnotator) is an Apache
+		UIMA analysis engine that detects entities based on regular
+		expressions or concepts. A regular expression describe precise
+		patterns that are looked for in the document text. A concepts in
+		the current sense is a set of regular expressions that work
+		together to detect a more complex entity. The defined regular
+		expressions or concepts are used to detect entities like
+		numbers, email addresses or URLs and create annotations for
+		them.
+	</para>
+
+	<section id="sandbox.regexAnnotator.processingOverview">
+		<title>Processing Overview</title>
+		<para>
+			To detect entities the RegexAnnotator must be configured
+			using an external XML file. We call this file concepts file
+			since it contains the concepts and regular expression rules
+			that the annotator use to detect the entities. This
+			configuration contains additional to the rules and concepts
+			also the annotations that should be created if an entity was
+			found in the document text. The types and features used to
+			create the annotations must be defined in the UIMA type
+			system.
+		</para>
+		<para>
+			After the configuration is done, the RegexAnnotator is ready
+			to use. During is initialization is reads the concepts file
+			and checks if all rules and concepts are valid and if all
+			annotations types are defined. If no error exists the
+			processing can start. During the processing the rules are
+			processed in the same order as defined in the concepts xml
+			document. The results of a preceding rule can be used for
+			the following one.
+		</para>
+	</section>
+
+	<section id="sandbox.regexAnnotator.conceptsFile">
+		<title>Concepts Configuration File</title>
+		<para>
+			The RegexAnnotator can be configured using two levels of
+			complexity.
+		</para>
+		<para>
+			The RuleSet definition is the simple way to define rules
+			that can consists of a regular expression pattern and of
+			annotations that should be created if the rules match an
+			entity.
+		</para>
+		<para>
+			The Concept definition is the more complex way to define
+			rules that consists of more than one regular expression rule
+			that are combined together.
+		</para>
+		<para>
+			The syntax in both definitions is the same, so you don't
+			need to learn two configuration possibilities it is just to
+			have an easier way to configure the annotator for simpler
+			entities. Furthermore it is possible to extend the RuleSet
+			definition with more and more features so that it becomes a
+			real Concept definition.
+		</para>
+
+		<section id="sandbox.regexAnnotator.conceptsFile.rules">
+			<title>RuleSet definition</title>
+			<para>The RuleSet definition looks like:</para>
+			<para>
+
+				<programlisting><![CDATA[
+<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
+
+  <concept name="RuleSetDefinitionExample">
+    <rules>
+      <rule regEx="PatternExample" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+    </rules>
+    <createAnnotations>
+      <annotation id="MyAnnotation" type="org.apache.uima.MyAnnotation">
+        <begin group="0"/>
+        <end group="0"/>
+      </annotation>
+    </createAnnotations>
+  </concept>
+
+</conceptSet>
+]]></programlisting>
+			</para>
+			<para>
+				The RuleSet definition above defines are simple concept
+				with the name "RuleSetDefinitionExample". The rule use
+				the "PatternExample" pattern that is matched on the
+				covered text of the uima.tcas.DocumentAnnotation. As
+				match strategy, "matchAll" is used that means that all
+				matches for the pattern are used to create the
+				annotations defined in the
+				<code>&lt;createAnnotations></code>
+				element. So for each match a
+				org.apache.uima.MyAnnotation annotation is created that
+				covers the match in the document text.
+			</para>
+			<para>
+				For more advanced configuration possibilities, please
+				refer to the advanced configuration below.
+			</para>
+		</section>
+
+		<section id="sandbox.regexAnnotator.conceptsFile.concepts">
+			<title>Concept definition</title>
+			<para>The concept definition looks like:</para>
+			<para>
+			
+			<programlisting><![CDATA[
+<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
+
+  <concept name="complexConceptExample">
+    <rules>
+      <rule ruleId="Id1" regEx="PatternExample1" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
+      <rule ruleId="Id2" regEx="PatternExample2" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.7"/>
+      <rule ruleId="Id3" regEx="PatternExample3" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.3"/>
+    </rules>
+    <createAnnotations>	
+      <annotation id="MyAnnotation1" type="org.apache.uima.MyAnnotation1">
+        <begin group="0"/>
+        <end group="0"/>
+        <setFeature name="confidenceValue" type="Confidence"/>
+        <setFeature name="ruleId" type="RuleId"/>
+      </annotation>
+    <createAnnotations>
+  </concept>
+
+</conceptSet>
+]]></programlisting>
+				
+			</para>
+			<para>
+				As you can see the concept definition is a more complex
+				RuleSet definition. The main differences are the ruleID
+				and confidence features for a rule. If these features
+				are specified, the feature values can be used as
+				annotation feature values when the
+				org.apache.uima.MyAnnotation1 is created. But lets see
+				how these concept is processed.
+			</para>
+			<para>
+				The concept processing depends on a parameter setting
+				for the RegexAnnotator. The parameter to control the
+				processing is called
+				<code>ProcessAllConceptRules</code>
+				. By default this parameter is set to
+				<code>false</code>
+				what means that the concept processing starts with the
+				first rule. If this rule found any match that triggers
+				to create an annotation the concept processing stops and
+				the other rules are not used. If the first rule doesn't
+				find a match, the next rule is used. This strategy is
+				used until a annotation is found or all rules are
+				processed. If the parameter
+				<code>ProcessAllConceptRules</code>
+				is set to
+				<code>true</code>
+				all rules are processed independent of the matches of a
+				rule.
+			</para>
+			<para>
+				If for a rule an annotations is created that has a
+				<code>&lt;setFeature></code>
+				definition of type
+				<code>Confidence</code>
+				or
+				<code>RuleId</code>
+				the current ruleId and confidence value of the rule is
+				added as feature value to the created annotations. Doing
+				this helps you after the text is processed to make
+				reliable statements about the confidence of your
+				annotation.
+			</para>
+			<note>
+				<para>
+					The features for
+					<code>Confidence</code>
+					and
+					<code>RuleId</code>
+					must be defined by yourself in the UIMA type system.
+					So you can also assign the confidence or ruleId to
+					any other feature you have defined in the UIMA type
+					system. Confidence features have to be of type
+					uima.cas.Float and RuleId features have to be of
+					type uima.cas.String.
+				</para>
+			</note>
+
+		</section>
+
+		<section
+			id="sandbox.regexAnnotator.conceptsFile.rulesDefinition">
+			<title>Rule Definition</title>
+			<para>
+				This paragraph shows in details how a rule is defined
+				and what are the advanced configuration possibilities
+				for the rule processing.
+			</para>
+			<para>
+				The listing below shows a complex rule definition with
+				all the possible features and details. Please refer to
+				the sub sections for some details.
+			</para>
+			<para>
+				 
+					<programlisting><![CDATA[
+<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
+
+  <matchTypeFilter>
+    <feature name="language">en</feature>
+  </matchTypeFilter>
+
+  <updateMatchTypeAnnotation>
+    <setFeature name="language" type="String">$0</setFeature>
+  </updateMatchTypeAnnotation>	
+
+  <ruleExceptions>	
+    <exception matchType="uima.tcas.DocumentAnnotation">Exception</exception>
+  </ruleExceptions>
+
+</rule>
+]]></programlisting>
+				
+			</para>
+			<section
+				id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.rule">
+				<title>Rule Definition Details</title>
+				<para>
+					The
+					<code>&lt;rule></code>
+					definition has three mandatory features, these are:
+				</para>
+				<para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								<code>regEx</code>
+								- The regular expression pattern that
+								should be used for this rule using the
+								Java regular expression syntax.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<code>matchStrategy</code>
+								- The match strategy that should be used
+								for this rule. Possible values are
+								<code>matchAll</code>
+								to get all matches,
+								<code>matchFirst</code>
+								to get the first match and
+								<code>matchComplete</code>
+								to get only matches if the whole input
+								text matches the regEx pattern.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<code>matchType</code>
+								- As match type the annotation type have
+								to be specified where the covered text
+								should be used as input text for the
+								regEx pattern.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					Additionally the
+					<code>&lt;rule></code>
+					definition also has some optional features that can
+					be set, these are:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>ruleId</code>
+							- Specifies an unique ID for the rule. This
+							ID value can later be used to add it as
+							value to an annotation feature (see
+							<code>&lt;setFeature></code>
+							).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>confidence</code>
+							- Specifies the confidence value of this
+							rule. Maybe you have more than one rule and
+							use different patterns to describe the same
+							entity, so you can classify the rules with
+							a confidence value. This confidence value
+							can later be used to add it as value to an
+							annotation feature (see
+							<code>&lt;setFeature></code>
+							).
+						</para>
+					</listitem>
+				</itemizedlist>
+			</section>
+			<section
+				id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.filter">
+				<title>Match Type Filter</title>
+				<para>
+					 
+						<programlisting><![CDATA[
+<matchTypeFilter>
+  <feature name="language">en</feature>
+</matchTypeFilter>
+]]></programlisting>
+					
+
+				</para>
+				<para>
+					The match type filter construct can be used to
+					filter the match type annotations before they are
+					used for the evaluation. The
+					<code>&lt;matchTypeFilter></code>
+					element can contain one or more
+					<code>&lt;feature></code>
+					elements that contains filter information.
+				</para>
+				<para>
+					The name of the UIMA feature is specified using the
+					<code>name</code>
+					feature of the
+					<code>&lt;feature></code>
+					element. The content of the
+					<code>&lt;feature></code>
+					element contains the regular expression pattern that
+					have to match the UIMA feature value. In the example
+					above the match type annotation has a feature
+					"language" that must have the content "en". If that
+					is true, the annotation is pass the filter
+					condition.
+				</para>
+			</section>
+			<section
+				id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.update">
+				<title>Update Match Type Annotation</title>
+				<para>
+					
+					<programlisting><![CDATA[
+<updateMatchTypeAnnotation>
+  <setFeature name="language" type="String">$0</setFeature>
+</updateMatchTypeAnnotation>
+]]></programlisting>
+					
+
+				</para>
+				<para>
+					With the
+					<code>&lt;updateMatchTypeAnnotation></code>
+					construct you can configure to update a UIMA feature
+					value at the match type annotation if a rule match
+					was found. The
+					<code>&lt;updateMatchTypeAnnotation></code>
+					can have one or more
+					<code>&lt;setFeature></code>
+					elements.
+				</para>
+				<para>
+					The
+					<code>&lt;setFeature></code>
+					element has the two mandatory features, these are:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>name</code>
+							- Specifies the UIMA feature name that
+							should be set at the match type annotation.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>type</code>
+							- Specifies the UIMA feature type that is
+							defined in the UIMA type system. Possible
+							values are
+							<code>String</code>
+							,
+							<code>Integer</code>
+							and
+							<code>Float</code>
+						</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					The content of the
+					<code>&lt;setFeature></code>
+					element contains the value that should be set. This
+					can either be a literal value or it can be a regular
+					expression matching group as shown in the example
+					above. A combination of matching groups and literals
+					is also possible.
+				</para>
+			</section>
+			<section
+				id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.exception">
+				<title>Rule exception</title>
+				<para>
+					 
+					<programlisting><![CDATA[
+<ruleExceptions>	
+  <exception matchType="uima.tcas.DocumentAnnotation">ExceptionPattern</exception>
+</ruleExceptions>
+]]></programlisting>
+					
+
+				</para>
+				<para>
+					With the
+					<code>&lt;ruleExceptions></code>
+					construct you can configure exceptions to prevent matches for the current rule. 
+					An exception is something
+					similar to a filter, but on the higher level. For
+					example take the scenario where you have several token annotations that
+					are all covered by a sentence annotation. You have written a rule that can detect
+					car brands. The text you analyze has the sentence "Henry Ford was born 1863". 
+					When analyzing the text you will get a car brand annotation since "Ford" is
+					a car brand. But is this behavior correct? The work around that issue
+					you can create an exception that looks like
+					 <programlisting><![CDATA[
+<ruleExceptions>	
+  <exception matchType="uima.SentenceAnnotation">Henry</exception>
+</ruleExceptions>
+]]></programlisting>
+					and add it to your car brand rule. After adding this, car brand annotations
+					are only created if the sentence annotation that covers the token annotation
+					does not contain the word "Henry". 					
+				</para>
+				<para>
+					The
+					<code>&lt;ruleExceptions></code>
+					element can have one or more exceptions specified with the 
+					<code>&lt;exception></code>
+					elements.
+				</para>
+				<para>
+					The
+					<code>&lt;exception></code>
+					element has one mandatory feature called
+					<code>matchType</code>. The <code>matchType</code> feature
+					specifies the annotation type the exception is based on. 
+					The exception annotation instance that is used during the runtime is evaluated for each
+					match type annotation that is used to match a rule. As
+					exception annotation instance always the covering annotation
+					of the match type annotation is searched. 
+					If no covering annotation was found the exception is not evaluated.
+				</para>
+				<para>
+					The content of the
+					<code>&lt;exception></code>
+					element specify the regular expression that is used to evaluate the exception.
+				</para>
+				<para>
+					If the exception match is true, the
+					current match type annotation is filtered out and is
+					not used to create any matches and annotations.
+				</para>
+			</section>
+		</section>
+		<section id="sandbox.regexAnnotator.conceptsFile.annotationDefinition">
+				<title>Annotation Definition</title>
+				<para>
+				  This paragraph explain with all the details how to create annotations if a rule has matched.
+				  The listing below shows the definition of an annotation with all possible settings.
+				</para>
+				<para>
+				<programlisting><![CDATA[
+<annotation id="testannot" type="org.apache.uima.TestAnnot">
+	<begin group="0" location="start"/>
+	<end group="0" location="end"/>
+	<setFeature name="testFeature1" type="String">$0</setFeature>
+	<setFeature name="testFeature2" type="Integer">$1</setFeature>
+	<setFeature name="testFeature3" type="Float">$2</setFeature>		
+	<setFeature name="testFeature4" type="Reference">testannot1</setFeature>
+	<setFeature name="confidenceValue" type="Confidence"/>
+	<setFeature name="ruleId" type="RuleId"/>
+</annotation>
+]]></programlisting>
+				</para>
+				<section id="sandbox.regexAnnotator.conceptsFile.annotationDefinition.details">
+				<title>Annotation Definition Details</title>
+				<para>
+				  The <code>&lt;annotation></code> definition has two mandatory features, these are:
+				</para>
+				<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>id</code>
+							- Specifies the annotation id for this annotation. The id must be unique within the
+							concepts file.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>type</code>
+							- Specifies the UIMA annotation type that should be used if a match was found
+							to create the annotation. The used type have to be specified in the UIMA type system.
+						</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+				<para>
+				  The mandatory sub elements of <code>&lt;annotation></code> are:
+				</para>
+				<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>&lt;begin></code>
+							- Specifies the begin position of the annotation.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>&lt;end></code>
+							- Specifies the end position of the annotation.
+						</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+				<para>
+				  The optional sub elements of <code>&lt;annotation></code> are:
+				</para>
+				<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code><code>&lt;setFeature></code></code>
+							- set a UIMA feature at the created annotation.
+						</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+				</section>
+				<section id="sandbox.regexAnnotator.conceptsFile.annotationDefinition.boundaries">
+				<title>Annotation Boundaries</title>
+				<para>
+				  The <code>&lt;annotation></code> element defines the annotations boundaries using the
+				  sub elements <code>&lt;begin></code> and <code>&lt;end></code>. The start position of
+				  an annotation is defined using the <code>&lt;begin></code> element. The end position using
+				  the <code>&lt;end></code> element. Both elements have the same features as shown below:
+				</para>
+				<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>group</code>
+							- identifies a capturing group within the regular expression pattern of the 
+							current rule. It can be assigned a single number from 0 to 9, where 0 denotes 
+							the whole match, 1 the first match group, 2 the second, and so on.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>location</code>
+							- indicates a position inside the match group, which can either be the position 
+							of the left parenthesis in case of a value “start”, or the right parenthesis in 
+							case of a value “end”. The <code>location</code> feature is optional. By default
+							the <code>&lt;begin></code> element set <code>location="start"</code> and the 
+							<code>&lt;end></code> element <code>location="end"</code>.
+						</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+				</section>
+				<section id="sandbox.regexAnnotator.conceptsFile.annotationDefinition.features">
+				<title>Annotation Features</title>
+				<para>
+				  With the <code>&lt;setFeature></code> element of <code>&lt;annotation></code> it is 
+				  possible to set UIMA features at the created annotation. The mandatory features
+				  that must be set are: 
+				</para>
+				<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>name</code>
+							- specifies the UIMA feature name that should be set.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>type</code>
+							- specifies the type of the UIMA feature. For a list of all
+							possible type values please refer to the feature types section below.
+						</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+				<para>
+				  The content of the <code>&lt;setFeature></code> element specifies the value of the
+				  UIMA feature that is set. As value a literal, a capturing group or a combination of
+				  both can be specified.
+				</para>
+				<section id="sandbox.regexAnnotator.conceptsFile.annotationDefinition.featureTypes">
+				<title>Features types</title>
+				<para>
+				  The <code>&lt;setFeature></code> element has a feature called <code>type</code> 
+				  to specify the UIMA feature type. The possible feature types are listed below: 
+				</para>
+				<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>String</code>
+							- for <code>uima.cas.String</code> based UIMA features.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>Integer</code>
+							- for <code>uima.cas.Integer</code> based UIMA features.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>Float</code>
+							- for <code>uima.cas.Float</code> based UIMA features.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>Reference</code>
+							- to link a UIMA feature to another annotation. In this case the
+							UIMA feature type have to be the same as the referred annotation type.
+							To reference another annotation the <code>&lt;setFeature></code>
+							content have to contain the annotation id of the referred annotation.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>Confidence</code>
+							- add if available the value of the <code>confidence</code> feature defined
+							at the <code>&lt;rule></code> element to this feature. The UIMA feature have to
+							be of type <code>uima.cas.Float</code>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>RuleId</code>
+							- add if available the value of the <code>ruleId</code> feature defined
+							at the <code>&lt;rule></code> element to this feature. The UIMA feature have to
+							be of type <code>uima.cas.String</code>.
+						</para>
+					</listitem>					
+				</itemizedlist>
+				</para>
+
+				</section>
+				</section>
+				
+		</section>
+	</section>
+
+</chapter>
