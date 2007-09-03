@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -47,7 +47,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
    * Resource bundle.
    */
   private ResourceBundle mResourceBundle;
-  
+
   private static NlpModel sNLPModel;
 
   /**
@@ -61,7 +61,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
 
   /**
    * This method is called upon plug-in activation
-   * 
+   *
    * @param context
    * @throws Exception
    */
@@ -72,7 +72,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
 
   /**
    * This method is called when the plug-in is stopped.
-   * 
+   *
    * @param context
    * @throws Exception
    */
@@ -86,7 +86,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
 
   /**
    * Returns the shared instance.
-   * 
+   *
    * @return the TaePlugin
    */
   public static CasEditorPlugin getDefault() {
@@ -95,7 +95,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
 
   /**
    * Returns the string from the plugin's resource bundle, or 'key' if not found.
-   * 
+   *
    * @param key
    * @return resource string
    */
@@ -111,7 +111,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
 
   /**
    * Returns the plugin's resource bundle.
-   * 
+   *
    * @return the ResourceBbundle or null if missing
    */
   public ResourceBundle getResourceBundle() {
@@ -127,8 +127,8 @@ public class CasEditorPlugin extends AbstractUIPlugin {
   }
 
   /**
-   * Retrives the nlp model.
-   * 
+   * Retrieves the nlp model.
+   *
    * @return the nlp model
    */
   public static NlpModel getNlpModel() {
@@ -143,26 +143,26 @@ public class CasEditorPlugin extends AbstractUIPlugin {
 
     return sNLPModel;
   }
-  
+
   /**
    * Log the throwable.
-   * 
+   *
    * @param t
    */
   public static void log(Throwable t) {
     getDefault().getLog().log(new Status(IStatus.ERROR, ID, IStatus.OK, t.getMessage(), t));
   }
-  
+
   /**
-   * Retrives an image.
-   * 
+   * Retrieves an image.
+   *
    * @param image
    * @return the requested image if not available null
    */
   public static ImageDescriptor getTaeImageDescriptor(Images image) {
     return imageDescriptorFromPlugin(ID, ICONS_PATH + image.getPath());
   }
-  
+
   /**
    * Destroy the nlp model, only for testing.
    */

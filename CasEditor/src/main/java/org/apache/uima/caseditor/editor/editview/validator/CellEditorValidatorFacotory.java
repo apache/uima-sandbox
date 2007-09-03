@@ -39,7 +39,7 @@ public class CellEditorValidatorFacotory {
   }
 
   private CellEditorValidatorFacotory() {
-    // must not be instanciated
+    // must not be instantiated
   }
 
   /**

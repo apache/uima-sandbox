@@ -20,9 +20,12 @@
 package org.apache.uima.caseditor.editor.editview;
 
 import java.util.Iterator;
+import java.util.List;
 
+import org.apache.uima.cas.ArrayFS;
 import org.apache.uima.cas.ByteArrayFS;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.CommonArrayFS;
 import org.apache.uima.cas.DoubleArrayFS;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
@@ -104,7 +107,20 @@ final class EditViewPage extends Page implements ISelectionListener {
         return value.getFeature().getRange().isPrimitive();
       }
       else if (element instanceof ArrayValue) {
-        return true;
+
+        ArrayValue value = (ArrayValue) element;
+
+        FeatureStructure arrayFS = value.getFeatureStructure();
+
+        if (arrayFS instanceof ArrayFS) {
+          return false;
+        }
+        else if (arrayFS instanceof CommonArrayFS) {
+          return true;
+        }
+        else {
+          throw new TaeError("Unkown array type");
+        }
       }
       else {
         throw new TaeError("Unkown element type!");
@@ -274,58 +290,92 @@ final class EditViewPage extends Page implements ISelectionListener {
     public void run() {
       IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-      FeatureValue featureValue = (FeatureValue) selection.getFirstElement();
+      if (selection.getFirstElement() instanceof FeatureValue) {
+        FeatureValue featureValue = (FeatureValue) selection.getFirstElement();
 
-      FeatureStructure newValue;
+        FeatureStructure newValue;
 
-      if (!featureValue.getFeature().getRange().isArray()) {
-        newValue = document.getCAS().createFS(featureValue.getFeature().getRange());
-        document.addFeatureStructure(newValue);
-      }
-      else {
-        CreateArrayDialog createArrayDialog = new CreateArrayDialog(
-                Display.getCurrent().getActiveShell());
+        Type fsSuperType = featureValue.getFeature().getRange();
 
-        int returnCode = createArrayDialog.open();
+        if (!fsSuperType.isArray()) {
+          List subTypes =
+              document.getCAS().getTypeSystem().getProperlySubsumedTypes(fsSuperType);
 
-        if (returnCode == IDialogConstants.OK_ID) {
-          // get size from array dialog
-          int arraySize = createArrayDialog.getArraySize();
+          Type typeToCreate;
 
-          Type arrayType = featureValue.getFeature().getRange();
-
-          if (arrayType.getName().equals(CAS.TYPE_NAME_BYTE_ARRAY)) {
-            newValue = document.getCAS().createByteArrayFS(arraySize);
-          }
-          else if (arrayType.getName().equals(CAS.TYPE_NAME_SHORT_ARRAY)) {
-            newValue = document.getCAS().createShortArrayFS(arraySize);
-          }
-          else if (arrayType.getName().equals(CAS.TYPE_NAME_INTEGER_ARRAY)) {
-            newValue = document.getCAS().createIntArrayFS(arraySize);
-          }
-          else if (arrayType.getName().equals(CAS.TYPE_NAME_LONG_ARRAY)) {
-            newValue = document.getCAS().createLongArrayFS(arraySize);
-          }
-          else if (arrayType.getName().equals(CAS.TYPE_NAME_FLOAT_ARRAY)) {
-            newValue = document.getCAS().createFloatArrayFS(arraySize);
-          }
-          else if (arrayType.getName().equals(CAS.TYPE_NAME_DOUBLE_ARRAY)) {
-            newValue = document.getCAS().createDoubleArrayFS(arraySize);
-          }
-          else if (arrayType.getName().equals(CAS.TYPE_NAME_FS_ARRAY)) {
-            newValue = document.getCAS().createArrayFS(arraySize);
+          if (subTypes.size() == 0) {
+            typeToCreate = fsSuperType;
           }
           else {
-            throw new TaeError("Unkown array type!");
+             CreateFeatureStructureDialog createFsDialog =
+                 new CreateFeatureStructureDialog(Display.getCurrent()
+                         .getActiveShell(), fsSuperType, document.getCAS().getTypeSystem());
+
+
+             int returnCode = createFsDialog.open();
+
+             if (returnCode == IDialogConstants.OK_ID) {
+               typeToCreate = createFsDialog.getType();
+             }
+             else {
+               return;
+             }
+          }
+
+          newValue = document.getCAS().createFS(typeToCreate);
+
+          document.addFeatureStructure(newValue);
+        } else {
+          Type arrayType = featureValue.getFeature().getRange();
+
+          CreateFeatureStructureDialog createArrayDialog = new CreateFeatureStructureDialog(Display.getCurrent()
+                  .getActiveShell(), arrayType, document.getCAS().getTypeSystem());
+
+          int returnCode = createArrayDialog.open();
+
+          if (returnCode == IDialogConstants.OK_ID) {
+            // get size from array dialog
+            int arraySize = createArrayDialog.getArraySize();
+
+            FeatureStructure arrayFS;
+
+            if (arrayType.getName().equals(CAS.TYPE_NAME_BYTE_ARRAY)) {
+              arrayFS = document.getCAS().createByteArrayFS(arraySize);
+            } else if (arrayType.getName().equals(CAS.TYPE_NAME_SHORT_ARRAY)) {
+              arrayFS = document.getCAS().createShortArrayFS(arraySize);
+            } else if (arrayType.getName().equals(CAS.TYPE_NAME_INTEGER_ARRAY)) {
+              arrayFS = document.getCAS().createIntArrayFS(arraySize);
+            } else if (arrayType.getName().equals(CAS.TYPE_NAME_LONG_ARRAY)) {
+              arrayFS = document.getCAS().createLongArrayFS(arraySize);
+            } else if (arrayType.getName().equals(CAS.TYPE_NAME_FLOAT_ARRAY)) {
+              arrayFS = document.getCAS().createFloatArrayFS(arraySize);
+            } else if (arrayType.getName().equals(CAS.TYPE_NAME_DOUBLE_ARRAY)) {
+              arrayFS = document.getCAS().createDoubleArrayFS(arraySize);
+            } else if (arrayType.getName().equals(CAS.TYPE_NAME_FS_ARRAY)) {
+              arrayFS = document.getCAS().createArrayFS(arraySize);
+            } else {
+              throw new TaeError("Unkown array type!");
+            }
+
+            newValue = arrayFS;
+          } else {
+            return;
           }
         }
-        else {
-          return;
-        }
+
+        featureValue.getFeatureStructure().setFeatureValue(featureValue.getFeature(), newValue);
+        document.update(featureValue.getFeatureStructure());
+      }
+      else if (selection.getFirstElement() instanceof ArrayValue) {
+        ArrayValue value = (ArrayValue) selection.getFirstElement();
+
+        ArrayFS array = document.getCAS().createArrayFS(2);
+
+        // create a fs of a given type
+
+        array.set(value.slot(), null);
       }
 
-      featureValue.getFeatureStructure().setFeatureValue(featureValue.getFeature(), newValue);
-      document.update(featureValue.getFeatureStructure());
     }
 
     @Override
@@ -339,6 +389,17 @@ final class EditViewPage extends Page implements ISelectionListener {
 
           result = !featureValue.getFeature().getRange().isPrimitive() &&
               featureValue.getFeatureStructure().getFeatureValue(featureValue.getFeature()) == null;
+        }
+        else if (selection.getFirstElement() instanceof ArrayValue) {
+          ArrayValue value = (ArrayValue) selection.getFirstElement();
+
+          if (value.getFeatureStructure() instanceof ArrayFS) {
+            ArrayFS array = (ArrayFS) value.getFeatureStructure();
+
+            if (array.get(value.slot()) == null) {
+              result = true;
+            }
+          }
         }
       }
 
@@ -358,7 +419,10 @@ final class EditViewPage extends Page implements ISelectionListener {
 
   private PinAction pinAction;
 
-  EditViewPage(AnnotationEditor editor) {
+  private final EditView editView;
+
+  EditViewPage(EditView editView, AnnotationEditor editor) {
+    this.editView = editView;
     document = editor.getDocument();
   }
 
@@ -387,7 +451,14 @@ final class EditViewPage extends Page implements ISelectionListener {
     valueColumn.setEditingSupport(new ValueEditingSupport(viewer)
     );
 
-    viewer.setContentProvider(new FeatureStructureContentProvider(document));
+
+    FeatureStructureContentProvider contentProvider =
+        new FeatureStructureContentProvider(document);
+
+    viewer.setContentProvider(contentProvider);
+
+    viewer.setInput(null);
+    document.addChangeListener(contentProvider);
 
     Transfer[] typesDropSupport = new Transfer[] { FeatureStructureTransfer.getInstance() };
 
@@ -551,20 +622,15 @@ final class EditViewPage extends Page implements ISelectionListener {
       if (fsSelection.size() == 1 && !pinAction.isChecked()) {
 
         // filter out selection which are cause by this view itself
-        if (viewer.getTree().getSelectionCount() == 1) {
-          TreeItem item = viewer.getTree().getSelection()[0];
-
-          if (item.getData() instanceof FeatureValue) {
-            FeatureValue featureValue = (FeatureValue) item.getData();
-
-            if (!featureValue.getFeature().getRange().isPrimitive()) {
-              return; // do not update
-            }
-          }
+        if (editView != part) {
+          viewer.setInput(fsSelection.toList().get(0));
         }
-
-        viewer.setInput(fsSelection.toList().get(0));
       }
     }
+  }
+
+  @Override
+  public void dispose() {
+    getSite().getPage().removeSelectionListener(this);
   }
 }

@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.uima.cas.ArrayFS;
 import org.apache.uima.cas.CommonArrayFS;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
@@ -51,46 +52,62 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
 
   public Object[] getElements(Object inputElement) {
 
+
+
     if (inputElement != null) {
+
       FeatureStructure featureStructure = (FeatureStructure) inputElement;
 
       Type type = featureStructure.getType();
 
-      List featureTypes = type.getFeatures();
+      if (!type.isArray()) {
+        List featureTypes = type.getFeatures();
 
-      Collection<FeatureValue> featureValues = new LinkedList<FeatureValue>();
+        Collection<FeatureValue> featureValues = new LinkedList<FeatureValue>();
 
-      Iterator featuresItertor = featureTypes.iterator();
+        Iterator featuresItertor = featureTypes.iterator();
 
-      while (featuresItertor.hasNext()) {
-        Feature feature = (Feature) featuresItertor.next();
+        while (featuresItertor.hasNext()) {
+          Feature feature = (Feature) featuresItertor.next();
 
-        featureValues.add(new FeatureValue(mDocument, featureStructure, feature));
+          featureValues.add(new FeatureValue(mDocument, featureStructure, feature));
+        }
+
+        return featureValues.toArray();
+      }
+      else {
+        int size;
+
+        if (featureStructure instanceof CommonArrayFS) {
+          CommonArrayFS array = (CommonArrayFS) featureStructure;
+          size = array.size();
+        } else if (featureStructure instanceof ArrayFS) {
+          ArrayFS array = (ArrayFS) featureStructure;
+          size = array.size();
+        } else {
+          throw new TaeError("Unkown array type!");
+        }
+
+        ArrayValue arrayValues[] = new ArrayValue[size];
+
+        for (int i = 0; i < size; i++) {
+          arrayValues[i] = new ArrayValue(featureStructure, i);
+        }
+
+        return arrayValues;
       }
 
-      return featureValues.toArray();
     } else {
       return new Object[0];
     }
   }
 
   public void dispose() {
+    mDocument.removeChangeListener(this);
   }
 
   public void inputChanged(final Viewer viewer, Object oldInput, Object newInput) {
-
     this.viewer = viewer;
-
-    if (oldInput != null) {
-      mDocument.removeChangeListener(this);
-    }
-
-    if (newInput == null) {
-      // this means empty input
-      return;
-    }
-
-    mDocument.addChangeListener(this);
 
     Display.getDefault().syncExec(new Runnable() {
       public void run() {
@@ -103,6 +120,7 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
   }
 
   public void changed() {
+
     // TODO: check if fs still exists
 
     Display.getDefault().syncExec(new Runnable() {
@@ -114,7 +132,13 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
   }
 
   public void removed(Collection<FeatureStructure> deletedFeatureStructure) {
-    // TODO: set viewer to null if current fs was deleted
+    for(FeatureStructure fs : deletedFeatureStructure) {
+      if (viewer.getInput() == fs) {
+        viewer.setInput(null);
+        break;
+      }
+    }
+
   }
 
   public void updated(Collection<FeatureStructure> featureStructure) {
@@ -128,29 +152,26 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
 
   public Object[] getChildren(Object parentElement) {
 
-    FeatureValue value = (FeatureValue) parentElement;
+    if (parentElement instanceof FeatureValue) {
+      FeatureValue value = (FeatureValue) parentElement;
 
-    if (!value.getFeature().getRange().isArray()) {
-      FeatureStructure childStructure = (FeatureStructure) value.getValue();
-      return getElements(childStructure);
+      if (!value.getFeature().getRange().isArray()) {
+        FeatureStructure childStructure = (FeatureStructure) value.getValue();
+        return getElements(childStructure);
+      } else {
+        FeatureStructure arrayFS = value.getFeatureStructure().getFeatureValue(value.getFeature());
+
+        return getElements(arrayFS);
+      }
+    } else if (parentElement instanceof ArrayValue) {
+      ArrayValue value = (ArrayValue) parentElement;
+
+      ArrayFS array = (ArrayFS) value.getFeatureStructure();
+
+      return getElements(array.get(value.slot()));
     }
     else {
-      FeatureStructure arrayFS = value.getFeatureStructure().getFeatureValue(value.getFeature());
-
-      CommonArrayFS array = (CommonArrayFS) arrayFS;
-
-      // TODO: is is a bug in eclipse ??
-      if (arrayFS == null) {
-        return new Object[0];
-      }
-
-      ArrayValue arrayValues[] = new ArrayValue[array.size()];
-
-      for (int i = 0; i < array.size(); i++) {
-        arrayValues[i] = new ArrayValue(arrayFS, i);
-      }
-
-      return arrayValues;
+      throw new TaeError("Unexpected element type!");
     }
   }
 
@@ -170,7 +191,24 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
         return value.getValue() != null;
       }
     } else if (element instanceof ArrayValue) {
-      return false;
+
+      ArrayValue value = (ArrayValue) element;
+
+      if (value.getFeatureStructure() instanceof ArrayFS) {
+
+        ArrayFS array = (ArrayFS) value.getFeatureStructure();
+
+        if (array.get(value.slot()) != null) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        // false for primitive arrays
+        return false;
+      }
     }
     else {
       throw new TaeError("Unkown element type");

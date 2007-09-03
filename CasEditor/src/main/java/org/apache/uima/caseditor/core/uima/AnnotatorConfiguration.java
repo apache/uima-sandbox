@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,8 +23,6 @@ import java.net.MalformedURLException;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
-import org.apache.uima.analysis_engine.AnalysisEngineDescription;
-import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
@@ -42,7 +40,7 @@ public class AnnotatorConfiguration {
 
   /**
    * Initializes the instance.
-   * 
+   *
    * @param descriptor
    */
   public AnnotatorConfiguration(ResourceSpecifier descriptor) {
@@ -51,7 +49,7 @@ public class AnnotatorConfiguration {
 
   /**
    * Only text analysis engines are supported.
-   * 
+   *
    * @return the text analysis engine
    * @throws ResourceInitializationException
    */
@@ -72,7 +70,7 @@ public class AnnotatorConfiguration {
 
   /**
    * Sets the base folder
-   * 
+   *
    * @param baseFolder
    */
   public void setBaseFolder(IFolder baseFolder) {

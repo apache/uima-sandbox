@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,10 +19,10 @@
 
 package org.apache.uima.caseditor.editor.fsview;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.eclipse.swt.SWT;
@@ -35,25 +35,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * The <code>TypeSelctionPane</code> notfies a listener about the selected type. Types are
- * retrived formt he type system.
- * 
+ * The <code>TypeSelctionPane</code> notifies a listener about the selected type. Types are
+ * retrieved format the type system.
+ *
  * TODO: Should be a types set to default ?
  */
-final class TypeSelectionPane extends Composite {
-  private static String[] filterTypes = new String[] { CAS.TYPE_NAME_ARRAY_BASE,
-      CAS.TYPE_NAME_BOOLEAN_ARRAY, CAS.TYPE_NAME_BYTE_ARRAY, CAS.TYPE_NAME_SHORT_ARRAY,
-      CAS.TYPE_NAME_LONG_ARRAY, CAS.TYPE_NAME_FLOAT_ARRAY, CAS.TYPE_NAME_DOUBLE_ARRAY,
-      CAS.TYPE_NAME_BYTE, CAS.TYPE_NAME_ANNOTATION_BASE, CAS.TYPE_NAME_SHORT, CAS.TYPE_NAME_LONG,
-      CAS.TYPE_NAME_FLOAT, CAS.TYPE_NAME_DOUBLE, CAS.TYPE_NAME_BOOLEAN,
-      CAS.TYPE_NAME_EMPTY_FLOAT_LIST, CAS.TYPE_NAME_EMPTY_FS_LIST,
-      CAS.TYPE_NAME_EMPTY_INTEGER_LIST, CAS.TYPE_NAME_EMPTY_STRING_LIST, CAS.TYPE_NAME_FLOAT,
-      CAS.TYPE_NAME_FLOAT_ARRAY, CAS.TYPE_NAME_FLOAT_LIST, CAS.TYPE_NAME_FS_ARRAY,
-      CAS.TYPE_NAME_FS_LIST, CAS.TYPE_NAME_INTEGER, CAS.TYPE_NAME_INTEGER_ARRAY,
-      CAS.TYPE_NAME_INTEGER_LIST, CAS.TYPE_NAME_LIST_BASE, CAS.TYPE_NAME_NON_EMPTY_FLOAT_LIST,
-      CAS.TYPE_NAME_NON_EMPTY_FS_LIST, CAS.TYPE_NAME_NON_EMPTY_INTEGER_LIST,
-      CAS.TYPE_NAME_NON_EMPTY_STRING_LIST, CAS.TYPE_NAME_SOFA, CAS.TYPE_NAME_STRING,
-      CAS.TYPE_NAME_STRING_ARRAY, CAS.TYPE_NAME_STRING_LIST, CAS.TYPE_NAME_TOP };
+public final class TypeSelectionPane extends Composite {
 
   private ITypePaneListener mListener;
 
@@ -61,7 +48,12 @@ final class TypeSelectionPane extends Composite {
 
   private Combo mTypeCombo;
 
-  TypeSelectionPane(Composite parent, TypeSystem typeSystem) {
+  public TypeSelectionPane(Composite parent, Type superType, TypeSystem typeSystem) {
+    this(parent, superType, typeSystem, new LinkedList<Type>());
+  }
+
+  public TypeSelectionPane(Composite parent, Type superType, TypeSystem typeSystem,
+          Collection<Type> filterTypes) {
     super(parent, SWT.NONE);
 
     mTypeSystem = typeSystem;
@@ -80,12 +72,12 @@ final class TypeSelectionPane extends Composite {
 
     // insert list box
 
-    mTypeCombo = new Combo(this, SWT.NONE);
+    mTypeCombo = new Combo(this, SWT.READ_ONLY);
     mTypeCombo.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         Type newType = mTypeSystem.getType(mTypeCombo.getText());
 
-        if (newType != null) {
+        if (mListener != null && newType != null) {
           mListener.typeChanged(newType);
         }
       }
@@ -98,30 +90,30 @@ final class TypeSelectionPane extends Composite {
 
     LinkedList<String> typeNameList = new LinkedList<String>();
 
+    typeNameList.add(superType.getName());
+
     // get a collection of all types
-    Iterator typeIterator = mTypeSystem.getTypeIterator();
+    Iterator typeIterator = mTypeSystem.getProperlySubsumedTypes(superType).iterator();
 
     while (typeIterator.hasNext()) {
       Type type = (Type) typeIterator.next();
 
-      boolean isFilteredType = false;
-
-      // TODO: use a collection here and call contains ...
-      for (String filteredType : filterTypes) {
-        if (type.getName().equals(filteredType)) {
-          isFilteredType = true;
-        }
-      }
-
-      if (!isFilteredType) {
+      if (!filterTypes.contains(type)) {
         typeNameList.add(type.getName());
       }
     }
 
     mTypeCombo.setItems(typeNameList.toArray(new String[typeNameList.size()]));
+
+    // select the super type, its the first element (and must be there)
+    mTypeCombo.select(0);
   }
 
-  void setListener(ITypePaneListener listener) {
+  public void setListener(ITypePaneListener listener) {
     mListener = listener;
+  }
+
+  public Type getType() {
+    return mTypeSystem.getType(mTypeCombo.getText());
   }
 }

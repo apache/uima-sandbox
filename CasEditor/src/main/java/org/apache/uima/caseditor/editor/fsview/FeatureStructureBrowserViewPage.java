@@ -20,16 +20,17 @@
 package org.apache.uima.caseditor.editor.fsview;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
 import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.FSIndex;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.Images;
@@ -84,13 +85,10 @@ public final class FeatureStructureBrowserViewPage extends Page {
         return new Object[] {};
       }
 
-      FSIndex index = mCAS.getIndexRepository().getIndex("TOPIndex");
-
-      assert index != null : "Unable to retrive the TOPIndex!";
-
       StrictTypeConstraint typeConstrain = new StrictTypeConstraint(mCurrentType);
 
-      FSIterator strictTypeIterator = mCAS.createFilteredIterator(index.iterator(), typeConstrain);
+      FSIterator strictTypeIterator = mCAS.createFilteredIterator(
+              mCAS.getIndexRepository().getAllIndexedFS(mCurrentType), typeConstrain);
 
       LinkedList<ModelFeatureStructure> featureStrucutreList = new LinkedList<ModelFeatureStructure>();
 
@@ -353,6 +351,8 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
   private Action mSelectAllAction;
 
+  private Collection<Type> filterTypes;
+
   /**
    * Initializes a new instance.
    *
@@ -366,9 +366,44 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
     mSelectAllAction = new SelectAllAction();
 
-    // TODO:
-    // add here a change listener, for add and remove operations
-    // the view must maybe updated
+    TypeSystem ts = mCAS.getTypeSystem();
+
+    filterTypes = new HashSet<Type>();
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_ARRAY_BASE));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_BOOLEAN_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_BYTE_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_LONG_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_SHORT_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_FLOAT_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_DOUBLE_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_BYTE));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_ANNOTATION_BASE));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_SHORT));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_LONG));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_FLOAT));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_DOUBLE));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_BOOLEAN));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_EMPTY_FLOAT_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_EMPTY_FS_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_EMPTY_INTEGER_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_EMPTY_STRING_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_FLOAT));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_FLOAT_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_FLOAT_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_FS_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_FS_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_INTEGER));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_INTEGER_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_INTEGER_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_LIST_BASE));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_NON_EMPTY_FLOAT_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_NON_EMPTY_FS_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_NON_EMPTY_INTEGER_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_NON_EMPTY_STRING_LIST));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_SOFA));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_STRING));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_STRING_ARRAY));
+    filterTypes.add(ts.getType(CAS.TYPE_NAME_STRING_LIST));
   }
 
   @Override
@@ -381,7 +416,8 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
     mInstanceComposite.setLayout(layout);
 
-    TypeSelectionPane mTypePane = new TypeSelectionPane(mInstanceComposite, mCAS.getTypeSystem());
+    TypeSelectionPane mTypePane = new TypeSelectionPane(mInstanceComposite,
+            mCAS.getTypeSystem().getType(CAS.TYPE_NAME_TOP),mCAS.getTypeSystem(), filterTypes);
 
     GridData typePaneData = new GridData();
     typePaneData.grabExcessHorizontalSpace = true;

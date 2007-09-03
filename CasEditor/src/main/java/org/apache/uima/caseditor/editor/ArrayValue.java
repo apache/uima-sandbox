@@ -28,8 +28,9 @@ import org.apache.uima.cas.IntArrayFS;
 import org.apache.uima.cas.LongArrayFS;
 import org.apache.uima.cas.ShortArrayFS;
 import org.apache.uima.caseditor.core.TaeError;
+import org.eclipse.core.runtime.IAdaptable;
 
-public class ArrayValue {
+public class ArrayValue implements IAdaptable {
 
   private final FeatureStructure arrayFS;
 
@@ -84,41 +85,6 @@ public class ArrayValue {
     }
   }
 
-//  public void set(Number value) {
-//
-//    if (arrayFS instanceof ByteArrayFS) {
-//      ByteArrayFS array = (ByteArrayFS) arrayFS;
-//      array.set(slot, (Byte) value);
-//    }
-//    else if (arrayFS instanceof ShortArrayFS) {
-//      ShortArrayFS array = (ShortArrayFS) arrayFS;
-//      array.set(slot, (Short) value);
-//    }
-//    else if (arrayFS instanceof IntArrayFS) {
-//      IntArrayFS array = (IntArrayFS) arrayFS;
-//      array.set(slot, (Integer) value);
-//    }
-//    else if (arrayFS instanceof LongArrayFS) {
-//      LongArrayFS array = (LongArrayFS) arrayFS;
-//      array.set(slot, (Long) value);
-//    }
-//    else if (arrayFS instanceof FloatArrayFS) {
-//      FloatArrayFS array = (FloatArrayFS) arrayFS;
-//      array.set(slot, (Float) value);
-//    }
-//    else if (arrayFS instanceof DoubleArrayFS) {
-//      DoubleArrayFS array = (DoubleArrayFS) arrayFS;
-//      array.set(slot, (Double) value);
-//    }
-//    else if (arrayFS instanceof ArrayFS) {
-//      ArrayFS array = (ArrayFS) arrayFS;
-//      array.set(slot, (FeatureStructure) value);
-//    }
-//    else {
-//      throw new TaeError("Unkown array type!");
-//    }
-//  }
-
   public Object get() {
     if (arrayFS instanceof ByteArrayFS) {
       ByteArrayFS array = (ByteArrayFS) arrayFS;
@@ -151,6 +117,19 @@ public class ArrayValue {
     else {
       throw new TaeError("Unkown array type!");
     }
+  }
+
+  public Object getAdapter(Class adapter) {
+
+    if (FeatureStructure.class.equals(adapter)) {
+      if (arrayFS instanceof ArrayFS) {
+        ArrayFS array = (ArrayFS) arrayFS;
+
+        return array.get(slot());
+      }
+    }
+
+    return null;
   }
 
   @Override

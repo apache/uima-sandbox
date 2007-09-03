@@ -46,7 +46,7 @@ public final class EditView extends AnnotationEditorView {
     if ((part instanceof AnnotationEditor)) {
       AnnotationEditor editor = (AnnotationEditor) part;
 
-      EditViewPage page = new EditViewPage(editor);
+      EditViewPage page = new EditViewPage(this, editor);
       initPage(page);
       page.createControl(getPageBook());
 

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -26,7 +26,7 @@ import java.util.Set;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.IDocument;
-import org.eclipse.jface.util.Assert;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -46,7 +46,7 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
 
   /**
    * Adds an {@link ISelectionChangedListener} to this provider.
-   * 
+   *
    * @param listener
    */
   public void addSelectionChangedListener(ISelectionChangedListener listener) {
@@ -56,8 +56,8 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
   }
 
   /**
-   * Retrives the current selection.
-   * 
+   * Retrieves the current selection.
+   *
    * @return selection
    */
   public ISelection getSelection() {
@@ -66,7 +66,7 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
 
   /**
    * Removes a registered selection listener.
-   * 
+   *
    * @param listener
    *          the listener to remove
    */
@@ -76,7 +76,7 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
 
   /**
    * Sets the current selection.
-   * 
+   *
    * @param selection
    */
   public void setSelection(ISelection selection) {
@@ -95,7 +95,7 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
 
   /**
    * Sets the current selection to the given {@link AnnotationFS} object.
-   * 
+   *
    * @param annotation
    */
   public void setSelection(IDocument document, AnnotationFS annotation) {
@@ -111,15 +111,15 @@ class FeatureStructureSelectionProvider implements ISelectionProvider {
   }
 
   /**
-   * Replaces the current selection with an emtpy selection.
+   * Replaces the current selection with an empty selection.
    */
   public void clearSelection() {
     setSelection(new StructuredSelection());
   }
 
   /**
-   * Replaces the current selection with an emtpy selectionw without notifiying listeners about it.
-   * 
+   * Replaces the current selection with an empty selection without notifying listeners about it.
+   *
    * Use it if the selection object is removed and a new selection was already made by an other
    * {@link ISelectionProvider} instance.
    */

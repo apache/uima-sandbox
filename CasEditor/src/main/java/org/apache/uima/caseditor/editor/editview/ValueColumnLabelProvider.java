@@ -19,6 +19,9 @@
 
 package org.apache.uima.caseditor.editor.editview;
 
+import org.apache.uima.cas.ArrayFS;
+import org.apache.uima.cas.CommonArrayFS;
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.caseditor.editor.ArrayValue;
 import org.apache.uima.caseditor.editor.FeatureValue;
@@ -39,18 +42,38 @@ final class ValueColumnLabelProvider extends CellLabelProvider {
                 featureValue.getFeature()));
       }
       else {
+        FeatureStructure value = (FeatureStructure) featureValue.getValue();
 
-        if (featureValue.getValue() == null) {
+        if (value == null) {
           cell.setText("null");
         } else {
-          cell.setText("");
+          cell.setText("[" + value.getType().getShortName() + "]");
         }
       }
     }
     else if (element instanceof ArrayValue) {
+
       ArrayValue value = (ArrayValue) element;
 
-      cell.setText(value.get().toString());
+      // if primitive array
+      if (value.getFeatureStructure() instanceof CommonArrayFS) {
+        cell.setText(value.get().toString());
+      }
+      else if (value.getFeatureStructure() instanceof ArrayFS) {
+        ArrayFS array = (ArrayFS) value.getFeatureStructure();
+
+        FeatureStructure fs = array.get(value.slot());
+
+        if (fs == null) {
+          cell.setText("null");
+        }
+        else {
+          cell.setText("");
+        }
+      }
+      else {
+        throw new TaeError("Unexpected array type!");
+      }
     }
     else {
       throw new TaeError("Unkown element!");
