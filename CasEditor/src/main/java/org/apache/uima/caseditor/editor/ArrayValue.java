@@ -20,6 +20,7 @@
 package org.apache.uima.caseditor.editor;
 
 import org.apache.uima.cas.ArrayFS;
+import org.apache.uima.cas.BooleanArrayFS;
 import org.apache.uima.cas.ByteArrayFS;
 import org.apache.uima.cas.DoubleArrayFS;
 import org.apache.uima.cas.FeatureStructure;
@@ -27,6 +28,8 @@ import org.apache.uima.cas.FloatArrayFS;
 import org.apache.uima.cas.IntArrayFS;
 import org.apache.uima.cas.LongArrayFS;
 import org.apache.uima.cas.ShortArrayFS;
+import org.apache.uima.cas.StringArrayFS;
+import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.TaeError;
 import org.eclipse.core.runtime.IAdaptable;
 
@@ -55,66 +58,73 @@ public class ArrayValue implements IAdaptable {
   }
 
   public void set(String value) {
-    if (arrayFS instanceof ByteArrayFS) {
-      ByteArrayFS array = (ByteArrayFS) arrayFS;
 
+    if (arrayFS instanceof BooleanArrayFS) {
+      BooleanArrayFS array = (BooleanArrayFS) arrayFS;
+      array.set(slot, Boolean.parseBoolean(value));
+    } else if (arrayFS instanceof ByteArrayFS) {
+      ByteArrayFS array = (ByteArrayFS) arrayFS;
       array.set(slot, Byte.parseByte(value));
-    }
-    else if (arrayFS instanceof ShortArrayFS) {
+    } else if (arrayFS instanceof ShortArrayFS) {
       ShortArrayFS array = (ShortArrayFS) arrayFS;
       array.set(slot, Short.parseShort(value));
-    }
-    else if (arrayFS instanceof IntArrayFS) {
+    } else if (arrayFS instanceof IntArrayFS) {
       IntArrayFS array = (IntArrayFS) arrayFS;
       array.set(slot, Integer.parseInt(value));
-    }
-    else if (arrayFS instanceof LongArrayFS) {
+    } else if (arrayFS instanceof LongArrayFS) {
       LongArrayFS array = (LongArrayFS) arrayFS;
       array.set(slot, Long.parseLong(value));
-    }
-    else if (arrayFS instanceof FloatArrayFS) {
+    } else if (arrayFS instanceof FloatArrayFS) {
       FloatArrayFS array = (FloatArrayFS) arrayFS;
       array.set(slot, Float.parseFloat(value));
-    }
-    else if (arrayFS instanceof DoubleArrayFS) {
+    } else if (arrayFS instanceof DoubleArrayFS) {
       DoubleArrayFS array = (DoubleArrayFS) arrayFS;
       array.set(slot, Double.parseDouble(value));
-    }
-    else {
+    } else if (arrayFS instanceof StringArrayFS) {
+      StringArrayFS array = (StringArrayFS) arrayFS;
+      array.set(slot, value);
+    } else {
       throw new TaeError("Unkown array type!");
     }
   }
 
   public Object get() {
-    if (arrayFS instanceof ByteArrayFS) {
+
+    if (arrayFS instanceof BooleanArrayFS) {
+      BooleanArrayFS array = (BooleanArrayFS) arrayFS;
+      return array.get(slot);
+    } else if (arrayFS instanceof ByteArrayFS) {
       ByteArrayFS array = (ByteArrayFS) arrayFS;
       return array.get(slot);
-    }
-    else if (arrayFS instanceof ShortArrayFS) {
+    } else if (arrayFS instanceof ShortArrayFS) {
       ShortArrayFS array = (ShortArrayFS) arrayFS;
       return array.get(slot);
-    }
-    else if (arrayFS instanceof IntArrayFS) {
+    } else if (arrayFS instanceof IntArrayFS) {
       IntArrayFS array = (IntArrayFS) arrayFS;
       return array.get(slot);
-    }
-    else if (arrayFS instanceof LongArrayFS) {
+    } else if (arrayFS instanceof LongArrayFS) {
       LongArrayFS array = (LongArrayFS) arrayFS;
       return array.get(slot);
-    }
-    else if (arrayFS instanceof FloatArrayFS) {
+    } else if (arrayFS instanceof FloatArrayFS) {
       FloatArrayFS array = (FloatArrayFS) arrayFS;
       return array.get(slot);
-    }
-    else if (arrayFS instanceof DoubleArrayFS) {
+    } else if (arrayFS instanceof DoubleArrayFS) {
       DoubleArrayFS array = (DoubleArrayFS) arrayFS;
       return array.get(slot);
-    }
-    else if (arrayFS instanceof ArrayFS) {
+    } else if (arrayFS instanceof StringArrayFS) {
+      StringArrayFS array = (StringArrayFS) arrayFS;
+
+      String value = array.get(slot);
+
+      if (value == null) {
+        value = "";
+      }
+
+      return value;
+    } else if (arrayFS instanceof ArrayFS) {
       ArrayFS array = (ArrayFS) arrayFS;
       return array.get(slot);
-    }
-    else {
+    } else {
       throw new TaeError("Unkown array type!");
     }
   }
@@ -126,6 +136,14 @@ public class ArrayValue implements IAdaptable {
         ArrayFS array = (ArrayFS) arrayFS;
 
         return array.get(slot());
+      }
+    }
+
+    if (AnnotationFS.class.equals(adapter)) {
+      FeatureStructure fs = (FeatureStructure) getAdapter(FeatureStructure.class);
+
+      if (fs instanceof AnnotationFS) {
+        return fs;
       }
     }
 

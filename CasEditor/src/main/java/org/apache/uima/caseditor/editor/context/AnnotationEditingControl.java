@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.editor.context;
 
-import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -33,7 +32,7 @@ public class AnnotationEditingControl extends Composite {
 
   /**
    * Initializes the current instance.
-   * 
+   *
    * @param parent
    */
   public AnnotationEditingControl(Composite parent) {
@@ -49,12 +48,12 @@ public class AnnotationEditingControl extends Composite {
 
   /**
    * Display this feature structure.
-   * 
-   * @param structure 
+   *
+   * @param structure
    */
   public void displayFeatureStructure(FeatureStructure structure) {
-    Feature hack = structure.getType().getFeatureByBaseName("byte");
-    structure.setFeatureValue(hack, structure.getCAS().createByteArrayFS(5));
+
+
 
   }
 }

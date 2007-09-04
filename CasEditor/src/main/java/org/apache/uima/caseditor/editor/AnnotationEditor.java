@@ -139,12 +139,28 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
         getDocument().addFeatureStructure(annotation);
 
-        mFeatureStructureSelectionProvider.setSelection(getDocument(), annotation);
+        setAnnotationSelection(annotation);
       }
     }
 
     AnnotationDocument getDocument() {
       return AnnotationEditor.this.getDocument();
+    }
+  }
+
+  private class SmartAnnotateAction extends Action {
+
+    @Override
+    public void run() {
+
+      if (isSomethingSelected()) {
+
+        QuickTypeSelectionDialog typeDialog =
+          new QuickTypeSelectionDialog(Display.getCurrent().getActiveShell(),
+          AnnotationEditor.this);
+
+        typeDialog.open();
+      }
     }
   }
 
@@ -538,7 +554,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
   private ShowAnnotationsMenu mShowAnnotationsMenu;
 
-private DocumentListener mAnnotationSynchronizer;
+  private DocumentListener mAnnotationSynchronizer;
 
   /**
    * Creates an new AnnotationEditor object.
@@ -960,11 +976,20 @@ private DocumentListener mAnnotationSynchronizer;
     // create annotate action
     AnnotateAction annotateAction = new AnnotateAction(getSourceViewer().getTextWidget());
 
-    annotateAction.setActionDefinitionId(ITextEditorActionDefinitionIds.SMART_ENTER);
+    final String annotateActionID = "Enter";
 
-    setAction(ITextEditorActionDefinitionIds.SMART_ENTER, annotateAction);
+    annotateAction.setActionDefinitionId(annotateActionID);
+
+    setAction(annotateActionID, annotateAction);
+    setActionActivationCode(annotateActionID, '\r', SWT.CR,
+            SWT.NONE);
+
+    SmartAnnotateAction smartAnnotateAction = new SmartAnnotateAction();
+    smartAnnotateAction.setActionDefinitionId(ITextEditorActionDefinitionIds.SMART_ENTER);
+    setAction(ITextEditorActionDefinitionIds.SMART_ENTER, smartAnnotateAction);
+
     setActionActivationCode(ITextEditorActionDefinitionIds.SMART_ENTER, '\r', SWT.CR,
-            SWT.DEFAULT);
+            SWT.SHIFT);
 
     // create delete action
     DeleteFeatureStructureAction deleteAnnotationAction = new DeleteFeatureStructureAction(
@@ -1000,5 +1025,9 @@ private DocumentListener mAnnotationSynchronizer;
 
   public void setDirty() {
     getDocument().fireDocumentChanged();
+  }
+
+  void setAnnotationSelection(AnnotationFS annotation) {
+    mFeatureStructureSelectionProvider.setSelection(getDocument(), annotation);
   }
 }
