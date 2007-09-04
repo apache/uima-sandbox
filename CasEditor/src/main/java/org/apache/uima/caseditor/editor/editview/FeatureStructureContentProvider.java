@@ -28,6 +28,7 @@ import org.apache.uima.cas.ArrayFS;
 import org.apache.uima.cas.CommonArrayFS;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.StringArrayFS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.caseditor.core.AbstractDocumentListener;
 import org.apache.uima.caseditor.core.TaeError;
@@ -48,6 +49,33 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
 
   FeatureStructureContentProvider(AnnotationDocument document) {
     mDocument = document;
+  }
+
+  private int arraySize(FeatureStructure value) {
+
+    if (!value.getType().isArray()) {
+      throw new IllegalArgumentException();
+    }
+
+    int size;
+
+    if (value instanceof ArrayFS) {
+      ArrayFS array = (ArrayFS) value;
+
+      size = array.size();
+    } else if (value instanceof CommonArrayFS) {
+      CommonArrayFS array = (CommonArrayFS) value;
+
+      size = array.size();
+    } else if (value instanceof StringArrayFS) {
+      StringArrayFS array = (StringArrayFS) value;
+
+      size = array.size();
+    } else {
+      throw new TaeError("Unkown array type!");
+    }
+
+    return size;
   }
 
   public Object[] getElements(Object inputElement) {
@@ -76,17 +104,7 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
         return featureValues.toArray();
       }
       else {
-        int size;
-
-        if (featureStructure instanceof CommonArrayFS) {
-          CommonArrayFS array = (CommonArrayFS) featureStructure;
-          size = array.size();
-        } else if (featureStructure instanceof ArrayFS) {
-          ArrayFS array = (ArrayFS) featureStructure;
-          size = array.size();
-        } else {
-          throw new TaeError("Unkown array type!");
-        }
+        int size = arraySize(featureStructure);
 
         ArrayValue arrayValues[] = new ArrayValue[size];
 
@@ -179,6 +197,26 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
     return null;
   }
 
+  private boolean hasChildren(FeatureStructure value) {
+
+    boolean result;
+
+
+    if (value != null) {
+
+      if (value.getType().isArray()) {
+        // if array it has children if size != 0
+        result = arraySize(value) > 0;
+      } else {
+        result = value.getType().getFeatures().size() > 0;
+      }
+    } else {
+      result = false;
+    }
+
+    return result;
+  }
+
   public boolean hasChildren(Object element) {
 
     if (element instanceof FeatureValue) {
@@ -188,7 +226,7 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
         return false;
       }
       else {
-        return value.getValue() != null;
+        return hasChildren((FeatureStructure) value.getValue());
       }
     } else if (element instanceof ArrayValue) {
 
@@ -198,12 +236,7 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
 
         ArrayFS array = (ArrayFS) value.getFeatureStructure();
 
-        if (array.get(value.slot()) != null) {
-          return true;
-        }
-        else {
-          return false;
-        }
+        return hasChildren(array.get(value.slot()));
       }
       else {
         // false for primitive arrays

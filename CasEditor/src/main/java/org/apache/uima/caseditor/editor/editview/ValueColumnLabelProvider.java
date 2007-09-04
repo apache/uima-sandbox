@@ -22,6 +22,7 @@ package org.apache.uima.caseditor.editor.editview;
 import org.apache.uima.cas.ArrayFS;
 import org.apache.uima.cas.CommonArrayFS;
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.StringArrayFS;
 import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.caseditor.editor.ArrayValue;
 import org.apache.uima.caseditor.editor.FeatureValue;
@@ -56,7 +57,8 @@ final class ValueColumnLabelProvider extends CellLabelProvider {
       ArrayValue value = (ArrayValue) element;
 
       // if primitive array
-      if (value.getFeatureStructure() instanceof CommonArrayFS) {
+      if (value.getFeatureStructure() instanceof CommonArrayFS ||
+              value.getFeatureStructure() instanceof StringArrayFS) {
         cell.setText(value.get().toString());
       }
       else if (value.getFeatureStructure() instanceof ArrayFS) {
@@ -68,7 +70,7 @@ final class ValueColumnLabelProvider extends CellLabelProvider {
           cell.setText("null");
         }
         else {
-          cell.setText("");
+          cell.setText("[" + fs.getType().getShortName() + "]");
         }
       }
       else {
