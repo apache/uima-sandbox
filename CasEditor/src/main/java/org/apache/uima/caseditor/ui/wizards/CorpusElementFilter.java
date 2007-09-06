@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,13 +17,29 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.editor;
+package org.apache.uima.caseditor.ui.wizards;
 
-import org.apache.uima.caseditor.FileDocumentProvider;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.apache.uima.caseditor.core.model.CorpusElement;
+import org.apache.uima.caseditor.core.model.NlpProject;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 
-public class SimpleTextEditor extends AbstractTextEditor {
-  public SimpleTextEditor() {
-    setDocumentProvider(new FileDocumentProvider());
+public class CorpusElementFilter extends ViewerFilter {
+
+  @Override
+  public boolean select(Viewer viewer, Object parentElement, Object element) {
+
+    boolean result;
+
+    if (element instanceof NlpProject) {
+      result = true;
+    }
+    else if (element instanceof CorpusElement) {
+      result = true;
+    } else {
+      result = false;
+    }
+
+    return result;
   }
 }

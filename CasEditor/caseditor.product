@@ -32,7 +32,6 @@ Copyright 2006, 2007 The Apache Software Foundation
       </win>
    </launcher>
 
-
    <vm>
       <linux type="ee">J2SE-1.5</linux>
       <macos type="ee">J2SE-1.5</macos>
@@ -49,6 +48,7 @@ Copyright 2006, 2007 The Apache Software Foundation
       <plugin id="org.eclipse.core.contenttype"/>
       <plugin id="org.eclipse.core.databinding"/>
       <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
       <plugin id="org.eclipse.core.filesystem.linux.ppc" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
@@ -86,6 +86,7 @@ Copyright 2006, 2007 The Apache Software Foundation
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
       <plugin id="org.eclipse.ui.carbon" fragment="true"/>
+      <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.views"/>

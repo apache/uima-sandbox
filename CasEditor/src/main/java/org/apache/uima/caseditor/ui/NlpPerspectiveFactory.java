@@ -77,8 +77,6 @@ public class NlpPerspectiveFactory implements IPerspectiveFactory
         IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT,
                 0.19f, editorArea);
         left.addView(CorpusExplorerView.ID);
-        left.addView(CorpusExplorerView.ID + "s");
-
 
         // right views
         IFolderLayout right = layout.createFolder("right", IPageLayout.RIGHT,

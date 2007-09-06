@@ -107,7 +107,7 @@
 			project="true"/> -->
 	</extension>
 
-	<!--  
+  
 		<extension point="org.eclipse.ui.importWizards">
 		<wizard
 		class="org.apache.uima.caseditor.ui.wizards.ImportDocumentWizard"
@@ -117,7 +117,6 @@
 		<description>Create a Document</description>
 		</wizard>
 		</extension>
-	-->
 
 	<extension point="org.eclipse.ui.perspectives">
 		<perspective
@@ -210,11 +209,6 @@
 			contributorClass="org.apache.uima.caseditor.editor.AnnotationEditorActionContributor"
 			id="org.apache.uima.caseditor.editor" extensions="xcas">
 		</editor>
-
-		<editor icon="icons/svgicons/document.png"
-			class="org.apache.uima.caseditor.editor.SimpleTextEditor"
-			name="Text Editor" id="org.apache.uima.caseditor.texteditor"
-			default="true" />
 	</extension>
 
 	<extension point="org.eclipse.ui.editors.annotationTypes">

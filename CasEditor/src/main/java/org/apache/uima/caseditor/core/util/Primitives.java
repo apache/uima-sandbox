@@ -113,6 +113,7 @@ public enum Primitives {
    * @param f
    * @return true if primitive otherwise false
    */
+  @Deprecated
   public static boolean isPrimitive(Feature f) {
     if (f == null) {
       throw new IllegalArgumentException();
@@ -127,6 +128,7 @@ public enum Primitives {
    * @param typeName
    * @return true if primitive otherwise false.
    */
+  @Deprecated
   public static boolean isPrimitive(String typeName) {
     if (typeName == null) {
       throw new IllegalArgumentException();
