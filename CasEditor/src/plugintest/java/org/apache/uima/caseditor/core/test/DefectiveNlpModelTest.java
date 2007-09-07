@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -27,6 +27,7 @@ import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.AnnotatorElement;
 import org.apache.uima.caseditor.core.model.ConsumerElement;
 import org.apache.uima.caseditor.core.model.DocumentElement;
+import org.apache.uima.caseditor.core.model.TypesystemElement;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -35,6 +36,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * This test produces invalid model elements and tests the nlp model for the
+ * specified behavior.
  */
 public class DefectiveNlpModelTest {
   private TestProject mProject;
@@ -89,7 +92,7 @@ public class DefectiveNlpModelTest {
     }
   }
 
-  @Test
+  @Test(expected=CoreException.class)
   public void testInvalidDocument() throws CoreException {
     mProject.createProject();
     mProject.createProjectContent();
@@ -97,8 +100,9 @@ public class DefectiveNlpModelTest {
 
     mProject.getDocument().setContents(new ByteArrayInputStream(new byte[0]), true, true, null);
 
-    assertTrue(((DocumentElement) CasEditorPlugin.getNlpModel().findMember(mProject.getDocument()))
-            .getDocument().getCAS() == null);
+    // throws a core exception since the document cannot be parsed
+    ((DocumentElement) CasEditorPlugin.getNlpModel().findMember(mProject.getDocument()))
+            .getDocument();
   }
 
   @Test
@@ -134,7 +138,8 @@ public class DefectiveNlpModelTest {
 
     mProject.getTypesystem().setContents(new ByteArrayInputStream(new byte[0]), true, true, null);
 
-    assertTrue(CasEditorPlugin.getNlpModel().findMember(mProject.getTypesystem()) == null);
+    assertTrue(((TypesystemElement) CasEditorPlugin.getNlpModel().findMember(
+            mProject.getTypesystem())).getTypeSystem() == null);
   }
 
   @Test

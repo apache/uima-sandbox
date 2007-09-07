@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -45,9 +45,7 @@ public class TestProject {
 
   private IFolder mCorpusFolder;
 
-  private IFolder mSourceFolder;
-
-  private IFolder mConfiguration;
+  private IFolder mProcessorFolder;
 
   private IFile mTypesystem;
 
@@ -66,15 +64,14 @@ public class TestProject {
 
     mCorpusFolder = mProject.getFolder("corpus");
 
-    mSourceFolder = mProject.getFolder("UimaSourceFolder");
-    mConfiguration = mProject.getFolder("UimaSourceFolder/Config");
+    mProcessorFolder = mProject.getFolder("UimaSourceFolder");
 
     mTypesystem = mProject.getFile("Typesystem.xml");
     mDocument = mCorpusFolder.getFile("Document.xcas");
-    mAnnotatorFile = mConfiguration.getFile("Annotator.ann");
-    mConsumerFile = mConfiguration.getFile("Consumer.con");
+    mAnnotatorFile = mProcessorFolder.getFile("Annotator.ann");
+    mConsumerFile = mProcessorFolder.getFile("Consumer.con");
 
-    mContentResources = new IResource[] { mCorpusFolder, mSourceFolder, mConfiguration, mDocument,
+    mContentResources = new IResource[] { mCorpusFolder, mProcessorFolder, mDocument,
         mAnnotatorFile, mConsumerFile };
   }
 
@@ -90,10 +87,6 @@ public class TestProject {
     return mAnnotatorFile;
   }
 
-  IFolder getConfiguration() {
-    return mConfiguration;
-  }
-
   IFile getConsumerFile() {
     return mConsumerFile;
   }
@@ -106,8 +99,8 @@ public class TestProject {
     return mDocument;
   }
 
-  IFolder getSourceFolder() {
-    return mSourceFolder;
+  IFolder getProcessorFolder() {
+    return mProcessorFolder;
   }
 
   IFile getTypesystem() {
@@ -119,8 +112,8 @@ public class TestProject {
   }
 
   /**
-   * Creates an emtpy project with nlp nature.
-   * 
+   * Creates an empty project with nlp nature.
+   *
    * @throws CoreException
    */
   void createProject() throws CoreException {
@@ -133,7 +126,7 @@ public class TestProject {
 
   /**
    * Creates the Nlp Project content.
-   * 
+   *
    * @throws CoreException
    */
   void createProjectContent() throws CoreException {
@@ -141,10 +134,7 @@ public class TestProject {
     mCorpusFolder.create(true, true, null);
 
     // create source folder
-    mSourceFolder.create(true, true, null);
-
-    // create config folder
-    mConfiguration.create(true, true, null);
+    mProcessorFolder.create(true, true, null);
 
     // create a typesystem file here ...
     mTypesystem.create(getClass().getResourceAsStream("/org/apache/uima/caseditor/core/test/Typesystem.xml"),
@@ -154,7 +144,7 @@ public class TestProject {
     mAnnotatorFile.create(getClass().getResourceAsStream("/org/apache/uima/caseditor/core/test/Annotator.ann"),
             true, null);
 
-    // careate consumer.con
+    // create consumer.con
     mConsumerFile.create(getClass().getResourceAsStream("/org/apache/uima/caseditor/core/test/Consumer.con"),
             true, null);
 
@@ -164,14 +154,14 @@ public class TestProject {
   }
 
   /**
-   * 
+   *
    * @throws CoreException
    */
   void createDotCorpus() throws CoreException {
     DotCorpus dotCorpus = new DotCorpus();
 
     dotCorpus.addCorpusFolder(mCorpusFolder.getName());
-    dotCorpus.addCasProcessorFolder(mSourceFolder.getName());
+    dotCorpus.addCasProcessorFolder(mProcessorFolder.getName());
     dotCorpus.setTypeSystemFilename(mTypesystem.getName());
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -191,8 +181,7 @@ public class TestProject {
     mCorpusFolder.delete(true, null);
     mAnnotatorFile.delete(true, null);
     mConsumerFile.delete(true, null);
-    mConfiguration.delete(true, null);
-    mSourceFolder.delete(true, null);
+    mProcessorFolder.delete(true, null);
   }
 
   void validateNlpProject() {

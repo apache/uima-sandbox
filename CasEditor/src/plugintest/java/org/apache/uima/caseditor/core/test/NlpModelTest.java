@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.delta.INlpModelChangeListener;
@@ -54,9 +55,21 @@ public class NlpModelTest {
     WorkspaceUtil.clearWorkspace();
   }
 
+  @Test
+  public void testDocumentCasCreation() throws CoreException {
+    mProject.createProject();
+    mProject.createProjectContent();
+    mProject.createDotCorpus();
+
+    DocumentElement document = ((DocumentElement) CasEditorPlugin.getNlpModel().findMember(
+            mProject.getDocument()));
+
+    assertTrue(document.getDocument().getCAS().getDocumentText().length() > 0);
+  }
+
   /**
    * Creates the nlp project from an existing project structure.
-   * 
+   *
    * @throws CoreException
    */
   @Test
@@ -70,8 +83,8 @@ public class NlpModelTest {
   }
 
   /**
-   * Adds the dotcorpus to an empty existing nlp project.
-   * 
+   * Adds the .corpus to an empty existing nlp project.
+   *
    * @throws CoreException
    */
   @Test
@@ -91,9 +104,9 @@ public class NlpModelTest {
 
   /**
    * This creates an nlp project. Then it creates the dot corpus and the NlpModel.
-   * 
+   *
    * After that all resources are added to the project.
-   * 
+   *
    * @throws CoreException
    */
   @Test
@@ -111,11 +124,12 @@ public class NlpModelTest {
   }
 
   /**
-   * 1. create project with nlp nature 2. then create the dot corpus file 3. add all folders and
-   * files
-   * 
+   * 1. create project with nlp nature
+   * 2. then create the dot corpus file
+   * 3. add all folders and files
+   *
    * Note: the listener must be removed after the test
-   * 
+   *
    * @throws CoreException
    */
   @Test
@@ -157,7 +171,7 @@ public class NlpModelTest {
 
   /**
    * Tests if a project can be removed.
-   * 
+   *
    * @throws CoreException
    */
   @Test
@@ -185,7 +199,7 @@ public class NlpModelTest {
 
   /**
    * Note: the listener must be removed after the test.
-   * 
+   *
    * @throws CoreException
    */
   @Test

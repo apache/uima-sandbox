@@ -48,6 +48,11 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
   private Viewer viewer;
 
   FeatureStructureContentProvider(AnnotationDocument document) {
+
+    if (document == null) {
+      throw new IllegalArgumentException("document parameter must not be null!");
+    }
+
     mDocument = document;
   }
 

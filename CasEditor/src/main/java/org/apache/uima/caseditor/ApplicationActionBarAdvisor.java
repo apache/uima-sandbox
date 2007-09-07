@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,6 +36,7 @@ import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
+import org.eclipse.ui.internal.ide.actions.OpenWorkspaceAction;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
@@ -43,7 +44,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   private IWorkbenchWindow window;
 
-//  private OpenWorkspaceAction openWorkspaceAction;
+  private OpenWorkspaceAction openWorkspaceAction;
 
   public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
     super(configurer);
@@ -54,29 +55,29 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     this.window = window;
     ActionFactory actionsToCreate[] = new ActionFactory[] { ActionFactory.NEW_WIZARD_DROP_DOWN,
-        ActionFactory.NEW, 
-        ActionFactory.IMPORT, 
-        ActionFactory.EXPORT, 
+        ActionFactory.NEW,
+        ActionFactory.IMPORT,
+        ActionFactory.EXPORT,
         ActionFactory.SAVE,
-        ActionFactory.SAVE_ALL, 
-        ActionFactory.CLOSE, 
-        ActionFactory.CLOSE_ALL, 
+        ActionFactory.SAVE_ALL,
+        ActionFactory.CLOSE,
+        ActionFactory.CLOSE_ALL,
         ActionFactory.CUT,
-        ActionFactory.COPY, 
-        ActionFactory.PASTE, 
-        ActionFactory.SELECT_ALL, 
+        ActionFactory.COPY,
+        ActionFactory.PASTE,
+        ActionFactory.SELECT_ALL,
         ActionFactory.DELETE,
-        ActionFactory.QUIT, 
-        ActionFactory.ABOUT, 
-        ActionFactory.REVERT, 
+        ActionFactory.QUIT,
+        ActionFactory.ABOUT,
+        ActionFactory.REVERT,
         ActionFactory.PROPERTIES,
-        ActionFactory.FORWARD_HISTORY, 
-        ActionFactory.BACKWARD_HISTORY, 
+        ActionFactory.FORWARD_HISTORY,
+        ActionFactory.BACKWARD_HISTORY,
         ActionFactory.LOCK_TOOL_BAR,
-        ActionFactory.RESET_PERSPECTIVE, 
-        ActionFactory.PREFERENCES, 
+        ActionFactory.RESET_PERSPECTIVE,
+        ActionFactory.PREFERENCES,
         ActionFactory.OPEN_NEW_WINDOW,
-        ActionFactory.NEW_EDITOR, 
+        ActionFactory.NEW_EDITOR,
 //        ActionFactory.EDIT_ACTION_SETS,
         ActionFactory.MAXIMIZE,
         ActionFactory.MINIMIZE,
@@ -96,8 +97,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       actions.put(factory, action);
       register(action);
     }
-    
-//    openWorkspaceAction = new OpenWorkspaceAction(window);
+
+    openWorkspaceAction = new OpenWorkspaceAction(window);
   }
 
   @Override
@@ -118,7 +119,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     fileMenu.add(actions.get(ActionFactory.REVERT));
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.SAVE_EXT));
     fileMenu.add(new Separator());
-//    fileMenu.add(openWorkspaceAction);
+    fileMenu.add(openWorkspaceAction);
     fileMenu.add(new Separator());
     fileMenu.add(actions.get(ActionFactory.IMPORT));
     fileMenu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -167,9 +168,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     subMenu.add(actions.get(ActionFactory.NEXT_PART));
     subMenu.add(actions.get(ActionFactory.PREVIOUS_PART));
     windowMenu.add(subMenu);
-    
+
     windowMenu.add(new Separator());
-    
+
     windowMenu.add(actions.get(ActionFactory.PREFERENCES));
     windowMenu.add(ContributionItemFactory.OPEN_WINDOWS.create(window));
     menuBar.add(windowMenu);
