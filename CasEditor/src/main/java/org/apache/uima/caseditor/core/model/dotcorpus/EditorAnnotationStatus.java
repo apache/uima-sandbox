@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -34,7 +34,7 @@ public class EditorAnnotationStatus {
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param mode
    * @param displayAnnotations
    */
@@ -47,12 +47,12 @@ public class EditorAnnotationStatus {
 
     if (displayAnnotations != null) {
       mDisplayAnnotations.addAll(displayAnnotations);
-    } 
+    }
   }
 
   /**
    * Retrives the editor mode.
-   * 
+   *
    * @return the editor mode
    */
   public Type getMode() {
@@ -61,7 +61,7 @@ public class EditorAnnotationStatus {
 
   /**
    * Retrives the annotations wich a displayed in the editor.
-   * 
+   *
    * @return the display annotations
    */
   public Collection<Type> getDisplayAnnotations() {

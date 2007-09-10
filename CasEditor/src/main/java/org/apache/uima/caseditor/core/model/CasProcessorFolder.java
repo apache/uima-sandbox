@@ -209,7 +209,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
    * Not implemented.
    */
   @Override
-  void addResource(IResource resource) throws CoreException {
+  void addResource(INlpElementDelta delta, IResource resource) throws CoreException {
     if (resource instanceof IFile) {
       // if .con file notify it
       if (resource.getName().endsWith(".con")) {
@@ -253,7 +253,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
    * Not implemented.
    */
   @Override
-  void removeResource(IResource resource) {
+  void removeResource(INlpElementDelta delta, IResource resource) {
     if (resource instanceof IFile) {
       // if .con file notify it
       if (resource.getName().endsWith(".con")) {

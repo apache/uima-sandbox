@@ -27,6 +27,7 @@ import java.util.LinkedList;
 
 import org.apache.uima.cas.Type;
 import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
 import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpus;
 import org.apache.uima.caseditor.core.model.dotcorpus.DotCorpusSerializer;
@@ -66,7 +67,7 @@ public class DotCorpusElement extends AbstractNlpElement {
   /**
    * Retrieves the name of the type system file.
    *
-   * @return - type system file name
+   * @return - type system file name or null if no set
    */
   public IFile getTypeSystemFile() {
     IFile result;
@@ -389,7 +390,7 @@ public class DotCorpusElement extends AbstractNlpElement {
    * Not implemented.
    */
   @Override
-  void addResource(IResource resource) {
+  void addResource(INlpElementDelta delta, IResource resource) {
     // not needed here, there are no child resources
   }
 
@@ -397,7 +398,7 @@ public class DotCorpusElement extends AbstractNlpElement {
    * Not implemented.
    */
   @Override
-  void removeResource(IResource resource) {
+  void removeResource(INlpElementDelta delta, IResource resource) {
     // not needed here, there are no child resources
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -64,7 +64,7 @@ public class DotCorpus {
 
   /**
    * Retrives type system name parameter.
-   * 
+   *
    * @return type system name parameter
    */
   public String getTypeSystemFileName() {
@@ -73,7 +73,7 @@ public class DotCorpus {
 
   /**
    * Sets type system name parameter.
-   * 
+   *
    * @param name
    *          type system name parameter
    */
@@ -83,7 +83,7 @@ public class DotCorpus {
 
   /**
    * Retrvies the uima config folder name parameter.
-   * 
+   *
    * @return uima config folder name parameter.
    */
   public Collection<String> getCasProcessorFolderNames() {
@@ -92,21 +92,21 @@ public class DotCorpus {
 
   /**
    * Sets the uima config folder name parameter.
-   * 
+   *
    * @param folder
    *          uima config folder name parameter.
    */
   public void addCasProcessorFolder(String folder) {
     mCasProcessorFolders.add(folder);
   }
-  
+
   public void removeCasProcessorFolder(String folder) {
     mCasProcessorFolders.remove(folder);
   }
 
   /**
    * Adds a corpus folder
-   * 
+   *
    * @param name
    */
   public void addCorpusFolder(String name) {
@@ -115,7 +115,7 @@ public class DotCorpus {
 
   /**
    * Removes the given corpus folder.
-   * 
+   *
    * @param name
    */
   public void removeCorpusFolder(String name) {
@@ -124,7 +124,7 @@ public class DotCorpus {
 
   /**
    * Retrives the list of all corpus fodlers.
-   * 
+   *
    * @return corpus folder list
    */
   public Collection<String> getCorpusFolderNameList() {
@@ -133,7 +133,7 @@ public class DotCorpus {
 
   /**
    * Retrvies the editor line length hint parameter.
-   * 
+   *
    * @return line length hint
    */
   public int getEditorLineLengthHint() {
@@ -142,7 +142,7 @@ public class DotCorpus {
 
   /**
    * Sets the editor line length hint parameter.
-   * 
+   *
    * @param lineLengthHint
    */
   public void setEditorLineLength(int lineLengthHint) {
@@ -151,7 +151,7 @@ public class DotCorpus {
 
   /**
    * Retrives the annotation styles.
-   * 
+   *
    * @return - the annoation styles
    */
   public Collection<AnnotationStyle> getAnnotationStyles() {
@@ -160,7 +160,7 @@ public class DotCorpus {
 
   /**
    * Adds an AnnotationStyle. TODO: move style stuff to nlp project
-   * 
+   *
    * @param style
    */
   public void setStyle(AnnotationStyle style) {
@@ -174,7 +174,7 @@ public class DotCorpus {
 
   /**
    * Removes an AnnotationStyle for the given name, does nothing if not existent.
-   * 
+   *
    * @param name
    */
   public void removeStyle(String name) {
@@ -183,7 +183,7 @@ public class DotCorpus {
 
   /**
    * Retrives the AnnotationStyle for the given type or null if not available.
-   * 
+   *
    * @param type
    * @return the requested style or null if none
    */
@@ -203,9 +203,9 @@ public class DotCorpus {
    */
   @Override
   public boolean equals(Object obj) {
-	  
-	boolean result;  
-	  
+
+	boolean result;
+
     if (obj == this) {
     	result = true;
     }
@@ -222,13 +222,13 @@ public class DotCorpus {
     else {
     	result = false;
     }
-    
+
     return result;
   }
 
   /**
    * Compares two objects for equality.
-   * 
+   *
    * @param a -
    *          the first object or null
    * @param b -

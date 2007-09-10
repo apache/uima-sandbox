@@ -35,6 +35,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
@@ -77,8 +79,9 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
   /**
    * Initializes the current instance. This method is called before this instance can be used.
-   * Currently it recognizes and loads all nlp resources. Node: This method should only be called
-   * during static {@link NlpModel} creation.
+   * Currently it recognizes and loads all nlp resources.
+   *
+   * Note: This method should only be called during static {@link NlpModel} creation.
    *
    * @throws CoreException
    */
@@ -190,7 +193,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       mDotCorpusElement = DotCorpusElement.createDotCorpus((IFile) dotCorpusResource, this);
     }
 
-    // TODO: What happens when ther is a folder with the name ".corpus"
+    // TODO: What happens when there is a folder with the name ".corpus"
     // then load default .corpus ...
   }
 
@@ -360,12 +363,15 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
    * @return the {@link DotCorpusElement}
    */
   public DotCorpusElement getDotCorpus() {
-    return mDotCorpusElement;
-  }
+
+	Assert.isTrue(mDotCorpusElement != null);
+
+	return mDotCorpusElement;
+    }
 
   /**
-   * Retrieves the {@link NlpProject}.
-   */
+     * Retrieves the {@link NlpProject}.
+     */
   public NlpProject getNlpProject() {
     return this;
   }
@@ -386,15 +392,40 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
    * Adds a resource to the current project instance.
    */
   @Override
-  public void addResource(IResource resource) throws CoreException {
+  public void addResource(INlpElementDelta delta, IResource resource) throws CoreException {
     if (resource instanceof IFile) {
       IFile file = (IFile) resource;
 
       if (DOT_CORPUS_FILENAME.equals(file.getName())) {
         mIsDotCorpusDirty = true;
       }
+      // if type system is set, it could had been renamed
+      else if (mDotCorpusElement.getTypeSystemFile() != null
+		    && (delta.getFlags() & IResourceDelta.MOVED_FROM) > 0
+		    && mDotCorpusElement.getTypeSystemFile().getFullPath()
+			    .equals(delta.getMovedFromPath())) {
+	  // rename type system in dot corpus
+	  mDotCorpusElement.setTypeSystemFilename(resource.getName());
+
+	  // dot corpus was changed and must be writen
+	  // do this after the delta processing
+
+
+	  Runnable serialze = new Runnable() {
+
+	    public void run() {
+		try {
+		    mDotCorpusElement.serialize();
+		} catch (CoreException e) {
+		    CasEditorPlugin.log(e);
+		}
+	    }};
+
+	  ((NlpModel) getNlpProject().getParent()).asyncExcuteQueue(serialze);
+      }
       // check if file is type system
-      else if (mDotCorpusElement.getTypeSystemFile() != null) {
+      else if (mDotCorpusElement.getTypeSystemFile() != null &&
+	      mDotCorpusElement.getTypeSystemFile().equals(resource)) {
         mTypesystem = new TypesystemElement((IFile) resource, this);
       }
     } else if (resource instanceof IFolder) {
@@ -411,7 +442,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
    * Removes a resource form the current project instance.
    */
   @Override
-  public void removeResource(IResource resource) {
+  public void removeResource(INlpElementDelta delta, IResource resource) {
     if (resource instanceof IFile) {
       IFile file = (IFile) resource;
 
@@ -444,8 +475,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
     if (DOT_CORPUS_FILENAME.equals(resource.getName())) {
       mIsDotCorpusDirty = true;
     }
-
-    if (mTypesystem != null && resource.equals(mTypesystem.getResource())) {
+    else if (mTypesystem != null && resource.equals(mTypesystem.getResource())) {
       mTypesystem.changedResource(resource, delta);
 
       if (getTypesystemElement().getTypeSystem() != null) {

@@ -128,7 +128,7 @@ public class AnnotatorElement extends AbstractNlpElement {
   // private void createMarker()
 
   @Override
-  void addResource(IResource resource) {
+  void addResource(INlpElementDelta delta, IResource resource) {
     // just do nothing, no children
   }
 
@@ -138,7 +138,7 @@ public class AnnotatorElement extends AbstractNlpElement {
   }
 
   @Override
-  void removeResource(IResource resource) {
+  void removeResource(INlpElementDelta delta, IResource resource) {
     // just do nothing, no children
   }
 

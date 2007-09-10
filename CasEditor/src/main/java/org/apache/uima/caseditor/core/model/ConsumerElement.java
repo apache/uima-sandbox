@@ -124,7 +124,7 @@ public class ConsumerElement extends AbstractNlpElement {
   }
 
   @Override
-  void addResource(IResource resource) {
+  void addResource(INlpElementDelta delta, IResource resource) {
     // just do nothing, no children
   }
 
@@ -134,7 +134,7 @@ public class ConsumerElement extends AbstractNlpElement {
   }
 
   @Override
-  void removeResource(IResource resource) {
+  void removeResource(INlpElementDelta delta, IResource resource) {
     // just do nothing, no children
   }
 

@@ -27,11 +27,14 @@ import java.util.Set;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.INlpElement;
+import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.delta.INlpModelChangeListener;
 import org.apache.uima.caseditor.core.model.delta.Kind;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,6 +42,12 @@ import org.junit.Test;
  */
 public class NlpModelTest {
   private TestProject mProject;
+
+  /**
+   * This flag is used by the {@link NlpModelTest#testTypesystemRename()} method.
+   * It indicates that the rename of the type system is completed.
+   */
+  private volatile boolean finishedRenameOfTypesystem;
 
   /**
    * Initializes the current instance.
@@ -241,5 +250,51 @@ public class NlpModelTest {
     } finally {
       CasEditorPlugin.getNlpModel().removeNlpModelChangeListener(listener);
     }
+  }
+
+  @Test
+  public void testTypesystemRename() throws CoreException {
+    mProject.createProject();
+    mProject.createProjectContent();
+    mProject.createDotCorpus();
+
+    IPath typesystemPath = mProject.getTypesystem().getFullPath();
+
+    IPath renamedTypesystemPath = new Path(typesystemPath.removeLastSegments(1).toPortableString() + "/" +
+            "NewTS.xml");
+
+    mProject.getTypesystem()
+            .move(renamedTypesystemPath, true, null);
+
+    // wait until the nlp model was update
+    // during the update the internal change listeners post a runnable which serializes the
+    // dotCorpus to the execute queue of the nlp model
+
+    // Now post a runnable after the runnable from the change listener
+    CasEditorPlugin.getNlpModel().asyncExcuteQueue(new Runnable() {
+
+      public void run() {
+        synchronized (NlpModelTest.this) {
+          finishedRenameOfTypesystem = true;
+          NlpModelTest.this.notifyAll();
+        }
+      }
+    });
+
+    // wait until this runnable was executed, to make sure the changes where processed
+    synchronized (this) {
+      while (!finishedRenameOfTypesystem) {
+        try {
+          wait();
+        } catch (InterruptedException e) {
+        }
+      }
+    }
+
+    NlpProject nlpProject = (NlpProject) CasEditorPlugin.getNlpModel().findMember(
+            mProject.getProject());
+
+    assertTrue(nlpProject.getTypesystemElement().getResource().
+            getFullPath().equals(renamedTypesystemPath));
   }
 }

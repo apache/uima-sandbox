@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,10 +25,11 @@ import java.util.LinkedList;
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.IPath;
 
 /**
  * The internal implementation of the nlp model delta interface.
- * 
+ *
  * TODO: Add a filter to avoid node with Kind.NOTHING.
  */
 public final class NlpModelDeltaImpl implements INlpElementDelta {
@@ -50,7 +51,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param parent
    * @param resourceDelta
    */
@@ -72,7 +73,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
 
   /**
    * Sets the nlp element Note: do not call this method from ouside code
-   * 
+   *
    * @param element
    */
   public void setNlpElement(INlpElement element) {
@@ -80,8 +81,8 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   }
 
   /**
-   * Retrives the parent element or null if this is the root delta.
-   * 
+   * Retrieves the parent element or null if this is the root delta.
+   *
    * @return parent element or null
    */
   public INlpElementDelta getParent() {
@@ -90,7 +91,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
 
   /**
    * Adds a child to the current element instance.
-   * 
+   *
    * @param child
    */
   public void addChild(NlpModelDeltaImpl child) {
@@ -111,7 +112,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   }
 
   /**
-   * Retrives the affected children.
+   * Retrieves the affected children.
    */
   public INlpElementDelta[] getAffectedChildren() {
     return mChildren.toArray(new INlpElementDelta[mChildren.size()]);
@@ -125,21 +126,21 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   }
 
   /**
-   * Retrives the nlp element.
+   * Retrieves the nlp element.
    */
   public INlpElement getNlpElement() {
     return mNlpElement;
   }
 
   /**
-   * Retrives the resource.
+   * Retrieves the resource.
    */
   public IResource getResource() {
     return mResourceDelta.getResource();
   }
 
   /**
-   * Retrives the kind
+   * Retrieves the kind
    */
   public Kind getKind() {
     return mKind;
@@ -148,7 +149,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   /**
    * Sets the new kind. This method should only be called from the event handlers snd not by any
    * client.
-   * 
+   *
    * @param kind
    */
   public void setKind(Kind kind) {
@@ -156,23 +157,31 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   }
 
   /**
-   * Retrives the original flags of the {@link IResourceDelta} object.
+   * Retrieves the original flags of the {@link IResourceDelta} object.
    */
   public int getFlags() {
     return mResourceDelta.getFlags();
   }
 
   /**
-   * Retrives the resource delta.
-   * 
+   * Retrieves the resource delta.
+   *
    * @return the resource delta
    */
   public IResourceDelta getResourceDelta() {
     return mResourceDelta;
   }
 
+  public IPath getMovedFromPath() {
+    return mResourceDelta.getMovedFromPath();
+  }
+
+  public IPath getMovedToPath() {
+      return mResourceDelta.getMovedToPath();
+  }
+
   /**
-   * Retrives a human-readable string of the current instance.
+   * Retrieves a human-readable string of the current instance.
    */
   @Override
   public String toString() {

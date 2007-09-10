@@ -156,7 +156,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
    * Not implemented.
    */
   @Override
-  void addResource(IResource resource) {
+  void addResource(INlpElementDelta delta, IResource resource) {
     // not needed here, there are no resources
   }
 
@@ -179,7 +179,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
    * Not implemented.
    */
   @Override
-  void removeResource(IResource resource) {
+  void removeResource(INlpElementDelta delta, IResource resource) {
     // not needed here, there are no resources
   }
 

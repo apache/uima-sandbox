@@ -132,7 +132,7 @@ public final class NlpModel extends AbstractNlpElement {
      * Executes the current action.
      */
     public void handle(NlpModelDeltaImpl delta) {
-      CasEditorPlugin.getNlpModel().addInternal(delta.getResource());
+      CasEditorPlugin.getNlpModel().addInternal(delta, delta.getResource());
 
       /*
        * Note: If a project is added, it is closed (isOpen() == false). Tough, the .project file is
@@ -167,7 +167,7 @@ public final class NlpModel extends AbstractNlpElement {
         INlpElement parent = delta.getNlpElement().getParent();
 
         if (parent != null) {
-          CasEditorPlugin.getNlpModel().removeInternal(delta.getResource());
+          CasEditorPlugin.getNlpModel().removeInternal(delta, delta.getResource());
         }
       }
     }
@@ -384,7 +384,7 @@ public final class NlpModel extends AbstractNlpElement {
     }
   }
 
-  void addInternal(IResource resource) {
+  void addInternal(INlpElementDelta delta, IResource resource) {
     // TODO: why is this possible ?
     if (resource.equals(mWorkspaceRoot)) {
       return;
@@ -396,7 +396,7 @@ public final class NlpModel extends AbstractNlpElement {
 
     if (parentElement != null) {
       try {
-        parentElement.addResource(resource);
+        parentElement.addResource(delta, resource);
       } catch (CoreException e) {
         handleExceptionDuringResoruceChange(e);
       }
@@ -404,7 +404,7 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   @Override
-  void addResource(IResource resource) throws CoreException {
+  void addResource(INlpElementDelta delta, IResource resource) throws CoreException {
     if (resource instanceof IProject) {
       IProject project = (IProject) resource;
 
@@ -413,14 +413,14 @@ public final class NlpModel extends AbstractNlpElement {
     }
   }
 
-  void removeInternal(IResource resource) {
+  void removeInternal(INlpElementDelta delta, IResource resource) {
     IResource parent = resource.getParent();
 
     AbstractNlpElement parentElement = (AbstractNlpElement) findMember(parent);
 
     if (parentElement != null) {
       try {
-        parentElement.removeResource(resource);
+        parentElement.removeResource(delta, resource);
       } catch (CoreException e) {
         handleExceptionDuringResoruceChange(e);
       }
@@ -428,7 +428,7 @@ public final class NlpModel extends AbstractNlpElement {
   }
 
   @Override
-  void removeResource(IResource resource) {
+  void removeResource(INlpElementDelta delta, IResource resource) {
     for (NlpProject project : mNlpProjects) {
       if (project.getResource().equals(resource)) {
         mNlpProjects.remove(project);
@@ -624,7 +624,7 @@ public final class NlpModel extends AbstractNlpElement {
    *
    * @param worker
    */
-  void asyncExcuteQueue(Runnable worker) {
+  public void asyncExcuteQueue(Runnable worker) {
     mAsynchronExecutor.submit(worker);
   }
 

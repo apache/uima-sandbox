@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -60,22 +60,22 @@ public class TypesystemElement extends AbstractNlpElement {
   }
 
   public TypeSystem getTypeSystem() {
-    
+
     CAS cas = getCAS();
-    
+
     if (cas != null) {
       return cas.getTypeSystem();
     }
-    
-	  return null;
+
+    return null;
   }
-  
+
   /**
-   * Retrieves the {@link CAS}. 
-   * 
-   * @return the {@link CAS} or null if there is an error in the type system.
-   * @deprecated
-   */
+     * Retrieves the {@link CAS}.
+     *
+     * @return the {@link CAS} or null if there is an error in the type system.
+     * @deprecated
+     */
   @Deprecated
   public CAS getCAS() {
     Runnable clearMarkers = new Runnable() {
@@ -102,7 +102,7 @@ public class TypesystemElement extends AbstractNlpElement {
         }
       };
       ((NlpModel) mProject.getParent()).asyncExcuteQueue(createMarker);
-      
+
       return null;
     }
   }
@@ -195,12 +195,12 @@ public class TypesystemElement extends AbstractNlpElement {
   }
 
   @Override
-  void addResource(IResource resource) throws CoreException {
+  void addResource(INlpElementDelta delta, IResource resource) throws CoreException {
     // not needed here, there are no child resources
   }
 
   @Override
-  void removeResource(IResource resource) throws CoreException {
+  void removeResource(INlpElementDelta delta, IResource resource) throws CoreException {
     // not needed here, there are no child resources
   }
 }

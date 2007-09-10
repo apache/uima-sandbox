@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,11 +31,11 @@ public final class AnnotationStyle {
    * The styles that can be used to draw an annotation.
    */
   public enum Style {
-    
+
     TEXT_COLOR,
-    
+
     TOKEN,
-    
+
     /**
      * The squiggles style.
      */
@@ -75,7 +75,7 @@ public final class AnnotationStyle {
 
   /**
    * Initialize a new instance.
-   * 
+   *
    * @param annotation -
    *          the annotation type
    * @param style -
@@ -108,7 +108,7 @@ public final class AnnotationStyle {
 
   /**
    * Retrives the annoation type.
-   * 
+   *
    * @return - annotation type.
    */
   public String getAnnotation() {
@@ -117,7 +117,7 @@ public final class AnnotationStyle {
 
   /**
    * Retrives the drawing style of the annotation.
-   * 
+   *
    * @return - annotation drawing style
    */
   public Style getStyle() {
@@ -126,7 +126,7 @@ public final class AnnotationStyle {
 
   /**
    * Retrives the color of the annotation.
-   * 
+   *
    * @return - annotation color
    */
   public Color getColor() {

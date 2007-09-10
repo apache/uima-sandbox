@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -72,7 +72,7 @@ public class DotCorpusSerializer {
 
   /**
    * Creats a {@link DotCorpus} object from a given {@link InputStream}.
-   * 
+   *
    * @param dotCorpusStream
    * @return the {@link DotCorpus} instance.
    * @throws CoreException
@@ -174,7 +174,7 @@ public class DotCorpusSerializer {
 
   /**
    * Writes the <code>DotCorpus</code> instance to the given <code>OutputStream</code>.
-   * 
+   *
    * @param dotCorpus
    *          the {@link DotCorpus} object to serialize.
    * @param out -
@@ -185,7 +185,7 @@ public class DotCorpusSerializer {
 
     XMLSerializer xmlSerializer = new XMLSerializer(out, true);
     ContentHandler xmlSerHandler = xmlSerializer.getContentHandler();
-    
+
     try {
       xmlSerHandler.startDocument();
       xmlSerHandler.startElement("", CONFIG_ELEMENT, CONFIG_ELEMENT, new AttributesImpl());
@@ -225,7 +225,7 @@ public class DotCorpusSerializer {
       for (String folder : dotCorpus.getCasProcessorFolderNames()) {
         AttributesImpl taggerConfigAttributes = new AttributesImpl();
         taggerConfigAttributes.addAttribute("", "", CAS_PROCESSOR_FOLDER_ATTRIBUTE, "", folder);
-        
+
         xmlSerHandler.startElement("", CAS_PROCESSOR_ELEMENT, CAS_PROCESSOR_ELEMENT, taggerConfigAttributes);
         xmlSerHandler.endElement("", CAS_PROCESSOR_ELEMENT, CAS_PROCESSOR_ELEMENT);
       }

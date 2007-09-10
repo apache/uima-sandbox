@@ -77,21 +77,23 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
 
   /**
    * Adds resources after the element was initialized.
-   *
-   * @param resource
+ * @param delta TODO
+ * @param resource
    *          the added resource
+   *
    * @throws CoreException
    */
-  abstract void addResource(IResource resource) throws CoreException;
+  abstract void addResource(INlpElementDelta delta, IResource resource) throws CoreException;
 
   /**
    * Removes resources after the element was initialized.
-   *
-   * @param resource
+ * @param delta TODO
+ * @param resource
    *          the removed resource
+   *
    * @throws CoreException
    */
-  abstract void removeResource(IResource resource) throws CoreException;
+  abstract void removeResource(INlpElementDelta delta, IResource resource) throws CoreException;
 
   /**
    * Changed resource after the element was initialized.

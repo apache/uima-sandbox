@@ -174,11 +174,10 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Adds the given resource.
-   *
-   * @param resource
+ * @param resource
    */
   @Override
-  void addResource(IResource resource) {
+  void addResource(INlpElementDelta delta, IResource resource) {
     if (resource instanceof IFile) {
       mDocuments.add(new DocumentElement(this, (IFile) resource));
     }
@@ -196,11 +195,10 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Removes the given resource.
-   *
-   * @param resource
+ * @param resource
    */
   @Override
-  void removeResource(IResource resource) {
+  void removeResource(INlpElementDelta delta, IResource resource) {
     for (DocumentElement document : mDocuments) {
       if (document.getResource().equals(resource)) {
         mDocuments.remove(document);
