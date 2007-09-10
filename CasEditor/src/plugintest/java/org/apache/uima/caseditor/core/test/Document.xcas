@@ -1,119 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.    
+-->
+
 <CAS>
     <uima.cas.Sofa _indexed="0" _id="1" sofaNum="1"
-        sofaID="_InitialView" mimeType="text" sofaString="On March 15, there was an accident near Munich. The driver got badly&#xd;&#xa;injured. Driving alone not far from her home, the middle-aged woman&#xd;&#xa;crashed at high speed into a tree. A resident, who lives near the&#xd;&#xa;street where the accident took place, called instantly the police. He &#xd;&#xa;reported what had happened and gave his name and address to the officer.&#xd;&#xa;He's called Peter Schubert and he lives at Max-Löw-Straße 13 in&#xd;&#xa;84630 Gauting. The police arrived ten minutes later and brought&#xd;&#xa;the woman into hospital. Although she had multiple trauma, she's &#xd;&#xa;out of mortal danger.&#xd;&#xa;"/>
+        sofaID="_InitialView" mimeType="text" sofaString="On March 15, there was an accident near Munich. The driver got badly&#xd;&#xa;injured. Driving alone not far from her home, the middle-aged woman&#xd;&#xa;crashed at high speed into a tree. A resident, who lives near the&#xd;&#xa;street where the accident took place, called instantly the police. He &#xd;&#xa;reported what had happened and gave his name and address to the officer.&#xd;&#xa;He's called Peter Schubert and he lives at Max-Lï¿½w-Straï¿½e 13 in&#xd;&#xa;84630 Gauting. The police arrived ten minutes later and brought&#xd;&#xa;the woman into hospital. Although she had multiple trauma, she's &#xd;&#xa;out of mortal danger.&#xd;&#xa;"/>
     <uima.tcas.DocumentAnnotation _indexed="1" _id="12" _ref_sofa="1"
         begin="0" end="572" language="x-unspecified"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="17" _ref_sofa="1" begin="0"
-        end="2" pos="IN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="22" _ref_sofa="1" begin="9"
-        end="11" pos="CD"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="27" _ref_sofa="1" begin="11"
-        end="12" pos=","/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="32" _ref_sofa="1" begin="13"
-        end="18" pos="EX"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="37" _ref_sofa="1" begin="19"
-        end="22" pos="VBD"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="42" _ref_sofa="1" begin="23"
-        end="25" pos="DT"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="47" _ref_sofa="1" begin="26"
-        end="34" pos="NN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="52" _ref_sofa="1" begin="35"
-        end="39" pos="IN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="57" _ref_sofa="1" begin="40"
-        end="46" pos="NNP"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="62" _ref_sofa="1" begin="46"
-        end="47" pos="."/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="67" _ref_sofa="1" begin="48"
-        end="51" pos="DT"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="72" _ref_sofa="1" begin="52"
-        end="58" pos="NN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="77" _ref_sofa="1" begin="59"
-        end="62" pos="VBD"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="82" _ref_sofa="1" begin="63"
-        end="68" pos="RB"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="87" _ref_sofa="1" begin="70"
-        end="77" pos="VBN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="92" _ref_sofa="1" begin="77"
-        end="78" pos="."/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="97" _ref_sofa="1" begin="79"
-        end="86" pos="VBG"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="102" _ref_sofa="1" begin="93"
-        end="96" pos="RB"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="107" _ref_sofa="1" begin="97"
-        end="100" pos="RB"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="112" _ref_sofa="1" begin="101"
-        end="105" pos="IN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="117" _ref_sofa="1" begin="106"
-        end="109" pos="PRP$"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="122" _ref_sofa="1" begin="110"
-        end="114" pos="NN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="127" _ref_sofa="1" begin="114"
-        end="115" pos=","/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="132" _ref_sofa="1" begin="116"
-        end="119" pos="DT"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="137" _ref_sofa="1" begin="120"
-        end="131" pos="JJ"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="142" _ref_sofa="1" begin="132"
-        end="137" pos="NN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="147" _ref_sofa="1" begin="147"
-        end="149" pos="IN"/>
-    <org.apache.uima.caseditor.Token _indexed="1" _id="152" _ref_sofa="1" begin="139"
-        end="146" pos="VBD"/>
-    <org.apache.uima.caseditor.Sentence _indexed="1" _id="157" _ref_sofa="1" begin="0" end="47"/>
-    <org.apache.uima.caseditor.Sentence _indexed="1" _id="161" _ref_sofa="1" begin="48" end="78"/>
-    <org.apache.uima.caseditor.Sentence _indexed="1" _id="165" _ref_sofa="1" begin="79" end="173"/>
-    <org.apache.uima.caseditor.City _indexed="1" _id="169" _ref_sofa="1" begin="40" end="46"/>
-    <org.apache.uima.caseditor.Address _indexed="1" _id="173" _ref_person="305"
-        _ref_street="301" _ref_city="297" _ref_zip="293"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="178" _ref_sofa="1" begin="3"
-        end="11" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="183" _ref_sofa="1" begin="0"
-        end="11" type="PP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="188" _ref_sofa="1" begin="13"
-        end="18" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="193" _ref_sofa="1" begin="23"
-        end="34" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="198" _ref_sofa="1" begin="40"
-        end="46" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="203" _ref_sofa="1" begin="35"
-        end="46" type="PP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="208" _ref_sofa="1" begin="23"
-        end="46" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="213" _ref_sofa="1" begin="19"
-        end="46" type="VP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="218" _ref_sofa="1" begin="0"
-        end="47" type="S"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="223" _ref_sofa="1" begin="48"
-        end="58" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="228" _ref_sofa="1" begin="63"
-        end="68" type="ADVP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="233" _ref_sofa="1" begin="70"
-        end="77" type="VP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="238" _ref_sofa="1" begin="59"
-        end="77" type="VP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="243" _ref_sofa="1" begin="48"
-        end="78" type="S"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="248" _ref_sofa="1" begin="106"
-        end="114" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="253" _ref_sofa="1" begin="101"
-        end="114" type="PP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="258" _ref_sofa="1" begin="93"
-        end="114" type="ADVP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="263" _ref_sofa="1" begin="79"
-        end="114" type="VP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="268" _ref_sofa="1" begin="79"
-        end="114" type="S"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="273" _ref_sofa="1" begin="116"
-        end="137" type="NP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="278" _ref_sofa="1" begin="147"
-        end="172" type="PP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="283" _ref_sofa="1" begin="139"
-        end="172" type="VP"/>
-    <org.apache.uima.caseditor.Parse _indexed="1" _id="288" _ref_sofa="1" begin="79"
-        end="173" type="S"/>
-    <org.apache.uima.caseditor.Zip _id="293" _ref_sofa="1" begin="417" end="422"/>
-    <org.apache.uima.caseditor.City _id="297" _ref_sofa="1" begin="423" end="430"/>
-    <org.apache.uima.caseditor.Street _id="301" _ref_sofa="1" begin="395" end="412"/>
-    <org.apache.uima.caseditor.Person _id="305" _ref_sofa="1" begin="364" end="378"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="17" _ref_sofa="1" begin="0"
+        end="2"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="22" _ref_sofa="1" begin="9"
+        end="11"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="27" _ref_sofa="1" begin="11"
+        end="12"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="32" _ref_sofa="1" begin="13"
+        end="18"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="37" _ref_sofa="1" begin="19"
+        end="22"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="42" _ref_sofa="1" begin="23"
+        end="25"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="47" _ref_sofa="1" begin="26"
+        end="34"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="52" _ref_sofa="1" begin="35"
+        end="39"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="57" _ref_sofa="1" begin="40"
+        end="46"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="62" _ref_sofa="1" begin="46"
+        end="47"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="67" _ref_sofa="1" begin="48"
+        end="51"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="72" _ref_sofa="1" begin="52"
+        end="58"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="77" _ref_sofa="1" begin="59"
+        end="62"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="82" _ref_sofa="1" begin="63"
+        end="68"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="87" _ref_sofa="1" begin="70"
+        end="77"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="92" _ref_sofa="1" begin="77"
+        end="78"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="97" _ref_sofa="1" begin="79"
+        end="86"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="102" _ref_sofa="1" begin="93"
+        end="96"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="107" _ref_sofa="1" begin="97"
+        end="100"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="112" _ref_sofa="1" begin="101"
+        end="105"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="117" _ref_sofa="1" begin="106"
+        end="109"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="122" _ref_sofa="1" begin="110"
+        end="114"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="127" _ref_sofa="1" begin="114"
+        end="115"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="132" _ref_sofa="1" begin="116"
+        end="119"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="137" _ref_sofa="1" begin="120"
+        end="131"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="142" _ref_sofa="1" begin="132"
+        end="137"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="147" _ref_sofa="1" begin="147"
+        end="149"/>
+    <org.apache.uima.caseditor.Test _indexed="1" _id="152" _ref_sofa="1" begin="139"
+        end="146"/>
 </CAS>
