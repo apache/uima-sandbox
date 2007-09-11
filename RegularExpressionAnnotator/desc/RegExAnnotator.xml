@@ -28,8 +28,8 @@
        
        <configurationParameter>
           <name>ProcessAllConceptRules</name>
-          <description>If this parameter is true, all rules of a concept are processed. If the parameter is false, 
-             the rules are processed by confidence (hightest confidence value first) and the processing stops after the frist 
+          <description>If this parameter is set to true, all rules of a concept are processed. If this parameter is set to false, 
+             the rules are processed by confidence (highest confidence value first) and the processing stops after the first 
              rule where matches are available.
           </description>
           <type>Boolean</type>
@@ -98,6 +98,7 @@
       <outputsNewCASes>false</outputsNewCASes>
     </operationalProperties>
   </analysisEngineMetaData>
+ 
   <externalResourceDependencies>
     <externalResourceDependency>
       <key>RegexConcepts</key>
@@ -106,7 +107,9 @@
       <optional>false</optional>
     </externalResourceDependency>
   </externalResourceDependencies>
+  
   <resourceManagerConfiguration>
+  
     <externalResources>
       <externalResource>
         <name>RegexConceptsFile</name>
@@ -117,6 +120,7 @@
         <implementationName>org.apache.uima.annotator.regex.impl.FileResource_impl</implementationName>
       </externalResource>
     </externalResources>
+  
     <externalResourceBindings>
       <externalResourceBinding>
         <key>RegexConcepts</key>
@@ -124,4 +128,5 @@
       </externalResourceBinding>
     </externalResourceBindings>
   </resourceManagerConfiguration>
+  
 </analysisEngineDescription>
