@@ -680,8 +680,336 @@
 				</para>
 
 				</section>
-				</section>
+			</section>			
+		</section>
+		<section id="sandbox.regexAnnotator.annotatorDescriptor">
+			<title>Annotator Descriptor</title>
+			<para>The RegexAnnotator analysis engine descriptor contains some processing information about 
+			the annotator. These processing information are specified as parameters and external resource dependencies. 
+			In this chapter we will look in detail at the descriptor settings.
+			</para>
+			<section id="sandbox.regexAnnotator.annotatorDescriptor.configParam">
+				<title>Configuration Parameters</title>
+				<para>
+				  The RegexAnnotator has the following configuration parameters that can affect the processing: 
+				</para>
+				<para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								<code>ProcessAllConceptRules</code>
+								- If this parameter is set to true, all rules of a concept are processed. 
+								If this parameter is set to false, the rules are processed by confidence 
+								(highest confidence value first) and the processing stops after the first 
+								rule where matches are available.
+							</para>
+						</listitem>
+				  	</itemizedlist>
+				</para>
+			</section>
+			<section id="sandbox.regexAnnotator.annotatorDescriptor.externalResource">
+				<title>External Resources</title>
+				<para>
+				  To specify the concept file that contains all the concepts and rules the 
+				  RegexAnnotator should process an external resource binding is used. 
+				  The important section in the descriptor where the external resource
+				  is specified is shown below.
+				</para>
+				<para>
+				<programlisting><![CDATA[
+<externalResources>
+  <externalResource>
+    <name>RegexConceptsFile</name>
+    <description>Regex Concepts file</description>
+    <fileResourceSpecifier>
+      <fileUrl>file:concepts.xml</fileUrl>
+    </fileResourceSpecifier>
+    <implementationName>org.apache.uima.annotator.regex.impl.FileResource_impl</implementationName>
+  </externalResource>
+</externalResources>
+]]></programlisting>
+				</para>
+				<para>
+				  The <code>&lt;fileUrl></code> element contains the file URL of the concept file.
+				  The given URL have to be available in the UIMA datapath or in the classpath. 
+				</para>
 				
+			</section>
+			<section id="sandbox.regexAnnotator.annotatorDescriptor.capabilities">
+				<title>Capabilities</title>
+				<para>
+				  In the capabilities section of the RegexAnnotator descriptor the input and output 
+				  capabilities and the supported languages have to be defined. 
+				</para>
+				<para>
+				  The input capabilities defined
+				  in the descriptor have to comply with the match types used in the concept rule file 
+				  that is used. For example the <code>uima.SentenceAnnotation</code> use in the rule
+				  below must be added to the input capability section in the RegexAnnotator descriptor.
+				</para>
+				<para>
+				<programlisting><![CDATA[
+<rules>
+  <rule regEx="RestRegex" matchStrategy="matchAll" matchType="uima.SentenceAnnotation"/>
+</rules>
+]]></programlisting>
+				</para>
+				<para>
+				  In the output section, all of the annotation types and features created by 
+				  the RegexAnnotator have to be specified. These have to match the 
+				  output types and features declared in the <code>&lt;annotation></code> elements of the concept file.
+				  For example the <code>org.apache.uima.TestAnnot</code> annotation and the 
+				  <code>org.apache.uima.TestAnnot:testFeature</code> feature used below must
+				  be added to the output capability section in the RegexAnnotator descriptor. 
+				</para>
+				<para>
+				<programlisting><![CDATA[
+<createAnnotations>
+  <annotation id="testannotation" type="org.apache.uima.TestAnnot">
+    <begin group="0"/>
+    <end group="0"/>
+    <setFeature name="testFeature" type="String">$0</setFeature>
+  </annotation>
+</createAnnotations>
+]]></programlisting>
+				</para>
+				<para>
+				  If there are any language dependent rules in the concept file the supported languages abbreviations 
+				  have to be specified in the <code>&lt;languagesSupported></code>element. If there are no 
+				  language dependent rules available you can specify <code>x-unspecified</code> as language. That means
+				  that the annotator can work on all languages.   
+				</para>
+				<para>
+				  For the short examples used above the capabilities section in the RegexAnnotator 
+				  descriptor looks like:
+				</para>
+				<para>
+				<programlisting><![CDATA[
+<capabilities>
+  <capability>
+    <inputs>
+      <type>uima.SentenceAnnotation</type>
+    </inputs>
+    <outputs>
+      <type>org.apache.uima.TestAnnot</type>
+      <feature>org.apache.uima.TestAnnot:testFeature</feature>
+    </outputs>
+    <languagesSupported>
+      <language>x-unspecified</language>
+    </languagesSupported>
+  </capability>
+</capabilities>
+]]></programlisting>
+				</para>
+			</section>
+		</section>
+		<section id="sandbox.regexAnnotator.xsd">
+			<title>Concept File Schema</title>
+			<para>The concept file schema looks like:
+			</para>
+			<para>
+				<programlisting><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<!--
+		* Licensed to the Apache Software Foundation (ASF) under one
+		* or more contributor license agreements.  See the NOTICE file
+		* distributed with this work for additional information
+		* regarding copyright ownership.  The ASF licenses this file
+		* to you under the Apache License, Version 2.0 (the
+		* "License"); you may not use this file except in compliance
+		* with the License.  You may obtain a copy of the License at
+		* 
+		*   http://www.apache.org/licenses/LICENSE-2.0
+		* 
+		* Unless required by applicable law or agreed to in writing,
+		* software distributed under the License is distributed on an
+		* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+		* KIND, either express or implied.  See the License for the
+		* specific language governing permissions and limitations
+		* under the License.
+	-->
+
+  <xs:element name="conceptSet">
+	<xs:complexType>
+	  <xs:sequence>
+		<xs:element ref="concept" minOccurs="1"	maxOccurs="unbounded" />
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="concept">
+	<xs:complexType>
+	  <xs:sequence>
+		<xs:element ref="rules" minOccurs="1" maxOccurs="1" />
+		<xs:element ref="createAnnotations" minOccurs="1" maxOccurs="1" />
+	  </xs:sequence>
+	  <xs:attribute name="name" type="xs:ID" use="optional" />
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="createAnnotations">
+	<xs:complexType>
+	  <xs:sequence>
+		<xs:element ref="annotation" minOccurs="1" maxOccurs="unbounded" />
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="rules">
+	<xs:complexType>
+	  <xs:sequence>
+		<xs:element ref="rule" minOccurs="1" maxOccurs="unbounded" />
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="rule">
+	<xs:complexType>
+	  <xs:all>
+		<xs:element ref="matchTypeFilter" minOccurs="0"	maxOccurs="1" />
+		<xs:element ref="updateMatchTypeAnnotation" minOccurs="0" maxOccurs="1" />
+		<xs:element ref="ruleExceptions" minOccurs="0" maxOccurs="1" />
+	  </xs:all>
+	  <xs:attribute name="regEx" type="xs:string" use="required" />
+	  <xs:attribute name="matchStrategy" use="required">
+	    <xs:simpleType>
+		  <xs:restriction base="xs:string">
+		    <xs:enumeration value="matchFirst" />
+			<xs:enumeration value="matchAll" />
+			<xs:enumeration value="matchComplete" />
+		  </xs:restriction>
+		</xs:simpleType>
+	  </xs:attribute>
+	  <xs:attribute name="matchType" type="xs:string" use="required" />
+	  <xs:attribute name="ruleId" type="xs:ID" use="optional" />
+	  <xs:attribute name="confidence" type="xs:decimal"	use="optional" />
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="matchTypeFilter">
+	<xs:complexType>
+	  <xs:sequence>
+		<xs:element ref="feature" minOccurs="0"	maxOccurs="unbounded" />
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="ruleExceptions">
+	<xs:complexType>
+	  <xs:sequence>
+	    <xs:element ref="exception" minOccurs="0" maxOccurs="unbounded" />
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="exception">
+	<xs:complexType>
+	  <xs:simpleContent>
+		<xs:extension base="xs:string">
+		  <xs:attribute name="matchType" type="xs:string" use="required" />
+		</xs:extension>
+	  </xs:simpleContent>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="feature">
+	<xs:complexType>
+	  <xs:simpleContent>
+		<xs:extension base="xs:string">
+		  <xs:attribute name="name" type="xs:string" use="required" />
+		</xs:extension>
+	  </xs:simpleContent>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="annotation">
+	<xs:complexType>
+	  <xs:sequence>
+		<xs:element ref="begin" minOccurs="1" maxOccurs="1" />
+		<xs:element ref="end" minOccurs="1" maxOccurs="1" />
+		<xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded" />
+	  </xs:sequence>
+	  <xs:attribute name="id" type="xs:ID" use="required" />
+	  <xs:attribute name="type" type="xs:string" use="required" />
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="updateMatchTypeAnnotation">
+	<xs:complexType>
+	  <xs:sequence>
+	    <xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded" />
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="begin">
+	<xs:complexType>
+	  <xs:attribute name="group" use="required">
+	    <xs:simpleType>
+		  <xs:restriction base="xs:integer">
+		    <xs:minInclusive value="0" />
+			<xs:maxInclusive value="9" />
+		  </xs:restriction>
+		</xs:simpleType>
+	  </xs:attribute>
+	  <xs:attribute name="location" use="optional" default="start">
+	    <xs:simpleType>
+	      <xs:restriction base="xs:string">
+		    <xs:enumeration value="start" />
+		    <xs:enumeration value="end" />
+		  </xs:restriction>
+	    </xs:simpleType>
+	  </xs:attribute>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="end">
+	<xs:complexType>
+	  <xs:attribute name="group" use="required">
+		<xs:simpleType>
+		  <xs:restriction base="xs:integer">
+			<xs:minInclusive value="0" />
+			<xs:maxInclusive value="9" />
+		  </xs:restriction>
+		</xs:simpleType>
+	  </xs:attribute>
+	  <xs:attribute name="location" use="optional" default="end">
+		<xs:simpleType>
+		  <xs:restriction base="xs:string">
+		    <xs:enumeration value="start" />
+			<xs:enumeration value="end" />
+		  </xs:restriction>
+		</xs:simpleType>
+	  </xs:attribute>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="setFeature">
+	<xs:complexType>
+	  <xs:simpleContent>
+		<xs:extension base="xs:string">
+		  <xs:attribute name="name" type="xs:string" use="required" />
+		  <xs:attribute name="type" use="required">
+		    <xs:simpleType>
+			  <xs:restriction base="xs:string">
+			    <xs:enumeration value="String" />
+				<xs:enumeration value="Integer" />
+				<xs:enumeration value="Float" />
+				<xs:enumeration value="Reference" />
+				<xs:enumeration value="Confidence" />
+				<xs:enumeration value="RuleId" />
+			  </xs:restriction>
+			</xs:simpleType>
+		  </xs:attribute>
+		</xs:extension>
+	  </xs:simpleContent>
+	</xs:complexType>
+  </xs:element>
+</xs:schema>
+]]></programlisting>
+			  
+			</para>
 		</section>
 	</section>
 
