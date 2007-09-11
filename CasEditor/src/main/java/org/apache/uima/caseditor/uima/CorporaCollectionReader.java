@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -42,7 +42,7 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
 
   /**
    * Sets the <code>CorpusElement</code>s to be read.
-   * 
+   *
    * @param corpora
    */
   public void setCorpora(Collection<CorpusElement> corpora) {
@@ -59,7 +59,7 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
 
   /**
    * Copies the next text with all annotation to the given cas object.
-   * 
+   *
    * @throws CollectionException -
    */
   public void getNext(CAS cas) throws CollectionException {
@@ -68,7 +68,7 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
     CAS documentCas = null;
 
     try {
-      documentCas = document.getDocument().getCAS();
+      documentCas = document.getDocument(false).getCAS();
     } catch (CoreException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -94,7 +94,7 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
 
   /**
    * Currently not implemented
-   * 
+   *
    * @return Progress[] - just returns null
    */
   public Progress[] getProgress() {

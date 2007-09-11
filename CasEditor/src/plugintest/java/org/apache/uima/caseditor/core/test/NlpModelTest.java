@@ -73,7 +73,7 @@ public class NlpModelTest {
     DocumentElement document = ((DocumentElement) CasEditorPlugin.getNlpModel().findMember(
             mProject.getDocument()));
 
-    assertTrue(document.getDocument().getCAS().getDocumentText().length() > 0);
+    assertTrue(document.getDocument(true).getCAS().getDocumentText().length() > 0);
   }
 
   /**

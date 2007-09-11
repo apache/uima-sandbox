@@ -102,7 +102,7 @@ public class DefectiveNlpModelTest {
 
     // throws a core exception since the document cannot be parsed
     ((DocumentElement) CasEditorPlugin.getNlpModel().findMember(mProject.getDocument()))
-            .getDocument();
+            .getDocument(true);
   }
 
   @Test

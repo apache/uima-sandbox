@@ -34,7 +34,7 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 	 * objects for the given element in this map, if something with document creation
 	 * goes wrong.
 	 *
-	 * The method {@link #getStatus(Object)} can than retrive and return the status.
+	 * The method {@link #getStatus(Object)} can then retrieve and return the status.
 	 */
 	private Map<Object, IStatus> mElementErrorStatus = new HashMap<Object, IStatus>();
 
@@ -111,7 +111,7 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 
 				try {
 					org.apache.uima.caseditor.core.IDocument workingCopy =
-						((DocumentElement) nlpElement).getDocument();
+						((DocumentElement) nlpElement).getDocument(true);
 
 					AnnotationDocument document = new AnnotationDocument();
 					document.setProject(nlpElement.getNlpProject());

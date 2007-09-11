@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
@@ -114,7 +115,7 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
 
       final IDocument document;
       try {
-        document = element.getDocument(); // retrieve the working copy
+        document = element.getDocument(false); // retrieve the working copy
       } catch (CoreException e1) {
         throw new InvocationTargetException(e1);
       }
@@ -148,8 +149,10 @@ public final class AnnotatorActionRunnable implements IRunnableWithProgress {
           // element is opened in editor and dirty, do nothing
         }
       } catch (CoreException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+
+        // TODO: Show the user an error dialog
+
+        CasEditorPlugin.log(e);
       }
     }
 

@@ -63,7 +63,6 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
 	if (corpus == null || documentFile == null) {
 	  throw new IllegalArgumentException("Parameters must not be null!");
-
 	}
 
     mParent = corpus;
@@ -95,10 +94,10 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
   /**
    * Retrieves the working copy.
    *
-   * @return the working copy
    * @throws CoreException
+   * @return the working copy
    */
-  public IDocument getDocument() throws CoreException {
+  public IDocument getDocument(boolean reload) throws CoreException {
 
     NlpProject project = (NlpProject) mParent.getParent();
 
@@ -110,7 +109,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
 	  DocumentUimaImpl document = mWorkingCopy.get();
 
-    if (document == null) {
+    if (reload || document == null) {
 
     	InputStream in = mDocumentFile.getContents();
 
@@ -136,7 +135,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
     ByteArrayOutputStream outStream = new ByteArrayOutputStream(40000);
 
-    ((DocumentUimaImpl) getDocument()).serialize(outStream);
+    ((DocumentUimaImpl) getDocument(false)).serialize(outStream);
 
     InputStream stream = new ByteArrayInputStream(outStream.toByteArray());
 
