@@ -38,7 +38,7 @@ public class DotCorpus {
   public static final int EDITOR_LINE_LENGTH_HINT_DEFAULT = 80;
 
   /**
-   * Name of the typesystem file
+   * Name of the type system file
    */
   private String mTypeSystemFileName;
 
@@ -63,7 +63,7 @@ public class DotCorpus {
   private HashMap<String, AnnotationStyle> mStyleMap = new HashMap<String, AnnotationStyle>();
 
   /**
-   * Retrives type system name parameter.
+   * Retrieves type system name parameter.
    *
    * @return type system name parameter
    */
@@ -82,7 +82,7 @@ public class DotCorpus {
   }
 
   /**
-   * Retrvies the uima config folder name parameter.
+   * Retrieves the uima config folder name parameter.
    *
    * @return uima config folder name parameter.
    */
@@ -123,7 +123,7 @@ public class DotCorpus {
   }
 
   /**
-   * Retrives the list of all corpus fodlers.
+   * Retrieves the list of all corpus folders.
    *
    * @return corpus folder list
    */
@@ -132,7 +132,7 @@ public class DotCorpus {
   }
 
   /**
-   * Retrvies the editor line length hint parameter.
+   * Retrieves the editor line length hint parameter.
    *
    * @return line length hint
    */
@@ -150,9 +150,9 @@ public class DotCorpus {
   }
 
   /**
-   * Retrives the annotation styles.
+   * Retrieves the annotation styles.
    *
-   * @return - the annoation styles
+   * @return - the annotation styles
    */
   public Collection<AnnotationStyle> getAnnotationStyles() {
     return mStyleMap.values();
@@ -164,11 +164,15 @@ public class DotCorpus {
    * @param style
    */
   public void setStyle(AnnotationStyle style) {
-    if (!(AnnotationStyle.DEFAULT_COLOR.equals(style.getColor()) && AnnotationStyle.DEFAULT_STYLE
-            .equals(style.getStyle()))) {
-      mStyleMap.put(style.getAnnotation(), style);
-    } else {
+
+    boolean isDefaultAnnotation = AnnotationStyle.DEFAULT_COLOR.equals(style.getColor()) &&
+        AnnotationStyle.DEFAULT_STYLE.equals(style.getStyle()) &&
+        AnnotationStyle.DEFAULT_LAYER == style.getLayer();
+
+    if (isDefaultAnnotation) {
       mStyleMap.remove(style.getAnnotation());
+    } else {
+      mStyleMap.put(style.getAnnotation(), style);
     }
   }
 
@@ -182,7 +186,7 @@ public class DotCorpus {
   }
 
   /**
-   * Retrives the AnnotationStyle for the given type or null if not available.
+   * Retrieves the AnnotationStyle for the given type or null if not available.
    *
    * @param type
    * @return the requested style or null if none
@@ -192,7 +196,7 @@ public class DotCorpus {
 
     if (style == null) {
       style = new AnnotationStyle(type.getName(), AnnotationStyle.DEFAULT_STYLE,
-              AnnotationStyle.DEFAULT_COLOR);
+              AnnotationStyle.DEFAULT_COLOR, 0);
     }
 
     return style;
@@ -232,7 +236,7 @@ public class DotCorpus {
    * @param a -
    *          the first object or null
    * @param b -
-   *          the secend object or null
+   *          the second object or null
    * @return - a.equals(b) or true if both null
    */
   private static boolean isEqual(Object a, Object b) {

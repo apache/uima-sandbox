@@ -32,8 +32,19 @@ public final class AnnotationStyle {
    */
   public enum Style {
 
+    /**
+     * The background color style.
+     */
+    BACKGROUND,
+
+    /**
+     * The text color style.
+     */
     TEXT_COLOR,
 
+    /**
+     * The token style.
+     */
     TOKEN,
 
     /**
@@ -67,11 +78,15 @@ public final class AnnotationStyle {
    */
   public static final Color DEFAULT_COLOR = new Color(0xff, 0, 0);
 
-  private String mAnnotation;
+  public static final int DEFAULT_LAYER = 0;
 
-  private Style mStyle;
+  private final String annotation;
 
-  private Color mColor;
+  private final Style style;
+
+  private final Color color;
+
+  private final int layer;
 
   /**
    * Initialize a new instance.
@@ -82,55 +97,61 @@ public final class AnnotationStyle {
    *          the drawing style
    * @param color -
    *          annotation color
+   *
+   * @param layer - drawing layer
    */
-  public AnnotationStyle(String annotation, Style style, Color color) {
-    // annoatation
-    if (annotation == null) {
-      throw new IllegalArgumentException("annotation must be not null!");
+  public AnnotationStyle(String annotation, Style style, Color color, int layer) {
+
+    if (annotation == null || style == null || color == null) {
+      throw new IllegalArgumentException("parameters must be not null!");
     }
 
-    mAnnotation = annotation;
+    this.annotation = annotation;
+    this.style = style;
+    this.color = color;
 
-    // style
-    if (style == null) {
-      throw new IllegalArgumentException("style must be not null!");
+    if (layer < 0) {
+      throw new IllegalArgumentException("layer must be a positive or zero");
     }
 
-    mStyle = style;
+    this.layer = layer;
 
-    // color
-    if (color == null) {
-      throw new IllegalArgumentException("color must be not null!");
-    }
-
-    mColor = color;
   }
 
   /**
-   * Retrives the annoation type.
+   * Retrieves the annotation type.
    *
    * @return - annotation type.
    */
   public String getAnnotation() {
-    return mAnnotation;
+    return annotation;
   }
 
   /**
-   * Retrives the drawing style of the annotation.
+   * Retrieves the drawing style of the annotation.
    *
    * @return - annotation drawing style
    */
   public Style getStyle() {
-    return mStyle;
+    return style;
   }
 
   /**
-   * Retrives the color of the annotation.
+   * Retrieves the color of the annotation.
    *
    * @return - annotation color
    */
   public Color getColor() {
-    return mColor;
+    return color;
+  }
+
+  /**
+   * Retrieves the drawing layer.
+   *
+   * @return
+   */
+  public int getLayer() {
+    return layer;
   }
 
   /**
@@ -140,17 +161,15 @@ public final class AnnotationStyle {
   public boolean equals(Object object) {
     boolean isEqual;
 
-    if (object != this) {
-      if (object instanceof AnnotationStyle) {
-        AnnotationStyle style = (AnnotationStyle) object;
-
-        isEqual = mAnnotation.equals(style.mAnnotation) && mStyle.equals(style.mStyle)
-                && mColor.equals(style.mColor);
-      } else {
-        isEqual = false;
-      }
-    } else {
+    if (object == this) {
       isEqual = true;
+    } else if (object instanceof AnnotationStyle) {
+      AnnotationStyle style = (AnnotationStyle) object;
+
+      isEqual = annotation.equals(style.annotation) && style.style.equals(style.style)
+              && color.equals(style.color) && layer == style.layer;
+    } else {
+      isEqual = false;
     }
 
     return isEqual;
@@ -169,10 +188,10 @@ public final class AnnotationStyle {
    */
   @Override
   public String toString() {
-    String annotationStyle = "Type: " + mAnnotation;
-    annotationStyle += " Style: " + mStyle.name();
-    annotationStyle += " Color: " + mColor.toString();
-
+    String annotationStyle = "Type: " + annotation;
+    annotationStyle += " Style: " + getStyle().name();
+    annotationStyle += " Color: " + getColor().toString();
+    annotationStyle += " Layer: " + getLayer();
     return annotationStyle;
   }
 }

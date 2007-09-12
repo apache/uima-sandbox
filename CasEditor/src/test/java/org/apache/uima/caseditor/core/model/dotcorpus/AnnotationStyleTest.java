@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,21 +35,25 @@ public class AnnotationStyleTest {
    */
   @Test
   public void testEquals() {
-    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
+    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(
+            255, 255, 0), 0);
 
-    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
+    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(
+            255, 255, 0), 0);
 
     assertEquals(a, b);
   }
 
   /**
    * Test the {@link AnnotationStyle#hashCode()} method.
-   * 
+   *
    */
   public void testHashCode() {
-    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
+    AnnotationStyle a = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(
+            255, 255, 0), 0);
 
-    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(255, 255, 0));
+    AnnotationStyle b = new AnnotationStyle("testType", AnnotationStyle.Style.BRACKET, new Color(
+            255, 255, 0), 0);
 
     assertEquals(a.hashCode(), b.hashCode());
   }

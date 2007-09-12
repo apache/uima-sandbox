@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,18 +19,22 @@
 
 package org.apache.uima.caseditor.editor.annotation;
 
-import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
 
 /**
- * TODO: add javadoc here
+ * This class is used to provide additional information about the {@link AnnotationFS}
+ * object to the custom drawing strategies.
  */
 public class EclipseAnnotationPeer extends org.eclipse.jface.text.source.Annotation {
-  private AnnotationFS mAnnotation;
+
+  /**
+   * The uima annotation.
+   */
+  private AnnotationFS annotation;
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param name
    * @param isPersitent
    * @param text
@@ -41,29 +45,20 @@ public class EclipseAnnotationPeer extends org.eclipse.jface.text.source.Annotat
 
   /**
    * Sets the annotation.
-   * 
+   *
    * @param annotation
    */
   public void setAnnotation(AnnotationFS annotation) {
-    mAnnotation = annotation;
+    this.annotation = annotation;
     setText(annotation.getCoveredText());
   }
 
   /**
-   * Retrives the annotation.
-   * 
+   * Retrieves the annotation.
+   *
    * @return the annotation
    */
   public AnnotationFS getAnnotationFS() {
-    return mAnnotation;
-  }
-
-  /**
-   * Retives the type of the annotation.
-   * 
-   * @return the type
-   */
-  public Type getAnnotationType() {
-    return mAnnotation.getType();
+    return annotation;
   }
 }

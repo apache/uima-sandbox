@@ -58,6 +58,8 @@ public class DotCorpusSerializer {
 
   private static final String STYLE_COLOR_ATTRIBUTE = "color";
 
+  private static final String STYLE_LAYER_ATTRIBUTE = "layer";
+
   private static final String TYPESYSTEM_ELEMENT = "typesystem";
 
   private static final String TYPESYTEM_FILE_ATTRIBUTE = "file";
@@ -71,7 +73,7 @@ public class DotCorpusSerializer {
   private static final String EDITOR_LINE_LENGTH_ATTRIBUTE = "line-length-hint";
 
   /**
-   * Creats a {@link DotCorpus} object from a given {@link InputStream}.
+   * Creates a {@link DotCorpus} object from a given {@link InputStream}.
    *
    * @param dotCorpusStream
    * @return the {@link DotCorpus} instance.
@@ -142,13 +144,22 @@ public class DotCorpusSerializer {
 
         String styleString = corporaChildElement.getAttribute(STYLE_STYLE_ATTRIBUTE);
 
-        String colorString = corporaChildElement.getAttribute(STYLE_COLOR_ATTRIBUTE);
-
-        int colorInteger = Integer.parseInt(colorString);
+        int colorInteger = Integer.parseInt(corporaChildElement.getAttribute(STYLE_COLOR_ATTRIBUTE));
 
         Color color = new Color(colorInteger);
+
+        String drawingLayerString = corporaChildElement.getAttribute(STYLE_LAYER_ATTRIBUTE);
+
+        int drawingLayer;
+
+        try {
+        drawingLayer = Integer.parseInt(drawingLayerString);
+        } catch(NumberFormatException e) {
+          drawingLayer = 0;
+        }
+
         AnnotationStyle style = new AnnotationStyle(type, AnnotationStyle.Style
-                .valueOf(styleString), color);
+                .valueOf(styleString), color, drawingLayer);
 
         dotCorpus.setStyle(style);
       } else if (CAS_PROCESSOR_ELEMENT.equals(corporaChildElement.getNodeName())) {
@@ -199,17 +210,19 @@ public class DotCorpusSerializer {
       }
 
       for (AnnotationStyle style : dotCorpus.getAnnotationStyles()) {
-        AttributesImpl corpusFolderAttributes = new AttributesImpl();
-        corpusFolderAttributes
+        AttributesImpl styleAttributes = new AttributesImpl();
+        styleAttributes
                 .addAttribute("", "", STYLE_TYPE_ATTRIBUTE, "", style.getAnnotation());
-        corpusFolderAttributes.addAttribute("", "", STYLE_STYLE_ATTRIBUTE, "", style.getStyle()
+        styleAttributes.addAttribute("", "", STYLE_STYLE_ATTRIBUTE, "", style.getStyle()
                 .name());
 
         Color color = style.getColor();
         Integer colorInt = new Color(color.getRed(), color.getGreen(), color.getBlue()).getRGB();
-        corpusFolderAttributes.addAttribute("", "", STYLE_COLOR_ATTRIBUTE, "", colorInt.toString());
+        styleAttributes.addAttribute("", "", STYLE_COLOR_ATTRIBUTE, "", colorInt.toString());
+        styleAttributes.addAttribute("", "", STYLE_LAYER_ATTRIBUTE, "",
+                Integer.toString(style.getLayer()));
 
-        xmlSerHandler.startElement("", STYLE_ELEMENT, STYLE_ELEMENT, corpusFolderAttributes);
+        xmlSerHandler.startElement("", STYLE_ELEMENT, STYLE_ELEMENT, styleAttributes);
         xmlSerHandler.endElement("", STYLE_ELEMENT, STYLE_ELEMENT);
       }
 
@@ -245,7 +258,6 @@ public class DotCorpusSerializer {
       String message = (e.getMessage() != null ? e.getMessage() : "");
 
       IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
-
       throw new CoreException(s);
     }
   }

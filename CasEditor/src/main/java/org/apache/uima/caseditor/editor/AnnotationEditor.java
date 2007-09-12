@@ -40,6 +40,7 @@ import org.apache.uima.caseditor.core.uima.AnnotationComparator;
 import org.apache.uima.caseditor.core.util.Span;
 import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;
 import org.apache.uima.caseditor.editor.annotation.DrawingStyle;
+import org.apache.uima.caseditor.editor.annotation.EclipseAnnotationPeer;
 import org.apache.uima.caseditor.editor.context.AnnotationEditingControlCreator;
 import org.apache.uima.caseditor.editor.outline.AnnotationOutline;
 import org.apache.uima.caseditor.ui.FeatureStructureTransfer;
@@ -54,6 +55,7 @@ import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationPainter;
 import org.eclipse.jface.text.source.IAnnotationAccess;
+import org.eclipse.jface.text.source.IAnnotationAccessExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -72,7 +74,10 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -303,7 +308,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
 
     private void fillTypeMenu(Type parentType, Menu parentMenu, boolean isParentIncluded) {
-      List childs = mTypeSystem.getDirectSubtypes(parentType);
+      List<Type> childs = mTypeSystem.getDirectSubtypes(parentType);
 
       Menu newSubMenu;
 
@@ -324,10 +329,10 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
         insertAction(parentType, newSubMenu);
 
-        Iterator childsIterator = childs.iterator();
+        Iterator<Type> childsIterator = childs.iterator();
 
         while (childsIterator.hasNext()) {
-          Type child = (Type) childsIterator.next();
+          Type child = childsIterator.next();
 
           fillTypeMenu(child, newSubMenu, true);
         }
@@ -427,9 +432,9 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
           // must be removed/added
           syncAnnotations();
 
-          EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
+          EditorAnnotationStatus status = getDocument().getProject().getEditorAnnotationStatus();
 
-          mDocument.getProject().setEditorAnnotationStatus(
+          getDocument().getProject().setEditorAnnotationStatus(
                   new EditorAnnotationStatus(status.getMode(), getSelectedTypes()));
         }
       });
@@ -526,6 +531,59 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
   }
 
+  private class AnnotationAccess implements IAnnotationAccess, IAnnotationAccessExtension {
+
+    public Object getType(Annotation annotation) {
+      return null;
+    }
+
+    public boolean isMultiLine(Annotation annotation) {
+      return false;
+    }
+
+    public boolean isTemporary(Annotation annotation) {
+      return false;
+    }
+
+    public int getLayer(Annotation annotation) {
+
+      if (annotation instanceof EclipseAnnotationPeer) {
+
+        EclipseAnnotationPeer eclipseAnnotation = (EclipseAnnotationPeer) annotation;
+
+        AnnotationStyle style = getDocument().getProject().
+            getDotCorpus().getAnnotation(eclipseAnnotation.getAnnotationFS().getType());
+
+        return style.getLayer();
+      }
+      else {
+        return 0;
+      }
+    }
+
+    public Object[] getSupertypes(Object annotationType) {
+      return null;
+    }
+
+    public String getTypeLabel(Annotation annotation) {
+      return null;
+    }
+
+    public boolean isPaintable(Annotation annotation) {
+      assert false : "Should never be called";
+
+      return false;
+    }
+
+    public boolean isSubtype(Object annotationType, Object potentialSupertype) {
+      return true;
+    }
+
+    public void paint(Annotation annotation, GC gc, Canvas canvas, Rectangle bounds) {
+      assert false : "Should never be called";
+    }
+  }
+
   private Type mAnnotationMode;
 
   /**
@@ -549,8 +607,6 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   private FeatureStructureSelectionProvider mFeatureStructureSelectionProvider;
 
   private AnnotationPainter mPainter;
-
-//  private IAnnotationModel mAnnotationModel;
 
   private ShowAnnotationsMenu mShowAnnotationsMenu;
 
@@ -591,21 +647,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     sourceViewer.setEditable(false);
 
-    mPainter = new AnnotationPainter(sourceViewer, new IAnnotationAccess() {
-
-		public Object getType(Annotation annotation) {
-			return null;
-		}
-
-		public boolean isMultiLine(Annotation annotation) {
-			return false;
-		}
-
-		public boolean isTemporary(Annotation annotation) {
-			return false;
-		}
-
-	});
+    mPainter = new AnnotationPainter(sourceViewer, new AnnotationAccess());
     sourceViewer.addPainter(mPainter);
 
     return sourceViewer;
@@ -677,12 +719,12 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     getSite().setSelectionProvider(mFeatureStructureSelectionProvider);
 
-    if (mDocument != null) {
+    if (getDocument() != null) {
 	    mShowAnnotationsMenu = new ShowAnnotationsMenu(
-	    		mDocument.getProject().getEditorAnnotationStatus(),
+	    		getDocument().getProject().getEditorAnnotationStatus(),
 	    		getDocument().getCAS().getTypeSystem());
 
-	    EditorAnnotationStatus status = mDocument.getProject().getEditorAnnotationStatus();
+	    EditorAnnotationStatus status = getDocument().getProject().getEditorAnnotationStatus();
 
 
 	    setAnnotationMode(status.getMode());
@@ -800,7 +842,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   }
 
   private void showAnnotationType(Type type) {
-		AnnotationStyle style = mDocument.getProject().getDotCorpus().getAnnotation(type);
+		AnnotationStyle style = getDocument().getProject().getDotCorpus().getAnnotation(type);
 		mPainter.addDrawingStrategy(type.getName(),
 				DrawingStyle.valueOf(style.getStyle().name()).getStrategy());
 		mPainter.addAnnotationType(type.getName(), type.getName());

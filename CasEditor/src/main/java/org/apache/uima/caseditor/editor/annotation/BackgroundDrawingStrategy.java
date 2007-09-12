@@ -27,11 +27,11 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
- * Draws a box around an annotation.
+ * Fills the background of an annotation.
  */
-final class BoxDrawingStrategy implements IDrawingStrategy {
+final class BackgroundDrawingStrategy implements IDrawingStrategy {
   /**
-   * Draws a box around the given annotation.
+   * Fill the background of the given annotation in the specified color.
    *
    * @param annotation
    * @param gc
@@ -46,9 +46,30 @@ final class BoxDrawingStrategy implements IDrawingStrategy {
       if (gc != null) {
         Rectangle bounds = textWidget.getTextBounds(offset, offset + length - 1);
 
-        gc.setForeground(color);
+        gc.setBackground(color);
+        gc.fillRectangle(bounds);
 
-        gc.drawRectangle(bounds.x, bounds.y, bounds.width, bounds.height);
+        int start = offset;
+        int end = offset + length;
+
+
+//        Point selection = textWidget.getSelection();
+//        boolean isPartOfAnnotationSelected = selection.x < end && start < selection.y &&
+//            selection.y - selection.x > 0;
+//        if (isPartOfAnnotationSelected) {
+//
+//          int startInAnnotation = selection.x < start ? start : selection.x;
+//          int endInAnnotation = selection.y < end ? selection.y : end;
+//
+//          Rectangle boundsInAnnotation = textWidget.getTextBounds(startInAnnotation, endInAnnotation);
+//
+//          gc.setBackground(new Color(gc.getDevice(), 100, 100, 100));
+//          gc.fillRectangle(boundsInAnnotation);
+//        }
+
+        gc.setForeground(new Color(gc.getDevice(), 0, 0, 0));
+
+        gc.drawText(textWidget.getText(start, end), bounds.x, bounds.y, true);
       } else {
         textWidget.redrawRange(offset, length, true);
       }

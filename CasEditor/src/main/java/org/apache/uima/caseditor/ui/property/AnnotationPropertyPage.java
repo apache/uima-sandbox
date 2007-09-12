@@ -31,26 +31,33 @@ import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.model.TypesystemElement;
 import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 /**
- * This is the <code>AnnotationPropertyPage</code>. this page configures the
- * project dependent and type dependent annotation appearance in the
- * <code>AnnotationEditor</code>.
+ * This is the <code>AnnotationPropertyPage</code>. this page configures the project dependent
+ * and type dependent annotation appearance in the <code>AnnotationEditor</code>.
  */
 public class AnnotationPropertyPage extends PropertyPage {
   private DotCorpusElement mDotCorpusElement;
@@ -59,11 +66,45 @@ public class AnnotationPropertyPage extends PropertyPage {
 
   private ColorSelector mColorSelector;
 
-  private List mTypeList;
+  private TableViewer mTypeList;
 
   private AnnotationStyle mCurrentSelectedAnnotation = null;
 
   private NlpProject mProject;
+
+  private AnnotationStyle getDefaultAnnotation() {
+
+    IStructuredSelection selection = (IStructuredSelection) mTypeList.getSelection();
+
+    Type selectedType = (Type) selection.getFirstElement();
+
+    return new AnnotationStyle(selectedType.getName(), AnnotationStyle.DEFAULT_STYLE,
+            AnnotationStyle.DEFAULT_COLOR, mCurrentSelectedAnnotation.getLayer());
+  }
+
+  private void itemSelected() {
+    IStructuredSelection selection = (IStructuredSelection) mTypeList.getSelection();
+
+    Type selectedType = (Type) selection.getFirstElement();
+
+    TypeSystem typesystem = mProject.getTypesystemElement().getTypeSystem();
+
+    AnnotationStyle style = mDotCorpusElement.getAnnotation(selectedType);
+
+    mCurrentSelectedAnnotation = style;
+
+    if (style == null) {
+      style = new AnnotationStyle(selectedType.getName(), AnnotationStyle.DEFAULT_STYLE,
+              AnnotationStyle.DEFAULT_COLOR, mCurrentSelectedAnnotation.getLayer());
+    }
+
+    mStyleCombo.setText(style.getStyle().name());
+    mStyleCombo.setEnabled(true);
+
+    Color color = style.getColor();
+    mColorSelector.setColorValue(new RGB(color.getRed(), color.getGreen(), color.getBlue()));
+    mColorSelector.setEnabled(true);
+  }
 
   /**
    * Creates the annotation property page controls.
@@ -83,7 +124,6 @@ public class AnnotationPropertyPage extends PropertyPage {
       return message;
     }
 
-
     Composite base = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout();
     layout.numColumns = 2;
@@ -98,37 +138,60 @@ public class AnnotationPropertyPage extends PropertyPage {
     typeText.setLayoutData(typeTextGridData);
 
     // type list
-    mTypeList = new List(base, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
+    mTypeList = new TableViewer(base, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
     GridData typeListGridData = new GridData();
     typeListGridData.horizontalAlignment = SWT.FILL;
     typeListGridData.grabExcessVerticalSpace = true;
     typeListGridData.verticalAlignment = SWT.FILL;
     typeListGridData.verticalSpan = 2;
-    mTypeList.setLayoutData(typeListGridData);
+    mTypeList.getControl().setLayoutData(typeListGridData);
+
+    mTypeList.getTable().setHeaderVisible(true);
+
+    TableViewerColumn typeColumn = new TableViewerColumn(mTypeList, SWT.LEFT);
+    typeColumn.getColumn().setText("Type");
+    typeColumn.getColumn().setWidth(250);
+    typeColumn.setLabelProvider(new CellLabelProvider(){
+      @Override
+      public void update(ViewerCell cell) {
+
+        Type type = (Type) cell.getElement();
+
+        cell.setText(type.getName());
+      }});
+
+    TableViewerColumn layerColumn = new TableViewerColumn(mTypeList, SWT.LEFT);
+    layerColumn.getColumn().setText("Layer");
+    layerColumn.getColumn().setWidth(50);
+
+    layerColumn.setLabelProvider(new CellLabelProvider() {
+
+      @Override
+      public void update(ViewerCell cell) {
+
+        Type type = (Type) cell.getElement();
+
+        AnnotationStyle style = mDotCorpusElement.getAnnotation(type);
+
+        cell.setText(Integer.toString(style.getLayer()));
+      }});
 
     TypeSystem typeSytstem = mProject.getTypesystemElement().getTypeSystem();
 
     Type annotationType = typeSytstem.getType(CAS.TYPE_NAME_ANNOTATION);
 
     java.util.List types = typeSytstem.getProperlySubsumedTypes(annotationType);
-    // Vector types = typeSytstem.getDirectlySubsumedTypes(annotationType);
 
     for (Object typeObject : types) {
-      Type type = (Type) typeObject;
-
-      mTypeList.add(type.getName());
+      // inserts objects with type Type
+      mTypeList.add(typeObject);
     }
 
-    mTypeList.addSelectionListener(new SelectionListener() {
+    mTypeList.addSelectionChangedListener(new ISelectionChangedListener() {
 
-      public void widgetSelected(SelectionEvent e) {
+      public void selectionChanged(SelectionChangedEvent event) {
         itemSelected();
       }
-
-      public void widgetDefaultSelected(SelectionEvent e) {
-        // not needed
-      }
-
     });
 
     Composite settingsComposite = new Composite(base, SWT.NONE);
@@ -147,7 +210,16 @@ public class AnnotationPropertyPage extends PropertyPage {
     mStyleCombo.setEnabled(false);
     mStyleCombo.addSelectionListener(new SelectionListener() {
       public void widgetSelected(SelectionEvent e) {
-        styleChanged();
+        if (mCurrentSelectedAnnotation == null) {
+          mCurrentSelectedAnnotation = getDefaultAnnotation();
+        }
+
+        mCurrentSelectedAnnotation = new AnnotationStyle(
+                mCurrentSelectedAnnotation.getAnnotation(), AnnotationStyle.Style
+                        .valueOf(mStyleCombo.getText()), mCurrentSelectedAnnotation.getColor(),
+                mCurrentSelectedAnnotation.getLayer());
+
+        mDotCorpusElement.setStyle(mCurrentSelectedAnnotation);
       }
 
       public void widgetDefaultSelected(SelectionEvent e) {
@@ -169,71 +241,79 @@ public class AnnotationPropertyPage extends PropertyPage {
     mColorSelector.setEnabled(false);
     mColorSelector.addListener(new IPropertyChangeListener() {
       public void propertyChange(PropertyChangeEvent event) {
-        colorChanged();
+        if (mCurrentSelectedAnnotation == null) {
+          mCurrentSelectedAnnotation = getDefaultAnnotation();
+        }
+
+        RGB colorRGB = mColorSelector.getColorValue();
+
+        Color color = new Color(colorRGB.red, colorRGB.green, colorRGB.blue);
+
+        mCurrentSelectedAnnotation = new AnnotationStyle(
+                mCurrentSelectedAnnotation.getAnnotation(), mCurrentSelectedAnnotation.getStyle(),
+                color, mCurrentSelectedAnnotation.getLayer());
+
+        mDotCorpusElement.setStyle(mCurrentSelectedAnnotation);
       }
     });
 
-    mTypeList.select(0);
+    Button moveLayerUpButton = new Button(settingsComposite, SWT.NONE);
+    moveLayerUpButton.setText("Move layer up");
+    GridDataFactory.fillDefaults().span(2, 1).applyTo(moveLayerUpButton);
+    moveLayerUpButton.addSelectionListener(new SelectionListener() {
 
-    if (mTypeList.getSelectionIndex() != -1) {
+      public void widgetDefaultSelected(SelectionEvent e) {
+      }
+
+      public void widgetSelected(SelectionEvent e) {
+        if (mCurrentSelectedAnnotation == null) {
+          mCurrentSelectedAnnotation = getDefaultAnnotation();
+        }
+
+        mCurrentSelectedAnnotation = new AnnotationStyle(
+                mCurrentSelectedAnnotation.getAnnotation(), AnnotationStyle.Style
+                        .valueOf(mStyleCombo.getText()), mCurrentSelectedAnnotation.getColor(),
+                mCurrentSelectedAnnotation.getLayer() + 1);
+
+        mDotCorpusElement.setStyle(mCurrentSelectedAnnotation);
+
+        mTypeList.refresh(((IStructuredSelection) mTypeList.getSelection()).getFirstElement(),
+                true);
+      }
+    });
+
+    Button moveLayerDownButton = new Button(settingsComposite, SWT.NONE);
+    moveLayerDownButton.setText("Move layer down");
+    GridDataFactory.fillDefaults().span(2, 1).applyTo(moveLayerDownButton);
+
+    moveLayerDownButton.addSelectionListener(new SelectionListener() {
+
+      public void widgetDefaultSelected(SelectionEvent e) {
+      }
+
+      public void widgetSelected(SelectionEvent e) {
+        if (mCurrentSelectedAnnotation != null && mCurrentSelectedAnnotation.getLayer() - 1 >= 0) {
+          mCurrentSelectedAnnotation = getDefaultAnnotation();
+
+          mCurrentSelectedAnnotation = new AnnotationStyle(mCurrentSelectedAnnotation
+                  .getAnnotation(), AnnotationStyle.Style.valueOf(mStyleCombo.getText()),
+                  mCurrentSelectedAnnotation.getColor(), mCurrentSelectedAnnotation.getLayer() - 1);
+
+          mDotCorpusElement.setStyle(mCurrentSelectedAnnotation);
+
+          mTypeList.update(((IStructuredSelection) mTypeList.getSelection()).getFirstElement(),
+                  null);
+        }
+      }
+    });
+
+    mTypeList.getTable().select(0);
+
+    if (mTypeList.getTable().getSelectionIndex() != -1) {
       itemSelected();
     }
 
     return base;
-  }
-
-  private void colorChanged() {
-    if (mCurrentSelectedAnnotation == null) {
-      mCurrentSelectedAnnotation = getDefaultAnnotation();
-    }
-
-    RGB colorRGB = mColorSelector.getColorValue();
-
-    Color color = new Color(colorRGB.red, colorRGB.green, colorRGB.blue);
-
-    mCurrentSelectedAnnotation = new AnnotationStyle(mCurrentSelectedAnnotation.getAnnotation(),
-            mCurrentSelectedAnnotation.getStyle(), color);
-
-    mDotCorpusElement.setStyle(mCurrentSelectedAnnotation);
-  }
-
-  private void styleChanged() {
-    if (mCurrentSelectedAnnotation == null) {
-      mCurrentSelectedAnnotation = getDefaultAnnotation();
-    }
-
-    mCurrentSelectedAnnotation = new AnnotationStyle(mCurrentSelectedAnnotation.getAnnotation(),
-            AnnotationStyle.Style.valueOf(mStyleCombo.getText()), mCurrentSelectedAnnotation
-                    .getColor());
-
-    mDotCorpusElement.setStyle(mCurrentSelectedAnnotation);
-  }
-
-  private void itemSelected() {
-    String name = mTypeList.getItem(mTypeList.getSelectionIndex());
-
-    TypeSystem typesystem = mProject.getTypesystemElement().getTypeSystem();
-
-    AnnotationStyle style = mDotCorpusElement.getAnnotation(typesystem.getType(name));
-
-    mCurrentSelectedAnnotation = style;
-
-    if (style == null) {
-      style = new AnnotationStyle(name, AnnotationStyle.DEFAULT_STYLE,
-              AnnotationStyle.DEFAULT_COLOR);
-    }
-
-    mStyleCombo.setText(style.getStyle().name());
-    mStyleCombo.setEnabled(true);
-
-    Color color = style.getColor();
-    mColorSelector.setColorValue(new RGB(color.getRed(), color.getGreen(), color.getBlue()));
-    mColorSelector.setEnabled(true);
-  }
-
-  private AnnotationStyle getDefaultAnnotation() {
-    return new AnnotationStyle(mTypeList.getItem(mTypeList.getSelectionIndex()),
-            AnnotationStyle.DEFAULT_STYLE, AnnotationStyle.DEFAULT_COLOR);
   }
 
   /**

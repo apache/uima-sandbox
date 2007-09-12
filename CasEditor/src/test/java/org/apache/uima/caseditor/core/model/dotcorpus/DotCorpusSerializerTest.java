@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,12 +31,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 
 /**
- * TODO: add javadoc here
+ * This is the test for the {@link DotCorpusSerializer} class.
+ *
+ * @see DotCorpusSerializer
  */
 public class DotCorpusSerializerTest {
   /**
    * Tests if serialization and recreations creates and object that is equal to the original.
-   * 
+   *
    * @throws CoreException
    */
   @Test
@@ -44,7 +46,7 @@ public class DotCorpusSerializerTest {
     DotCorpus original = new DotCorpus();
     original.setTypeSystemFilename("typesystem");
     original.addCasProcessorFolder("uima processor folder");
-    original.setStyle(new AnnotationStyle("test", Style.BRACKET, new Color(255, 255, 0)));
+    original.setStyle(new AnnotationStyle("test", Style.BRACKET, new Color(255, 255, 0), 0));
     original.addCorpusFolder("corpus");
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
