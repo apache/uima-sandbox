@@ -19,17 +19,12 @@
 
 package org.apache.uima.caseditor.ui.corpusview;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.apache.uima.caseditor.core.model.AnnotatorElement;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.DocumentElement;
-import org.apache.uima.caseditor.core.model.NlpProject;
-import org.apache.uima.caseditor.core.model.CasProcessorFolder;
-import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
-import org.apache.uima.caseditor.ui.action.AnnotatorActionRunnable;
+import org.apache.uima.caseditor.ui.action.CleanDocumentActionRunnable;
 import org.apache.uima.caseditor.ui.action.RunnableAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -37,30 +32,20 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.ActionGroup;
 
-/**
- * This is an action group for annotator actions.
- */
-final class AnnotatorActionGroup extends ActionGroup {
-  private Shell mShell;
+public class UimaRefactorActionGroup extends ActionGroup {
+
+  private Shell shell;
 
   /**
    * Initializes the current instance with the given shell.
    *
    * @param shell
    */
-  AnnotatorActionGroup(Shell shell) {
-    mShell = shell;
+  UimaRefactorActionGroup(Shell shell) {
+    this.shell = shell;
   }
 
-  /**
-   * Adds for each uima annotator an appropriate configured <code>AnnotatorAction</code> to the
-   * given menu.
-   *
-   * Note: The action appears only in the menu if a document or corpus is selected.
-   *
-   * @param menu -
-   *          the context menu manager
-   */
+
   @Override
   public void fillContextMenu(IMenuManager menu) {
     IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
@@ -82,34 +67,15 @@ final class AnnotatorActionGroup extends ActionGroup {
       }
     }
 
-    // TODO: refactor this
-    // how to retrieve the project of the selected elements ?
-    // what happens if someone selects DocumentElements form
-    // different projects ?
     if (!documentElements.isEmpty()) {
-      DocumentElement aDocument = documentElements.getFirst();
 
-      NlpProject project = aDocument.getNlpProject();
+      IRunnableWithProgress annotatorRunnableAction = new CleanDocumentActionRunnable(
+              documentElements);
 
-      Collection<CasProcessorFolder> sourceFolders = project.getCasProcessorFolders();
+      RunnableAction annotatorAction = new RunnableAction(shell, "Clean documents",
+              annotatorRunnableAction);
 
-      for (CasProcessorFolder sourceFolder : sourceFolders) {
-        Collection<AnnotatorElement> annotators = sourceFolder.getAnnotators();
-
-        for (AnnotatorElement annotator : annotators) {
-          AnnotatorConfiguration config = annotator.getAnnotatorConfiguration();
-
-          if (config != null) {
-            IRunnableWithProgress annotatorRunnableAction = new AnnotatorActionRunnable(config,
-                    documentElements);
-
-            RunnableAction annotatorAction = new RunnableAction(mShell, annotator.getName(),
-                    annotatorRunnableAction);
-
-            menu.add(annotatorAction);
-          }
-        }
-      }
+      menu.add(annotatorAction);
     }
   }
 }

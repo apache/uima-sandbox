@@ -274,6 +274,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
 
     public void changed() {
+      mFeatureStructureSelectionProvider.clearSelection();
+
       syncAnnotations();
     }
   }

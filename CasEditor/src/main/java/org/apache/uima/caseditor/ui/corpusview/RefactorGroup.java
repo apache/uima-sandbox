@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,55 +35,55 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
  * This group contains refactoring actions.
  */
 final class RefactorGroup extends ActionGroup {
-  
+
     /**
      * The Clipboard for the copy/paste actions. Must be diposed!
      */
     private Clipboard mClipboard;
-    
+
     /**
      * Action that actually copy the resource.
      */
     private CopyAction mCopyAction;
-    
+
     /**
      * The copy retarget action
      */
     private IWorkbenchAction mRetargetCopyAction;
-    
+
     /**
-     * Actin that actually paste the resource.
+     * Action that actually paste the resource.
      */
     private PasteAction mPasteAction;
-    
+
     /**
      * The paste retarget action.
      */
     private IWorkbenchAction mRetargetPasteAction;
-    
+
     /**
      * Action that actually delete the resource.
      */
     private DeleteResourceAction mDeleteAction;
-    
+
     /**
      * The delete retarget action.
      */
     private IWorkbenchAction mRetargetDeleteAction;
-    
+
     /**
      * Action that actually rename the resource.
      */
     private RenameResourceAction mRenameAction;
-    
+
     /**
      * The rename retarget action.
      */
     private IWorkbenchAction mRetargetRenameAction;
-    
+
     /**
      * Initializes a new instance.
-     * 
+     *
      * @param shell
      * @param window
      */
@@ -92,25 +92,25 @@ final class RefactorGroup extends ActionGroup {
 
     // copy action
         mCopyAction = new CopyAction(mClipboard);
-        
+
         mRetargetCopyAction = ActionFactory.COPY.create(window);
-        
+
         // paste action
         mPasteAction = new PasteAction(shell, mClipboard);
-        
+
         mRetargetPasteAction = ActionFactory.PASTE.create(window);
-        
+
         // delete action
         mDeleteAction = new DeleteResourceAction(shell);
-        
+
         mRetargetDeleteAction = ActionFactory.DELETE.create(window);
-        
+
         // rename action
         mRenameAction = new RenameResourceAction(shell);
-        
+
         mRetargetRenameAction = ActionFactory.RENAME.create(window);
     }
-    
+
     /**
      * Fills the context menu with actions.
      */
@@ -146,7 +146,7 @@ final class RefactorGroup extends ActionGroup {
 
     // 7. other refactoring commands
   }
-    
+
  /**
    * Fill the ActionBars with defined actions.
    */
@@ -162,7 +162,7 @@ final class RefactorGroup extends ActionGroup {
 
     actionBars.updateActionBars();
   }
-    
+
     /**
      * Update the selction of the actions.
      */
@@ -172,25 +172,25 @@ final class RefactorGroup extends ActionGroup {
 
     IStructuredSelection selection = CorpusExplorerUtil
             .convertNLPElementsToResources((IStructuredSelection) getContext().getSelection());
-        
+
         mCopyAction.selectionChanged(selection);
         mPasteAction.selectionChanged(selection);
         mDeleteAction.selectionChanged(selection);
         mRenameAction.selectionChanged(selection);
     }
-    
+
     /**
    * Destroy all swt elements which where created by this instance.
    */
   @Override
   public void dispose() {
-      
+
     mClipboard.dispose();
     mRetargetCopyAction.dispose();
     mRetargetPasteAction.dispose();
     mRetargetDeleteAction.dispose();
     mRetargetRenameAction.dispose();
-    
+
     super.dispose();
   }
 }

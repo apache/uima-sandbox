@@ -85,8 +85,6 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
 
   public Object[] getElements(Object inputElement) {
 
-
-
     if (inputElement != null) {
 
       FeatureStructure featureStructure = (FeatureStructure) inputElement;
@@ -132,11 +130,13 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
   public void inputChanged(final Viewer viewer, Object oldInput, Object newInput) {
     this.viewer = viewer;
 
-    Display.getDefault().syncExec(new Runnable() {
-      public void run() {
-        viewer.refresh();
-      }
-    });
+    if (newInput != null) {
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          viewer.refresh();
+        }
+      });
+    }
   }
 
   public void added(Collection<FeatureStructure> newFeatureStructure) {
@@ -144,12 +144,9 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
 
   public void changed() {
 
-    // TODO: check if fs still exists
-
     Display.getDefault().syncExec(new Runnable() {
       public void run() {
-        viewer.setSelection(viewer.getSelection());
-        viewer.refresh();
+        viewer.setInput(null);
       }
     });
   }
