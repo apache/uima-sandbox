@@ -18,6 +18,7 @@
  */
 package org.apache.uima.annotator.regex.impl;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.apache.uima.annotator.regex.Rule;
@@ -25,9 +26,11 @@ import org.apache.uima.annotator.regex.Rule;
 /**
  *
  */
-public class RuleComparator implements Comparator {
+public class RuleComparator implements Comparator, Serializable {
 
-  /* (non-Javadoc)
+  private static final long serialVersionUID = -1327195437752705633L;
+
+/* (non-Javadoc)
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */
   public int compare(Object o1, Object o2) {
@@ -45,6 +48,5 @@ public class RuleComparator implements Comparator {
        return 0;
     }
  }
-  
   
 }
