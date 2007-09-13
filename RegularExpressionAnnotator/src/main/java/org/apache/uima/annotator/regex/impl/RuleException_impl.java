@@ -61,10 +61,14 @@ public class RuleException_impl implements org.apache.uima.annotator.regex.RuleE
    */
   public boolean matchPattern(AnnotationFS annot) {
     
-    if(lastAnnot == annot) {
-      return lastMatchResult;
+    if(this.lastAnnot == annot) {
+      return this.lastMatchResult;
     }
     
+    //save current annotation
+    this.lastAnnot = annot;
+    
+    //check if the pattern match the current annotation
     if(this.pattern != null) {
       Matcher matcher = this.pattern.matcher(annot.getCoveredText());  
       //use match strategy matchFirst

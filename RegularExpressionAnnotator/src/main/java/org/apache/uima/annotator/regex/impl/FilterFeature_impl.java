@@ -85,7 +85,7 @@ public class FilterFeature_impl implements FilterFeature {
     this.feature = annotationType.getFeatureByBaseName(this.name);
 
     // throw exception if the feature does not exist
-    if (feature == null) {
+    if (this.feature == null) {
       throw new ResourceInitializationException(AnnotatorInitializationException.FEATURE_NOT_FOUND,
               new Object[] { FilterFeature_impl.class.getName(), this.name });
     }

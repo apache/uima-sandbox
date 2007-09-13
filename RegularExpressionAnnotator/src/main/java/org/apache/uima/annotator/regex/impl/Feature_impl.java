@@ -89,7 +89,7 @@ public class Feature_impl implements Feature {
     this.feature = annotationType.getFeatureByBaseName(this.name);
 
     // throw exception if the feature does not exist
-    if (feature == null) {
+    if (this.feature == null) {
       throw new ResourceInitializationException(AnnotatorInitializationException.FEATURE_NOT_FOUND,
               new Object[] { Feature_impl.class.getName(), this.name });
     }
