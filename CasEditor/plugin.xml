@@ -269,7 +269,7 @@
 				value="plugin_customization.ini" />
 			<property name="appName" value="Cas Editor"></property>
 			<property name="aboutImage"
-				value="icons/UIMA_logo_50.gif">
+				value="icons/window/uima_window_128.gif">
 			</property>
    <property
          name="startupForegroundColor"
@@ -282,6 +282,10 @@
    <property
          name="startupProgressRect"
          value="7,265,195,25">
+   </property>
+   <property
+         name="windowImages"
+         value="icons/window/uima_window_16.gif,icons/window/uima_window_32.gif,icons/window/uima_window_48.gif,icons/window/uima_window_64.gif,icons/window/uima_window_128.gif">
    </property>
 		</product>
 	</extension>
