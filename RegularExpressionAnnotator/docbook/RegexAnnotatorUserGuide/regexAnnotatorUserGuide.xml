@@ -26,51 +26,67 @@
 
 <book lang="en">
 
-<title>Apache UIMA RegexAnnotator Documentation</title>
+	<title>
+		Apache UIMA Regular Expression Annotator Documentation
+	</title>
 
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../SandboxDocs/src/docbook/book_info.xml"/>	
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="../../../SandboxDocs/src/docbook/book_info.xml" />
 
-<chapter id="sandbox.regexAnnotator">
-	<title>Regular Expression Annotator</title>
+	<preface>
+		<title>Introduction</title>
+		<para>
+			The Regular Expression Annotator (RegexAnnotator) is an
+			Apache UIMA analysis engine that detects entities such as
+			email addresses, URLs, phone numbers, zip codes or any other
+			entity that can be specified using a regular expression. For
+			each entity that is detected an own annotation can be
+			created or an already existing annotation can be updated
+			with new features.
 
-	<para>
-		The Regular Expression Annotator (RegexAnnotator) is an Apache
-		UIMA analysis engine that detects entities based on regular
-		expressions or concepts. A regular expression describe precise
-		patterns that are looked for in the document text. A concepts in
-		the current sense is a set of regular expressions that work
-		together to detect a more complex entity. The defined regular
-		expressions or concepts are used to detect entities like
-		numbers, email addresses or URLs and create annotations for
-		them.
-	</para>
+			To detect also more difficult and complex entities, the
+			annotator provides some advanced filter capabilities and a
+			rule definition syntax that can combine rules to a concept
+			with a confidence value for each of the concept's rules.
+		</para>
+	</preface>
 
-	<section id="sandbox.regexAnnotator.processingOverview">
+	<chapter id="sandbox.regexAnnotator.processingOverview">
 		<title>Processing Overview</title>
 		<para>
-			To detect entities the RegexAnnotator must be configured
-			using an external XML file. We call this file concepts file
-			since it contains the concepts and regular expression rules
-			that the annotator use to detect the entities. This
-			configuration contains additional to the rules and concepts
-			also the annotations that should be created if an entity was
-			found in the document text. The types and features used to
-			create the annotations must be defined in the UIMA type
-			system.
+			To detect any kind of entity the RegexAnnotator must be
+			configured using an external XML file. We call this file
+			"concepts file" since it contains the regular expressions
+			and concepts that the annotator use during its processing to
+			detect entities. In addition to the rules the concept file
+			also contains the result processing that is done if an
+			entity was detected. The result processing can be the
+			creation of new annotations or an update of an existing
+			annotation with additional features. The types and features
+			used to create new annotations must be defined in the UIMA
+			type system.
 		</para>
 		<para>
-			After the configuration is done, the RegexAnnotator is ready
-			to use. During is initialization is reads the concepts file
-			and checks if all rules and concepts are valid and if all
-			annotations types are defined. If no error exists the
-			processing can start. During the processing the rules are
-			processed in the same order as defined in the concepts xml
-			document. The results of a preceding rule can be used for
-			the following one.
+			After the concept file is created, the annotator XML
+			descriptor must be updated with the capabilities and type
+			system information from the concept file. This update is
+			necessary that the UIMA framework can call the annotator
+			also in complex annotator flows if the annotator is
+			assembled with others to an analysis bundle.
 		</para>
-	</section>
-
-	<section id="sandbox.regexAnnotator.conceptsFile">
+		<para>
+			Now the RegexAnnotator is ready to use. During the annotator
+			initialization the annotator reads the concept file and
+			checks if all rules and concepts are valid and if all
+			annotations types are defined in the UIMA type system. If
+			no error occurs the document processing can be started.
+			For each document that is processed the rules are executed in
+			the same order as defined in the concept file. The results
+			and annotations created for a preceding rule are used by the
+			following one.
+		</para>
+	</chapter>
+	<chapter id="sandbox.regexAnnotator.conceptsFile">
 		<title>Concepts Configuration File</title>
 		<para>
 			The RegexAnnotator can be configured using two levels of
@@ -691,7 +707,8 @@
 				</section>
 			</section>			
 		</section>
-		<section id="sandbox.regexAnnotator.annotatorDescriptor">
+</chapter>
+<chapter id="sandbox.regexAnnotator.annotatorDescriptor">
 			<title>Annotator Descriptor</title>
 			<para>The RegexAnnotator analysis engine descriptor contains some processing information about 
 			the annotator. These processing information are specified as parameters and external resource dependencies. 
@@ -811,8 +828,8 @@
 ]]></programlisting>
 				</para>
 			</section>
-		</section>
-		<section id="sandbox.regexAnnotator.xsd">
+</chapter>
+<appendix id="sandbox.regexAnnotator.xsd">
 			<title>Concept File Schema</title>
 			<para>The concept file schema looks like:
 			</para>
@@ -1019,9 +1036,7 @@
 ]]></programlisting>
 			  
 			</para>
-		</section>
-	</section>
 
-</chapter>
+</appendix>
 
 </book>
