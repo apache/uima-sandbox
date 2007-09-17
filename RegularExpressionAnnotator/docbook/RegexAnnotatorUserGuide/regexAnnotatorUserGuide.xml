@@ -56,34 +56,36 @@
 		<para>
 			To detect any kind of entity the RegexAnnotator must be
 			configured using an external XML file. We call this file
-			"concepts file" since it contains the regular expressions
+			"concept file" since it contains the regular expressions
 			and concepts that the annotator use during its processing to
 			detect entities. In addition to the rules the concept file
-			also contains the result processing that is done if an
-			entity was detected. The result processing can be the
+			also contains the "entity result processing" that is done if an
+			entity was detected. The "entity result processing" can either be the
 			creation of new annotations or an update of an existing
-			annotation with additional features. The types and features
-			used to create new annotations must be defined in the UIMA
+			annotation with additional features. The types and features that are 
+			used to create new annotations have to be available in the UIMA
 			type system.
 		</para>
 		<para>
 			After the concept file is created, the annotator XML
-			descriptor must be updated with the capabilities and type
-			system information from the concept file. This update is
+			descriptor have to be updated with the capabilities and maybe with the type
+			system information from the concept file. The capability update is
 			necessary that the UIMA framework can call the annotator
 			also in complex annotator flows if the annotator is
-			assembled with others to an analysis bundle.
+			assembled with others to an analysis bundle. The UIMA type system
+			update is only necessary if the used types are not available in 
+			the UIMA type system definition.  
 		</para>
 		<para>
-			Now the RegexAnnotator is ready to use. During the annotator
-			initialization the annotator reads the concept file and
+			With the completion of the descriptor updates, 
+			the RegexAnnotator is ready to use. When starting the annotator, 
+			during the initialization the annotator reads the concept file and
 			checks if all rules and concepts are valid and if all
-			annotations types are defined in the UIMA type system. If
-			no error occurs the document processing can be started.
-			For each document that is processed the rules are executed in
-			the same order as defined in the concept file. The results
+			annotations types are defined in the UIMA type system. 
+			For each document that is processed the rules and concepts are executed in
+			exactly the same order as defined in the concept file. The results
 			and annotations created for a preceding rule are used by the
-			following one.
+			following one since they are stored in the CAS.
 		</para>
 	</chapter>
 	<chapter id="sandbox.regexAnnotator.conceptsFile">
@@ -93,28 +95,32 @@
 			complexity.
 		</para>
 		<para>
-			The RuleSet definition is the simple way to define rules
-			that can consists of a regular expression pattern and of
-			annotations that should be created if the rules match an
+			The RuleSet definition is the easier way to define rules.
+			Such a definition consists of a regular expression pattern and of
+			annotations that should be created if the rule match an
 			entity.
 		</para>
 		<para>
 			The Concept definition is the more complex way to define
-			rules that consists of more than one regular expression rule
-			that are combined together.
+			rules. Such a definition can consists of more than one regular 
+			expression rule	that can be combined together and of a set
+			of annotations that should be created if one of the
+			rules has matched an entity.
 		</para>
 		<para>
-			The syntax in both definitions is the same, so you don't
-			need to learn two configuration possibilities it is just to
-			have an easier way to configure the annotator for simpler
-			entities. Furthermore it is possible to extend the RuleSet
-			definition with more and more features so that it becomes a
+			The syntax for both definitions is the same, so you don't
+			need to learn two configuration possibilities. The RuleSet 
+			definition is just available to have an easier and faster way to 
+			configure the annotator for simple tasks.  
+			If you have a RuleSet definition it is also possible to extend it 
+			with more and more features so that it becomes a
 			real Concept definition.
 		</para>
 
 		<section id="sandbox.regexAnnotator.conceptsFile.rules">
 			<title>RuleSet definition</title>
-			<para>The RuleSet definition looks like:</para>
+			<para>The syntax of a simple RuleSet definition for the 
+			  RegexAnnotator is shown in the listing below:</para>
 			<para>
 
 				<programlisting><![CDATA[
@@ -122,7 +128,7 @@
 
   <concept name="RuleSetDefinitionExample">
     <rules>
-      <rule regEx="PatternExample" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+      <rule regEx="ExamplePattern" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
     </rules>
     <createAnnotations>
       <annotation id="MyAnnotation" type="org.apache.uima.MyAnnotation">
@@ -136,27 +142,30 @@
 ]]></programlisting>
 			</para>
 			<para>
-				The RuleSet definition above defines are simple concept
-				with the name "RuleSetDefinitionExample". The rule use
-				the "PatternExample" pattern that is matched on the
-				covered text of the uima.tcas.DocumentAnnotation. As
-				match strategy, "matchAll" is used that means that all
+				The definition above defines are simple concept
+				with the name <code>RuleSetDefinitionExample</code>. The 
+				defined rule use the <code>ExamplePattern</code> as 
+				regular expression pattern that is matched on the
+				covered text of the match type <code>uima.tcas.DocumentAnnotation</code>. 
+				As match strategy, <code>matchAll</code> is used that means that all
 				matches for the pattern are used to create the
 				annotations defined in the
 				<code>&lt;createAnnotations></code>
 				element. So for each match a
-				org.apache.uima.MyAnnotation annotation is created that
+				<code>org.apache.uima.MyAnnotation</code> annotation is created that
 				covers the match in the document text.
 			</para>
 			<para>
-				For more advanced configuration possibilities, please
-				refer to the advanced configuration below.
+				For additional annotation creation possibilities such as adding
+				features to a created annotation, please refer to 
+				<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation"/>
 			</para>
 		</section>
 
 		<section id="sandbox.regexAnnotator.conceptsFile.concepts">
 			<title>Concept definition</title>
-			<para>The concept definition looks like:</para>
+			<para>The syntax of a complex Concept definition for the 
+			  RegexAnnotator is shown in the listing below:</para>
 			<para>
 			
 			<programlisting><![CDATA[
@@ -169,7 +178,7 @@
       <rule ruleId="Id3" regEx="PatternExample3" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.3"/>
     </rules>
     <createAnnotations>	
-      <annotation id="MyAnnotation1" type="org.apache.uima.MyAnnotation1">
+      <annotation id="myAnnotation" type="org.apache.uima.MyAnnotation">
         <begin group="0"/>
         <end group="0"/>
         <setFeature name="confidenceValue" type="Confidence"/>
@@ -183,61 +192,53 @@
 				
 			</para>
 			<para>
-				As you can see the concept definition is a more complex
-				RuleSet definition. The main differences are the ruleID
-				and confidence features for a rule. If these features
-				are specified, the feature values can be used as
-				annotation feature values when the
-				org.apache.uima.MyAnnotation1 is created. But lets see
-				how these concept is processed.
-			</para>
-			<para>
-				The concept processing depends on a parameter setting
-				for the RegexAnnotator. The parameter to control the
-				processing is called
-				<code>ProcessAllConceptRules</code>
-				. By default this parameter is set to
-				<code>false</code>
-				what means that the concept processing starts with the
-				first rule. If this rule found any match that triggers
-				to create an annotation the concept processing stops and
-				the other rules are not used. If the first rule doesn't
-				find a match, the next rule is used. This strategy is
-				used until a annotation is found or all rules are
-				processed. If the parameter
-				<code>ProcessAllConceptRules</code>
-				is set to
-				<code>true</code>
-				all rules are processed independent of the matches of a
-				rule.
-			</para>
-			<para>
-				If for a rule an annotations is created that has a
-				<code>&lt;setFeature></code>
-				definition of type
-				<code>Confidence</code>
-				or
-				<code>RuleId</code>
-				the current ruleId and confidence value of the rule is
-				added as feature value to the created annotations. Doing
-				this helps you after the text is processed to make
-				reliable statements about the confidence of your
-				annotation.
+				As you can see the Concept definition is a complex
+				RuleSet definition. The main differences are some additional
+				features defined at the rule and the combination of rules 
+				within one concept. 
+				The new features for a rule are <code>ruleID</code>
+				and <code>confidence</code>. If these features
+				are specified, the feature values for these features can 
+				later be assigned to an annotation feature for a created annotation. 
+				In case we use the listing above as example this means that when the 
+				<code>org.apache.uima.MyAnnotation</code> is created the value of the
+				<code>confidence</code> feature of the rule that matched the document text 
+				is assigned to the annotation feature called <code>confidenceValue</code>.
+				The same is done for the <code>ruleId</code> feature.
+				With that you can later check your annotation confidence and you can see 
+				which rule was responsible for the annotation creation.
 			</para>
 			<note>
 				<para>
-					The features for
-					<code>Confidence</code>
-					and
-					<code>RuleId</code>
-					must be defined by yourself in the UIMA type system.
-					So you can also assign the confidence or ruleId to
-					any other feature you have defined in the UIMA type
-					system. Confidence features have to be of type
-					uima.cas.Float and RuleId features have to be of
-					type uima.cas.String.
+					The annotation features for <code>Confidence</code>
+					and <code>RuleId</code>
+					have to be created manually in the UIMA type system.
+					Given that it is possible to assign the <code>confidence</code> and <code>ruleId</code> 
+					feature values to any other annotation feature you have defined 
+					in the UIMA type system. Confidence features have to be of type
+					<code>uima.cas.Float</code> and RuleId features have to be of
+					type <code>uima.cas.String</code>.
 				</para>
 			</note>
+			
+			<para>
+				The processing of a concept definition depends on a parameter setting
+				that can be changed in the RegexAnnotator descriptor. 
+				The parameter that controls the processing is called
+				<code>ProcessAllConceptRules</code>.
+				By default this parameter is set to	<code>false</code>. 
+				This means that the concept processing 
+				starts with the	first rule and goes on with the next one 
+				until a match was found. So in this processing maybe only the first rule
+				of a concept is evaluated if there a match was found. The other rules
+				of this concept will be ignored in that case.
+				This strategy should be used for example if your first concept 
+				rule has a strict pattern with a confidence of 1.0 and your 
+				second rule has a more lenient pattern with a confidence
+				of 0.5. If the <code>ProcessAllConceptRules</code> parameter
+				is set to <code>true</code>	all rules of a concept are processed 
+				independent of the matches for a previous rule.
+			</para>
 
 		</section>
 
@@ -383,7 +384,7 @@
 					element contains the regular expression pattern that
 					have to match the UIMA feature value. In the example
 					above the match type annotation has a feature
-					"language" that must have the content "en". If that
+					"language" that have to have the content "en". If that
 					is true, the annotation is pass the filter
 					condition.
 				</para>
@@ -514,8 +515,8 @@
 				</para>
 			</section>
 		</section>
-		<section id="sandbox.regexAnnotator.conceptsFile.annotationDefinition">
-				<title>Annotation Definition</title>
+		<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation">
+				<title>Annotation Creation</title>
 				<para>
 				  This paragraph explain with all the details how to create annotations if a rule has matched.
 				  The listing below shows the definition of an annotation with all possible settings.
@@ -544,7 +545,7 @@
 					<listitem>
 						<para>
 							<code>id</code>
-							- Specifies the annotation id for this annotation. The id must be unique within the
+							- Specifies the annotation id for this annotation. The id have to be unique within the
 							concepts file.
 						</para>
 					</listitem>
@@ -626,7 +627,7 @@
 				<para>
 				  With the <code>&lt;setFeature></code> element of <code>&lt;annotation></code> it is 
 				  possible to set UIMA features at the created annotation. The mandatory features
-				  that must be set are: 
+				  that have to be set are: 
 				</para>
 				<para>
 				<itemizedlist>
@@ -770,8 +771,8 @@
 				<para>
 				  The input capabilities defined
 				  in the descriptor have to comply with the match types used in the concept rule file 
-				  that is used. For example the <code>uima.SentenceAnnotation</code> use in the rule
-				  below must be added to the input capability section in the RegexAnnotator descriptor.
+				  that is used. For example the <code>uima.SentenceAnnotation</code> used in the rule
+				  below have to be added to the input capability section in the RegexAnnotator descriptor.
 				</para>
 				<para>
 				<programlisting><![CDATA[
@@ -785,7 +786,7 @@
 				  the RegexAnnotator have to be specified. These have to match the 
 				  output types and features declared in the <code>&lt;annotation></code> elements of the concept file.
 				  For example the <code>org.apache.uima.TestAnnot</code> annotation and the 
-				  <code>org.apache.uima.TestAnnot:testFeature</code> feature used below must
+				  <code>org.apache.uima.TestAnnot:testFeature</code> feature used below have to
 				  be added to the output capability section in the RegexAnnotator descriptor. 
 				</para>
 				<para>
