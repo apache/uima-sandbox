@@ -127,12 +127,13 @@
 			</para>
 			<para>
 
-				<programlisting><![CDATA[
-<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
+<programlisting><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:noNamespaceSchemaLocation="concept.xsd">
 
   <concept name="RuleSetDefinitionExample">
     <rules>
-      <rule regEx="ExamplePattern" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+      <rule regEx="ExamplePattern" matchStrategy="matchAll" 
+          matchType="uima.tcas.DocumentAnnotation"/>
     </rules>
     <createAnnotations>
       <annotation id="MyAnnotation" type="org.apache.uima.MyAnnotation">
@@ -172,14 +173,17 @@
 			  RegexAnnotator is shown in the listing below:</para>
 			<para>
 			
-			<programlisting><![CDATA[
-<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
+			<programlisting><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="concept.xsd">
 
   <concept name="complexConceptExample">
     <rules>
-      <rule ruleId="Id1" regEx="PatternExample1" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
-      <rule ruleId="Id2" regEx="PatternExample2" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.7"/>
-      <rule ruleId="Id3" regEx="PatternExample3" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.3"/>
+      <rule ruleId="Id1" regEx="PatternExample1" matchStrategy="matchAll" 
+          matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
+      <rule ruleId="Id2" regEx="PatternExample2" matchStrategy="matchAll" 
+          matchType="uima.tcas.DocumentAnnotation" confidence="0.7"/>
+      <rule ruleId="Id3" regEx="PatternExample3" matchStrategy="matchAll" 
+          matchType="uima.tcas.DocumentAnnotation" confidence="0.3"/>
     </rules>
     <createAnnotations>	
       <annotation id="myAnnotation" type="org.apache.uima.MyAnnotation">
@@ -260,8 +264,8 @@
 				the sub sections for the details about the sub elements.
 			</para>
 			<para> 
-				<programlisting><![CDATA[
-<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
+<programlisting><![CDATA[<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" 
+    matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
 
   <matchTypeFilter>
     <feature name="language">en</feature>
@@ -272,7 +276,9 @@
   </updateMatchTypeAnnotation>	
 
   <ruleExceptions>	
-    <exception matchType="uima.tcas.DocumentAnnotation">Exception</exception>
+    <exception matchType="uima.tcas.DocumentAnnotation">
+        Exception
+    </exception>
   </ruleExceptions>
 
 </rule>
@@ -352,8 +358,7 @@
 				id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.filter">
 				<title>Match Type Filter</title>
 				<para>
-				<programlisting><![CDATA[
-<matchTypeFilter>
+				<programlisting><![CDATA[<matchTypeFilter>
   <feature name="language">en</feature>
 </matchTypeFilter>
 ]]></programlisting>
@@ -392,8 +397,7 @@
 			<section id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.update">
 				<title>Update Match Type Annotations With Additional Features</title>
 				<para>	
-					<programlisting><![CDATA[
-<updateMatchTypeAnnotation>
+					<programlisting><![CDATA[<updateMatchTypeAnnotation>
   <setFeature name="language" type="String">$0</setFeature>
 </updateMatchTypeAnnotation>
 ]]></programlisting>
@@ -447,9 +451,10 @@
 				<title>Rule exception</title>
 				<para>
 					 
-					<programlisting><![CDATA[
-<ruleExceptions>	
-  <exception matchType="uima.tcas.DocumentAnnotation">ExceptionPattern</exception>
+					<programlisting><![CDATA[<ruleExceptions>	
+  <exception matchType="uima.tcas.DocumentAnnotation">
+      ExceptionPattern
+  </exception>
 </ruleExceptions>
 ]]></programlisting>
 					
@@ -466,8 +471,7 @@
 					When analyzing the text you will get a car brand annotation since "Ford" is
 					a car brand. But is this the correct behavior? The work around that issue
 					you can create an exception that looks like
-					 <programlisting><![CDATA[
-<ruleExceptions>	
+					 <programlisting><![CDATA[<ruleExceptions>	
   <exception matchType="uima.SentenceAnnotation">Henry</exception>
 </ruleExceptions>
 ]]></programlisting>
@@ -511,8 +515,7 @@
 				  An annotation creation example with all possible settings is shown in the listing below.
 				</para>
 				<para>
-				<programlisting><![CDATA[
-<annotation id="testannot" type="org.apache.uima.TestAnnot">
+				<programlisting><![CDATA[<annotation id="testannot" type="org.apache.uima.TestAnnot">
 	<begin group="0" location="start"/>
 	<end group="0" location="end"/>
 	<setFeature name="testFeature1" type="String">$0</setFeature>
@@ -748,15 +751,16 @@
 				  is specified is shown below.
 				</para>
 				<para>
-				<programlisting><![CDATA[
-<externalResources>
+				<programlisting><![CDATA[<externalResources>
   <externalResource>
     <name>RegexConceptsFile</name>
     <description>Regex Concepts file</description>
     <fileResourceSpecifier>
       <fileUrl>file:concepts.xml</fileUrl>
     </fileResourceSpecifier>
-    <implementationName>org.apache.uima.annotator.regex.impl.FileResource_impl</implementationName>
+    <implementationName>
+      org.apache.uima.annotator.regex.impl.FileResource_impl
+    </implementationName>
   </externalResource>
 </externalResources>
 ]]></programlisting>
@@ -780,9 +784,9 @@
 				  below have to be added to the input capability section in the RegexAnnotator descriptor.
 				</para>
 				<para>
-				<programlisting><![CDATA[
-<rules>
-  <rule regEx="RestRegex" matchStrategy="matchAll" matchType="uima.SentenceAnnotation"/>
+				<programlisting><![CDATA[<rules>
+  <rule regEx="SampleRegex" matchStrategy="matchAll" 
+      matchType="uima.SentenceAnnotation"/>
 </rules>
 ]]></programlisting>
 				</para>
@@ -795,8 +799,7 @@
 				  be added to the output capability section in the RegexAnnotator descriptor. 
 				</para>
 				<para>
-				<programlisting><![CDATA[
-<createAnnotations>
+				<programlisting><![CDATA[<createAnnotations>
   <annotation id="testannotation" type="org.apache.uima.TestAnnot">
     <begin group="0"/>
     <end group="0"/>
@@ -816,8 +819,7 @@
 				  descriptor looks like:
 				</para>
 				<para>
-				<programlisting><![CDATA[
-<capabilities>
+				<programlisting><![CDATA[<capabilities>
   <capability>
     <inputs>
       <type>uima.SentenceAnnotation</type>
@@ -840,8 +842,7 @@
 			<para>The concept file schema that is used to define the concept file looks like:
 			</para>
 			<para>
-				<programlisting><![CDATA[
-<?xml version="1.0" encoding="UTF-8"?>
+				<programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!--
 		* Licensed to the Apache Software Foundation (ASF) under one
@@ -865,7 +866,7 @@
   <xs:element name="conceptSet">
 	<xs:complexType>
 	  <xs:sequence>
-		<xs:element ref="concept" minOccurs="1"	maxOccurs="unbounded" />
+		<xs:element ref="concept" minOccurs="1"	maxOccurs="unbounded"/>
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>
@@ -873,17 +874,17 @@
   <xs:element name="concept">
 	<xs:complexType>
 	  <xs:sequence>
-		<xs:element ref="rules" minOccurs="1" maxOccurs="1" />
-		<xs:element ref="createAnnotations" minOccurs="1" maxOccurs="1" />
+		<xs:element ref="rules" minOccurs="1" maxOccurs="1"/>
+		<xs:element ref="createAnnotations" minOccurs="1" maxOccurs="1"/>
 	  </xs:sequence>
-	  <xs:attribute name="name" type="xs:ID" use="optional" />
+	  <xs:attribute name="name" type="xs:ID" use="optional"/>
 	</xs:complexType>
   </xs:element>
 
   <xs:element name="createAnnotations">
 	<xs:complexType>
 	  <xs:sequence>
-		<xs:element ref="annotation" minOccurs="1" maxOccurs="unbounded" />
+		<xs:element ref="annotation" minOccurs="1" maxOccurs="unbounded"/>
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>
@@ -891,7 +892,7 @@
   <xs:element name="rules">
 	<xs:complexType>
 	  <xs:sequence>
-		<xs:element ref="rule" minOccurs="1" maxOccurs="unbounded" />
+		<xs:element ref="rule" minOccurs="1" maxOccurs="unbounded"/>
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>
@@ -899,30 +900,30 @@
   <xs:element name="rule">
 	<xs:complexType>
 	  <xs:all>
-		<xs:element ref="matchTypeFilter" minOccurs="0"	maxOccurs="1" />
-		<xs:element ref="updateMatchTypeAnnotation" minOccurs="0" maxOccurs="1" />
-		<xs:element ref="ruleExceptions" minOccurs="0" maxOccurs="1" />
+		<xs:element ref="matchTypeFilter" minOccurs="0"	maxOccurs="1"/>
+		<xs:element ref="updateMatchTypeAnnotation" minOccurs="0" maxOccurs="1"/>
+		<xs:element ref="ruleExceptions" minOccurs="0" maxOccurs="1"/>
 	  </xs:all>
-	  <xs:attribute name="regEx" type="xs:string" use="required" />
+	  <xs:attribute name="regEx" type="xs:string" use="required"/>
 	  <xs:attribute name="matchStrategy" use="required">
 	    <xs:simpleType>
 		  <xs:restriction base="xs:string">
-		    <xs:enumeration value="matchFirst" />
-			<xs:enumeration value="matchAll" />
-			<xs:enumeration value="matchComplete" />
+		    <xs:enumeration value="matchFirst"/>
+			<xs:enumeration value="matchAll"/>
+			<xs:enumeration value="matchComplete"/>
 		  </xs:restriction>
 		</xs:simpleType>
 	  </xs:attribute>
-	  <xs:attribute name="matchType" type="xs:string" use="required" />
-	  <xs:attribute name="ruleId" type="xs:ID" use="optional" />
-	  <xs:attribute name="confidence" type="xs:decimal"	use="optional" />
+	  <xs:attribute name="matchType" type="xs:string" use="required"/>
+	  <xs:attribute name="ruleId" type="xs:ID" use="optional"/>
+	  <xs:attribute name="confidence" type="xs:decimal"	use="optional"/>
 	</xs:complexType>
   </xs:element>
 
   <xs:element name="matchTypeFilter">
 	<xs:complexType>
 	  <xs:sequence>
-		<xs:element ref="feature" minOccurs="0"	maxOccurs="unbounded" />
+		<xs:element ref="feature" minOccurs="0"	maxOccurs="unbounded"/>
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>
@@ -930,7 +931,7 @@
   <xs:element name="ruleExceptions">
 	<xs:complexType>
 	  <xs:sequence>
-	    <xs:element ref="exception" minOccurs="0" maxOccurs="unbounded" />
+	    <xs:element ref="exception" minOccurs="0" maxOccurs="unbounded"/>
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>
@@ -939,7 +940,7 @@
 	<xs:complexType>
 	  <xs:simpleContent>
 		<xs:extension base="xs:string">
-		  <xs:attribute name="matchType" type="xs:string" use="required" />
+		  <xs:attribute name="matchType" type="xs:string" use="required"/>
 		</xs:extension>
 	  </xs:simpleContent>
 	</xs:complexType>
@@ -949,7 +950,7 @@
 	<xs:complexType>
 	  <xs:simpleContent>
 		<xs:extension base="xs:string">
-		  <xs:attribute name="name" type="xs:string" use="required" />
+		  <xs:attribute name="name" type="xs:string" use="required"/>
 		</xs:extension>
 	  </xs:simpleContent>
 	</xs:complexType>
@@ -958,19 +959,19 @@
   <xs:element name="annotation">
 	<xs:complexType>
 	  <xs:sequence>
-		<xs:element ref="begin" minOccurs="1" maxOccurs="1" />
-		<xs:element ref="end" minOccurs="1" maxOccurs="1" />
-		<xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded" />
+		<xs:element ref="begin" minOccurs="1" maxOccurs="1"/>
+		<xs:element ref="end" minOccurs="1" maxOccurs="1"/>
+		<xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded"/>
 	  </xs:sequence>
-	  <xs:attribute name="id" type="xs:ID" use="required" />
-	  <xs:attribute name="type" type="xs:string" use="required" />
+	  <xs:attribute name="id" type="xs:ID" use="required"/>
+	  <xs:attribute name="type" type="xs:string" use="required"/>
 	</xs:complexType>
   </xs:element>
 
   <xs:element name="updateMatchTypeAnnotation">
 	<xs:complexType>
 	  <xs:sequence>
-	    <xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded" />
+	    <xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded"/>
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>
@@ -980,16 +981,16 @@
 	  <xs:attribute name="group" use="required">
 	    <xs:simpleType>
 		  <xs:restriction base="xs:integer">
-		    <xs:minInclusive value="0" />
-			<xs:maxInclusive value="9" />
+		    <xs:minInclusive value="0"/>
+			<xs:maxInclusive value="9"/>
 		  </xs:restriction>
 		</xs:simpleType>
 	  </xs:attribute>
 	  <xs:attribute name="location" use="optional" default="start">
 	    <xs:simpleType>
 	      <xs:restriction base="xs:string">
-		    <xs:enumeration value="start" />
-		    <xs:enumeration value="end" />
+		    <xs:enumeration value="start"/>
+		    <xs:enumeration value="end"/>
 		  </xs:restriction>
 	    </xs:simpleType>
 	  </xs:attribute>
@@ -1001,16 +1002,16 @@
 	  <xs:attribute name="group" use="required">
 		<xs:simpleType>
 		  <xs:restriction base="xs:integer">
-			<xs:minInclusive value="0" />
-			<xs:maxInclusive value="9" />
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="9"/>
 		  </xs:restriction>
 		</xs:simpleType>
 	  </xs:attribute>
 	  <xs:attribute name="location" use="optional" default="end">
 		<xs:simpleType>
 		  <xs:restriction base="xs:string">
-		    <xs:enumeration value="start" />
-			<xs:enumeration value="end" />
+		    <xs:enumeration value="start"/>
+			<xs:enumeration value="end"/>
 		  </xs:restriction>
 		</xs:simpleType>
 	  </xs:attribute>
@@ -1021,16 +1022,16 @@
 	<xs:complexType>
 	  <xs:simpleContent>
 		<xs:extension base="xs:string">
-		  <xs:attribute name="name" type="xs:string" use="required" />
+		  <xs:attribute name="name" type="xs:string" use="required"/>
 		  <xs:attribute name="type" use="required">
 		    <xs:simpleType>
 			  <xs:restriction base="xs:string">
-			    <xs:enumeration value="String" />
-				<xs:enumeration value="Integer" />
-				<xs:enumeration value="Float" />
-				<xs:enumeration value="Reference" />
-				<xs:enumeration value="Confidence" />
-				<xs:enumeration value="RuleId" />
+			    <xs:enumeration value="String"/>
+				<xs:enumeration value="Integer"/>
+				<xs:enumeration value="Float"/>
+				<xs:enumeration value="Reference"/>
+				<xs:enumeration value="Confidence"/>
+				<xs:enumeration value="RuleId"/>
 			  </xs:restriction>
 			</xs:simpleType>
 		  </xs:attribute>
