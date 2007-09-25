@@ -52,38 +52,24 @@
     <typeSystemDescription>
       <types>
         <typeDescription>
-          <name>org.apache.uima.TestAnnot</name>
+          <name>org.apache.uima.EmailAddress</name>
           <description/>
           <supertypeName>uima.tcas.Annotation</supertypeName>
           <features>
             <featureDescription>
-              <name>testFeature</name>
+              <name>localPart</name>
               <description/>
               <rangeTypeName>uima.cas.String</rangeTypeName>
             </featureDescription>
             <featureDescription>
-              <name>testFeature1</name>
-              <description/>
-              <rangeTypeName>org.apache.uima.TestAnnot1</rangeTypeName>
-            </featureDescription>
-            <featureDescription>
-              <name>confidenceValue</name>
-              <description/>
-              <rangeTypeName>uima.cas.Float</rangeTypeName>
-            </featureDescription>
-            <featureDescription>
-              <name>ruleId</name>
+              <name>domainPart</name>
               <description/>
               <rangeTypeName>uima.cas.String</rangeTypeName>
             </featureDescription>
           </features>
         </typeDescription>
-        <typeDescription>
-          <name>org.apache.uima.TestAnnot1</name>
-          <description/>
-          <supertypeName>uima.tcas.Annotation</supertypeName>
-        </typeDescription>
-      </types>
+         
+       </types>
     </typeSystemDescription>
     <capabilities>
       <capability>

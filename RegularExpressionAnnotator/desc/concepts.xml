@@ -19,59 +19,18 @@
  -->
 <conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
 	
-    <concept name="carConcept">
+    <concept name="emailAddressDetection">
     	<rules>
-			<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
-				<matchTypeFilter>
-					<feature name="language">en</feature>
-				</matchTypeFilter>
-				<updateMatchTypeAnnotation>
-			 		<setFeature name="language" type="String">$0</setFeature>
-			 	</updateMatchTypeAnnotation>	
-			 	<ruleExceptions>	
-	  				<exception matchType="uima.tcas.DocumentAnnotation">Exception</exception>
-  				</ruleExceptions>
-
-			</rule>
-      		<rule regEx="TestRegexSubrule1" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.7">
-				<matchTypeFilter>
-					<feature name="language">en</feature>
-				</matchTypeFilter>
-			</rule>
-			<rule regEx="TestRegexSubrule2" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.3">
-				<matchTypeFilter>
-					<feature name="language">en</feature>
-				</matchTypeFilter>
-				
-			</rule>		
+	   		<rule regEx="([a-zA-Z0-9!#$%*+'/=?^_-`{|}~.\x26]+)@([a-zA-Z0-9._-]+[a-zA-Z]{2,4})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>		
 	    </rules>
 	    <createAnnotations>	
-			<annotation id="testannot" type="org.apache.uima.TestAnnot">
+			<annotation id="emailAnnot" type="org.apache.uima.EmailAddress">
 				<begin group="0"/>
 				<end group="0"/>
-				<setFeature name="testFeature" type="String">$0</setFeature>		
-				<setFeature name="testFeature1" type="Reference">testannot1</setFeature>
-				<setFeature name="confidenceValue" type="Confidence"/>
-				<setFeature name="ruleId" type="RuleId"/>
-		 	</annotation>
-		 			 	
-		 	<annotation id="testannot1" type="org.apache.uima.TestAnnot1">
-				<begin group="0"/>
-				<end group="0"/>
+				<setFeature name="localPart" type="String">$1</setFeature>		
+				<setFeature name="domainPart" type="String">$2</setFeature>
 		 	</annotation>
 	 	</createAnnotations>
     </concept>
-    
-    <concept name="simpleConcept">
-    	<rules>
-			<rule regEx="RestRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
- 	    </rules>
-	    <createAnnotations>
-		 	<annotation id="testannotation" type="org.apache.uima.TestAnnot1">
-				<begin group="0"/>
-				<end group="0"/>
-		 	</annotation>
-	 	</createAnnotations>
-    </concept>
-    
+        
 </conceptSet>
