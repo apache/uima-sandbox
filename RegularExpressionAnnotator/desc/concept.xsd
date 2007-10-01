@@ -33,7 +33,7 @@
 		<xs:element ref="rules" minOccurs="1" maxOccurs="1" />
 		<xs:element ref="createAnnotations" minOccurs="1" maxOccurs="1" />
 	  </xs:sequence>
-	  <xs:attribute name="name" type="xs:ID" use="optional" />
+	  <xs:attribute name="name" type="xs:string" use="optional" />
 	</xs:complexType>
   </xs:element>
 
@@ -71,7 +71,7 @@
 		</xs:simpleType>
 	  </xs:attribute>
 	  <xs:attribute name="matchType" type="xs:string" use="required" />
-	  <xs:attribute name="ruleId" type="xs:ID" use="optional" />
+	  <xs:attribute name="ruleId" type="xs:string" use="optional" />
 	  <xs:attribute name="confidence" type="xs:decimal"	use="optional" />
 	</xs:complexType>
   </xs:element>
@@ -119,7 +119,7 @@
 		<xs:element ref="end" minOccurs="1" maxOccurs="1" />
 		<xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded" />
 	  </xs:sequence>
-	  <xs:attribute name="id" type="xs:ID" use="required" />
+	  <xs:attribute name="id" type="xs:string" use="optional" />
 	  <xs:attribute name="type" type="xs:string" use="required" />
 	</xs:complexType>
   </xs:element>

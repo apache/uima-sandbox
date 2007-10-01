@@ -19,30 +19,22 @@
  -->
 <conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
 	
-	<!-- same concept name -->
-	
-    <concept name="simpleConcept">
+    <concept name="referenceFeatureValues">
     	<rules>
-			<rule ruleId="ID1" regEx="regexExpression" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
- 	    </rules>
-	    <createAnnotations>
-		 	<annotation id="testannotation" type="org.apache.uima.TestAnnot1">
+			<rule ruleId="Id1" regEx="(Rule)(Regex)(1)(2.4)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
+	    </rules>
+	    <createAnnotations>	
+			<annotation id="testannot" type="org.apache.uima.TestAnnot">
+				<begin group="0"/>
+				<end group="0"/>
+				<setFeature name="testFeature5" type="Reference">refAnnotID</setFeature>
+		 	</annotation>
+		 			 	
+		 	<annotation type="org.apache.uima.TestAnnot1">
 				<begin group="0"/>
 				<end group="0"/>
 		 	</annotation>
 	 	</createAnnotations>
-    </concept>
-    
-    <concept name="simpleConcept">
-    	<rules>
-			<rule ruleId="ID1" regEx="regexExpression" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
- 	    </rules>
-	    <createAnnotations>
-		 	<annotation id="testannotation" type="org.apache.uima.TestAnnot1">
-				<begin group="0"/>
-				<end group="0"/>
-		 	</annotation>
-	 	</createAnnotations>
-    </concept>
-    
+    </concept>    
+        
 </conceptSet>

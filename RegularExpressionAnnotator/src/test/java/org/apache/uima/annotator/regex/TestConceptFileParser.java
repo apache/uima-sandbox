@@ -31,8 +31,7 @@ import org.apache.uima.test.junit_extension.FileCompare;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 
 /**
- * Test class to test the concept file XML parser. Also the test class detects the 
- * if the concept file contains duplicate IDs.
+ * Test class to test the concept file XML parser.
  */
 public class TestConceptFileParser extends TestCase {
 
@@ -63,32 +62,6 @@ public class TestConceptFileParser extends TestCase {
 
     // compare current output with reference output
     Assert.assertTrue(FileCompare.compare(refFile, outputFile));
-  }
-
-  /**
-   * check some duplicate ID error conditions
-   * 
-   * @throws Exception
-   */
-  public void testSyntaxErrorDuplicateIDs() throws Exception {
-    // check invalid concept file -> duplicate concept ID value -> simpleConcept
-    // check invalid concept file -> duplicate annotation ID value -> testannotation
-    // check invalid concept file -> duplicate rule ID value -> ID1
-    File conceptFile = JUnitExtension.getFile("conceptSyntax/syntaxErrorDuplicateIDs.xml");
-
-    try {
-      //parse concept file
-      ConceptFileParser parser = new ConceptFileParser_impl();
-      parser.parseConceptFile(conceptFile);
-    } catch (ResourceInitializationException ex) {
-      // catch exception and check if the error message contains the duplicate ID errors
-      String message = ex.getLocalizedMessage();
-      Assert.assertTrue("Duplicate concept name not detected",
-              message.indexOf("simpleConcept") >= 0);
-      Assert.assertTrue("Duplicate annotation ID not detected",
-              message.indexOf("testannotation") >= 0);
-      Assert.assertTrue("Duplicate rule ID not detected", message.indexOf("ID1") >= 0);
-    }
   }
 
   /**
