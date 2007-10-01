@@ -136,7 +136,7 @@
           matchType="uima.tcas.DocumentAnnotation"/>
     </rules>
     <createAnnotations>
-      <annotation id="MyAnnotation" type="org.apache.uima.MyAnnotation">
+      <annotation type="org.apache.uima.MyAnnotation">
         <begin group="0"/>
         <end group="0"/>
       </annotation>
@@ -186,7 +186,7 @@
           matchType="uima.tcas.DocumentAnnotation" confidence="0.3"/>
     </rules>
     <createAnnotations>	
-      <annotation id="myAnnotation" type="org.apache.uima.MyAnnotation">
+      <annotation type="org.apache.uima.MyAnnotation">
         <begin group="0"/>
         <end group="0"/>
         <setFeature name="confidenceValue" type="Confidence"/>
@@ -334,7 +334,7 @@
 					<listitem>
 						<para>
 							<code>ruleId</code>
-							- Specifies an unique ID for the rule. This
+							- Specifies the ID for this rule. The
 							ID can later be used to add it as
 							value to an annotation feature (see
 							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.features"/>).
@@ -536,8 +536,10 @@
 					<listitem>
 						<para>
 							<code>id</code>
-							- Specifies the annotation id for this annotation. The id have to be unique within the
-							concepts file.
+							- Specifies the annotation id for this annotation. If the annotation id is specified, 
+							it must be unique within the same concept. An annotation id is required if the
+							annotation is referred by another annotation or if the annotation itself refers 
+							other annotations using a <code>Reference</code> feature. 
 						</para>
 					</listitem>
 					<listitem>
@@ -800,7 +802,7 @@
 				</para>
 				<para>
 				<programlisting><![CDATA[<createAnnotations>
-  <annotation id="testannotation" type="org.apache.uima.TestAnnot">
+  <annotation type="org.apache.uima.TestAnnot">
     <begin group="0"/>
     <end group="0"/>
     <setFeature name="testFeature" type="String">$0</setFeature>
@@ -877,7 +879,7 @@
 		<xs:element ref="rules" minOccurs="1" maxOccurs="1"/>
 		<xs:element ref="createAnnotations" minOccurs="1" maxOccurs="1"/>
 	  </xs:sequence>
-	  <xs:attribute name="name" type="xs:ID" use="optional"/>
+	  <xs:attribute name="name" type="xs:string" use="optional"/>
 	</xs:complexType>
   </xs:element>
 
@@ -915,7 +917,7 @@
 		</xs:simpleType>
 	  </xs:attribute>
 	  <xs:attribute name="matchType" type="xs:string" use="required"/>
-	  <xs:attribute name="ruleId" type="xs:ID" use="optional"/>
+	  <xs:attribute name="ruleId" type="xs:string" use="optional"/>
 	  <xs:attribute name="confidence" type="xs:decimal"	use="optional"/>
 	</xs:complexType>
   </xs:element>
@@ -963,7 +965,7 @@
 		<xs:element ref="end" minOccurs="1" maxOccurs="1"/>
 		<xs:element ref="setFeature" minOccurs="0" maxOccurs="unbounded"/>
 	  </xs:sequence>
-	  <xs:attribute name="id" type="xs:ID" use="required"/>
+	  <xs:attribute name="id" type="xs:string" use="optional"/>
 	  <xs:attribute name="type" type="xs:string" use="required"/>
 	</xs:complexType>
   </xs:element>
