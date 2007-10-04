@@ -122,6 +122,16 @@
         
       </types>
     </typeSystemDescription>
+        
+    <typePriorities>
+	  	<priorityList>
+    		<type>org.apache.uima.TestAnnot</type>
+    		<type>org.apache.uima.TestAnnot1</type>
+    		<type>org.apache.uima.TestAnnot2</type>
+    		<type>org.apache.uima.TestAnnot3</type>
+  		</priorityList>
+	</typePriorities>
+    
     <capabilities>
       <capability>
         <inputs/>

@@ -130,7 +130,17 @@
           <supertypeName>uima.tcas.Annotation</supertypeName>
         </typeDescription>
       </types>
+    
     </typeSystemDescription>
+    
+    <typePriorities>
+	  	<priorityList>
+	  		<type>org.apache.uima.TestAnnot1</type>
+	  		<type>uima.tcas.DocumentAnnotation</type>
+    		<type>org.apache.uima.TestAnnot</type>
+  		</priorityList>
+	</typePriorities>
+    
     <capabilities>
       <capability>
         <inputs/>
