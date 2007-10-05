@@ -20,10 +20,12 @@
 package org.apache.uima.annotator.regex.impl;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +39,6 @@ import org.apache.uima.annotator.regex.Annotation;
 import org.apache.uima.annotator.regex.Concept;
 import org.apache.uima.annotator.regex.ConceptFileParser;
 import org.apache.uima.annotator.regex.Feature;
-import org.apache.uima.annotator.regex.FileResource;
 import org.apache.uima.annotator.regex.FilterFeature;
 import org.apache.uima.annotator.regex.Rule;
 import org.apache.uima.annotator.regex.RuleException;
@@ -47,22 +48,24 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 /**
- * Main RegEx annotator implementation class. 
+ * Main RegEx annotator implementation class.
  * 
  */
 public class RegExAnnotator extends CasAnnotator_ImplBase {
 
    public static final String MESSAGE_DIGEST = "org.apache.uima.annotator.regex.regexMessages";
 
-   public static final String REGEX_CONCEPTS = "RegexConcepts";
+   public static final String REGEX_CONCEPTS_FILES = "ConceptFiles";
 
    public static final String PROCESS_ALL_CONCEPT_RULES_PARAMETER = "ProcessAllConceptRules";
+
+   public static final String PATH_SEPARATOR = System
+         .getProperty("path.separator");
 
    private Logger logger;
 
@@ -84,45 +87,61 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          throws ResourceInitializationException {
       super.initialize(aContext);
 
-      FileResource fileResource = null;
-      try {
-         // initialize annotator logger
-         this.logger = getContext().getLogger();
+      String[] conceptFileNames = new String[] {};
 
-         // get regex rules file
-         fileResource = (FileResource) getContext().getResourceObject(
-               REGEX_CONCEPTS);
-
-         // get configuration parameter settings
-         // get parameter ProcessAllConceptRules, default is false
-         this.processAllConceptRules = safeGetConfigParameterValue(
-               getContext(), PROCESS_ALL_CONCEPT_RULES_PARAMETER, false);
-
-      } catch (ResourceAccessException ex) {
-         throw new ResourceInitializationException(ex);
-      }
-
-      // check if the file resource is valid
-      if (fileResource == null) {
-         throw new ResourceInitializationException(MESSAGE_DIGEST,
-               "regex_annotator_resource_not_found", null);
-      }
-
-      // get the rules file from the file resource
-      File rulesFile = fileResource.getFile();
-      if (rulesFile == null) {
-         throw new ResourceInitializationException(MESSAGE_DIGEST,
-               "regex_annotator_resource_not_found", null);
-      }
-
-      // log path name of the used rules file
-      this.logger.logrb(Level.CONFIG, "RegExAnnotator", "initialize",
-            MESSAGE_DIGEST, "regex_annotator_rule_set_file",
-            new Object[] { rulesFile.getAbsolutePath() });
-
-      // parse regex rules file to internal objects
+      // initialize annotator logger
+      this.logger = getContext().getLogger();
+      
+      // create a concept file parser object
       ConceptFileParser parser = new ConceptFileParser_impl();
-      this.regexConcepts = parser.parseConceptFile(rulesFile);
+
+      // get configuration parameter settings
+      // get parameter ProcessAllConceptRules, default is false
+      this.processAllConceptRules = safeGetConfigParameterBooleanValue(
+            getContext(), PROCESS_ALL_CONCEPT_RULES_PARAMETER, false);
+
+      // get parameter ConceptFiles, default is an empty array
+      conceptFileNames = safeGetConfigParameterStringArrayValue(getContext(),
+            REGEX_CONCEPTS_FILES, new String[] {});
+
+      // get UIMA datapath and tokenize it into its elements
+      StringTokenizer tokenizer = new StringTokenizer(getContext()
+            .getDataPath(), PATH_SEPARATOR);
+      ArrayList datapathElements = new ArrayList();
+      while (tokenizer.hasMoreTokens()) {
+         //add datapath elements to the 'datapathElements' array list
+         datapathElements.add(new File(tokenizer.nextToken()));
+      }
+
+      // try to resolve the concept file names 
+      ArrayList concepts = new ArrayList();
+      for (int i = 0; i < conceptFileNames.length; i++) {
+         //try to resolve the relative file name with classpath or datapath
+         File file = resolveRelativeFilePath(conceptFileNames[i],
+               datapathElements);
+
+         //if the current concept file wasn't found, throw an exception
+         if (file == null) {
+            throw new ResourceInitializationException(MESSAGE_DIGEST,
+                  "regex_annotator_resource_not_found",
+                  new Object[] { conceptFileNames[i] });
+         } else {
+            // log concept file path
+            this.logger.logrb(Level.CONFIG, "RegExAnnotator", "initialize",
+                  MESSAGE_DIGEST, "regex_annotator_rule_set_file",
+                  new Object[] { file.getAbsolutePath() });
+            
+            // parse concept file to internal objects
+            Concept[] currentConcepts = parser.parseConceptFile(file);
+            //add all concepts to the concepts list
+            for (int c = 0; c < currentConcepts.length; c++) {
+               concepts.add(currentConcepts[c]);
+            }
+         }
+      }
+
+      // get one array that contains all the concepts
+      this.regexConcepts = (Concept[]) concepts.toArray(new Concept[] {});
 
       // check duplicate concept names
       HashSet conceptNames = new HashSet(this.regexConcepts.length);
@@ -172,7 +191,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          }
       }
 
-      // check if annotation IDs are available in case of reference type features and 
+      // check if annotation IDs are available in case of reference type
+      // features and
       // check if they are unique within the concept
       for (int i = 0; i < this.regexConcepts.length; i++) {
          Annotation[] annotations = this.regexConcepts[i].getAnnotations();
@@ -206,15 +226,14 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   // if this annotation ID is available and unique for the
                   // concept
                   referenceIds.add(features[f].getValue());
-                  
-                  //check annotation ID for the current annotation. Annotations
-                  //that have a reference type feature must also have a valid
-                  //annotation ID
-                  if(annotID == null) {
-                     throw new ResourceInitializationException(
-                           MESSAGE_DIGEST,
+
+                  // check annotation ID for the current annotation. Annotations
+                  // that have a reference type feature must also have a valid
+                  // annotation ID
+                  if (annotID == null) {
+                     throw new ResourceInitializationException(MESSAGE_DIGEST,
                            "regex_annotator_error_annotation_id_not_available",
-                           new Object[] { this.regexConcepts[i].getName() }); 
+                           new Object[] { this.regexConcepts[i].getName() });
                   }
                }
             }
@@ -228,7 +247,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             // check if refID is available in the anntoationIDs list
             // if it is not available, throw an exception
             if (!annotationIds.contains(refID)) {
-               throw new ResourceInitializationException(MESSAGE_DIGEST,
+               throw new ResourceInitializationException(
+                     MESSAGE_DIGEST,
                      "regex_annotator_error_referred_annotation_id_not_available",
                      new Object[] { refID, this.regexConcepts[i].getName() });
             }
@@ -243,13 +263,59 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     * @return returns the boolean parameter value
     * @throws AnnotatorContextException
     */
-   private static boolean safeGetConfigParameterValue(UimaContext context,
-         String param, boolean defaultValue) {
+   private static boolean safeGetConfigParameterBooleanValue(
+         UimaContext context, String param, boolean defaultValue) {
       Boolean v = (Boolean) context.getConfigParameterValue(param);
       if (v != null) {
          return v.booleanValue();
       }
       return defaultValue;
+   }
+
+   /**
+    * @param context
+    * @param param
+    * @param defaultValue
+    * @return returns the boolean parameter value
+    * @throws AnnotatorContextException
+    */
+   private static String[] safeGetConfigParameterStringArrayValue(
+         UimaContext context, String param, String[] defaultValue) {
+      String[] array = (String[]) context.getConfigParameterValue(param);
+      if (array != null && array.length > 0) {
+         return array;
+      }
+      return defaultValue;
+   }
+
+   /**
+    * @param context
+    * @param param
+    * @param defaultValue
+    * @return returns the boolean parameter value
+    * @throws AnnotatorContextException
+    */
+   private File resolveRelativeFilePath(String fileName,
+         ArrayList datapathElements) {
+
+      URL url;
+      // try to use the class loader to load the file resource
+      if ((url = this.getClass().getClassLoader().getResource(fileName)) != null) {
+         return new File(url.getFile());
+      } else {
+         if (datapathElements == null || datapathElements.size() == 0) {
+            return null;
+         }
+         // try to use the datapath to load the file resource
+         for (int i = 0; i < datapathElements.size(); i++) {
+            File testFile = new File((File) datapathElements.get(i), fileName);
+            if (testFile.exists()) {
+               return testFile;
+            }
+         }
+      }
+      return null;
+
    }
 
    /**
@@ -687,7 +753,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          // add annotation to the local HashMap that is used to set annotation
          // reference features, the annotation must only be added in case that
          // an annotation id was specified.
-         if(annotations[a].getId() != null) {
+         if (annotations[a].getId() != null) {
             annotMap.put(annotations[a].getId(), fs);
          }
 

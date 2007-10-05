@@ -37,6 +37,16 @@
           <mandatory>false</mandatory>
        </configurationParameter>
     	
+       <configurationParameter>
+          <name>ConceptFiles</name>
+          <description>list of concept files to configure the annotator
+          </description>
+          <type>String</type>
+          <multiValued>true</multiValued>
+          <mandatory>true</mandatory>
+       </configurationParameter>
+
+    	
     </configurationParameters>
     
     <configurationParameterSettings>
@@ -45,6 +55,15 @@
           <name>ProcessAllConceptRules</name>
           <value>
              <boolean>false</boolean>
+          </value>
+       </nameValuePair>
+       
+       <nameValuePair>
+          <name>ConceptFiles</name>
+          <value>
+          	<array>
+          	   <string>matchStrategy/matchStrategy.xml</string> 
+          	</array>
           </value>
        </nameValuePair>
     
@@ -88,30 +107,5 @@
       <outputsNewCASes>false</outputsNewCASes>
     </operationalProperties>
   </analysisEngineMetaData>
-  <externalResourceDependencies>
-    <externalResourceDependency>
-      <key>RegexConcepts</key>
-      <description>Regex Rules file</description>
-      <interfaceName>org.apache.uima.annotator.regex.FileResource</interfaceName>
-      <optional>false</optional>
-    </externalResourceDependency>
-  </externalResourceDependencies>
-  <resourceManagerConfiguration>
-    <externalResources>
-      <externalResource>
-        <name>RegexConceptsFile</name>
-        <description>Regex Concepts file</description>
-        <fileResourceSpecifier>
-          <fileUrl>file:matchStrategy/matchStrategy.xml</fileUrl>
-        </fileResourceSpecifier>
-        <implementationName>org.apache.uima.annotator.regex.impl.FileResource_impl</implementationName>
-      </externalResource>
-    </externalResources>
-    <externalResourceBindings>
-      <externalResourceBinding>
-        <key>RegexConcepts</key>
-        <resourceName>RegexConceptsFile</resourceName>
-      </externalResourceBinding>
-    </externalResourceBindings>
-  </resourceManagerConfiguration>
+
 </analysisEngineDescription>
