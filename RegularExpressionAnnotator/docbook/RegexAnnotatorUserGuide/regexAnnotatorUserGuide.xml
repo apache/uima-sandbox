@@ -716,8 +716,8 @@
 </chapter>
 <chapter id="sandbox.regexAnnotator.annotatorDescriptor">
 			<title>Annotator Descriptor</title>
-			<para>The RegexAnnotator analysis engine descriptor contains some processing information about 
-			the annotator. This processing information is specified as parameters and external resource dependencies. 
+			<para>The RegexAnnotator analysis engine descriptor contains some processing information for 
+			the annotator. The processing information is specified as configuration parameters. 
 			This chapter we explain in detail the possible descriptor settings.
 			</para>
 			<section id="sandbox.regexAnnotator.annotatorDescriptor.configParam">
@@ -741,37 +741,26 @@
 								independent of the matches for a previous rule. 
 							</para>
 						</listitem>
+						<listitem>
+							<para>
+								<code>ConceptFiles</code>
+								- This parameter is modeled as array of Strings and contains 
+								the concept files the annotator should use. The concept files
+								must be specified using a relative path that is available in the
+								UIMA datapath or in the classpath.
+								<programlisting><![CDATA[<nameValuePair>
+  <name>ConceptFiles</name>
+  <value>
+    <array>
+      <string>subdir/myConcepts.xml</string>
+      <string>SampleConcept.xml</string> 
+    </array>
+  </value>
+</nameValuePair>]]></programlisting>
+							</para>
+						</listitem>
 				  	</itemizedlist>
 				</para>
-			</section>
-			<section id="sandbox.regexAnnotator.annotatorDescriptor.externalResource">
-				<title>External Resources</title>
-				<para>
-				  To specify the concept file the RegexAnnotator should use 
-				  an external resource binding is used. 
-				  The important section in the descriptor where the external resource
-				  is specified is shown below.
-				</para>
-				<para>
-				<programlisting><![CDATA[<externalResources>
-  <externalResource>
-    <name>RegexConceptsFile</name>
-    <description>Regex Concepts file</description>
-    <fileResourceSpecifier>
-      <fileUrl>file:concepts.xml</fileUrl>
-    </fileResourceSpecifier>
-    <implementationName>
-      org.apache.uima.annotator.regex.impl.FileResource_impl
-    </implementationName>
-  </externalResource>
-</externalResources>
-]]></programlisting>
-				</para>
-				<para>
-				  The <code>&lt;fileUrl></code> element contains the file URL of the concept file.
-				  The given URL have to be available in the UIMA datapath or in the classpath. 
-				</para>
-				
 			</section>
 			<section id="sandbox.regexAnnotator.annotatorDescriptor.capabilities">
 				<title>Capabilities</title>
@@ -868,7 +857,7 @@
   <xs:element name="conceptSet">
 	<xs:complexType>
 	  <xs:sequence>
-		<xs:element ref="concept" minOccurs="1"	maxOccurs="unbounded"/>
+		<xs:element ref="concept" minOccurs="0"	maxOccurs="unbounded"/>
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>

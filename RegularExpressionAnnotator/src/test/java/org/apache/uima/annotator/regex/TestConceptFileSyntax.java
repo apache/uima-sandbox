@@ -21,7 +21,9 @@ package org.apache.uima.annotator.regex;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.test.junit_extension.AnnotatorTester;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 
@@ -82,6 +84,43 @@ public class TestConceptFileSyntax extends TestCase {
                 "exception does not contain the concept name: referenceFeatureValueError",
                 message.indexOf("referenceFeatureValueError") > 0);
       }
+   }
+
+   public void testSyntaxRuleFileNotFound() throws Exception {
+      // test annotator configuration with a concept file that could not be found
+      // in the UIMA datapath or in the classpath
+      try {
+         new AnnotatorTester(JUnitExtension
+               .getFile("conceptSyntax/RegExAnnotRuleFileNotFound.xml"));
+      } catch (ResourceInitializationException ex) {
+         String message = ex.getCause().getLocalizedMessage();
+         Assert.assertTrue(
+                "exception does not contain the file name: fileThatDoesNotExist.xml",
+                message.indexOf("fileThatDoesNotExist.xml") > 0);
+      }
+   }
+
+   public void testSyntaxNotAllRuleFilesAvailable() throws Exception {
+      // test annotator configuration with more than one concept file
+      // where one of the concept files could not be found
+      try {
+         new AnnotatorTester(JUnitExtension
+               .getFile("conceptSyntax/RegExAnnotNotAllRuleFilesAvailable.xml"));
+      } catch (ResourceInitializationException ex) {
+         String message = ex.getCause().getLocalizedMessage();
+         Assert.assertTrue(
+                "exception does not contain the file name: fileThatDoesNotExist.xml",
+                message.indexOf("fileThatDoesNotExist.xml") > 0);
+      }
+   }
+
+   public void testSyntaxLoadRuleFileUsingDatapath() throws Exception {
+      // test annotator configuration with a concept file that is loaded
+      // using the UIMA datapath
+      ResourceManager rscMgr = UIMAFramework.newDefaultResourceManager();
+      rscMgr.setDataPath(JUnitExtension.getFile("conceptSyntax").getAbsolutePath());
+         new AnnotatorTester(JUnitExtension
+               .getFile("conceptSyntax/RegExAnnotLoadRuleFileUsingDatapath.xml").getAbsolutePath(), rscMgr);
    }
 
 }
