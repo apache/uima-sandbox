@@ -31,81 +31,88 @@ import org.apache.uima.resource.ResourceInitializationException;
  */
 public class FilterFeature_impl implements FilterFeature {
 
-  private final String name;
+   private final String name;
 
-  private final String patternStr;
+   private final String patternStr;
 
-  private org.apache.uima.cas.Feature feature;
+   private org.apache.uima.cas.Feature feature;
 
-  private Pattern pattern;
+   private Pattern pattern;
 
-  /**
-   * @param name
-   * @param patternStr
-   */
-  public FilterFeature_impl(String name, String patternStr) {
-    this.name = name;
-    this.patternStr = patternStr;
-    this.feature = null;
-    this.pattern = null;
-  }
+   /**
+    * @param name
+    * @param patternStr
+    */
+   public FilterFeature_impl(String name, String patternStr) {
+      this.name = name;
+      this.patternStr = patternStr;
+      this.feature = null;
+      this.pattern = null;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.FilterFeature#getName()
-   */
-  public String getName() {
-    return this.name;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.FilterFeature#getName()
+    */
+   public String getName() {
+      return this.name;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.FilterFeature#getPattern()
-   */
-  public Pattern getPattern() {
-    return this.pattern;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.FilterFeature#getPattern()
+    */
+   public Pattern getPattern() {
+      return this.pattern;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.FilterFeature#getFeature()
-   */
-  public org.apache.uima.cas.Feature getFeature() {
-    return this.feature;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.FilterFeature#getFeature()
+    */
+   public org.apache.uima.cas.Feature getFeature() {
+      return this.feature;
+   }
 
-  public void initialize(Type annotationType) throws ResourceInitializationException {
-    // compile pattern
-    this.pattern = Pattern.compile(this.patternStr);
+   public void typeInit(Type annotationType)
+         throws ResourceInitializationException {
+      // get feature by name from the specified annotation type
+      this.feature = annotationType.getFeatureByBaseName(this.name);
 
-    // get feature by name from the specified annotation type
-    this.feature = annotationType.getFeatureByBaseName(this.name);
+      // throw exception if the feature does not exist
+      if (this.feature == null) {
+         throw new ResourceInitializationException(
+               AnnotatorInitializationException.FEATURE_NOT_FOUND,
+               new Object[] { FilterFeature_impl.class.getName(), this.name });
+      }
+   }
 
-    // throw exception if the feature does not exist
-    if (this.feature == null) {
-      throw new ResourceInitializationException(AnnotatorInitializationException.FEATURE_NOT_FOUND,
-              new Object[] { FilterFeature_impl.class.getName(), this.name });
-    }
-  }
+   /**
+    * initialize the regex pattern
+    */
+   public void initialize() {
+      // compile pattern
+      this.pattern = Pattern.compile(this.patternStr);
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("Filter Feature: ");
-    buffer.append("\n  Name: ");
-    buffer.append(this.name);
-    buffer.append("\n  Pattern: ");
-    buffer.append(this.patternStr);
-    buffer.append("\n");
+   /*
+    * (non-Javadoc)
+    * 
+    * @see java.lang.Object#toString()
+    */
+   public String toString() {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append("Filter Feature: ");
+      buffer.append("\n  Name: ");
+      buffer.append(this.name);
+      buffer.append("\n  Pattern: ");
+      buffer.append(this.patternStr);
+      buffer.append("\n");
 
-    return buffer.toString();
-  }
+      return buffer.toString();
+   }
 
 }

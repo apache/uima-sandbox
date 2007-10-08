@@ -19,7 +19,7 @@
 package org.apache.uima.annotator.regex;
 
 /**
- * 
+ * The Feature interface provides access to a Regex Feature definition
  */
 public interface Feature {
 	
@@ -30,7 +30,11 @@ public interface Feature {
   public static final int CONFIDENCE_FEATURE = 5;
   public static final int RULEID_FEATURE = 6;
   
-	/**
+  public static final int CUSTOM_NORMALIZATION = 1;
+  public static final int TO_LOWER_NORMALIZATION = 2;
+  public static final int TO_UPPER_NORMALIZATION = 3;
+
+  /**
 	 * Get the feature name of this feature
 	 * 
 	 * @return returns the feature name
@@ -57,5 +61,14 @@ public interface Feature {
    * @return returns the UIMA feature object.
    */
   public org.apache.uima.cas.Feature getFeature();
+  
+  /**
+   * Get the normalization of the input string based on the specified
+   * normalization for this feature. If no normalization was specified,
+   * the input string is returned.
+   * 
+   * @return returns the normalization type for this feature.
+   */
+  public String normalize(String input) throws Exception;
 
 }

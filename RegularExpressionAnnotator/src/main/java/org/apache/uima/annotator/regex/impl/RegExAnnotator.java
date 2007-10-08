@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,7 +90,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
       // initialize annotator logger
       this.logger = getContext().getLogger();
-      
+
       // create a concept file parser object
       ConceptFileParser parser = new ConceptFileParser_impl();
 
@@ -109,20 +108,20 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             .getDataPath(), PATH_SEPARATOR);
       ArrayList datapathElements = new ArrayList();
       while (tokenizer.hasMoreTokens()) {
-         //add datapath elements to the 'datapathElements' array list
+         // add datapath elements to the 'datapathElements' array list
          datapathElements.add(new File(tokenizer.nextToken()));
       }
 
-      // try to resolve the concept file names 
+      // try to resolve the concept file names
       ArrayList concepts = new ArrayList();
       for (int i = 0; i < conceptFileNames.length; i++) {
-         //try to resolve the relative file name with classpath or datapath
+         // try to resolve the relative file name with classpath or datapath
          File file = resolveRelativeFilePath(conceptFileNames[i],
                datapathElements);
 
-         //if the current concept file wasn't found, throw an exception
+         // if the current concept file wasn't found, throw an exception
          if (file == null) {
-            throw new ResourceInitializationException(MESSAGE_DIGEST,
+            throw new RegexAnnotatorConfigException(
                   "regex_annotator_resource_not_found",
                   new Object[] { conceptFileNames[i] });
          } else {
@@ -130,10 +129,10 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             this.logger.logrb(Level.CONFIG, "RegExAnnotator", "initialize",
                   MESSAGE_DIGEST, "regex_annotator_rule_set_file",
                   new Object[] { file.getAbsolutePath() });
-            
+
             // parse concept file to internal objects
             Concept[] currentConcepts = parser.parseConceptFile(file);
-            //add all concepts to the concepts list
+            // add all concepts to the concepts list
             for (int c = 0; c < currentConcepts.length; c++) {
                concepts.add(currentConcepts[c]);
             }
@@ -164,96 +163,13 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          }
       }
 
-      // check duplicate rule IDs within the same concept
-      for (int i = 0; i < this.regexConcepts.length; i++) {
-         Rule[] rules = this.regexConcepts[i].getRules();
-         // ruleIDs for one concept
-         HashSet ruleIds = new HashSet(rules.length);
-
-         for (int x = 0; x < rules.length; x++) {
-            String ruleID = rules[x].getId();
-
-            // if no ruleID was specified, skip rule
-            if (ruleID == null) {
-               continue;
-            }
-            // check if ruleID already exist for this concept
-            if (ruleIds.contains(ruleID)) {
-               this.logger.logrb(Level.WARNING, "RegExAnnotator", "initialize",
-                     MESSAGE_DIGEST,
-                     "regex_annotator_warning_duplicate_rule_id", new Object[] {
-                           ruleID, this.regexConcepts[i].getName() });
-            } else {
-               // ruleID does not exist for this concept, add it to the ruleID
-               // list
-               ruleIds.add(ruleID);
-            }
+      // initialize the regex concepts
+      if (this.regexConcepts != null) {
+         for (int i = 0; i < this.regexConcepts.length; i++) {
+            ((Concept_impl) this.regexConcepts[i]).initialize(this.logger);
          }
       }
 
-      // check if annotation IDs are available in case of reference type
-      // features and
-      // check if they are unique within the concept
-      for (int i = 0; i < this.regexConcepts.length; i++) {
-         Annotation[] annotations = this.regexConcepts[i].getAnnotations();
-         HashSet referenceIds = new HashSet();
-         HashSet annotationIds = new HashSet();
-
-         for (int a = 0; a < annotations.length; a++) {
-
-            String annotID = annotations[a].getId();
-
-            // check annotation ID if available
-            if (annotID != null) {
-               // if annotation ID already exists for the current concept
-               // throw an exception, annotation IDs must be unique for a
-               // concept
-               if (annotationIds.contains(annotID)) {
-                  throw new ResourceInitializationException(
-                        MESSAGE_DIGEST,
-                        "regex_annotator_error_duplicate_annotation_id",
-                        new Object[] { annotID, this.regexConcepts[i].getName() });
-               } else {
-                  annotationIds.add(annotID);
-               }
-            }
-
-            Feature[] features = annotations[a].getFeatures();
-            for (int f = 0; f < features.length; f++) {
-               // check if the feature is a reference feature
-               if (features[f].getType() == Feature.REFERENCE_FEATURE) {
-                  // add the annotation ID to the referenceIDs list to check
-                  // if this annotation ID is available and unique for the
-                  // concept
-                  referenceIds.add(features[f].getValue());
-
-                  // check annotation ID for the current annotation. Annotations
-                  // that have a reference type feature must also have a valid
-                  // annotation ID
-                  if (annotID == null) {
-                     throw new ResourceInitializationException(MESSAGE_DIGEST,
-                           "regex_annotator_error_annotation_id_not_available",
-                           new Object[] { this.regexConcepts[i].getName() });
-                  }
-               }
-            }
-         }
-
-         // check if all referred annotation IDs are available
-         Iterator refIterator = referenceIds.iterator();
-         while (refIterator.hasNext()) {
-            String refID = (String) refIterator.next();
-
-            // check if refID is available in the anntoationIDs list
-            // if it is not available, throw an exception
-            if (!annotationIds.contains(refID)) {
-               throw new ResourceInitializationException(
-                     MESSAGE_DIGEST,
-                     "regex_annotator_error_referred_annotation_id_not_available",
-                     new Object[] { refID, this.regexConcepts[i].getName() });
-            }
-         }
-      }
    }
 
    /**
@@ -330,10 +246,10 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       if (this.regexConcepts != null) {
          try {
             for (int i = 0; i < this.regexConcepts.length; i++) {
-               ((Concept_impl) this.regexConcepts[i]).initialize(aTypeSystem);
+               ((Concept_impl) this.regexConcepts[i]).typeInit(aTypeSystem);
             }
          } catch (ResourceInitializationException ex) {
-            throw new AnalysisEngineProcessException(ex);
+            throw new RegexAnnotatorProcessException(ex);
          }
       }
    }
@@ -673,7 +589,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     *           array for the annotations that should be created
     */
    private void processConceptInstructions(Matcher matcher, AnnotationFS annot,
-         CAS aCAS, Concept concept, int ruleIndex, ArrayList annotsToAdd) {
+         CAS aCAS, Concept concept, int ruleIndex, ArrayList annotsToAdd)
+         throws RegexAnnotatorProcessException {
 
       // create local annotation map for reference features
       HashMap annotMap = new HashMap();
@@ -732,7 +649,18 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   fs.setIntValue(features[f].getFeature(), Integer
                         .parseInt(featureValue));
                } else if (type == Feature.STRING_FEATURE) {
-                  fs.setStringValue(features[f].getFeature(), featureValue);
+                  try {
+                     // try to set the normalized feature value, if no
+                     // normalization was specified for the feature, the
+                     // original feature value is set
+                     fs.setStringValue(features[f].getFeature(), features[f]
+                           .normalize(featureValue));
+                  } catch (Exception ex) {
+                     throw new RegexAnnotatorProcessException(
+                           "regex_annotator_error_normalizing_feature_value",
+                           new Object[] { featureValue, features[f].getName() },
+                           ex);
+                  }
                }
             } else if (type == Feature.REFERENCE_FEATURE) {
                // we have a reference feature, we have to set this later
@@ -820,8 +748,18 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                annot.setIntValue(updateFeatures[f].getFeature(), Integer
                      .parseInt(featureValue));
             } else if (type == Feature.STRING_FEATURE) {
-               annot.setStringValue(updateFeatures[f].getFeature(),
-                     featureValue);
+               try {
+                  // try to set the normalized feature value, if no
+                  // normalization was specified for the feature, the
+                  // original feature value is set
+                  annot.setStringValue(updateFeatures[f].getFeature(),
+                        updateFeatures[f].normalize(featureValue));
+               } catch (Exception ex) {
+                  throw new RegexAnnotatorProcessException(
+                        "regex_annotator_error_normalizing_feature_value",
+                        new Object[] { featureValue,
+                              updateFeatures[f].getName() }, ex);
+               }
             }
          } else if (type == Feature.REFERENCE_FEATURE) {
             // search for the referenced annotation ID

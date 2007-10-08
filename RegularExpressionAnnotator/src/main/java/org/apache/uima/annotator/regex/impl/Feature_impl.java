@@ -20,6 +20,7 @@ package org.apache.uima.annotator.regex.impl;
 
 import org.apache.uima.analysis_engine.annotator.AnnotatorInitializationException;
 import org.apache.uima.annotator.regex.Feature;
+import org.apache.uima.annotator.regex.Normalization;
 import org.apache.uima.cas.Type;
 import org.apache.uima.resource.ResourceInitializationException;
 
@@ -29,100 +30,167 @@ import org.apache.uima.resource.ResourceInitializationException;
  */
 public class Feature_impl implements Feature {
 
-  private final int type;
+   private final int type;
 
-  private final String name;
+   private final int normalizationType;
 
-  private final String value;
+   private final String name;
 
-  private org.apache.uima.cas.Feature feature;
+   private final String value;
 
-  public Feature_impl(int type, String name, String value) {
-    this.type = type;
-    this.name = name;
-    this.value = value;
-    this.feature = null;
-  }
+   private final String implClass;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Feature#getType()
-   */
-  public int getType() {
-    return this.type;
-  }
+   private Normalization normalizer;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Feature#getName()
-   */
-  public String getName() {
-    return this.name;
-  }
+   private org.apache.uima.cas.Feature feature;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Feature#getValue()
-   */
-  public String getValue() {
-    return this.value;
-  }
+   public Feature_impl(int type, String name, String value,
+         int normalizationType, String implClass) {
+      this.type = type;
+      this.name = name;
+      this.value = value;
+      this.feature = null;
+      this.normalizationType = normalizationType;
+      this.implClass = implClass;
+      this.normalizer = null;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Feature#getFeature()
-   */
-  public org.apache.uima.cas.Feature getFeature() {
-    return this.feature;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Feature#getType()
+    */
+   public int getType() {
+      return this.type;
+   }
 
-  /**
-   * @param annotationType
-   * @throws ResourceInitializationException
-   */
-  public void initialize(Type annotationType) throws ResourceInitializationException {
-    // get feature by name from the specified annotation type
-    this.feature = annotationType.getFeatureByBaseName(this.name);
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Feature#getName()
+    */
+   public String getName() {
+      return this.name;
+   }
 
-    // throw exception if the feature does not exist
-    if (this.feature == null) {
-      throw new ResourceInitializationException(AnnotatorInitializationException.FEATURE_NOT_FOUND,
-              new Object[] { Feature_impl.class.getName(), this.name });
-    }
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Feature#getValue()
+    */
+   public String getValue() {
+      return this.value;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("Feature: ");
-    buffer.append("\n  Name: ");
-    buffer.append(this.name);
-    if (this.type == Feature.FLOAT_FEATURE) {
-      buffer.append("\n  Type: float");
-    } else if (this.type == Feature.INTEGER_FEATURE) {
-      buffer.append("\n  Type: integer");
-    } else if (this.type == Feature.STRING_FEATURE) {
-      buffer.append("\n  Type: string");
-    } else if (this.type == Feature.REFERENCE_FEATURE) {
-      buffer.append("\n  Type: reference");
-    } else if (this.type == Feature.CONFIDENCE_FEATURE) {
-      buffer.append("\n  Type: confidence");
-    } else if (this.type == Feature.RULEID_FEATURE) {
-      buffer.append("\n  Type: ruleId");
-    }
-    buffer.append("\n  Value: ");
-    buffer.append(this.value);
-    buffer.append("\n");
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Feature#getFeature()
+    */
+   public org.apache.uima.cas.Feature getFeature() {
+      return this.feature;
+   }
 
-    return buffer.toString();
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Feature#normalize(java.lang.String)
+    */
+   public String normalize(String input) throws Exception {
+      // check normalizer type
+      if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
+         return this.normalizer.normalize(input);
+      } else if (this.normalizationType == Feature.TO_LOWER_NORMALIZATION) {
+         return input.toLowerCase();
+      } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {
+         return input.toUpperCase();
+      } else {
+         return input;
+      }
+   }
+
+   /**
+    * @param annotationType
+    * @throws ResourceInitializationException
+    */
+   public void typeInit(Type annotationType)
+         throws ResourceInitializationException {
+      // get feature by name from the specified annotation type
+      this.feature = annotationType.getFeatureByBaseName(this.name);
+
+      // throw exception if the feature does not exist
+      if (this.feature == null) {
+         throw new ResourceInitializationException(
+               AnnotatorInitializationException.FEATURE_NOT_FOUND,
+               new Object[] { Feature_impl.class.getName(), this.name });
+      }
+   }
+
+   /**
+    * Initialize the feature definition. Try to instantiate the custom
+    * normalization class if specified.
+    * 
+    */
+   public void initialize() throws RegexAnnotatorConfigException {
+      // check if the normalization implementation exists in case of custom
+      // normalization
+      if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
+
+         // check if the normalizer class is specified
+         if (this.implClass == null) {
+            throw new RegexAnnotatorConfigException(
+                  "regex_annotator_error_custom_normalizer_not_specified",
+                  new Object[] { this.name });
+         } else {
+            try {
+               // try to get the custom normalization class
+               Class normalizerClass = this.getClass().getClassLoader()
+                     .loadClass(this.implClass);
+               Object obj = normalizerClass.newInstance();
+               if (obj instanceof Normalization) {
+                  this.normalizer = (Normalization) obj;
+               } else {
+                  throw new RegexAnnotatorConfigException(
+                        "regex_annotator_error_custom_normalizer_wrong_interface",
+                        new Object[] { this.implClass });
+               }
+            } catch (Exception ex) {
+               throw new RegexAnnotatorConfigException(
+                     "regex_annotator_error_creating_custom_normalizer",
+                     new Object[] { this.implClass }, ex);
+            }
+         }
+      }
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see java.lang.Object#toString()
+    */
+   public String toString() {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append("Feature: ");
+      buffer.append("\n  Name: ");
+      buffer.append(this.name);
+      if (this.type == Feature.FLOAT_FEATURE) {
+         buffer.append("\n  Type: float");
+      } else if (this.type == Feature.INTEGER_FEATURE) {
+         buffer.append("\n  Type: integer");
+      } else if (this.type == Feature.STRING_FEATURE) {
+         buffer.append("\n  Type: string");
+      } else if (this.type == Feature.REFERENCE_FEATURE) {
+         buffer.append("\n  Type: reference");
+      } else if (this.type == Feature.CONFIDENCE_FEATURE) {
+         buffer.append("\n  Type: confidence");
+      } else if (this.type == Feature.RULEID_FEATURE) {
+         buffer.append("\n  Type: ruleId");
+      }
+      buffer.append("\n  Value: ");
+      buffer.append(this.value);
+      buffer.append("\n");
+
+      return buffer.toString();
+   }
 
 }

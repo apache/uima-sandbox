@@ -30,96 +30,104 @@ import org.apache.uima.resource.ResourceInitializationException;
  * 
  * 
  */
-public class RuleException_impl implements org.apache.uima.annotator.regex.RuleException {
+public class RuleException_impl implements
+      org.apache.uima.annotator.regex.RuleException {
 
-  private final String matchTypeStr;
+   private final String matchTypeStr;
 
-  private final String patternStr;
+   private final String patternStr;
 
-  private org.apache.uima.cas.Type matchType;
+   private org.apache.uima.cas.Type matchType;
 
-  private Pattern pattern;
-  
-  private AnnotationFS lastAnnot = null;
-  
-  private boolean lastMatchResult = false;
+   private Pattern pattern;
 
-  /**
-   * @param matchType
-   * @param patternStr
-   */
-  public RuleException_impl(String matchType, String patternStr) {
-    this.matchTypeStr = matchType;
-    this.patternStr = patternStr;
-    this.matchType = null;
-    this.pattern = null;
-  }
+   private AnnotationFS lastAnnot = null;
 
+   private boolean lastMatchResult = false;
 
-  /* (non-Javadoc)
-   * @see org.apache.uima.annotator.regex.RuleException#matchPattern(org.apache.uima.cas.text.AnnotationFS)
-   */
-  public boolean matchPattern(AnnotationFS annot) {
-    
-    if(this.lastAnnot == annot) {
-      return this.lastMatchResult;
-    }
-    
-    //save current annotation
-    this.lastAnnot = annot;
-    
-    //check if the pattern match the current annotation
-    if(this.pattern != null) {
-      Matcher matcher = this.pattern.matcher(annot.getCoveredText());  
-      //use match strategy matchFirst
-      if (matcher.find()) {
-        this.lastMatchResult = true;
-        return true;
+   /**
+    * @param matchType
+    * @param patternStr
+    */
+   public RuleException_impl(String matchType, String patternStr) {
+      this.matchTypeStr = matchType;
+      this.patternStr = patternStr;
+      this.matchType = null;
+      this.pattern = null;
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.RuleException#matchPattern(org.apache.uima.cas.text.AnnotationFS)
+    */
+   public boolean matchPattern(AnnotationFS annot) {
+
+      if (this.lastAnnot == annot) {
+         return this.lastMatchResult;
       }
-    }
-    this.lastMatchResult = false;
-    return false;
-  }
-    
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Exception#getType()
-   */
-  public Type getType() {
-    return this.matchType;
-  }
 
-  public void initialize(TypeSystem ts) throws ResourceInitializationException {
-    // compile pattern
-    this.pattern = Pattern.compile(this.patternStr);
+      // save current annotation
+      this.lastAnnot = annot;
 
-    // initialize annotation type
-    if (this.matchTypeStr != null) {
-      this.matchType = ts.getType(this.matchTypeStr);
-      if (this.matchType == null) {
-        throw new ResourceInitializationException(RegExAnnotator.MESSAGE_DIGEST,
-                "regex_annotator_error_resolving_types", new Object[] { this.matchTypeStr });
+      // check if the pattern match the current annotation
+      if (this.pattern != null) {
+         Matcher matcher = this.pattern.matcher(annot.getCoveredText());
+         // use match strategy matchFirst
+         if (matcher.find()) {
+            this.lastMatchResult = true;
+            return true;
+         }
       }
-    }
-    
-  }
+      this.lastMatchResult = false;
+      return false;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("Exception: ");
-    buffer.append("\n  matchType: ");
-    buffer.append(this.matchTypeStr);
-    buffer.append("\n  Pattern: ");
-    buffer.append(this.patternStr);
-    buffer.append("\n");
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Exception#getType()
+    */
+   public Type getType() {
+      return this.matchType;
+   }
 
-    return buffer.toString();
-  }
+   public void typeInit(TypeSystem ts) throws ResourceInitializationException {
+      // initialize annotation type
+      if (this.matchTypeStr != null) {
+         this.matchType = ts.getType(this.matchTypeStr);
+         if (this.matchType == null) {
+            throw new ResourceInitializationException(
+                  RegExAnnotator.MESSAGE_DIGEST,
+                  "regex_annotator_error_resolving_types",
+                  new Object[] { this.matchTypeStr });
+         }
+      }
+   }
+
+   /**
+    * 
+    */
+   public void initialize() {
+      // compile pattern
+      this.pattern = Pattern.compile(this.patternStr);
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see java.lang.Object#toString()
+    */
+   public String toString() {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append("Exception: ");
+      buffer.append("\n  matchType: ");
+      buffer.append(this.matchTypeStr);
+      buffer.append("\n  Pattern: ");
+      buffer.append(this.patternStr);
+      buffer.append("\n");
+
+      return buffer.toString();
+   }
 
 }

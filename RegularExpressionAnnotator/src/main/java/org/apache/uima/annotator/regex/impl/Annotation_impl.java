@@ -29,141 +29,156 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.resource.ResourceInitializationException;
 
 /**
- * 
+ * Implementation of an RegEx Annotation definition
  * 
  */
 public class Annotation_impl implements Annotation {
 
-  private final String annotationId;
+   private final String annotationId;
 
-  private final String annotationTypeStr;
+   private final String annotationTypeStr;
 
-  private final Position begin;
+   private final Position begin;
 
-  private final Position end;
+   private final Position end;
 
-  private ArrayList features;
+   private ArrayList features;
 
-  private Type annotationType;
+   private Type annotationType;
 
-  /**
-   * @param annotId
-   * @param annotType
-   * @param begin
-   * @param end
-   */
-  public Annotation_impl(String annotId, String annotType, Position begin, Position end) {
-    this.annotationId = annotId;
-    this.annotationTypeStr = annotType;
-    this.begin = begin;
-    this.end = end;
-    this.features = new ArrayList();
-  }
+   /**
+    * @param annotId
+    * @param annotType
+    * @param begin
+    * @param end
+    */
+   public Annotation_impl(String annotId, String annotType, Position begin,
+         Position end) {
+      this.annotationId = annotId;
+      this.annotationTypeStr = annotType;
+      this.begin = begin;
+      this.end = end;
+      this.features = new ArrayList();
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Annotation#getAnnotationType()
-   */
-  public Type getAnnotationType() {
-    return this.annotationType;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Annotation#getAnnotationType()
+    */
+   public Type getAnnotationType() {
+      return this.annotationType;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Annotation#getBegin()
-   */
-  public Position getBegin() {
-    return this.begin;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Annotation#getBegin()
+    */
+   public Position getBegin() {
+      return this.begin;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Annotation#getEnd()
-   */
-  public Position getEnd() {
-    return this.end;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Annotation#getEnd()
+    */
+   public Position getEnd() {
+      return this.end;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Annotation#getId()
-   */
-  public String getId() {
-    return this.annotationId;
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Annotation#getId()
+    */
+   public String getId() {
+      return this.annotationId;
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Annotation#addFeature(org.apache.uima.annotator.regex.Feature)
-   */
-  public void addFeature(Feature aFeature) {
-    this.features.add(aFeature);
-  }
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Annotation#addFeature(org.apache.uima.annotator.regex.Feature)
+    */
+   public void addFeature(Feature aFeature) {
+      this.features.add(aFeature);
+   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.annotator.regex.Annotation#getFeatures()
-   */
-  public Feature[] getFeatures() {
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Annotation#getFeatures()
+    */
+   public Feature[] getFeatures() {
 
-    return (Feature[]) this.features.toArray(new Feature[0]);
-  }
+      return (Feature[]) this.features.toArray(new Feature[0]);
+   }
 
-  /**
-   * @param ts
-   * @throws ResourceInitializationException
-   */
-  public void initialize(TypeSystem ts) throws ResourceInitializationException {
+   /**
+    * @param ts
+    * @throws ResourceInitializationException
+    */
+   public void typeInit(TypeSystem ts) throws ResourceInitializationException {
 
-    // initialize annotation type
-    if (this.annotationTypeStr != null) {
-      this.annotationType = ts.getType(this.annotationTypeStr);
-      if (this.annotationType == null) {
-        throw new ResourceInitializationException(RegExAnnotator.MESSAGE_DIGEST,
-                "regex_annotator_error_resolving_types", new Object[] { this.annotationTypeStr });
+      // initialize annotation type
+      if (this.annotationTypeStr != null) {
+         this.annotationType = ts.getType(this.annotationTypeStr);
+         if (this.annotationType == null) {
+            throw new RegexAnnotatorConfigException(
+                  "regex_annotator_error_resolving_types",
+                  new Object[] { this.annotationTypeStr });
+         }
       }
-    }
-    
-    //initialize features
-    Feature[] featureList = getFeatures();
-    for(int i = 0; i < featureList.length; i++) {
-      ((Feature_impl)featureList[i]).initialize(this.annotationType);
-    }
-  }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("Annotation: ");
-    buffer.append("\n  ID: ");
-    buffer.append(this.annotationId);
-    buffer.append("\n  Type: ");
-    buffer.append(this.annotationTypeStr);
-    buffer.append("\n  Begin: ");
-    buffer.append(this.begin.toString());
-    buffer.append("\n  End: ");
-    buffer.append(this.end.toString());
-    
-    Feature[] featureList = getFeatures();
-    if(featureList.length > 0) {
-      buffer.append("\nFeatures: \n");
-    }
-    //print all features for this annotation
-    for (int i = 0; i < featureList.length; i++) {
-      buffer.append(featureList[i].toString());
-    }
-    buffer.append("\n");
+      // initialize features with types
+      Feature[] featureList = getFeatures();
+      for (int i = 0; i < featureList.length; i++) {
+         ((Feature_impl) featureList[i]).typeInit(this.annotationType);
+      }
+   }
 
-    return buffer.toString();
-  }
+   /**
+    * initialize the Regex Annotation object with all the annotation features
+    * 
+    * @throws RegexAnnotatorConfigException
+    */
+   public void initialize() throws RegexAnnotatorConfigException {
+      // initialize features
+      Feature[] featureList = getFeatures();
+      for (int i = 0; i < featureList.length; i++) {
+         ((Feature_impl) featureList[i]).initialize();
+      }
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see java.lang.Object#toString()
+    */
+   public String toString() {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append("Annotation: ");
+      buffer.append("\n  ID: ");
+      buffer.append(this.annotationId);
+      buffer.append("\n  Type: ");
+      buffer.append(this.annotationTypeStr);
+      buffer.append("\n  Begin: ");
+      buffer.append(this.begin.toString());
+      buffer.append("\n  End: ");
+      buffer.append(this.end.toString());
+
+      Feature[] featureList = getFeatures();
+      if (featureList.length > 0) {
+         buffer.append("\nFeatures: \n");
+      }
+      // print all features for this annotation
+      for (int i = 0; i < featureList.length; i++) {
+         buffer.append(featureList[i].toString());
+      }
+      buffer.append("\n");
+
+      return buffer.toString();
+   }
 }

@@ -191,6 +191,16 @@
 			  </xs:restriction>
 			</xs:simpleType>
 		  </xs:attribute>
+		  <xs:attribute name="normalization" use="optional">
+		    <xs:simpleType>
+			  <xs:restriction base="xs:string">
+			    <xs:enumeration value="Custom" />
+				<xs:enumeration value="ToLowerCase" />
+				<xs:enumeration value="ToUpperCase" />
+			  </xs:restriction>
+			</xs:simpleType>
+		  </xs:attribute>
+		  <xs:attribute name="class" type="xs:string" use="optional" />
 		</xs:extension>
 	  </xs:simpleContent>
 	</xs:complexType>

@@ -45,82 +45,126 @@ public class TestConceptFileSyntax extends TestCase {
    public void testSyntaxDuplicateAnnotationIds() throws Exception {
       // test annotator configuration with
       // - duplicate annotation IDs within the same concept
+      String message = "";
       try {
          new AnnotatorTester(JUnitExtension
                .getFile("conceptSyntax/RegExAnnotDuplicateAnnotId.xml"));
       } catch (ResourceInitializationException ex) {
-         String message = ex.getCause().getLocalizedMessage();
-         Assert
-               .assertTrue(
-                     "exception does not contain the duplicate annotation id: testannotation",
-                     message.indexOf("testannotation") > 0);
+         message = ex.getCause().getLocalizedMessage();
       }
+      Assert
+            .assertTrue(
+                  "exception does not contain the duplicate annotation id: testannotation",
+                  message.indexOf("testannotation") > 0);
    }
 
    public void testSyntaxReferenceAnnotationIdNotAvaliable() throws Exception {
       // test annotator configuration with
-      // - duplicate annotation IDs within the same concept
+      // - missing annotation ID-
+      String message = "";
       try {
          new AnnotatorTester(JUnitExtension
                .getFile("conceptSyntax/RegExAnnotReferenceFeature.xml"));
       } catch (ResourceInitializationException ex) {
-         String message = ex.getCause().getLocalizedMessage();
-         Assert.assertTrue(
-               "exception does not contain missing annotation id: refAnnotID",
-               message.indexOf("refAnnotID") > 0);
+         message = ex.getCause().getLocalizedMessage();
       }
+      Assert.assertTrue(
+            "exception does not contain missing annotation id: refAnnotID",
+            message.indexOf("refAnnotID") > 0);
    }
 
    public void testSyntaxReferenceAnnotationIdError() throws Exception {
       // test annotator configuration with
       // a missing annotation id for the annotation that has - duplicate
       // annotation IDs within the same concept
+      String message = "";
       try {
          new AnnotatorTester(JUnitExtension
                .getFile("conceptSyntax/RegExAnnotReferenceFeatureError.xml"));
       } catch (ResourceInitializationException ex) {
-         String message = ex.getCause().getLocalizedMessage();
-         Assert.assertTrue(
-                "exception does not contain the concept name: referenceFeatureValueError",
-                message.indexOf("referenceFeatureValueError") > 0);
+         message = ex.getCause().getLocalizedMessage();
       }
+      Assert
+            .assertTrue(
+                  "exception does not contain the concept name: referenceFeatureValueError",
+                  message.indexOf("referenceFeatureValueError") > 0);
    }
 
    public void testSyntaxRuleFileNotFound() throws Exception {
-      // test annotator configuration with a concept file that could not be found
+      // test annotator configuration with a concept file that could not be
+      // found
       // in the UIMA datapath or in the classpath
+      String message = "";
       try {
          new AnnotatorTester(JUnitExtension
                .getFile("conceptSyntax/RegExAnnotRuleFileNotFound.xml"));
       } catch (ResourceInitializationException ex) {
-         String message = ex.getCause().getLocalizedMessage();
-         Assert.assertTrue(
-                "exception does not contain the file name: fileThatDoesNotExist.xml",
-                message.indexOf("fileThatDoesNotExist.xml") > 0);
+         message = ex.getCause().getLocalizedMessage();
       }
+      Assert
+            .assertTrue(
+                  "exception does not contain the file name: fileThatDoesNotExist.xml",
+                  message.indexOf("fileThatDoesNotExist.xml") > 0);
    }
 
    public void testSyntaxNotAllRuleFilesAvailable() throws Exception {
       // test annotator configuration with more than one concept file
       // where one of the concept files could not be found
+      String message = "";
       try {
          new AnnotatorTester(JUnitExtension
                .getFile("conceptSyntax/RegExAnnotNotAllRuleFilesAvailable.xml"));
       } catch (ResourceInitializationException ex) {
-         String message = ex.getCause().getLocalizedMessage();
-         Assert.assertTrue(
-                "exception does not contain the file name: fileThatDoesNotExist.xml",
-                message.indexOf("fileThatDoesNotExist.xml") > 0);
+         message = ex.getCause().getLocalizedMessage();
       }
+      Assert
+            .assertTrue(
+                  "exception does not contain the file name: fileThatDoesNotExist.xml",
+                  message.indexOf("fileThatDoesNotExist.xml") > 0);
    }
 
    public void testSyntaxLoadRuleFileUsingDatapath() throws Exception {
       // test annotator configuration with a concept file that is loaded
       // using the UIMA datapath
       ResourceManager rscMgr = UIMAFramework.newDefaultResourceManager();
-      rscMgr.setDataPath(JUnitExtension.getFile("conceptSyntax").getAbsolutePath());
-         new AnnotatorTester(JUnitExtension
-               .getFile("conceptSyntax/RegExAnnotLoadRuleFileUsingDatapath.xml").getAbsolutePath(), rscMgr);
+      rscMgr.setDataPath(JUnitExtension.getFile("conceptSyntax")
+            .getAbsolutePath());
+      new AnnotatorTester(JUnitExtension.getFile(
+            "conceptSyntax/RegExAnnotLoadRuleFileUsingDatapath.xml")
+            .getAbsolutePath(), rscMgr);
    }
+   
+   public void testCustomNormalizationSyntaxError() throws Exception {
+      // test annotator configuration with more than one concept file
+      // where one of the concept files could not be found
+      String message = "";
+      try {
+         new AnnotatorTester(JUnitExtension
+               .getFile("conceptSyntax/RegExAnnotCustomNormalizationSyntaxError.xml"));
+      } catch (ResourceInitializationException ex) {
+         message = ex.getCause().getLocalizedMessage();
+      }
+      Assert
+            .assertTrue(
+                  "exception does not contain the file name: testFeatureCustomNormalizer",
+                  message.indexOf("testFeatureCustomNormalizer") > 0);
+   }
+
+   public void testCustomNormalizationClassNotFound() throws Exception {
+      // test annotator configuration with more than one concept file
+      // where one of the concept files could not be found
+      String message = "";
+      try {
+         new AnnotatorTester(JUnitExtension
+               .getFile("conceptSyntax/RegExAnnotCustomNormalizationClassNotFound.xml"));
+      } catch (ResourceInitializationException ex) {
+         message = ex.getCause().getLocalizedMessage();
+      }
+      Assert
+            .assertTrue(
+                  "exception does not contain the file name: CustomNormalizerTestClass",
+                  message.indexOf("CustomNormalizerTestClass") > 0);
+   }
+
 
 }

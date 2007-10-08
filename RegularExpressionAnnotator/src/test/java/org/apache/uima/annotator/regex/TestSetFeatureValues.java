@@ -33,7 +33,7 @@ import org.apache.uima.test.junit_extension.JUnitExtension;
 public class TestSetFeatureValues extends TestCase {
 
   /**
-   * test all possible feature values and types
+   * test all possible feature values and types use Rule with id=ID1
    * 
    * @throws Exception
    */
@@ -51,6 +51,10 @@ public class TestSetFeatureValues extends TestCase {
         "org.apache.uima.TestAnnot:testFeature4", "org.apache.uima.TestAnnot:testFeature5",
         "org.apache.uima.TestAnnot:testFeature6", "org.apache.uima.TestAnnot:testFeature7",
         "org.apache.uima.TestAnnot:testFeature8", "org.apache.uima.TestAnnot:testFeature9",
+        "org.apache.uima.TestAnnot:testFeature10", "org.apache.uima.TestAnnot:testFeature11",
+        "org.apache.uima.TestAnnot:testFeature12", "org.apache.uima.TestAnnot:testFeature13",
+        "org.apache.uima.TestAnnot:testFeature14", "uima.tcas.DocumentAnnotation:language1",
+        "uima.tcas.DocumentAnnotation:language2",
         "org.apache.uima.TestAnnot:confidenceValue", "org.apache.uima.TestAnnot:ruleId",
         "org.apache.uima.TestAnnot1" };
 
@@ -64,7 +68,7 @@ public class TestSetFeatureValues extends TestCase {
 
   /**
    * test all possbible feature values and types with the second rule of a concept. Especially the
-   * confidence and rule ID.
+   * confidence and rule ID. Use Rule with id=ID2
    * 
    * @throws Exception
    */
@@ -82,6 +86,10 @@ public class TestSetFeatureValues extends TestCase {
         "org.apache.uima.TestAnnot:testFeature4", "org.apache.uima.TestAnnot:testFeature5",
         "org.apache.uima.TestAnnot:testFeature6", "org.apache.uima.TestAnnot:testFeature7",
         "org.apache.uima.TestAnnot:testFeature8", "org.apache.uima.TestAnnot:testFeature9",
+        "org.apache.uima.TestAnnot:testFeature10", "org.apache.uima.TestAnnot:testFeature11",
+        "org.apache.uima.TestAnnot:testFeature12", "org.apache.uima.TestAnnot:testFeature13",
+        "org.apache.uima.TestAnnot:testFeature14", "uima.tcas.DocumentAnnotation:language1",
+        "uima.tcas.DocumentAnnotation:language2",
         "org.apache.uima.TestAnnot:confidenceValue", "org.apache.uima.TestAnnot:ruleId",
         "org.apache.uima.TestAnnot1" };
 
