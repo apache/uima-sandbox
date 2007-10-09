@@ -27,8 +27,9 @@
 			<annotation id="emailAnnot" type="org.apache.uima.EmailAddress">
 				<begin group="0"/>
 				<end group="0"/>
-				<setFeature name="localPart" type="String">$1</setFeature>		
-				<setFeature name="domainPart" type="String">$2</setFeature>
+				<setFeature name="localPart" type="String" normalization="ToLowerCase">$1</setFeature>		
+				<setFeature name="domainPart" type="String" normalization="ToLowerCase">$2</setFeature>
+				<setFeature name="normalizedEmail" type="String" normalization="ToLowerCase">$0</setFeature>
 		 	</annotation>
 	 	</createAnnotations>
     </concept>
