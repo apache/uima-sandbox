@@ -127,7 +127,7 @@
 			</para>
 			<para>
 
-<programlisting><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+				<programlisting><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:noNamespaceSchemaLocation="concept.xsd">
 
   <concept name="RuleSetDefinitionExample">
@@ -438,6 +438,33 @@
 					</listitem>
 				</itemizedlist>
 				<para>
+					The	optional features are:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>normalization</code>
+							- Specifies the normalization that should be performed before the feature value
+							is assigned to the match type annotation. This <code>normalization</code> feature is
+							only evaluated for features of type <code>String</code>. For a list of all built-in
+							normalization functions please refer to 
+							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>class</code>
+							- Specifies the custom normalization class that should be used to normalize the
+							feature value before it is assigned to the match type annotation. Custom normalization
+							classes are used if the <code>normalization</code> feature has the value 
+							<code>Custom</code>. The normalization class have to implement the
+							<code>org.apache.uima.annotator.regex.Normalization</code> interface.
+							For details about the feature normalization please refer to 
+							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
+						</para>
+					</listitem>								
+				</itemizedlist>
+				<para>
 					The content of the	<code>&lt;setFeature></code>
 					element definition contains the feature value that should be set. 
 					This can either be a literal value or a regular
@@ -519,11 +546,16 @@
 	<begin group="0" location="start"/>
 	<end group="0" location="end"/>
 	<setFeature name="testFeature1" type="String">$0</setFeature>
-	<setFeature name="testFeature2" type="Integer">$1</setFeature>
-	<setFeature name="testFeature3" type="Float">$2</setFeature>		
-	<setFeature name="testFeature4" type="Reference">testannot1</setFeature>
+	<setFeature name="testFeature2" type="String" 
+		normalization="ToLowerCase">$0</setFeature>
+	<setFeature name="testFeature3" type="Integer">$1</setFeature>
+	<setFeature name="testFeature4" type="Float">$2</setFeature>		
+	<setFeature name="testFeature5" type="Reference">testannot1</setFeature>
 	<setFeature name="confidenceValue" type="Confidence"/>
 	<setFeature name="ruleId" type="RuleId"/>
+	<setFeature name="normalizedText" type="String" 
+		normalization="Custom" 
+		class="org.apache.CustomNormalizer">$0</setFeature>
 </annotation>
 ]]></programlisting>
 				</para>
@@ -633,7 +665,7 @@
 					<listitem>
 						<para>
 							<code>name</code>
-							- specifies the UIMA feature name that should be set. The feature name have to 
+							- Specifies the UIMA feature name that should be set. The feature name have to 
 							be a valid UIMA feature for this annotation and have to be defined in the
 							UIMA type system.
 						</para>
@@ -641,11 +673,40 @@
 					<listitem>
 						<para>
 							<code>type</code>
-							- specifies the type of the UIMA feature. For a list of all
+							- Specifies the type of the UIMA feature. For a list of all
 							possible feature types please refer to 
 							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureTypes"/>.
 						</para>
 					</listitem>
+				</itemizedlist>
+				</para>
+				<para>
+				  The optional features are:
+				</para>
+				<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>normalization</code>
+							- Specifies the normalization that should be performed before the feature value
+							is assigned to the UIMA annotation. This <code>normalization</code> feature is 
+							only evaluated for features of type <code>String</code>. For a list of all built-in
+							normalization functions please refer to 
+							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>class</code>
+							- Specifies the custom normalization class that should be used to normalize the
+							feature value before it is assigned to the UIMA annotation. Custom normalization
+							classes are used if the <code>normalization</code> feature has the value 
+							<code>Custom</code>. The normalization class have to implement the
+							<code>org.apache.uima.annotator.regex.Normalization</code> interface.
+							For details about the feature normalization please refer to 
+							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
+						</para>
+					</listitem>					
 				</itemizedlist>
 				</para>
 				<para>
@@ -654,7 +715,7 @@
 				  both can be used.
 				</para>
 				<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureTypes">
-				<title>Features types</title>
+				<title>Features Types</title>
 				<para>
 				  When setting UIMA feature for an annotation using the <code>&lt;setFeature></code> element 
 				  the feature type has to be specified according the the UIMA type system definition.
@@ -710,6 +771,75 @@
 				</itemizedlist>
 				</para>
 
+				</section>
+				<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization">
+					<title>Features Value Normalization</title>
+					<para>
+					  Before assigning a <code>String</code> feature value to an annotation it is possible to 
+					  do a normalization on the feature value. This normalization can be useful for example to normalize 
+					  a detected email addresses to lower case before it is added to the annotation. 
+					  To normalize a feature value the <code>normalization</code> feature of the 
+					  <code>&lt;setFeature></code> element is used. The built-in normalization functions 
+					  are listed below. Additionally the RegexAnnotator provides an extension point that can be 
+					  implemented to add a custom normalization. 
+				    </para>
+				    <para>
+				      The possible build-in functions that are specified as feature value of 
+				      the <code>normalization</code> feature are listed below: 
+					</para>
+					<para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									<code>ToLowerCase</code>
+									- normalize the feature value to lower case before it is assigned to the annotation.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<code>ToUpperCase</code>
+									- normalize the feature value to upper case before it is assigned to the annotation.
+								</para>
+							</listitem>
+						</itemizedlist>
+						Built-in normalization configuration:
+						<programlisting><![CDATA[<setFeature name="normalizedFeature" type="String" 
+	normalization="ToLowerCase">$0</setFeature>]]></programlisting>
+   					</para>
+					<para>
+					  In case of a custom normalization, the <code>normalization</code> feature must have the value
+					  <code>Custom</code>, and an additional feature of the <code>&lt;setFeature></code> element 
+					  called <code>class</code> have to be specified containing the full qualified class name of the 
+					  custom normalization implementation. The custom normalization implementation have to implement 
+					  the interface <code>org.apache.uima.annotator.regex.Normalization</code> which defines to 
+					  <code>normalize</code> method to normalize the feature values. A sample implementation with 
+					  the corresponding configuration is shown blow.
+					</para>
+					<para> 
+					  Custom normalization implementation:
+					  <programlisting><![CDATA[package org.apache.uima;
+					  
+public class CustomNormalizer 
+  implements org.apache.uima.annotator.regex.Normalization {
+
+   /* (non-Javadoc)
+    * @see org.apache.uima.annotator.regex.Normalization
+    *		#normalize(java.lang.String)
+    */
+   public String normalize(String input) {
+      
+      //implement your custom normalization
+      String result = ...
+      return result;
+   }]]></programlisting>
+   					</para>
+   					<para>
+   					  Custom normalization configuration:
+   					  <programlisting><![CDATA[<setFeature name="normalizedFeature" type="String" 
+	normalization="Custom" class="org.apache.uima.CustomNormalizer">
+  $0
+</setFeature>]]></programlisting>
+   					</para>
 				</section>
 			</section>			
 		</section>
@@ -1026,6 +1156,16 @@
 			  </xs:restriction>
 			</xs:simpleType>
 		  </xs:attribute>
+		  <xs:attribute name="normalization" use="optional">
+		    <xs:simpleType>
+			  <xs:restriction base="xs:string">
+			    <xs:enumeration value="Custom" />
+				<xs:enumeration value="ToLowerCase" />
+				<xs:enumeration value="ToUpperCase" />
+			  </xs:restriction>
+			</xs:simpleType>
+		  </xs:attribute>
+		  <xs:attribute name="class" type="xs:string" use="optional" />
 		</xs:extension>
 	  </xs:simpleContent>
 	</xs:complexType>
