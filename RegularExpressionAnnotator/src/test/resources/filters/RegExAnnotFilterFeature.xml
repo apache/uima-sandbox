@@ -97,6 +97,7 @@
     
     <typePriorities>
 	  	<priorityList>
+    		<type>uima.tcas.DocumentAnnotation</type>
     		<type>org.apache.uima.TestAnnot</type>
     		<type>org.apache.uima.TestAnnot1</type>
   		</priorityList>
