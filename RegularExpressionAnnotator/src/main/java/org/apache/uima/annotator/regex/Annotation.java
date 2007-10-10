@@ -24,47 +24,68 @@ import org.apache.uima.cas.Type;
  * 
  */
 public interface Annotation {
-	
-  /**
-	 * Get the annotation identifier.
-	 * 
-	 * @return returns the annotation identifier
-	 */
-	public String getId();
 
-	/**
-	 * Get the annotation type of this annotation.
-	 * 
-	 * @return returns the annotation type of this annotation
-	 */
-	public Type getAnnotationType();
+   /**
+    * Get the annotation identifier.
+    * 
+    * @return returns the annotation identifier
+    */
+   public String getId();
 
-	/**
-	 * Get the annotation begin position of this annotation.
-	 * 
-	 * @return returns the annotation begin position.
-	 */
-	public Position getBegin();
+   /**
+    * Get the annotation type of this annotation.
+    * 
+    * @return returns the annotation type of this annotation
+    */
+   public Type getAnnotationType();
 
-	/**
-	 * Get the annotation end position of this annotation.
-	 * 
-	 * @return returns the annotation end position.
-	 */
-	public Position getEnd();
-	
-  /**
-   * Adds the given feature to this annotation. 
-   * 
-   * @param aFeat The feature to be added.
-   */
-  public void addFeature(Feature aFeat);
+   /**
+    * Get the annotation begin position of this annotation.
+    * 
+    * @return returns the annotation begin position.
+    */
+   public Position getBegin();
 
-  /**
-   * Retuns the feature array for this annotation
-   * 
-   * @return returns the feature array for this annotation
-   */
-  public Feature[] getFeatures();
+   /**
+    * Get the annotation end position of this annotation.
+    * 
+    * @return returns the annotation end position.
+    */
+   public Position getEnd();
+
+   /**
+    * Adds the given feature to this annotation.
+    * 
+    * @param aFeat
+    *           The feature to be added.
+    */
+   public void addFeature(Feature aFeat);
+
+   /**
+    * Returns the feature array for this annotation
+    * 
+    * @return returns the feature array for this annotation
+    */
+   public Feature[] getFeatures();
+
+   /**
+    * Validate the covered Text of the annotation and checks if the annotation
+    * is valid or not.
+    * 
+    * @param coveredText covered text of the annotation that should be created
+    * 
+    * @param ruleID ruleID (if specified) of the rule that created the match
+    * 
+    * @return true if the annotation is valid or if not validation was
+    *         specified. If the annotation is invalid, false is returned.
+    */
+   public boolean validate(String coveredText, String ruleID) throws Exception;
+
+   /**
+    * Returns true if for the current annotation an validator is available.
+    * 
+    * @return Returns true if an validator is available.
+    */
+   public boolean hasValidator();
 
 }

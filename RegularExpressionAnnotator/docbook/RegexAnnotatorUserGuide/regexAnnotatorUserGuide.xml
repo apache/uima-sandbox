@@ -458,7 +458,7 @@
 							feature value before it is assigned to the match type annotation. Custom normalization
 							classes are used if the <code>normalization</code> feature has the value 
 							<code>Custom</code>. The normalization class have to implement the
-							<code>org.apache.uima.annotator.regex.Normalization</code> interface.
+							<code>org.apache.uima.annotator.regex.extension.Normalization</code> interface.
 							For details about the feature normalization please refer to 
 							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
 						</para>
@@ -702,7 +702,7 @@
 							feature value before it is assigned to the UIMA annotation. Custom normalization
 							classes are used if the <code>normalization</code> feature has the value 
 							<code>Custom</code>. The normalization class have to implement the
-							<code>org.apache.uima.annotator.regex.Normalization</code> interface.
+							<code>org.apache.uima.annotator.regex.extension.Normalization</code> interface.
 							For details about the feature normalization please refer to 
 							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
 						</para>
@@ -811,7 +811,7 @@
 					  <code>Custom</code>, and an additional feature of the <code>&lt;setFeature></code> element 
 					  called <code>class</code> have to be specified containing the full qualified class name of the 
 					  custom normalization implementation. The custom normalization implementation have to implement 
-					  the interface <code>org.apache.uima.annotator.regex.Normalization</code> which defines to 
+					  the interface <code>org.apache.uima.annotator.regex.extension.Normalization</code> which defines to 
 					  <code>normalize</code> method to normalize the feature values. A sample implementation with 
 					  the corresponding configuration is shown blow.
 					</para>
@@ -820,10 +820,10 @@
 					  <programlisting><![CDATA[package org.apache.uima;
 					  
 public class CustomNormalizer 
-  implements org.apache.uima.annotator.regex.Normalization {
+  implements org.apache.uima.annotator.regex.extension.Normalization {
 
    /* (non-Javadoc)
-    * @see org.apache.uima.annotator.regex.Normalization
+    * @see org.apache.uima.annotator.regex.extension.Normalization
     *		#normalize(java.lang.String)
     */
    public String normalize(String input) {

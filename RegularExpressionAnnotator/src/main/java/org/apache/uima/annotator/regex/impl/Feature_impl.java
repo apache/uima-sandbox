@@ -20,7 +20,7 @@ package org.apache.uima.annotator.regex.impl;
 
 import org.apache.uima.analysis_engine.annotator.AnnotatorInitializationException;
 import org.apache.uima.annotator.regex.Feature;
-import org.apache.uima.annotator.regex.Normalization;
+import org.apache.uima.annotator.regex.extension.Normalization;
 import org.apache.uima.cas.Type;
 import org.apache.uima.resource.ResourceInitializationException;
 

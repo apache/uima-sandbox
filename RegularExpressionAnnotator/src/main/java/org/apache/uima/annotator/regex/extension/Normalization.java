@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.uima.annotator.regex;
+package org.apache.uima.annotator.regex.extension;
 
 
 /**
@@ -32,5 +32,5 @@ public interface Normalization {
  * 
  * @return String - normalized input string 
  */
-public String normalize(String input);
+public String normalize(String input) throws Exception;
 }

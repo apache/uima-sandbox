@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.apache.uima.annotator.regex.Annotation;
 import org.apache.uima.annotator.regex.Feature;
 import org.apache.uima.annotator.regex.Position;
+import org.apache.uima.annotator.regex.extension.Validation;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -42,6 +43,10 @@ public class Annotation_impl implements Annotation {
 
    private final Position end;
 
+   private final String validationClass;
+
+   private Validation validator;
+
    private ArrayList features;
 
    private Type annotationType;
@@ -53,12 +58,14 @@ public class Annotation_impl implements Annotation {
     * @param end
     */
    public Annotation_impl(String annotId, String annotType, Position begin,
-         Position end) {
+         Position end, String validationClass) {
       this.annotationId = annotId;
       this.annotationTypeStr = annotType;
       this.begin = begin;
       this.end = end;
       this.features = new ArrayList();
+      this.validationClass = validationClass;
+      this.validator = null;
    }
 
    /*
@@ -116,6 +123,27 @@ public class Annotation_impl implements Annotation {
       return (Feature[]) this.features.toArray(new Feature[0]);
    }
 
+   /* (non-Javadoc)
+    * @see org.apache.uima.annotator.regex.Annotation#validate(java.lang.String, java.lang.String)
+    */
+   public boolean validate(String coveredText, String ruleID) throws Exception{
+      if (this.validator != null) {
+         return this.validator.validate(coveredText, ruleID);
+      } else {
+         return true;
+      }
+   }
+
+   /* (non-Javadoc)
+    * @see org.apache.uima.annotator.regex.Annotation#hasValidator()
+    */
+   public boolean hasValidator() {
+      if (this.validator != null) {
+         return true;
+      }
+      return false;
+   }
+
    /**
     * @param ts
     * @throws ResourceInitializationException
@@ -149,6 +177,27 @@ public class Annotation_impl implements Annotation {
       Feature[] featureList = getFeatures();
       for (int i = 0; i < featureList.length; i++) {
          ((Feature_impl) featureList[i]).initialize();
+      }
+
+      if (this.validationClass != null) {
+
+         try {
+            // try to get the custom validation class
+            Class validatorClass = this.getClass().getClassLoader().loadClass(
+                  this.validationClass);
+            Object obj = validatorClass.newInstance();
+            if (obj instanceof Validation) {
+               this.validator = (Validation) obj;
+            } else {
+               throw new RegexAnnotatorConfigException(
+                     "regex_annotator_error_custom_validator_wrong_interface",
+                     new Object[] { this.validationClass });
+            }
+         } catch (Exception ex) {
+            throw new RegexAnnotatorConfigException(
+                  "regex_annotator_error_creating_custom_validator",
+                  new Object[] { this.validationClass }, ex);
+         }
       }
    }
 

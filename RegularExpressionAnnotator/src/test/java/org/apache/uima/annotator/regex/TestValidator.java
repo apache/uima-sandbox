@@ -18,21 +18,24 @@
  */
 package org.apache.uima.annotator.regex;
 
-import org.apache.uima.annotator.regex.extension.Normalization;
+import org.apache.uima.annotator.regex.extension.Validation;
 
 /**
- * custom test normalizer
+ * custom test validator
  * 
  */
-public class CustomTestNormalizer implements Normalization {
+public class TestValidator implements Validation {
 
    /* (non-Javadoc)
-    * @see org.apache.uima.annotator.regex.Normalization#normalize(java.lang.String)
+    * @see org.apache.uima.annotator.regex.extension.Validation#validate(java.lang.String, java.lang.String)
     */
-   public String normalize(String input) {
+   public boolean validate(String coveredText, String ruleID) throws Exception {
       
-      //replace input string with Test Output
-      return "CustomTestNormalizerWorks";
+      if(ruleID != null && ruleID.equals("TestID")) {
+         return true;
+      }
+      
+      return false;
    }
 
  

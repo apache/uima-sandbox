@@ -203,8 +203,9 @@ public class ConceptFileParser_impl implements ConceptFileParser {
             // create annotation object
             String id = annotationList[a].getId();
             String type = annotationList[a].getType();
+            String validationClass = annotationList[a].getValidate();
 
-            Annotation annotation = new Annotation_impl(id, type, begin, end);
+            Annotation annotation = new Annotation_impl(id, type, begin, end, validationClass);
 
             // read out feature values and add it to the annotation
             SetFeature[] features = annotationList[a].getSetFeatureArray();

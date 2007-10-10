@@ -21,16 +21,16 @@
 	
     <concept name="annotationCreationTest">
     	<rules>
-			<rule regEx="(Annotation)(Creation)(Test)(That)(Tests)(The)(Various)(Match)(Groups)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+			<rule ruleId="TestID" regEx="(Annotation)(Creation)(Test)(That)(Tests)(The)(Various)(Match)(Groups)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
 	    </rules>
 	    <createAnnotations>	
-			<annotation id="testannot" type="org.apache.uima.TestAnnot">
+			<annotation type="org.apache.uima.TestAnnot">
 				<begin group="0" location="start"/>
 				<end group="0" location="end"/>
 				<setFeature name="testFeature" type="String">$0</setFeature>
 				<setFeature name="testFeature1" type="String">$1</setFeature>
 		 	</annotation>
-		 	<annotation id="testannot1" type="org.apache.uima.TestAnnot1">
+		 	<annotation type="org.apache.uima.TestAnnot1">
 				<begin group="2" location="end"/>
 				<end group="4" location="start"/>
 				<setFeature name="testFeature" type="String">$2</setFeature>
@@ -42,7 +42,7 @@
 				<setFeature name="testFeature" type="String">$6</setFeature>
 				<setFeature name="testFeature1" type="String">$8</setFeature>
 		 	</annotation>
-		 	<annotation id="testannot3" type="org.apache.uima.TestAnnot3">
+		 	<annotation id="testannot3" type="org.apache.uima.TestAnnot3" validate="org.apache.uima.annotator.regex.TestValidator">
 				<begin group="5" location="start"/>
 				<end group="5" location="start"/>
 				<setFeature name="testFeature" type="String">$7</setFeature>

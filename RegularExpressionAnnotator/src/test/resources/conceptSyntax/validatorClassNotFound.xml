@@ -19,31 +19,17 @@
  -->
 <conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
 	
-    <concept name="emailAddressDetection">
+    <concept name="featureValues">
     	<rules>
-	   		<rule regEx="([a-zA-Z0-9!#$%*+'/=?^_-`{|}~.\x26]+)@([a-zA-Z0-9._-]+[a-zA-Z]{2,4})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>		
+			<rule ruleId="ID1" regEx="(Rule)(Regex)(1)(2.4)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
+			</rule>
 	    </rules>
 	    <createAnnotations>	
-			<annotation id="emailAnnot" type="org.apache.uima.EmailAddress">
+			<annotation id="testannot" type="org.apache.uima.TestAnnot" validate="org.apache.uima.annotator.regex.TestValidatorDoesNotExist">
 				<begin group="0"/>
 				<end group="0"/>
-				<setFeature name="localPart" type="String" normalization="ToLowerCase">$1</setFeature>		
-				<setFeature name="domainPart" type="String" normalization="ToLowerCase">$2</setFeature>
-				<setFeature name="normalizedEmail" type="String" normalization="ToLowerCase">$0</setFeature>
+				<setFeature name="testFeatureCustomNormalizer" type="String">$1 test $2</setFeature>
 		 	</annotation>
 	 	</createAnnotations>
-    </concept>
-
-    <concept name="isbnNumberDetection">
-    	<rules>
-	   		<rule regEx="(97(8|9))?-?(\d{9}|(\d|-){11})-?(\d|X)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>		
-	    </rules>
-	    <createAnnotations>	
-			<annotation id="isbnNumber" type="org.apache.uima.ISBNNumber" validate="org.apache.uima.annotator.regex.extension.impl.ISBNNumberValidator">
-				<begin group="0"/>
-				<end group="0"/>
-		 	</annotation>
-	 	</createAnnotations>
-    </concept>
-        
+    </concept>        
 </conceptSet>

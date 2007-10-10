@@ -616,79 +616,107 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             continue;
          }
 
-         // make positions absoulute to the document text -> add match type
-         // annotation offset.
-         localStart = annot.getBegin() + localStart;
-         localEnd = annot.getBegin() + localEnd;
+         // set default validation value to true, of by default all annotations
+         // are created
+         boolean validation = true;
 
-         // create annotation for this match
-         FeatureStructure fs = aCAS.createAnnotation(annotType, localStart,
-               localEnd);
-
-         // get features for the current annotation
-         Feature[] features = annotations[a].getFeatures();
-         for (int f = 0; f < features.length; f++) {
-            // get feature type
-            int type = features[f].getType();
-
-            // check if we have a reference feature or not
-            if (type == Feature.FLOAT_FEATURE
-                  || type == Feature.INTEGER_FEATURE
-                  || type == Feature.STRING_FEATURE) {
-               // we have no reference feature
-               // replace match groups in the feature value
-               String featureValue = replaceMatchGroupValues(features[f]
-                     .getValue(), matcher);
-
-               // set feature value at the annotation in dependence of the
-               // feature type
-               if (type == Feature.FLOAT_FEATURE) {
-                  fs.setFloatValue(features[f].getFeature(), Float
-                        .parseFloat(featureValue));
-               } else if (type == Feature.INTEGER_FEATURE) {
-                  fs.setIntValue(features[f].getFeature(), Integer
-                        .parseInt(featureValue));
-               } else if (type == Feature.STRING_FEATURE) {
-                  try {
-                     // try to set the normalized feature value, if no
-                     // normalization was specified for the feature, the
-                     // original feature value is set
-                     fs.setStringValue(features[f].getFeature(), features[f]
-                           .normalize(featureValue));
-                  } catch (Exception ex) {
-                     throw new RegexAnnotatorProcessException(
-                           "regex_annotator_error_normalizing_feature_value",
-                           new Object[] { featureValue, features[f].getName() },
-                           ex);
-                  }
-               }
-            } else if (type == Feature.REFERENCE_FEATURE) {
-               // we have a reference feature, we have to set this later
-               // since we cannot be sure that the referenced annotation is
-               // already created
-               hasReferenceFeatures = true;
-            } else if (type == Feature.RULEID_FEATURE) {
-               // get rule id and set it as feature value
-               String ruleId = concept.getRules()[ruleIndex].getId();
-               fs.setStringValue(features[f].getFeature(), ruleId);
-            } else if (type == Feature.CONFIDENCE_FEATURE) {
-               // get rule confidence value and set it as feature value
-               float confidence = concept.getRules()[ruleIndex].getConfidence();
-               fs.setFloatValue(features[f].getFeature(), confidence);
+         // check if an validator for the current annotation is available
+         if (annotations[a].hasValidator()) {
+            // get the covered text of the annotation that should be created
+            String coveredText = annot.getCoveredText().substring(localStart,
+                  localEnd);
+            // validate annotation
+            try {
+               validation = annotations[a].validate(coveredText, concept.getRules()[ruleIndex].getId());
+            } catch (Exception ex) {
+               throw new RegexAnnotatorProcessException(
+                     "regex_annotator_error_validating_annotation",
+                     new Object[] { annotations[a].getId(),
+                           coveredText, new Integer(localStart), new Integer(localEnd)}, ex);
             }
          }
 
-         // add annotation to the local HashMap that is used to set annotation
-         // reference features, the annotation must only be added in case that
-         // an annotation id was specified.
-         if (annotations[a].getId() != null) {
-            annotMap.put(annotations[a].getId(), fs);
-         }
+         // only create annotation if the validation was true
+         if (validation == true) {
+            // make positions absolute to the document text -> add match type
+            // annotation offset.
+            localStart = annot.getBegin() + localStart;
+            localEnd = annot.getBegin() + localEnd;
 
-         // add annotation to the list of feature structures that must be added
-         // to the index
-         annotsToAdd.add(fs);
-      }
+            // create annotation for this match
+            FeatureStructure fs = aCAS.createAnnotation(annotType, localStart,
+                  localEnd);
+
+            // get features for the current annotation
+            Feature[] features = annotations[a].getFeatures();
+            for (int f = 0; f < features.length; f++) {
+               // get feature type
+               int type = features[f].getType();
+
+               // check if we have a reference feature or not
+               if (type == Feature.FLOAT_FEATURE
+                     || type == Feature.INTEGER_FEATURE
+                     || type == Feature.STRING_FEATURE) {
+                  // we have no reference feature
+                  // replace match groups in the feature value
+                  String featureValue = replaceMatchGroupValues(features[f]
+                        .getValue(), matcher);
+
+                  // set feature value at the annotation in dependence of the
+                  // feature type
+                  if (type == Feature.FLOAT_FEATURE) {
+                     fs.setFloatValue(features[f].getFeature(), Float
+                           .parseFloat(featureValue));
+                  } else if (type == Feature.INTEGER_FEATURE) {
+                     fs.setIntValue(features[f].getFeature(), Integer
+                           .parseInt(featureValue));
+                  } else if (type == Feature.STRING_FEATURE) {
+                     try {
+                        // try to set the normalized feature value, if no
+                        // normalization was specified for the feature, the
+                        // original feature value is set
+                        fs.setStringValue(features[f].getFeature(), features[f]
+                              .normalize(featureValue));
+                     } catch (Exception ex) {
+                        throw new RegexAnnotatorProcessException(
+                              "regex_annotator_error_normalizing_feature_value",
+                              new Object[] { featureValue,
+                                    features[f].getName() }, ex);
+                     }
+                  }
+               } else if (type == Feature.REFERENCE_FEATURE) {
+                  // we have a reference feature, we have to set this later
+                  // since we cannot be sure that the referenced annotation is
+                  // already created
+                  hasReferenceFeatures = true;
+               } else if (type == Feature.RULEID_FEATURE) {
+                  // get rule id and set it as feature value
+                  String ruleId = concept.getRules()[ruleIndex].getId();
+                  fs.setStringValue(features[f].getFeature(), ruleId);
+               } else if (type == Feature.CONFIDENCE_FEATURE) {
+                  // get rule confidence value and set it as feature value
+                  float confidence = concept.getRules()[ruleIndex]
+                        .getConfidence();
+                  fs.setFloatValue(features[f].getFeature(), confidence);
+               }
+            }
+
+            // add annotation to the local HashMap that is used to set
+            // annotation
+            // reference features, the annotation must only be added in case
+            // that
+            // an annotation id was specified.
+            if (annotations[a].getId() != null) {
+               annotMap.put(annotations[a].getId(), fs);
+            }
+
+            // add annotation to the list of feature structures that must be
+            // added
+            // to the index
+            annotsToAdd.add(fs);
+         }
+      
+      } //end of annotation processing
 
       // if we detected previously some reference feature types we have to set
       // them now

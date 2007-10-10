@@ -121,6 +121,7 @@
 	  </xs:sequence>
 	  <xs:attribute name="id" type="xs:string" use="optional" />
 	  <xs:attribute name="type" type="xs:string" use="required" />
+	  <xs:attribute name="validate" type="xs:string" use="optional" />
 	</xs:complexType>
   </xs:element>
 

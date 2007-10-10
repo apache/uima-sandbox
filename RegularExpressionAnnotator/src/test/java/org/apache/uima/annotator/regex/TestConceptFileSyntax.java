@@ -135,8 +135,7 @@ public class TestConceptFileSyntax extends TestCase {
    }
    
    public void testCustomNormalizationSyntaxError() throws Exception {
-      // test annotator configuration with more than one concept file
-      // where one of the concept files could not be found
+      // test annotator configuration with a syntax error for the custom normalizer
       String message = "";
       try {
          new AnnotatorTester(JUnitExtension
@@ -151,8 +150,7 @@ public class TestConceptFileSyntax extends TestCase {
    }
 
    public void testCustomNormalizationClassNotFound() throws Exception {
-      // test annotator configuration with more than one concept file
-      // where one of the concept files could not be found
+      // test annotator configuration where the custom normalizer could not be found.
       String message = "";
       try {
          new AnnotatorTester(JUnitExtension
@@ -164,6 +162,21 @@ public class TestConceptFileSyntax extends TestCase {
             .assertTrue(
                   "exception does not contain the file name: CustomNormalizerTestClass",
                   message.indexOf("CustomNormalizerTestClass") > 0);
+   }
+
+   public void testCustomValidatorClassNotFound() throws Exception {
+      // test annotator configuration where the custom validator could not be found 
+      String message = "";
+      try {
+         new AnnotatorTester(JUnitExtension
+               .getFile("conceptSyntax/RegExAnnotValidatorClassNotFound.xml"));
+      } catch (ResourceInitializationException ex) {
+         message = ex.getCause().getLocalizedMessage();
+      }
+      Assert
+            .assertTrue(
+                  "exception does not contain the file name: org.apache.uima.annotator.regex.TestValidatorDoesNotExist",
+                  message.indexOf("org.apache.uima.annotator.regex.TestValidatorDoesNotExist") > 0);
    }
 
 

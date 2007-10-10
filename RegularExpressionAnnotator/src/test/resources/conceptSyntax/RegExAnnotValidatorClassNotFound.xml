@@ -28,23 +28,25 @@
        
        <configurationParameter>
           <name>ProcessAllConceptRules</name>
-          <description>If this parameter is set to true, all rules of a concept are processed. If this parameter is set to false, 
-             the rules are processed by confidence (highest confidence value first) and the processing stops after the first 
+          <description>If this parameter is true, all rules of a concept are processed. If the parameter is false, 
+             the rules are processed by confidence (hightest confidence value first) and the processing stops after the frist 
              rule where matches are available.
           </description>
           <type>Boolean</type>
           <multiValued>false</multiValued>
           <mandatory>false</mandatory>
        </configurationParameter>
-
+    	
        <configurationParameter>
           <name>ConceptFiles</name>
-          <description>list of concept files to configure the annotator</description>
+          <description>list of concept files to configure the annotator
+          </description>
           <type>String</type>
           <multiValued>true</multiValued>
           <mandatory>true</mandatory>
        </configurationParameter>
-	
+
+    	
     </configurationParameters>
     
     <configurationParameterSettings>
@@ -60,57 +62,22 @@
           <name>ConceptFiles</name>
           <value>
           	<array>
-          	   <string>concepts.xml</string> 
+          	   <string>conceptSyntax/validatorClassNotFound.xml</string> 
           	</array>
           </value>
        </nameValuePair>
-       
     
     </configurationParameterSettings>
     <typeSystemDescription>
-      <types>
-        <typeDescription>
-          <name>org.apache.uima.EmailAddress</name>
-          <description/>
-          <supertypeName>uima.tcas.Annotation</supertypeName>
-          <features>
-            <featureDescription>
-              <name>localPart</name>
-              <description/>
-              <rangeTypeName>uima.cas.String</rangeTypeName>
-            </featureDescription>
-            <featureDescription>
-              <name>domainPart</name>
-              <description/>
-              <rangeTypeName>uima.cas.String</rangeTypeName>
-            </featureDescription>
-            <featureDescription>
-              <name>normalizedEmail</name>
-              <description/>
-              <rangeTypeName>uima.cas.String</rangeTypeName>
-            </featureDescription>
-          </features>
-        </typeDescription>
-
-        <typeDescription>
-          <name>org.apache.uima.ISBNNumber</name>
-          <description/>
-          <supertypeName>uima.tcas.Annotation</supertypeName>
-          <features/>
-        </typeDescription>
-         
-       </types>
     </typeSystemDescription>
+    
+    <typePriorities>
+	</typePriorities>
+    
     <capabilities>
       <capability>
         <inputs/>
-        <outputs>
-         <type>org.apache.uima.EmailAddress</type>
-		 <feature>org.apache.uima.EmailAddress:localPart</feature>
-		 <feature>org.apache.uima.EmailAddress:domainPart</feature>
-		 <feature>org.apache.uima.EmailAddress:normalizedEmail</feature>
-		 <type>org.apache.uima.ISBNNumber</type>
-        </outputs>
+        <outputs/>
         <languagesSupported/>
       </capability>
     </capabilities>
@@ -120,5 +87,5 @@
       <outputsNewCASes>false</outputsNewCASes>
     </operationalProperties>
   </analysisEngineMetaData>
-   
+
 </analysisEngineDescription>
