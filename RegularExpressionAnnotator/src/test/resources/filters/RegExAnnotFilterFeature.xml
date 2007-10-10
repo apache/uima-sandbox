@@ -94,6 +94,14 @@
         </typeDescription>
       </types>
     </typeSystemDescription>
+    
+    <typePriorities>
+	  	<priorityList>
+    		<type>org.apache.uima.TestAnnot</type>
+    		<type>org.apache.uima.TestAnnot1</type>
+  		</priorityList>
+	</typePriorities>
+    
     <capabilities>
       <capability>
         <inputs/>

@@ -99,6 +99,15 @@
         </typeDescription>        
       </types>
     </typeSystemDescription>
+    
+    <typePriorities>
+	  	<priorityList>
+    		<type>org.apache.uima.TokenAnnot</type>
+    		<type>org.apache.uima.TestAnnot</type>
+    		<type>org.apache.uima.SentenceAnnot</type>
+  		</priorityList>
+	</typePriorities>
+    
     <capabilities>
       <capability>
         <inputs/>
