@@ -45,5 +45,17 @@
 		 	</annotation>
 	 	</createAnnotations>
     </concept>
+
+    <concept name="creditCardNumberDetection">
+    	<rules>
+	   		<rule regEx="(([1-6]\d{3}[- ])(\d{4}[- ]){2}\d{4})|([1-6]\d{13,18})|([1-6]\d{3}[- ]\d{6}[- ]\d{5})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>		
+	    </rules>
+	    <createAnnotations>	
+			<annotation id="creditCardNumber" type="org.apache.uima.CreditCardNumber" validate="org.apache.uima.annotator.regex.extension.impl.CreditCardNumberValidator">
+				<begin group="0"/>
+				<end group="0"/>
+		 	</annotation>
+	 	</createAnnotations>
+    </concept>
         
 </conceptSet>
