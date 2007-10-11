@@ -578,7 +578,10 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
 
     public boolean isSubtype(Object annotationType, Object potentialSupertype) {
-      return true;
+
+      // imitate behavior without IAnnotationAccessExtension
+      return mShowAnnotationsMenu.getSelectedTypes().contains(
+                getDocument().getCAS().getTypeSystem().getType((String) annotationType));
     }
 
     public void paint(Annotation annotation, GC gc, Canvas canvas, Rectangle bounds) {
@@ -645,11 +648,12 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   @Override
   protected ISourceViewer createSourceViewer(Composite parent,
           org.eclipse.jface.text.source.IVerticalRuler ruler, int styles) {
-	  SourceViewer sourceViewer = new SourceViewer(parent, ruler, styles);
+    SourceViewer sourceViewer = new SourceViewer(parent, ruler, styles);
 
     sourceViewer.setEditable(false);
 
     mPainter = new AnnotationPainter(sourceViewer, new AnnotationAccess());
+
     sourceViewer.addPainter(mPainter);
 
     return sourceViewer;
@@ -854,22 +858,22 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   }
 
   /**
-   *
+   * Synchronizes all annotations which the eclipse annotation painter.
    */
   private void syncAnnotations() {
 
-	mPainter.removeAllAnnotationTypes();
+    mPainter.removeAllAnnotationTypes();
 
-	for (Type displayType : mShowAnnotationsMenu.getSelectedTypes()) {
-		showAnnotationType(displayType);
-	}
+    for (Type displayType : mShowAnnotationsMenu.getSelectedTypes()) {
+      showAnnotationType(displayType);
+    }
 
     // if not contained in types add current mode annotations
     if (!mShowAnnotationsMenu.getSelectedTypes().contains(mAnnotationMode)) {
-    	showAnnotationType(mAnnotationMode);
+      showAnnotationType(mAnnotationMode);
     }
 
-	mPainter.paint(IPainter.CONFIGURATION);
+    mPainter.paint(IPainter.CONFIGURATION);
   }
 
   /**
