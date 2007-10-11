@@ -18,47 +18,55 @@
  */
 package org.apache.uima.annotator.regex;
 
-
 /**
  * 
  */
 public interface Concept {
 
-	/**
-	 * Get the concept name.
-	 * 
-	 * @return returns the concept name.
-	 */
-	public String getName();
-	
-	/**
-	 * Gets an array of annotations for this rule.
-	 * 
-	 * @return returns an array of annotations for this concept.
-	 */
-	public Annotation[] getAnnotations();
+   /**
+    * Get the concept name.
+    * 
+    * @return returns the concept name.
+    */
+   public String getName();
 
-	/**
-	 * Adds the given annotation to this concept.
-	 * 
-	 * @param aAnnot The annotation to be added.
-	 */
-	public void addAnnotation(Annotation aAnnot);
+   /**
+    * Gets an array of annotations for this rule.
+    * 
+    * @return returns an array of annotations for this concept.
+    */
+   public Annotation[] getAnnotations();
 
-  /**
-   * Gets an array of rules for this concept
-   * 
-   * @return returns an array of rules for this concept.
-   */
-  public Rule[] getRules();
+   /**
+    * Adds the given annotation to this concept.
+    * 
+    * @param aAnnot
+    *           The annotation to be added.
+    */
+   public void addAnnotation(Annotation aAnnot);
 
-  /**
-   * Adds the given rule to this concept
-   * 
-   * @param aRule The rule to be added.
-   */
-  public void addRule(Rule aRule);
+   /**
+    * Gets an array of rules for this concept
+    * 
+    * @return returns an array of rules for this concept.
+    */
+   public Rule[] getRules();
 
+   /**
+    * Adds the given rule to this concept
+    * 
+    * @param aRule
+    *           The rule to be added.
+    */
+   public void addRule(Rule aRule);
 
-	
+   /**
+    * Checks the rule processing for this concept.
+    * 
+    * @return Returns true if all rules for this concept should be process.
+    *         Returns false if the rule processing should be stopped after the
+    *         first match was found.
+    */
+   public boolean processAllConceptRules();
+
 }

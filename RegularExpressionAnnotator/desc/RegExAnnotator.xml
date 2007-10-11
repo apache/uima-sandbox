@@ -27,17 +27,6 @@
     <configurationParameters>
        
        <configurationParameter>
-          <name>ProcessAllConceptRules</name>
-          <description>If this parameter is set to true, all rules of a concept are processed. If this parameter is set to false, 
-             the rules are processed by confidence (highest confidence value first) and the processing stops after the first 
-             rule where matches are available.
-          </description>
-          <type>Boolean</type>
-          <multiValued>false</multiValued>
-          <mandatory>false</mandatory>
-       </configurationParameter>
-
-       <configurationParameter>
           <name>ConceptFiles</name>
           <description>list of concept files to configure the annotator</description>
           <type>String</type>
@@ -50,21 +39,13 @@
     <configurationParameterSettings>
     
        <nameValuePair>
-          <name>ProcessAllConceptRules</name>
-          <value>
-             <boolean>false</boolean>
-          </value>
-       </nameValuePair>
-       
-       <nameValuePair>
           <name>ConceptFiles</name>
           <value>
           	<array>
           	   <string>concepts.xml</string> 
           	</array>
           </value>
-       </nameValuePair>
-       
+       </nameValuePair>      
     
     </configurationParameterSettings>
     <typeSystemDescription>
@@ -96,14 +77,32 @@
           <name>org.apache.uima.ISBNNumber</name>
           <description/>
           <supertypeName>uima.tcas.Annotation</supertypeName>
-          <features/>
+          <features>
+            <featureDescription>
+              <name>confidence</name>
+              <description/>
+              <rangeTypeName>uima.cas.Float</rangeTypeName>
+            </featureDescription>
+            
+          </features>
         </typeDescription>
 
         <typeDescription>
           <name>org.apache.uima.CreditCardNumber</name>
           <description/>
           <supertypeName>uima.tcas.Annotation</supertypeName>
-          <features/>
+          <features>
+            <featureDescription>
+              <name>confidence</name>
+              <description/>
+              <rangeTypeName>uima.cas.Float</rangeTypeName>
+            </featureDescription>
+            <featureDescription>
+              <name>cardType</name>
+              <description/>
+              <rangeTypeName>uima.cas.String</rangeTypeName>
+            </featureDescription>
+          </features>
         </typeDescription>
          
        </types>

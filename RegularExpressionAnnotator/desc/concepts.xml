@@ -36,24 +36,30 @@
 
     <concept name="isbnNumberDetection">
     	<rules>
-	   		<rule regEx="(97(8|9))?-?(\d{9}|(\d|-){11})-?(\d|X)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>		
+	   		<rule regEx="(97(8|9))?-?(\d{9}|(\d|-){11})-?(\d|X)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>		
 	    </rules>
 	    <createAnnotations>	
 			<annotation id="isbnNumber" type="org.apache.uima.ISBNNumber" validate="org.apache.uima.annotator.regex.extension.impl.ISBNNumberValidator">
 				<begin group="0"/>
 				<end group="0"/>
+				<setFeature name="confidence" type="Confidence"/>
 		 	</annotation>
 	 	</createAnnotations>
     </concept>
 
-    <concept name="creditCardNumberDetection">
+    <concept name="creditCardNumberDetection" processAllRules="true">
     	<rules>
-	   		<rule regEx="(([1-6]\d{3}[- ])(\d{4}[- ]){2}\d{4})|([1-6]\d{13,18})|([1-6]\d{3}[- ]\d{6}[- ]\d{5})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>		
-	    </rules>
+	   		<rule ruleId="AmericanExpress" regEx="(((34|37)\d{2}[- ]?)(\d{6}[- ]?)\d{5})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
+	   		<rule ruleId="Visa" regEx="((4\d{3}[- ]?)(\d{4}[- ]?){2}\d{4})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
+	   		<rule ruleId="MasterCard" regEx="((5[1-5]\d{2}[- ]?)(\d{4}[- ]?){2}\d{4})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
+	   		<rule ruleId="unknown" regEx="(([1-6]\d{3}[- ])(\d{4}[- ]){2}\d{4})|([1-6]\d{13,18})|([1-6]\d{3}[- ]\d{6}[- ]\d{5})" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>		
+	    </rules> 
 	    <createAnnotations>	
 			<annotation id="creditCardNumber" type="org.apache.uima.CreditCardNumber" validate="org.apache.uima.annotator.regex.extension.impl.CreditCardNumberValidator">
 				<begin group="0"/>
 				<end group="0"/>
+				<setFeature name="confidence" type="Confidence"/>
+				<setFeature name="cardType" type="RuleId"/>
 		 	</annotation>
 	 	</createAnnotations>
     </concept>

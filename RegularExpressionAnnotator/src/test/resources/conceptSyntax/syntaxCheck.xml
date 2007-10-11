@@ -19,7 +19,7 @@
  -->
 <conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
 	
-    <concept name="ConceptName">
+    <concept name="ConceptName" processAllRules="true">
     	<rules>
 			<rule ruleId="ID1" regEx="someRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
 				<matchTypeFilter>
@@ -47,13 +47,14 @@
 			<annotation id="testannot" type="org.apache.uima.TestAnnot">
 				<begin group="0" location="end"/>
 				<end group="0" location="start"/>
-				<setFeature name="testFeature" type="String">$0</setFeature>		
+				<setFeature name="testFeature" type="String" normalization="ToLowerCase">$0</setFeature>		
+				<setFeature name="customNormalized" type="String" normalization="Custom" class="my.package.Normalizer">$0</setFeature>
 				<setFeature name="testFeature1" type="Reference">testannot1</setFeature>
 				<setFeature name="confidenceValue" type="Confidence"/>
-				<setFeature name="ruleId" type="RuleId"/>
+				<setFeature name="ruleId" type="RuleId" normalization="ToUpperCase"/>
 		 	</annotation>
 		 			 	
-		 	<annotation id="testannot1" type="org.apache.uima.TestAnnot1">
+		 	<annotation id="testannot1" type="org.apache.uima.TestAnnot1" validate="my.package.Validator">
 				<begin group="8"/>
 				<end group="3"/>
 		 	</annotation>

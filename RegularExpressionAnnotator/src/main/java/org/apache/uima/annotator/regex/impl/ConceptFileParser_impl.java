@@ -91,10 +91,11 @@ public class ConceptFileParser_impl implements ConceptFileParser {
       for (int i = 0; i < concepts.length; i++) {
          // get concept meta data
          String conceptName = concepts[i].getName();
+         boolean processAllRules = concepts[i].getProcessAllRules();
 
          // create new concept object
          org.apache.uima.annotator.regex.Concept concept = new Concept_impl(
-               conceptName);
+               conceptName, processAllRules);
 
          // ********************************
          // get all rules for this concept

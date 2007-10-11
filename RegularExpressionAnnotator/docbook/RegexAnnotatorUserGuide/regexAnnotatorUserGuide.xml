@@ -176,7 +176,7 @@
 			<programlisting><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:noNamespaceSchemaLocation="concept.xsd">
 
-  <concept name="complexConceptExample">
+  <concept name="complexConceptExample" processAllRules="false">
     <rules>
       <rule ruleId="Id1" regEx="PatternExample1" matchStrategy="matchAll" 
           matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
@@ -230,11 +230,10 @@
 			</note>
 			
 			<para>
-				The processing of a concept definition depends on a parameter setting
-				that can be changed in the RegexAnnotator descriptor. 
-				The parameter that controls the processing is called
-				<code>ProcessAllConceptRules</code>.
-				By default this parameter is set to	<code>false</code>. 
+				The processing of a concept definition depends on the rule processing.
+				The feature that controls the rule processing is called
+				<code>processAllRules</code> and is specified at the <code>&lt;concept></code> element.
+				By default this optional feature is set to <code>false</code>. 
 				This means that the concept processing 
 				starts with the	first rule and goes on with the next one 
 				until a match was found. So in this processing mode, maybe only the first rule
@@ -243,7 +242,7 @@
 				This strategy should be used for example if your first concept 
 				rule has a strict pattern with a confidence of 1.0 and your 
 				second rule has a more lenient pattern with a confidence
-				of 0.5. If the <code>ProcessAllConceptRules</code> parameter
+				of 0.5. If the <code>processAllRules</code> feature
 				is set to <code>true</code>	all rules of a concept are processed 
 				independent of the matches for a previous rule.
 			</para>
@@ -918,24 +917,10 @@ public class CustomNormalizer
 			<section id="sandbox.regexAnnotator.annotatorDescriptor.configParam">
 				<title>Configuration Parameters</title>
 				<para>
-				  The RegexAnnotator has the following configuration parameters that can affect the processing: 
+				  The RegexAnnotator has the following configuration parameters: 
 				</para>
 				<para>
 					<itemizedlist>
-						<listitem>
-							<para>
-								<code>ProcessAllConceptRules</code>
-								- By default this parameter is set to <code>false</code>. 
-								This means that the concept processing
-								starts with the	first rule (highest confidence) and goes on with the next one
-								until a match was found. So in this processing mode, maybe only the first rule
-								of a concept is evaluated if there a match was found. 
-								The other rules of this concept will be ignored in that case.
-								If the <code>ProcessAllConceptRules</code> parameter
-								is set to <code>true</code>	all rules of a concept are processed 
-								independent of the matches for a previous rule. 
-							</para>
-						</listitem>
 						<listitem>
 							<para>
 								<code>ConceptFiles</code>

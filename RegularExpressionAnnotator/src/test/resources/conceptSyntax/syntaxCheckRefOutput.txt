@@ -1,4 +1,6 @@
 Concept ConceptName
+ProcessAllConceptRules: true
+
 Concept rules: 
 Rule ID1
 Regex: someRegex
@@ -41,6 +43,12 @@ Feature:
   Name: testFeature
   Type: string
   Value: $0
+  Normalization: ToLowerCase
+Feature: 
+  Name: customNormalized
+  Type: string
+  Value: $0
+  Normalization: my.package.Normalizer
 Feature: 
   Name: testFeature1
   Type: reference
@@ -53,14 +61,18 @@ Feature:
   Name: ruleId
   Type: ruleId
   Value: 
+  Normalization: ToUpperCase
 
 Annotation: 
   ID: testannot1
   Type: org.apache.uima.TestAnnot1
   Begin: matchGroup: 8 location: start
   End: matchGroup: 3 location: end
+  Validation class: my.package.Validator
 
-Concept
+Concept 
+ProcessAllConceptRules: false
+
 Concept rules: 
 Rule 
 Regex: regexExpression

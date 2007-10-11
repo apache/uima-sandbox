@@ -25,18 +25,7 @@
     <name>RegExAnnotator</name>
     <description>Matches regular expressions in document text.</description>
     <configurationParameters>
-       
-       <configurationParameter>
-          <name>ProcessAllConceptRules</name>
-          <description>If this parameter is true, all rules of a concept are processed. If the parameter is false, 
-             the rules are processed by confidence (hightest confidence value first) and the processing stops after the frist 
-             rule where matches are available.
-          </description>
-          <type>Boolean</type>
-          <multiValued>false</multiValued>
-          <mandatory>false</mandatory>
-       </configurationParameter>
-    	
+     	
        <configurationParameter>
           <name>ConceptFiles</name>
           <description>list of concept files to configure the annotator
@@ -51,14 +40,7 @@
     
     <configurationParameterSettings>
     
-       <nameValuePair>
-          <name>ProcessAllConceptRules</name>
-          <value>
-             <boolean>false</boolean>
-          </value>
-       </nameValuePair>
-       
-       <nameValuePair>
+        <nameValuePair>
           <name>ConceptFiles</name>
           <value>
           	<array>

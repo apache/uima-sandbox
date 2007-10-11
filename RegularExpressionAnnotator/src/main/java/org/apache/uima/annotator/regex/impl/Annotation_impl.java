@@ -217,7 +217,11 @@ public class Annotation_impl implements Annotation {
       buffer.append(this.begin.toString());
       buffer.append("\n  End: ");
       buffer.append(this.end.toString());
-
+      if(this.validationClass != null) {
+         buffer.append("\n  Validation class: ");
+         buffer.append(this.validationClass);
+      }
+      
       Feature[] featureList = getFeatures();
       if (featureList.length > 0) {
          buffer.append("\nFeatures: \n");

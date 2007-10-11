@@ -43,11 +43,14 @@ public class Concept_impl implements Concept {
 
    private ArrayList rules;
 
+   private boolean processAllRules;
+
    /**
     * @param name
     */
-   public Concept_impl(String name) {
+   public Concept_impl(String name, boolean processAllRules) {
       this.name = name;
+      this.processAllRules = processAllRules;
       this.annotations = new ArrayList();
       this.rules = new ArrayList();
    }
@@ -99,6 +102,15 @@ public class Concept_impl implements Concept {
       // sort rules array by confidence
       Arrays.sort(ruleList, new RuleComparator());
       return ruleList;
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Concept#processAllConceptRules()
+    */
+   public boolean processAllConceptRules() {
+      return this.processAllRules;
    }
 
    /**
@@ -234,7 +246,8 @@ public class Concept_impl implements Concept {
       if (this.name != null) {
          buffer.append(this.name);
       }
-
+      buffer.append("\nProcessAllConceptRules: " + this.processAllRules + "\n");
+      
       Rule[] ruleList = getRules();
       if (ruleList.length > 0) {
          buffer.append("\nConcept rules: \n");

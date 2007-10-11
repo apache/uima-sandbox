@@ -61,14 +61,10 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
    public static final String REGEX_CONCEPTS_FILES = "ConceptFiles";
 
-   public static final String PROCESS_ALL_CONCEPT_RULES_PARAMETER = "ProcessAllConceptRules";
-
    public static final String PATH_SEPARATOR = System
          .getProperty("path.separator");
 
    private Logger logger;
-
-   private boolean processAllConceptRules;
 
    private Concept[] regexConcepts;
 
@@ -95,10 +91,6 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       ConceptFileParser parser = new ConceptFileParser_impl();
 
       // get configuration parameter settings
-      // get parameter ProcessAllConceptRules, default is false
-      this.processAllConceptRules = safeGetConfigParameterBooleanValue(
-            getContext(), PROCESS_ALL_CONCEPT_RULES_PARAMETER, false);
-
       // get parameter ConceptFiles, default is an empty array
       conceptFileNames = safeGetConfigParameterStringArrayValue(getContext(),
             REGEX_CONCEPTS_FILES, new String[] {});
@@ -170,22 +162,6 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          }
       }
 
-   }
-
-   /**
-    * @param context
-    * @param param
-    * @param defaultValue
-    * @return returns the boolean parameter value
-    * @throws AnnotatorContextException
-    */
-   private static boolean safeGetConfigParameterBooleanValue(
-         UimaContext context, String param, boolean defaultValue) {
-      Boolean v = (Boolean) context.getConfigParameterValue(param);
-      if (v != null) {
-         return v.booleanValue();
-      }
-      return defaultValue;
    }
 
    /**
@@ -406,10 +382,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                // all analysis is done, we can go to the next annotation
             }
             if (foundMatch) {
-               // check parameter setting of processAllConceptRules to decide if
-               // we go on with
-               // the next rule or not
-               if (!this.processAllConceptRules) {
+               // check setting of processAllConceptRules to decide if
+               // we go on with the next rule or not
+               if (!this.regexConcepts[i].processAllConceptRules()) {
                   // we found a match for the current rule and we don't want go
                   // on with
                   // further rules of this concept

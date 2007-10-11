@@ -39,6 +39,36 @@ public class CreditCardNumberValidator implements Validation {
       coveredText = coveredText.replaceAll("-", "");
       coveredText = coveredText.replaceAll(" ", "");
 
+      // check unknown card type numbers for know card types
+      // we already had regex rules that detect the card types AmericanExpress,
+      // Visa and MasterCard so those must not be detected be ruleID unknown
+      if (ruleID != null && ruleID.equals("unknown")) {
+
+         // check AmericanExpress
+         if ((coveredText.startsWith("34") | coveredText.startsWith("37"))
+               && coveredText.length() == 15) {
+            // already detected by the AmericanExpress pattern
+            return false;
+         }
+
+         // check MasterCards
+         if (coveredText.length() == 16) {
+            String[] masterCardStarts = { "51", "52", "53", "54", "55" };
+            for (int i = 0; i < masterCardStarts.length; i++) {
+               if (coveredText.startsWith(masterCardStarts[i])) {
+                  // master card already detected
+                  return false;
+               }
+            }
+         }
+
+         // check Visa
+         if (coveredText.startsWith("4") && coveredText.length() == 16) {
+            // already detected by the Visa pattern
+            return false;
+         }
+      }
+
       // get character array of credit card number digits
       char[] creditCardCharArray = coveredText.toCharArray();
 

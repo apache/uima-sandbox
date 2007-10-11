@@ -188,6 +188,16 @@ public class Feature_impl implements Feature {
       }
       buffer.append("\n  Value: ");
       buffer.append(this.value);
+      if(this.normalizationType > 0) {
+         if (this.normalizationType == Feature.TO_LOWER_NORMALIZATION) {
+            buffer.append("\n  Normalization: ToLowerCase");
+         } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {
+            buffer.append("\n  Normalization: ToUpperCase");
+         } if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
+            buffer.append("\n  Normalization: " + this.implClass);
+         }
+      }
+             
       buffer.append("\n");
 
       return buffer.toString();
