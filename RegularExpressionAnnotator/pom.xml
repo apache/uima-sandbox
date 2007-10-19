@@ -114,6 +114,7 @@
 						  <mainComponentDesc>desc/RegExAnnotator.xml</mainComponentDesc>
 						  <componentId>RegExAnnotator</componentId>
 						  <mainComponentDir>${basedir}</mainComponentDir>
+						  <compiledClassesDir>${basedir}/target/classes</compiledClassesDir>
 						  <targetDir>${basedir}/target</targetDir>
 						</configuration>
 						<goals>
