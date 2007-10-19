@@ -142,7 +142,7 @@ public class PearPackagingMojo extends AbstractMojo {
          copyPearData();
 
          // update classpath with compiled classes
-         String classpathExtension = "$main_root/"
+         String classpathExtension = ";$main_root/"
                + InstallationController.PACKAGE_BIN_DIR;
          this.classpath = this.classpath + classpathExtension;
 
