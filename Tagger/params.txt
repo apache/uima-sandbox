@@ -1,0 +1,16 @@
+%% PARAMETERS FOR TAGGER %% 
+% 
+MODEL = 'brown_model_trigramm.dat'
+
+%% uncomment  the following two lines if training is desirable, and change the corpus directory destination path, 
+%% e.g. T_CORPUS='brown' for all the files of the brown corpus which are in the 'brown/' -directory 
+%TRAINING = 'true'
+%T_CORPUS = 'brown'
+
+%% uncomment the following line for smoothing  
+
+%SMOOTHING = 'true'
+
+%% N =2 or N= 3 are supported, default N=3 
+
+N='3'

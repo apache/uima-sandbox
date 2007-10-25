@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>true</primitive>
+  <annotatorImplementationName>org.apache.uima.examples.tagger.HMMTagger</annotatorImplementationName>
+  <analysisEngineMetaData>
+    <name>Hidden Markov Model - Part of Speech Tagger</name>
+    <description>A configuration of the HmmTaggerAnnotator that looks for parts of speech of identified tokens within existing Sentence and Token annotations.  See also WhitespaceTokenizer.xml.</description>
+    <version>1.0</version>
+    <vendor>The Apache Software Foundation</vendor>
+    <configurationParameters>
+      <configurationParameter>
+        <name>PARAM_FILE</name>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>PARAM_FILE</name>
+        <value>
+          <string>tagger.properties</string>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+	<typeSystemDescription>
+			<typeDescription>
+				<name>org.apache.uima.TokenAnnotation</name>
+				<description>Single token annotation</description>
+				<supertypeName>uima.tcas.Annotation</supertypeName>
+				<features>
+					 <featureDescription>
+             					 <name>posTag</name>
+              					<description>contains part-of-speech of a corresponding token</description>
+              					<rangeTypeName>uima.cas.String</rangeTypeName>
+            				</featureDescription>
+				</features>
+			</typeDescription>
+			<typeDescription>
+				<name>org.apache.uima.SentenceAnnotation</name>
+				<description>sentence annotation</description>
+				<supertypeName>uima.tcas.Annotation</supertypeName>
+				<features>
+
+				</features>
+			</typeDescription>
+	</typeSystemDescription>
+    <typePriorities/>
+    <fsIndexCollection/>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </analysisEngineMetaData>
+  <resourceManagerConfiguration/>
+</analysisEngineDescription>
