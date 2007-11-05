@@ -27,6 +27,7 @@ import java.util.Collection;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.uima.CasConsumerConfiguration;
@@ -45,9 +46,15 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.util.InvalidXMLException;
 import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.XMLParser;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.texteditor.IReadOnlyDependent;
 
 /**
  * This action launches the cpm with the configured cas consumer.
@@ -298,6 +305,16 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
                 wait();
             }
         }
+        
+        // refresh cas processor directory
+        IResource processorFolder = mConfiguration.getBaseFolder();
+        
+        try {
+          processorFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+    	} catch (CoreException e) {
+    		// maybe this fails, sorry
+    		CasEditorPlugin.log(e);
+    	}
         
         monitor.done();
     }

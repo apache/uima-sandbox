@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.caseditor.core.TaeError;
+import org.apache.uima.caseditor.core.model.AnnotatorElement;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceSpecifier;
@@ -36,17 +37,24 @@ import org.eclipse.core.runtime.IPath;
 public class AnnotatorConfiguration {
   private ResourceSpecifier mDescriptor;
 
-  private IPath mResourceBasePath;
+  private IFolder mResourceBasePath;
+
+  private final AnnotatorElement element;
 
   /**
    * Initializes the instance.
    *
    * @param descriptor
    */
-  public AnnotatorConfiguration(ResourceSpecifier descriptor) {
-    mDescriptor = descriptor;
+  public AnnotatorConfiguration(AnnotatorElement element, ResourceSpecifier descriptor) {
+    this.element = element;
+	mDescriptor = descriptor;
   }
 
+  public AnnotatorElement getAnnotatorElement() {
+	  return element;
+  }
+  
   /**
    * Only text analysis engines are supported.
    *
@@ -56,9 +64,9 @@ public class AnnotatorConfiguration {
   public AnalysisEngine createAnnotator() throws ResourceInitializationException {
     ResourceManager resourceManager = UIMAFramework.newDefaultResourceManager();
 
-    if (mResourceBasePath != null) {
+    if (mResourceBasePath.getLocation() != null) {
       try {
-        resourceManager.setDataPath(mResourceBasePath.toOSString());
+        resourceManager.setDataPath(mResourceBasePath.getLocation().toOSString());
       } catch (MalformedURLException e) {
         // this will not happen
         throw new TaeError("Unexpexted exceptioon", e);
@@ -68,12 +76,16 @@ public class AnnotatorConfiguration {
     return UIMAFramework.produceAnalysisEngine(mDescriptor, resourceManager, null);
   }
 
+  public IFolder getBaseFolder() {
+	  return mResourceBasePath;
+  }
+  
   /**
    * Sets the base folder
    *
    * @param baseFolder
    */
   public void setBaseFolder(IFolder baseFolder) {
-    mResourceBasePath = baseFolder.getLocation();
+    mResourceBasePath = baseFolder;
   }
 }

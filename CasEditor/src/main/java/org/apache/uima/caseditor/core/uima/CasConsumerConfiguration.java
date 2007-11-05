@@ -36,11 +36,11 @@ import org.eclipse.core.runtime.IPath;
  * TODO: add javadoc here
  */
 public final class CasConsumerConfiguration {
-  private CasConsumerDescription mCasConsumerDescriptor;
+  private CasConsumerDescription casConsumerDescriptor;
 
-  private IPath mResoueceBasePath;
+  private IFolder resourceBasePath;
 
-  private ConsumerElement mConsumerElement;
+  private ConsumerElement consumerElement;
 
   /**
    * Initializes a new instance.
@@ -50,17 +50,17 @@ public final class CasConsumerConfiguration {
    * @param descriptor
    */
   public CasConsumerConfiguration(ConsumerElement element, CasConsumerDescription descriptor) {
-    mCasConsumerDescriptor = descriptor;
-    mConsumerElement = element;
+    casConsumerDescriptor = descriptor;
+    consumerElement = element;
   }
 
   /**
-   * Retrives the name.
+   * Retrieves the name.
    * 
    * @return the name
    */
   public String getName() {
-    ProcessingResourceMetaData trainerMetaData = mCasConsumerDescriptor.getCasConsumerMetaData();
+    ProcessingResourceMetaData trainerMetaData = casConsumerDescriptor.getCasConsumerMetaData();
 
     return trainerMetaData.getName();
   }
@@ -71,9 +71,13 @@ public final class CasConsumerConfiguration {
    * @param baseFolder
    */
   public void setBaseFolder(IFolder baseFolder) {
-    mResoueceBasePath = baseFolder.getLocation();
+    resourceBasePath = baseFolder;
   }
 
+  public IFolder getBaseFolder() {
+	  return resourceBasePath;
+  }
+  
   /**
    * Creates the consumer.
    * 
@@ -82,10 +86,10 @@ public final class CasConsumerConfiguration {
   public CasConsumer createConsumer() {
     ResourceManager resourceManager = UIMAFramework.newDefaultResourceManager();
 
-    if (mResoueceBasePath != null) {
+    if (resourceBasePath.getLocation() != null) {
       try {
-        resourceManager.setExtensionClassPath(mResoueceBasePath.toOSString(), true);
-        resourceManager.setDataPath(mResoueceBasePath.toOSString());
+        resourceManager.setExtensionClassPath(resourceBasePath.getLocation().toOSString(), true);
+        resourceManager.setDataPath(resourceBasePath.getLocation().toOSString());
       } catch (MalformedURLException e) {
         // this should never happen
         throw new TaeError("Unexpected exception", e);
@@ -93,7 +97,7 @@ public final class CasConsumerConfiguration {
     }
 
     try {
-      CasConsumer consumer = UIMAFramework.produceCasConsumer(mCasConsumerDescriptor,
+      CasConsumer consumer = UIMAFramework.produceCasConsumer(casConsumerDescriptor,
               resourceManager, null);
 
       return consumer;
@@ -105,11 +109,11 @@ public final class CasConsumerConfiguration {
   }
 
   /**
-   * Retrives the {@link ConsumerElement}.
+   * Retrieves the {@link ConsumerElement}.
    * 
    * @return the {@link ConsumerElement}
    */
   public ConsumerElement getConsumerElement() {
-    return mConsumerElement;
+    return consumerElement;
   }
 }

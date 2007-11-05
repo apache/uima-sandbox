@@ -25,9 +25,13 @@ import java.util.Collection;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  */
@@ -72,7 +76,8 @@ public final class AnnotatorActionRunnable extends DocumentActionRunnable {
 
 
   @Override
-  protected void completedProcessing() throws InvocationTargetException {
+  protected void completedProcessing(IProgressMonitor monitor) 
+      throws InvocationTargetException {
   try {
       annotatorInstance.collectionProcessComplete();
     } catch (AnalysisEngineProcessException e) {
@@ -81,6 +86,16 @@ public final class AnnotatorActionRunnable extends DocumentActionRunnable {
 
     annotatorInstance.destroy();
     annotatorInstance = null;
+    
+    // refresh cas processor directory
+    IResource processorFolder = mAnnotatorConfiguration.getBaseFolder();
+    
+    try {
+      processorFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+	} catch (CoreException e) {
+		// maybe this fails, sorry
+		CasEditorPlugin.log(e);
+	}
   }
 
 

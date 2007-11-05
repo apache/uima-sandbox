@@ -105,7 +105,7 @@ abstract class DocumentActionRunnable implements IRunnableWithProgress {
    *
    * @throws InvocationTargetException
    */
-  protected void completedProcessing() throws InvocationTargetException {
+  protected void completedProcessing(IProgressMonitor monitor) throws InvocationTargetException {
   }
 
   /**
@@ -172,7 +172,7 @@ abstract class DocumentActionRunnable implements IRunnableWithProgress {
 
     monitor.subTask("Completing processing!");
 
-    completedProcessing();
+    completedProcessing(monitor);
 
     monitor.done();
   }
