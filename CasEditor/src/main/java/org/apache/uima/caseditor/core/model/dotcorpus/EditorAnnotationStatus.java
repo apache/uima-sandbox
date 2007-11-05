@@ -28,9 +28,9 @@ import org.apache.uima.cas.Type;
  * TODO: add javadoc here
  */
 public class EditorAnnotationStatus {
-  private Type mMode;
+  private String mMode;
 
-  private Collection<Type> mDisplayAnnotations = new HashSet<Type>();
+  private Collection<String> mDisplayAnnotations = new HashSet<String>();
 
   /**
    * Initializes a new instance.
@@ -38,7 +38,7 @@ public class EditorAnnotationStatus {
    * @param mode
    * @param displayAnnotations
    */
-  public EditorAnnotationStatus(Type mode, Collection<Type> displayAnnotations) {
+  public EditorAnnotationStatus(String mode, Collection<Type> displayAnnotations) {
     if (mode == null) {
       throw new IllegalArgumentException("Mode must not be null!");
     }
@@ -46,25 +46,28 @@ public class EditorAnnotationStatus {
     mMode = mode;
 
     if (displayAnnotations != null) {
-      mDisplayAnnotations.addAll(displayAnnotations);
+    	
+      for (Type type : displayAnnotations) {
+        mDisplayAnnotations.add(type.getName());
+      }
     }
   }
 
   /**
-   * Retrives the editor mode.
+   * Retrieves the editor mode.
    *
    * @return the editor mode
    */
-  public Type getMode() {
+  public String getMode() {
     return mMode;
   }
 
   /**
-   * Retrives the annotations wich a displayed in the editor.
+   * Retrieves the annotations which a displayed in the editor.
    *
    * @return the display annotations
    */
-  public Collection<Type> getDisplayAnnotations() {
+  public Collection<String> getDisplayAnnotations() {
     return mDisplayAnnotations;
   }
 }

@@ -114,8 +114,11 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
       List<Type> displayTypes = typeSystem.getProperlySubsumedTypes(annotationType);
 
+      // removes the document annotation
+      displayTypes.remove(typeSystem.getType(CAS.TYPE_NAME_DOCUMENT_ANNOTATION));
+      
       mEditorAnnotationStatus = new EditorAnnotationStatus(
-              annotationType, displayTypes);
+              annotationType.getName(), displayTypes);
     }
   }
 
@@ -479,8 +482,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       mTypesystem.changedResource(resource, delta);
 
       if (getTypesystemElement().getTypeSystem() != null) {
-          mEditorAnnotationStatus = new EditorAnnotationStatus(getTypesystemElement().getTypeSystem()
-                  .getType(CAS.TYPE_NAME_ANNOTATION), null);
+          mEditorAnnotationStatus = new EditorAnnotationStatus(CAS.TYPE_NAME_ANNOTATION, null);
         }
     }
   }

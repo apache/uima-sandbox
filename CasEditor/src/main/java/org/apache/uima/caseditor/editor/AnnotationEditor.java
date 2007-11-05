@@ -130,7 +130,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         // get old annotations of current type for this area
         // if there is something ... the delete them and add
         Collection<AnnotationFS> oldAnnotations = getDocument().getAnnotation(
-                mAnnotationMode, new Span(selection.x, selection.y));
+        		getAnnotationMode(), new Span(selection.x, selection.y));
 
         if (!oldAnnotations.isEmpty()) {
           getDocument().removeAnnotations(oldAnnotations);
@@ -139,7 +139,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         int start = selection.x;
         int end = start + selection.y;
 
-        AnnotationFS annotation = getDocument().getCAS().createAnnotation(mAnnotationMode,
+        AnnotationFS annotation = getDocument().getCAS().createAnnotation(getAnnotationMode(),
                 start, end);
 
         getDocument().addFeatureStructure(annotation);
@@ -387,7 +387,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      * This collection contains all type names which are displayed in
      * the editor.
      */
-    private Collection<String> mTypesToDisplay = new HashSet<String>();
+    private Collection<Type> mTypesToDisplay = new HashSet<Type>();
 
     private final TypeSystem typeSystem;
 
@@ -402,12 +402,9 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
       this.typeSystem = typeSystem;
 
-      Collection<Type> displayAnnotations = status.getDisplayAnnotations();
-
-      for (Type type : displayAnnotations) {
-        mTypesToDisplay.add(type.getName());
+      for (String typeName : status.getDisplayAnnotations()) {
+        mTypesToDisplay.add(getDocument().getType(typeName));
       }
-
     }
 
     @Override
@@ -415,7 +412,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       final MenuItem actionItem = new MenuItem(parentMenu, SWT.CHECK);
       actionItem.setText(type.getShortName());
 
-      if (mTypesToDisplay.contains(type.getName())) {
+      if (getAnnotationMode().equals(type)) {
+    	  actionItem.setSelection(true);
+      }
+      
+      if (mTypesToDisplay.contains(type)) {
         actionItem.setSelection(true);
       }
 
@@ -424,10 +425,10 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       actionItem.addListener(SWT.Selection, new Listener() {
         public void handleEvent(Event e) {
           if (actionItem.getSelection()) {
-            mTypesToDisplay.add(type.getName());
+            mTypesToDisplay.add(type);
 
           } else {
-            mTypesToDisplay.remove(type.getName());
+            mTypesToDisplay.remove(type);
           }
 
           // TODO: only synchronize annotation which
@@ -445,18 +446,18 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     Collection<Type> getSelectedTypes() {
       Collection<Type> selectedTypes = new LinkedList<Type>();
 
-      for (String typeName : mTypesToDisplay) {
-        selectedTypes.add(typeSystem.getType(typeName));
+      for (Type type : mTypesToDisplay) {
+        selectedTypes.add(type);
       }
 
     	return Collections.unmodifiableCollection(selectedTypes);
     }
 
     void setSelectedTypes(Collection<Type> types) {
-      mTypesToDisplay = new HashSet<String>();
+      mTypesToDisplay = new HashSet<Type>();
 
       for (Type type : types) {
-        mTypesToDisplay.add(type.getName());
+        mTypesToDisplay.add(type);
       }
     }
   }
@@ -503,7 +504,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
               return;
             }
 
-            Map<Integer, AnnotationFS> view = getDocument().getView(mAnnotationMode);
+            Map<Integer, AnnotationFS> view = getDocument().getView(getAnnotationMode());
 
             mCandidate = view.get(offset);
 
@@ -577,11 +578,16 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       return false;
     }
 
+    /**
+     * This implementation imitates the behavior without the
+     * {@link IAnnotationAccessExtension}.
+     */
     public boolean isSubtype(Object annotationType, Object potentialSupertype) {
 
-      // imitate behavior without IAnnotationAccessExtension
-      return mShowAnnotationsMenu.getSelectedTypes().contains(
-                getDocument().getCAS().getTypeSystem().getType((String) annotationType));
+      Type type = getDocument().getCAS().getTypeSystem().getType((String) annotationType);
+    	
+      return mShowAnnotationsMenu.getSelectedTypes().contains(type) || 
+          getAnnotationMode().equals(type);
     }
 
     public void paint(Annotation annotation, GC gc, Canvas canvas, Rectangle bounds) {
@@ -733,7 +739,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 	    EditorAnnotationStatus status = getDocument().getProject().getEditorAnnotationStatus();
 
 
-	    setAnnotationMode(status.getMode());
+	    setAnnotationMode(getDocument().getType(status.getMode()));
     }
   }
 
@@ -793,7 +799,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     // can be null directly after doSetInput()
     if (statusField != null) {
-      statusField.setText(mAnnotationMode.getShortName());
+      statusField.setText(getAnnotationMode().getShortName());
     }
   }
 
@@ -833,7 +839,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     syncAnnotations();
 
-    fireAnnotationTypeChanged(mAnnotationMode);
+    fireAnnotationTypeChanged(getAnnotationMode());
   }
 
   /**
@@ -867,12 +873,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     for (Type displayType : mShowAnnotationsMenu.getSelectedTypes()) {
       showAnnotationType(displayType);
     }
-
-    // if not contained in types add current mode annotations
-    if (!mShowAnnotationsMenu.getSelectedTypes().contains(mAnnotationMode)) {
-      showAnnotationType(mAnnotationMode);
+    
+    if (!mShowAnnotationsMenu.getSelectedTypes().contains(getAnnotationMode())) {
+      showAnnotationType(getAnnotationMode());
     }
-
+    
     mPainter.paint(IPainter.CONFIGURATION);
   }
 
@@ -937,7 +942,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       Span selecectedSpan = new Span(selectedText.x, selectedText.y);
 
       Collection<AnnotationFS> selectedAnnotations = getDocument().getAnnotation(
-              mAnnotationMode, selecectedSpan);
+    		  getAnnotationMode(), selecectedSpan);
 
       for (AnnotationFS annotation : selectedAnnotations) {
         selection.add(annotation);
@@ -945,7 +950,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
       Collections.sort(selection, new AnnotationComparator());
     } else {
-      Map<Integer, AnnotationFS> view = getDocument().getView(mAnnotationMode);
+      Map<Integer, AnnotationFS> view = getDocument().getView(getAnnotationMode());
 
       AnnotationFS annotation = view.get(mCursorPosition);
 
@@ -1005,7 +1010,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
   private void setProjectEditorStatus() {
     // TODO: do not replace if equal ... check this
-    EditorAnnotationStatus status = new EditorAnnotationStatus(getAnnotationMode(),
+    EditorAnnotationStatus status = new EditorAnnotationStatus(getAnnotationMode().getName(),
             mShowAnnotationsMenu.getSelectedTypes());
     getDocument().getProject().setEditorAnnotationStatus(status);
   }
