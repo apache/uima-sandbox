@@ -66,7 +66,7 @@ public class DictionaryBuilderTest extends TestCase {
       }
 
       reader.close();
-      
+
       Assert.assertTrue(dict.contains("CpE"));
       Assert.assertTrue(dict.contains("CPE"));
       Assert.assertTrue(dict.contains("cpe"));
@@ -98,7 +98,7 @@ public class DictionaryBuilderTest extends TestCase {
                .contains(line));
          line = reader.readLine();
       }
-      
+
       reader.close();
 
       Assert.assertFalse(dict.contains("CpE"));
@@ -131,11 +131,11 @@ public class DictionaryBuilderTest extends TestCase {
 
          StringTokenizer tokenizer = new StringTokenizer(line, " ");
 
-         ArrayList list = new ArrayList();
+         ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
             list.add(tokenizer.nextToken());
          }
-         String[] multiWord = (String[]) list.toArray(new String[] {});
+         String[] multiWord = list.toArray(new String[] {});
 
          Assert.assertTrue("Missing in dictionary: " + line, dict
                .contains(multiWord));
@@ -143,7 +143,7 @@ public class DictionaryBuilderTest extends TestCase {
       }
 
       reader.close();
-      
+
       Assert.assertEquals(5, dict.getEntryCount());
       Assert.assertFalse(dict.contains(new String[] { "Unstructured",
             "Information", "Management", "Architecture" }));
@@ -175,11 +175,11 @@ public class DictionaryBuilderTest extends TestCase {
 
          StringTokenizer tokenizer = new StringTokenizer(line, " ");
 
-         ArrayList list = new ArrayList();
+         ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
             list.add(tokenizer.nextToken());
          }
-         String[] multiWord = (String[]) list.toArray(new String[] {});
+         String[] multiWord = list.toArray(new String[] {});
 
          Assert.assertTrue("Missing in dictionary: " + line, dict
                .contains(multiWord));

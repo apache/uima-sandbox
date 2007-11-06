@@ -59,7 +59,8 @@ public class DictionaryMatcherTest extends TestCase {
     * @param matches
     *           match list
     */
-   public void match(Dictionary dict, AnnotationFS[] annotFSs, ArrayList matches) {
+   public void match(Dictionary dict, AnnotationFS[] annotFSs,
+         ArrayList<String> matches) {
       int currentPos = 0;
       while (currentPos < annotFSs.length) {
 
@@ -89,7 +90,7 @@ public class DictionaryMatcherTest extends TestCase {
     */
    public void testDictionaryMatchingOutsideAnnotator() throws Exception {
 
-      //create the dictionary
+      // create the dictionary
       File dictFile = JUnitExtension
             .getFile("DictionaryMatchTests/MultiWords.txt");
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder(true, true);
@@ -97,42 +98,46 @@ public class DictionaryMatcherTest extends TestCase {
       Dictionary dict = dictBuilder.getDictionary();
 
       // -- read input XCAS and create a CAS --
-      
-      //read type system file
-      File typeSystemFile = JUnitExtension
-      .getFile("DictionaryMatchTests/Token.xml");
-      //get XCAS file
-      File xcasFile = JUnitExtension
-      .getFile("DictionaryMatchTests/Token.xcas");
 
-      //parse type system file
-      Object descriptor = UIMAFramework.getXMLParser().parse(new XMLInputSource(typeSystemFile));
+      // read type system file
+      File typeSystemFile = JUnitExtension
+            .getFile("DictionaryMatchTests/Token.xml");
+      // get XCAS file
+      File xcasFile = JUnitExtension.getFile("DictionaryMatchTests/Token.xcas");
+
+      // parse type system file
+      Object descriptor = UIMAFramework.getXMLParser().parse(
+            new XMLInputSource(typeSystemFile));
       TypeSystemDescription tsDesc = (TypeSystemDescription) descriptor;
 
-      //create a CAS and add XCAS content
-      CAS cas = CasCreationUtils.createCas(tsDesc, null, new FsIndexDescription[0]);
+      // create a CAS and add XCAS content
+      CAS cas = CasCreationUtils.createCas(tsDesc, null,
+            new FsIndexDescription[0]);
       SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-      XCASDeserializer xcasDeserializer = new XCASDeserializer(cas.getTypeSystem());
+      XCASDeserializer xcasDeserializer = new XCASDeserializer(cas
+            .getTypeSystem());
       parser.parse(xcasFile, xcasDeserializer.getXCASHandler(cas));
 
-      //get dictionary match input type
-      Type inputType = cas.getTypeSystem().getType("org.apache.uima.TokenAnnotation");
-      Assert.assertNotNull("Type org.apache.uima.TokenAnnotation not found in the type system" + inputType);
-      
+      // get dictionary match input type
+      Type inputType = cas.getTypeSystem().getType(
+            "org.apache.uima.TokenAnnotation");
+      Assert
+            .assertNotNull("Type org.apache.uima.TokenAnnotation not found in the type system"
+                  + inputType);
+
       // copy input match type annotations to an array
       FSIterator it = cas.getAnnotationIndex(inputType).iterator();
-      ArrayList inputTypeAnnots = new ArrayList();
+      ArrayList<AnnotationFS> inputTypeAnnots = new ArrayList<AnnotationFS>();
       while (it.hasNext()) {
-         inputTypeAnnots.add(it.next());
+         inputTypeAnnots.add((AnnotationFS) it.next());
       }
-      AnnotationFS[] annotFSs = (AnnotationFS[]) inputTypeAnnots
-            .toArray(new AnnotationFS[] {});
+      AnnotationFS[] annotFSs = inputTypeAnnots.toArray(new AnnotationFS[] {});
 
-      //check matches for the CAS
-      ArrayList matches = new ArrayList();
+      // check matches for the CAS
+      ArrayList<String> matches = new ArrayList<String>();
       match(dict, annotFSs, matches);
-      
-      //check match results
+
+      // check match results
       Assert.assertEquals("new", matches.get(0));
       Assert.assertEquals("new york", matches.get(1));
       Assert.assertEquals("new orleans", matches.get(2));

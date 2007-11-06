@@ -25,8 +25,8 @@
     <delegateAnalysisEngine key="WhitespaceTokenizer">
       <import name="WhitespaceTokenizer"/>
     </delegateAnalysisEngine>
-    <delegateAnalysisEngine key="ListBasedAnnotator">
-      <import name="ListBasedAnnotator"/>
+    <delegateAnalysisEngine key="DictionaryAnnotator">
+      <import name="DictionaryAnnotator"/>
     </delegateAnalysisEngine>
   </delegateAnalysisEngineSpecifiers>
   <analysisEngineMetaData>
@@ -39,7 +39,7 @@
     <flowConstraints>
       <fixedFlow>
         <node>WhitespaceTokenizer</node>
-        <node>ListBasedAnnotator</node>
+        <node>DictionaryAnnotator</node>
       </fixedFlow>
     </flowConstraints>
     <fsIndexCollection/>

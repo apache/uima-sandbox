@@ -75,12 +75,11 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
 
       // copy input match type annotations to an array
       FSIterator it = cas.getAnnotationIndex(this.inputMatchType).iterator();
-      ArrayList inputTypeAnnots = new ArrayList();
+      ArrayList<AnnotationFS> inputTypeAnnots = new ArrayList<AnnotationFS>();
       while (it.hasNext()) {
-         inputTypeAnnots.add(it.next());
+         inputTypeAnnots.add((AnnotationFS) it.next());
       }
-      AnnotationFS[] annotFSs = (AnnotationFS[]) inputTypeAnnots
-            .toArray(new AnnotationFS[] {});
+      AnnotationFS[] annotFSs = inputTypeAnnots.toArray(new AnnotationFS[] {});
 
       // -- use the array of annotations to detect matches --
 
@@ -159,14 +158,14 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       // get UIMA datapath and tokenize it into its elements
       StringTokenizer tokenizer = new StringTokenizer(getContext()
             .getDataPath(), PATH_SEPARATOR);
-      ArrayList datapathElements = new ArrayList();
+      ArrayList<File> datapathElements = new ArrayList<File>();
       while (tokenizer.hasMoreTokens()) {
          // add datapath elements to the 'datapathElements' array list
          datapathElements.add(new File(tokenizer.nextToken()));
       }
 
       // parse dictionary files
-      ArrayList dicts = new ArrayList();
+      ArrayList<Dictionary> dicts = new ArrayList<Dictionary>();
       for (int i = 0; i < dictionaryFileNames.length; i++) {
          // try to resolve the relative file name with classpath or datapath
          File file = resolveRelativeFilePath(dictionaryFileNames[i],
@@ -191,7 +190,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       }
 
       // store all dictionaries in the dictionary array
-      this.dictionaries = (Dictionary[]) dicts.toArray(new Dictionary[] {});
+      this.dictionaries = dicts.toArray(new Dictionary[] {});
    }
 
    /*
@@ -202,7 +201,8 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
    public void typeSystemInit(TypeSystem typeSystem)
          throws AnalysisEngineProcessException {
 
-      //initialize the input match type that is used to match the dictionary entries
+      // initialize the input match type that is used to match the dictionary
+      // entries
       this.inputMatchType = typeSystem.getType(this.inputMatchTypeStr);
       if (this.inputMatchType == null) {
          Exception ex = new DictionaryAnnotatorConfigException(
@@ -236,7 +236,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
     * @throws AnnotatorContextException
     */
    private File resolveRelativeFilePath(String fileName,
-         ArrayList datapathElements) {
+         ArrayList<File> datapathElements) {
 
       URL url;
       // try to use the class loader to load the file resource
@@ -248,7 +248,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
          }
          // try to use the datapath to load the file resource
          for (int i = 0; i < datapathElements.size(); i++) {
-            File testFile = new File((File) datapathElements.get(i), fileName);
+            File testFile = new File(datapathElements.get(i), fileName);
             if (testFile.exists()) {
                return testFile;
             }

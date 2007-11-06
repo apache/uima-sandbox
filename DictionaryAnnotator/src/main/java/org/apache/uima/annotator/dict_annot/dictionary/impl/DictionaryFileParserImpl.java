@@ -32,6 +32,7 @@ import org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder;
 import org.apache.uima.annotator.dict_annot.dictionary.DictionaryFileParser;
 import org.apache.uima.annotator.dict_annot.impl.DictionaryAnnotatorConfigException;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
 
 /**
@@ -60,7 +61,7 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
       }
 
       // validate input file
-      ArrayList validationErrors = new ArrayList();
+      ArrayList<XmlError> validationErrors = new ArrayList<XmlError>();
       XmlOptions validationOptions = new XmlOptions();
       validationOptions.setErrorListener(validationErrors);
 
@@ -68,7 +69,7 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
 
       // output the errors if the XML is invalid.
       if (!isValid) {
-         Iterator iter = validationErrors.iterator();
+         Iterator<XmlError> iter = validationErrors.iterator();
          StringBuffer errorMessages = new StringBuffer();
          while (iter.hasNext()) {
             errorMessages.append("\n>> ");

@@ -38,7 +38,7 @@ import org.apache.uima.cas.text.AnnotationFS;
 public class HashMapDictionary implements Dictionary {
 
    // main dictionary HashMap
-   private HashMap dictionary = null;
+   private HashMap<String, DictionaryEntry> dictionary = null;
 
    private int idCounter;
 
@@ -53,7 +53,7 @@ public class HashMapDictionary implements Dictionary {
     * entries.
     */
    public HashMapDictionary(boolean caseNormalization) {
-      this.dictionary = new HashMap(100);
+      this.dictionary = new HashMap<String, DictionaryEntry>(100);
       this.idCounter = 0;
       this.caseNormalization = caseNormalization;
       this.language = null;
@@ -67,8 +67,7 @@ public class HashMapDictionary implements Dictionary {
     */
    public boolean contains(String word) {
       // check if the given word is available in the dictionary
-      DictionaryEntry entry = (DictionaryEntry) this.dictionary
-            .get(normalizeString(word));
+      DictionaryEntry entry = this.dictionary.get(normalizeString(word));
       if (entry != null) {
          return entry.isComplete();
       } else {
@@ -121,15 +120,14 @@ public class HashMapDictionary implements Dictionary {
     *         not in the dictionary
     */
    private DictionaryEntry containsMultiWord(String[] multiWord) {
-      HashMap currentMap = this.dictionary;
+      HashMap<String, DictionaryEntry> currentMap = this.dictionary;
       DictionaryEntry entry = null;
 
       // iterate over all multi word tokens and check if the multi word is
       // available
       for (int i = 0; i < multiWord.length; i++) {
          // check token
-         entry = (DictionaryEntry) currentMap
-               .get(normalizeString(multiWord[i]));
+         entry = currentMap.get(normalizeString(multiWord[i]));
          if (entry == null) {
             // multi word is not available
             return null;
@@ -186,8 +184,7 @@ public class HashMapDictionary implements Dictionary {
    public int addWord(String word) {
 
       // check if the word is already available in the dictionary
-      DictionaryEntry entry = (DictionaryEntry) this.dictionary
-            .get(normalizeString(word));
+      DictionaryEntry entry = this.dictionary.get(normalizeString(word));
       if (entry != null) {
          // check if entry is marked as complete
          if (entry.isComplete()) {
@@ -246,7 +243,7 @@ public class HashMapDictionary implements Dictionary {
       // create new entry meta data object and add ID
       EntryMetaData metaData = new EntryMetaDataImpl(this.idCounter);
 
-      HashMap currentMap = this.dictionary;
+      HashMap<String, DictionaryEntry> currentMap = this.dictionary;
 
       // iterate over all multi word tokens and add them to the dictionary
       for (int i = 0; i < multiWord.length; i++) {
@@ -254,8 +251,8 @@ public class HashMapDictionary implements Dictionary {
          if (currentMap.containsKey(normalizeString(multiWord[i]))) {
             // current multi word token is already in the dictionary get the map
             // of sub tokens for this entry
-            currentMap = ((DictionaryEntry) currentMap
-                  .get(normalizeString(multiWord[i]))).getSubBranch();
+            currentMap = (currentMap.get(normalizeString(multiWord[i])))
+                  .getSubBranch();
          } else { // current multi word token is not in the dictionary
             // check how we have to set the word end property
             if (i == (multiWord.length - 1)) {
@@ -328,15 +325,17 @@ public class HashMapDictionary implements Dictionary {
     *           offset in relation to the start position of the current token
     *           that is discovered
     */
-   private void checkMatches(int pos, AnnotationFS[] annotFSs, HashMap dict,
-         DictionaryMatchImpl match, int offset) {
+   private void checkMatches(int pos, AnnotationFS[] annotFSs,
+         HashMap<String, DictionaryEntry> dict, DictionaryMatchImpl match,
+         int offset) {
 
       // check if the current token that is investigated is available in the
       // current map
-      if (dict.containsKey(normalizeString(annotFSs[pos + offset].getCoveredText()))) {
+      if (dict.containsKey(normalizeString(annotFSs[pos + offset]
+            .getCoveredText()))) {
          // token is available in the map, get the dictionary entry object
-         DictionaryEntry currentEntry = (DictionaryEntry) dict
-               .get(normalizeString(annotFSs[pos + offset].getCoveredText()));
+         DictionaryEntry currentEntry = dict.get(normalizeString(annotFSs[pos
+               + offset].getCoveredText()));
          // add match to the match object
          match.storeMatch(currentEntry.getEntryMetaData(), currentEntry
                .isComplete());
@@ -361,18 +360,18 @@ public class HashMapDictionary implements Dictionary {
     * @param previousTokens
     *           previous tokens for the current branch
     */
-   private void printBranch(HashMap map, ArrayList previousTokens, Writer out)
-         throws IOException {
+   private void printBranch(HashMap<String, DictionaryEntry> map,
+         ArrayList<String> previousTokens, Writer out) throws IOException {
       // get an iterator over the main entries of this dictionary branch
-      Iterator mainEntries = map.keySet().iterator();
-  
+      Iterator<String> mainEntries = map.keySet().iterator();
+
       // iterate over all entries of this branch
       while (mainEntries.hasNext()) {
          // get current token
-         String currentToken = (String) mainEntries.next();
+         String currentToken = mainEntries.next();
 
          // get dictionary entry for the current token
-         DictionaryEntry dictEntry = (DictionaryEntry) map.get(currentToken);
+         DictionaryEntry dictEntry = map.get(currentToken);
 
          // check if the token is a valid word entry or a part of a multi word
          // entry
@@ -400,10 +399,10 @@ public class HashMapDictionary implements Dictionary {
 
          // check for the current token if it is part of a multi word
          // get the sub branch of this entry
-         HashMap subBranch = dictEntry.getSubBranch();
+         HashMap<String, DictionaryEntry> subBranch = dictEntry.getSubBranch();
          // add current token to previousTokens list
          if (previousTokens == null) {
-            previousTokens = new ArrayList();
+            previousTokens = new ArrayList<String>();
          }
          previousTokens.add(currentToken);
          // call printBranch for the current sub branch
@@ -423,7 +422,7 @@ public class HashMapDictionary implements Dictionary {
     * 
     * @return concatenated String separated by whitespace characters
     */
-   private String getString(ArrayList stringList) {
+   private String getString(ArrayList<String> stringList) {
 
       StringBuffer buf = new StringBuffer();
 

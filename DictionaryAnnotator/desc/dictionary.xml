@@ -22,7 +22,7 @@
 	<typeCollection>
 		<languageId>en-XX</languageId>
 		<typeDescription>
-			<typeName>org.apache.uima.ListBased</typeName>
+			<typeName>org.apache.uima.DictionaryEntry</typeName>
 		</typeDescription>
 		<entries>
 			<entry>

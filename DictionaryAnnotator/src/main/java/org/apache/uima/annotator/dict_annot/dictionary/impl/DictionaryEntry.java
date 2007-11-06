@@ -32,7 +32,7 @@ import org.apache.uima.annotator.dict_annot.dictionary.EntryMetaData;
 public class DictionaryEntry {
 
    // sub branch of multi word token entries of the current entry
-   private HashMap subBranch;
+   private HashMap<String, DictionaryEntry> subBranch;
 
    // specifies if the current entry is complete or just a part of a multi word
    private boolean isComplete = false;
@@ -62,9 +62,9 @@ public class DictionaryEntry {
     * 
     * @return returns the sub branch HashMap for this entry
     */
-   public HashMap getSubBranch() {
+   public HashMap<String, DictionaryEntry> getSubBranch() {
       if (this.subBranch == null) {
-         this.subBranch = new HashMap();
+         this.subBranch = new HashMap<String, DictionaryEntry>();
       }
       return this.subBranch;
    }

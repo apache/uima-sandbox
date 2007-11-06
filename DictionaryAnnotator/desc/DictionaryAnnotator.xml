@@ -20,7 +20,7 @@
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
   <primitive>true</primitive>
-  <annotatorImplementationName>org.apache.uima.annotator.listbased.impl.ListBasedAnnotator</annotatorImplementationName>
+  <annotatorImplementationName>org.apache.uima.annotator.dict_annot.impl.DictionaryAnnotator</annotatorImplementationName>
   <analysisEngineMetaData>
     <name>ListBasedAnnotator</name>
     <description></description>
@@ -66,7 +66,7 @@
     <typeSystemDescription>
       <types>
         <typeDescription>
-          <name>org.apache.uima.ListBased</name>
+          <name>org.apache.uima.DictionaryEntry</name>
           <description/>
           <supertypeName>uima.tcas.Annotation</supertypeName>
         </typeDescription>

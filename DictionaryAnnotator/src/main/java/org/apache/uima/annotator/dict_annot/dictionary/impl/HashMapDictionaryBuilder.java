@@ -51,8 +51,11 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
       this.dictionary = new HashMapDictionary(this.caseNormalization);
    }
 
-   /* (non-Javadoc)
-    * @see org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder#setDictionaryProperties(java.lang.String, java.lang.String)
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder#setDictionaryProperties(java.lang.String,
+    *      java.lang.String)
     */
    public void setDictionaryProperties(String language, String typeName) {
       this.dictionary.setDictionaryLanguage(language);
@@ -76,7 +79,7 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
          while (line != null) {
 
             addWord(line);
-            //get next line
+            // get next line
             line = reader.readLine();
          }
          reader.close();
@@ -86,36 +89,37 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
    }
 
    /**
-    * split up the given input in several tokens using the whitespace character 
+    * split up the given input in several tokens using the whitespace character
     * as delimiter.
-    *  
-    * @param input word that should be tokenized
+    * 
+    * @param input
+    *           word that should be tokenized
     * 
     * @return Tokens for the given input
     */
    private String[] whiteSpaceTokenizer(String input) {
-      
-      //create 
+
+      // create
       StringTokenizer tokenizer = new StringTokenizer(input, " ");
-      
-      ArrayList tokens = new ArrayList();
+
+      ArrayList<String> tokens = new ArrayList<String>();
       while (tokenizer.hasMoreTokens()) {
          tokens.add(tokenizer.nextToken());
       }
-      String[] multiWord = (String[]) tokens.toArray(new String[] {});
-      
+      String[] multiWord = tokens.toArray(new String[] {});
+
       return multiWord;
    }
-   
+
    /*
     * (non-Javadoc)
     * 
     * @see org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder#addWord(java.lang.String)
     */
    public void addWord(String word) {
-      
+
       if (this.createMultiWordEntries) {
-         //tokenize the entry
+         // tokenize the entry
          String[] multiWord = whiteSpaceTokenizer(word);
 
          if (multiWord.length == 1) {
@@ -124,7 +128,7 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
             this.dictionary.addMultiWord(multiWord);
          }
       } else {
-         this.dictionary.addWord(word);  
+         this.dictionary.addWord(word);
       }
    }
 
