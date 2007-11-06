@@ -25,7 +25,7 @@
 	<artifactId>FsVariables</artifactId>
 	<packaging>jar</packaging>
 	<version>2.2.0-incubating</version>
-	<name>Apache UIMA Java Annotator - WhitespaceTokenizer</name>
+	<name>Apache UIMA FS Variables Package</name>
 	<url>http://incubator.apache.org/uima</url>
 	<dependencies>
 		<dependency>
