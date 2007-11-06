@@ -122,21 +122,21 @@
 		<section id="sandbox.regexAnnotator.conceptsFile.rules">
 			<title>RuleSet definition</title>
 			<para>
-				The syntax of a simple RuleSet definition for the
-				RegexAnnotator is shown in the listing below:
+				The syntax of a simple RuleSet definition to detect email addresses 
+				is shown in the listing below:
 			</para>
 			<para>
-
 				<programlisting><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:noNamespaceSchemaLocation="concept.xsd">
 
-  <concept name="RuleSetDefinitionExample">
+  <concept name="emailAddressDetection">
     <rules>
-      <rule regEx="ExamplePattern" matchStrategy="matchAll" 
-          matchType="uima.tcas.DocumentAnnotation"/>
+      <rule regEx="([a-zA-Z0-9!#$%*+'/=?^_-`{|}~.\x26]+)@
+      			([a-zA-Z0-9._-]+[a-zA-Z]{2,4})" 
+        matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>		
     </rules>
-    <createAnnotations>
-      <annotation type="org.apache.uima.MyAnnotation">
+    <createAnnotations>	
+      <annotation id="emailAnnot" type="org.apache.uima.EmailAddress">
         <begin group="0"/>
         <end group="0"/>
       </annotation>
@@ -148,8 +148,8 @@
 			</para>
 			<para>
 				The definition above defines are simple concept
-				with the name <code>RuleSetDefinitionExample</code>. The 
-				defined rule use the <code>ExamplePattern</code> as 
+				with the name <code>emailAddressDetection</code>. The 
+				defined rule use <code>([a-zA-Z0-9!#$%*+'/=?^_-`{|}~.\x26]+)@([a-zA-Z0-9._-]+[a-zA-Z]{2,4})</code> as 
 				regular expression pattern that is matched on the
 				covered text of the match type <code>uima.tcas.DocumentAnnotation</code>. 
 				As match strategy, <code>matchAll</code> is used that means that all
@@ -157,7 +157,7 @@
 				annotations defined in the
 				<code>&lt;createAnnotations></code>
 				element. So for each match a
-				<code>org.apache.uima.MyAnnotation</code> annotation is created that
+				<code>org.apache.uima.EmailAddress</code> annotation is created that
 				covers the match in the document text.
 			</para>
 			<para>
@@ -169,31 +169,49 @@
 
 		<section id="sandbox.regexAnnotator.conceptsFile.concepts">
 			<title>Concept definition</title>
-			<para>The syntax of a complex Concept definition for the 
+			<para>The syntax of a complex Concept definition to detect credit card numbers for the 
 			  RegexAnnotator is shown in the listing below:</para>
 			<para>
 			
 			<programlisting><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:noNamespaceSchemaLocation="concept.xsd">
 
-  <concept name="complexConceptExample" processAllRules="false">
-    <rules>
-      <rule ruleId="Id1" regEx="PatternExample1" matchStrategy="matchAll" 
-          matchType="uima.tcas.DocumentAnnotation" confidence="1.0"/>
-      <rule ruleId="Id2" regEx="PatternExample2" matchStrategy="matchAll" 
-          matchType="uima.tcas.DocumentAnnotation" confidence="0.7"/>
-      <rule ruleId="Id3" regEx="PatternExample3" matchStrategy="matchAll" 
-          matchType="uima.tcas.DocumentAnnotation" confidence="0.3"/>
-    </rules>
-    <createAnnotations>	
-      <annotation type="org.apache.uima.MyAnnotation">
-        <begin group="0"/>
-        <end group="0"/>
-        <setFeature name="confidenceValue" type="Confidence"/>
-        <setFeature name="ruleId" type="RuleId"/>
-      </annotation>
-    <createAnnotations>
-  </concept>
+    <concept name="creditCardNumberDetection" processAllRules="true">
+      <rules>
+        <rule ruleId="AmericanExpress" 
+              regEx="(((34|37)\d{2}[- ]?)(\d{6}[- ]?)\d{5})" 
+              matchStrategy="matchAll" 
+              matchType="uima.tcas.DocumentAnnotation" 
+              confidence="1.0"/>
+        <rule ruleId="Visa" 
+              regEx="((4\d{3}[- ]?)(\d{4}[- ]?){2}\d{4})" 
+              matchStrategy="matchAll" 
+              matchType="uima.tcas.DocumentAnnotation" 
+              confidence="1.0"/>
+        <rule ruleId="MasterCard" 
+              regEx="((5[1-5]\d{2}[- ]?)(\d{4}[- ]?){2}\d{4})" 
+              matchStrategy="matchAll" 
+              matchType="uima.tcas.DocumentAnnotation" 
+              confidence="1.0"/>
+        <rule ruleId="unknownCardType" 
+              regEx="(([1-6]\d{3}[- ])(\d{4}[- ]){2}\d{4})|
+                 ([1-6]\d{13,18})|([1-6]\d{3}[- ]\d{6}[- ]\d{5})" 
+              matchStrategy="matchAll" 
+              matchType="uima.tcas.DocumentAnnotation" 
+              confidence="1.0"/>		
+      </rules> 
+      <createAnnotations>	
+        <annotation	id="creditCardNumber" 
+            		type="org.apache.uima.CreditCardNumber" 
+            		validate="org.apache.uima.annotator.regex.
+            		    extension.impl.CreditCardNumberValidator">
+          <begin group="0"/>
+          <end group="0"/>
+          <setFeature name="confidence" type="Confidence"/>
+          <setFeature name="cardType" type="RuleId"/>
+        </annotation>
+      </createAnnotations>
+    </concept>
 
 </conceptSet>
 ]]></programlisting>
@@ -209,7 +227,7 @@
 				are specified, the feature values for these features can 
 				later be assigned to an annotation feature for a created annotation. 
 				In case we use the listing above as example this means that when the 
-				<code>org.apache.uima.MyAnnotation</code> is created the value of the
+				<code>org.apache.uima.CreditCardNumber</code> is created the value of the
 				<code>confidence</code> feature of the rule that matched the document text 
 				is assigned to the annotation feature called <code>confidenceValue</code>.
 				The same is done for the <code>ruleId</code> feature.
@@ -258,12 +276,12 @@
 				configuration possibilities	for the rule processing.
 			</para>
 			<para>
-				The listing below shows a complex rule definition with
-				all the possible sub elements and details. Please refer to
-				the sub sections for the details about the sub elements.
+				The listing below shows an abstract rule definition with
+				all the possible sub elements. Please refer to
+				the sub sections for details about the sub elements.
 			</para>
 			<para> 
-<programlisting><![CDATA[<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" 
+<programlisting><emphasis><![CDATA[<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" 
     matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
 
   <matchTypeFilter>
@@ -276,12 +294,12 @@
 
   <ruleExceptions>	
     <exception matchType="uima.tcas.DocumentAnnotation">
-        Exception
+        ExceptionExpression
     </exception>
   </ruleExceptions>
 
 </rule>
-]]></programlisting>
+]]></emphasis></programlisting>
 			</para>
 			
 			<para>
@@ -357,10 +375,10 @@
 				id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.filter">
 				<title>Match Type Filter</title>
 				<para>
-				<programlisting><![CDATA[<matchTypeFilter>
+				<programlisting><emphasis><![CDATA[<matchTypeFilter>
   <feature name="language">en</feature>
 </matchTypeFilter>
-]]></programlisting>
+]]></emphasis></programlisting>
 					
 
 				</para>
@@ -396,10 +414,10 @@
 			<section id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.update">
 				<title>Update Match Type Annotations With Additional Features</title>
 				<para>	
-					<programlisting><![CDATA[<updateMatchTypeAnnotation>
+					<programlisting><emphasis><![CDATA[<updateMatchTypeAnnotation>
   <setFeature name="language" type="String">$0</setFeature>
 </updateMatchTypeAnnotation>
-]]></programlisting>
+]]></emphasis></programlisting>
 				</para>
 				<para>
 					With the
@@ -477,13 +495,12 @@
 				<title>Rule exception</title>
 				<para>
 					 
-					<programlisting><![CDATA[<ruleExceptions>	
+					<programlisting><emphasis><![CDATA[<ruleExceptions>	
   <exception matchType="uima.tcas.DocumentAnnotation">
       ExceptionPattern
   </exception>
 </ruleExceptions>
-]]></programlisting>
-					
+]]></emphasis></programlisting>			
 
 				</para>
 				<para>
@@ -497,10 +514,10 @@
 					When analyzing the text you will get a car brand annotation since "Ford" is
 					a car brand. But is this the correct behavior? The work around that issue
 					you can create an exception that looks like
-					 <programlisting><![CDATA[<ruleExceptions>	
+					 <programlisting><emphasis><![CDATA[<ruleExceptions>	
   <exception matchType="uima.SentenceAnnotation">Henry</exception>
 </ruleExceptions>
-]]></programlisting>
+]]></emphasis></programlisting>
 					and add it to your car brand rule. After adding this, car brand annotations
 					are only created if the sentence annotation that covers the token annotation
 					does not contain the word "Henry". 					
@@ -541,7 +558,7 @@
 				  An annotation creation example with all possible settings is shown in the listing below.
 				</para>
 				<para>
-				<programlisting><![CDATA[<annotation id="testannot" type="org.apache.uima.TestAnnot" 
+				<programlisting><emphasis><![CDATA[<annotation id="testannot" type="org.apache.uima.TestAnnot" 
 	validate="CustomValidatorClass">
 	<begin group="0" location="start"/>
 	<end group="0" location="end"/>
@@ -556,7 +573,7 @@
 	<setFeature name="normalizedText" type="String" 
 		normalization="Custom" 
 		class="org.apache.CustomNormalizer">$0</setFeature>
-</annotation>]]></programlisting>
+</annotation>]]></emphasis></programlisting>
 				</para>
 				
 				<para>
@@ -709,11 +726,11 @@ public class SampleValidator implements
 				  The configuration for this example looks like: 
 				</para>
 				<para>
-				<programlisting><![CDATA[<annotation id="isbnNumber" type="org.apache.uima.ISBNNumber" 
+				<programlisting><emphasis><![CDATA[<annotation id="isbnNumber" type="org.apache.uima.ISBNNumber" 
     validate="org.apache.uima.annotator.regex.SampleValidator">
 	<begin group="0"/>
 	<end group="0"/>
-</annotation>]]></programlisting>
+</annotation>]]></emphasis></programlisting>
 				</para>
 				</section>
 				<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation.features">
@@ -810,9 +827,10 @@ public class SampleValidator implements
 							<code>Reference</code>
 							- to link a UIMA feature to another annotation. In this case the
 							UIMA feature type have to be the same as the referred annotation type.
-							To reference another annotation the <code>&lt;setFeature></code>
-							content have to contain the annotation <code>id</code> of the referred 
-							annotation.
+							To reference another annotation instance the <code>&lt;setFeature></code>
+							content must have the annotation <code>id</code> as value of the referred 
+							annotation. The referred annotation instance is the created annotation of
+							the current match.
 						</para>
 					</listitem>
 					<listitem>
@@ -866,8 +884,8 @@ public class SampleValidator implements
 							</listitem>
 						</itemizedlist>
 						Built-in normalization configuration:
-						<programlisting><![CDATA[<setFeature name="normalizedFeature" type="String" 
-	normalization="ToLowerCase">$0</setFeature>]]></programlisting>
+						<programlisting><emphasis><![CDATA[<setFeature name="normalizedFeature" type="String" 
+	normalization="ToLowerCase">$0</setFeature>]]></emphasis></programlisting>
    					</para>
 					<para>
 					  In case of a custom normalization, the <code>normalization</code> feature must have the value
@@ -899,10 +917,10 @@ public class CustomNormalizer
    					</para>
    					<para>
    					  Custom normalization configuration:
-   					  <programlisting><![CDATA[<setFeature name="normalizedFeature" type="String" 
+   					  <programlisting><emphasis><![CDATA[<setFeature name="normalizedFeature" type="String" 
 	normalization="Custom" class="org.apache.uima.CustomNormalizer">
   $0
-</setFeature>]]></programlisting>
+</setFeature>]]></emphasis></programlisting>
    					</para>
 				</section>
 			</section>			
@@ -928,7 +946,7 @@ public class CustomNormalizer
 								the concept files the annotator should use. The concept files
 								must be specified using a relative path that is available in the
 								UIMA datapath or in the classpath.
-								<programlisting><![CDATA[<nameValuePair>
+								<programlisting><emphasis><![CDATA[<nameValuePair>
   <name>ConceptFiles</name>
   <value>
     <array>
@@ -936,7 +954,7 @@ public class CustomNormalizer
       <string>SampleConcept.xml</string> 
     </array>
   </value>
-</nameValuePair>]]></programlisting>
+</nameValuePair>]]></emphasis></programlisting>
 							</para>
 						</listitem>
 				  	</itemizedlist>
@@ -955,11 +973,11 @@ public class CustomNormalizer
 				  below have to be added to the input capability section in the RegexAnnotator descriptor.
 				</para>
 				<para>
-				<programlisting><![CDATA[<rules>
+				<programlisting><emphasis><![CDATA[<rules>
   <rule regEx="SampleRegex" matchStrategy="matchAll" 
       matchType="uima.SentenceAnnotation"/>
 </rules>
-]]></programlisting>
+]]></emphasis></programlisting>
 				</para>
 				<para>
 				  In the output section, all of the annotation types and features created by 
@@ -970,14 +988,14 @@ public class CustomNormalizer
 				  be added to the output capability section in the RegexAnnotator descriptor. 
 				</para>
 				<para>
-				<programlisting><![CDATA[<createAnnotations>
+				<programlisting><emphasis><![CDATA[<createAnnotations>
   <annotation type="org.apache.uima.TestAnnot">
     <begin group="0"/>
     <end group="0"/>
     <setFeature name="testFeature" type="String">$0</setFeature>
   </annotation>
 </createAnnotations>
-]]></programlisting>
+]]></emphasis></programlisting>
 				</para>
 				<para>
 				  If there are any language dependent rules in the concept file the languages abbreviations 
@@ -990,7 +1008,7 @@ public class CustomNormalizer
 				  descriptor looks like:
 				</para>
 				<para>
-				<programlisting><![CDATA[<capabilities>
+				<programlisting><emphasis><![CDATA[<capabilities>
   <capability>
     <inputs>
       <type>uima.SentenceAnnotation</type>
@@ -1004,7 +1022,7 @@ public class CustomNormalizer
     </languagesSupported>
   </capability>
 </capabilities>
-]]></programlisting>
+]]></emphasis></programlisting>
 				</para>
 			</section>
 </chapter>
