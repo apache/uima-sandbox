@@ -47,7 +47,7 @@ public class Annotation_impl implements Annotation {
 
    private Validation validator;
 
-   private ArrayList features;
+   private ArrayList<Feature> features;
 
    private Type annotationType;
 
@@ -63,7 +63,7 @@ public class Annotation_impl implements Annotation {
       this.annotationTypeStr = annotType;
       this.begin = begin;
       this.end = end;
-      this.features = new ArrayList();
+      this.features = new ArrayList<Feature>();
       this.validationClass = validationClass;
       this.validator = null;
    }
@@ -120,13 +120,16 @@ public class Annotation_impl implements Annotation {
     */
    public Feature[] getFeatures() {
 
-      return (Feature[]) this.features.toArray(new Feature[0]);
+      return this.features.toArray(new Feature[0]);
    }
 
-   /* (non-Javadoc)
-    * @see org.apache.uima.annotator.regex.Annotation#validate(java.lang.String, java.lang.String)
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Annotation#validate(java.lang.String,
+    *      java.lang.String)
     */
-   public boolean validate(String coveredText, String ruleID) throws Exception{
+   public boolean validate(String coveredText, String ruleID) throws Exception {
       if (this.validator != null) {
          return this.validator.validate(coveredText, ruleID);
       } else {
@@ -134,7 +137,9 @@ public class Annotation_impl implements Annotation {
       }
    }
 
-   /* (non-Javadoc)
+   /*
+    * (non-Javadoc)
+    * 
     * @see org.apache.uima.annotator.regex.Annotation#hasValidator()
     */
    public boolean hasValidator() {
@@ -183,8 +188,8 @@ public class Annotation_impl implements Annotation {
 
          try {
             // try to get the custom validation class
-            Class validatorClass = this.getClass().getClassLoader().loadClass(
-                  this.validationClass);
+            Class<?> validatorClass = this.getClass().getClassLoader()
+                  .loadClass(this.validationClass);
             Object obj = validatorClass.newInstance();
             if (obj instanceof Validation) {
                this.validator = (Validation) obj;
@@ -217,11 +222,11 @@ public class Annotation_impl implements Annotation {
       buffer.append(this.begin.toString());
       buffer.append("\n  End: ");
       buffer.append(this.end.toString());
-      if(this.validationClass != null) {
+      if (this.validationClass != null) {
          buffer.append("\n  Validation class: ");
          buffer.append(this.validationClass);
       }
-      
+
       Feature[] featureList = getFeatures();
       if (featureList.length > 0) {
          buffer.append("\nFeatures: \n");

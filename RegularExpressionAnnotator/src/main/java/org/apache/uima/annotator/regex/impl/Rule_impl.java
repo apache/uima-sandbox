@@ -48,20 +48,20 @@ public class Rule_impl implements Rule {
 
    private Type matchType;
 
-   private ArrayList filterFeatures;
+   private ArrayList<FilterFeature> filterFeatures;
 
-   private ArrayList updateFeatures;
+   private ArrayList<Feature> updateFeatures;
 
-   private ArrayList exceptions;
+   private ArrayList<RuleException> exceptions;
 
    public Rule_impl(String regex, int matchStrategy, String matchType,
          String id, float confidence) {
       this.regex = regex;
       this.matchStrategy = matchStrategy;
       this.matchTypeStr = matchType;
-      this.filterFeatures = new ArrayList();
-      this.updateFeatures = new ArrayList();
-      this.exceptions = new ArrayList();
+      this.filterFeatures = new ArrayList<FilterFeature>();
+      this.updateFeatures = new ArrayList<Feature>();
+      this.exceptions = new ArrayList<RuleException>();
       this.pattern = null;
       this.id = id;
       this.confidence = confidence;
@@ -82,8 +82,7 @@ public class Rule_impl implements Rule {
     * @see org.apache.uima.annotator.regex.Rule#getMatchTypeFilterFeatures()
     */
    public FilterFeature[] getMatchTypeFilterFeatures() {
-      return (FilterFeature[]) this.filterFeatures
-            .toArray(new FilterFeature[0]);
+      return this.filterFeatures.toArray(new FilterFeature[0]);
    }
 
    /*
@@ -147,7 +146,7 @@ public class Rule_impl implements Rule {
     * @see org.apache.uima.annotator.regex.Rule#getMatchTypeUpdateFeatures()
     */
    public Feature[] getMatchTypeUpdateFeatures() {
-      return (Feature[]) this.updateFeatures.toArray(new Feature[0]);
+      return this.updateFeatures.toArray(new Feature[0]);
    }
 
    /*
@@ -166,7 +165,7 @@ public class Rule_impl implements Rule {
     * @see org.apache.uima.annotator.regex.Rule#getExceptions()
     */
    public RuleException[] getExceptions() {
-      return (RuleException[]) this.exceptions.toArray(new RuleException[0]);
+      return this.exceptions.toArray(new RuleException[0]);
    }
 
    /**

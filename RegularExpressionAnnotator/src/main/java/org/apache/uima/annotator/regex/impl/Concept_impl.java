@@ -37,11 +37,11 @@ import org.apache.uima.util.Logger;
  */
 public class Concept_impl implements Concept {
 
-   private ArrayList annotations;
+   private ArrayList<Annotation> annotations;
 
    private String name;
 
-   private ArrayList rules;
+   private ArrayList<Rule> rules;
 
    private boolean processAllRules;
 
@@ -51,8 +51,8 @@ public class Concept_impl implements Concept {
    public Concept_impl(String name, boolean processAllRules) {
       this.name = name;
       this.processAllRules = processAllRules;
-      this.annotations = new ArrayList();
-      this.rules = new ArrayList();
+      this.annotations = new ArrayList<Annotation>();
+      this.rules = new ArrayList<Rule>();
    }
 
    /*
@@ -70,7 +70,7 @@ public class Concept_impl implements Concept {
     * @see org.apache.uima.annotator.regex.Rule#getInstructions()
     */
    public Annotation[] getAnnotations() {
-      return (Annotation[]) this.annotations.toArray(new Annotation[0]);
+      return this.annotations.toArray(new Annotation[0]);
    }
 
    /*
@@ -98,7 +98,7 @@ public class Concept_impl implements Concept {
     */
    public Rule[] getRules() {
       // get rules array
-      Rule[] ruleList = (Rule[]) this.rules.toArray(new Rule[0]);
+      Rule[] ruleList = this.rules.toArray(new Rule[0]);
       // sort rules array by confidence
       Arrays.sort(ruleList, new RuleComparator());
       return ruleList;
@@ -157,7 +157,7 @@ public class Concept_impl implements Concept {
 
       // check duplicate rule IDs within the same concept
       // store ruleIDs for one concept
-      HashSet ruleIds = new HashSet(ruleList.length);
+      HashSet<String> ruleIds = new HashSet<String>(ruleList.length);
       for (int x = 0; x < ruleList.length; x++) {
          String ruleID = ruleList[x].getId();
          // if no ruleID was specified, skip rule
@@ -180,8 +180,8 @@ public class Concept_impl implements Concept {
       // check if annotation IDs are available in case of reference type
       // features and
       // check if they are unique within the concept
-      HashSet referenceIds = new HashSet();
-      HashSet annotationIds = new HashSet();
+      HashSet<String> referenceIds = new HashSet<String>();
+      HashSet<String> annotationIds = new HashSet<String>();
       for (int a = 0; a < annots.length; a++) {
          String annotID = annots[a].getId();
          // check annotation ID if available
@@ -219,9 +219,9 @@ public class Concept_impl implements Concept {
       }
 
       // check if all referred annotation IDs are available
-      Iterator refIterator = referenceIds.iterator();
+      Iterator<String> refIterator = referenceIds.iterator();
       while (refIterator.hasNext()) {
-         String refID = (String) refIterator.next();
+         String refID = refIterator.next();
 
          // check if refID is available in the anntoationIDs list
          // if it is not available, throw an exception

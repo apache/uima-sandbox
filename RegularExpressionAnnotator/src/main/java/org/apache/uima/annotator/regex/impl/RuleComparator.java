@@ -26,17 +26,17 @@ import org.apache.uima.annotator.regex.Rule;
 /**
  *
  */
-public class RuleComparator implements Comparator, Serializable {
+public class RuleComparator implements Comparator<Rule>, Serializable {
 
   private static final long serialVersionUID = -1327195437752705633L;
 
 /* (non-Javadoc)
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */
-  public int compare(Object o1, Object o2) {
+  public int compare(Rule r1, Rule r2) {
     
-    Rule rule1 = (Rule) o1;
-    Rule rule2 = (Rule) o2;
+    Rule rule1 = r1;
+    Rule rule2 = r2;
     
     if(rule1.getConfidence() < rule2.getConfidence()) {
        return 1;

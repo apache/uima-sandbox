@@ -144,7 +144,7 @@ public class Feature_impl implements Feature {
          } else {
             try {
                // try to get the custom normalization class
-               Class normalizerClass = this.getClass().getClassLoader()
+               Class<?> normalizerClass = this.getClass().getClassLoader()
                      .loadClass(this.implClass);
                Object obj = normalizerClass.newInstance();
                if (obj instanceof Normalization) {

@@ -98,14 +98,14 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       // get UIMA datapath and tokenize it into its elements
       StringTokenizer tokenizer = new StringTokenizer(getContext()
             .getDataPath(), PATH_SEPARATOR);
-      ArrayList datapathElements = new ArrayList();
+      ArrayList<File> datapathElements = new ArrayList<File>();
       while (tokenizer.hasMoreTokens()) {
          // add datapath elements to the 'datapathElements' array list
          datapathElements.add(new File(tokenizer.nextToken()));
       }
 
       // try to resolve the concept file names
-      ArrayList concepts = new ArrayList();
+      ArrayList<Concept> concepts = new ArrayList<Concept>();
       for (int i = 0; i < conceptFileNames.length; i++) {
          // try to resolve the relative file name with classpath or datapath
          File file = resolveRelativeFilePath(conceptFileNames[i],
@@ -132,10 +132,11 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       }
 
       // get one array that contains all the concepts
-      this.regexConcepts = (Concept[]) concepts.toArray(new Concept[] {});
+      this.regexConcepts = concepts.toArray(new Concept[] {});
 
       // check duplicate concept names
-      HashSet conceptNames = new HashSet(this.regexConcepts.length);
+      HashSet<String> conceptNames = new HashSet<String>(
+            this.regexConcepts.length);
       for (int i = 0; i < this.regexConcepts.length; i++) {
          String name = this.regexConcepts[i].getName();
          // check if concept name was set, if not, skip concept
@@ -188,7 +189,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     * @throws AnnotatorContextException
     */
    private File resolveRelativeFilePath(String fileName,
-         ArrayList datapathElements) {
+         ArrayList<File> datapathElements) {
 
       URL url;
       // try to use the class loader to load the file resource
@@ -200,7 +201,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          }
          // try to use the datapath to load the file resource
          for (int i = 0; i < datapathElements.size(); i++) {
-            File testFile = new File((File) datapathElements.get(i), fileName);
+            File testFile = new File(datapathElements.get(i), fileName);
             if (testFile.exists()) {
                return testFile;
             }
@@ -251,7 +252,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
          // list of all annotation that must be added to the CAS for this
          // concept
-         ArrayList annotsToAdd = new ArrayList();
+         ArrayList<FeatureStructure> annotsToAdd = new ArrayList<FeatureStructure>();
 
          // get the rules for the current concept
          Rule[] conceptRules = this.regexConcepts[i].getRules();
@@ -396,8 +397,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          // add all created annotations to the CAS index before moving to the
          // next concept
          for (int x = 0; x < annotsToAdd.size(); x++) {
-            aCAS.getIndexRepository().addFS(
-                  (FeatureStructure) annotsToAdd.get(x));
+            aCAS.getIndexRepository().addFS(annotsToAdd.get(x));
          }
 
          // reset last rule exception annotation since we move to the next rule
@@ -562,11 +562,12 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     *           array for the annotations that should be created
     */
    private void processConceptInstructions(Matcher matcher, AnnotationFS annot,
-         CAS aCAS, Concept concept, int ruleIndex, ArrayList annotsToAdd)
+         CAS aCAS, Concept concept, int ruleIndex,
+         ArrayList<FeatureStructure> annotsToAdd)
          throws RegexAnnotatorProcessException {
 
       // create local annotation map for reference features
-      HashMap annotMap = new HashMap();
+      HashMap<String, FeatureStructure> annotMap = new HashMap<String, FeatureStructure>();
 
       // has the rule some reference features to set
       boolean hasReferenceFeatures = false;
@@ -710,14 +711,12 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   // annotation was created earlier
                   // to search for the correct annotation we use the current
                   // annotation ID
-                  FeatureStructure fs = (FeatureStructure) annotMap
-                        .get(annotations[a].getId());
+                  FeatureStructure fs = annotMap.get(annotations[a].getId());
 
                   // search for the referenced annotation ID
                   // the annotation ID we search for is specified in the feature
                   // value
-                  FeatureStructure refFs = (FeatureStructure) annotMap
-                        .get(features[f].getValue());
+                  FeatureStructure refFs = annotMap.get(features[f].getValue());
 
                   // set reference feature value
                   fs.setFeatureValue(features[f].getFeature(), refFs);
@@ -766,8 +765,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          } else if (type == Feature.REFERENCE_FEATURE) {
             // search for the referenced annotation ID
             // the annotation ID we search for is specified in the feature value
-            FeatureStructure refFs = (FeatureStructure) annotMap
-                  .get(updateFeatures[f].getValue());
+            FeatureStructure refFs = annotMap.get(updateFeatures[f].getValue());
 
             // set reference feature value
             annot.setFeatureValue(updateFeatures[f].getFeature(), refFs);
