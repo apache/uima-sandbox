@@ -20,6 +20,7 @@
 <dictionary xmlns="http://incubator.apache.org/uima" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="dictionary.xsd">
 	<typeCollection>
+		<dictionaryMetaData caseNormalization="true" multiWordEntries="true"/>
 		<languageId>en-XX</languageId>
 		<typeDescription>
 			<typeName>org.apache.uima.DictionaryEntry</typeName>
