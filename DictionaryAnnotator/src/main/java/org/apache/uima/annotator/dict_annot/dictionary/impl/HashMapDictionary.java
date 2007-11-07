@@ -30,22 +30,26 @@ import org.apache.uima.annotator.dict_annot.dictionary.EntryMetaData;
 import org.apache.uima.cas.text.AnnotationFS;
 
 /**
- * HashMap dictionary implementation.
- * 
- * TODO: describe how the dictionary is implemented
- * 
+ * HashMap dictionary implementation. Implements the Dictionary interface using
+ * a simple HashMap for the lookup. Each word added to the dictionary is added
+ * to the main dictionary HashMap with some additional meta data information. In
+ * case of multi-words the multi word parts are added as tree to the dictionary.
  */
 public class HashMapDictionary implements Dictionary {
 
    // main dictionary HashMap
    private HashMap<String, DictionaryEntry> dictionary = null;
 
+   // counts the entries in the dictionary, each entry gets an own unique ID
    private int idCounter;
 
+   // dictionary language
    private String language;
 
+   // dictionary output type
    private String typeName;
 
+   // dictionary case normalization setting
    private boolean caseNormalization = true;
 
    /**
@@ -81,7 +85,7 @@ public class HashMapDictionary implements Dictionary {
     * @see org.apache.uima.annotator.listbased.Dictionary#contains(java.lang.String[])
     */
    public boolean contains(String[] multiWord) {
-
+      // check if the dictionary contains the given multiword
       DictionaryEntry entry = containsMultiWord(multiWord);
       if (entry != null) {
          return entry.isComplete();
@@ -96,6 +100,7 @@ public class HashMapDictionary implements Dictionary {
     * @see org.apache.uima.annotator.listbased.dictionary.Dictionary#getTypeName()
     */
    public String getTypeName() {
+      // returns the dictionary output type name
       return this.typeName;
    }
 
@@ -105,31 +110,32 @@ public class HashMapDictionary implements Dictionary {
     * @see org.apache.uima.annotator.listbased.dictionary.Dictionary#getLanguage()
     */
    public String getLanguage() {
+      // returns the dictionary language
       return this.language;
    }
 
    /**
-    * check if the given multi word is available in the dictionary. If it is
+    * check if the given multi-word is available in the dictionary. If it is
     * available the DictionaryEntry is returned. If it is not available, null is
     * returned
     * 
     * @param multiWord
-    *           multi word to look for
+    *           multi-word used for the lookup
     * 
-    * @return DictionaryEntry for the given multi word, or null if the entry is
+    * @return DictionaryEntry for the given multi-word, or null if the entry is
     *         not in the dictionary
     */
    private DictionaryEntry containsMultiWord(String[] multiWord) {
       HashMap<String, DictionaryEntry> currentMap = this.dictionary;
       DictionaryEntry entry = null;
 
-      // iterate over all multi word tokens and check if the multi word is
+      // iterate over all multi-word tokens and check if the multi-word is
       // available
       for (int i = 0; i < multiWord.length; i++) {
          // check token
          entry = currentMap.get(normalizeString(multiWord[i]));
          if (entry == null) {
-            // multi word is not available
+            // multi-word is not available
             return null;
          } else {
             // use sub branch to lookup the next token
@@ -170,6 +176,7 @@ public class HashMapDictionary implements Dictionary {
     * @see org.apache.uima.annotator.listbased.Dictionary#getEntryCount()
     */
    public int getEntryCount() {
+      // returns the number of entries in the dictionary
       return this.idCounter;
    }
 
@@ -213,10 +220,10 @@ public class HashMapDictionary implements Dictionary {
    }
 
    /**
-    * Adds a new multi word to the dictionary
+    * Adds a new multi-word to the dictionary
     * 
     * @param multiWord
-    *           multi word that should be added to the dictionary
+    *           multi-word that should be added to the dictionary
     * 
     * @return ID that was generated for this entry
     */
@@ -245,18 +252,18 @@ public class HashMapDictionary implements Dictionary {
 
       HashMap<String, DictionaryEntry> currentMap = this.dictionary;
 
-      // iterate over all multi word tokens and add them to the dictionary
+      // iterate over all multi-word tokens and add them to the dictionary
       for (int i = 0; i < multiWord.length; i++) {
          // check if the current token is already in the dictionary
          if (currentMap.containsKey(normalizeString(multiWord[i]))) {
-            // current multi word token is already in the dictionary get the map
+            // current multi-word token is already in the dictionary get the map
             // of sub tokens for this entry
             currentMap = (currentMap.get(normalizeString(multiWord[i])))
                   .getSubBranch();
-         } else { // current multi word token is not in the dictionary
+         } else { // current multi-word token is not in the dictionary
             // check how we have to set the word end property
             if (i == (multiWord.length - 1)) {
-               // if it is the last token of the multi word, the word end
+               // if it is the last token of the multi-word, the word end
                // property must be set to true
                entry = new DictionaryEntry(true, metaData);
             } else {
@@ -283,7 +290,6 @@ public class HashMapDictionary implements Dictionary {
     * @throws IOException
     */
    public void printDictionary(Writer out) throws IOException {
-
       // start printing with the main branch
       printBranch(this.dictionary, null, out);
    }
@@ -373,12 +379,12 @@ public class HashMapDictionary implements Dictionary {
          // get dictionary entry for the current token
          DictionaryEntry dictEntry = map.get(currentToken);
 
-         // check if the token is a valid word entry or a part of a multi word
+         // check if the token is a valid word entry or a part of a multi-word
          // entry
          if (dictEntry.isComplete()) {
             // word end detected, print word
             if (previousTokens != null) {
-               // add previous tokens of this multi word
+               // add previous tokens of this multi-word
                String previous = getString(previousTokens);
                if (out == null) {
                   System.out.println(previous + currentToken);
@@ -397,7 +403,7 @@ public class HashMapDictionary implements Dictionary {
             }
          }
 
-         // check for the current token if it is part of a multi word
+         // check for the current token if it is part of a multi-word
          // get the sub branch of this entry
          HashMap<String, DictionaryEntry> subBranch = dictEntry.getSubBranch();
          // add current token to previousTokens list
@@ -444,11 +450,11 @@ public class HashMapDictionary implements Dictionary {
     * @return returns the normalized string
     */
    private String normalizeString(String input) {
+      // check if case normalization is enabled
       if (this.caseNormalization) {
          return input.toLowerCase().trim();
       }
 
-      return input;
+      return input.trim();
    }
-
 }

@@ -24,10 +24,10 @@ import org.apache.uima.annotator.dict_annot.dictionary.EntryMetaData;
 
 /**
  * The DictionaryEntry contains the entry meta data object and the information
- * if the entry is complete or just a part of a multi word entry.
+ * if an entry is complete or just a part of a multi-word entry.
  * 
- * If the entry is part of a multi word entry it also contains the branch of
- * multi word tokens that are followed by the current entry.
+ * If the entry is part of a multi-word entry it also contains the branch of
+ * multi-word tokens that are followed by the current entry.
  */
 public class DictionaryEntry {
 

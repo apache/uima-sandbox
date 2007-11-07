@@ -21,9 +21,10 @@ package org.apache.uima.annotator.dict_annot.dictionary.impl;
 import org.apache.uima.InternationalizedException;
 
 /**
- * DictionaryBuildException is thrown if an error occurred while building the dictionary. 
+ * DictionaryBuildException is thrown if an error occurred while building the
+ * dictionary.
  */
-public class DictionaryBuilderException extends InternationalizedException{
+public class DictionaryBuilderException extends InternationalizedException {
 
    private static final long serialVersionUID = 1231121236199052775L;
 
@@ -31,10 +32,11 @@ public class DictionaryBuilderException extends InternationalizedException{
     * Creates a new exception with the specified cause and a null message.
     * 
     * @param aCause
-    *          the original exception that caused this exception to be thrown, if any
+    *           the original exception that caused this exception to be thrown,
+    *           if any
     */
    public DictionaryBuilderException(Throwable aCause) {
-     super(aCause);
+      super(aCause);
    }
 
 }

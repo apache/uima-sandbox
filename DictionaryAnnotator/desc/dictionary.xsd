@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://incubator.apache.org/uima"
+            xmlns="http://incubator.apache.org/uima" elementFormDefault="qualified">
 	<!--
 		* Licensed to the Apache Software Foundation (ASF) under one
 		* or more contributor license agreements.  See the NOTICE file
@@ -30,6 +31,7 @@
 	<xs:element name="typeCollection">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element ref="dictionaryMetaData" minOccurs="0" maxOccurs="1" />
 				<xs:element name="languageId" type="xs:string"
 					minOccurs="0" maxOccurs="1" />
 				<xs:element ref="typeDescription" minOccurs="1"
@@ -37,6 +39,13 @@
 				<xs:element ref="entries" minOccurs="1"
 					maxOccurs="1" />
 			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="dictionaryMetaData">
+		<xs:complexType>
+		  <xs:attribute name="caseNormalization" type="xs:boolean" use="optional" default="true" />
+		  <xs:attribute name="multiWordEntries" type="xs:boolean" use="optional" default="true" />
 		</xs:complexType>
 	</xs:element>
 

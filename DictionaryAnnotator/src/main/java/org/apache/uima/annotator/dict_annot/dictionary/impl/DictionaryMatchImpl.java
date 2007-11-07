@@ -24,7 +24,7 @@ import org.apache.uima.annotator.dict_annot.dictionary.EntryMetaData;
 /**
  * Implementation of the DictionaryMatch interface. Store the matches found in
  * the dictionary temporarily and check on the fly in they are valid or not. All
- * valid matches are stored. The last valid match is replaced if a new valid
+ * valid matches are stored separately. The last valid match is replaced if a new valid
  * match was found. At the end the match object contains the longest valid match
  * from the dictionary.
  */

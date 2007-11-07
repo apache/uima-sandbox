@@ -21,8 +21,8 @@ package org.apache.uima.annotator.dict_annot.impl;
 import org.apache.uima.resource.ResourceInitializationException;
 
 /**
- * 
- *
+ * DictionaryAnnotatorConfigException is thrown if an configuration exception
+ * occurs.
  */
 public class DictionaryAnnotatorConfigException extends
       ResourceInitializationException {
@@ -30,36 +30,40 @@ public class DictionaryAnnotatorConfigException extends
    private static final long serialVersionUID = 5719082938917468647L;
 
    /**
-    * Creates a new exception with a the specified message.
+    * Creates a new exception with a the specified message from the
+    * DictionaryAnnotator message catalog.
     * 
     * @param aMessageKey
-    *          an identifier that maps to the message for this exception. The message may contain
-    *          placeholders for arguments as defined by the
-    *          {@link java.text.MessageFormat MessageFormat} class.
+    *           an identifier that maps to the message for this exception. The
+    *           message may contain place holders for arguments as defined by
+    *           the {@link java.text.MessageFormat MessageFormat} class.
     * @param aArguments
-    *          The arguments to the message. <code>null</code> may be used if the message has no
-    *          arguments.
+    *           The arguments to the message. <code>null</code> may be used if
+    *           the message has no arguments.
     */
-   public DictionaryAnnotatorConfigException(String aMessageKey, Object[] aArguments) {
-     super(DictionaryAnnotator.MESSAGE_DIGEST, aMessageKey, aArguments);
+   public DictionaryAnnotatorConfigException(String aMessageKey,
+         Object[] aArguments) {
+      super(DictionaryAnnotator.MESSAGE_DIGEST, aMessageKey, aArguments);
    }
 
    /**
     * Creates a new exception with the specified cause and a message from the
-    * {@link #STANDARD_MESSAGE_CATALOG}.
+    * DictionaryAnnotator message catalog.
     * 
     * @param aMessageKey
-    *          an identifier that maps to the message for this exception. The message may contain
-    *          placeholders for arguments as defined by the
-    *          {@link java.text.MessageFormat MessageFormat} class.
+    *           an identifier that maps to the message for this exception. The
+    *           message may contain place holders for arguments as defined by
+    *           the {@link java.text.MessageFormat MessageFormat} class.
     * @param aArguments
-    *          The arguments to the message. <code>null</code> may be used if the message has no
-    *          arguments.
+    *           The arguments to the message. <code>null</code> may be used if
+    *           the message has no arguments.
     * @param aCause
-    *          the original exception that caused this exception to be thrown, if any
+    *           the original exception that caused this exception to be thrown,
+    *           if any
     */
-   public DictionaryAnnotatorConfigException(String aMessageKey, Object[] aArguments, Throwable aCause) {
-     super(DictionaryAnnotator.MESSAGE_DIGEST, aMessageKey, aArguments, aCause);
+   public DictionaryAnnotatorConfigException(String aMessageKey,
+         Object[] aArguments, Throwable aCause) {
+      super(DictionaryAnnotator.MESSAGE_DIGEST, aMessageKey, aArguments, aCause);
    }
 
 }

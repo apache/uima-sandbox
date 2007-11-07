@@ -16,21 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.uima.annotator.listbased.dictionary;
+package org.apache.uima.annotator.dict_annot.dictionary;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder;
+import org.apache.incubator.uima.DictionaryDocument;
+import org.apache.incubator.uima.EntriesDocument;
+import org.apache.incubator.uima.EntryDocument;
+import org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryFileParserImpl;
 import org.apache.uima.annotator.dict_annot.dictionary.impl.HashMapDictionary;
 import org.apache.uima.annotator.dict_annot.dictionary.impl.HashMapDictionaryBuilder;
+import org.apache.uima.annotator.dict_annot.impl.DictionaryAnnotatorConfigException;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 
 /**
@@ -49,23 +50,22 @@ public class DictionaryBuilderTest extends TestCase {
 
       // read input file
       File dictFile = JUnitExtension
-            .getFile("DictionaryBuilderTests/SingleWords.txt");
+            .getFile("DictionaryBuilderTests/SingleWordsCaseNormalization.xml");
       // create dictionary
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder(true, false);
-      dictBuilder.createDictionary(dictFile, "UTF-8");
+      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+      fileParser.parseDictionaryFile(dictFile, dictBuilder);
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(
-            new FileInputStream(dictFile), "UTF-8"));
-      String line = reader.readLine();
+      //read dictionary entries
+      ArrayList<String> entries = getDictionaryEntries(dictFile);
+       
+      for(int i = 0; i < entries.size(); i++) {
 
-      while (line != null) {
-         Assert.assertTrue("Missing in dictionary: " + line, dict
-               .contains(line));
-         line = reader.readLine();
+         Assert.assertTrue("Missing in dictionary: " + entries.get(i), dict
+               .contains(entries.get(i)));
       }
-
-      reader.close();
 
       Assert.assertTrue(dict.contains("CpE"));
       Assert.assertTrue(dict.contains("CPE"));
@@ -83,23 +83,23 @@ public class DictionaryBuilderTest extends TestCase {
 
       // read input file
       File dictFile = JUnitExtension
-            .getFile("DictionaryBuilderTests/SingleWords.txt");
+            .getFile("DictionaryBuilderTests/SingleWordsNoCaseNormalization.xml");
       // create dictionary
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder(false, false);
-      dictBuilder.createDictionary(dictFile, "UTF-8");
+      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+      fileParser.parseDictionaryFile(dictFile, dictBuilder);
+
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(
-            new FileInputStream(dictFile), "UTF-8"));
-      String line = reader.readLine();
+      //read dictionary entries
+      ArrayList<String> entries = getDictionaryEntries(dictFile);
+       
+      for(int i = 0; i < entries.size(); i++) {
 
-      while (line != null) {
-         Assert.assertTrue("Missing in dictionary: " + line, dict
-               .contains(line));
-         line = reader.readLine();
+         Assert.assertTrue("Missing in dictionary: " + entries.get(i), dict
+               .contains(entries.get(i)));
       }
-
-      reader.close();
 
       Assert.assertFalse(dict.contains("CpE"));
       Assert.assertTrue(dict.contains("CPE"));
@@ -117,19 +117,20 @@ public class DictionaryBuilderTest extends TestCase {
 
       // read input file
       File dictFile = JUnitExtension
-            .getFile("DictionaryBuilderTests/MultiWords.txt");
+            .getFile("DictionaryBuilderTests/MultiWordsNoCaseNormalization.xml");
       // create dictionary
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder(false, true);
-      dictBuilder.createDictionary(dictFile, "UTF-8");
+      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+      fileParser.parseDictionaryFile(dictFile, dictBuilder);
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(
-            new FileInputStream(dictFile), "UTF-8"));
-      String line = reader.readLine();
+      //read dictionary entries
+      ArrayList<String> entries = getDictionaryEntries(dictFile);
+       
+      for(int i = 0; i < entries.size(); i++) {
 
-      while (line != null) {
-
-         StringTokenizer tokenizer = new StringTokenizer(line, " ");
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), " ");
 
          ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
@@ -137,12 +138,9 @@ public class DictionaryBuilderTest extends TestCase {
          }
          String[] multiWord = list.toArray(new String[] {});
 
-         Assert.assertTrue("Missing in dictionary: " + line, dict
+         Assert.assertTrue("Missing in dictionary: " + entries.get(i), dict
                .contains(multiWord));
-         line = reader.readLine();
       }
-
-      reader.close();
 
       Assert.assertEquals(5, dict.getEntryCount());
       Assert.assertFalse(dict.contains(new String[] { "Unstructured",
@@ -161,19 +159,20 @@ public class DictionaryBuilderTest extends TestCase {
 
       // read input file
       File dictFile = JUnitExtension
-            .getFile("DictionaryBuilderTests/MultiWords.txt");
+            .getFile("DictionaryBuilderTests/MultiWordsCaseNormalization.xml");
       // create dictionary
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder(true, true);
-      dictBuilder.createDictionary(dictFile, "UTF-8");
+      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+      fileParser.parseDictionaryFile(dictFile, dictBuilder);
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(
-            new FileInputStream(dictFile), "UTF-8"));
-      String line = reader.readLine();
+      //read dictionary entries
+      ArrayList<String> entries = getDictionaryEntries(dictFile);
+       
+      for(int i = 0; i < entries.size(); i++) {
 
-      while (line != null) {
-
-         StringTokenizer tokenizer = new StringTokenizer(line, " ");
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), " ");
 
          ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
@@ -181,18 +180,53 @@ public class DictionaryBuilderTest extends TestCase {
          }
          String[] multiWord = list.toArray(new String[] {});
 
-         Assert.assertTrue("Missing in dictionary: " + line, dict
+         Assert.assertTrue("Missing in dictionary: " + entries.get(i), dict
                .contains(multiWord));
-         line = reader.readLine();
       }
 
-      reader.close();
       Assert.assertEquals(4, dict.getEntryCount());
       Assert.assertFalse(dict.contains(new String[] { "Unstructured",
             "Information", "Management", "Architecture" }));
       Assert.assertTrue(dict.contains(new String[] { "new", "yORk" }));
       Assert.assertTrue(dict.contains(new String[] { "new", "york", "city" }));
       Assert.assertFalse(dict.contains("new"));
+   }
+
+   /**
+    * parse the dictionary file and returns the entries as ArrayList.
+    * 
+    * @param dictionaryFile
+    * @return
+    * @throws Exception
+    */
+   private ArrayList<String> getDictionaryEntries(File dictionaryFile)
+         throws Exception {
+
+      ArrayList<String> dictEntries = new ArrayList<String>();
+
+      // parse the dictionary file and extract the content
+      DictionaryDocument dictionaryDoc;
+      try {
+         dictionaryDoc = DictionaryDocument.Factory.parse(dictionaryFile);
+      } catch (Exception ex) {
+         throw new DictionaryAnnotatorConfigException(
+               "listbased_annotator_error_parsing_dictionary_file",
+               new Object[] { dictionaryFile.getAbsolutePath() }, ex);
+      }
+
+      // get dictionary document
+      DictionaryDocument.Dictionary dictionary = dictionaryDoc.getDictionary();
+
+      // get dictionary entries
+      EntriesDocument.Entries entries = dictionary.getTypeCollection()
+            .getEntries();
+      EntryDocument.Entry[] entryArray = entries.getEntryArray();
+      for (int i = 0; i < entryArray.length; i++) {
+         dictEntries.add(entryArray[i].getKey().getStringValue());
+      }
+
+      // return the dictionary entries
+      return dictEntries;
    }
 
 }

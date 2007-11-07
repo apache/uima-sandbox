@@ -22,7 +22,6 @@ import org.apache.uima.annotator.dict_annot.dictionary.EntryMetaData;
 
 /**
  * Implementation of the EntryMetaData interface.
- * 
  */
 public class EntryMetaDataImpl implements EntryMetaData {
 

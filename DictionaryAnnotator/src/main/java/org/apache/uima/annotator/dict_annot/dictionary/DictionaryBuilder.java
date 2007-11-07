@@ -18,31 +18,11 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary;
 
-import java.io.File;
-
-import org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryBuilderException;
-
 /**
  * The Dictionary builder interface define the methods to create a new
  * dictionary.
- * 
  */
 public interface DictionaryBuilder {
-
-   /**
-    * Creates a new dictionary based on the given file.
-    * 
-    * @param entriesFile
-    *           input file that contains the content of the dictionary
-    * 
-    * @param encoding
-    *           file encoding of the entriesFile
-    * 
-    * @throws DictionaryBuilderException
-    *            in case of dictionary building errors
-    */
-   public void createDictionary(File entriesFile, String encoding)
-         throws DictionaryBuilderException;
 
    /**
     * @return returns the Dictionary object if the dictionary could be created.
@@ -58,14 +38,20 @@ public interface DictionaryBuilder {
    public void addWord(String word);
 
    /**
-    * Set the dictionary properties
+    * Set the dictionary properties, this method have to be called before words
+    * can be added to the dictionary.
     * 
     * @param language
     *           dictionary language
     * 
     * @param typeName
     *           type name for the dictionary content
+    * @param caseNormalization
+    *           case normalization settings
+    * @param multiWordEntries
+    *           multi-word entries setting
     */
-   public void setDictionaryProperties(String language, String typeName);
+   public void setDictionaryProperties(String language, String typeName,
+         boolean caseNormalization, boolean multiWordEntries);
 
 }

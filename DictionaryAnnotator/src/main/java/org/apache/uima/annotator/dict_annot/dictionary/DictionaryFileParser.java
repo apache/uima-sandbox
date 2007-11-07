@@ -23,7 +23,8 @@ import java.io.File;
 import org.apache.uima.resource.ResourceInitializationException;
 
 /**
- * 
+ * The DictionaryFileParser interface defines the method to parse a dictionary
+ * file to create a dictionary.
  */
 public interface DictionaryFileParser {
 

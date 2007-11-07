@@ -22,9 +22,9 @@ import org.apache.uima.cas.text.AnnotationFS;
 
 
 /**
- * Dictionary interface to work with the dictionary. The interface defines
- * methods to check if a word or multi word is available in the dictionary and
- * to match tokens against the dictionary.
+ * Dictionary interface to work with a dictionary. 
+ * The interface defines methods to check if a word or multi-word is available 
+ * in the dictionary and to match tokens against the dictionary.
  */
 public interface Dictionary {
 

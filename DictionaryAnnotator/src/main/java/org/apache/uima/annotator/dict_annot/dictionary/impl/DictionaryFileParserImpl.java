@@ -22,11 +22,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import noNamespace.DictionaryDocument;
-import noNamespace.EntriesDocument.Entries;
-import noNamespace.EntryDocument.Entry;
-import noNamespace.TypeCollectionDocument.TypeCollection;
-
+import org.apache.incubator.uima.DictionaryDocument;
+import org.apache.incubator.uima.EntriesDocument;
+import org.apache.incubator.uima.EntryDocument;
+import org.apache.incubator.uima.TypeCollectionDocument;
+import org.apache.incubator.uima.DictionaryMetaDataDocument.DictionaryMetaData;
 import org.apache.uima.annotator.dict_annot.dictionary.Dictionary;
 import org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder;
 import org.apache.uima.annotator.dict_annot.dictionary.DictionaryFileParser;
@@ -81,23 +81,28 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
                      errorMessages.toString() });
       }
 
-      // ***************************************************
-      // get the concepts from the concept file document
-      // ***************************************************
-      noNamespace.DictionaryDocument.Dictionary dictionary = dictionaryDoc
+      //get dictionary document
+      DictionaryDocument.Dictionary dictionary = dictionaryDoc
             .getDictionary();
 
-      TypeCollection typeCollection = dictionary.getTypeCollection();
-
+      //get type collection settings
+      TypeCollectionDocument.TypeCollection typeCollection = dictionary.getTypeCollection();
+      DictionaryMetaData dictMetaData = typeCollection.getDictionaryMetaData();
+      boolean caseNormalization = true;
+      boolean multiWordEntries = true;
+      if(dictMetaData != null) {
+         caseNormalization = dictMetaData.getCaseNormalization();
+         multiWordEntries = dictMetaData.getMultiWordEntries();
+      }
       // get the dictionary language and the type name
       String language = typeCollection.getLanguageId();
       String typeName = typeCollection.getTypeDescription().getTypeName();
       // set dictionary properties
-      dictBuilder.setDictionaryProperties(language, typeName);
+      dictBuilder.setDictionaryProperties(language, typeName, caseNormalization, multiWordEntries);
 
       // get dictionary entries and add process them with the dictionary builder
-      Entries entries = typeCollection.getEntries();
-      Entry[] entryArray = entries.getEntryArray();
+      EntriesDocument.Entries entries = typeCollection.getEntries();
+      EntryDocument.Entry[] entryArray = entries.getEntryArray();
       for (int i = 0; i < entryArray.length; i++) {
          dictBuilder.addWord(entryArray[i].getKey().getStringValue());
       }

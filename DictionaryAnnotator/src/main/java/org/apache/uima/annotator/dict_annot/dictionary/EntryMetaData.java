@@ -19,8 +19,7 @@
 package org.apache.uima.annotator.dict_annot.dictionary;
 
 /**
- * The EntryMetaData defines the access to the dictionary entry meta data.
- * 
+ * The EntryMetaData interface defines the access to the dictionary entry meta data.
  */
 public interface EntryMetaData {
 

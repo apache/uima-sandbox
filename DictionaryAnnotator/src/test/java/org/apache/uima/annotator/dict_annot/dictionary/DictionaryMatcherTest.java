@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.uima.annotator.listbased.dictionary;
+package org.apache.uima.annotator.dict_annot.dictionary;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,9 +28,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.annotator.dict_annot.dictionary.Dictionary;
-import org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder;
-import org.apache.uima.annotator.dict_annot.dictionary.DictionaryMatch;
+import org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryFileParserImpl;
 import org.apache.uima.annotator.dict_annot.dictionary.impl.HashMapDictionaryBuilder;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
@@ -92,9 +90,12 @@ public class DictionaryMatcherTest extends TestCase {
 
       // create the dictionary
       File dictFile = JUnitExtension
-            .getFile("DictionaryMatchTests/MultiWords.txt");
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder(true, true);
-      dictBuilder.createDictionary(dictFile, "UTF-8");
+            .getFile("DictionaryMatchTests/MultiWords.xml");
+      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+      fileParser.parseDictionaryFile(dictFile, dictBuilder);
+
       Dictionary dict = dictBuilder.getDictionary();
 
       // -- read input XCAS and create a CAS --

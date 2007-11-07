@@ -44,26 +44,37 @@ import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 /**
- * ListBased annotator implementation that use HashMap dictionaries
- * 
+ * Dictionary annotator implementation that use HashMap dictionaries
  */
 public class DictionaryAnnotator extends CasAnnotator_ImplBase {
 
-   public static final String MESSAGE_DIGEST = "org.apache.uima.annotator.listbased.dictionaryAnnotatorMessages";
+   /**
+    * Message catalog
+    */
+   public static final String MESSAGE_DIGEST = "org.apache.uima.annotator.dict_annot.dictionaryAnnotatorMessages";
 
+   /**
+    * System path separator
+    */
    public static final String PATH_SEPARATOR = System
          .getProperty("path.separator");
 
-   public static final String DICTIONARY_FILES = "DictionaryFiles";
+   // DictionaryFiles configuration parameter name
+   private static final String DICTIONARY_FILES = "DictionaryFiles";
 
-   public static final String INPUT_MATCH_TYPE = "InputMatchType";
+   // InputMatchType configuration parameter name
+   private static final String INPUT_MATCH_TYPE = "InputMatchType";
 
+   // annotator logger
    private Logger logger;
 
+   // input match type name
    private String inputMatchTypeStr;
 
+   // input match type
    private Type inputMatchType;
 
+   // dictionaries used with this annotator
    private Dictionary[] dictionaries;
 
    /*
@@ -149,8 +160,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
             .getConfigParameterValue(INPUT_MATCH_TYPE);
 
       // create dictionary builder
-      // TODO: make normalization and multi value properties configurable
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder(true, true);
+      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
 
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
@@ -213,11 +223,19 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
    }
 
    /**
+    * Reads the given configuration parameters and returns the parameter value.
+    * If the parameter is not available or the parameter type is not a String[],
+    * the given default value is returned.
+    * 
     * @param context
+    *           Annotator context
     * @param param
+    *           configuration parameter to read
     * @param defaultValue
+    *           default parameter value in case of errors
     * @return returns the boolean parameter value
     * @throws AnnotatorContextException
+    *            if an unrecoverable error occurs
     */
    private static String[] safeGetConfigParameterStringArrayValue(
          UimaContext context, String param, String[] defaultValue) {
@@ -229,11 +247,17 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
    }
 
    /**
-    * @param context
-    * @param param
-    * @param defaultValue
-    * @return returns the boolean parameter value
-    * @throws AnnotatorContextException
+    * Resolves the absolute file name of the given relative file name using the
+    * given datapath path elements. If the resolution was successful the File
+    * object is returned, if not null.
+    * 
+    * @param fileName
+    *           relative file name to resolve
+    * 
+    * @param datapathElements
+    *           datapath path elements
+    * 
+    * @return returns the File object of the resolved file, otherwise null.
     */
    private File resolveRelativeFilePath(String fileName,
          ArrayList<File> datapathElements) {
@@ -256,5 +280,4 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       }
       return null;
    }
-
 }

@@ -18,10 +18,6 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -34,57 +30,34 @@ import org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder;
  */
 public class HashMapDictionaryBuilder implements DictionaryBuilder {
 
-   private boolean caseNormalization;
-
+   // multi-word entry dictionary
    private boolean createMultiWordEntries;
 
+   // HashMap dictionary
    private HashMapDictionary dictionary;
 
+   /**
+    * Default constructor. Creates a new HashMap dictionary with case normalization.
+    */
    public HashMapDictionaryBuilder() {
-      this(true, true);
+      this.dictionary = new HashMapDictionary(true);
    }
-
-   public HashMapDictionaryBuilder(boolean caseNormalization,
-         boolean createMultiWordEntries) {
-      this.caseNormalization = caseNormalization;
-      this.createMultiWordEntries = createMultiWordEntries;
-      this.dictionary = new HashMapDictionary(this.caseNormalization);
-   }
-
+   
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder#setDictionaryProperties(java.lang.String,
-    *      java.lang.String)
+    * @see org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder#setDictionaryProperties(java.lang.String,
+    *      java.lang.String, boolean, boolean)
     */
-   public void setDictionaryProperties(String language, String typeName) {
+   public void setDictionaryProperties(String language, String typeName,
+         boolean caseNormalization, boolean multiWordEntries) {
       this.dictionary.setDictionaryLanguage(language);
       this.dictionary.setTypeName(typeName);
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder#createDictionary(java.io.File,
-    *      java.lang.String)
-    */
-   public void createDictionary(File entriesFile, String encoding)
-         throws DictionaryBuilderException {
-
-      try {
-         BufferedReader reader = new BufferedReader(new InputStreamReader(
-               new FileInputStream(entriesFile), encoding));
-         String line = reader.readLine();
-
-         while (line != null) {
-
-            addWord(line);
-            // get next line
-            line = reader.readLine();
-         }
-         reader.close();
-      } catch (Exception ex) {
-         throw new DictionaryBuilderException(ex);
+      this.createMultiWordEntries = multiWordEntries;
+      
+      //create a new dictionary if the settings changed.
+      if(!caseNormalization) {
+         this.dictionary = new HashMapDictionary(caseNormalization);
       }
    }
 

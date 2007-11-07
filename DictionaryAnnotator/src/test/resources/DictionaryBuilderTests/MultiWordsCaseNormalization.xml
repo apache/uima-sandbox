@@ -20,19 +20,25 @@
 <dictionary xmlns="http://incubator.apache.org/uima" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="dictionary.xsd">
 	<typeCollection>
-		<languageId>en-XX</languageId>
+		<dictionaryMetaData caseNormalization="true" multiWordEntries="true"/>
 		<typeDescription>
 			<typeName>org.apache.uima.DictionaryEntry</typeName>
 		</typeDescription>
 		<entries>
 			<entry>
-				<key>new</key>
+				<key>new Orleans</key>
+			</entry>
+			<entry>
+				<key>New Orleans</key>
 			</entry>
 			<entry>
 				<key>new York</key>
 			</entry>
 			<entry>
-				<key>new york city</key>
+				<key>new York City</key>
+			</entry>
+			<entry>
+				<key>New Hampshire</key>
 			</entry>
 		</entries>
 	</typeCollection>

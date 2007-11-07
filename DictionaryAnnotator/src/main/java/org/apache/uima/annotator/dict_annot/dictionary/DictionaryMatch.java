@@ -20,7 +20,6 @@ package org.apache.uima.annotator.dict_annot.dictionary;
 
 /**
  * The DictionaryMatch interface defines the access to a dictionary match.
- * 
  */
 public interface DictionaryMatch {
 
