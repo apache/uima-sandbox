@@ -28,12 +28,14 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.uima.pear.tools.InstallationController;
-import org.apache.uima.pear.tools.PackageCreator;
-import org.apache.uima.pear.tools.PackageCreatorException;
+import org.apache.uima.UIMAFramework;
+import org.apache.uima.util.Level;
 
 /**
- * Goal which generates a UIMA PEAR package
+ * PearPackagingMojo which generates an UIMA PEAR package. All the necessary
+ * information from the UIMA nature is gathered and added to the PEAR package.
+ * Additionally the generated jar file from the Maven build is added with the
+ * according classpath information.
  * 
  * @goal package
  * 
@@ -42,15 +44,16 @@ import org.apache.uima.pear.tools.PackageCreatorException;
 public class PearPackagingMojo extends AbstractMojo {
 
    /**
-    * Root directory of the UIMA project that contains the pear structure
+    * Main component directory of the UIMA project that contains the UIMA
+    * nature.
     * 
-    * @parameter expression="${project.build.directory}"
+    * @parameter expression="${basedir}"
     * @required
     */
    private String mainComponentDir = null;
 
    /**
-    * Required classpath settings for the pear component.
+    * Required classpath settings for the PEAR package.
     * 
     * @parameter
     * @required
@@ -58,7 +61,7 @@ public class PearPackagingMojo extends AbstractMojo {
    private String classpath = null;
 
    /**
-    * Main Component Descriptor
+    * Main Component Descriptor path relative to the main component directory
     * 
     * @parameter
     * @required
@@ -66,7 +69,7 @@ public class PearPackagingMojo extends AbstractMojo {
    private String mainComponentDesc = null;
 
    /**
-    * pear component ID
+    * PEAR package component ID
     * 
     * @parameter
     * @required
@@ -74,30 +77,22 @@ public class PearPackagingMojo extends AbstractMojo {
    private String componentId = null;
 
    /**
-    * target directory for the pear file
+    * Target directory for the PEAR package
     * 
-    * @parameter expression="${project.build.directory}/target"
+    * @parameter expression="${basedir}/target"
     * @required
     */
    private String targetDir = null;
 
    /**
-    * compiled classes directory
-    * 
-    * @parameter expression="${project.build.directory}/target/classes"
-    * @required
-    */
-   private String compiledClassesDir = null;
-
-   /**
-    * Required UIMA datapath settings for the pear component
+    * Required UIMA datapath settings for the PEAR package
     * 
     * @parameter default-value="$main_root/resources"
     */
    private String datapath = null;
 
    /**
-    * environment variables
+    * Required environment variables for the PEAR package
     * 
     * @parameter
     */
@@ -109,12 +104,12 @@ public class PearPackagingMojo extends AbstractMojo {
     * @parameter expression="${project}"
     * @required
     * @readonly
-    * @description "the maven project to use"
+    * @description "the maven project"
     */
    private MavenProject project;
 
-   // the pear packaging directory contains all the stuff that is packaged to
-   // the PEAR package
+   // the PEAR packaging directory contains all the stuff that is added to
+   // the PEAR
    private File pearPackagingDir;
 
    /*
@@ -123,9 +118,22 @@ public class PearPackagingMojo extends AbstractMojo {
     * @see org.apache.maven.plugin.AbstractMojo#execute()
     */
    public void execute() throws MojoExecutionException {
+
+      // create the PEAR packaging directory in the target directory
       this.pearPackagingDir = new File(this.targetDir, "pearPackaging");
 
+      // save current UIMA log level
+      Level level = getCurrentUIMALogLevel();
+      // change UIMA log level to only log warnings and errors
+      UIMAFramework.getLogger().setLevel(Level.WARNING);
+
+      // create final PEAR file object
+      File finalPearFileName = new File(this.targetDir, this.componentId
+            + ".pear");
+
+      // log PEAR packaging details
       Log log = getLog();
+      log.info("Start building PEAR package for component " + this.componentId);
       log.debug("UIMA PEAR INFORMATION ");
       log.debug("======================");
       log.debug("main component dir:   " + this.mainComponentDir);
@@ -136,21 +144,60 @@ public class PearPackagingMojo extends AbstractMojo {
       log.debug("target dir:           " + this.targetDir);
       log.debug("pear packaging dir:   "
             + this.pearPackagingDir.getAbsolutePath());
+      log.debug("final PEAR file:      " + finalPearFileName.getAbsolutePath());
+
+      // check Maven project packaging type - only jar packaging is supported
+      if (!this.project.getPackaging().equals("jar")) {
+         throw new MojoExecutionException(
+               "Wrong packaging type, only 'jar' packaging is supported");
+      }
 
       try {
-         // copies the PEAR data to the pear packaging directory
+         // copies all PEAR data to the PEAR packaging directory
          copyPearData();
 
-         // update classpath with compiled classes
-         String classpathExtension = ";$main_root/"
-               + InstallationController.PACKAGE_BIN_DIR;
+         // copy created jar package to the PEAR packaging lib directory
+         // get jar file name
+         String jarFileName = this.project.getBuild().getFinalName() + ".jar";
+         // get jar file location
+         File finalJarFile = new File(this.project.getBuild().getDirectory(),
+               jarFileName);
+         // check if the jar file exist
+         if (finalJarFile.exists()) {
+            // specify the target directory for the jar file
+            File target = new File(this.pearPackagingDir,
+                  InstallationController.PACKAGE_LIB_DIR);
+            File targetFile = new File(target, jarFileName);
+            // copy the jar file to the target directory
+            FileUtils.copyFile(finalJarFile, targetFile);
+         } else {
+            // jar file does not exist - build was not successful
+            String errorMessage = "Jar package "
+                  + finalJarFile.getAbsolutePath() + " not found";
+            log.debug(errorMessage);
+            throw new IOException(errorMessage);
+         }
+
+         // add compiled jar to the PEAR classpath
+         StringBuffer buffer = new StringBuffer();
+         buffer.append(";$main_root/");
+         buffer.append(InstallationController.PACKAGE_LIB_DIR);
+         buffer.append("/");
+         buffer.append(this.project.getBuild().getFinalName());
+         buffer.append(".jar");
+         String classpathExtension = buffer.toString();
          this.classpath = this.classpath + classpathExtension;
 
          // create the PEAR package
          createPear();
 
-         File finalFile = new File(this.targetDir, this.componentId + ".pear");
-         this.project.getArtifact().setFile(finalFile);
+         // log success message
+         log.info("PEAR package for component " + this.componentId
+               + " successfully created at: "
+               + finalPearFileName.getAbsolutePath());
+
+         // set UIMA logger back to the original log level
+         UIMAFramework.getLogger().setLevel(level);
 
       } catch (PackageCreatorException e) {
          log.debug(e.getMessage());
@@ -163,7 +210,34 @@ public class PearPackagingMojo extends AbstractMojo {
    }
 
    /**
-    * copies the given directory if it exists to the PEAR packaging directory
+    * Returns the current UIMA log level for the UIMA root logger
+    * 
+    * @return the current UIMA log level
+    */
+   private Level getCurrentUIMALogLevel() {
+      if (UIMAFramework.getLogger().isLoggable(Level.ALL)) {
+         return Level.ALL;
+      } else if (UIMAFramework.getLogger().isLoggable(Level.FINEST)) {
+         return Level.FINEST;
+      } else if (UIMAFramework.getLogger().isLoggable(Level.FINER)) {
+         return Level.FINER;
+      } else if (UIMAFramework.getLogger().isLoggable(Level.FINE)) {
+         return Level.FINE;
+      } else if (UIMAFramework.getLogger().isLoggable(Level.CONFIG)) {
+         return Level.CONFIG;
+      } else if (UIMAFramework.getLogger().isLoggable(Level.INFO)) {
+         return Level.INFO;
+      } else if (UIMAFramework.getLogger().isLoggable(Level.WARNING)) {
+         return Level.WARNING;
+      } else if (UIMAFramework.getLogger().isLoggable(Level.SEVERE)) {
+         return Level.SEVERE;
+      } else {
+         return Level.OFF;
+      }
+   }
+
+   /**
+    * Copies the given directory when available to the PEAR packaging directory
     * 
     * @param directory
     *           directory to copy
@@ -183,18 +257,19 @@ public class PearPackagingMojo extends AbstractMojo {
    }
 
    /**
-    * removes recursively all directories that begins with a ".". E.g. ".SVN"
+    * Removes recursively all directories that begins with a "." e.g. ".SVN"
     * 
     * @param dir
     *           directory to check for Dot-directories
     * 
     * @throws IOException
     */
+   @SuppressWarnings("unchecked")
    private void removeDotDirectories(File dir) throws IOException {
-      ArrayList subdirs = org.apache.uima.util.FileUtils.getSubDirs(dir);
+      ArrayList<File> subdirs = org.apache.uima.util.FileUtils.getSubDirs(dir);
 
       for (int i = 0; i < subdirs.size(); i++) {
-         File current = (File) subdirs.get(i);
+         File current = subdirs.get(i);
          if (current.getName().startsWith(".")) {
             FileUtils.deleteDirectory(current);
          } else {
@@ -204,7 +279,8 @@ public class PearPackagingMojo extends AbstractMojo {
    }
 
    /**
-    * copies all the necessary PEAR data to the PEAR packaging directory
+    * Copies all the necessary PEAR directories (UIMA nature) to the PEAR
+    * packaging directory
     * 
     * @throws IOException
     */
@@ -225,15 +301,6 @@ public class PearPackagingMojo extends AbstractMojo {
       for (int i = 0; i < dirsToCopy.length; i++) {
          copyDirIfAvailable(dirsToCopy[i]);
       }
-
-      // copy compiled classes to the PEAR packaging directory
-      File dirToCopy = new File(this.compiledClassesDir);
-      if (dirToCopy.exists()) {
-         File target = new File(this.pearPackagingDir,
-               InstallationController.PACKAGE_BIN_DIR);
-         FileUtils.copyDirectory(dirToCopy, target);
-         removeDotDirectories(target);
-      }
    }
 
    /**
@@ -242,6 +309,7 @@ public class PearPackagingMojo extends AbstractMojo {
     * @throws PackageCreatorException
     */
    private void createPear() throws PackageCreatorException {
+      //generates the PEAR packages with the given information
       PackageCreator
             .generatePearPackage(this.componentId, this.mainComponentDesc,
                   this.classpath, this.datapath, this.pearPackagingDir
