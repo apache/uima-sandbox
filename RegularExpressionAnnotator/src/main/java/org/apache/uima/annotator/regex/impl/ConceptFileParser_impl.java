@@ -18,7 +18,7 @@
  */
 package org.apache.uima.annotator.regex.impl;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -44,23 +44,21 @@ import org.apache.xmlbeans.XmlOptions;
  */
 public class ConceptFileParser_impl implements ConceptFileParser {
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.apache.uima.annotator.regex.RuleFileParser#parseRuleFile(java.io.File)
+   /* (non-Javadoc)
+    * @see org.apache.uima.annotator.regex.ConceptFileParser#parseConceptFile(java.lang.String, java.io.InputStream)
     */
-   public Concept[] parseConceptFile(File conceptFile)
+   public Concept[] parseConceptFile(String conceptFilePathName, InputStream conceptFileStream)
          throws ResourceInitializationException {
       ArrayList<Concept> conceptList = new ArrayList<Concept>();
 
       // parse regex concept file and extract content to local objects
       ConceptSetDocument conceptSetDoc;
       try {
-         conceptSetDoc = ConceptSetDocument.Factory.parse(conceptFile);
+         conceptSetDoc = ConceptSetDocument.Factory.parse(conceptFileStream);
       } catch (Exception ex) {
          throw new RegexAnnotatorConfigException(
                "regex_annotator_error_parsing_rule_set_file",
-               new Object[] { conceptFile.getAbsolutePath() }, ex);
+               new Object[] { conceptFilePathName }, ex);
       }
 
       // validate input file
@@ -80,7 +78,7 @@ public class ConceptFileParser_impl implements ConceptFileParser {
          }
          throw new RegexAnnotatorConfigException(
                "regex_annotator_error_xml_validation", new Object[] {
-                     conceptFile.getAbsolutePath(), errorMessages.toString() });
+                     conceptFilePathName, errorMessages.toString() });
       }
 
       // ***************************************************

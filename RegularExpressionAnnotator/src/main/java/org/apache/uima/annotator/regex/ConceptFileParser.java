@@ -18,7 +18,7 @@
  */
 package org.apache.uima.annotator.regex;
 
-import java.io.File;
+import java.io.InputStream;
 
 import org.apache.uima.resource.ResourceInitializationException;
 
@@ -31,13 +31,16 @@ public interface ConceptFileParser {
    * parse the XML concepts file and create the object representation for the concepts and rules. To parse the XML
    * concept file, XMLBeans are used.
    * 
-   * @param conceptFile -
-   *          XML concepts file
+   * @param conceptFilePathName 
+   *          XML concepts file path name
    * 
+   * @param conceptFileStream
+   *          XML concept file stream
+   *          
    * @return returns a Concept[] that contains the object representation of all concepts
    * 
    * @throws ResourceInitializationException
    *           in case of parsing errors.
    */
-  public Concept[] parseConceptFile(File conceptFile) throws ResourceInitializationException;
+  public Concept[] parseConceptFile(String conceptFilePathName, InputStream conceptFileStream) throws ResourceInitializationException;
 }

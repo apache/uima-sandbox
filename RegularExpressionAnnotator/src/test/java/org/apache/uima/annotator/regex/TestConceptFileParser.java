@@ -18,8 +18,11 @@
  */
 package org.apache.uima.annotator.regex;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 
 import junit.framework.Assert;
@@ -42,10 +45,10 @@ public class TestConceptFileParser extends TestCase {
    */
   public void testSyntaxCheck() throws Exception {
     File conceptFile = JUnitExtension.getFile("conceptSyntax/syntaxCheck.xml");
-
+    InputStream stream = new BufferedInputStream(new FileInputStream(conceptFile));
     //parse concept file
     ConceptFileParser parser = new ConceptFileParser_impl();
-    Concept[] concepts = parser.parseConceptFile(conceptFile);
+    Concept[] concepts = parser.parseConceptFile(conceptFile.getAbsolutePath(), stream);
 
     File outputFile = new File(conceptFile.getParent(), "syntaxCheck_current.txt");
     OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(outputFile, false),
@@ -71,11 +74,12 @@ public class TestConceptFileParser extends TestCase {
    */
   public void testEmptySyntaxFile() throws Exception {
     File conceptFile = JUnitExtension.getFile("conceptSyntax/emptyFile.xml");
-
+    InputStream stream = new BufferedInputStream(new FileInputStream(conceptFile));
+    
     try {
       //parse empty concept file
       ConceptFileParser parser = new ConceptFileParser_impl();
-      parser.parseConceptFile(conceptFile);
+      parser.parseConceptFile(conceptFile.getAbsolutePath(), stream);
     } catch (ResourceInitializationException ex) {
       //we get an exception... what is correct!
     }

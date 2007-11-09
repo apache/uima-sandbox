@@ -19,7 +19,11 @@
 
 package org.apache.uima.annotator.regex.impl;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -108,7 +112,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       ArrayList<Concept> concepts = new ArrayList<Concept>();
       for (int i = 0; i < conceptFileNames.length; i++) {
          // try to resolve the relative file name with classpath or datapath
-         File file = resolveRelativeFilePath(conceptFileNames[i],
+         ConceptFile file = resolveRelativeFilePath(conceptFileNames[i],
                datapathElements);
 
          // if the current concept file wasn't found, throw an exception
@@ -120,10 +124,11 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             // log concept file path
             this.logger.logrb(Level.CONFIG, "RegExAnnotator", "initialize",
                   MESSAGE_DIGEST, "regex_annotator_rule_set_file",
-                  new Object[] { file.getAbsolutePath() });
+                  new Object[] { file.getFilePath() });
 
             // parse concept file to internal objects
-            Concept[] currentConcepts = parser.parseConceptFile(file);
+            Concept[] currentConcepts = parser.parseConceptFile(file
+                  .getFilePath(), file.getStream());
             // add all concepts to the concepts list
             for (int c = 0; c < currentConcepts.length; c++) {
                concepts.add(currentConcepts[c]);
@@ -188,13 +193,20 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     * @return returns the boolean parameter value
     * @throws AnnotatorContextException
     */
-   private File resolveRelativeFilePath(String fileName,
+   private ConceptFile resolveRelativeFilePath(String fileName,
          ArrayList<File> datapathElements) {
 
+      ConceptFile conceptFile;
       URL url;
+
       // try to use the class loader to load the file resource
       if ((url = this.getClass().getClassLoader().getResource(fileName)) != null) {
-         return new File(url.getFile());
+         // we have successfully resolved the concept file, now also get it as
+         // stream
+         InputStream stream = this.getClass().getClassLoader()
+               .getResourceAsStream(fileName);
+         conceptFile = new ConceptFile(url.getFile(), stream);
+         return conceptFile;
       } else {
          if (datapathElements == null || datapathElements.size() == 0) {
             return null;
@@ -203,7 +215,15 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          for (int i = 0; i < datapathElements.size(); i++) {
             File testFile = new File(datapathElements.get(i), fileName);
             if (testFile.exists()) {
-               return testFile;
+               InputStream stream;
+               try {
+                  stream = new BufferedInputStream(
+                        new FileInputStream(testFile));
+               } catch (FileNotFoundException ex) {
+                  return null;
+               }
+               conceptFile = new ConceptFile(testFile.getAbsolutePath(), stream);
+               return conceptFile;
             }
          }
       }
@@ -844,5 +864,49 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          }
       }
       return replaced.toString();
+   }
+
+   /**
+    * Helper class to bundle the XML Concept file name and the concept file
+    * input stream to one object.
+    */
+   private class ConceptFile {
+      // concept file path name
+      private String filePath;
+
+      // concept file stream
+      private InputStream stream;
+
+      /**
+       * creates a new conceptFile object with the file path and the stream
+       * 
+       * @param filePath
+       *           concept file path
+       * 
+       * @param stream
+       *           concept file stream
+       */
+      public ConceptFile(String filePath, InputStream stream) {
+         this.filePath = filePath;
+         this.stream = stream;
+      }
+
+      /**
+       * Returns the concept file path name
+       * 
+       * @return concept file path name
+       */
+      public String getFilePath() {
+         return this.filePath;
+      }
+
+      /**
+       * Returns the concept file stream
+       * 
+       * @return concept file stream
+       */
+      public InputStream getStream() {
+         return this.stream;
+      }
    }
 }
