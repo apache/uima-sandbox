@@ -79,6 +79,9 @@
 		<resources>
 			<resource>
 				<directory>desc</directory>
+				<excludes>
+        	  		<exclude>**</exclude>
+		        </excludes>
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -96,8 +99,7 @@
 	        </configuration>
 	      </plugin>
 		
-		<!-- 
-			<plugin>
+   		  <plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
@@ -122,10 +124,9 @@
 						<phase>package</phase>
 						<configuration>
 						  <classpath>$main_root/lib/jsr173_1.0_api.jar;$main_root/lib/xmltypes.jar;$main_root/lib/xbean.jar</classpath>
-						  <mainComponentDesc>desc/RegExAnnotator.xml</mainComponentDesc>
-						  <componentId>RegExAnnotator</componentId>
-						  <mainComponentDir>${basedir}</mainComponentDir>
-						  <targetDir>${basedir}/target</targetDir>
+						  <mainComponentDesc>desc/DictionaryAnnotator.xml</mainComponentDesc>
+						  <componentId>DictionaryAnnotator</componentId>
+						  
 						</configuration>
 						<goals>
 							<goal>package</goal>
@@ -133,7 +134,7 @@
 					</execution>	
 				</executions>
 			</plugin>
-			 -->
+
 		</plugins>
 	</build>
 	<repositories>

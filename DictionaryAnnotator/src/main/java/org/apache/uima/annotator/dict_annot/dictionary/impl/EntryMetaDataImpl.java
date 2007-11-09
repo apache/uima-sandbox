@@ -41,7 +41,7 @@ public class EntryMetaDataImpl implements EntryMetaData {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.EntryMetaData#getId()
+    * @see org.apache.uima.annotator.dict_annot.EntryMetaData#getId()
     */
    public int getId() {
       return this.id;

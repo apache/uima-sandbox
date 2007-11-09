@@ -210,7 +210,7 @@ public class DictionaryBuilderTest extends TestCase {
          dictionaryDoc = DictionaryDocument.Factory.parse(dictionaryFile);
       } catch (Exception ex) {
          throw new DictionaryAnnotatorConfigException(
-               "listbased_annotator_error_parsing_dictionary_file",
+               "dictionary_annotator_error_parsing_dictionary_file",
                new Object[] { dictionaryFile.getAbsolutePath() }, ex);
       }
 

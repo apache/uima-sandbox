@@ -101,7 +101,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
          // check output type and throw an exception in case of errors
          if (currentDictOutputType == null) {
             Exception ex = new DictionaryAnnotatorConfigException(
-                  "listbased_annotator_error_resolving_types",
+                  "dictionary_annotator_error_resolving_types",
                   new Object[] { this.inputMatchTypeStr });
             throw new AnalysisEngineProcessException(ex);
          }
@@ -184,12 +184,12 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
          // if the current dictionary file wasn't found, throw an exception
          if (file == null) {
             throw new DictionaryAnnotatorConfigException(
-                  "listbased_annotator_resource_not_found",
+                  "dictionary_annotator_resource_not_found",
                   new Object[] { dictionaryFileNames[i] });
          } else {
             // log concept file path
-            this.logger.logrb(Level.CONFIG, "ListBasedAnnotator", "initialize",
-                  MESSAGE_DIGEST, "listbased_annotator_dictionary_file",
+            this.logger.logrb(Level.CONFIG, "DictionaryAnnotator", "initialize",
+                  MESSAGE_DIGEST, "dictionary_annotator_dictionary_file",
                   new Object[] { file.getAbsolutePath() });
 
             // parse dictionary file
@@ -216,7 +216,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       this.inputMatchType = typeSystem.getType(this.inputMatchTypeStr);
       if (this.inputMatchType == null) {
          Exception ex = new DictionaryAnnotatorConfigException(
-               "listbased_annotator_error_resolving_types",
+               "dictionary_annotator_error_resolving_types",
                new Object[] { this.inputMatchTypeStr });
          throw new AnalysisEngineProcessException(ex);
       }

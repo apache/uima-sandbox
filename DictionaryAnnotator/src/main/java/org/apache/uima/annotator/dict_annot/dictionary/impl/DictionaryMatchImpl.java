@@ -52,7 +52,7 @@ public class DictionaryMatchImpl implements DictionaryMatch {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.DictionaryMatch#getMatchMetaData()
+    * @see org.apache.uima.annotator.dict_annot.DictionaryMatch#getMatchMetaData()
     */
    public EntryMetaData getMatchMetaData() {
       return this.correctMetaData;
@@ -61,7 +61,7 @@ public class DictionaryMatchImpl implements DictionaryMatch {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.DictionaryMatch#getMatchLength()
+    * @see org.apache.uima.annotator.dict_annot.DictionaryMatch#getMatchLength()
     */
    public int getMatchLength() {
       return this.correctTokenCount;

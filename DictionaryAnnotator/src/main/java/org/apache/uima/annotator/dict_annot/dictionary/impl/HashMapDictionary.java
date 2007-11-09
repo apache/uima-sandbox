@@ -67,7 +67,7 @@ public class HashMapDictionary implements Dictionary {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.Dictionary#contains(java.lang.String)
+    * @see org.apache.uima.annotator.dict_annot.Dictionary#contains(java.lang.String)
     */
    public boolean contains(String word) {
       // check if the given word is available in the dictionary
@@ -82,10 +82,10 @@ public class HashMapDictionary implements Dictionary {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.Dictionary#contains(java.lang.String[])
+    * @see org.apache.uima.annotator.dict_annot.Dictionary#contains(java.lang.String[])
     */
    public boolean contains(String[] multiWord) {
-      // check if the dictionary contains the given multiword
+      // check if the dictionary contains the given multi-word
       DictionaryEntry entry = containsMultiWord(multiWord);
       if (entry != null) {
          return entry.isComplete();
@@ -97,7 +97,7 @@ public class HashMapDictionary implements Dictionary {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.dictionary.Dictionary#getTypeName()
+    * @see org.apache.uima.annotator.dict_annot.dictionary.Dictionary#getTypeName()
     */
    public String getTypeName() {
       // returns the dictionary output type name
@@ -107,7 +107,7 @@ public class HashMapDictionary implements Dictionary {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.dictionary.Dictionary#getLanguage()
+    * @see org.apache.uima.annotator.dict_annot.dictionary.Dictionary#getLanguage()
     */
    public String getLanguage() {
       // returns the dictionary language
@@ -148,7 +148,7 @@ public class HashMapDictionary implements Dictionary {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.Dictionary#matchEntry(int,
+    * @see org.apache.uima.annotator.dict_annot.Dictionary#matchEntry(int,
     *      java.lang.String[])
     */
    public DictionaryMatch matchEntry(int pos, AnnotationFS[] annotFSs) {
@@ -173,7 +173,7 @@ public class HashMapDictionary implements Dictionary {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.Dictionary#getEntryCount()
+    * @see org.apache.uima.annotator.dict_annot.Dictionary#getEntryCount()
     */
    public int getEntryCount() {
       // returns the number of entries in the dictionary

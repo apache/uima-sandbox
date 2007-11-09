@@ -87,7 +87,7 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder#addWord(java.lang.String)
+    * @see org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder#addWord(java.lang.String)
     */
    public void addWord(String word) {
 
@@ -108,7 +108,7 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder#getDictionary()
+    * @see org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder#getDictionary()
     */
    public Dictionary getDictionary() {
       return this.dictionary;

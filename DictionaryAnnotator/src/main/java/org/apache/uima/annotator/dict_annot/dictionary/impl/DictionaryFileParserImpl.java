@@ -44,8 +44,8 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.listbased.dictionary.DictionaryFileParser#parseDictionaryFile(java.io.File,
-    *      org.apache.uima.annotator.listbased.dictionary.DictionaryBuilder)
+    * @see org.apache.uima.annotator.dict_annot.dictionary.DictionaryFileParser#parseDictionaryFile(java.io.File,
+    *      org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder)
     */
    public Dictionary parseDictionaryFile(File dictionaryFile,
          DictionaryBuilder dictBuilder) throws ResourceInitializationException {
@@ -56,7 +56,7 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
          dictionaryDoc = DictionaryDocument.Factory.parse(dictionaryFile);
       } catch (Exception ex) {
          throw new DictionaryAnnotatorConfigException(
-               "listbased_annotator_error_parsing_dictionary_file",
+               "dictionary_annotator_error_parsing_dictionary_file",
                new Object[] { dictionaryFile.getAbsolutePath() }, ex);
       }
 
@@ -76,7 +76,7 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
             errorMessages.append(iter.next());
          }
          throw new DictionaryAnnotatorConfigException(
-               "listbased_annotator_error_xml_validation",
+               "dictionary_annotator_error_xml_validation",
                new Object[] { dictionaryFile.getAbsolutePath(),
                      errorMessages.toString() });
       }
