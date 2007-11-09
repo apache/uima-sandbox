@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resultSpecification xmlns="http://incubator.apache.org/uima/simpleserver/config/xml">
+<uimaSimpleServerSpec xmlns="http://incubator.apache.org/uima/simpleserver/config/xml">
 	<shortDescription>Recognize stuff</shortDescription>
 	<type name="org.apache.uima.Stuff" outputTag="Stuff" outputCoveredText="on">
 		<filters>
-			<filter feature="feat" condition="not null"/>
+			<filter featurePath="feat" condition="not null"/>
 		</filters>
 		<outputs>
-			<output feature="ashes" outputAttribute="ashes"/>
-			<output feature="dust" outputAttribute="dust"/>
+			<output featurePath="ashes" outputAttribute="ashes"/>
+			<output featurePath="dust" outputAttribute="dust"/>
 		</outputs>
 	</type>
 	
-</resultSpecification>
+</uimaSimpleServerSpec>

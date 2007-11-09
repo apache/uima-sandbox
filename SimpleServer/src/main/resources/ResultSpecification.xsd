@@ -22,7 +22,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:uima="http://incubator.apache.org/uima/simpleserver/config/xml"
     targetNamespace="http://incubator.apache.org/uima/simpleserver/config/xml">
-    <xsd:element name="resultSpecification">
+    <xsd:element name="uimaSimpleServerSpec">
         <xsd:complexType>
             <xsd:sequence>
                 <xsd:element name="shortDescription"
@@ -83,7 +83,7 @@
 
 
     <xsd:complexType name="filterType">
-        <xsd:attribute name="feature" type="xsd:string"
+        <xsd:attribute name="featurePath" type="xsd:string"
             use="required">
         </xsd:attribute>
         <xsd:attribute name="condition" type="xsd:string"
@@ -100,7 +100,7 @@
                 minOccurs="0" maxOccurs="1">
             </xsd:element>
         </xsd:sequence>
-        <xsd:attribute name="feature" type="xsd:string"
+        <xsd:attribute name="featurePath" type="xsd:string"
             use="required">
         </xsd:attribute>
         <xsd:attribute name="outputAttribute" type="xsd:string"

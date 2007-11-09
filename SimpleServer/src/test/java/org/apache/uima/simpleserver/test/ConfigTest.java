@@ -4,9 +4,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
-import org.apache.incubator.uima.simpleserver.config.xml.ResultSpecificationDocument;
-import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType;
+import org.apache.uima.simpleserver.config.ServerSpec;
+import org.apache.uima.simpleserver.config.TypeMap;
+import org.apache.uima.simpleserver.config.impl.XmlConfigReader;
 import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 
@@ -21,14 +23,12 @@ public class ConfigTest {
   public void readSampleConfig() {
     try {
       InputStream is = this.getClass().getClassLoader().getResourceAsStream(CONFIG_TEST_FILE);
-      ResultSpecificationDocument.ResultSpecification spec = ResultSpecificationDocument.Factory
-          .parse(is).getResultSpecification();
-      System.out
-          .println("Short description: " + spec.getShortDescription());
-      TypeElementType[] types = spec.getTypeArray();
-      for (int i = 0; i < types.length; i++) {
-        TypeElementType type = types[i];
-        System.out.println("Type: " + type.getName() + ", " + type.getOutputTag());
+      ServerSpec spec = XmlConfigReader.readServerSpec(is);
+      System.out.println("Short description: " + spec.getShortDescription());
+      List<TypeMap> types = spec.getTypeSpecs();
+      for (int i = 0; i < types.size(); i++) {
+        TypeMap type = types.get(i);
+        System.out.println("Type: " + type.getTypeName() + ", " + type.getOutputTag());
       }
     } catch (XmlException e) {
       e.printStackTrace();
