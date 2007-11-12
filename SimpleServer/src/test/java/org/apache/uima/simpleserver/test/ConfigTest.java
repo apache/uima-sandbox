@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.uima.simpleserver.config.ServerSpec;
+import org.apache.uima.simpleserver.config.SimpleServerException;
 import org.apache.uima.simpleserver.config.TypeMap;
 import org.apache.uima.simpleserver.config.impl.XmlConfigReader;
 import org.apache.xmlbeans.XmlException;
@@ -34,6 +35,9 @@ public class ConfigTest {
       e.printStackTrace();
       assertTrue(false);
     } catch (IOException e) {
+      e.printStackTrace();
+      assertTrue(false);
+    } catch (SimpleServerException e) {
       e.printStackTrace();
       assertTrue(false);
     }

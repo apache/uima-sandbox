@@ -26,6 +26,8 @@ import java.util.List;
  * Consists of a collection of type specifications.
  */
 public interface ServerSpec {
+  
+  public static final char PATH_SEPARATOR = '/';
 
   public List<TypeMap> getTypeSpecs();
 
