@@ -18,7 +18,11 @@
  */
 package org.apache.uima.annotator.dict_annot.impl;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -178,7 +182,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       ArrayList<Dictionary> dicts = new ArrayList<Dictionary>();
       for (int i = 0; i < dictionaryFileNames.length; i++) {
          // try to resolve the relative file name with classpath or datapath
-         File file = resolveRelativeFilePath(dictionaryFileNames[i],
+         DictionaryFile file = resolveRelativeFilePath(dictionaryFileNames[i],
                datapathElements);
 
          // if the current dictionary file wasn't found, throw an exception
@@ -188,12 +192,14 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
                   new Object[] { dictionaryFileNames[i] });
          } else {
             // log concept file path
-            this.logger.logrb(Level.CONFIG, "DictionaryAnnotator", "initialize",
-                  MESSAGE_DIGEST, "dictionary_annotator_dictionary_file",
-                  new Object[] { file.getAbsolutePath() });
+            this.logger.logrb(Level.CONFIG, "DictionaryAnnotator",
+                  "initialize", MESSAGE_DIGEST,
+                  "dictionary_annotator_dictionary_file", new Object[] { file
+                        .getFilePath() });
 
             // parse dictionary file
-            Dictionary dict = fileParser.parseDictionaryFile(file, dictBuilder);
+            Dictionary dict = fileParser.parseDictionaryFile(
+                  file.getFilePath(), file.getStream(), dictBuilder);
             // add dictionary to the dictionary list
             dicts.add(dict);
          }
@@ -259,13 +265,27 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
     * 
     * @return returns the File object of the resolved file, otherwise null.
     */
-   private File resolveRelativeFilePath(String fileName,
+   /**
+    * @param context
+    * @param param
+    * @param defaultValue
+    * @return returns the boolean parameter value
+    * @throws AnnotatorContextException
+    */
+   private DictionaryFile resolveRelativeFilePath(String fileName,
          ArrayList<File> datapathElements) {
 
+      DictionaryFile dictionaryFile;
       URL url;
+
       // try to use the class loader to load the file resource
       if ((url = this.getClass().getClassLoader().getResource(fileName)) != null) {
-         return new File(url.getFile());
+         // we have successfully resolved the concept file, now also get it as
+         // stream
+         InputStream stream = this.getClass().getClassLoader()
+               .getResourceAsStream(fileName);
+         dictionaryFile = new DictionaryFile(url.getFile(), stream);
+         return dictionaryFile;
       } else {
          if (datapathElements == null || datapathElements.size() == 0) {
             return null;
@@ -274,10 +294,65 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
          for (int i = 0; i < datapathElements.size(); i++) {
             File testFile = new File(datapathElements.get(i), fileName);
             if (testFile.exists()) {
-               return testFile;
+               InputStream stream;
+               try {
+                  stream = new BufferedInputStream(
+                        new FileInputStream(testFile));
+               } catch (FileNotFoundException ex) {
+                  return null;
+               }
+               dictionaryFile = new DictionaryFile(testFile.getAbsolutePath(),
+                     stream);
+               return dictionaryFile;
             }
          }
       }
       return null;
+
    }
+
+   /**
+    * Helper class to bundle the XML dictionary file name and the dictionary
+    * file input stream to one object.
+    */
+   private class DictionaryFile {
+      // concept file path name
+      private String filePath;
+
+      // concept file stream
+      private InputStream stream;
+
+      /**
+       * creates a new dictionaryFile object with the file path and the stream
+       * 
+       * @param filePath
+       *           concept file path
+       * 
+       * @param stream
+       *           concept file stream
+       */
+      public DictionaryFile(String filePath, InputStream stream) {
+         this.filePath = filePath;
+         this.stream = stream;
+      }
+
+      /**
+       * Returns the dictionary file path name
+       * 
+       * @return concept file path name
+       */
+      public String getFilePath() {
+         return this.filePath;
+      }
+
+      /**
+       * Returns the dictionary file stream
+       * 
+       * @return concept file stream
+       */
+      public InputStream getStream() {
+         return this.stream;
+      }
+   }
+
 }

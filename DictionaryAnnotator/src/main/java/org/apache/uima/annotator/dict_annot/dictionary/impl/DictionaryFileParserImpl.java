@@ -18,7 +18,7 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary.impl;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -44,20 +44,22 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
    /*
     * (non-Javadoc)
     * 
-    * @see org.apache.uima.annotator.dict_annot.dictionary.DictionaryFileParser#parseDictionaryFile(java.io.File,
+    * @see org.apache.uima.annotator.dict_annot.dictionary.DictionaryFileParser#parseDictionaryFile(java.lang.String,
+    *      java.io.InputStream,
     *      org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder)
     */
-   public Dictionary parseDictionaryFile(File dictionaryFile,
-         DictionaryBuilder dictBuilder) throws ResourceInitializationException {
+   public Dictionary parseDictionaryFile(String dictionaryFilePath,
+         InputStream dictionaryFileStream, DictionaryBuilder dictBuilder)
+         throws ResourceInitializationException {
 
       // parse the dictionary file and extract the content
       DictionaryDocument dictionaryDoc;
       try {
-         dictionaryDoc = DictionaryDocument.Factory.parse(dictionaryFile);
+         dictionaryDoc = DictionaryDocument.Factory.parse(dictionaryFileStream);
       } catch (Exception ex) {
          throw new DictionaryAnnotatorConfigException(
                "dictionary_annotator_error_parsing_dictionary_file",
-               new Object[] { dictionaryFile.getAbsolutePath() }, ex);
+               new Object[] { dictionaryFilePath }, ex);
       }
 
       // validate input file
@@ -76,21 +78,20 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
             errorMessages.append(iter.next());
          }
          throw new DictionaryAnnotatorConfigException(
-               "dictionary_annotator_error_xml_validation",
-               new Object[] { dictionaryFile.getAbsolutePath(),
-                     errorMessages.toString() });
+               "dictionary_annotator_error_xml_validation", new Object[] {
+                     dictionaryFilePath, errorMessages.toString() });
       }
 
-      //get dictionary document
-      DictionaryDocument.Dictionary dictionary = dictionaryDoc
-            .getDictionary();
+      // get dictionary document
+      DictionaryDocument.Dictionary dictionary = dictionaryDoc.getDictionary();
 
-      //get type collection settings
-      TypeCollectionDocument.TypeCollection typeCollection = dictionary.getTypeCollection();
+      // get type collection settings
+      TypeCollectionDocument.TypeCollection typeCollection = dictionary
+            .getTypeCollection();
       DictionaryMetaData dictMetaData = typeCollection.getDictionaryMetaData();
       boolean caseNormalization = true;
       boolean multiWordEntries = true;
-      if(dictMetaData != null) {
+      if (dictMetaData != null) {
          caseNormalization = dictMetaData.getCaseNormalization();
          multiWordEntries = dictMetaData.getMultiWordEntries();
       }
@@ -98,7 +99,8 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
       String language = typeCollection.getLanguageId();
       String typeName = typeCollection.getTypeDescription().getTypeName();
       // set dictionary properties
-      dictBuilder.setDictionaryProperties(language, typeName, caseNormalization, multiWordEntries);
+      dictBuilder.setDictionaryProperties(language, typeName,
+            caseNormalization, multiWordEntries);
 
       // get dictionary entries and add process them with the dictionary builder
       EntriesDocument.Entries entries = typeCollection.getEntries();

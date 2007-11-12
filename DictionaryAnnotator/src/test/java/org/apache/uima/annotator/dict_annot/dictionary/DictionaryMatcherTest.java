@@ -18,7 +18,10 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.xml.parsers.SAXParser;
@@ -91,10 +94,13 @@ public class DictionaryMatcherTest extends TestCase {
       // create the dictionary
       File dictFile = JUnitExtension
             .getFile("DictionaryMatchTests/MultiWords.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+ 
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
-      fileParser.parseDictionaryFile(dictFile, dictBuilder);
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream, dictBuilder);
 
       Dictionary dict = dictBuilder.getDictionary();
 

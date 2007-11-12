@@ -18,7 +18,10 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -51,17 +54,21 @@ public class DictionaryBuilderTest extends TestCase {
       // read input file
       File dictFile = JUnitExtension
             .getFile("DictionaryBuilderTests/SingleWordsCaseNormalization.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
       // create dictionary
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
-      fileParser.parseDictionaryFile(dictFile, dictBuilder);
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+            dictBuilder);
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      //read dictionary entries
+      // read dictionary entries
       ArrayList<String> entries = getDictionaryEntries(dictFile);
-       
-      for(int i = 0; i < entries.size(); i++) {
+
+      for (int i = 0; i < entries.size(); i++) {
 
          Assert.assertTrue("Missing in dictionary: " + entries.get(i), dict
                .contains(entries.get(i)));
@@ -84,18 +91,22 @@ public class DictionaryBuilderTest extends TestCase {
       // read input file
       File dictFile = JUnitExtension
             .getFile("DictionaryBuilderTests/SingleWordsNoCaseNormalization.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
       // create dictionary
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
-      fileParser.parseDictionaryFile(dictFile, dictBuilder);
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+            dictBuilder);
 
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      //read dictionary entries
+      // read dictionary entries
       ArrayList<String> entries = getDictionaryEntries(dictFile);
-       
-      for(int i = 0; i < entries.size(); i++) {
+
+      for (int i = 0; i < entries.size(); i++) {
 
          Assert.assertTrue("Missing in dictionary: " + entries.get(i), dict
                .contains(entries.get(i)));
@@ -118,17 +129,21 @@ public class DictionaryBuilderTest extends TestCase {
       // read input file
       File dictFile = JUnitExtension
             .getFile("DictionaryBuilderTests/MultiWordsNoCaseNormalization.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
       // create dictionary
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
-      fileParser.parseDictionaryFile(dictFile, dictBuilder);
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+            dictBuilder);
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      //read dictionary entries
+      // read dictionary entries
       ArrayList<String> entries = getDictionaryEntries(dictFile);
-       
-      for(int i = 0; i < entries.size(); i++) {
+
+      for (int i = 0; i < entries.size(); i++) {
 
          StringTokenizer tokenizer = new StringTokenizer(entries.get(i), " ");
 
@@ -160,17 +175,21 @@ public class DictionaryBuilderTest extends TestCase {
       // read input file
       File dictFile = JUnitExtension
             .getFile("DictionaryBuilderTests/MultiWordsCaseNormalization.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
       // create dictionary
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
-      fileParser.parseDictionaryFile(dictFile, dictBuilder);
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+            dictBuilder);
       HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
 
-      //read dictionary entries
+      // read dictionary entries
       ArrayList<String> entries = getDictionaryEntries(dictFile);
-       
-      for(int i = 0; i < entries.size(); i++) {
+
+      for (int i = 0; i < entries.size(); i++) {
 
          StringTokenizer tokenizer = new StringTokenizer(entries.get(i), " ");
 

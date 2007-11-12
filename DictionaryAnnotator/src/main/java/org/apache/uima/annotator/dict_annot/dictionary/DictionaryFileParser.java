@@ -18,7 +18,7 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary;
 
-import java.io.File;
+import java.io.InputStream;
 
 import org.apache.uima.resource.ResourceInitializationException;
 
@@ -32,13 +32,18 @@ public interface DictionaryFileParser {
     * parse the given dictionary file and creates a new dictionary using the
     * given dictionary builder.
     * 
-    * @param dictionaryFile
-    *           dictionary XML file
+    * @param dictionaryFilePath
+    *           dictionary XML file path
+    * 
+    * @param dictionaryFileStream
+    *           dictionary XML file stream
+    *           
     * @param dictBuilder
     *           dictionary build that should be used to create the dictionary
     * @return returns the created Dictionary
     * @throws ResourceInitializationException
     */
-   public Dictionary parseDictionaryFile(File dictionaryFile,
-         DictionaryBuilder dictBuilder) throws ResourceInitializationException;
+   public Dictionary parseDictionaryFile(String dictionaryFilePath,
+         InputStream dictionaryFileStream, DictionaryBuilder dictBuilder)
+         throws ResourceInitializationException;
 }
