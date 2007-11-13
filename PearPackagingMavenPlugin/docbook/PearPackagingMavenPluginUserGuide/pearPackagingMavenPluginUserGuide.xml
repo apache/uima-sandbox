@@ -27,7 +27,7 @@
 <book lang="en">
 
 	<title>
-		Apache UIMA Pear Packaging Maven Plugin Documentation
+		Apache UIMA PEAR Packaging Maven Plugin Documentation
 	</title>
 
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
