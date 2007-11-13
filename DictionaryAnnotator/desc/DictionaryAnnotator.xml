@@ -22,7 +22,7 @@
   <primitive>true</primitive>
   <annotatorImplementationName>org.apache.uima.annotator.dict_annot.impl.DictionaryAnnotator</annotatorImplementationName>
   <analysisEngineMetaData>
-    <name>ListBasedAnnotator</name>
+    <name>DictionaryAnnotator</name>
     <description></description>
     <configurationParameters>
        
@@ -70,6 +70,18 @@
           <description/>
           <supertypeName>uima.tcas.Annotation</supertypeName>
         </typeDescription>
+        <typeDescription>
+			<name>org.apache.uima.TokenAnnotation</name>
+			<description>Single token annotation</description>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<features>
+				<featureDescription>
+					<name>tokenType</name>
+					<description>token type</description>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
        </types>
     </typeSystemDescription>
     <capabilities>

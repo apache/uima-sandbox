@@ -221,10 +221,9 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       // entries
       this.inputMatchType = typeSystem.getType(this.inputMatchTypeStr);
       if (this.inputMatchType == null) {
-         Exception ex = new DictionaryAnnotatorConfigException(
+         throw new DictionaryAnnotatorProcessException(
                "dictionary_annotator_error_resolving_types",
                new Object[] { this.inputMatchTypeStr });
-         throw new AnalysisEngineProcessException(ex);
       }
    }
 
