@@ -37,11 +37,11 @@
 		<title>Overview</title>
 		<para>
 			To make UIMA analysis components easily consumable for other users, UIMA defined
-			the PEAR (Processing Engine ARchive) file format. It allows applications and tools
+			the PEAR (Processing Engine ARchive) file format. This allows applications and tools
 			to manage UIMA analysis components automatically for verification, deployment, 
 			invocation and testing. So far the PEAR file format is the desired output format for 
-			an analysis component. With the PEAR packaging Maven plugin it is possible to create
-			such a PEAR package for the analysis component automatically during the Maven component 
+			an UIMA analysis component. With the PEAR packaging Maven plugin it is possible to create
+			such a PEAR package for the analysis component automatically during the Maven artifact 
 			build.
 		</para>
 	</preface>
@@ -50,8 +50,8 @@
 		<title>Installing The PEAR Packaging Plugin</title>
 		<para>
 		  The PEAR packaging Maven plugin is modeled as custom plugin for the Maven build system.
-		  To use the plugin it must be available in the local Maven repository. So far the plugin is
-		  not available by default when building UIMA, so it have to be built manually using the provided 
+		  To use it, the plugin must be available in the local Maven repository. So far the plugin is
+		  not available by default when building the UIMA SDK, so it have to be built manually using the provided 
 		  Maven build. The plugin code is available in the Apache
 		  subversion repository at:
 		  <blockquote>
@@ -60,17 +60,17 @@
            </para>
          </blockquote>
 		  After downloading the code to the Apache UIMA build environment just call the provided maven build
-		  in the main directory of the plugin as shown in the listing below.
+		  in the main directory of the PEAR Packaging plugin as shown in the listing below.
 		</para>
 		<para>
 		<programlisting><![CDATA[#PearPackagingMavenPlugin> mvn install]]></programlisting>
 		</para>
 		<para>
-		  After a successful build the plugin is available in the local Maven repository and can be used
-		  in other Maven component builds from now. To add the plugin to other builds it is necessary to 
-		  know the plugin version number as it is available in the Maven repository. The plugin version number
-		  is displayed at the end of the Maven build as shown in the example below. For this plugin, the 
-		  version number was: <code>2.2.0-incubating-SNAPSHOT</code> 
+		  After successfully building the plugin is available in the local Maven repository and can be used
+		  in other Maven artifact builds from now. To integrate the plugin into other builds it is necessary to 
+		  know the PEAR Packaging plugin version number as it is available in the Maven repository. The plugin version number
+		  is displayed at the end of the Maven build as shown in the example below. For this example, the plugin 
+		  version number is: <code>2.2.0-incubating-SNAPSHOT</code> 
 		</para>
 		<para>
 		<programlisting><![CDATA[[INFO] Installing 
@@ -96,11 +96,11 @@ PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
 		<section id="pear.packaging.maven.plugin.usage.dependency">
 			<title>Adding The Plugin Dependency To The POM</title>
 		<para>
-		  To use the PEAR packaging Maven plugin in a Maven build, it is necessary to add it as dependency to the
-		  POM. Important while adding the dependency is the version number of the plugin so that the correct
-		  version is used and can be found in the local Maven repository. The version number of the plugin was 
-		  displayed when installing the PEAR packaging Maven plugin to the Maven repository. The lines below 
-		  shows a snippet to add the plugin dependency to the POM.
+		  To use the PEAR packaging plugin in a Maven build, it is necessary to add it as dependency to the
+		  POM. Important while adding the dependency is the version number of the plugin. With that the correct
+		  version of the plugin is used and can be found in the local Maven repository. The version number of the plugin was 
+		  displayed when installing the PEAR packaging Maven plugin to the Maven repository. The snippet below 
+		  shows how the plugin dependency is added to the dependencies sections of the POM.
 		</para>
 		<para>
 		<programlisting><![CDATA[<dependencies>
@@ -119,7 +119,8 @@ PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
 		<section id="pear.packaging.maven.plugin.usage.configure">
 			<title>Calling The PEAR Packaging Plugin</title>
 		<para>
-		  To call the PEAR packaging Maven plugin within the Maven build, the plugin must be added to the POM as shown below:
+		  To call the PEAR packaging plugin within a Maven build, the plugin must be added to the plugins section of the 
+		  POM as shown below:
 		</para>
 		<para>
 		<programlisting><![CDATA[<build>
@@ -167,17 +168,17 @@ PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
 ]]></programlisting>
 		</para>
 		<para>
-		  To configure the plugin with the specific settings for the PEAR package, the 
-		  <code>&lt;configuration></code> element section is used. This sections contains all the parameters
-		  that are defined for the PEAR packaging plugin. The details about each parameter and how it is used
-		  are listed below:
+		  To configure the plugin with the specific settings of a PEAR package, the 
+		  <code>&lt;configuration></code> element section is used. This sections contains all parameters 
+		  that are provided by the PEAR packaging plugin to package the right content and set the specific PEAR package settings.
+		  The details about each parameter and how it is used is shown below:
 		</para>
 		<para>
 			<itemizedlist>
 				<listitem>
 					<para>
 						<code>&lt;classpath></code>
-						  - This element specifies the classpath settings that are necessary to run the 
+						  - This element specifies the classpath settings that are necessary to start up the 
 						  PEAR component. The jar artifact that is built during the current Maven build is 
 						  automatically added to the PEAR classpath settings and do not have to be added manually. 
 					</para>
@@ -216,8 +217,8 @@ PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
 			</itemizedlist>
 		</para>
 		<para>
-		  For most of the Maven projects it is sufficient to specify the parameters described above. In some cases, for 
-		  more complex Maven projects, it may be necessary to specify some additional configuration 
+		  For most Maven projects it is sufficient to specify the parameters described above. In some cases, for 
+		  more complex projects, it may be necessary to specify some additional configuration 
 		  parameters. These parameters are listed below with the default values that are used if they are not 
 		  added to the configuration section shown above.
 		</para>
