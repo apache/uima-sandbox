@@ -46,6 +46,7 @@
 		<xs:complexType>
 		  <xs:attribute name="caseNormalization" type="xs:boolean" use="optional" default="true" />
 		  <xs:attribute name="multiWordEntries" type="xs:boolean" use="optional" default="true" />
+		  <xs:attribute name="multiWordSeparator" type="xs:string" use="optional" default=" " />
 		</xs:complexType>
 	</xs:element>
 

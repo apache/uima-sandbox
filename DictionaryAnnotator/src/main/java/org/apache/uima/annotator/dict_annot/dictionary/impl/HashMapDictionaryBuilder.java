@@ -36,44 +36,66 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
    // HashMap dictionary
    private HashMapDictionary dictionary;
 
+   // multi-word separator
+   private String multiWordSeparator;
+
    /**
-    * Default constructor. Creates a new HashMap dictionary with case normalization.
+    * Default constructor. Creates a new HashMap dictionary with case
+    * normalization.
     */
    public HashMapDictionaryBuilder() {
       this.dictionary = new HashMapDictionary(true);
+      // initialize the default separator character with a space character
+      this.multiWordSeparator = " ";
    }
    
+   /**
+    * Returns the multi-word separator of the dictionary builder
+    * 
+    * @return multi-word separator
+    */
+   public String getMultiWordSeparator() {
+      return this.multiWordSeparator;
+   }
+
    /*
     * (non-Javadoc)
     * 
     * @see org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder#setDictionaryProperties(java.lang.String,
-    *      java.lang.String, boolean, boolean)
+    *      java.lang.String, boolean, boolean, java.lang.String)
     */
    public void setDictionaryProperties(String language, String typeName,
-         boolean caseNormalization, boolean multiWordEntries) {
+         boolean caseNormalization, boolean multiWordEntries,
+         String multiWordSeparator) {
       this.dictionary.setDictionaryLanguage(language);
       this.dictionary.setTypeName(typeName);
       this.createMultiWordEntries = multiWordEntries;
-      
-      //create a new dictionary if the settings changed.
-      if(!caseNormalization) {
+
+      // set multi-word separator
+      if (multiWordSeparator != null) {
+         this.multiWordSeparator = multiWordSeparator;
+      }
+
+      // create a new dictionary if the settings changed.
+      if (!caseNormalization) {
          this.dictionary = new HashMapDictionary(caseNormalization);
       }
    }
 
    /**
-    * split up the given input in several tokens using the whitespace character
-    * as delimiter.
+    * split up the given input in several tokens using the multi-word separator
+    * character as delimiter.
     * 
     * @param input
     *           word that should be tokenized
     * 
     * @return Tokens for the given input
     */
-   private String[] whiteSpaceTokenizer(String input) {
+   private String[] multiTokenTokenizer(String input) {
 
       // create
-      StringTokenizer tokenizer = new StringTokenizer(input, " ");
+      StringTokenizer tokenizer = new StringTokenizer(input,
+            this.multiWordSeparator);
 
       ArrayList<String> tokens = new ArrayList<String>();
       while (tokenizer.hasMoreTokens()) {
@@ -93,7 +115,7 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
 
       if (this.createMultiWordEntries) {
          // tokenize the entry
-         String[] multiWord = whiteSpaceTokenizer(word);
+         String[] multiWord = multiTokenTokenizer(word);
 
          if (multiWord.length == 1) {
             this.dictionary.addWord(multiWord[0]);

@@ -91,16 +91,18 @@ public class DictionaryFileParserImpl implements DictionaryFileParser {
       DictionaryMetaData dictMetaData = typeCollection.getDictionaryMetaData();
       boolean caseNormalization = true;
       boolean multiWordEntries = true;
+      String multiWordSeparator = null;
       if (dictMetaData != null) {
          caseNormalization = dictMetaData.getCaseNormalization();
          multiWordEntries = dictMetaData.getMultiWordEntries();
+         multiWordSeparator = dictMetaData.getMultiWordSeparator();
       }
       // get the dictionary language and the type name
       String language = typeCollection.getLanguageId();
       String typeName = typeCollection.getTypeDescription().getTypeName();
       // set dictionary properties
       dictBuilder.setDictionaryProperties(language, typeName,
-            caseNormalization, multiWordEntries);
+            caseNormalization, multiWordEntries, multiWordSeparator);
 
       // get dictionary entries and add process them with the dictionary builder
       EntriesDocument.Entries entries = typeCollection.getEntries();

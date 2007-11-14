@@ -58,7 +58,7 @@ public class DictionaryBuilderTest extends TestCase {
             new FileInputStream(dictFile));
 
       // create dictionary
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      HashMapDictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
       fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
@@ -133,7 +133,7 @@ public class DictionaryBuilderTest extends TestCase {
             new FileInputStream(dictFile));
 
       // create dictionary
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      HashMapDictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
       fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
@@ -145,7 +145,7 @@ public class DictionaryBuilderTest extends TestCase {
 
       for (int i = 0; i < entries.size(); i++) {
 
-         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), " ");
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), dictBuilder.getMultiWordSeparator());
 
          ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
@@ -179,7 +179,7 @@ public class DictionaryBuilderTest extends TestCase {
             new FileInputStream(dictFile));
 
       // create dictionary
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      HashMapDictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
       fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
@@ -191,7 +191,54 @@ public class DictionaryBuilderTest extends TestCase {
 
       for (int i = 0; i < entries.size(); i++) {
 
-         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), " ");
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), dictBuilder.getMultiWordSeparator());
+
+         ArrayList<String> list = new ArrayList<String>();
+         while (tokenizer.hasMoreTokens()) {
+            list.add(tokenizer.nextToken());
+         }
+         String[] multiWord = list.toArray(new String[] {});
+
+         Assert.assertTrue("Missing in dictionary: " + entries.get(i), dict
+               .contains(multiWord));
+      }
+
+      Assert.assertEquals(4, dict.getEntryCount());
+      Assert.assertFalse(dict.contains(new String[] { "Unstructured",
+            "Information", "Management", "Architecture" }));
+      Assert.assertTrue(dict.contains(new String[] { "new", "yORk" }));
+      Assert.assertTrue(dict.contains(new String[] { "new", "york", "city" }));
+      Assert.assertFalse(dict.contains("new"));
+   }
+
+   /**
+    * test multi-word dictionary creation with a special multi-word separator
+    * 
+    * @throws Exception
+    */
+   public void testMultiWordDictionaryBuildingWithSpecialMultiWordSeparator()
+         throws Exception {
+
+      // read input file
+      File dictFile = JUnitExtension
+            .getFile("DictionaryBuilderTests/MultiWordsSpecialMultiWordSeparator.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
+      // create dictionary
+      HashMapDictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+            dictBuilder);
+      HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
+
+      // read dictionary entries
+      ArrayList<String> entries = getDictionaryEntries(dictFile);
+
+      for (int i = 0; i < entries.size(); i++) {
+
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), dictBuilder.getMultiWordSeparator());
 
          ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {

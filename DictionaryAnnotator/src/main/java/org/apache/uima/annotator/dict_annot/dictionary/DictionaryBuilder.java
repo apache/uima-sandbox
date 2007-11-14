@@ -50,8 +50,10 @@ public interface DictionaryBuilder {
     *           case normalization settings
     * @param multiWordEntries
     *           multi-word entries setting
+    * @param multiWordSeparator
+    *           multi-word entry separator
     */
    public void setDictionaryProperties(String language, String typeName,
-         boolean caseNormalization, boolean multiWordEntries);
+         boolean caseNormalization, boolean multiWordEntries, String multiWordSeparator);
 
 }
