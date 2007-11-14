@@ -35,6 +35,7 @@ import org.apache.incubator.uima.simpleserver.config.xml.Or;
 import org.apache.incubator.uima.simpleserver.config.xml.SimpleFilterType;
 import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType;
 import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument;
+import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType.Filters;
 import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument.UimaSimpleServerSpec;
 import org.apache.uima.cas.impl.TypeSystemUtils;
 import org.apache.uima.simpleserver.config.AndFilter;
@@ -112,9 +113,13 @@ public final class XmlConfigReader {
     boolean coveredText = typeBean.getOutputCoveredText();
     Filter filter = null;
     if (typeBean.getFilters() != null) {
-      FilterType filterBean = typeBean.getFilters().getFilter();
-      if (filterBean != null) {
-        filter = readFilter(filterBean);
+      Filters filterBean = typeBean.getFilters();
+      if (filterBean.getAnd() != null) {
+        filter = readFilter(filterBean.getAnd());
+      } else if (filterBean.getOr() != null) {
+        filter = readFilter(filterBean.getOr());
+      } else if (filterBean.getFilter() != null) {
+        filter = readFilter(filterBean.getFilter());
       }
     }
     return ConfigFactory.newTypeMap(typeBean.getName(), filter, typeBean.getOutputTag(),
@@ -135,18 +140,39 @@ public final class XmlConfigReader {
 
   private static final AndFilter readAndFilter(And filterBean) throws SimpleServerException {
     AndFilter filter = ConfigFactory.newAndFilter();
-    FilterType[] filterBeans = filterBean.getFilterTypeArray();
-    for (int i = 0; i < filterBeans.length; i++) {
-      filter.addFilter(readFilter(filterBeans[i]));
+    SimpleFilterType[] simpleFilters = filterBean.getFilterArray();
+    And[] andBeans = filterBean.getAndArray();
+    Or[] orBeans = filterBean.getOrArray();
+    List<FilterType> filterBeans = getFilters(simpleFilters, andBeans, orBeans);
+    for (int i = 0; i < filterBeans.size(); i++) {
+      filter.addFilter(readFilter(filterBeans.get(i)));
     }
     return filter;
   }
 
+  private static final List<FilterType> getFilters(SimpleFilterType[] simpleFilters,
+      And[] andBeans, Or[] orBeans) {
+    List<FilterType> list = new ArrayList<FilterType>();
+    for (int i = 0; i < simpleFilters.length; i++) {
+      list.add(simpleFilters[i]);
+    }
+    for (int i = 0; i < andBeans.length; i++) {
+      list.add(andBeans[i]);
+    }
+    for (int i = 0; i < orBeans.length; i++) {
+      list.add(orBeans[i]);
+    }
+    return list;
+  }
+
   private static final OrFilter readOrFilter(Or filterBean) throws SimpleServerException {
     OrFilter filter = ConfigFactory.newOrFilter();
-    FilterType[] filterBeans = filterBean.getFilterTypeArray();
-    for (int i = 0; i < filterBeans.length; i++) {
-      filter.addFilter(readFilter(filterBeans[i]));
+    SimpleFilterType[] simpleFilters = filterBean.getFilterArray();
+    And[] andBeans = filterBean.getAndArray();
+    Or[] orBeans = filterBean.getOrArray();
+    List<FilterType> filterBeans = getFilters(simpleFilters, andBeans, orBeans);
+    for (int i = 0; i < filterBeans.size(); i++) {
+      filter.addFilter(readFilter(filterBeans.get(i)));
     }
     return filter;
   }

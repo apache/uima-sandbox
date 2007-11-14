@@ -30,6 +30,7 @@ public class ConfigTest {
       for (int i = 0; i < types.size(); i++) {
         TypeMap type = types.get(i);
         System.out.println("Type: " + type.getTypeName() + ", " + type.getOutputTag());
+        System.out.println("Filter: " + type.getFilter());
       }
     } catch (XmlException e) {
       e.printStackTrace();

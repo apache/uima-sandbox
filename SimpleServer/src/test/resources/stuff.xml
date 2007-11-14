@@ -19,18 +19,20 @@
 -->
 
 <uimaSimpleServerSpec
-	xmlns="http://incubator.apache.org/uima/simpleserver/config/xml">
+	xmlns="http://incubator.apache.org/uima/simpleserver/config/xml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="file:///SimpleServerConfig.xsd">
 	<shortDescription>Recognize stuff</shortDescription>
 	<type name="org.apache.uima.Stuff" outputTag="Stuff"
 		outputCoveredText="true">
 		<filters>
 			<or>
 				<and>
-					<filter featurePath="feat" condition="not null" />
-					<filter featurePath="feat" condition="not null" />
+					<filter featurePath="feat" operator="null" />
+					<filter featurePath="feat" operator="null" />
 				</and>
-				<filter featurePath="feat" condition="not null" />
-				<filter featurePath="feat" condition="not null" />
+				<filter featurePath="feat" operator="null" />
+				<filter featurePath="feat" operator="null" />
 			</or>
 		</filters>
 		<outputs>

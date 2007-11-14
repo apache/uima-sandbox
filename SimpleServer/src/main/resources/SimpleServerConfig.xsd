@@ -51,11 +51,13 @@
 			<!-- Filters: either a single filter, a conjunction or disjunction -->
 			<xsd:element name="filters" minOccurs="0" maxOccurs="1">
 				<xsd:complexType>
-					<xsd:sequence minOccurs="0" maxOccurs="1">
-						<xsd:element type="uima:filterType"
+					<xsd:choice minOccurs="0" maxOccurs="1">
+						<xsd:element type="uima:simpleFilterType"
 							name="filter">
 						</xsd:element>
-					</xsd:sequence>
+						<xsd:element type="uima:or" name="or"></xsd:element>
+						<xsd:element type="uima:and" name="and"></xsd:element>
+					</xsd:choice>
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="outputs" minOccurs="0" maxOccurs="1">
@@ -112,11 +114,13 @@
 	<xsd:complexType name="and">
 		<xsd:complexContent>
 			<xsd:extension base="uima:filterType">
-				<xsd:sequence minOccurs="2" maxOccurs="unbounded">
-					<xsd:element name="filterType"
-						type="uima:filterType">
+				<xsd:choice minOccurs="2" maxOccurs="unbounded">
+					<xsd:element type="uima:simpleFilterType"
+						name="filter">
 					</xsd:element>
-				</xsd:sequence>
+					<xsd:element type="uima:or" name="or"></xsd:element>
+					<xsd:element type="uima:and" name="and"></xsd:element>
+				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -125,11 +129,13 @@
 	<xsd:complexType name="or">
 		<xsd:complexContent>
 			<xsd:extension base="uima:filterType">
-				<xsd:sequence minOccurs="2" maxOccurs="unbounded">
-					<xsd:element name="filterType"
-						type="uima:filterType">
+				<xsd:choice minOccurs="2" maxOccurs="unbounded">
+					<xsd:element type="uima:simpleFilterType"
+						name="filter">
 					</xsd:element>
-				</xsd:sequence>
+					<xsd:element type="uima:or" name="or"></xsd:element>
+					<xsd:element type="uima:and" name="and"></xsd:element>
+				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
