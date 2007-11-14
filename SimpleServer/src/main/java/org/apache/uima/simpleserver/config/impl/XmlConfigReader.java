@@ -25,24 +25,53 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.incubator.uima.simpleserver.config.xml.And;
+import org.apache.incubator.uima.simpleserver.config.xml.FilterOperator;
 import org.apache.incubator.uima.simpleserver.config.xml.FilterType;
+import org.apache.incubator.uima.simpleserver.config.xml.Or;
+import org.apache.incubator.uima.simpleserver.config.xml.SimpleFilterType;
 import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType;
 import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument;
 import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument.UimaSimpleServerSpec;
 import org.apache.uima.cas.impl.TypeSystemUtils;
+import org.apache.uima.simpleserver.config.AndFilter;
+import org.apache.uima.simpleserver.config.Condition;
 import org.apache.uima.simpleserver.config.ConfigFactory;
 import org.apache.uima.simpleserver.config.Filter;
+import org.apache.uima.simpleserver.config.FilterOp;
+import org.apache.uima.simpleserver.config.OrFilter;
 import org.apache.uima.simpleserver.config.ServerSpec;
+import org.apache.uima.simpleserver.config.SimpleFilter;
 import org.apache.uima.simpleserver.config.SimpleServerException;
 import org.apache.uima.simpleserver.config.TypeMap;
+import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlOptions;
 
 /**
  * Read server configuration from an XML file or stream.
  */
 public final class XmlConfigReader {
+
+  // Constants for filter operators
+  private static final int NULL = FilterOperator.Enum.forString("null").intValue();
+
+  private static final int NOT_NULL = FilterOperator.Enum.forString("null").intValue();
+
+  private static final int EQUALS = FilterOperator.Enum.forString("null").intValue();
+
+  private static final int NOT_EQUALS = FilterOperator.Enum.forString("null").intValue();
+
+  private static final int LESS = FilterOperator.Enum.forString("null").intValue();
+
+  private static final int LESS_EQ = FilterOperator.Enum.forString("null").intValue();
+
+  private static final int GREATER = FilterOperator.Enum.forString("null").intValue();
+
+  private static final int GREATER_EQ = FilterOperator.Enum.forString("null").intValue();
 
   public static ServerSpec readServerSpec(File file) throws IOException, XmlException,
       SimpleServerException {
@@ -53,6 +82,23 @@ public final class XmlConfigReader {
       SimpleServerException {
     UimaSimpleServerSpec specBean = UimaSimpleServerSpecDocument.Factory.parse(is)
         .getUimaSimpleServerSpec();
+    ArrayList<XmlError> validationErrors = new ArrayList<XmlError>();
+    XmlOptions validationOptions = new XmlOptions();
+    validationOptions.setErrorListener(validationErrors);
+
+    boolean isValid = specBean.validate(validationOptions);
+
+    // output the errors if the XML is invalid.
+    if (!isValid) {
+      Iterator<XmlError> iter = validationErrors.iterator();
+      StringBuffer errorMessages = new StringBuffer();
+      while (iter.hasNext()) {
+        errorMessages.append("\n>> ");
+        errorMessages.append(iter.next());
+      }
+      System.err.println(errorMessages);
+    }
+
     ServerSpec spec = ConfigFactory.newServerSpec(specBean.getShortDescription(), specBean
         .getLongDescription());
     TypeElementType[] typeMaps = specBean.getTypeArray();
@@ -64,21 +110,81 @@ public final class XmlConfigReader {
 
   private static TypeMap readTypeMap(TypeElementType typeBean) throws SimpleServerException {
     boolean coveredText = typeBean.getOutputCoveredText();
-    TypeMap typeMap = ConfigFactory.newTypeMap(typeBean.getName(), typeBean.getOutputTag(),
-        coveredText, typeBean.getShortDescription(), typeBean.getLongDescription());
+    Filter filter = null;
     if (typeBean.getFilters() != null) {
-      FilterType[] filters = typeBean.getFilters().getFilterArray();
-      for (int i = 0; i < filters.length; i++) {
-        typeMap.addFilter(readFilter(filters[i]));
+      FilterType filterBean = typeBean.getFilters().getFilter();
+      if (filterBean != null) {
+        filter = readFilter(filterBean);
       }
     }
-    return typeMap;
+    return ConfigFactory.newTypeMap(typeBean.getName(), filter, typeBean.getOutputTag(),
+        coveredText, typeBean.getShortDescription(), typeBean.getLongDescription());
   }
 
-  private static Filter readFilter(FilterType filterBean) throws SimpleServerException {
-    List<String> path = parseFeaturePath(filterBean.getFeaturePath());
-    Filter filter = ConfigFactory.newFilter(path, null);
+  private static final Filter readFilter(FilterType filterBean) throws SimpleServerException {
+    Filter filter = null;
+    if (filterBean instanceof And) {
+      filter = readAndFilter((And) filterBean);
+    } else if (filterBean instanceof Or) {
+      filter = readOrFilter((Or) filterBean);
+    } else {
+      filter = readSimpleFilter((SimpleFilterType) filterBean);
+    }
     return filter;
+  }
+
+  private static final AndFilter readAndFilter(And filterBean) throws SimpleServerException {
+    AndFilter filter = ConfigFactory.newAndFilter();
+    FilterType[] filterBeans = filterBean.getFilterTypeArray();
+    for (int i = 0; i < filterBeans.length; i++) {
+      filter.addFilter(readFilter(filterBeans[i]));
+    }
+    return filter;
+  }
+
+  private static final OrFilter readOrFilter(Or filterBean) throws SimpleServerException {
+    OrFilter filter = ConfigFactory.newOrFilter();
+    FilterType[] filterBeans = filterBean.getFilterTypeArray();
+    for (int i = 0; i < filterBeans.length; i++) {
+      filter.addFilter(readFilter(filterBeans[i]));
+    }
+    return filter;
+  }
+
+  private static final SimpleFilter readSimpleFilter(SimpleFilterType filterBean)
+      throws SimpleServerException {
+    List<String> path = parseFeaturePath(filterBean.getFeaturePath());
+    Condition condition = readCondition(filterBean.getOperator(), filterBean.getValue());
+    return ConfigFactory.newSimpleFilter(path, condition);
+  }
+
+  private static final Condition readCondition(FilterOperator.Enum operator, String value) {
+    return ConfigFactory.newCondition(readOperator(operator), value);
+  }
+
+  private static final FilterOp readOperator(FilterOperator.Enum operator) {
+    final int op = operator.intValue();
+    // Can't use switch because enum values aren't constants.
+    if (op == NULL) {
+      return FilterOp.NULL;
+    } else if (op == NOT_NULL) {
+      return FilterOp.NOT_NULL;
+    } else if (op == EQUALS) {
+      return FilterOp.EQUALS;
+    } else if (op == NOT_EQUALS) {
+      return FilterOp.NOT_EQUALS;
+    } else if (op == LESS) {
+      return FilterOp.LESS;
+    } else if (op == LESS_EQ) {
+      return FilterOp.LESS_EQ;
+    } else if (op == GREATER) {
+      return FilterOp.GREATER;
+    } else if (op == GREATER_EQ) {
+      return FilterOp.GREATER_EQ;
+    }
+    assert (false);
+    return null;
+
   }
 
   private static List<String> parseFeaturePath(String path) throws SimpleServerException {

@@ -51,15 +51,10 @@
 			<!-- Filters: either a single filter, a conjunction or disjunction -->
 			<xsd:element name="filters" minOccurs="0" maxOccurs="1">
 				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:choice minOccurs="0"
-							maxOccurs="unbounded">
-							<xsd:element name="filter"
-								type="uima:filterType">
-							</xsd:element>
-							<xsd:element name="or" type="uima:or"></xsd:element>
-							<xsd:element name="and" type="uima:and"></xsd:element>
-						</xsd:choice>
+					<xsd:sequence minOccurs="0" maxOccurs="1">
+						<xsd:element type="uima:filterType"
+							name="filter">
+						</xsd:element>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
@@ -80,36 +75,63 @@
 			use="optional" />
 	</xsd:complexType>
 
-	<!-- A single constraint on output -->
-	<xsd:complexType name="filterType">
-		<xsd:attribute name="featurePath" type="xsd:string"
-			use="required">
-		</xsd:attribute>
-		<xsd:attribute name="condition" type="xsd:string"
-			use="required">
-		</xsd:attribute>
+	<xsd:complexType name="filterType" abstract="true">
 	</xsd:complexType>
+
+	<!-- A single constraint on output -->
+	<xsd:complexType name="simpleFilterType">
+		<xsd:complexContent>
+			<xsd:extension base="uima:filterType">
+				<xsd:attribute name="featurePath" type="xsd:string"
+					use="required">
+				</xsd:attribute>
+				<xsd:attribute name="operator"
+					type="uima:filterOperator" use="required">
+				</xsd:attribute>
+				<xsd:attribute name="value" type="xsd:string"
+					use="optional">
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:simpleType name="filterOperator">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="null" />
+			<xsd:enumeration value="!null" />
+			<xsd:enumeration value="=" />
+			<xsd:enumeration value="!=" />
+			<xsd:enumeration value="&gt;" />
+			<xsd:enumeration value="&lt;" />
+			<xsd:enumeration value="&gt;=" />
+			<xsd:enumeration value="&lt;=" />
+		</xsd:restriction>
+	</xsd:simpleType>
 
 	<!-- A conjunction of output constraints; must contain at least 2 subelements -->
 	<xsd:complexType name="and">
-		<xsd:sequence>
-			<xsd:choice minOccurs="2" maxOccurs="unbounded">
-				<xsd:element name="filterType" type="uima:filterType"></xsd:element>
-				<xsd:element name="or" type="uima:or"></xsd:element>
-				<xsd:element name="and" type="uima:and"></xsd:element>
-			</xsd:choice>
-		</xsd:sequence>
+		<xsd:complexContent>
+			<xsd:extension base="uima:filterType">
+				<xsd:sequence minOccurs="2" maxOccurs="unbounded">
+					<xsd:element name="filterType"
+						type="uima:filterType">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<!-- A disjunction of output constraints; must contain at least 2 subelements -->
 	<xsd:complexType name="or">
-		<xsd:sequence>
-			<xsd:choice minOccurs="2" maxOccurs="unbounded">
-				<xsd:element name="filterType" type="uima:filterType"></xsd:element>
-				<xsd:element name="or" type="uima:or"></xsd:element>
-				<xsd:element name="and" type="uima:and"></xsd:element>
-			</xsd:choice>
-		</xsd:sequence>
+		<xsd:complexContent>
+			<xsd:extension base="uima:filterType">
+				<xsd:sequence minOccurs="2" maxOccurs="unbounded">
+					<xsd:element name="filterType"
+						type="uima:filterType">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<!-- Output feature path/attribute mapping -->

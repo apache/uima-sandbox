@@ -17,31 +17,37 @@
  * under the License.
  */
 
-package org.apache.uima.simpleserver.config;
 
+package org.apache.uima.simpleserver.config.impl;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-/*
- * represents one type specification -- one <type> element in the
- * XML Result Specification. Consists of several output definitions
- * and several filter definitions.
+import org.apache.uima.simpleserver.config.Filter;
+import org.apache.uima.simpleserver.config.OrFilter;
+
+/**
+ * TODO: Create type commment.
  */
-public interface TypeMap {
-
-  public Filter getFilter();
+public class OrFilterImpl extends FilterImpl implements OrFilter {
   
-  public List<Output> getOutputs();
+  private final List<Filter> filters = new ArrayList<Filter>();
+
+  /**
+   * @param type
+   */
+  public OrFilterImpl() {
+    super(Filter.FilterType.OR);
+  }
+
+  public void addFilter(Filter filter) {
+    this.filters.add(filter);
+  }
+
+  public List<Filter> getFilters() {
+    return Collections.unmodifiableList(this.filters);
+  }
   
-  public void addOutput(Output output);
-
-  public String getOutputTag();
-
-  public String getTypeName();
-
-  public boolean isOutputCoveredText();
-
-  public String getShortDescription();
-
-  public String getLongDescription();
 
 }

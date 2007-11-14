@@ -19,29 +19,14 @@
 
 package org.apache.uima.simpleserver.config;
 
-import java.util.List;
-
-/*
- * represents one type specification -- one <type> element in the
- * XML Result Specification. Consists of several output definitions
- * and several filter definitions.
+/**
+ * Disjunction of filters.
  */
-public interface TypeMap {
+public interface OrFilter extends Filter {
 
-  public Filter getFilter();
-  
-  public List<Output> getOutputs();
-  
-  public void addOutput(Output output);
-
-  public String getOutputTag();
-
-  public String getTypeName();
-
-  public boolean isOutputCoveredText();
-
-  public String getShortDescription();
-
-  public String getLongDescription();
-
+  /**
+   * @param readFilter
+   */
+  void addFilter(Filter filter);
+  // Adds nothing to Filter interface.
 }

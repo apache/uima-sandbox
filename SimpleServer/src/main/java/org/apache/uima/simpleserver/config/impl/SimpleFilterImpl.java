@@ -17,39 +17,43 @@
  * under the License.
  */
 
-
 package org.apache.uima.simpleserver.config.impl;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.uima.simpleserver.config.Condition;
-import org.apache.uima.simpleserver.config.FilterOp;
+import org.apache.uima.simpleserver.config.Filter;
+import org.apache.uima.simpleserver.config.SimpleFilter;
 
 /**
- * Implementation of <code>Condition</code> interface.
+ * Implementation of <code>Filter</code> interface. 
  */
-public class ConditionImpl implements Condition {
+public class SimpleFilterImpl extends FilterImpl implements SimpleFilter {
+  
+  private final List<String> path;
 
-  private final FilterOp type;
+  private final Condition condition;
+
   
-  private final String value;
-  
-  public ConditionImpl(FilterOp type, String value) {
-    super();
-    this.type = type;
-    this.value = value;
-  }
-  
-  /* (non-Javadoc)
-   * @see org.apache.uima.simpleserver.config.Condition#getConditionType()
-   */
-  public FilterOp getConditionType() {
-    return this.type;
+  @SuppressWarnings("unused")
+  private SimpleFilterImpl() {
+    this(null, null);
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.uima.simpleserver.config.Condition#getValue()
-   */
-  public String getValue() {
-    return this.value;
+  public SimpleFilterImpl(List<String> path, Condition condition) {
+    super(Filter.FilterType.SIMPLE);
+    this.path = path;
+    this.condition = condition;
+  }
+
+  public Condition getCondition() {
+    return this.condition;
+  }
+
+
+  public List<String> getFeaturePath() {
+    return Collections.unmodifiableList(this.path);
   }
 
 }

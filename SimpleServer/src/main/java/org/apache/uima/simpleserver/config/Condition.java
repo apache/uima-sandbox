@@ -22,8 +22,8 @@ package org.apache.uima.simpleserver.config;
 
 public interface Condition {
 
-  ConditionType getConditionType();
+  FilterOp getConditionType();
   
-  Object getValue();
+  String getValue();
   
 }

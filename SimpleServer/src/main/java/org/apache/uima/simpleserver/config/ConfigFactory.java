@@ -21,8 +21,10 @@ package org.apache.uima.simpleserver.config;
 
 import java.util.List;
 
+import org.apache.uima.simpleserver.config.impl.AndFilterImpl;
 import org.apache.uima.simpleserver.config.impl.ConditionImpl;
-import org.apache.uima.simpleserver.config.impl.FilterImpl;
+import org.apache.uima.simpleserver.config.impl.OrFilterImpl;
+import org.apache.uima.simpleserver.config.impl.SimpleFilterImpl;
 import org.apache.uima.simpleserver.config.impl.ServerSpecImpl;
 import org.apache.uima.simpleserver.config.impl.TypeMapImpl;
 
@@ -56,8 +58,9 @@ public final class ConfigFactory {
    *                Output covered text, yes or no.
    * @return A new type map object. Can be added to a server spec.
    */
-  public static TypeMap newTypeMap(String typeName, String outputTag, boolean coveredText) {
-    return new TypeMapImpl(typeName, outputTag, coveredText, null, null);
+  public static TypeMap newTypeMap(String typeName, Filter filter, String outputTag,
+      boolean coveredText) {
+    return new TypeMapImpl(typeName, filter, outputTag, coveredText, null, null);
   }
 
   /**
@@ -75,37 +78,54 @@ public final class ConfigFactory {
    *                Verbose description of map.
    * @return A new type map object. Can be added to a server spec.
    */
-  public static TypeMap newTypeMap(String typeName, String outputTag, boolean coveredText,
-      String shortDescription, String longDescription) {
-    return new TypeMapImpl(typeName, outputTag, coveredText, shortDescription, longDescription);
+  public static TypeMap newTypeMap(String typeName, Filter filter, String outputTag,
+      boolean coveredText, String shortDescription, String longDescription) {
+    return new TypeMapImpl(typeName, filter, outputTag, coveredText, shortDescription,
+        longDescription);
   }
-  
+
   /**
    * Create a new Filter.
-   * @param featurePath Feature path whose value the filter operates on.  Must not be null.
-   * @param condition The condition the path's value must satisfy.
+   * 
+   * @param featurePath
+   *                Feature path whose value the filter operates on. Must not be null.
+   * @param condition
+   *                The condition the path's value must satisfy.
    * @return A new Filter.
    */
-  public static Filter newFilter(List<String> featurePath, Condition condition) {
-    return new FilterImpl(featurePath, condition);
+  public static SimpleFilter newSimpleFilter(List<String> featurePath, Condition condition) {
+    return new SimpleFilterImpl(featurePath, condition);
+  }
+
+  public static AndFilter newAndFilter() {
+    return new AndFilterImpl();
+  }
+  
+  public static OrFilter newOrFilter() {
+    return new OrFilterImpl();
   }
   
   /**
    * Create new Condition.
-   * @param type The condition's type (not null, equals etc.).
-   * @param value Value for equality constraints.
+   * 
+   * @param type
+   *                The condition's type (not null, equals etc.).
+   * @param value
+   *                Value for equality constraints.
    * @return A new Condition.
    */
-  public static Condition newCondition(ConditionType type, String value) {
+  public static Condition newCondition(FilterOp type, String value) {
     return new ConditionImpl(type, value);
   }
-  
+
   /**
    * Create new Condition with null value.
-   * @param type The condition's type (not null, etc.).
+   * 
+   * @param type
+   *                The condition's type (not null, etc.).
    * @return A new Condition.
    */
-  public static Condition newCondition(ConditionType type) {
+  public static Condition newCondition(FilterOp type) {
     return newCondition(type, null);
   }
 

@@ -17,41 +17,18 @@
  * under the License.
  */
 
-package org.apache.uima.simpleserver.config.impl;
+package org.apache.uima.simpleserver.config;
 
 import java.util.List;
 
-import org.apache.uima.simpleserver.config.Condition;
-import org.apache.uima.simpleserver.config.Filter;
-
-/**
- * Implementation of <code>Filter</code> interface. 
+/*
+ * Represents a Filter, which consists of a feature path (a string like abc:def:ghi)
+ * and a condition (a string like "not null" or "!=asdfg")
  */
-public class FilterImpl implements Filter {
-  
-  private final List<String> path;
+public interface SimpleFilter extends Filter {
 
-  private final Condition condition;
+  public Condition getCondition();
 
-  
-  @SuppressWarnings("unused")
-  private FilterImpl() {
-    this(null, null);
-  }
-
-  public FilterImpl(List<String> path, Condition condition) {
-    super();
-    this.path = path;
-    this.condition = condition;
-  }
-
-  public Condition getCondition() {
-    return this.condition;
-  }
-
-
-  public List<String> getFeaturePath() {
-    return this.path;
-  }
+  public List<String> getFeaturePath();
 
 }

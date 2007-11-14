@@ -19,6 +19,7 @@
 
 package org.apache.uima.simpleserver.config.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.uima.simpleserver.config.Output;
@@ -70,7 +71,7 @@ public class OutputImpl implements Output {
   }
 
   public List<String> getFeaturePath() {
-    return this.features;
+    return Collections.unmodifiableList(this.features);
   }
 
 }

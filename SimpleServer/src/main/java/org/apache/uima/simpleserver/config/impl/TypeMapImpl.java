@@ -20,9 +20,11 @@
 package org.apache.uima.simpleserver.config.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.uima.simpleserver.config.Filter;
+import org.apache.uima.simpleserver.config.SimpleFilter;
 import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.TypeMap;
 
@@ -39,7 +41,7 @@ public class TypeMapImpl implements TypeMap {
 
   private boolean outputCoveredText;
 
-  private final List<Filter> filters = new ArrayList<Filter>();
+  private final Filter filter;
 
   private final List<Output> outputs = new ArrayList<Output>();
 
@@ -47,22 +49,23 @@ public class TypeMapImpl implements TypeMap {
 
   private final String longDescription;
 
-  public TypeMapImpl(String typeName, String outputTag, boolean outputCoveredText,
+  public TypeMapImpl(String typeName, Filter filter, String outputTag, boolean outputCoveredText,
       String shortDescription, String longDescription) {
     super();
     this.typeName = typeName;
+    this.filter = filter;
     this.outputTag = outputTag;
     this.outputCoveredText = outputCoveredText;
     this.shortDescription = shortDescription;
     this.longDescription = longDescription;
   }
 
-  public List<Filter> getFilters() {
-    return this.filters;
+  public Filter getFilter() {
+    return this.filter;
   }
 
   public List<Output> getOutputs() {
-    return this.outputs;
+    return Collections.unmodifiableList(this.outputs);
   }
 
   public String getOutputTag() {
@@ -83,10 +86,6 @@ public class TypeMapImpl implements TypeMap {
 
   public String getShortDescription() {
     return this.shortDescription;
-  }
-
-  public void addFilter(Filter filter) {
-    this.filters.add(filter);
   }
 
   public void addOutput(Output output) {

@@ -17,18 +17,14 @@
  * under the License.
  */
 
+
 package org.apache.uima.simpleserver.config;
 
-import java.util.List;
-
-/*
- * Represents a Filter, which consists of a feature path (a string like abc:def:ghi)
- * and a condition (a string like "not null" or "!=asdfg")
+/**
+ * Types of conditions.
  */
-public interface Filter {
-
-  public Condition getCondition();
-
-  public List<String> getFeaturePath();
+public enum FilterOp {
+  
+  NULL, NOT_NULL, EQUALS, NOT_EQUALS, LESS, LESS_EQ, GREATER, GREATER_EQ
 
 }

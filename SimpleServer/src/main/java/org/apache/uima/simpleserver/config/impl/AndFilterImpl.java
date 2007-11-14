@@ -18,13 +18,39 @@
  */
 
 
-package org.apache.uima.simpleserver.config;
+package org.apache.uima.simpleserver.config.impl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.uima.simpleserver.config.AndFilter;
+import org.apache.uima.simpleserver.config.Filter;
 
 /**
- * Types of conditions.
+ * TODO: Create type commment.
  */
-public enum ConditionType {
+public class AndFilterImpl extends FilterImpl implements AndFilter {
   
-  NULL, NOTNULL, EQUALS
+  private final List<Filter> filters = new ArrayList<Filter>();
+
+  /**
+   * @param type
+   */
+  public AndFilterImpl() {
+    super(Filter.FilterType.AND);
+  }
+
+  public void addFilter(Filter filter) {
+    this.filters.add(filter);
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.uima.simpleserver.config.AndFilter#getFilters()
+   */
+  public List<Filter> getFilters() {
+    return Collections.unmodifiableList(this.filters);
+  }
+  
 
 }

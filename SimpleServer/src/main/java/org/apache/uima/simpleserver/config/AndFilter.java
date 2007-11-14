@@ -21,27 +21,13 @@ package org.apache.uima.simpleserver.config;
 
 import java.util.List;
 
-/*
- * represents one type specification -- one <type> element in the
- * XML Result Specification. Consists of several output definitions
- * and several filter definitions.
+/**
+ * Conjunction of filters.
  */
-public interface TypeMap {
-
-  public Filter getFilter();
+public interface AndFilter extends Filter {
   
-  public List<Output> getOutputs();
+  void addFilter(Filter filter);
   
-  public void addOutput(Output output);
-
-  public String getOutputTag();
-
-  public String getTypeName();
-
-  public boolean isOutputCoveredText();
-
-  public String getShortDescription();
-
-  public String getLongDescription();
-
+  List<Filter> getFilters();
+  
 }
