@@ -36,7 +36,7 @@
 	<preface>
 		<title>Overview</title>
 		<para>
-			To make UIMA analysis components easily consumable for other users, UIMA defined
+			To make UIMA analysis components easily consumable for other users, UIMA defines
 			the PEAR (Processing Engine ARchive) file format. This allows applications and tools
 			to manage UIMA analysis components automatically for verification, deployment, 
 			invocation and testing. So far the PEAR file format is the desired output format for 
