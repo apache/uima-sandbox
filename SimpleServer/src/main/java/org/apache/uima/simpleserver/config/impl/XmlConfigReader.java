@@ -74,32 +74,45 @@ public final class XmlConfigReader {
 
   private static final int GREATER_EQ = FilterOperator.Enum.forString("null").intValue();
 
+  /**
+   * Read a config file.
+   * @param file The config file.
+   * @return The corresponding server spec.
+   * @throws IOException
+   * @throws XmlException XML parsing error.
+   * @throws SimpleServerException Content parsing error.
+   */
   public static ServerSpec readServerSpec(File file) throws IOException, XmlException,
       SimpleServerException {
     return readServerSpec(new BufferedInputStream(new FileInputStream(file)));
   }
 
+  /**
+   * Read a config XML stream.
+   * @param is The XML input stream.
+   * @return The corresponding server spec.
+   * @throws IOException
+   * @throws XmlException XML parsing error.
+   * @throws SimpleServerException Content parsing error.
+   */
   public static ServerSpec readServerSpec(InputStream is) throws IOException, XmlException,
       SimpleServerException {
     UimaSimpleServerSpec specBean = UimaSimpleServerSpecDocument.Factory.parse(is)
         .getUimaSimpleServerSpec();
+
+    // Do validation.  If XML is not valid, throw first error.
     ArrayList<XmlError> validationErrors = new ArrayList<XmlError>();
     XmlOptions validationOptions = new XmlOptions();
     validationOptions.setErrorListener(validationErrors);
-
     boolean isValid = specBean.validate(validationOptions);
-
-    // output the errors if the XML is invalid.
     if (!isValid) {
       Iterator<XmlError> iter = validationErrors.iterator();
-      StringBuffer errorMessages = new StringBuffer();
-      while (iter.hasNext()) {
-        errorMessages.append("\n>> ");
-        errorMessages.append(iter.next());
+      if (iter.hasNext()) {
+        throw new XmlException(iter.next());
       }
-      System.err.println(errorMessages);
     }
 
+    // Create new server spec from XML beans.
     ServerSpec spec = ConfigFactory.newServerSpec(specBean.getShortDescription(), specBean
         .getLongDescription());
     TypeElementType[] typeMaps = specBean.getTypeArray();
@@ -109,9 +122,11 @@ public final class XmlConfigReader {
     return spec;
   }
 
+  // Read a type element.
   private static TypeMap readTypeMap(TypeElementType typeBean) throws SimpleServerException {
     boolean coveredText = typeBean.getOutputCoveredText();
     Filter filter = null;
+    // Check if type element has a filter, and what kind of filter it is (atomic filter, and, or).
     if (typeBean.getFilters() != null) {
       Filters filterBean = typeBean.getFilters();
       if (filterBean.getAnd() != null) {
@@ -126,8 +141,11 @@ public final class XmlConfigReader {
         coveredText, typeBean.getShortDescription(), typeBean.getLongDescription());
   }
 
+  // Process a filter bean.
   private static final Filter readFilter(FilterType filterBean) throws SimpleServerException {
+    System.out.println(filterBean.toString());
     Filter filter = null;
+    // Need to distinguish the various kinds of filters.
     if (filterBean instanceof And) {
       filter = readAndFilter((And) filterBean);
     } else if (filterBean instanceof Or) {
@@ -138,8 +156,10 @@ public final class XmlConfigReader {
     return filter;
   }
 
+  // Parse an AND filter.
   private static final AndFilter readAndFilter(And filterBean) throws SimpleServerException {
     AndFilter filter = ConfigFactory.newAndFilter();
+    // May embed any number of simple filters, conjunctions and disjunctions.
     SimpleFilterType[] simpleFilters = filterBean.getFilterArray();
     And[] andBeans = filterBean.getAndArray();
     Or[] orBeans = filterBean.getOrArray();
@@ -150,6 +170,7 @@ public final class XmlConfigReader {
     return filter;
   }
 
+  // Aggregate the various forms of filter arrays into one filter list.
   private static final List<FilterType> getFilters(SimpleFilterType[] simpleFilters,
       And[] andBeans, Or[] orBeans) {
     List<FilterType> list = new ArrayList<FilterType>();
@@ -165,6 +186,7 @@ public final class XmlConfigReader {
     return list;
   }
 
+  // Parse an OR filter
   private static final OrFilter readOrFilter(Or filterBean) throws SimpleServerException {
     OrFilter filter = ConfigFactory.newOrFilter();
     SimpleFilterType[] simpleFilters = filterBean.getFilterArray();
@@ -177,6 +199,7 @@ public final class XmlConfigReader {
     return filter;
   }
 
+  // Process a simple, atomic filter.
   private static final SimpleFilter readSimpleFilter(SimpleFilterType filterBean)
       throws SimpleServerException {
     List<String> path = parseFeaturePath(filterBean.getFeaturePath());
@@ -184,8 +207,22 @@ public final class XmlConfigReader {
     return ConfigFactory.newSimpleFilter(path, condition);
   }
 
+  // Process a condition.  Check that value is set according to the operator.
   private static final Condition readCondition(FilterOperator.Enum operator, String value) {
-    return ConfigFactory.newCondition(readOperator(operator), value);
+    FilterOp op = readOperator(operator);
+    checkCondition(op, value, operator);
+    return ConfigFactory.newCondition(op, value);
+  }
+  
+  private static final void checkCondition(FilterOp op, String value, FilterOperator.Enum opBean) {
+
+  }
+  
+  private static final void valueMustBeNull(FilterOp op, String value, FilterOperator.Enum opBean)
+      throws SimpleServerException {
+    if (value != null) {
+      throw new SimpleServerException(null, null);
+    }
   }
 
   private static final FilterOp readOperator(FilterOperator.Enum operator) {

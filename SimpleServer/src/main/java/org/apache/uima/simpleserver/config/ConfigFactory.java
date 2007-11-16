@@ -97,10 +97,18 @@ public final class ConfigFactory {
     return new SimpleFilterImpl(featurePath, condition);
   }
 
+  /**
+   * Create a new filter conjunction.
+   * @return A new filter conjunction.
+   */
   public static AndFilter newAndFilter() {
     return new AndFilterImpl();
   }
   
+  /**
+   * Create a new filter disjunction.
+   * @return A new filter disjunction.
+   */
   public static OrFilter newOrFilter() {
     return new OrFilterImpl();
   }

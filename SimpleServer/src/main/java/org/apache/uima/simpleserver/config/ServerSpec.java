@@ -21,20 +21,56 @@ package org.apache.uima.simpleserver.config;
 
 import java.util.List;
 
-/*
- * represents the whole ResultSpecification XML file.
- * Consists of a collection of type specifications.
+import org.apache.uima.cas.TypeSystem;
+
+/**
+ * Output specification for a simple service.
  */
 public interface ServerSpec {
-  
+
+  /**
+   * The path separator of feature paths: /.
+   */
   public static final char PATH_SEPARATOR = '/';
 
+  /**
+   * @return A list of type specifications. Each type specification represents output specifications
+   *         for a single CAS type.
+   */
   public List<TypeMap> getTypeSpecs();
 
+  /**
+   * Add a type map to an existing spec.
+   * 
+   * @param typeMap
+   *                The input type map to be added.
+   */
   public void addTypeMap(TypeMap typeMap);
 
+  /**
+   * Get the service's short description.
+   * 
+   * @return The short description.
+   */
   public String getShortDescription();
 
+  /**
+   * Get the service's long description.
+   * 
+   * @return The long description.
+   */
   public String getLongDescription();
+
+  /**
+   * Validate a service spec with respect to a type system. Check that types and feature paths
+   * exist.  None of the errors found here need to be considered fatal.  A non-existing type simply
+   * means a type spec that will never produce any output.  Similarly, an invalid feature path means
+   * a filter that will never match or an output spec that will never produce output.  Server-side,
+   * it's probably valid to simply log those errors and carry on.
+   * 
+   * @param typeSystem
+   * @return
+   */
+  public List<SimpleServerException> validate(TypeSystem typeSystem);
 
 }

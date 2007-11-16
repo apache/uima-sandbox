@@ -23,7 +23,9 @@ package org.apache.uima.simpleserver.config.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.simpleserver.config.ServerSpec;
+import org.apache.uima.simpleserver.config.SimpleServerException;
 import org.apache.uima.simpleserver.config.TypeMap;
 
 /**
@@ -57,6 +59,11 @@ public class ServerSpecImpl implements ServerSpec {
 
   public List<TypeMap> getTypeSpecs() {
     return this.typeMaps;
+  }
+
+  public List<SimpleServerException> validate(TypeSystem typeSystem) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
