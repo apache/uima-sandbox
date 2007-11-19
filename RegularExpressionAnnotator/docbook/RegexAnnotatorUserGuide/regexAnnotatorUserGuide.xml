@@ -277,12 +277,12 @@
 			</para>
 			<para>
 				The listing below shows an abstract rule definition with
-				all the possible sub elements. Please refer to
+				all possible sub elements and attributes. Please refer to
 				the sub sections for details about the sub elements.
 			</para>
 			<para> 
 <programlisting><emphasis><![CDATA[<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" 
-    matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
+    matchType="uima.tcas.DocumentAnnotation" featurePath="my/feature/path" confidence="1.0">
 
   <matchTypeFilter>
     <feature name="language">en</feature>
@@ -337,7 +337,8 @@
 								- The annotation type that is used 
 								to match the regular expression pattern.
 								As input text for the match, the annotation span 
-								is used.
+								is used, but only if no additional <code>featurePath</code>
+								feature is specified.
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -369,6 +370,29 @@
 							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.features"/>).
 						</para>
 					</listitem>
+					<listitem>
+						<para>
+							<code>featurePath</code>
+							- Specifies the feature path that should be used to match the regular expression pattern. 
+							If a feature path is specified, the feature path value is used to match against the
+							regular expression instead of the match type annotation span.
+							The defined feature path must be valid for the specified match type annotation type. 
+							The feature path elements are separated by "/".
+						</para>
+						<para>
+						    The listing below shows how to match a regular expression on the <code>normalizedText</code> 
+						    feature of a <code>uima.TokenAnnotation</code>. So in this case, not the covered text of the
+						    <code>uima.TokenAnnotation</code> is used to match the regular expression but the 
+						    <code>normalizedText</code> feature value of the annotation. The <code>normalizedText</code> 
+						    feature must be defined in the UIMA type system as feature of type <code>uima.TokenAnnotation</code>.
+						</para>
+						<para>
+						    <programlisting><emphasis><![CDATA[<rule regEx="TestRegex" matchStrategy="matchAll" 
+    matchType="uima.TokenAnnotation" featurePath="normalizedText">
+</rule>
+]]></emphasis></programlisting>
+						</para>
+					</listitem>					
 				</itemizedlist>
 
 			<section
@@ -684,6 +708,15 @@
 					</listitem>
 				</itemizedlist>
 				</para>
+				<note>
+					<para>
+					When the rule definition defines a <code>featurePath</code> for a <code>matchType</code>, 
+					the annotation boundaries for the created annotation are automatically set to 
+					the annotation boundaries of the match input annotation. This must be done since
+					the matching with a feature value of an annotation has no relation to the document text, so the only
+					relation is the annotation where the feature is defined. 
+					</para>
+				</note>
 				</section>
 				<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation.validation">
 				<title>Annotation Validation</title>
@@ -701,8 +734,7 @@
 				  method called <code>validate(String coveredText, String ruleID)</code>. The validate method is called by the annotator
 				  before the match is added as annotation to the CAS. Annotations are only added if the validate method 
 				  returns <code>true</code>, otherwise the match is skipped. The <code>coveredText</code> parameter contains 
-				  the text span that will be covered by the annotation and was defined using the annotation boundaries (see 
-				  <xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.boundaries"/> for details).
+				  the text that matches the regular expression.
 				  The <code>ruleID</code> parameter contains the ruldId of the rule that creates the match. This can also be null
 				  if no ruleID was specified. The listing below shows a sample implementation of the validation interface.  
 				</para>
@@ -1032,7 +1064,10 @@ public class CustomNormalizer
 			</para>
 			<para>
 				<programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+   targetNamespace="http://incubator.apache.org/uima/regex"
+   xmlns="http://incubator.apache.org/uima/regex" 
+   elementFormDefault="qualified">
 	<!--
 		* Licensed to the Apache Software Foundation (ASF) under one
 		* or more contributor license agreements.  See the NOTICE file
@@ -1104,6 +1139,7 @@ public class CustomNormalizer
 		</xs:simpleType>
 	  </xs:attribute>
 	  <xs:attribute name="matchType" type="xs:string" use="required"/>
+	  <xs:attribute name="featurePath" type="xs:string" use="optional" />
 	  <xs:attribute name="ruleId" type="xs:string" use="optional"/>
 	  <xs:attribute name="confidence" type="xs:decimal"	use="optional"/>
 	</xs:complexType>
