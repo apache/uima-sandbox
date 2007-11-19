@@ -6,6 +6,7 @@ Rule ID1
 Regex: someRegex
 Match strategy: MATCH_ALL
 Match type: uima.tcas.DocumentAnnotation
+FeaturePath: null
 Confidence: 1.0
 Match type filter features: 
 Filter Feature: 
@@ -16,6 +17,7 @@ Rule ID2
 Regex: someOtherRegex
 Match strategy: MATCH_FIRST
 Match type: uima.tcas.DocumentAnnotation
+FeaturePath: null
 Confidence: 0.7
 Match type filter features: 
 Filter Feature: 
@@ -26,6 +28,7 @@ Rule ID3
 Regex: anotherRegex
 Match strategy: MATCH_COMPLETE
 Match type: uima.tcas.DocumentAnnotation
+FeaturePath: valid/feature/path
 Confidence: 0.3
 Match type filter features: 
 Filter Feature: 
@@ -78,6 +81,7 @@ Rule
 Regex: regexExpression
 Match strategy: MATCH_ALL
 Match type: uima.tcas.DocumentAnnotation
+FeaturePath: null
 Annotations: 
 Annotation: 
   ID: testannotation

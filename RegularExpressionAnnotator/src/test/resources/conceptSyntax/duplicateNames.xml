@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  -->
-<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
+<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://incubator.apache.org/uima/regex">
 	
    <concept name="simpleName">
     	<rules>

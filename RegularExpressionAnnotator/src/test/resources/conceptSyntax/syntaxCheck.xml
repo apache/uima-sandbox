@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  -->
-<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="concept.xsd">
+<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://incubator.apache.org/uima/regex" xsi:schemaLocation="concept.xsd">
 	
     <concept name="ConceptName" processAllRules="true">
     	<rules>
@@ -37,7 +37,7 @@
 					<feature name="language">regexExpression</feature>
 				</matchTypeFilter>
 			</rule>
-			<rule ruleId="ID3" regEx="anotherRegex" matchStrategy="matchComplete" matchType="uima.tcas.DocumentAnnotation" confidence="0.3">
+			<rule ruleId="ID3" regEx="anotherRegex" matchStrategy="matchComplete" matchType="uima.tcas.DocumentAnnotation" confidence="0.3" featurePath="valid/feature/path">
 				<matchTypeFilter>
 					<feature name="language">regexExpression</feature>
 				</matchTypeFilter>
