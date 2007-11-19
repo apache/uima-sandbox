@@ -400,7 +400,7 @@
 				<title>Match Type Filter</title>
 				<para>
 				<programlisting><emphasis><![CDATA[<matchTypeFilter>
-  <feature name="language">en</feature>
+  <feature featurePath="language">en</feature>
 </matchTypeFilter>
 ]]></emphasis></programlisting>
 					
@@ -418,21 +418,22 @@
 					The <code>&lt;matchTypeFilter></code>
 					element can contain an arbitrary amount of
 					<code>&lt;feature></code>
-					elements that contains the filter information. But all specified features
-					have to be valid for the <code>matchType</code> annotation
+					elements that contains the filter information. But all specified <code>&lt;feature></code>
+					elements have to be valid for the <code>matchType</code> annotation
 					of the rule.
 				</para>
 				<para>
-					The name of the UIMA feature that should be used as 
-					filter is specified using the <code>name</code> feature of the
-					<code>&lt;feature></code> element. The content of the
+					The feature path that should be used as 
+					filter is specified using the <code>featurePath</code> feature of the
+					<code>&lt;feature></code> element. Feature path elements are separated by "/" e.g.
+					my/feature/path. The specified feature path must be valid for the <code>matchType</code> annotation.
+					The content of the
 					<code>&lt;feature></code> element contains the regular expression pattern 
-					that is used as filter. This pattern 
-					have to match the UIMA feature value of the match type annotation 
-					that the filter pass. In the example
-					above the match type annotation has a UIMA feature called 
+					that is used as filter. To pass the filter, this pattern 
+					have to match the feature path value that is resolved using the match type annotation. 
+					In the example above the match type annotation has a UIMA feature called 
 					<code>language</code> that have to have the content <code>en</code>. If that
-					is true, the annotation is pass the filter condition.
+					is true, the annotation passed the filter condition.
 				</para>
 			</section>
 			<section id="sandbox.regexAnnotator.conceptsFile.rulesDefinition.update">
@@ -1175,7 +1176,7 @@ public class CustomNormalizer
 	<xs:complexType>
 	  <xs:simpleContent>
 		<xs:extension base="xs:string">
-		  <xs:attribute name="name" type="xs:string" use="required"/>
+		  <xs:attribute name="featurePath" type="xs:string" use="required"/>
 		</xs:extension>
 	  </xs:simpleContent>
 	</xs:complexType>
