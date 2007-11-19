@@ -131,7 +131,7 @@ public class ConceptFileParser_impl implements ConceptFileParser {
                FeatureDocument.Feature[] filterFeatures = ruleList[r]
                      .getMatchTypeFilter().getFeatureArray();
                for (int x = 0; x < filterFeatures.length; x++) {
-                  String featureName = filterFeatures[x].getName();
+                  String featureName = filterFeatures[x].getFeaturePath();
                   String featureValue = filterFeatures[x].getStringValue();
 
                   // create new filter feature and add them to the rule

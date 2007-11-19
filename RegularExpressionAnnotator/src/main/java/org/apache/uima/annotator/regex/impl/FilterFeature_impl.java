@@ -20,7 +20,7 @@ package org.apache.uima.annotator.regex.impl;
 
 import java.util.regex.Pattern;
 
-import org.apache.uima.analysis_engine.annotator.AnnotatorInitializationException;
+import org.apache.uima.annotator.regex.FeaturePath;
 import org.apache.uima.annotator.regex.FilterFeature;
 import org.apache.uima.cas.Type;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -31,32 +31,23 @@ import org.apache.uima.resource.ResourceInitializationException;
  */
 public class FilterFeature_impl implements FilterFeature {
 
-   private final String name;
+   private final FeaturePath_impl featurePath;
 
+   private final String featurePathString;
+   
    private final String patternStr;
-
-   private org.apache.uima.cas.Feature feature;
 
    private Pattern pattern;
 
    /**
-    * @param name
+    * @param featurePath
     * @param patternStr
     */
-   public FilterFeature_impl(String name, String patternStr) {
-      this.name = name;
+   public FilterFeature_impl(String featurePathString, String patternStr) {
+      this.featurePath = new FeaturePath_impl(featurePathString);
+      this.featurePathString = featurePathString;
       this.patternStr = patternStr;
-      this.feature = null;
       this.pattern = null;
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.apache.uima.annotator.regex.FilterFeature#getName()
-    */
-   public String getName() {
-      return this.name;
    }
 
    /*
@@ -68,26 +59,17 @@ public class FilterFeature_impl implements FilterFeature {
       return this.pattern;
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.apache.uima.annotator.regex.FilterFeature#getFeature()
+   /* (non-Javadoc)
+    * @see org.apache.uima.annotator.regex.FilterFeature#getFeaturePath()
     */
-   public org.apache.uima.cas.Feature getFeature() {
-      return this.feature;
+   public FeaturePath getFeaturePath() {
+      return this.featurePath;
    }
 
    public void typeInit(Type annotationType)
          throws ResourceInitializationException {
-      // get feature by name from the specified annotation type
-      this.feature = annotationType.getFeatureByBaseName(this.name);
-
-      // throw exception if the feature does not exist
-      if (this.feature == null) {
-         throw new ResourceInitializationException(
-               AnnotatorInitializationException.FEATURE_NOT_FOUND,
-               new Object[] { FilterFeature_impl.class.getName(), this.name });
-      }
+      
+      this.featurePath.initialize(annotationType);
    }
 
    /**
@@ -106,8 +88,8 @@ public class FilterFeature_impl implements FilterFeature {
    public String toString() {
       StringBuffer buffer = new StringBuffer();
       buffer.append("Filter Feature: ");
-      buffer.append("\n  Name: ");
-      buffer.append(this.name);
+      buffer.append("\n  FeaturePath: ");
+      buffer.append(this.featurePathString);
       buffer.append("\n  Pattern: ");
       buffer.append(this.patternStr);
       buffer.append("\n");

@@ -26,13 +26,6 @@ import java.util.regex.Pattern;
 public interface FilterFeature {
 	
 	/**
-	 * Get the feature name of this feature
-	 * 
-	 * @return returns the feature name
-	 */
-	public String getName();
-
-	/**
 	 * Get the pattern for this filter feature
 	 * 
 	 * @return returns the pattern for this filter feature
@@ -40,10 +33,10 @@ public interface FilterFeature {
 	public Pattern getPattern();
 
   /**
-   * Get the UIMA feature value of this feature object
+   * Get the featurePath of this fileFeature object
    * 
-   * @return returns the UIMA feature object.
+   * @return returns the featurePath object.
    */
-  public org.apache.uima.cas.Feature getFeature();
+  public FeaturePath getFeaturePath();
 
 }

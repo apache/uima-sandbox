@@ -304,9 +304,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                      .getMatchTypeFilterFeatures();
                boolean passed = true;
                for (int ff = 0; ff < filterFeatures.length; ff++) {
-                  String featureValue = currentAnnot
-                        .getFeatureValueAsString(filterFeatures[ff]
-                              .getFeature());
+                  //get the current filterFeature featurePath value                 
+                  String featureValue = filterFeatures[ff].getFeaturePath().getValue(currentAnnot);
                   // check if feature value is set
                   if (featureValue != null) {
                      // create matcher for the current feature value
