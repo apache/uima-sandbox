@@ -23,90 +23,109 @@ import java.util.regex.Pattern;
 import org.apache.uima.cas.Type;
 
 /**
- * 
+ * Rule interface defines the access to the Rule settings and allows to add new
+ * Rule settings.
  */
 public interface Rule {
 
-  public static final int MATCH_FIRST = 1;
-  public static final int MATCH_ALL = 2;
-  public static final int MATCH_COMPLETE = 3;
+   public static final int MATCH_FIRST = 1;
 
-	/**
-	 * Get the regular expression of this rule.
-	 * 
-	 * @return returns the regular expression of this rule.
-	 */
-	public Pattern getRegexPattern();
+   public static final int MATCH_ALL = 2;
 
-  /**
-   * Get the rule id
-   * 
-   * @return returns the rule id
-   */
-  public String getId();
+   public static final int MATCH_COMPLETE = 3;
 
-  /**
-   * Get the rule confidence
-   * 
-   * @return returns the rule confidence
-   */
-  public float getConfidence();
+   /**
+    * Get the regular expression of this rule.
+    * 
+    * @return returns the regular expression of this rule.
+    */
+   public Pattern getRegexPattern();
 
-	/**
-	 * Get the match strategy of this rule;
-	 * 
-	 * @return returns the match strategy of this rule.
-	 */
-	public int getMatchStrategy();
-	
-	/**
-	 * Get the match type of this rule.
-	 * 
-	 * @return returns the match type of this rule.
-	 */
-	public Type getMatchType();
+   /**
+    * Get the rule id
+    * 
+    * @return returns the rule id
+    */
+   public String getId();
 
-  /**
-   * Adds the given feature to the match type filter features
-   * 
-   * @param aFeature The feature to be added.
-   */
-  public void addFilterFeature(FilterFeature aFeature);
-  
-  /**
-   * Retuns the match type filter features
-   * 
-   * @return returns the match type feature filters
-   */
-  public FilterFeature[] getMatchTypeFilterFeatures();
+   /**
+    * Get the rule confidence
+    * 
+    * @return returns the rule confidence
+    */
+   public float getConfidence();
 
-  /**
-   * Adds the given feature to the match type annotation update features
-   * 
-   * @param aFeature The feature to be added.
-   */
-  public void addUpdateFeature(Feature aFeature);
-  
-  /**
-   * Retuns the match type annotation update features
-   * 
-   * @return returns the match type annotation update features
-   */
-  public Feature[] getMatchTypeUpdateFeatures();
+   /**
+    * Get the match strategy of this rule;
+    * 
+    * @return returns the match strategy of this rule.
+    */
+   public int getMatchStrategy();
 
-  /**
-   * Adds the given exception to this rule
-   * 
-   * @param aException The exception to be added.
-   */
-  public void addException(RuleException aException);
-  
-  /**
-   * Retuns the exceptions for this rule
-   * 
-   * @return returns the exceptions for this rule
-   */
-  public RuleException[] getExceptions();
+   /**
+    * Get the match type of this rule.
+    * 
+    * @return returns the match type of this rule.
+    */
+   public Type getMatchType();
 
-	
+   /**
+    * Adds the given feature to the match type filter features
+    * 
+    * @param aFeature
+    *           The feature to be added.
+    */
+   public void addFilterFeature(FilterFeature aFeature);
+
+   /**
+    * Returns the match type filter features
+    * 
+    * @return returns the match type feature filters
+    */
+   public FilterFeature[] getMatchTypeFilterFeatures();
+
+   /**
+    * Adds the given feature to the match type annotation update features
+    * 
+    * @param aFeature
+    *           The feature to be added.
+    */
+   public void addUpdateFeature(Feature aFeature);
+
+   /**
+    * Returns the match type annotation update features
+    * 
+    * @return returns the match type annotation update features
+    */
+   public Feature[] getMatchTypeUpdateFeatures();
+
+   /**
+    * Adds the given exception to this rule
+    * 
+    * @param aException
+    *           The exception to be added.
+    */
+   public void addException(RuleException aException);
+
+   /**
+    * Returns the exceptions for this rule
+    * 
+    * @return returns the exceptions for this rule
+    */
+   public RuleException[] getExceptions();
+
+   /**
+    * Returns the match type featurePath object.
+    * 
+    * @return returns the match type featurePath object
+    */
+   public FeaturePath getMatchTypeFeaturePath();
+
+   /**
+    * Returns true if a featurePath for this rule was specified.
+    * 
+    * @return true if a featurePath was specified for this rule
+    */
+   public boolean isFeaturePathMatch();
+
 }

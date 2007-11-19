@@ -22,12 +22,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import noNamespace.ConceptSetDocument;
-import noNamespace.ConceptSetDocument.ConceptSet;
-import noNamespace.CreateAnnotationsDocument.CreateAnnotations;
-import noNamespace.RulesDocument.Rules;
-import noNamespace.SetFeatureDocument.SetFeature;
-
+import org.apache.incubator.uima.regex.AnnotationDocument;
+import org.apache.incubator.uima.regex.ConceptDocument;
+import org.apache.incubator.uima.regex.ConceptSetDocument;
+import org.apache.incubator.uima.regex.CreateAnnotationsDocument;
+import org.apache.incubator.uima.regex.ExceptionDocument;
+import org.apache.incubator.uima.regex.FeatureDocument;
+import org.apache.incubator.uima.regex.RuleDocument;
+import org.apache.incubator.uima.regex.RulesDocument;
+import org.apache.incubator.uima.regex.SetFeatureDocument;
 import org.apache.uima.annotator.regex.Annotation;
 import org.apache.uima.annotator.regex.Concept;
 import org.apache.uima.annotator.regex.ConceptFileParser;
@@ -44,11 +47,14 @@ import org.apache.xmlbeans.XmlOptions;
  */
 public class ConceptFileParser_impl implements ConceptFileParser {
 
-   /* (non-Javadoc)
-    * @see org.apache.uima.annotator.regex.ConceptFileParser#parseConceptFile(java.lang.String, java.io.InputStream)
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.ConceptFileParser#parseConceptFile(java.lang.String,
+    *      java.io.InputStream)
     */
-   public Concept[] parseConceptFile(String conceptFilePathName, InputStream conceptFileStream)
-         throws ResourceInitializationException {
+   public Concept[] parseConceptFile(String conceptFilePathName,
+         InputStream conceptFileStream) throws ResourceInitializationException {
       ArrayList<Concept> conceptList = new ArrayList<Concept>();
 
       // parse regex concept file and extract content to local objects
@@ -68,7 +74,7 @@ public class ConceptFileParser_impl implements ConceptFileParser {
 
       boolean isValid = conceptSetDoc.validate(validationOptions);
 
-      // outout the errors if the XML is invalid.
+      // output the errors if the XML is invalid.
       if (!isValid) {
          Iterator<XmlError> iter = validationErrors.iterator();
          StringBuffer errorMessages = new StringBuffer();
@@ -84,8 +90,8 @@ public class ConceptFileParser_impl implements ConceptFileParser {
       // ***************************************************
       // get the concepts from the concept file document
       // ***************************************************
-      ConceptSet conceptSet = conceptSetDoc.getConceptSet();
-      noNamespace.ConceptDocument.Concept[] concepts = conceptSet
+      ConceptSetDocument.ConceptSet conceptSet = conceptSetDoc.getConceptSet();
+      ConceptDocument.Concept[] concepts = conceptSet
             .getConceptArray();
       for (int i = 0; i < concepts.length; i++) {
          // get concept meta data
@@ -99,14 +105,15 @@ public class ConceptFileParser_impl implements ConceptFileParser {
          // ********************************
          // get all rules for this concept
          // ********************************
-         Rules rules = concepts[i].getRules();
-         noNamespace.RuleDocument.Rule[] ruleList = rules.getRuleArray();
+         RulesDocument.Rules rules = concepts[i].getRules();
+         RuleDocument.Rule[] ruleList = rules.getRuleArray();
          for (int r = 0; r < ruleList.length; r++) {
             // get rule meta data
             String regex = ruleList[r].getRegEx();
             String matchType = ruleList[r].getMatchType();
             int matchStrategy = ruleList[r].getMatchStrategy().intValue();
             String id = ruleList[r].getRuleId();
+            String featurePath = ruleList[r].getFeaturePath();
             float confidence = (float) 0.0;
             if (ruleList[r].getConfidence() != null) {
                confidence = ruleList[r].getConfidence().floatValue();
@@ -114,14 +121,14 @@ public class ConceptFileParser_impl implements ConceptFileParser {
 
             // create new rule
             Rule rule = new Rule_impl(regex, matchStrategy, matchType, id,
-                  confidence);
+                  confidence, featurePath);
 
             // ********************************
             // get match type filter features
             // ********************************
             if (ruleList[r].getMatchTypeFilter() != null) {
                // iterate over all filter features and add them to the rule
-               noNamespace.FeatureDocument.Feature[] filterFeatures = ruleList[r]
+               FeatureDocument.Feature[] filterFeatures = ruleList[r]
                      .getMatchTypeFilter().getFeatureArray();
                for (int x = 0; x < filterFeatures.length; x++) {
                   String featureName = filterFeatures[x].getName();
@@ -139,7 +146,7 @@ public class ConceptFileParser_impl implements ConceptFileParser {
             if (ruleList[r].getUpdateMatchTypeAnnotation() != null) {
                // iterate over all match type annotation update features and add
                // them to the rule
-               SetFeature[] updateFeatures = ruleList[r]
+               SetFeatureDocument.SetFeature[] updateFeatures = ruleList[r]
                      .getUpdateMatchTypeAnnotation().getSetFeatureArray();
                for (int x = 0; x < updateFeatures.length; x++) {
                   String featureName = updateFeatures[x].getName();
@@ -164,7 +171,7 @@ public class ConceptFileParser_impl implements ConceptFileParser {
             if (ruleList[r].getRuleExceptions() != null) {
                // iterate over all match type annotation update features and add
                // them to the rule
-               noNamespace.ExceptionDocument.Exception[] exceptions = ruleList[r]
+               ExceptionDocument.Exception[] exceptions = ruleList[r]
                      .getRuleExceptions().getExceptionArray();
                for (int x = 0; x < exceptions.length; x++) {
                   String exceptionMatchType = exceptions[x].getMatchType();
@@ -184,8 +191,8 @@ public class ConceptFileParser_impl implements ConceptFileParser {
          // **************************************
          // get all annotations for this concept
          // **************************************
-         CreateAnnotations annotations = concepts[i].getCreateAnnotations();
-         noNamespace.AnnotationDocument.Annotation[] annotationList = annotations
+         CreateAnnotationsDocument.CreateAnnotations annotations = concepts[i].getCreateAnnotations();
+         AnnotationDocument.Annotation[] annotationList = annotations
                .getAnnotationArray();
          for (int a = 0; a < annotationList.length; a++) {
 
@@ -205,10 +212,11 @@ public class ConceptFileParser_impl implements ConceptFileParser {
             String type = annotationList[a].getType();
             String validationClass = annotationList[a].getValidate();
 
-            Annotation annotation = new Annotation_impl(id, type, begin, end, validationClass);
+            Annotation annotation = new Annotation_impl(id, type, begin, end,
+                  validationClass);
 
             // read out feature values and add it to the annotation
-            SetFeature[] features = annotationList[a].getSetFeatureArray();
+            SetFeatureDocument.SetFeature[] features = annotationList[a].getSetFeatureArray();
             for (int f = 0; f < features.length; f++) {
                String name = features[f].getName();
                int featureType = features[f].getType().intValue();

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://incubator.apache.org/uima/regex"
+            xmlns="http://incubator.apache.org/uima/regex" elementFormDefault="qualified">
 	<!--
 		* Licensed to the Apache Software Foundation (ASF) under one
 		* or more contributor license agreements.  See the NOTICE file
@@ -72,6 +73,7 @@
 		</xs:simpleType>
 	  </xs:attribute>
 	  <xs:attribute name="matchType" type="xs:string" use="required" />
+	  <xs:attribute name="featurePath" type="xs:string" use="optional" />
 	  <xs:attribute name="ruleId" type="xs:string" use="optional" />
 	  <xs:attribute name="confidence" type="xs:decimal"	use="optional" />
 	</xs:complexType>

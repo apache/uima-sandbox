@@ -97,8 +97,7 @@ public class RuleException_impl implements
       if (this.matchTypeStr != null) {
          this.matchType = ts.getType(this.matchTypeStr);
          if (this.matchType == null) {
-            throw new ResourceInitializationException(
-                  RegExAnnotator.MESSAGE_DIGEST,
+            throw new RegexAnnotatorConfigException(
                   "regex_annotator_error_resolving_types",
                   new Object[] { this.matchTypeStr });
          }

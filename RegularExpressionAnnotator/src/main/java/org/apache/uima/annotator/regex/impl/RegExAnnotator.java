@@ -289,7 +289,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             FSIterator mtIterator = aCAS.getAnnotationIndex(matchType)
                   .iterator();
 
-            String coveredText = null;
+            String matchValue = null;
             AnnotationFS currentAnnot = null;
 
             // iterate over all match type annotations where the
@@ -331,13 +331,19 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   continue;
                }
 
-               // get the covered text from this annotation, the run the regex
-               // on the
-               // covered text of the current annotation.
-               coveredText = currentAnnot.getCoveredText();
+               // get the specified feature path value from the current
+               // annotation to run the regex on
+               matchValue = conceptRules[ruleCount].getMatchTypeFeaturePath()
+                     .getValue(currentAnnot);
+
+               // check matchValue result, if it is null we don't have to match
+               // anything and can go on with the next annotation
+               if(matchValue == null) {
+                  continue;
+               }
 
                // try to match the current pattern on the text
-               Matcher matcher = pattern.matcher(coveredText);
+               Matcher matcher = pattern.matcher(matchValue);
 
                // check the match strategy we have for this rule
                // MatchStrategy - MATCH_ALL
@@ -351,8 +357,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                            .getExceptions(), aCAS, currentAnnot)) {
 
                         // create annotations and features
-                        processConceptInstructions(matcher, currentAnnot, aCAS,
-                              this.regexConcepts[i], ruleCount, annotsToAdd);
+                        processConceptInstructions(matcher, currentAnnot,
+                              matchValue, aCAS, this.regexConcepts[i],
+                              ruleCount, annotsToAdd);
 
                         // set match found
                         foundMatch = true;
@@ -373,8 +380,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                            .getExceptions(), aCAS, currentAnnot)) {
 
                         // create annotations and features
-                        processConceptInstructions(matcher, currentAnnot, aCAS,
-                              this.regexConcepts[i], ruleCount, annotsToAdd);
+                        processConceptInstructions(matcher, currentAnnot,
+                              matchValue, aCAS, this.regexConcepts[i],
+                              ruleCount, annotsToAdd);
 
                         // set match found
                         foundMatch = true;
@@ -391,8 +399,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                            .getExceptions(), aCAS, currentAnnot)) {
 
                         // create annotations and features
-                        processConceptInstructions(matcher, currentAnnot, aCAS,
-                              this.regexConcepts[i], ruleCount, annotsToAdd);
+                        processConceptInstructions(matcher, currentAnnot,
+                              matchValue, aCAS, this.regexConcepts[i],
+                              ruleCount, annotsToAdd);
 
                         // set match found
                         foundMatch = true;
@@ -407,8 +416,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                // we go on with the next rule or not
                if (!this.regexConcepts[i].processAllConceptRules()) {
                   // we found a match for the current rule and we don't want go
-                  // on with
-                  // further rules of this concept
+                  // on with further rules of this concept
                   break;
                }
             }
@@ -571,7 +579,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     * @param matcher
     *           current regex matcher
     * @param annot
-    *           matchtype annotation
+    *           match type annotation
+    * @param matchingText
+    *           text that is used to match
     * @param aCAS
     *           current CAS
     * @param concept
@@ -582,7 +592,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     *           array for the annotations that should be created
     */
    private void processConceptInstructions(Matcher matcher, AnnotationFS annot,
-         CAS aCAS, Concept concept, int ruleIndex,
+         String matchingText, CAS aCAS, Concept concept, int ruleIndex,
          ArrayList<FeatureStructure> annotsToAdd)
          throws RegexAnnotatorProcessException {
 
@@ -598,7 +608,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          // get annotation type
          Type annotType = annotations[a].getAnnotationType();
 
-         // get local start and end position
+         // get local start and end position of the match in the matchingText
          int localStart = annotations[a].getBegin().getMatchPosition(matcher);
          int localEnd = annotations[a].getEnd().getMatchPosition(matcher);
 
@@ -616,28 +626,35 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
          // check if an validator for the current annotation is available
          if (annotations[a].hasValidator()) {
-            // get the covered text of the annotation that should be created
-            String coveredText = annot.getCoveredText().substring(localStart,
-                  localEnd);
+            // get the substring of the match from the matching text
+            String matchText = matchingText.substring(localStart, localEnd);
             // validate annotation
             try {
-               validation = annotations[a].validate(coveredText, concept
+               validation = annotations[a].validate(matchText, concept
                      .getRules()[ruleIndex].getId());
             } catch (Exception ex) {
                throw new RegexAnnotatorProcessException(
                      "regex_annotator_error_validating_annotation",
-                     new Object[] { annotations[a].getId(), coveredText,
+                     new Object[] { annotations[a].getId(), matchText,
                            new Integer(localStart), new Integer(localEnd) }, ex);
             }
          }
 
          // only create annotation if the validation was true
          if (validation == true) {
-            // make positions absolute to the document text -> add match type
-            // annotation offset.
-            localStart = annot.getBegin() + localStart;
-            localEnd = annot.getBegin() + localEnd;
-
+            // create annotation start and begin positions dependent of the rule
+            // matching
+            if (concept.getRules()[ruleIndex].isFeaturePathMatch()) {
+               // we match a feature path, use a source annotation boundaries
+               // for the annotation that is created
+               localStart = annot.getBegin();
+               localEnd = annot.getEnd();
+            } else {
+               // we match no feature path, make positions absolute to the
+               // document text -> add match type annotation offset.
+               localStart = annot.getBegin() + localStart;
+               localEnd = annot.getBegin() + localEnd;
+            }
             // create annotation for this match
             FeatureStructure fs = aCAS.createAnnotation(annotType, localStart,
                   localEnd);

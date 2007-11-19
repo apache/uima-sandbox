@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import org.apache.uima.annotator.regex.Feature;
+import org.apache.uima.annotator.regex.FeaturePath;
 import org.apache.uima.annotator.regex.FilterFeature;
 import org.apache.uima.annotator.regex.Rule;
 import org.apache.uima.annotator.regex.RuleException;
@@ -30,32 +31,64 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.resource.ResourceInitializationException;
 
 /**
- * 
+ * Implementation of the Rule interface.
  */
 public class Rule_impl implements Rule {
 
+   // rule regex string
    private final String regex;
 
+   // rule ID
    private final String id;
 
+   // rule confidence value
    private final float confidence;
 
+   // rule match type as string value
    private final String matchTypeStr;
 
+   // rule featurePath object
+   private FeaturePath_impl featurePath;
+
+   // true if a featurePath was specified for this rule
+   private boolean isFeaturePathMatch = false;
+
+   // rule match strategy
    private final int matchStrategy;
 
+   // compiled rule regex pattern
    private Pattern pattern;
 
+   // resolved rule match type
    private Type matchType;
 
+   // rule filter features
    private ArrayList<FilterFeature> filterFeatures;
 
+   // rule update features
    private ArrayList<Feature> updateFeatures;
 
+   // rule exceptions
    private ArrayList<RuleException> exceptions;
 
+   /**
+    * Constructor to create a new Rule object.
+    * 
+    * @param regex
+    *           regex pattern as String
+    * @param matchStrategy
+    *           matching strategy
+    * @param matchType
+    *           match type as String
+    * @param id
+    *           rule id (can also be null)
+    * @param confidence
+    *           confidence value
+    * @param featurePath
+    *           featurePath (can also be null)
+    */
    public Rule_impl(String regex, int matchStrategy, String matchType,
-         String id, float confidence) {
+         String id, float confidence, String featurePath) {
       this.regex = regex;
       this.matchStrategy = matchStrategy;
       this.matchTypeStr = matchType;
@@ -65,6 +98,11 @@ public class Rule_impl implements Rule {
       this.pattern = null;
       this.id = id;
       this.confidence = confidence;
+      this.featurePath = new FeaturePath_impl(featurePath);
+      // set FeaturePath matching mode if a feature path is specified
+      if (featurePath != null) {
+         this.isFeaturePathMatch = true;
+      }
    }
 
    /*
@@ -168,6 +206,24 @@ public class Rule_impl implements Rule {
       return this.exceptions.toArray(new RuleException[0]);
    }
 
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Rule#getMatchTypeFeaturePath()
+    */
+   public FeaturePath getMatchTypeFeaturePath() {
+      return this.featurePath;
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Rule#isFeaturePathMatch()
+    */
+   public boolean isFeaturePathMatch() {
+      return this.isFeaturePathMatch;
+   }
+
    /**
     * @param ts
     * @throws ResourceInitializationException
@@ -177,8 +233,7 @@ public class Rule_impl implements Rule {
       if (this.matchTypeStr != null) {
          this.matchType = ts.getType(this.matchTypeStr);
          if (this.matchType == null) {
-            throw new ResourceInitializationException(
-                  RegExAnnotator.MESSAGE_DIGEST,
+            throw new RegexAnnotatorConfigException(
                   "regex_annotator_error_resolving_types",
                   new Object[] { this.matchTypeStr });
          }
@@ -201,6 +256,10 @@ public class Rule_impl implements Rule {
       for (int i = 0; i < ruleExceptions.length; i++) {
          ((RuleException_impl) ruleExceptions[i]).typeInit(ts);
       }
+
+      // initialize featurePath element
+      this.featurePath.initialize(this.matchType);
+
    }
 
    /**
@@ -253,6 +312,9 @@ public class Rule_impl implements Rule {
       }
       buffer.append("\nMatch type: ");
       buffer.append(this.matchTypeStr);
+
+      buffer.append("\nFeaturePath: ");
+      buffer.append(this.featurePath.getFeaturePath());
 
       if (this.confidence != 0.0) {
          buffer.append("\nConfidence: ");
