@@ -10,7 +10,7 @@ FeaturePath: null
 Confidence: 1.0
 Match type filter features: 
 Filter Feature: 
-  Name: language
+  FeaturePath: language
   Pattern: regexExpression
 
 Rule ID2
@@ -21,7 +21,7 @@ FeaturePath: null
 Confidence: 0.7
 Match type filter features: 
 Filter Feature: 
-  Name: language
+  FeaturePath: language
   Pattern: regexExpression
 
 Rule ID3
@@ -32,7 +32,7 @@ FeaturePath: valid/feature/path
 Confidence: 0.3
 Match type filter features: 
 Filter Feature: 
-  Name: language
+  FeaturePath: language
   Pattern: regexExpression
 
 Annotations: 

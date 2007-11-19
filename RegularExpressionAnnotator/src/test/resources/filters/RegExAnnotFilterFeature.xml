@@ -67,6 +67,11 @@
               <description/>
               <rangeTypeName>uima.cas.String</rangeTypeName>
             </featureDescription>
+            <featureDescription>
+              <name>refFeature</name>
+              <description/>
+              <rangeTypeName>org.apache.uima.TestAnnot2</rangeTypeName>
+            </featureDescription>
           </features>
         </typeDescription>
         <typeDescription>
@@ -74,6 +79,28 @@
           <description/>
           <supertypeName>uima.tcas.Annotation</supertypeName>
         </typeDescription>
+        <typeDescription>
+          <name>org.apache.uima.TestAnnot2</name>
+          <description/>
+          <supertypeName>uima.tcas.Annotation</supertypeName>
+          <features>
+            <featureDescription>
+              <name>testFeature</name>
+              <description/>
+              <rangeTypeName>uima.cas.String</rangeTypeName>
+            </featureDescription>
+           <featureDescription>
+              <name>testFeature1</name>
+              <description/>
+              <rangeTypeName>uima.cas.String</rangeTypeName>
+            </featureDescription>
+            <featureDescription>
+              <name>refFeature</name>
+              <description/>
+              <rangeTypeName>org.apache.uima.TestAnnot1</rangeTypeName>
+            </featureDescription>
+          </features>
+        </typeDescription>               
       </types>
     </typeSystemDescription>
     
@@ -82,6 +109,7 @@
     		<type>uima.tcas.DocumentAnnotation</type>
     		<type>org.apache.uima.TestAnnot</type>
     		<type>org.apache.uima.TestAnnot1</type>
+    		<type>org.apache.uima.TestAnnot2</type>
   		</priorityList>
 	</typePriorities>
     

@@ -23,7 +23,7 @@
     	<rules>
 			<rule ruleId="ID1" regEx="someRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="1.0">
 				<matchTypeFilter>
-					<feature name="language">regexExpression</feature>
+					<feature featurePath="language">regexExpression</feature>
 				</matchTypeFilter>
 				<updateMatchTypeAnnotation>
 			 		<setFeature name="language" type="String">$0</setFeature>
@@ -34,12 +34,12 @@
 			</rule>
       		<rule ruleId="ID2" regEx="someOtherRegex" matchStrategy="matchFirst" matchType="uima.tcas.DocumentAnnotation" confidence="0.7">
 				<matchTypeFilter>
-					<feature name="language">regexExpression</feature>
+					<feature featurePath="language">regexExpression</feature>
 				</matchTypeFilter>
 			</rule>
 			<rule ruleId="ID3" regEx="anotherRegex" matchStrategy="matchComplete" matchType="uima.tcas.DocumentAnnotation" confidence="0.3" featurePath="valid/feature/path">
 				<matchTypeFilter>
-					<feature name="language">regexExpression</feature>
+					<feature featurePath="language">regexExpression</feature>
 				</matchTypeFilter>
 			</rule>		
 	    </rules>

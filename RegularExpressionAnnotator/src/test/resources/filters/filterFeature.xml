@@ -23,7 +23,7 @@
     	<rules>
 			<rule regEx="SimpleRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation">
 				<matchTypeFilter>
-					<feature name="language">en</feature>
+					<feature featurePath="language">en</feature>
 				</matchTypeFilter>
 			</rule>
 	    </rules>
@@ -39,7 +39,7 @@
     	<rules>
 			<rule regEx="AdvancedFilterRegex" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation">
 				<matchTypeFilter>
-					<feature name="language">en-\w\w</feature>
+					<feature featurePath="language">en-\w\w</feature>
 				</matchTypeFilter>
 			</rule>
 	    </rules>
@@ -51,7 +51,7 @@
 	 	</createAnnotations>
     </concept>
 
-<!-- creat an annotation to check another filter condition -->
+<!-- create an annotation to check another filter condition -->
     <concept name="CreateAnnot">
     	<rules>
 			<rule regEx="(JustCreate)(AnAnnotation)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
@@ -62,7 +62,16 @@
 				<end group="0"/>
 				<setFeature name="testFeature" type="String">$1</setFeature>
 				<setFeature name="testFeature1" type="String">$2</setFeature>
+				<!-- create a reference to another annotation to validate a feature path later -->
+				<setFeature name="refFeature" type="Reference">testannot6</setFeature>
 		 	</annotation>
+		 	<annotation id="testannot6" type="org.apache.uima.TestAnnot2">
+				<begin group="0"/>
+				<end group="0"/>
+				<setFeature name="testFeature" type="String">$1</setFeature>
+				<setFeature name="testFeature1" type="String">$2</setFeature>
+		 	</annotation>
+		 	
 	 	</createAnnotations>
     </concept>
 
@@ -70,8 +79,11 @@
     	<rules>
 			<rule regEx="Annotation" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot">
 				<matchTypeFilter>
-					<feature name="testFeature">JustCreate</feature>
-					<feature name="testFeature1">AnAnnotation</feature>
+					<feature featurePath="testFeature">JustCreate</feature>
+					<feature featurePath="testFeature1">AnAnnotation</feature>
+					<!-- validate a featurePath for a filter feature -->
+					<feature featurePath="refFeature/testFeature">JustCreate</feature>
+					<feature featurePath="refFeature/testFeature1">AnAnnotation</feature>
 				</matchTypeFilter>
 			</rule>
 	    </rules>
@@ -88,8 +100,8 @@
     	<rules>
 			<rule regEx="Annotation" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot">
 				<matchTypeFilter>
-					<feature name="testFeature">doesNotMatch</feature>
-					<feature name="testFeature1">AnAnnotation</feature>
+					<feature featurePath="testFeature">doesNotMatch</feature>
+					<feature featurePath="testFeature1">AnAnnotation</feature>
 				</matchTypeFilter>
 			</rule>
 	    </rules>
