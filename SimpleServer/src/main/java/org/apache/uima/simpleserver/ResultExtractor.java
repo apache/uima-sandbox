@@ -20,21 +20,17 @@
 package org.apache.uima.simpleserver;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Feature;
-import org.apache.uima.cas.FeaturePath;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.LowLevelCAS;
 import org.apache.uima.cas.impl.TypeSystemUtils;
 import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.simpleserver.config.Filter;
 import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.ServerSpec;
 import org.apache.uima.simpleserver.config.TypeMap;
@@ -96,7 +92,7 @@ public class ResultExtractor {
         if (tspec.getFilter().match(annotation)) {
           ResultEntryImpl resultEntry = new ResultEntryImpl(tspec.getOutputTag());
           // ...then we use it to make output obect
-          makeOutputs(resultEntry, annotation, tspec, typeSystem);
+          makeOutputs(resultEntry, annotation, tspec);
           // and add it to the result collection
           resultEntries.add(resultEntry);
         }
@@ -110,7 +106,7 @@ public class ResultExtractor {
    * This method produces the output as specified by the ResultSpecification XML file
    */
   public static void makeOutputs(ResultEntryImpl resultEntry, AnnotationFS annotation,
-      TypeMap tspec, TypeSystem typeSystem) {
+      TypeMap tspec) {
 
     // TODO covered text - DONE
 
