@@ -19,6 +19,8 @@
 
 package org.apache.uima.simpleserver.config;
 
+import java.util.List;
+
 /**
  * Disjunction of filters.
  */
@@ -28,5 +30,8 @@ public interface OrFilter extends Filter {
    * @param readFilter
    */
   void addFilter(Filter filter);
-  // Adds nothing to Filter interface.
+  
+  List<Filter> getFilters();
+  
+
 }

@@ -28,8 +28,8 @@
 		<filters>
 			<or>
 				<and>
-					<filter featurePath="feat" operator="null" />
-					<filter featurePath="feat" operator="null" />
+					<filter featurePath="feat" operator=">" value="stuff"/>
+					<filter featurePath="feat" operator="=" value="enough"/>
 				</and>
 				<filter featurePath="feat" operator="null" />
 				<filter featurePath="feat" operator="null" />

@@ -17,46 +17,35 @@
  * under the License.
  */
 
+package org.apache.uima.simpleserver.output;
 
-package org.apache.uima.simpleserver.config;
+import java.util.List;
 
-/**
- * Types of conditions.
+/*
+ * represents one annotation taken for output, i.e. for example 
+ * one tag of the XML output
  */
-public enum FilterOp {
-  
-  NULL, NOT_NULL, EQUALS, NOT_EQUALS, LESS, LESS_EQ, GREATER, GREATER_EQ;
-  
-  public String toString() {
-    switch (this) {
-    case NULL: {
-      return "null";
-    }
-    case NOT_NULL: {
-      return "!null";
-    }
-    case EQUALS: {
-      return "=";
-    }
-    case NOT_EQUALS: {
-      return "!=";
-    }
-    case LESS: {
-      return "<";
-    }
-    case LESS_EQ: {
-      return "<=";
-    }
-    case GREATER: {
-      return "<";
-    }
-    case GREATER_EQ: {
-      return "<=";
-    }
-    default: {
-      return null;
-    }
-    }
-  }
+public interface ResultEntry {
 
+  /*
+   * represents the name of the output tag for this annotation
+   */
+  public String getEntryName();
+
+  /*
+   * gives an attribute value for the given attribute name
+   */
+  public String getAttriuteValue(String string);
+
+  /*
+   * a list of the attributes taken for output for this annotation, i.e.
+   * attributes of the XML tag (in case we produce XML output)
+   */
+  public List<String> getAttributeNames();
+
+  /*
+   * text covered by the annotation
+   */
+  public String getCoveredText();
+  
 }

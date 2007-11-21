@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.simpleserver.config.AndFilter;
 import org.apache.uima.simpleserver.config.Filter;
 
@@ -50,6 +51,16 @@ public class AndFilterImpl extends FilterImpl implements AndFilter {
    */
   public List<Filter> getFilters() {
     return Collections.unmodifiableList(this.filters);
+  }
+
+  @Override
+  public boolean match(FeatureStructure fs) {
+    for (Filter filter: this.filters) {
+      if (!filter.match(fs)) {
+        return false;
+      }
+    }
+    return true;
   }
   
 

@@ -17,48 +17,46 @@
  * under the License.
  */
 
-
-package org.apache.uima.simpleserver.config.impl;
+package org.apache.uima.simpleserver.output.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.simpleserver.config.Filter;
-import org.apache.uima.simpleserver.config.OrFilter;
+import org.apache.uima.simpleserver.output.Result;
+import org.apache.uima.simpleserver.output.ResultEntry;
 
-/**
- * TODO: Create type commment.
+/*
+ * Implementation of the Result interface.
+ * No sophisticated logic, just a bean-like class.
  */
-public class OrFilterImpl extends FilterImpl implements OrFilter {
-  
-  private final List<Filter> filters = new ArrayList<Filter>();
+public class ResultImpl implements Result {
 
-  /**
-   * @param type
+  private List<ResultEntry> resultEntries = null;
+
+  private String text = null;
+
+  public ResultImpl(List<ResultEntry> resultEntries, String text) {
+    super();
+    this.resultEntries = resultEntries;
+    this.text = text;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.uima.uimaserver.output.Result#getResultEntries()
    */
-  public OrFilterImpl() {
-    super(Filter.FilterType.OR);
+  public List<ResultEntry> getResultEntries() {
+    return this.resultEntries;
   }
 
-  public void addFilter(Filter filter) {
-    this.filters.add(filter);
+  public ResultImpl() {
+    super();
+    this.resultEntries = new ArrayList<ResultEntry>();
   }
 
-  public List<Filter> getFilters() {
-    return Collections.unmodifiableList(this.filters);
+  public String getText() {
+    return this.text;
   }
-
-  @Override
-  public boolean match(FeatureStructure fs) {
-    for (Filter filter: this.filters) {
-      if (filter.match(fs)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  
 
 }

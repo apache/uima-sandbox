@@ -22,6 +22,7 @@ package org.apache.uima.simpleserver.config;
 import java.util.List;
 
 import org.apache.uima.cas.TypeSystem;
+import org.apache.uima.simpleserver.SimpleServerException;
 
 /**
  * Output specification for a simple service.

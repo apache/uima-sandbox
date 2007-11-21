@@ -20,12 +20,13 @@
 
 package org.apache.uima.simpleserver.config.impl;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.simpleserver.config.Filter;
 
 /**
  * TODO: Create type commment.
  */
-public class FilterImpl implements Filter {
+public abstract class FilterImpl implements Filter {
   
   private final FilterType type;
   
@@ -37,5 +38,7 @@ public class FilterImpl implements Filter {
   public FilterType getFilterType() {
     return this.type;
   }
+
+  public abstract boolean match(FeatureStructure fs);
 
 }

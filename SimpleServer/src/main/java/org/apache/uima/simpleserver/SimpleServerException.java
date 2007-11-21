@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.simpleserver.config;
+package org.apache.uima.simpleserver;
 
 import org.apache.uima.InternationalizedException;
 
@@ -34,6 +34,14 @@ public class SimpleServerException extends InternationalizedException {
   public static final String incorrect_path_syntax = "incorrect_path_syntax";
 
   public static final String incorrect_feature_syntax = "incorrect_feature_syntax";
+  
+  public static final String value_must_not_be_set = "value_must_not_be_set";
+  
+  public static final String value_must_be_set = "value_must_be_set";
+  
+  public static final String type_does_not_exist = "type_does_not_exist";
+  
+  public static final String path_never_valid = "path_never_valid";
 
   private static final String messages = "org.apache.uima.simpleserver.exception";
 

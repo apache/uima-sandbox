@@ -19,6 +19,8 @@
 
 package org.apache.uima.simpleserver.config;
 
+import org.apache.uima.cas.FeatureStructure;
+
 /**
  * 
  */
@@ -29,5 +31,7 @@ public interface Filter {
   }
   
   FilterType getFilterType();
+  
+  boolean match(FeatureStructure fs);
 
 }

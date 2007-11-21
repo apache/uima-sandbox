@@ -17,46 +17,23 @@
  * under the License.
  */
 
+package org.apache.uima.simpleserver.output;
 
-package org.apache.uima.simpleserver.config;
+import java.util.List;
 
-/**
- * Types of conditions.
+/*
+ * Represent the result of analysis.  The result is the input text plus a list of metadata.
  */
-public enum FilterOp {
-  
-  NULL, NOT_NULL, EQUALS, NOT_EQUALS, LESS, LESS_EQ, GREATER, GREATER_EQ;
-  
-  public String toString() {
-    switch (this) {
-    case NULL: {
-      return "null";
-    }
-    case NOT_NULL: {
-      return "!null";
-    }
-    case EQUALS: {
-      return "=";
-    }
-    case NOT_EQUALS: {
-      return "!=";
-    }
-    case LESS: {
-      return "<";
-    }
-    case LESS_EQ: {
-      return "<=";
-    }
-    case GREATER: {
-      return "<";
-    }
-    case GREATER_EQ: {
-      return "<=";
-    }
-    default: {
-      return null;
-    }
-    }
-  }
+public interface Result {
+
+  /*
+   * 
+   */
+  public List<ResultEntry> getResultEntries();
+
+  /*
+   * the whole text passed to the analysis engine
+   */
+  public String getText();
 
 }

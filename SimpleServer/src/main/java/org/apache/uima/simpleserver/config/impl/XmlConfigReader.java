@@ -38,6 +38,7 @@ import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDoc
 import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType.Filters;
 import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument.UimaSimpleServerSpec;
 import org.apache.uima.cas.impl.TypeSystemUtils;
+import org.apache.uima.simpleserver.SimpleServerException;
 import org.apache.uima.simpleserver.config.AndFilter;
 import org.apache.uima.simpleserver.config.Condition;
 import org.apache.uima.simpleserver.config.ConfigFactory;
@@ -46,7 +47,6 @@ import org.apache.uima.simpleserver.config.FilterOp;
 import org.apache.uima.simpleserver.config.OrFilter;
 import org.apache.uima.simpleserver.config.ServerSpec;
 import org.apache.uima.simpleserver.config.SimpleFilter;
-import org.apache.uima.simpleserver.config.SimpleServerException;
 import org.apache.uima.simpleserver.config.TypeMap;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
@@ -60,27 +60,31 @@ public final class XmlConfigReader {
   // Constants for filter operators
   private static final int NULL = FilterOperator.Enum.forString("null").intValue();
 
-  private static final int NOT_NULL = FilterOperator.Enum.forString("null").intValue();
+  private static final int NOT_NULL = FilterOperator.Enum.forString("!null").intValue();
 
-  private static final int EQUALS = FilterOperator.Enum.forString("null").intValue();
+  private static final int EQUALS = FilterOperator.Enum.forString("=").intValue();
 
-  private static final int NOT_EQUALS = FilterOperator.Enum.forString("null").intValue();
+  private static final int NOT_EQUALS = FilterOperator.Enum.forString("!=").intValue();
 
-  private static final int LESS = FilterOperator.Enum.forString("null").intValue();
+  private static final int LESS = FilterOperator.Enum.forString("<").intValue();
 
-  private static final int LESS_EQ = FilterOperator.Enum.forString("null").intValue();
+  private static final int LESS_EQ = FilterOperator.Enum.forString("<=").intValue();
 
-  private static final int GREATER = FilterOperator.Enum.forString("null").intValue();
+  private static final int GREATER = FilterOperator.Enum.forString(">").intValue();
 
-  private static final int GREATER_EQ = FilterOperator.Enum.forString("null").intValue();
+  private static final int GREATER_EQ = FilterOperator.Enum.forString(">=").intValue();
 
   /**
    * Read a config file.
-   * @param file The config file.
+   * 
+   * @param file
+   *                The config file.
    * @return The corresponding server spec.
    * @throws IOException
-   * @throws XmlException XML parsing error.
-   * @throws SimpleServerException Content parsing error.
+   * @throws XmlException
+   *                 XML parsing error.
+   * @throws SimpleServerException
+   *                 Content parsing error.
    */
   public static ServerSpec readServerSpec(File file) throws IOException, XmlException,
       SimpleServerException {
@@ -89,18 +93,22 @@ public final class XmlConfigReader {
 
   /**
    * Read a config XML stream.
-   * @param is The XML input stream.
+   * 
+   * @param is
+   *                The XML input stream.
    * @return The corresponding server spec.
    * @throws IOException
-   * @throws XmlException XML parsing error.
-   * @throws SimpleServerException Content parsing error.
+   * @throws XmlException
+   *                 XML parsing error.
+   * @throws SimpleServerException
+   *                 Content parsing error.
    */
   public static ServerSpec readServerSpec(InputStream is) throws IOException, XmlException,
       SimpleServerException {
     UimaSimpleServerSpec specBean = UimaSimpleServerSpecDocument.Factory.parse(is)
         .getUimaSimpleServerSpec();
 
-    // Do validation.  If XML is not valid, throw first error.
+    // Do validation. If XML is not valid, throw first error.
     ArrayList<XmlError> validationErrors = new ArrayList<XmlError>();
     XmlOptions validationOptions = new XmlOptions();
     validationOptions.setErrorListener(validationErrors);
@@ -207,21 +215,42 @@ public final class XmlConfigReader {
     return ConfigFactory.newSimpleFilter(path, condition);
   }
 
-  // Process a condition.  Check that value is set according to the operator.
-  private static final Condition readCondition(FilterOperator.Enum operator, String value) {
+  // Process a condition. Check that value is set according to the operator.
+  private static final Condition readCondition(FilterOperator.Enum operator, String value)
+      throws SimpleServerException {
     FilterOp op = readOperator(operator);
-    checkCondition(op, value, operator);
+    checkCondition(op, value);
     return ConfigFactory.newCondition(op, value);
   }
-  
-  private static final void checkCondition(FilterOp op, String value, FilterOperator.Enum opBean) {
 
+  // Check filter syntax: null and !null must not have the value attribute defined, while all others
+  // must.
+  private static final void checkCondition(FilterOp op, String value) throws SimpleServerException {
+    switch (op) {
+    case NOT_NULL:
+    case NULL: {
+      valueMustBeNull(op, value);
+      break;
+    }
+    default: {
+      valueMustNotBeNull(op, value);
+      break;
+    }
+    }
   }
-  
-  private static final void valueMustBeNull(FilterOp op, String value, FilterOperator.Enum opBean)
-      throws SimpleServerException {
+
+  private static final void valueMustBeNull(FilterOp op, String value) throws SimpleServerException {
     if (value != null) {
-      throw new SimpleServerException(null, null);
+      throw new SimpleServerException(SimpleServerException.value_must_not_be_set, new Object[] {
+          op, value });
+    }
+  }
+
+  private static final void valueMustNotBeNull(FilterOp op, String value)
+      throws SimpleServerException {
+    if (value == null) {
+      throw new SimpleServerException(SimpleServerException.value_must_be_set, new Object[] {
+          op});
     }
   }
 
