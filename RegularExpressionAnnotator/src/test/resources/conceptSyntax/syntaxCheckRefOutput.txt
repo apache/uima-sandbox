@@ -13,6 +13,12 @@ Filter Feature:
   FeaturePath: language
   Pattern: regexExpression
 
+
+Rule exceptions: 
+Exception: 
+  matchType: uima.tcas.DocumentAnnotation
+  Pattern: regexExpression
+
 Rule ID2
 Regex: someOtherRegex
 Match strategy: MATCH_FIRST
@@ -24,6 +30,7 @@ Filter Feature:
   FeaturePath: language
   Pattern: regexExpression
 
+
 Rule ID3
 Regex: anotherRegex
 Match strategy: MATCH_COMPLETE
@@ -34,6 +41,7 @@ Match type filter features:
 Filter Feature: 
   FeaturePath: language
   Pattern: regexExpression
+
 
 Annotations: 
 Annotation: 
@@ -82,6 +90,7 @@ Regex: regexExpression
 Match strategy: MATCH_ALL
 Match type: uima.tcas.DocumentAnnotation
 FeaturePath: null
+
 Annotations: 
 Annotation: 
   ID: testannotation

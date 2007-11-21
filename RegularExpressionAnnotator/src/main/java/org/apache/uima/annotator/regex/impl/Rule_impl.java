@@ -329,6 +329,16 @@ public class Rule_impl implements Rule {
          buffer.append(filterFeats[i].toString());
       }
       buffer.append("\n");
+
+      RuleException[] ruleExceptions = getExceptions();
+      if (ruleExceptions.length > 0) {
+         buffer.append("\nRule exceptions: \n");
+      }
+      for (int i = 0; i < ruleExceptions.length; i++) {
+         buffer.append(ruleExceptions[i].toString());
+      }
+      buffer.append("\n");
+      
       return buffer.toString();
    }
 

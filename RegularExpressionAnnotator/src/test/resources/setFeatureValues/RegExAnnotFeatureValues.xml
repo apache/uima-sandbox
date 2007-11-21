@@ -176,6 +176,16 @@
               <description/>
               <rangeTypeName>uima.cas.String</rangeTypeName>
             </featureDescription>
+            <featureDescription>
+              <name>refFeature</name>
+              <description/>
+              <rangeTypeName>org.apache.uima.TestAnnot</rangeTypeName>
+            </featureDescription>
+            <featureDescription>
+              <name>ruleID</name>
+              <description/>
+              <rangeTypeName>uima.cas.String</rangeTypeName>
+            </featureDescription>
           </features>
         </typeDescription>
 

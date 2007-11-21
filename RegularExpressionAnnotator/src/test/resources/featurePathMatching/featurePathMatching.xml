@@ -30,14 +30,17 @@
 				<begin group="0"/>
 				<end group="0"/>
 				<setFeature name="testFeature" type="String">SimpleFeaturePathMatchingTest</setFeature>
+				<setFeature name="testFeatureInt" type="Integer">3243</setFeature>
+				<setFeature name="testFeatureFloat" type="Float">324.34</setFeature>
 		 	</annotation>
 	 	</createAnnotations>
     </concept>
 
-    <concept name="SimpleFeaturePathMatch">
+    <concept name="SimpleFeaturePathMatch" processAllRules="true">
     	<rules>
-			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeature">
-			</rule>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeature"/>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureInt"/>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureFloat"/>
 	    </rules>
 	    <createAnnotations>	
 			<annotation type="org.apache.uima.TestAnnot1">
@@ -47,7 +50,8 @@
 		 	</annotation>
 	 	</createAnnotations>
     </concept>
-
+    
+ 
 	<!-- Advanced FeaturePath matching -->	
     <concept name="AdvancedAnnotCreation">
     	<rules>

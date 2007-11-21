@@ -5,5 +5,7 @@ TestAnnot1(3,16): AdvancedRegex  { refFeature=TestAnnot "AdvancedRegex"
    end: 16
    testFeature: "MyAdvancedFeaturePathMatchingTest"
    testFeature1: <null>
+   testFeatureInt: 0
+   testFeatureFloat: 0.0
 , testFeature=null }
 TestAnnot2(3,16): AdvancedRegex  { testFeature=AdvancedFeaturePath }

@@ -26,6 +26,8 @@
 			 		<setFeature name="language" type="String">$0 Test</setFeature>
 			 		<setFeature name="language1" type="String" normalization="ToUpperCase">$0 Test</setFeature>
 			 		<setFeature name="language2" type="String" normalization="Custom" class="org.apache.uima.annotator.regex.CustomTestNormalizer">$0</setFeature>
+			 		<setFeature name="refFeature" type="Reference">testannot</setFeature>
+			 		<setFeature name="ruleID" type="RuleId"/>
 			 	</updateMatchTypeAnnotation>	
 			</rule>
       		<rule ruleId="ID2" regEx="(Rule)(Regex)(2)(2.4)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.7">

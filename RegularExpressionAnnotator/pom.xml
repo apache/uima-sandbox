@@ -83,6 +83,12 @@
 		        </excludes>
 			</resource>
 			<resource>
+				<directory>resources</directory>
+				<excludes>
+        	  		<exclude>**</exclude>
+		        </excludes>
+			</resource>
+			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
@@ -123,7 +129,7 @@
 						  <classpath>$main_root/lib/jsr173_1.0_api.jar;$main_root/lib/xmltypes.jar;$main_root/lib/xbean.jar</classpath>
 						  <mainComponentDesc>desc/RegExAnnotator.xml</mainComponentDesc>
 						  <componentId>RegExAnnotator</componentId>
-						  <datapath>$main_root/desc</datapath>
+						  <datapath>$main_root/resources</datapath>
 						</configuration>
 						<goals>
 							<goal>package</goal>
