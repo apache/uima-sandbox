@@ -60,7 +60,6 @@ public class TestFeaturePathMatching extends TestCase {
             .getFile("featurePathMatching/featurePathMatchingRef.txt"),
             outputFile);
    }
-
    /**
     * Test advanced feature path matching. Test matching on a feature path of
     * the match type
@@ -92,8 +91,7 @@ public class TestFeaturePathMatching extends TestCase {
    }
 
    /**
-    * Test advanced feature path matching. Test matching on a feature path of
-    * the match type
+    * Test invalid feature path matching. Test a feature path that does not exist.
     * 
     * @throws Exception
     */
@@ -109,6 +107,29 @@ public class TestFeaturePathMatching extends TestCase {
       }catch(RegexAnnotatorProcessException ex) {
          String message = ex.getCause().getMessage();
          if(message.indexOf("testFeature/invalid/path") > -1){
+            foundMessage = true;
+         }
+      }
+      Assert.assertTrue(foundMessage);
+   }
+
+   /**
+    * Test unsupported feature path matching. Test an unsupported feature path
+    * 
+    * @throws Exception
+    */
+   public void testInvalidFeaturePath2() throws Exception {
+
+      // create annotation tester with the regex annotator specifier
+      AnnotatorTester annotTester = new AnnotatorTester(JUnitExtension
+            .getFile("featurePathMatching/RegExAnnotInvalidFeaturePath2.xml"));
+
+      boolean foundMessage = false;
+      try {
+         annotTester.performTest("Dummy text", "en");
+      }catch(RegexAnnotatorProcessException ex) {
+         String message = ex.getMessage();
+         if(message.indexOf("arrayFeature") > -1){
             foundMessage = true;
          }
       }

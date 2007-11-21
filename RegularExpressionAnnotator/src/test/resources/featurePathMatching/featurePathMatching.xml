@@ -39,8 +39,14 @@
     <concept name="SimpleFeaturePathMatch" processAllRules="true">
     	<rules>
 			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeature"/>
+			<!-- only featurePath evaluation is tested - no matching occurs -->
 			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureInt"/>
 			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureFloat"/>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureBoolean"/>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureShort"/>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureLong"/>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureByte"/>
+			<rule regEx="FeaturePath" matchStrategy="matchAll" matchType="org.apache.uima.TestAnnot" featurePath="testFeatureDouble"/>
 	    </rules>
 	    <createAnnotations>	
 			<annotation type="org.apache.uima.TestAnnot1">
