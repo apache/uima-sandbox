@@ -180,7 +180,8 @@ PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
 						<code>&lt;classpath></code>
 						  - This element specifies the classpath settings that are necessary to start up the 
 						  PEAR component. The jar artifact that is built during the current Maven build is 
-						  automatically added to the PEAR classpath settings and do not have to be added manually. 
+						  automatically added to the PEAR classpath settings and do not have to be added manually.
+						  The classpath element can be removed if the component jar artifact is the only classpath entry. 
 					</para>
 					<note>
 					  <para>Use $main_root variables to refer libraries inside 
