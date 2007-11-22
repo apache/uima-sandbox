@@ -56,7 +56,6 @@ public class PearPackagingMojo extends AbstractMojo {
     * Required classpath settings for the PEAR package.
     * 
     * @parameter
-    * @required
     */
    private String classpath = null;
 
