@@ -38,183 +38,196 @@ import org.apache.uima.util.Logger;
 
 public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
 
-  private static final int CH_SPECIAL = 0;
+   private static final int CH_SPECIAL = 0;
 
-  private static final int CH_NUMBER = 1;
+   private static final int CH_NUMBER = 1;
 
-  private static final int CH_LETTER = 2;
+   private static final int CH_LETTER = 2;
 
-  private static final int CH_WHITESPACE = 4;
+   private static final int CH_WHITESPACE = 4;
 
-  private static final int CH_PUNCTUATION = 5;
+   private static final int CH_PUNCTUATION = 5;
 
-  private static final int CH_NEWLINE = 6;
+   private static final int CH_NEWLINE = 6;
 
-  private static final int UNDEFINED = -1;
+   private static final int UNDEFINED = -1;
 
-  private static final int INVALID_CHAR = 0;
+   private static final int INVALID_CHAR = 0;
 
-  public static final String TOKEN_ANNOTATION_NAME = "org.apache.uima.TokenAnnotation";
+   public static final String TOKEN_ANNOTATION_NAME = "org.apache.uima.TokenAnnotation";
 
-  public static final String SENTENCE_ANNOTATION_NAME = "org.apache.uima.SentenceAnnotation";
-  
-  public static final String TOKEN_TYPE_FEATURE_NAME = "tokenType";
+   public static final String SENTENCE_ANNOTATION_NAME = "org.apache.uima.SentenceAnnotation";
 
-  private Type tokenType;
+   public static final String TOKEN_TYPE_FEATURE_NAME = "tokenType";
 
-  private Type sentenceType;
+   private Type tokenType;
 
-  private CAS cas = null;
+   private Type sentenceType;
 
-  private Logger logger;
+   private CAS cas = null;
 
-  private static List<String> punctuations = Arrays.asList(new String[] { ".", "!", "?" });
+   private Logger logger;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.analysis_engine.annotator.JTextAnnotator#process(org.apache.uima.jcas.impl.JCas,
-   *      org.apache.uima.analysis_engine.ResultSpecification)
-   */
-  public void process(JCas aJCas, ResultSpecification aResultSpec) throws AnnotatorProcessException {
-    this.logger.log(Level.INFO, "Whitespace tokenizer starts processing");
+   private static List<String> punctuations = Arrays.asList(new String[] { ".",
+         "!", "?" });
 
-    // get text content from the CAS
-    char[] textContent = aJCas.getCas().getDocumentText().toCharArray();
-    this.cas = aJCas.getCas();
-    int tokenStart = UNDEFINED;
-    int currentCharPos = 0;
-    int sentenceStart = 0;
-    int nextCharType = UNDEFINED;
-    char nextChar = INVALID_CHAR;
+   public static final String MESSAGE_BUNDLE = "org.apache.uima.annotator.whitespaceTokenizerMessages";
 
-    while (currentCharPos < textContent.length) {
-      char currentChar = textContent[currentCharPos];
-      int currentCharType = getCharacterType(currentChar);
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.analysis_engine.annotator.JTextAnnotator#process(org.apache.uima.jcas.impl.JCas,
+    *      org.apache.uima.analysis_engine.ResultSpecification)
+    */
+   public void process(JCas aJCas, ResultSpecification aResultSpec)
+         throws AnnotatorProcessException {
 
-      //get character class for current and next character
-      if ((currentCharPos + 1) < textContent.length) {
-        nextChar = textContent[currentCharPos + 1];
-        nextCharType = getCharacterType(nextChar);
-      } else {
-        nextCharType = UNDEFINED;
-        nextChar = INVALID_CHAR;
+      this.logger.logrb(Level.INFO, "WhitespaceTokenizer", "process",
+            MESSAGE_BUNDLE, "whitespace_tokenizer_info_start_processing");
+
+      // get text content from the CAS
+      char[] textContent = aJCas.getCas().getDocumentText().toCharArray();
+      this.cas = aJCas.getCas();
+      int tokenStart = UNDEFINED;
+      int currentCharPos = 0;
+      int sentenceStart = 0;
+      int nextCharType = UNDEFINED;
+      char nextChar = INVALID_CHAR;
+
+      while (currentCharPos < textContent.length) {
+         char currentChar = textContent[currentCharPos];
+         int currentCharType = getCharacterType(currentChar);
+
+         // get character class for current and next character
+         if ((currentCharPos + 1) < textContent.length) {
+            nextChar = textContent[currentCharPos + 1];
+            nextCharType = getCharacterType(nextChar);
+         } else {
+            nextCharType = UNDEFINED;
+            nextChar = INVALID_CHAR;
+         }
+
+         // check if current character is a letter or number
+         if (currentCharType == CH_LETTER || currentCharType == CH_NUMBER) {
+
+            // check if it is the first letter of a token
+            if (tokenStart == UNDEFINED) {
+               // start new token here
+               tokenStart = currentCharPos;
+            }
+         }
+
+         // check if current character is a whitespace character
+         else if (currentCharType == CH_WHITESPACE) {
+
+            // terminate current token
+            if (tokenStart != UNDEFINED) {
+               // end of current word
+               createAnnotation(this.tokenType, tokenStart, currentCharPos);
+               tokenStart = UNDEFINED;
+            }
+         }
+
+         // check if current character is a special character
+         else if (currentCharType == CH_SPECIAL) {
+
+            // terminate current token
+            if (tokenStart != UNDEFINED) {
+               // end of current word
+               createAnnotation(this.tokenType, tokenStart, currentCharPos);
+               tokenStart = UNDEFINED;
+            }
+
+            // create token for special character
+            createAnnotation(this.tokenType, currentCharPos, currentCharPos + 1);
+         }
+
+         // check if current character is new line character
+         else if (currentCharType == CH_NEWLINE) {
+            // terminate current token
+            if (tokenStart != UNDEFINED) {
+               // end of current word
+               createAnnotation(this.tokenType, tokenStart, currentCharPos);
+               tokenStart = UNDEFINED;
+            }
+         }
+
+         // check if current character is new punctuation character
+         else if (currentCharType == CH_PUNCTUATION) {
+
+            // terminates the current token
+            if (tokenStart != UNDEFINED) {
+               createAnnotation(this.tokenType, tokenStart, currentCharPos);
+               tokenStart = UNDEFINED;
+            }
+
+            // check next token type so see if we have a sentence end
+            if (((nextCharType == CH_WHITESPACE) || (nextCharType == CH_NEWLINE))
+                  && (punctuations.contains(new String(
+                        new char[] { currentChar })))) {
+               // terminate sentence
+               createAnnotation(this.sentenceType, sentenceStart,
+                     currentCharPos + 1);
+               sentenceStart = currentCharPos + 1;
+            }
+            // create token for punctuation character
+            createAnnotation(this.tokenType, currentCharPos, currentCharPos + 1);
+         }
+         // go to the next token
+         currentCharPos++;
+      } // end of character loop
+
+      // we are at the end of the text terminate open token annotations
+      if (tokenStart != UNDEFINED) {
+         // end of current word
+         createAnnotation(this.tokenType, tokenStart, currentCharPos);
+         tokenStart = UNDEFINED;
       }
 
-      // check if current character is a letter or number
-      if (currentCharType == CH_LETTER || currentCharType == CH_NUMBER) {
-
-        // check if it is the first letter of a token
-        if (tokenStart == UNDEFINED) {
-          // start new token here
-          tokenStart = currentCharPos;
-        }
+      // we are at the end of the text terminate open sentence annotations
+      if (sentenceStart != UNDEFINED) {
+         // end of current word
+         createAnnotation(this.sentenceType, sentenceStart, currentCharPos);
+         sentenceStart = UNDEFINED;
       }
 
-      // check if current character is a whitespace character
-      else if (currentCharType == CH_WHITESPACE) {
+      this.logger.logrb(Level.INFO, "WhitespaceTokenizer", "process",
+            MESSAGE_BUNDLE, "whitespace_tokenizer_info_stop_processing");
+   }
 
-        // terminate current token
-        if (tokenStart != UNDEFINED) {
-          // end of current word
-          createAnnotation(this.tokenType, tokenStart, currentCharPos);
-          tokenStart = UNDEFINED;
-        }
-      }
+   /**
+    * create an annotation of the given type in the CAS using startPos and
+    * endPos.
+    * 
+    * @param annotationType
+    *           annotation type
+    * @param startPos
+    *           annotation start position
+    * @param endPos
+    *           annotation end position
+    */
+   private void createAnnotation(Type annotationType, int startPos, int endPos) {
 
-      // check if current character is a special character
-      else if (currentCharType == CH_SPECIAL) {
+      AnnotationFS annot = this.cas.createAnnotation(annotationType, startPos,
+            endPos);
+      this.cas.addFsToIndexes(annot);
+   }
 
-        // terminate current token
-        if (tokenStart != UNDEFINED) {
-          // end of current word
-          createAnnotation(this.tokenType, tokenStart, currentCharPos);
-          tokenStart = UNDEFINED;
-        }
+   /**
+    * returns the character type of the given character. Possible character
+    * classes are: CH_LETTER for all letters CH_NUMBER for all numbers
+    * CH_WHITESPACE for all whitespace characters CH_PUNCTUATUATION for all
+    * punctuation characters CH_NEWLINE for all new line characters CH_SPECIAL
+    * for all other characters that are not in any of the groups above
+    * 
+    * @param character
+    *           aCharacter
+    * 
+    * @return returns the character type of the given character
+    */
+   private static int getCharacterType(char character) {
 
-        // create token for special character
-        createAnnotation(this.tokenType, currentCharPos, currentCharPos + 1);
-      }
-
-      // check if current character is new line character
-      else if (currentCharType == CH_NEWLINE) {
-        // terminate current token
-        if (tokenStart != UNDEFINED) {
-          // end of current word
-          createAnnotation(this.tokenType, tokenStart, currentCharPos);
-          tokenStart = UNDEFINED;
-        } 
-      }
-
-      // check if current character is new punctuation character
-      else if (currentCharType == CH_PUNCTUATION) {
-
-        // terminates the current token
-        if (tokenStart != UNDEFINED) {
-          createAnnotation(this.tokenType, tokenStart, currentCharPos);
-          tokenStart = UNDEFINED;
-        }
-
-        // check next token type so see if we have a sentence end
-        if (((nextCharType == CH_WHITESPACE) || (nextCharType == CH_NEWLINE))
-                && (punctuations.contains(new String(new char[] { currentChar })))) {
-          // terminate sentence
-          createAnnotation(this.sentenceType, sentenceStart, currentCharPos + 1);
-          sentenceStart = currentCharPos + 1;
-        }
-        // create token for punctuation character
-        createAnnotation(this.tokenType, currentCharPos, currentCharPos + 1);
-      }
-      // go to the next token
-      currentCharPos++;
-    } //end of character loop
-
-    // we are at the end of the text terminate open token annotations
-    if (tokenStart != UNDEFINED) {
-      // end of current word
-      createAnnotation(this.tokenType, tokenStart, currentCharPos);
-      tokenStart = UNDEFINED;
-    }
-
-    // we are at the end of the text terminate open sentence annotations
-    if (sentenceStart != UNDEFINED) {
-      // end of current word
-      createAnnotation(this.sentenceType, sentenceStart, currentCharPos);
-      sentenceStart = UNDEFINED;
-    }
-
-    this.logger.log(Level.INFO, "Whitespace tokenizer finished processing");
-  }
-
-  /**
-   * create an annotation of the given type in the CAS using startPos and endPos.
-   * 
-   * @param annotationType annotation type
-   * @param startPos annotation start position
-   * @param endPos annotation end position
-   */
-  private void createAnnotation(Type annotationType, int startPos, int endPos) {
-
-    AnnotationFS annot = this.cas.createAnnotation(annotationType, startPos, endPos);
-    this.cas.addFsToIndexes(annot);
-  }
-
-  /**
-   * returns the character type of the given character. Possible character classes are:
-   * CH_LETTER for all letters
-   * CH_NUMBER for all numbers
-   * CH_WHITESPACE for all whitespace characters
-   * CH_PUNCTUATUATION for all punctuation characters
-   * CH_NEWLINE for all new line characters 
-   * CH_SPECIAL for all other characters that are not in any of the groups above
-   * 
-   * @param character aCharacter
-   * 
-   * @return returns the character type of the given character
-   */
-  private static int getCharacterType(char character) {
-
-    switch (Character.getType(character)) {
+      switch (Character.getType(character)) {
 
       // letter characters
       case Character.UPPERCASE_LETTER:
@@ -228,70 +241,77 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
       case Character.PRIVATE_USE:
       case Character.SURROGATE:
       case Character.MODIFIER_SYMBOL:
-        return CH_LETTER;
+         return CH_LETTER;
 
-        // number characters
+         // number characters
       case Character.DECIMAL_DIGIT_NUMBER:
       case Character.LETTER_NUMBER:
       case Character.OTHER_NUMBER:
-        return CH_NUMBER;
+         return CH_NUMBER;
 
-        // whitespace characters
+         // whitespace characters
       case Character.SPACE_SEPARATOR:
       case Character.CONNECTOR_PUNCTUATION:
-        return CH_WHITESPACE;
+         return CH_WHITESPACE;
 
       case Character.DASH_PUNCTUATION:
       case Character.START_PUNCTUATION:
       case Character.END_PUNCTUATION:
       case Character.OTHER_PUNCTUATION:
-        return CH_PUNCTUATION;
+         return CH_PUNCTUATION;
 
       case Character.LINE_SEPARATOR:
       case Character.PARAGRAPH_SEPARATOR:
-        return CH_NEWLINE;
+         return CH_NEWLINE;
 
       case Character.CONTROL:
-        if (character == '\n' || character == '\r') {
-          return CH_NEWLINE;
-        } else {
-          return CH_SPECIAL;
-        }
+         if (character == '\n' || character == '\r') {
+            return CH_NEWLINE;
+         } else {
+            return CH_SPECIAL;
+         }
 
       default:
-        return CH_SPECIAL;
-    }
+         return CH_SPECIAL;
+      }
 
-  }
+   }
 
-  /* (non-Javadoc)
-   * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#initialize(org.apache.uima.analysis_engine.annotator.AnnotatorContext)
-   */
-  public void initialize(AnnotatorContext aContext) throws AnnotatorInitializationException,
-          AnnotatorConfigurationException {
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#initialize(org.apache.uima.analysis_engine.annotator.AnnotatorContext)
+    */
+   public void initialize(AnnotatorContext aContext)
+         throws AnnotatorInitializationException,
+         AnnotatorConfigurationException {
 
-    // initialize logger
-    try {
-      this.logger = aContext.getLogger();
-    } catch (AnnotatorContextException ex) {
-      throw new AnnotatorInitializationException(ex);
-    }
-    
-    this.logger.log(Level.INFO, "Whitespace tokenizer successfully initialized");
-  }
+      // initialize logger
+      try {
+         this.logger = aContext.getLogger();
+      } catch (AnnotatorContextException ex) {
+         throw new AnnotatorInitializationException(ex);
+      }
 
-  /* (non-Javadoc)
-   * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#typeSystemInit(org.apache.uima.cas.TypeSystem)
-   */
-  public void typeSystemInit(TypeSystem aTypeSystem) throws AnnotatorInitializationException,
-          AnnotatorConfigurationException {
+      this.logger.logrb(Level.INFO, "WhitespaceTokenizer", "initialize",
+            MESSAGE_BUNDLE, "whitespace_tokenizer_info_initialized");
+   }
 
-    // initialize cas token type
-    this.tokenType = aTypeSystem.getType(TOKEN_ANNOTATION_NAME);
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#typeSystemInit(org.apache.uima.cas.TypeSystem)
+    */
+   public void typeSystemInit(TypeSystem aTypeSystem)
+         throws AnnotatorInitializationException,
+         AnnotatorConfigurationException {
 
-    this.sentenceType = aTypeSystem.getType(SENTENCE_ANNOTATION_NAME);
-    
-    this.logger.log(Level.INFO, "Whitespace tokenizer typesystem initialized");
-  }
+      // initialize cas token type
+      this.tokenType = aTypeSystem.getType(TOKEN_ANNOTATION_NAME);
 
+      this.sentenceType = aTypeSystem.getType(SENTENCE_ANNOTATION_NAME);
+
+      this.logger.logrb(Level.INFO, "WhitespaceTokenizer", "typeSystemInit",
+            MESSAGE_BUNDLE, "whitespace_tokenizer_info_typesystem_initialized");
+   }
 }
