@@ -104,10 +104,9 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
                this.dictionaries[i].getTypeName());
          // check output type and throw an exception in case of errors
          if (currentDictOutputType == null) {
-            Exception ex = new DictionaryAnnotatorConfigException(
+            throw new DictionaryAnnotatorProcessException(
                   "dictionary_annotator_error_resolving_types",
-                  new Object[] { this.inputMatchTypeStr });
-            throw new AnalysisEngineProcessException(ex);
+                  new Object[] { this.dictionaries[i].getTypeName() });
          }
 
          // iterate over the annotation array and detect matches

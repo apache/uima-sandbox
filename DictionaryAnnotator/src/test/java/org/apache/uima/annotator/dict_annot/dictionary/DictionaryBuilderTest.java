@@ -21,6 +21,7 @@ package org.apache.uima.annotator.dict_annot.dictionary;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -35,6 +36,7 @@ import org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryFileParser
 import org.apache.uima.annotator.dict_annot.dictionary.impl.HashMapDictionary;
 import org.apache.uima.annotator.dict_annot.dictionary.impl.HashMapDictionaryBuilder;
 import org.apache.uima.annotator.dict_annot.impl.DictionaryAnnotatorConfigException;
+import org.apache.uima.test.junit_extension.FileCompare;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 
 /**
@@ -145,7 +147,8 @@ public class DictionaryBuilderTest extends TestCase {
 
       for (int i = 0; i < entries.size(); i++) {
 
-         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), dictBuilder.getMultiWordSeparator());
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i),
+               dictBuilder.getMultiWordSeparator());
 
          ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
@@ -191,7 +194,8 @@ public class DictionaryBuilderTest extends TestCase {
 
       for (int i = 0; i < entries.size(); i++) {
 
-         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), dictBuilder.getMultiWordSeparator());
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i),
+               dictBuilder.getMultiWordSeparator());
 
          ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
@@ -238,7 +242,8 @@ public class DictionaryBuilderTest extends TestCase {
 
       for (int i = 0; i < entries.size(); i++) {
 
-         StringTokenizer tokenizer = new StringTokenizer(entries.get(i), dictBuilder.getMultiWordSeparator());
+         StringTokenizer tokenizer = new StringTokenizer(entries.get(i),
+               dictBuilder.getMultiWordSeparator());
 
          ArrayList<String> list = new ArrayList<String>();
          while (tokenizer.hasMoreTokens()) {
@@ -295,4 +300,107 @@ public class DictionaryBuilderTest extends TestCase {
       return dictEntries;
    }
 
+   /**
+    * test building an invalid XML dictionary file
+    * 
+    * @throws Exception
+    */
+   public void testBuildingInvalidDictFile() throws Exception {
+
+      // read input file
+      File dictFile = JUnitExtension
+            .getFile("DictionaryBuilderTests/InvalidDictFile.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
+      // create dictionary
+      HashMapDictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+
+      boolean foundMessage = false;
+
+      try {
+         fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+               dictBuilder);
+      } catch (DictionaryAnnotatorConfigException ex) {
+         String message = ex.getMessage();
+         if (message.indexOf("InvalidDictFile.xml") > -1) {
+            foundMessage = true;
+         }
+
+      }
+      Assert.assertTrue(foundMessage);
+   }
+
+   /**
+    * test building an invalid XML dictionary file
+    * 
+    * @throws Exception
+    */
+   public void testBuildingInvalidDictFile2() throws Exception {
+
+      // read input file
+      File dictFile = JUnitExtension
+            .getFile("DictionaryBuilderTests/InvalidDictFile2.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
+      // create dictionary
+      HashMapDictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+
+      boolean foundMessage = false;
+
+      try {
+         fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+               dictBuilder);
+      } catch (DictionaryAnnotatorConfigException ex) {
+         String message = ex.getMessage();
+         if (message.indexOf("InvalidDictFile2.xml") > -1) {
+            foundMessage = true;
+         }
+
+      }
+      Assert.assertTrue(foundMessage);
+   }
+
+   /**
+    * test dictionary printing
+    * 
+    * @throws Exception
+    */
+   public void testDictionaryPrinting() throws Exception {
+
+      // read input file
+      File dictFile = JUnitExtension
+            .getFile("DictionaryBuilderTests/MultiWordsSpecialMultiWordSeparator.xml");
+      InputStream stream = new BufferedInputStream(
+            new FileInputStream(dictFile));
+
+      // create dictionary
+      HashMapDictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
+      // create dictionary file parser
+      DictionaryFileParser fileParser = new DictionaryFileParserImpl();
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+            dictBuilder);
+      HashMapDictionary dict = (HashMapDictionary) dictBuilder.getDictionary();
+
+      //create dictionary content output file
+      File outputFile = new File(JUnitExtension
+            .getFile("DictionaryBuilderTests"),
+            "dictionaryPrinting_testoutput.txt");
+      FileWriter writer = new FileWriter(outputFile);
+
+      //print dictionary content to file
+      dict.printDictionary(writer);
+      
+      writer.flush();
+      writer.close();
+      
+      //compare dictionary content with reference content 
+      FileCompare.compare(outputFile, JUnitExtension
+            .getFile("DictionaryBuilderTests/dictionaryPrintingRef.txt"));
+   }
 }

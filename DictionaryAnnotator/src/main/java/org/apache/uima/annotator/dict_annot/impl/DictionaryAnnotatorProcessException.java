@@ -45,36 +45,4 @@ public class DictionaryAnnotatorProcessException extends
          Object[] aArguments) {
       super(DictionaryAnnotator.MESSAGE_DIGEST, aMessageKey, aArguments);
    }
-
-   /**
-    * Creates a new exception with the specified cause and a message from the
-    * DictionaryAnnotator message catalog.
-    * 
-    * @param aMessageKey
-    *           an identifier that maps to the message for this exception. The
-    *           message may contain place holders for arguments as defined by
-    *           the {@link java.text.MessageFormat MessageFormat} class.
-    * @param aArguments
-    *           The arguments to the message. <code>null</code> may be used if
-    *           the message has no arguments.
-    * @param aCause
-    *           the original exception that caused this exception to be thrown,
-    *           if any
-    */
-   public DictionaryAnnotatorProcessException(String aMessageKey,
-         Object[] aArguments, Throwable aCause) {
-      super(DictionaryAnnotator.MESSAGE_DIGEST, aMessageKey, aArguments, aCause);
-   }
-
-   /**
-    * Creates a new exception with the specified cause and a null message.
-    * 
-    * @param aCause
-    *          the original exception that caused this exception to be thrown, if any
-    */
-   public DictionaryAnnotatorProcessException(Throwable aCause) {
-     super(aCause);
-   }
-
-   
 }
