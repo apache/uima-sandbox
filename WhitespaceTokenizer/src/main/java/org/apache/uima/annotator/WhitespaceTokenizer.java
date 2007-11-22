@@ -68,7 +68,7 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
 
   private Logger logger;
 
-  private static List punctuations = Arrays.asList(new String[] { ".", "!", "?" });
+  private static List<String> punctuations = Arrays.asList(new String[] { ".", "!", "?" });
 
   /*
    * (non-Javadoc)
@@ -79,7 +79,7 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
   public void process(JCas aJCas, ResultSpecification aResultSpec) throws AnnotatorProcessException {
     this.logger.log(Level.INFO, "Whitespace tokenizer starts processing");
 
-    // get text content from teh CAS
+    // get text content from the CAS
     char[] textContent = aJCas.getCas().getDocumentText().toCharArray();
     this.cas = aJCas.getCas();
     int tokenStart = UNDEFINED;
@@ -104,7 +104,7 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
       // check if current character is a letter or number
       if (currentCharType == CH_LETTER || currentCharType == CH_NUMBER) {
 
-        // check if it is the frist letter of a token
+        // check if it is the first letter of a token
         if (tokenStart == UNDEFINED) {
           // start new token here
           tokenStart = currentCharPos;
@@ -187,7 +187,7 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
   }
 
   /**
-   * create an annoation of the given type in the CAS using startPos and endPos.
+   * create an annotation of the given type in the CAS using startPos and endPos.
    * 
    * @param annotationType annotation type
    * @param startPos annotation start position
@@ -204,7 +204,7 @@ public class WhitespaceTokenizer extends JTextAnnotator_ImplBase {
    * CH_LETTER for all letters
    * CH_NUMBER for all numbers
    * CH_WHITESPACE for all whitespace characters
-   * CH_PUNCTUATUATION for all puctuation characters
+   * CH_PUNCTUATUATION for all punctuation characters
    * CH_NEWLINE for all new line characters 
    * CH_SPECIAL for all other characters that are not in any of the groups above
    * 
