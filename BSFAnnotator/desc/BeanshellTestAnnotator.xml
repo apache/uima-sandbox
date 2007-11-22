@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taeDescription xmlns="http://uima.apache.org/resourceSpecifier">
+<frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+<primitive>true</primitive>
+<annotatorImplementationName>org.apache.uima.annotator.bsf.BSFAnnotator</annotatorImplementationName>
+<analysisEngineMetaData>
+<name>BSH Annotator</name>
+<description>Test of Beanshell BSF Annotator.</description>
+<version>1.0</version>
+<vendor>TEMIS</vendor>
+<configurationParameters>
+<configurationParameter>
+<name>SourceFile</name>
+<description>BSF script to be loaded</description>
+<type>String</type>
+<multiValued>false</multiValued>
+<mandatory>true</mandatory>
+</configurationParameter>
+<configurationParameter>
+<name>Regexp</name>
+<description>Regular expression</description>
+<type>String</type>
+<multiValued>false</multiValued>
+<mandatory>true</mandatory>
+</configurationParameter>
+</configurationParameters>
+<configurationParameterSettings>
+<nameValuePair>
+<name>SourceFile</name>
+<value>
+<string>TEST.bsh</string>
+</value>
+</nameValuePair>
+<nameValuePair>
+<name>Regexp</name>
+<value>
+<string>Dave|David|Bob|Tim|Joe</string>
+</value>
+</nameValuePair>
+</configurationParameterSettings>
+<typeSystemDescription>
+    <typeDescription>
+      <name>org.apache.uima.annotator.bsf.types.Token</name>
+      <description></description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features/>
+    </typeDescription>
+</typeSystemDescription>
+<typePriorities/>
+<fsIndexCollection/>
+<capabilities>
+<capability>
+<inputs/>
+<outputs/>
+<languagesSupported>
+<language>x-unspecified</language>
+</languagesSupported>
+</capability>
+</capabilities>
+<operationalProperties>
+<modifiesCas>true</modifiesCas>
+<multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+<outputsNewCASes>false</outputsNewCASes>
+</operationalProperties>
+</analysisEngineMetaData>
+</taeDescription>
