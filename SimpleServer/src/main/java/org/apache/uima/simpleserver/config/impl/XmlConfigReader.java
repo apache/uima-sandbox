@@ -151,7 +151,6 @@ public final class XmlConfigReader {
 
   // Process a filter bean.
   private static final Filter readFilter(FilterType filterBean) throws SimpleServerException {
-    System.out.println(filterBean.toString());
     Filter filter = null;
     // Need to distinguish the various kinds of filters.
     if (filterBean instanceof And) {
@@ -303,6 +302,7 @@ public final class XmlConfigReader {
         throw new SimpleServerException(SimpleServerException.incorrect_feature_syntax,
             new Object[] { feature, path });
       }
+      featureList.add(feature);
       pos = next + 1;
     }
     return featureList;

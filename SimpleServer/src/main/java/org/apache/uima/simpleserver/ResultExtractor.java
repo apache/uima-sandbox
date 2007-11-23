@@ -31,6 +31,7 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.LowLevelCAS;
 import org.apache.uima.cas.impl.TypeSystemUtils;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.simpleserver.config.Filter;
 import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.ServerSpec;
 import org.apache.uima.simpleserver.config.TypeMap;
@@ -89,7 +90,8 @@ public class ResultExtractor {
         // this fs is an annotation
         AnnotationFS annotation = (AnnotationFS) iterator.get();
         // if the annotation passes all filters...
-        if (tspec.getFilter().match(annotation)) {
+        Filter filter = tspec.getFilter();
+        if ((filter == null) || filter.match(annotation)) {
           ResultEntryImpl resultEntry = new ResultEntryImpl(tspec.getOutputTag());
           // ...then we use it to make output obect
           makeOutputs(resultEntry, annotation, tspec);
@@ -108,11 +110,7 @@ public class ResultExtractor {
   public static void makeOutputs(ResultEntryImpl resultEntry, AnnotationFS annotation,
       TypeMap tspec) {
 
-    // TODO covered text - DONE
-
-    String coveredText = annotation.getCoveredText();
-
-    resultEntry.setCoveredText(coveredText);
+    resultEntry.setCoveredText(annotation.getCoveredText());
 
     /*
      * 

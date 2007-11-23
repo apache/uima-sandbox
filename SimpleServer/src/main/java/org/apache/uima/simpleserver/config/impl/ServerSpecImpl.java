@@ -77,11 +77,14 @@ public class ServerSpecImpl implements ServerSpec {
       Type type = typeSystem.getType(typeMap.getTypeName());
       if (type == null) {
         exc.add(new SimpleServerException(SimpleServerException.type_does_not_exist,
-            new Object[] { type }));
+            new Object[] { typeMap.getTypeName() }));
         continue;
       }
       // Now go through the filter and outputs and check each path for validity
-      checkFilter(typeMap.getFilter(), type, exc);
+      Filter filter = typeMap.getFilter();
+      if (filter != null) {
+        checkFilter(filter, type, exc);
+      }
       checkOutputs(typeMap.getOutputs(), type, exc);
     }
     return exc;
