@@ -21,7 +21,7 @@ package org.apache.uima.annotator.regex.extension;
 
 /**
  * The Normalization interface was add to implement a custom normalization
- * for feature values before they are assigned to an anntoation. 
+ * for feature values before they are assigned to an annotation. 
  */
 public interface Normalization {
 	
