@@ -40,62 +40,46 @@ import org.apache.uima.simpleserver.output.ResultEntry;
 import org.apache.uima.simpleserver.output.impl.ResultEntryImpl;
 import org.apache.uima.simpleserver.output.impl.ResultImpl;
 
-/*
+/**
  * This class contains static methods responsible for iterating over annotations, applying filters
- * and building outputs
+ * and building output.
  */
 public class ResultExtractor {
 
-  /*
-   * this is the main method of this class, intended to be called from outside.
+  /**
+   * Extract a set of results from a CAS and a result specification.
    * 
-   * It receives a CAS and a ResultSpecification object and produces a Result object which contains
-   * annotations from the CAS which have passed the filters.
+   * @param cas
+   *                The CAS to extract results from.
+   * @param resultSpec
+   *                The result specification.
    */
-  public static Result getResult(CAS cas, ServerSpec rspec) {
-
-    // this collection will store the result - some number of ResultEntry
-    // instances
+  public static Result getResult(CAS cas, ServerSpec resultSpec) {
     List<ResultEntry> resultEntries = new ArrayList<ResultEntry>();
-
-    try {
-      processTypes(cas, rspec, resultEntries);
-
-      return new ResultImpl(resultEntries, cas.getDocumentText());
-    } catch (Throwable t) {
-      throw new RuntimeException(
-          "the CAS has been processed, but the result extraction from CAS failed");
-    }
+    processTypes(cas, resultSpec, resultEntries);
+    return new ResultImpl(resultEntries, cas.getDocumentText());
   }
 
-  /*
-   * this method perform iteration over all <type .. > specifications of the ResultSpecification XML
-   */
   private static void processTypes(CAS cas, ServerSpec rspec, List<ResultEntry> resultEntries) {
     Type annotationType = cas.getTypeSystem().getType(CAS.TYPE_NAME_ANNOTATION);
-    // we iterate over all <type> specifications of the ResultSpec
     for (TypeMap tspec : rspec.getTypeSpecs()) {
       TypeSystem typeSystem = cas.getTypeSystem();
       Type type = typeSystem.getType(tspec.getTypeName());
-
       // Check that type exists and is an annotation.
       if ((type == null) || !typeSystem.subsumes(annotationType, type)) {
+        // If not, skip.
         continue;
       }
-
-      // iterate over all annotations of the specified type
-      // and its subtypes
+      // Iterate over FSs, filter and create output.
       FSIterator iterator = cas.getAnnotationIndex(type).iterator();
       for (; iterator.isValid(); iterator.moveToNext()) {
-        // this fs is an annotation
         AnnotationFS annotation = (AnnotationFS) iterator.get();
-        // if the annotation passes all filters...
         Filter filter = tspec.getFilter();
+        // Check that there either is no filter, or the FS passes the filter.
         if ((filter == null) || filter.match(annotation)) {
+          // Create a new result entry, fill with attributes and add result set.
           ResultEntryImpl resultEntry = new ResultEntryImpl(tspec.getOutputTag());
-          // ...then we use it to make output obect
           makeOutputs(resultEntry, annotation, tspec);
-          // and add it to the result collection
           resultEntries.add(resultEntry);
         }
 
@@ -104,19 +88,10 @@ public class ResultExtractor {
 
   }
 
-  /*
-   * This method produces the output as specified by the ResultSpecification XML file
-   */
-  public static void makeOutputs(ResultEntryImpl resultEntry, AnnotationFS annotation,
-      TypeMap tspec) {
-
-    resultEntry.setCoveredText(annotation.getCoveredText());
-
-    /*
-     * 
-     * if (tspec.isOutputCoveredText()) { resultEntry.setAttributeValue("coveredText", coveredText); }
-     */
-
+  public static void makeOutputs(ResultEntryImpl resultEntry, AnnotationFS annotation, TypeMap tspec) {
+    if (tspec.isOutputCoveredText()) {
+      resultEntry.setCoveredText(annotation.getCoveredText());
+    }
     for (Output outSpec : tspec.getOutputs()) {
       Object value = evaluatePath(annotation, outSpec.getFeaturePath());
       if (value != null) {
