@@ -94,6 +94,16 @@ public class ConfigTest {
     test("serverspec/spec4.xml", 0);
   }
 
+  @Test
+  public void testResultGeneration5() {
+    test("serverspec/spec5.xml", 10);
+  }
+
+  @Test
+  public void testResultGeneration6() {
+    test("serverspec/spec6.xml", 10);
+  }
+
   private static final void test(String configFile, int expectedResultNumber) {
     JCas cas = createTestCas();
     ServerSpec serverSpec = null;
