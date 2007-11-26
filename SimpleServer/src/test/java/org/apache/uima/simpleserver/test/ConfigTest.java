@@ -76,11 +76,29 @@ public class ConfigTest {
 
   @Test
   public void testResultGeneration1() {
+    test("serverspec/spec1.xml", 289);    
+  }
+  
+  @Test
+  public void testResultGeneration2() {
+    test("serverspec/spec2.xml", 3);
+  }
+
+  @Test
+  public void testResultGeneration3() {
+    test("serverspec/spec3.xml", 1);
+  }
+
+  @Test
+  public void testResultGeneration4() {
+    test("serverspec/spec4.xml", 0);
+  }
+
+  private static final void test(String configFile, int expectedResultNumber) {
     JCas cas = createTestCas();
     ServerSpec serverSpec = null;
     try {
-      serverSpec = XmlConfigReader.readServerSpec(JUnitExtension
-          .getFile("serverspec/spec1.xml"));
+      serverSpec = XmlConfigReader.readServerSpec(JUnitExtension.getFile(configFile));
     } catch (SimpleServerException e) {
       e.printStackTrace();
       assertTrue(false);
@@ -97,7 +115,9 @@ public class ConfigTest {
       assertTrue(false);
     }
     Result result = ResultExtractor.getResult(cas.getCas(), serverSpec);
-    assertTrue((result.getResultEntries().size() + 1) == cas.getDocumentText().length());
+    final int resultSize = result.getResultEntries().size();
+    assertTrue("Expected number of results was " + expectedResultNumber + ", actual number is "
+        + resultSize, (resultSize == expectedResultNumber));
   }
 
   private static final JCas createTestCas() {
