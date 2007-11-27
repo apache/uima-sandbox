@@ -69,7 +69,7 @@ public class TestVariables extends TestCase {
       AnnotatorTester annotTester = new AnnotatorTester(JUnitExtension
             .getFile("variables/RegExAnnotVariables.xml"));
 
-      CAS cas = annotTester.performTest("Tuesday January Sunday test $days$",
+      CAS cas = annotTester.performTest("Tuesday January Sunday test {days}",
             "en");
 
       // define result interested in

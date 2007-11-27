@@ -25,7 +25,7 @@
 		
     <concept name="Variables1">
     	<rules>
-			<rule ruleId="VariableError" regEx="\v$days$ simple regex with variables \v$days$" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+			<rule ruleId="VariableError" regEx="\v{days} simple regex with variables \v{days}" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
 	    </rules>
 	    <createAnnotations>	
 			<annotation type="org.apache.uima.TestAnnot">

@@ -21,13 +21,18 @@ package org.apache.uima.annotator.regex;
 import java.util.regex.Pattern;
 
 /**
- * 
+ * RegexVariables interface. 
  */
 public interface RegexVariables {
 
    public static final String VARIABLE_START = "\\v";
 
-   public static final Pattern VARIABLE_REGEX_PATTERN = Pattern.compile("\\\\v\\$(\\w+)\\$");
+   public static final String VARIABLE_REGEX_BEGIN = "\\\\v\\{";
+
+   public static final String VARIABLE_REGEX_END = "\\}";
+
+   public static final Pattern VARIABLE_REGEX_PATTERN = Pattern
+         .compile(VARIABLE_REGEX_BEGIN + "(\\w+)" + VARIABLE_REGEX_END);
 
    /**
     * Adds a variable to the Variables object.

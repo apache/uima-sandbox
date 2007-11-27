@@ -27,7 +27,7 @@
 	
     <concept name="Variables1">
     	<rules>
-			<rule regEx="\v$days$ simple regex with variables \v$days$" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+			<rule regEx="\v{days} simple regex with variables \v{days}" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
 	    </rules>
 	    <createAnnotations>	
 			<annotation type="org.apache.uima.TestAnnot">
@@ -39,7 +39,7 @@
 
     <concept name="Variables2">
     	<rules>
-			<rule regEx="\v$days$ \v$month1$ \v$Last_Day$ test \$days\$" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+			<rule regEx="\v{days} \v{month1} \v{Last_Day} test \{days\}" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
 	    </rules>
 	    <createAnnotations>	
 			<annotation id="testannot1" type="org.apache.uima.TestAnnot">

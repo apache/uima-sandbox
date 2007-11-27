@@ -94,7 +94,8 @@ public class Rule_impl implements Rule {
     *           featurePath (can also be null)
     */
    public Rule_impl(String regex, int matchStrategy, String matchType,
-         String id, float confidence, String featurePath, RegexVariables variables) {
+         String id, float confidence, String featurePath,
+         RegexVariables variables) {
       this.regex = regex;
       this.matchStrategy = matchStrategy;
       this.matchTypeStr = matchType;
@@ -273,8 +274,9 @@ public class Rule_impl implements Rule {
     * @throws RegexAnnotatorConfigException
     */
    public void initialize() throws RegexAnnotatorConfigException {
-      // check if regular expression contains a regex variable, it must be replaced first
-      if (this.regex.indexOf(RegexVariables.VARIABLE_START) > -1 ) {
+      // check if regular expression contains a regex variable, it must be
+      // replaced first
+      if (this.regex.indexOf(RegexVariables.VARIABLE_START) > -1) {
          // we have to replace the regex variables
          replaceRegexVariables();
       }
@@ -308,7 +310,8 @@ public class Rule_impl implements Rule {
     */
    private void replaceRegexVariables() throws RegexAnnotatorConfigException {
       // create a regex matcher for the variable pattern
-      Matcher matcher = RegexVariables.VARIABLE_REGEX_PATTERN.matcher(this.regex);
+      Matcher matcher = RegexVariables.VARIABLE_REGEX_PATTERN
+            .matcher(this.regex);
 
       // find all variables in the regular expression
       int pos = 0;
@@ -339,8 +342,8 @@ public class Rule_impl implements Rule {
             String varValue = this.variables.getVariableValue(variableName);
             if (varValue != null) {
                // create variable expression that must be replaced
-               // regex pattern for a variable \\\\v\\$(\\w+)\\$
-               String variablePattern = "\\\\v\\$" + variableName + "\\$";
+               String variablePattern = RegexVariables.VARIABLE_REGEX_BEGIN
+                     + variableName + RegexVariables.VARIABLE_REGEX_END;
                // replace variable with the variable value
                this.regex = this.regex.replaceAll(variablePattern, varValue);
             } else {
