@@ -23,8 +23,24 @@
   <xs:element name="conceptSet">
 	<xs:complexType>
 	  <xs:sequence>
+		<xs:element ref="variables" minOccurs="0" maxOccurs="1" />
 		<xs:element ref="concept" minOccurs="0"	maxOccurs="unbounded" />
 	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="variables">
+	<xs:complexType>
+	  <xs:sequence>
+		<xs:element ref="variable" minOccurs="0" maxOccurs="unbounded" />
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
+
+  <xs:element name="variable">
+	<xs:complexType>
+	  <xs:attribute name="name" type="xs:string" use="required" />
+	  <xs:attribute name="value" type="xs:string" use="required" />
 	</xs:complexType>
   </xs:element>
 

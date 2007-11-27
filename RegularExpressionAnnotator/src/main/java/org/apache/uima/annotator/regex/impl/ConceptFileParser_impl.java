@@ -31,6 +31,8 @@ import org.apache.incubator.uima.regex.FeatureDocument;
 import org.apache.incubator.uima.regex.RuleDocument;
 import org.apache.incubator.uima.regex.RulesDocument;
 import org.apache.incubator.uima.regex.SetFeatureDocument;
+import org.apache.incubator.uima.regex.VariableDocument;
+import org.apache.incubator.uima.regex.VariablesDocument;
 import org.apache.uima.annotator.regex.Annotation;
 import org.apache.uima.annotator.regex.Concept;
 import org.apache.uima.annotator.regex.ConceptFileParser;
@@ -38,6 +40,7 @@ import org.apache.uima.annotator.regex.Feature;
 import org.apache.uima.annotator.regex.FilterFeature;
 import org.apache.uima.annotator.regex.Position;
 import org.apache.uima.annotator.regex.Rule;
+import org.apache.uima.annotator.regex.RegexVariables;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
@@ -87,12 +90,27 @@ public class ConceptFileParser_impl implements ConceptFileParser {
                      conceptFilePathName, errorMessages.toString() });
       }
 
+      // get concept file regex variables and store them all to the variables
+      // object
+      VariablesDocument.Variables variablesDoc = conceptSetDoc.getConceptSet()
+            .getVariables();
+      RegexVariables variables = null;
+      if (variablesDoc != null) {
+         VariableDocument.Variable[] varArray = variablesDoc.getVariableArray();
+         if (varArray.length > 0) {
+            variables = new RegexVariables_impl();
+            for (int i = 0; i < varArray.length; i++) {
+               variables.addVariable(varArray[i].getName(), varArray[i]
+                     .getValue());
+            }
+         }
+      }
+
       // ***************************************************
       // get the concepts from the concept file document
       // ***************************************************
       ConceptSetDocument.ConceptSet conceptSet = conceptSetDoc.getConceptSet();
-      ConceptDocument.Concept[] concepts = conceptSet
-            .getConceptArray();
+      ConceptDocument.Concept[] concepts = conceptSet.getConceptArray();
       for (int i = 0; i < concepts.length; i++) {
          // get concept meta data
          String conceptName = concepts[i].getName();
@@ -119,9 +137,11 @@ public class ConceptFileParser_impl implements ConceptFileParser {
                confidence = ruleList[r].getConfidence().floatValue();
             }
 
-            // create new rule
+            // create new rule and add all rule settings
+            // additionally add a reference to the regex variables object
+            // to resolve regex variables
             Rule rule = new Rule_impl(regex, matchStrategy, matchType, id,
-                  confidence, featurePath);
+                  confidence, featurePath, variables);
 
             // ********************************
             // get match type filter features
@@ -191,7 +211,8 @@ public class ConceptFileParser_impl implements ConceptFileParser {
          // **************************************
          // get all annotations for this concept
          // **************************************
-         CreateAnnotationsDocument.CreateAnnotations annotations = concepts[i].getCreateAnnotations();
+         CreateAnnotationsDocument.CreateAnnotations annotations = concepts[i]
+               .getCreateAnnotations();
          AnnotationDocument.Annotation[] annotationList = annotations
                .getAnnotationArray();
          for (int a = 0; a < annotationList.length; a++) {
@@ -216,7 +237,8 @@ public class ConceptFileParser_impl implements ConceptFileParser {
                   validationClass);
 
             // read out feature values and add it to the annotation
-            SetFeatureDocument.SetFeature[] features = annotationList[a].getSetFeatureArray();
+            SetFeatureDocument.SetFeature[] features = annotationList[a]
+                  .getSetFeatureArray();
             for (int f = 0; f < features.length; f++) {
                String name = features[f].getName();
                int featureType = features[f].getType().intValue();

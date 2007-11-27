@@ -19,6 +19,8 @@
 package org.apache.uima.annotator.regex.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.uima.annotator.regex.Feature;
@@ -26,6 +28,7 @@ import org.apache.uima.annotator.regex.FeaturePath;
 import org.apache.uima.annotator.regex.FilterFeature;
 import org.apache.uima.annotator.regex.Rule;
 import org.apache.uima.annotator.regex.RuleException;
+import org.apache.uima.annotator.regex.RegexVariables;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -36,7 +39,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 public class Rule_impl implements Rule {
 
    // rule regex string
-   private final String regex;
+   private String regex;
 
    // rule ID
    private final String id;
@@ -71,6 +74,9 @@ public class Rule_impl implements Rule {
    // rule exceptions
    private ArrayList<RuleException> exceptions;
 
+   // concept variables
+   private RegexVariables variables;
+
    /**
     * Constructor to create a new Rule object.
     * 
@@ -88,7 +94,7 @@ public class Rule_impl implements Rule {
     *           featurePath (can also be null)
     */
    public Rule_impl(String regex, int matchStrategy, String matchType,
-         String id, float confidence, String featurePath) {
+         String id, float confidence, String featurePath, RegexVariables variables) {
       this.regex = regex;
       this.matchStrategy = matchStrategy;
       this.matchTypeStr = matchType;
@@ -103,6 +109,7 @@ public class Rule_impl implements Rule {
       if (featurePath != null) {
          this.isFeaturePathMatch = true;
       }
+      this.variables = variables;
    }
 
    /*
@@ -266,6 +273,12 @@ public class Rule_impl implements Rule {
     * @throws RegexAnnotatorConfigException
     */
    public void initialize() throws RegexAnnotatorConfigException {
+      // check if regular expression contains a regex variable, it must be replaced first
+      if (this.regex.indexOf(RegexVariables.VARIABLE_START) > -1 ) {
+         // we have to replace the regex variables
+         replaceRegexVariables();
+      }
+
       // compile regex
       this.pattern = Pattern.compile(this.regex);
 
@@ -285,6 +298,57 @@ public class Rule_impl implements Rule {
       RuleException[] ruleExceptions = getExceptions();
       for (int i = 0; i < ruleExceptions.length; i++) {
          ((RuleException_impl) ruleExceptions[i]).initialize();
+      }
+   }
+
+   /**
+    * replace the variables used in the regular expression pattern
+    * 
+    * @throws RegexAnnotatorConfigException
+    */
+   private void replaceRegexVariables() throws RegexAnnotatorConfigException {
+      // create a regex matcher for the variable pattern
+      Matcher matcher = RegexVariables.VARIABLE_REGEX_PATTERN.matcher(this.regex);
+
+      // find all variables in the regular expression
+      int pos = 0;
+      HashSet<String> variableSet = new HashSet<String>();
+      while (matcher.find(pos)) {
+
+         // get match area for match group 1
+         int varStart = matcher.start(1);
+         int varEnd = matcher.end(1);
+
+         // add match group 1 content (variable name) to the variable list
+         variableSet.add(this.regex.substring(varStart, varEnd));
+
+         // current end match position
+         pos = matcher.end();
+      }
+
+      // replace all found variables in the regular expression
+      for (String variableName : variableSet) {
+
+         // check if variables are defined
+         if (this.variables == null) {
+            throw new RegexAnnotatorConfigException(
+                  "regex_annotator_error_variable_not_found", new Object[] {
+                        variableName, this.id });
+         } else {
+            // get variable value for the variable name
+            String varValue = this.variables.getVariableValue(variableName);
+            if (varValue != null) {
+               // create variable expression that must be replaced
+               // regex pattern for a variable \\\\v\\$(\\w+)\\$
+               String variablePattern = "\\\\v\\$" + variableName + "\\$";
+               // replace variable with the variable value
+               this.regex = this.regex.replaceAll(variablePattern, varValue);
+            } else {
+               throw new RegexAnnotatorConfigException(
+                     "regex_annotator_error_variable_not_found", new Object[] {
+                           variableName, this.id });
+            }
+         }
       }
    }
 
@@ -338,7 +402,7 @@ public class Rule_impl implements Rule {
          buffer.append(ruleExceptions[i].toString());
       }
       buffer.append("\n");
-      
+
       return buffer.toString();
    }
 
