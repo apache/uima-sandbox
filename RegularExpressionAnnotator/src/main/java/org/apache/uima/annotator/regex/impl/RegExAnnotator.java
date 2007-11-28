@@ -304,8 +304,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                      .getMatchTypeFilterFeatures();
                boolean passed = true;
                for (int ff = 0; ff < filterFeatures.length; ff++) {
-                  //get the current filterFeature featurePath value                 
-                  String featureValue = filterFeatures[ff].getFeaturePath().getValue(currentAnnot);
+                  // get the current filterFeature featurePath value
+                  String featureValue = filterFeatures[ff].getFeaturePath()
+                        .getValue(currentAnnot);
                   // check if feature value is set
                   if (featureValue != null) {
                      // create matcher for the current feature value
@@ -337,7 +338,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
                // check matchValue result, if it is null we don't have to match
                // anything and can go on with the next annotation
-               if(matchValue == null) {
+               if (matchValue == null) {
                   continue;
                }
 
@@ -673,6 +674,19 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   String featureValue = replaceMatchGroupValues(features[f]
                         .getValue(), matcher);
 
+                  // do featureValue normalization
+                  try {
+                     // try to set the normalized feature value, if no
+                     // normalization was specified for the feature, the
+                     // original feature value is set
+                     featureValue = features[f].normalize(featureValue);
+                  } catch (Exception ex) {
+                     throw new RegexAnnotatorProcessException(
+                           "regex_annotator_error_normalizing_feature_value",
+                           new Object[] { featureValue, features[f].getName() },
+                           ex);
+                  }
+
                   // set feature value at the annotation in dependence of the
                   // feature type
                   if (type == Feature.FLOAT_FEATURE) {
@@ -682,18 +696,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                      fs.setIntValue(features[f].getFeature(), Integer
                            .parseInt(featureValue));
                   } else if (type == Feature.STRING_FEATURE) {
-                     try {
-                        // try to set the normalized feature value, if no
-                        // normalization was specified for the feature, the
-                        // original feature value is set
-                        fs.setStringValue(features[f].getFeature(), features[f]
-                              .normalize(featureValue));
-                     } catch (Exception ex) {
-                        throw new RegexAnnotatorProcessException(
-                              "regex_annotator_error_normalizing_feature_value",
-                              new Object[] { featureValue,
-                                    features[f].getName() }, ex);
-                     }
+                     fs.setStringValue(features[f].getFeature(), featureValue);
                   }
                } else if (type == Feature.REFERENCE_FEATURE) {
                   // we have a reference feature, we have to set this later
