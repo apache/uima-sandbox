@@ -566,8 +566,7 @@
 						<para>
 							<code>normalization</code>
 							- Specifies the normalization that should be performed before the feature value
-							is assigned to the match type annotation. This <code>normalization</code> feature is
-							only evaluated for features of type <code>String</code>. For a list of all built-in
+							is assigned to the match type annotation. For a list of all built-in
 							normalization functions please refer to 
 							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
 						</para>
@@ -881,8 +880,7 @@ public class SampleValidator implements
 						<para>
 							<code>normalization</code>
 							- Specifies the normalization that should be performed before the feature value
-							is assigned to the UIMA annotation. This <code>normalization</code> feature is 
-							only evaluated for features of type <code>String</code>. For a list of all built-in
+							is assigned to the UIMA annotation. For a list of all built-in
 							normalization functions please refer to 
 							<xref linkend="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization"/>. 
 						</para>
@@ -968,7 +966,7 @@ public class SampleValidator implements
 				<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization">
 					<title>Features Value Normalization</title>
 					<para>
-					  Before assigning a <code>String</code> feature value to an annotation it is possible to 
+					  Before assigning a feature value to an annotation it is possible to 
 					  do a normalization on the feature value. This normalization can be useful for example to normalize 
 					  a detected email addresses to lower case before it is added to the annotation. 
 					  To normalize a feature value the <code>normalization</code> feature of the 
