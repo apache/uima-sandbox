@@ -268,6 +268,85 @@
 		</section>
 
 		<section
+			id="sandbox.regexAnnotator.conceptsFile.regexVariables">
+			<title>Regex Variables</title>
+			<para>
+				The regex variables allows to externalize parts of a regular expression
+				to shorten them and make it easier to read. The externalized part of the
+				expression is replaced with a regex variable. The variable syntax looks like
+				<code>\v{weekdays}</code>, where <code>weekdays</code> is the variable name.
+				The field for regex variables are mainly the separation of enumerations in a 
+				regular expression to make them easier to understand and maintain.
+				But let's see how it works in the short example below.
+			</para>
+			<para>
+			    A simple regular expression for a date like <code>Wednesday, November 28, 2007</code>
+			    can look like: 
+			</para>
+			<para>
+			   <programlisting><emphasis><![CDATA[<concept name="Date" processAllRules="true">
+ <rules>
+  <rule regEx="(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), 
+   (January|February|March|April|May|June|July|August|September|October|
+   November|December) (0[1-9]|[12][0-9]|3[01]), ((19|20)\d\d)"
+   matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+ </rules>
+ <createAnnotations>
+  <annotation type="org.apache.uima.Date">
+   <begin group="0" />
+   <end group="0" />
+  </annotation>
+ </createAnnotations>
+</concept>		   
+]]></emphasis></programlisting>
+			</para>
+			<para>
+			   When using regex variables to externalize the weekdays and the months in this 
+			   regular expression, it looks like: 
+			</para>
+			<para>
+			   <programlisting><emphasis><![CDATA[<conceptSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://incubator.apache.org/uima/regex">
+
+<variables>
+ <variable name="weekdays" 
+   value="Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday"/>
+ 
+ <variable name="months" 
+   value="January|February|March|April|May|June|July|August|September|
+     October|November|December"/>
+</variables>
+			   
+
+<concept name="Date" processAllRules="true">
+ <rules>
+  <rule regEx="(\v{weekdays}), (\v{months}) (0[1-9]|[12][0-9]|3[01]), 
+     ((19|20)\d\d)"
+     matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+  </rules>
+  <createAnnotations>
+   <annotation type="org.apache.uima.Date">
+    <begin group="0" />
+    <end group="0" />
+   </annotation>
+ </createAnnotations>
+</concept>		
+
+</conceptSet>   
+]]></emphasis></programlisting>
+			</para>
+			<para>
+			  The regex variables must be defined at the beginning of the concept file 
+			  next to the <code>&lt;conceptSet></code> element before the concepts are 
+			  defined. The variables can be used in all concept definition within the
+			  same file. 
+			</para>
+			<para>
+			  The regex variable name can contain any of the following characters 
+			  <code>[a-zA-Z_0-9]</code>. Other characters are not allowed.
+			</para>
+		</section>
+		<section
 			id="sandbox.regexAnnotator.conceptsFile.rulesDefinition">
 			<title>Rule Definition</title>
 			<para>
