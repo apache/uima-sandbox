@@ -31,7 +31,9 @@ public interface Normalization {
  * 
  * @param input input string which should be normalized
  * 
+ * @param ruleID rule ID of the matching rule
+ * 
  * @return String - normalized input string 
  */
-public String normalize(String input) throws Exception;
+public String normalize(String input, String ruleID) throws Exception;
 }

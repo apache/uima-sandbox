@@ -91,15 +91,13 @@ public class Feature_impl implements Feature {
       return this.feature;
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.apache.uima.annotator.regex.Feature#normalize(java.lang.String)
+   /* (non-Javadoc)
+    * @see org.apache.uima.annotator.regex.Feature#normalize(java.lang.String, java.lang.String)
     */
-   public String normalize(String input) throws Exception {
+   public String normalize(String input, String ruleId) throws Exception {
       // check normalizer type
       if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
-         return this.normalizer.normalize(input);
+         return this.normalizer.normalize(input, ruleId);
       } else if (this.normalizationType == Feature.TO_LOWER_NORMALIZATION) {
          return input.toLowerCase();
       } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {

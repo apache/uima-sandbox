@@ -1016,9 +1016,9 @@ public class CustomNormalizer
 
    /* (non-Javadoc)
     * @see org.apache.uima.annotator.regex.extension.Normalization
-    *		#normalize(java.lang.String)
+    *		#normalize(java.lang.String, java.lang.String)
     */
-   public String normalize(String input) {
+   public String normalize(String input, String ruleId) {
       
       //implement your custom normalization
       String result = ...
@@ -1443,10 +1443,12 @@ public interface Normalization {
  * perform a custom normalization on the given input string.
  * 
  * @param input input string which should be normalized
+ *
+ * @param ruleID rule ID of the matching rule
  * 
  * @return String - normalized input string 
  */
-public String normalize(String input) throws Exception;
+public String normalize(String input, String ruleID) throws Exception;
 }]]></programlisting>
 	</para>
 </appendix>

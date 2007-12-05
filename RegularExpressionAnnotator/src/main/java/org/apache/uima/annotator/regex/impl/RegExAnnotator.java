@@ -679,7 +679,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                      // try to set the normalized feature value, if no
                      // normalization was specified for the feature, the
                      // original feature value is set
-                     featureValue = features[f].normalize(featureValue);
+                     featureValue = features[f].normalize(featureValue, concept
+                           .getRules()[ruleIndex].getId());
                   } catch (Exception ex) {
                      throw new RegexAnnotatorProcessException(
                            "regex_annotator_error_normalizing_feature_value",
@@ -779,6 +780,20 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             String featureValue = replaceMatchGroupValues(updateFeatures[f]
                   .getValue(), matcher);
 
+            // do featureValue normalization
+            try {
+               // try to set the normalized feature value, if no
+               // normalization was specified for the feature, the
+               // original feature value is set
+               featureValue = updateFeatures[f].normalize(featureValue, concept
+                     .getRules()[ruleIndex].getId());
+            } catch (Exception ex) {
+               throw new RegexAnnotatorProcessException(
+                     "regex_annotator_error_normalizing_feature_value",
+                     new Object[] { featureValue, updateFeatures[f].getName() },
+                     ex);
+            }
+
             // set feature value at the annotation in dependence of the feature
             // type
             if (type == Feature.FLOAT_FEATURE) {
@@ -788,18 +803,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                annot.setIntValue(updateFeatures[f].getFeature(), Integer
                      .parseInt(featureValue));
             } else if (type == Feature.STRING_FEATURE) {
-               try {
-                  // try to set the normalized feature value, if no
-                  // normalization was specified for the feature, the
-                  // original feature value is set
-                  annot.setStringValue(updateFeatures[f].getFeature(),
-                        updateFeatures[f].normalize(featureValue));
-               } catch (Exception ex) {
-                  throw new RegexAnnotatorProcessException(
-                        "regex_annotator_error_normalizing_feature_value",
-                        new Object[] { featureValue,
-                              updateFeatures[f].getName() }, ex);
-               }
+               annot.setStringValue(updateFeatures[f].getFeature(),
+                     featureValue);
             }
          } else if (type == Feature.REFERENCE_FEATURE) {
             // search for the referenced annotation ID

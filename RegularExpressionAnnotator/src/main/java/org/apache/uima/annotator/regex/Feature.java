@@ -69,6 +69,6 @@ public interface Feature {
    * 
    * @return returns the normalization type for this feature.
    */
-  public String normalize(String input) throws Exception;
+  public String normalize(String input, String ruleId) throws Exception;
 
 }

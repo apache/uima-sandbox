@@ -29,7 +29,7 @@ public class CustomTestNormalizer implements Normalization {
    /* (non-Javadoc)
     * @see org.apache.uima.annotator.regex.Normalization#normalize(java.lang.String)
     */
-   public String normalize(String input) {
+   public String normalize(String input, String ruleId) {
       
       //replace input string with Test Output
       return "CustomTestNormalizerWorks";
