@@ -18,6 +18,8 @@
  */
 package org.apache.uima.annotator.regex;
 
+import junit.framework.Assert;
+
 import org.apache.uima.annotator.regex.extension.Normalization;
 
 /**
@@ -30,7 +32,8 @@ public class CustomTestNormalizer implements Normalization {
     * @see org.apache.uima.annotator.regex.Normalization#normalize(java.lang.String)
     */
    public String normalize(String input, String ruleId) {
-      
+      Assert.assertTrue(input.equals("Rule test Regex") || input.equals("RuleRegex12.4"));
+      Assert.assertTrue(ruleId.equals("ID1") || ruleId.equals("ID2"));
       //replace input string with Test Output
       return "CustomTestNormalizerWorks";
    }
