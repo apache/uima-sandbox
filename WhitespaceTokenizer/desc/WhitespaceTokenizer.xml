@@ -38,11 +38,34 @@
 			separated languages
 		</description>
 		<version>1.0</version>
-		<vendor>Michael Baessler</vendor>
+		<vendor>The Apache Software Foundation</vendor>
 
-		<configurationParameters></configurationParameters>
+		<configurationParameters>
+			<configurationParameter>
+				<name>SofaNames</name>
+				<description>
+					The Sofa names the annotator should work on. If no
+					names are specified, the annotator works on the
+					default sofa.
+				</description>
+				<type>String</type>
+				<multiValued>true</multiValued>
+				<mandatory>false</mandatory>
+			</configurationParameter>
+
+		</configurationParameters>
 
 		<configurationParameterSettings>
+		<!-- 
+			<nameValuePair>
+				<name>SofaNames</name>
+				<value>
+					<array>
+						<string>sofaName</string>
+					</array>
+				</value>
+			</nameValuePair>
+		-->
 		</configurationParameterSettings>
 
 		<typeSystemDescription>
@@ -76,7 +99,9 @@
 				<inputs />
 				<outputs>
 					<type>org.apache.uima.TokenAnnotation</type>
-					<feature>org.apache.uima.TokenAnnotation:tokentype</feature>
+					<feature>
+						org.apache.uima.TokenAnnotation:tokentype
+					</feature>
 					<type>org.apache.uima.SentenceAnnotation</type>
 				</outputs>
 				<languagesSupported>
