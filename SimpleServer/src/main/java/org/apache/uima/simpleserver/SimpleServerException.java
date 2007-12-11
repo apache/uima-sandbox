@@ -42,6 +42,12 @@ public class SimpleServerException extends InternationalizedException {
   public static final String type_does_not_exist = "type_does_not_exist";
   
   public static final String path_never_valid = "path_never_valid";
+  
+  public static final String validation_warning = "validation_warning";
+  
+  public static final String service_state_exception = "service_state_exception";
+  
+  public static final String uima_initialization_error = "uima_initialization_error";
 
   private static final String messages = "org.apache.uima.simpleserver.exception";
 

@@ -64,13 +64,14 @@ public interface ServerSpec {
 
   /**
    * Validate a service spec with respect to a type system. Check that types and feature paths
-   * exist.  None of the errors found here need to be considered fatal.  A non-existing type simply
-   * means a type spec that will never produce any output.  Similarly, an invalid feature path means
-   * a filter that will never match or an output spec that will never produce output.  Server-side,
+   * exist. None of the errors found here need to be considered fatal. A non-existing type simply
+   * means a type spec that will never produce any output. Similarly, an invalid feature path means
+   * a filter that will never match or an output spec that will never produce output. Server-side,
    * it's probably valid to simply log those errors and carry on.
    * 
    * @param typeSystem
-   * @return
+   *                The type system to validate against.
+   * @return A list of errors/warnings in the form of <code>SimpleServerException</code>s.
    */
   public List<SimpleServerException> validate(TypeSystem typeSystem);
 
