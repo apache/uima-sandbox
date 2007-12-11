@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -43,12 +44,16 @@ import org.apache.uima.simpleserver.output.ResultConverter;
  */
 public abstract class UimaServletBase extends HttpServlet {
 
+  public static final String utf8 = "utf-8";
+
+  public static final String DEFAULT_CODE_PAGE = utf8;
+
   public File baseWebappDirectory = null;
 
   public Service server = null;
-  
+
   private boolean initializationSuccessful = false;
-  
+
   private Logger logger = Logger.getAnonymousLogger();
 
   // define possible parameter names
@@ -66,7 +71,7 @@ public abstract class UimaServletBase extends HttpServlet {
   protected Logger getLogger() {
     return this.logger;
   }
-  
+
   // creates the mappings for standard parameter description
   // this method can be overridden for non-standard parameter sets
   protected void declareServletParameters() {
@@ -106,13 +111,17 @@ public abstract class UimaServletBase extends HttpServlet {
    * implements the GET behavior described in the documentation
    */
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
-    if (this.server == null) {
-      System.out.println("Server object is null, but a GET request is received");
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    if (!this.initializationSuccessful) {
+      response
+          .sendError(
+              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+              "The service is currently unavailable due to internal errors." +
+              "\nPlease contact the service provider.");
+      return;
     }
-    response.setCharacterEncoding("UTF-8");
-    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding(DEFAULT_CODE_PAGE);
+    request.setCharacterEncoding(DEFAULT_CODE_PAGE);
     PrintWriter writer = response.getWriter();
     String mode = request.getParameter("mode");
     try {
@@ -139,8 +148,10 @@ public abstract class UimaServletBase extends HttpServlet {
         // interpret this as a request for actual analysis
         analyze(request, response);
       }
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (IOException e) {
+      getLogger().log(Level.SEVERE, "An error occured processing this request", e);
+      //TODO: finish
+//      response.sendError(arg0, arg1)
     }
   }
 
@@ -159,8 +170,8 @@ public abstract class UimaServletBase extends HttpServlet {
   protected void analyze(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     System.out.println(this.getClass().getName() + ": POST request received: " + new Date());
-    request.setCharacterEncoding("UTF-8");
-    response.setCharacterEncoding("UTF-8");
+    request.setCharacterEncoding(DEFAULT_CODE_PAGE);
+    response.setCharacterEncoding(DEFAULT_CODE_PAGE);
     String text = request.getParameter("text");
     String lang = request.getParameter("lang");
     System.out.println("Given text: " + text.substring(0, Math.min(50, text.length())));
@@ -188,9 +199,6 @@ public abstract class UimaServletBase extends HttpServlet {
     // + "/schema/ResultSpecification.xsd");
     // server = new Server(xsdFile);
     this.server = new Service();
-    if (this.server == null) {
-      System.out.println("server object is null!");
-    }
     this.initializationSuccessful = initServer();
     declareServletParameters();
   }
@@ -198,14 +206,12 @@ public abstract class UimaServletBase extends HttpServlet {
   /*
    * this method must be overridden in the subclasses
    * 
-   * it should provide a valid ResultSpecification and a valid AE ot PEAR file
-   * for the server.
+   * it should provide a valid ResultSpecification and a valid AE ot PEAR file for the server.
    */
   protected abstract boolean initServer();
 
   /*
-   * choose the output format, depending on the value of the given "mode"
-   * parameter
+   * choose the output format, depending on the value of the given "mode" parameter
    */
   public String transformResult(Result result, String mode) {
     if ("xml".equals(mode)) {
