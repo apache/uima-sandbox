@@ -27,12 +27,12 @@ import org.apache.uima.jcas.JCas;
 /**
  * TODO: Create type commment.
  */
-public class TestAnnotator extends JTextAnnotator_ImplBase {
+public class Annotator extends JTextAnnotator_ImplBase {
 
   /**
    * 
    */
-  public TestAnnotator() {
+  public Annotator() {
     // TODO Auto-generated constructor stub
   }
 
