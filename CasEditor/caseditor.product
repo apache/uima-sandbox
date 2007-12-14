@@ -4,10 +4,10 @@
 <product name="Cas Editor" id="org.apache.uima.caseditor.product" application="org.apache.uima.caseditor.application" useFeatures="false">
 
    <aboutInfo>
-      <image path="/Cas Editor/icons/window/uima_window_128.gif"/>
+      <image path="/CasEditor/icons/window/uima_window_128.gif"/>
       <text>
          Cas Editor
-Apache UIMA Version 2.2-incubating
+Apache UIMA Version 2.2.1-incubating
 Copyright 2006, 2007 The Apache Software Foundation
       </text>
    </aboutInfo>
@@ -18,7 +18,7 @@ Copyright 2006, 2007 The Apache Software Foundation
       <programArgs>-refresh</programArgs>
    </launcherArgs>
 
-   <windowImages i16="/Cas Editor/icons/window/uima_window_16.gif" i32="/Cas Editor/icons/window/uima_window_32.gif" i48="/Cas Editor/icons/window/uima_window_48.gif" i64="/Cas Editor/icons/window/uima_window_64.gif" i128="/Cas Editor/icons/window/uima_window_128.gif"/>
+   <windowImages i16="/CasEditor/icons/window/uima_window_16.gif" i32="/CasEditor/icons/window/uima_window_32.gif" i48="/CasEditor/icons/window/uima_window_48.gif" i64="/CasEditor/icons/window/uima_window_64.gif" i128="/CasEditor/icons/window/uima_window_128.gif"/>
 
    <splash
       location="org.apache.uima.caseditor"
@@ -26,11 +26,11 @@ Copyright 2006, 2007 The Apache Software Foundation
       startupMessageRect="7,200,180,50"
       startupForegroundColor="000000" />
    <launcher name="CAS Editor">
-      <linux icon="/Cas Editor/icons/application/uima.xpm"/>
-      <macosx icon="/Cas Editor/icons/application/uima_logo.icns"/>
+      <linux icon="/CasEditor/icons/application/uima.xpm"/>
+      <macosx icon="/CasEditor/icons/application/uima_logo.icns"/>
       <solaris/>
       <win useIco="true">
-         <ico path="/Cas Editor/icons/application/uima.ico"/>
+         <ico path="/CasEditor/icons/application/uima.ico"/>
          <bmp/>
       </win>
    </launcher>
@@ -45,7 +45,7 @@ Copyright 2006, 2007 The Apache Software Foundation
 
    <plugins>
       <plugin id="com.ibm.icu"/>
-      <plugin id="com.ibm.icu36.data.update" fragment="true"/>
+      <plugin id="com.ibm.icu36.data.update"/>
       <plugin id="org.apache.uima.caseditor"/>
       <plugin id="org.apache.uima.runtime"/>
       <plugin id="org.eclipse.core.commands"/>
@@ -54,17 +54,17 @@ Copyright 2006, 2007 The Apache Software Foundation
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.ppc"/>
       <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64"/>
+      <plugin id="org.eclipse.core.filesystem.macosx"/>
+      <plugin id="org.eclipse.core.filesystem.solaris.sparc"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.net"/>
       <plugin id="org.eclipse.core.resources"/>
       <plugin id="org.eclipse.core.resources.compatibility" fragment="true"/>
-      <plugin id="org.eclipse.core.resources.win32" fragment="true"/>
+      <plugin id="org.eclipse.core.resources.win32"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
@@ -79,30 +79,31 @@ Copyright 2006, 2007 The Apache Software Foundation
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.pde.runtime"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.carbon.macosx" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.swt.carbon.macosx"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc"/>
       <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.swt.motif.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.wpf.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.sparc"/>
+      <plugin id="org.eclipse.swt.motif.aix.ppc"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86"/>
+      <plugin id="org.eclipse.swt.wpf.win32.x86"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.carbon" fragment="true"/>
+      <plugin id="org.eclipse.ui.carbon"/>
       <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.views.properties.tabbed"/>
-      <plugin id="org.eclipse.ui.win32" fragment="true"/>
+      <plugin id="org.eclipse.ui.win32"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.eclipse.update.core"/>
       <plugin id="org.eclipse.update.core.linux" fragment="true"/>
-      <plugin id="org.eclipse.update.core.win32" fragment="true"/>
+      <plugin id="org.eclipse.update.core.win32"/>
       <plugin id="org.eclipse.update.ui"/>
+      <plugin id="org.junit4"/>
    </plugins>
 
    <features>
