@@ -25,15 +25,12 @@ import org.apache.uima.analysis_engine.annotator.JTextAnnotator_ImplBase;
 import org.apache.uima.jcas.JCas;
 
 /**
- * TODO: Create type commment.
+ * Test case annotator.
  */
 public class Annotator extends JTextAnnotator_ImplBase {
 
-  /**
-   * 
-   */
   public Annotator() {
-    // TODO Auto-generated constructor stub
+    super();
   }
 
   public void process(JCas jcas, ResultSpecification _rs) {

@@ -60,7 +60,7 @@ import org.xml.sax.InputSource;
  * parameters "url1", "url2", etc. 
  * 
  */
-public class ResultMerger extends UimaServletBase {
+public class ResultMerger extends SimpleServerServlet {
 
   private static final long serialVersionUID = -2326819932388842032L;
 

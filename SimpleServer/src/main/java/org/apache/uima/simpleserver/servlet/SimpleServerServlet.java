@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +43,7 @@ import org.apache.uima.simpleserver.output.ResultConverter;
 /*
  * a base class that implements the specification of a UIMA Servlet
  */
-public abstract class UimaServletBase extends HttpServlet {
+public class SimpleServerServlet extends HttpServlet {
 
   public static final String utf8 = "utf-8";
 
@@ -58,15 +59,30 @@ public abstract class UimaServletBase extends HttpServlet {
 
   // define possible parameter names
   // map parameter name --> parameter description
-  protected Map<String, String> servletGETParameters = new HashMap<String, String>();
+  protected Map<String, String> servletGETParameters;
 
-  protected Map<String, String> servletPOSTParameters = new HashMap<String, String>();
+  protected Map<String, String> servletPOSTParameters;
 
   // for some parameters, we can define supported values
   // map parameter name --> map ( value --> description )
-  protected Map<String, Map<String, String>> servletGETParamOptions = new HashMap<String, Map<String, String>>();
+  protected Map<String, Map<String, String>> servletGETParamOptions;
 
-  protected Map<String, Map<String, String>> servletPOSTParamOptions = new HashMap<String, Map<String, String>>();
+  protected Map<String, Map<String, String>> servletPOSTParamOptions;
+  
+  private final boolean localInit;
+
+  public SimpleServerServlet(boolean localInit) {
+    super();
+    this.localInit = localInit;
+    this.servletGETParameters = new HashMap<String, String>();
+    this.servletPOSTParameters = new HashMap<String, String>();
+    this.servletGETParamOptions = new HashMap<String, Map<String, String>>();
+    this.servletPOSTParamOptions = new HashMap<String, Map<String, String>>();
+  }
+  
+  public SimpleServerServlet() {
+    this(false);
+  }
 
   protected Logger getLogger() {
     return this.logger;
@@ -113,11 +129,9 @@ public abstract class UimaServletBase extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     if (!this.initializationSuccessful) {
-      response
-          .sendError(
-              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-              "The service is currently unavailable due to internal errors." +
-              "\nPlease contact the service provider.");
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "The service is currently unavailable due to internal errors."
+              + "\nPlease contact the service provider.");
       return;
     }
     response.setCharacterEncoding(DEFAULT_CODE_PAGE);
@@ -150,8 +164,8 @@ public abstract class UimaServletBase extends HttpServlet {
       }
     } catch (IOException e) {
       getLogger().log(Level.SEVERE, "An error occured processing this request", e);
-      //TODO: finish
-//      response.sendError(arg0, arg1)
+      // TODO: finish
+      // response.sendError(arg0, arg1)
     }
   }
 
@@ -191,7 +205,11 @@ public abstract class UimaServletBase extends HttpServlet {
   // just create a Server instance and check where the project directory is
   // (baseWebappDirectory)
   @Override
-  public void init() {
+  public void init() throws ServletException {
+    if (this.localInit) {
+      return;
+    }
+    super.init();
     System.out.println("Servlet " + this.getClass().getCanonicalName()
         + " -- initialisation begins");
     this.baseWebappDirectory = new File(getServletContext().getRealPath(""));
@@ -202,13 +220,41 @@ public abstract class UimaServletBase extends HttpServlet {
     this.initializationSuccessful = initServer();
     declareServletParameters();
   }
+  
+  public void init(File descriptorFile, File serviceSpecFile) throws ServletException {
+    super.init();
+    this.initializationSuccessful = false;
+    this.server = new Service();
+    try {
+      this.server.configureAnalysisEngine(descriptorFile, serviceSpecFile);
+    } catch (Exception e) {
+      getLogger().log(Level.SEVERE, "UIMA Simple Service configuaration failed", e);
+      return;
+    }
+    declareServletParameters();
+    this.initializationSuccessful = true;
+  }
 
-  /*
-   * this method must be overridden in the subclasses
-   * 
-   * it should provide a valid ResultSpecification and a valid AE ot PEAR file for the server.
-   */
-  protected abstract boolean initServer();
+  protected boolean initServer() {
+    File resultSpec = new File(this.baseWebappDirectory.getAbsoluteFile(),
+        getInitParameter("ResultSpecFile"));
+    String pearPath = getInitParameter("PearPath");
+    String descriptorPath = getInitParameter("DescriptorPath");
+
+    try {
+      if (pearPath == null) {
+        File descriptor = new File(this.baseWebappDirectory.getAbsoluteFile(), descriptorPath);
+        this.server.configureAnalysisEngine(descriptor, resultSpec);
+      } else if (descriptorPath == null) {
+        File pear = new File(this.baseWebappDirectory.getAbsoluteFile(), pearPath);
+        this.server.configurePear(pear, new File(pearPath), resultSpec);
+      }
+    } catch (Exception e) {
+      getLogger().log(Level.SEVERE, "UIMA Simple Service configuaration failed", e);
+      return false;
+    }
+    return true;
+  }
 
   /*
    * choose the output format, depending on the value of the given "mode" parameter
