@@ -68,7 +68,7 @@ public class SimpleServerServlet extends HttpServlet {
   protected Map<String, Map<String, String>> servletGETParamOptions;
 
   protected Map<String, Map<String, String>> servletPOSTParamOptions;
-  
+
   private final boolean localInit;
 
   public SimpleServerServlet(boolean localInit) {
@@ -79,7 +79,7 @@ public class SimpleServerServlet extends HttpServlet {
     this.servletGETParamOptions = new HashMap<String, Map<String, String>>();
     this.servletPOSTParamOptions = new HashMap<String, Map<String, String>>();
   }
-  
+
   public SimpleServerServlet() {
     this(false);
   }
@@ -152,10 +152,6 @@ public class SimpleServerServlet extends HttpServlet {
         writer.print(this.getHtmlForm(request.getRequestURL().toString()));
         writer.close();
       } else if ("xmldesc".equals(mode)) {
-        if (this.server == null) {
-          throw new RuntimeException("Server object is null");
-        }
-
         writer.print(this.server.getServiceDescription());
         writer.close();
       } else {
@@ -164,8 +160,8 @@ public class SimpleServerServlet extends HttpServlet {
       }
     } catch (IOException e) {
       getLogger().log(Level.SEVERE, "An error occured processing this request", e);
-      // TODO: finish
-      // response.sendError(arg0, arg1)
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "An internal error occured, this service has not been properly initialized.");
     }
   }
 
@@ -220,7 +216,7 @@ public class SimpleServerServlet extends HttpServlet {
     this.initializationSuccessful = initServer();
     declareServletParameters();
   }
-  
+
   public void init(File descriptorFile, File serviceSpecFile) throws ServletException {
     super.init();
     this.initializationSuccessful = false;
