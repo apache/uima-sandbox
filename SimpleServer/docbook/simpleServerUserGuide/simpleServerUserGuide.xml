@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY imgroot "../images/FsVariablesUserGuide/" >
+<!ENTITY imgroot "./images/" >
 <!ENTITY % xinclude SYSTEM "../../../uima-docbook-tool/xinclude.mod">
   %xinclude;
 ]>
@@ -35,8 +35,37 @@ under the License.
 <chapter id="sandbox.simpleServer">
   <title>Simple Server</title>
   
-  <para>The user's guide to the Simple Server.
+  <section>
+  <title>Introduction</title>
+  
+  <para>The UIMA Simple Server makes results of UIMA processing available in a simple, XML-based
+  format.  The intended use of the the Simple Server is to provide UIMA analysis as a REST service.
+  The Simple Server is implemented as a Java Servlet, and can be deployed into any Servlet container
+  (such as Apache Tomcat or Jetty).</para>
+  
+  <para>Once you have installed the Simple Server into a Servlet container of your choice, you can
+  make your UIMA analysis available as follows:
   </para>
+  
+  <itemizedlist>
+  <listitem>
+  <para>Package you analysis as a UIMA PEAR file</para>
+  </listitem>
+  <listitem>
+  <para>Create a mapping file that tells the server what analysis results to show in which format</para>
+  </listitem>
+  <listitem>
+  <para>Deploy the PEAR file and the mapping file into the server.</para>
+  </listitem>
+  </itemizedlist>
+  
+  <para>In the following, we will explain how to perform each of these steps.  We will also show
+  you how to accomplish all of this in a concrete Servlet container, namely Apache Tomcat.  Finally,
+  we will describe how to use another Servlet container, Jetty, to test your application 
+  <emphasis>without</emphasis> deployment.</para>
+  
+  </section>
+  
 </chapter>
 
 </book>
