@@ -33,9 +33,6 @@ under the License.
 		href="../../../SandboxDocs/src/docbook/book_info.xml" />
 
 <chapter id="sandbox.simpleServer">
-  <title>Simple Server</title>
-  
-  <section>
   <title>Introduction</title>
   
   <para>The UIMA Simple Server makes results of UIMA processing available in a simple, XML-based
@@ -64,7 +61,6 @@ under the License.
   we will describe how to use another Servlet container, Jetty, to test your application 
   <emphasis>without</emphasis> deployment.</para>
   
-  </section>
   
 </chapter>
 

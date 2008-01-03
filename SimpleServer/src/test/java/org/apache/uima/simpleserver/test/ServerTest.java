@@ -19,7 +19,7 @@
 
 package org.apache.uima.simpleserver.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpResponse;
 import org.apache.uima.simpleserver.servlet.SimpleServerServlet;
+import org.apache.uima.simpleserver.util.HttpClientUtils;
+import org.apache.uima.simpleserver.util.JettyUtils;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -54,10 +56,11 @@ public class ServerTest {
   @BeforeClass
   public static void setUp() {
     // Set up the server
-    server = Utils.createServer();
+    server = JettyUtils.createServer();
+    assertNotNull(server);
 
     // Add servlets
-    Utils.addServletWithMapping(server, HelloServlet.class, "/hello");
+    JettyUtils.addServletWithMapping(server, HelloServlet.class, "/hello");
 
     // Set up UIMA servlet
     SimpleServerServlet uimaServlet = new SimpleServerServlet(true);
@@ -71,7 +74,7 @@ public class ServerTest {
       e1.printStackTrace();
       assertTrue(false);
     }
-    Utils.addServletWithMapping(server, uimaServlet, "/uima");
+    JettyUtils.addServletWithMapping(server, uimaServlet, "/uima");
 
     // Start the server
     try {
@@ -88,17 +91,28 @@ public class ServerTest {
    */
   @Test
   public void test() {
-    HttpResponse response = Utils.callGet(Utils.getHost(server), Utils.getPort(server), "/hello");
-    assertTrue(response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK);
-    System.out.println(Utils.getResponseContent(response));
+    try {
+      HttpResponse response = HttpClientUtils.callGet(JettyUtils.getHost(server), JettyUtils
+          .getPort(server), "/hello");
+      assertTrue(response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK);
+      System.out.println(HttpClientUtils.getResponseContent(response));
+    } catch (Exception e) {
+      e.printStackTrace();
+      assertTrue(false);
+    }
   }
 
   @Test
   public void test1() {
-    HttpResponse response = Utils.callGet(Utils.getHost(server), Utils.getPort(server),
-        "/uima?text=foo%20bar");
-    assertTrue(response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK);
-    System.out.println(Utils.getResponseContent(response));
+    try {
+      HttpResponse response = HttpClientUtils.callGet(JettyUtils.getHost(server), JettyUtils
+          .getPort(server), "/uima?text=foo%20bar");
+      assertTrue(response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK);
+      System.out.println(HttpClientUtils.getResponseContent(response));
+    } catch (Exception e) {
+      e.printStackTrace();
+      assertTrue(false);
+    }
   }
 
   @AfterClass

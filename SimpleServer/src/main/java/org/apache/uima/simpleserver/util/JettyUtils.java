@@ -17,28 +17,16 @@
  * under the License.
  */
 
-package org.apache.uima.simpleserver.test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+package org.apache.uima.simpleserver.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.ServerSocket;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import javax.servlet.Servlet;
 
-import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.uima.simpleserver.servlet.SimpleServerServlet;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -46,13 +34,80 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-public class Utils {
+public class JettyUtils {
+
+  private static final String uimaServletUrlFile = "/uima";
+
+  public static final Server startJettyServer(String analysisEngineDescriptor, String mappingFile)
+      throws Exception {
+    // Create Jetty server
+    Server server = createServer();
+    // Set up UIMA servlet
+    SimpleServerServlet uimaServlet = new SimpleServerServlet(true);
+    File descriptorFile = new File(analysisEngineDescriptor);
+    File specFile = new File(mappingFile);
+    uimaServlet.init(descriptorFile, specFile);
+    // Add UIMA servlet to jetty
+    JettyUtils.addServletWithMapping(server, uimaServlet, uimaServletUrlFile);
+    // Start the server
+    server.start();
+    return server;
+  }
+
+  public static final void stopJettyServer(Server server) throws Exception {
+    server.stop();
+    server.join();
+  }
+
+  public static final String getServletUrl(Server server) {
+    StringBuffer buf = new StringBuffer();
+    buf.append("http://");
+    buf.append(JettyUtils.getHost(server));
+    buf.append(":");
+    buf.append(Integer.toString(JettyUtils.getPort(server)));
+    buf.append(uimaServletUrlFile);
+    buf.append("?mode=form");
+    return buf.toString();
+  }
+
+  public static void main(String[] args) {
+    Server server = null;
+    try {
+      server = startJettyServer(args[0], args[1]);
+      String servletUrl = getServletUrl(server);
+      System.out.println("Use the following URL to access the servlet: " + servletUrl);
+      String prompt = "Type 'stop' to exit> ";
+      String stop = "stop";
+      System.out.println(prompt);
+      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        if (line.equals(stop)) {
+          break;
+        }
+        System.out.println(prompt);
+      }
+      stopJettyServer(server);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      if (server != null) {
+        try {
+          stopJettyServer(server);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
 
   public static Server createServer() {
     Server server = new Server();
     Connector connector = new SelectChannelConnector();
     final int port = findFreePort();
-    assertTrue("Could not find a free port to run Jetty", (port >= 0));
+    if (port <= 0) {
+      return null;
+    }
     System.out.println("Using port: " + port);
     connector.setPort(port);
     connector.setHost("127.0.0.1");
@@ -73,11 +128,11 @@ public class Utils {
     ((ServletHandler) server.getHandler()).addServletWithMapping(new ServletHolder(servlet),
         pathSpec);
   }
-  
+
   public static String getHost(Server server) {
     return server.getConnectors()[0].getHost();
   }
-  
+
   public static int getPort(Server server) {
     return server.getConnectors()[0].getPort();
   }
@@ -95,63 +150,4 @@ public class Utils {
     return p;
   }
 
-  public static HttpResponse callGet(String host, int port, String file) {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpGet method = null;
-    URL url = null;
-    try {
-      url = new URL("http", host, port, file);
-    } catch (MalformedURLException e1) {
-      e1.printStackTrace();
-      assertTrue(false);
-    }
-    try {
-      System.out.println("URL: " + url.toString());
-      method = new HttpGet(url.toString());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    }
-    HttpResponse response = null;
-    try {
-      response = httpClient.execute(method);
-    } catch (HttpException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    } catch (IOException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    }
-    assertNotNull(response);
-    return response;
-  }
-  
-  public static String getResponseContent(HttpResponse response) {
-    try {
-      Reader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(),
-          SimpleServerServlet.DEFAULT_CODE_PAGE));
-      char[] chars = new char[1024];
-      int len = 0;
-      StringBuffer buf = new StringBuffer();
-      while ((len = reader.read(chars)) >= 0) {
-        buf.append(chars, 0, len);
-      }
-      return buf.toString();
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    } catch (IllegalStateException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    } catch (IOException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    }
-    // Unreachable
-    return null;
-  }
-  
 }

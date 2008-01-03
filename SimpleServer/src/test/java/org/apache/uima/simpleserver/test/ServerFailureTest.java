@@ -19,12 +19,15 @@
 
 package org.apache.uima.simpleserver.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpResponse;
 import org.apache.uima.simpleserver.servlet.SimpleServerServlet;
+import org.apache.uima.simpleserver.util.HttpClientUtils;
+import org.apache.uima.simpleserver.util.JettyUtils;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 
@@ -35,20 +38,26 @@ public class ServerFailureTest {
 
   @Test
   public void uimaServiceNotInitialized() {
-    Server server = Utils.createServer();
+    Server server = JettyUtils.createServer();
+    assertNotNull(server);
     String pathSpec = "/notinitialized";
     // Create a simple service but don't initialize it (should throw http error 500 when called)
-    Utils.addServletWithMapping(server, new SimpleServerServlet(true), pathSpec);
+    JettyUtils.addServletWithMapping(server, new SimpleServerServlet(true), pathSpec);
     try {
       server.start();
     } catch (Exception e) {
       e.printStackTrace();
       assertTrue(false);
     }
-    HttpResponse response = Utils.callGet(Utils.getHost(server), Utils.getPort(server), pathSpec);
+    try {
+    HttpResponse response = HttpClientUtils.callGet(JettyUtils.getHost(server), JettyUtils.getPort(server), pathSpec);
     assertTrue("Expected http return code 500 (internal server error)", (response.getStatusLine()
         .getStatusCode() == HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
-    System.out.println(Utils.getResponseContent(response));
+    System.out.println(HttpClientUtils.getResponseContent(response));
+    } catch (Exception e) {
+      e.printStackTrace();
+      assertTrue(false);
+    }
     try {
       server.stop();
       server.join();
