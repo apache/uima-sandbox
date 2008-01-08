@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.ibm.uima.aae.jms_adapter;
+package org.apache.uima.aae.jms_adapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -143,5 +143,5 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub {
     }
   }
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

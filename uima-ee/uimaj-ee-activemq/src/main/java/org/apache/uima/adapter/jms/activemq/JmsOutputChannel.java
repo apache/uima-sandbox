@@ -1437,5 +1437,5 @@ public class JmsOutputChannel implements OutputChannel
 		return null;
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

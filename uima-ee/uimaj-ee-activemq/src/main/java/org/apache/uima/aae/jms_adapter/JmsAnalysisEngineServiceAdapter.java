@@ -1,4 +1,4 @@
-package com.ibm.uima.aae.jms_adapter;
+package org.apache.uima.aae.jms_adapter;
 
 
 import java.util.Map;
@@ -44,5 +44,5 @@ public class JmsAnalysisEngineServiceAdapter extends AnalysisEngineServiceAdapte
   }
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }
