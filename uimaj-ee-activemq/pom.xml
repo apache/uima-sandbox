@@ -6,7 +6,7 @@
 	<artifactId>uimaj-adapter-activemq</artifactId>
 	<packaging>jar</packaging>
 	<version>${uimaj-release-version}</version>
-	<name>Apache UIMA Java Collection Processing Engine</name>
+	<name>Apache UIMA Async Scaleout using ActiveMQ</name>
 	<url>http://incubator.apache.org/uima</url>
 	<parent>
 		<groupId>org.apache.uima</groupId>
