@@ -424,5 +424,5 @@ public class UIMA_Service
 		}
 	}
 
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

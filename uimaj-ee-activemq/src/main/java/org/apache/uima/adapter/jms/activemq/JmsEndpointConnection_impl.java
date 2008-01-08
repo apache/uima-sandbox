@@ -528,5 +528,5 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	}
 	
 	
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

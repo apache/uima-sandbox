@@ -654,5 +654,5 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		}.start();
 	}
 */	
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

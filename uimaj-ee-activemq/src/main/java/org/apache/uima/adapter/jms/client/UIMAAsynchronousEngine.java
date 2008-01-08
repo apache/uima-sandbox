@@ -15,6 +15,4 @@ public interface UIMAAsynchronousEngine
 	public void sendCAS( CAS aCAS ) throws ResourceProcessException;
 	public CAS getCAS() throws Exception;
 	public void process( URI aCollection ) throws ResourceProcessException;
-
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
 }

@@ -178,6 +178,6 @@ implements ExceptionListener
 	{
 		endpoint = anEndpoint;
 	}
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 
 }

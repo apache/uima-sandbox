@@ -342,6 +342,6 @@ public class BrokerDeployer implements ApplicationListener
 		}
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 
 }
