@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY sisterProject "../../../../uima-docbooks/src/docbook/">
+<!ENTITY % xinclude SYSTEM "../../../../uima-docbook-tool/xinclude.mod">
+  %xinclude;
+  ]>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<book lang="en">
+  <title>UIMA Asynchronous Scaleout</title>
+  <!--
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="&sisterProject;/common_book_info.xml"/>
+
+  <toc/>
+  -->  
+  <bookinfo>
+    <releaseinfo>Release 0.6</releaseinfo> <productname>UIMA AS</productname>
+    <legalnotice>
+      <para> </para>
+      <formalpara>
+        <title>Notices</title>
+        <para>This information was developed for products and services offered in the
+          U.S.A. IBM may not offer the products, services, or features discussed in this
+          document in other countries. Consult your local IBM representative for
+          information on the products and services currently available in your area. Any
+          reference to an IBM product, program, or service is not intended to state or imply
+          that only that IBM product, program, or service may be used. Any functionally
+          equivalent product, program, or service that does not infringe any IBM
+          intellectual property right may be used instead. However, it is the user’s
+          responsibility to evaluate and verify the operation of any non-IBM product,
+          program, or service. </para> </formalpara>
+      
+      <para>IBM may have patents or pending patent applications covering subject matter
+        described in this document. The furnishing of this document does not give you any
+        license to these patents. You can send license inquiries, in writing, to:</para>
+      <programlisting>IBM Director of Licensing 
+IBM Corporation 
+North Castle Drive 
+Armonk, NY
+10504-1785 U.S.A. </programlisting>
+      <para><emphasis role="bold"> The following paragraph does not apply to the United
+        Kingdom or any other country where such provisions are inconsistent with local
+        law:</emphasis> INTERNATIONAL BUSINESS MACHINES CORPORATION PROVIDES THIS
+        PUBLICATION "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF NON-INFRINGEMENT,
+        MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Some states do not allow
+        disclaimer of express or implied warranties in certain transactions, therefore,
+        this statement may not apply to you. </para>
+      <para> This information could include technical inaccuracies or typographical
+        errors. Changes are periodically made to the information herein; these changes will
+        be incorporated in new editions of the publication. IBM may make improvements and/or
+        changes in the product(s) and/or the program(s) described in this publication at any
+        time without notice. </para>
+      <para>Information concerning non-IBM products was obtained from the suppliers of
+        those products, their published announcements or other publicly available
+        sources. IBM has not tested those products and cannot confirm the accuracy of
+        performance, compatibility or any other claims related to non-IBM products.
+        Questions on the capabilities of non-IBM products should be addressed to the
+        suppliers of those products.</para>
+      <para> All statements regarding IBM’s future direction or intent are subject to change
+        or withdrawal without notice, and represent goals and objectives only. </para>
+      
+      <formalpara>
+        <title>Trademarks</title>
+        <para> The following terms are trademarks of the IBM Corporation in the United
+          States, other countries, or both. </para></formalpara><para> IBM </para>
+      <para> The following terms are trademarks or registered trademarks of other
+      companies: </para><para> Microsoft, Windows, Windows NT, and the Windows logo are
+      trademarks of Microsoft Corporation in the United States, other countries, or both.
+      </para><para> Java and all Java-based trademarks are trademarks of Sun Microsystems,
+      Inc. in the United States, other countries, or both. </para><para> Eclipse is a
+      trademark of Eclipse Foundation, Inc. </para>
+      <para>All terms mentioned in the text that are known to be trademarks or service marks
+        have been appropriately capitalized. Use of such terms in this book should not be
+        regarded as affecting the validity of the the trademark or service mark. </para>
+      
+      <para> </para>
+      <para> </para>
+      <para> </para>
+      <para>This edition applies to the IBM Unstructured information Management
+        Architecture Asynchronous Scaleout Edition (UIMA AS) Version 0.5.0 and to all subsequent
+        release and modifications until otherwise indicated in new editions.</para>
+      <para>US Government Users Restricted Rights - Use, duplication or disclosure
+        restricted by GSA ADP Schedule Contract with IBM Corp.</para>
+    </legalnotice>
+    <copyright>
+      <year>2007</year>
+      <holder>International Business Machines Corporation.  All rights reserved.</holder>
+    </copyright>
+    <pubdate>August, 2007</pubdate>
+    
+  </bookinfo>
+
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="async.overview.xml" />
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="async.errorhandling.xml"/> 
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ref.async.deployment.xml" />
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ref.async.api.xml" />
+
+  <!--
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="async.tutorial.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="async.reference.xml"/>
+  -->
+</book>

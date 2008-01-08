@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY sisterProject "../../../../uima-docbooks/src/docbook/">
+<!ENTITY imgroot "../images/uima_async_scaleout/async.overview/" >
+<!ENTITY % uimaents SYSTEM "../../../../uima-docbooks/src/docbook/entities.ent" >
+  %uimaents;
+  ]>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+  
+<chapter id="ugr.ref.async.api">
+  <title>Asynchronous Scaleout Application Interface</title>
+  
+  <section id="ugr.ref.async.api.organization">
+    <title>Asynchonous API Overview</title>
+    <para>
+      The Asynchronous API provides Java applications the capability to connect to
+      and to make reqests UIMA EE services. ProcessCas and CollectionProcessingComplete
+      requests are supported.
+    </para>
+
+    <para>
+      An application can prepare and send each CAS to a service one at a time, or
+      alternately can use a UIMA collection reader to prepare the CASes to be delivered.
+      The application must provide a listener class to receive asynchronous replies.
+      For individual CAS requests a synchronous sendAndReceive call is available. 
+      Note that for synchronous requests to a
+      UIMA EE service, the standard UIMA Analysis Engine APIs
+      can be used with an analysis engine instantiated from a JMS Service Descriptor.
+      See <xref linkend="ugr.async.ov.concepts.jms_descriptor"/>.
+    </para>
+
+     <para>
+      Other options include specifying the maximum number of outstanding requests allowed, timeout
+      values and the size of local Cas pool to create.      
+     </para>
+    
+    <para>
+      The Asynchronous API can also be used to deploy services.
+      Java services deployed by the API are instantiated in the same JVM. Logging for all UIMA
+      components in the same JVM are merged; class names and thread IDs can be used to distinguish
+      log entries from different services. All services in the JVM can be monitored by a single
+      JMX console. Native (org.apache.uima.cpp) services can be called from the JVM via the JNI or
+      optionally be launched as separate processes on the same machine. In either case logging
+      and JMX monitoring for native services are integrated with the those in the JVM.
+    </para>
+    
+  </section>
+  
+    <!--======================================================-->    
+    <!--        UimaAsynchronousEngine interface              -->    
+    <!--======================================================-->    
+  <section id="ugr.ref.async.api.descriptor">
+    <title>The UimaAsynchronousEngine Interface</title>
+    
+    <para>An application developer's starting point for accessing UIMA EE services is the
+      UimaAsynchronousEngine Interface. For each service an application wants to use, it
+      must instantiate a client object:
+
+      <programlisting> UimaAsynchronousEngine uimaEEEngine = new BaseUIMAAsynchronousEngine_impl();
+      </programlisting>
+
+      The following is a short introduction to some important methods on this class.
+      
+      <itemizedlist>
+        <listitem>
+          <para>void initialize( Map anApplicationContext ): Initializes asynchronous client. 
+            Using configuration provided in a given Map object, this method creates a connection to 
+            UIMA EE Service queue, creates a response queue, and retrieves service metadata. 
+            This method blocks until a reply is received from the service or a timeout occurs.
+            If a collection reader has been specified, it's typesystem is merged with that from the
+            service. The combined typesystem is used to create a Cas pool.
+            On success the application is notified via the listener's initializationComplete() method.
+            Asynchronous errors are delivered to the listener's entityProcessComplete() method.
+            See <xref linkend="ugr.ref.async.context.map"/> for more about the ApplicationContext map.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>void addStatusCallbackListener(StatusCallbackListener aListener):
+            Plugs-in application specific listener. The application receives callbacks
+            via methods in this listener class. More than one listener can be added.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>CAS getCAS(): Requests a new CAS instance from the CAS pool. This method blocks
+            until a free instance of CAS is available in the CAS pool.
+            Applications that use getCAS() need to call CAS.reset() as appropriate or CAS.release()
+            to return it to the Cas pool.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>void sendCAS( CAS aCAS ): Sends a given CAS for analysis to UIMA EE Service. 
+            This method may block if the client is configured to use a reply window which prevents 
+            from sending too many CASes to the service. Assuming the window is large enough to send 
+            the CAS this method returns as soon as the CAS is sent.
+            The application is notified of responses or timeouts via entityProcessComplete().
+         </para>
+        </listitem>
+
+        <listitem>
+          <para>void setCollectionReader( CollectionReader aCollectionReader ): 
+            Plugs in an instantiated CollectionReader instance to use. Must be called before initialize.
+            The application calls the process() method to begin analyzing the collection.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>void process(): 
+           Starts processing a collection using a collection reader. The method will block
+           until the CollectionReader finishes processing the entire collection.  
+           Throws ResourceProcessException if a CollectionReader has not been provided or initialize
+           has not been called.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>void collectionProcessingComplete(): Sends a Collection Processing Complete request 
+            to UIMA EE Analysis Service. The method blocks until the service replies or a timeout occurs.
+            On success the application is notified via the listener's initializationComplete() method.
+            Asynchronous errors are delivered to the listener's entityProcessComplete() method.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>void sendAndReceiveCAS(CAS aCAS):
+            Send a CAS, wait for response. On success aCAS contains the analysis results.
+            Errors are delivered to the listener's entityProcessComplete() method.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>String deploy( String aDeploymentDescriptor, Map anApplicationContext):
+            Deploys UIMA EE service specified by given deployment descriptor and returns a handle
+            to the Spring container for this service.
+            The application context map must contain DD2SpringXsltFilePath and SaxonClasspath entries.
+            This call blocks until the service is ready to process requests, or an exception occurs
+            during deployment.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>void undeploy( String aSpringContainerId ):
+            Tells the specified service to terminate and removes the Spring container.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>void stop():
+           Stops the asynchronous client. Removes Cas pool, drops connection to the UIMA EE
+           service queue and stops listening on it's response queue. 
+           Also, terminates and undeploys any services which have been started with this client.
+          </para>
+        </listitem>
+
+      </itemizedlist></para>
+
+    </section>
+
+
+    <!--======================================================-->    
+    <!--         Application Context Map                      -->    
+    <!--======================================================-->    
+    <section id="ugr.ref.async.context.map">
+      <title>Application Context Map</title>
+      <para>The application context map is used to pass initialization parameters.
+        These parameters are itemized below.
+
+      <itemizedlist>
+        <listitem>
+          <para>DD2SpringXsltFilePath: Required for deploying services.</para>
+        </listitem>
+
+        <listitem>
+          <para>SaxonClasspath: Required for deploying services.</para>
+        </listitem>
+
+        <listitem>
+          <para>ServerURI: Broker connector for service. Required for initialize.</para>
+        </listitem>
+
+        <listitem>
+          <para>Endpoint: Service queue name. Required for initialize.</para>
+        </listitem>
+
+        <listitem>
+          <para>CasPoolSize: Size of Cas pool to create to send to specified service. Default = 1.</para>
+        </listitem>
+
+        <listitem>
+          <para>ReplyWindow: Maximum number of outstanding process CAS requests that can be sent.
+            Default = 5.</para>
+        </listitem>
+
+        <listitem>
+          <para>Timeout: Process CAS timeout in ms. Default = no timeout.</para>
+        </listitem>
+
+        <listitem>
+          <para>GetMetaTimeout: Initialize timeout in ms. Default = 60 seconds.</para>
+        </listitem>
+
+        <listitem>
+          <para>CpcTimeout: Collection process complete timeout. Default = no timeout.</para>
+        </listitem>
+
+      </itemizedlist></para>
+
+  </section>
+
+
+    <!--======================================================-->    
+    <!--         Status Callback Listener                     -->    
+    <!--======================================================-->    
+    <section id="ugr.ref.async.callback.listener">
+      <title>Status Callback Listener</title>
+      <para>Asynchronous events are delivered to applications via methods in classes registered
+          to the API object with addStatusCallbackListener(). These classes must implement the
+          interface org.apache.uima.aae.client.UimaEEStatusCallbackListener.
+
+      <itemizedlist>
+        <listitem>
+          <para>initializationComplete(EntityProcessStatus aStatus): The callback used to inform the
+            application that the initialization request has completed. On success aStatus will be
+            null; on failure use the EntityProcessStatus class to get the details.</para>
+        </listitem>
+
+        <listitem>
+          <para>entityProcessComplete(CAS aCas, EntityProcessStatus aStatus): The callback used to 
+            inform the application that a processCas request has completed. On success aStatus 
+            will be null; on failure use the EntityProcessStatus class to get the details.</para>
+        </listitem>
+
+        <listitem>
+          <para>collectionProcessComplete(EntityProcessStatus aStatus): The callback used to inform the
+            application that the CPC request has completed. On success aStatus will be
+            null; on failure use the EntityProcessStatus class to get the details.</para>
+        </listitem>
+      </itemizedlist>
+      </para>
+  </section>
+
+
+    <!--======================================================-->    
+    <!--         Error Results                                -->    
+    <!--======================================================-->    
+    <section id="ugr.ref.async.error.status">
+      <title>Error Results</title>
+      <para>Errors are delivered to the callback listeners as an EntityProcessStatus object.
+          
+        <note><para>The use of EntityProcessStatus is temporary. This will be replaced shortly.
+        </para></note>
+
+      <itemizedlist>
+        <listitem>
+          <para>isException(): Indicates the error returned is in the form of exception messages.
+            </para>
+        </listitem>
+
+        <listitem>
+          <para>getExceptions(): Returns a List of exceptions.
+            </para>
+        </listitem>
+      </itemizedlist>
+      </para>
+  </section>
+  
+  <section id="ugr.ref.async.api.usage">
+    <title>Asynchonous API Usage Scenarios</title>
+
+  <section id="ugr.ref.async.api.usage_initialize">
+    <title>Instantiating a Client API Object</title>
+    <para>
+      A client API object must be instantiated for each remote service an application will 
+      directly connect with, and a listener class registered in order to process asynchronous events:
+        <programlisting>//create Asynchronous Client API
+uimaEEEngine = new BaseUIMAAsynchronousEngine_impl();
+uimaEEEngine.addStatusCallbackListener(new MyStatusCallbackListener());
+    </programlisting>
+    </para>
+  </section>
+
+  <section id="ugr.ref.async.api.usage_callservice">
+    <title>Calling an Existing Service</title>
+    <para>
+      The following code shows how to establish connection to an existing service:
+        <programlisting>//create Map to pass server URI and Endpoint parameters
+Map&lt;String,Object&gt; appCtx = new HashMap&lt;String,Object&gt;();
+// Add Broker URI on local machine
+appCtx.put(UimaAsynchronousEngine.ServerUri, "tcp://localhost:61616");
+// Add Queue Name
+appCtx.put(UimaAsynchronousEngine.Endpoint, "RoomNumberAnnotatorQueue");
+// Add the Cas Pool Size
+appCtx.put(UimaAsynchronousEngine.CasPoolSize, 2);
+
+//initialize
+uimaEEEngine.initialize(appCtx);
+    </programlisting>
+    </para>
+
+    <para>
+      Prepare a Cas and send it to the service:
+    <programlisting>//get an empty CAS from the Cas pool
+CAS cas = uimaEEEngine.getCAS();
+// Initialize it with input data
+cas.setDocumentText("Some text to pass to this service.");
+// Send Cas to service for processing
+uimaEEEngine.sendCAS(cas);
+    </programlisting>
+    </para>
+  </section>
+
+  <section id="ugr.ref.async.api.usage_getresults">
+    <title>Retrieving Asynchonous Results</title>
+    <para>
+      Asynchronous events resulting from the process Cas request are passed to the registered listener.
+        <programlisting>
+// Callback Listener. Receives event notifications from CPE.
+class MyStatusCallbackListener implements StatusCallbackListener {
+
+// Method called when the processing of a Document is completed.
+public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
+  if (aStatus != null &amp;&amp; aStatus.isException()) {
+    List exceptions = aStatus.getExceptions();
+    for (int i = 0; i &lt; exceptions.size(); i++) {
+      ((Throwable) exceptions.get(i)).printStackTrace();
+      }
+    uimaEEEngine.stop();
+    return;
+    }
+
+// Process the retrieved Cas here
+// ...
+  }
+
+// Add other required callback methods below...
+}
+    </programlisting>
+    </para>
+  </section>
+
+  <section id="ugr.ref.async.api.usage_deployservice">
+    <title>Deploying a Service with the Client API</title>
+    <para>
+      Services can be deployed from a client object independently of any service connection.
+      The main motivation for this feature is to be able to deploy a service, connect to it, and
+      then remove the service when the application is done using it.
+        <programlisting>// create Map to hold required parameters
+Map&lt;String,Object&gt; appCtx = new HashMap&lt;String,Object&gt;();
+appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, System.getenv("UIMA_HOME") + "/bin/dd2spring.xsl");
+appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + "/lib/saxon8.jar");
+uimaEEEngine.deploy(service, appCtx);
+    </programlisting>
+    </para>
+  </section>
+      
+    </section>
+    <!--======================================================-->    
+    <!--                  Sample Code                         -->    
+    <!--======================================================-->    
+
+    <section id="ugr.ref.async.api.sample.code">
+      <title>Sample Code</title>
+      <para>See $UIMA_HOME/examples/src/org/apache/uima/examples/ee/RunRemoteAsyncAE.java
+      </para>
+    </section>
+
+</chapter>
