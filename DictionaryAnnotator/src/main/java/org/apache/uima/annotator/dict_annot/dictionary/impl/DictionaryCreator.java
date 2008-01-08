@@ -75,10 +75,10 @@ public class DictionaryCreator {
    private static final String SEPARATOR_CHAR = " ";
 
    /**
-    * creates the CommandLine parser used to parse the DictionaryConverter
+    * creates the CommandLine parser used to parse the DictionaryCreator
     * command line.
     * 
-    * @return returns the CommandLineParser for the DictionaryConverter
+    * @return returns the CommandLineParser for the DictionaryCreator
     */
    private static final CommandLineParser createCmdLineParser() {
       CommandLineParser parser = new CommandLineParser();
@@ -93,7 +93,7 @@ public class DictionaryCreator {
    }
 
    /**
-    * prints the DictionaryConverter usage to the command line
+    * prints the DictionaryCreator usage to the command line
     */
    private static final void printUsage() {
       System.out
