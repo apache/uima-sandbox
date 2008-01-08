@@ -61,6 +61,117 @@ under the License.
   we will describe how to use another Servlet container, Jetty, to test your application 
   <emphasis>without</emphasis> deployment.</para>
   
+  <section>
+  <title>Quick start for the impatient</title>
+  <para>If you're familiar with UIMA and servlets, you can start right here and get your first
+  simple service running in a few minutes.  If not, not to worry.  We'll go over this in much more
+  detail later on.  To follow the quick start guide, you will need to have:</para>
+
+  <itemizedlist>
+  <listitem>
+  <para>Tomcat or some other servlet container installed.  Installing Tomcat is a breeze, see 
+  <ulink url="http://tomcat.apache.org/"></ulink>. </para>
+  </listitem>
+  <listitem>
+  <para>The UIMA development environment set up (with Maven and all the other good stuff).  For
+  information on how to do that, see <ulink url="http://incubator.apache.org/uima/svn.html"></ulink>.
+   </para>
+  </listitem>
+  <listitem>
+  <para>Doing all this from Eclipse is convenient, but not required.  If you work with Eclipse, the
+  Sysdeo Tomcat plugin is useful: <ulink url="http://www.eclipsetotale.com/tomcatPlugin.html"></ulink>.
+  It lets you start and stop Tomcat from Eclipse, and allows you to debug your web apps in the
+  Eclipse debugger.</para>
+  </listitem>
+  </itemizedlist>
+  
+  <section>
+  <title>Install the SimpleServer code</title>
+  
+  <para>If you haven't done so already, start by extracting the SimpleServer sandbox project from
+  Subversion, and build it with "mvn install".  Copy the following files to the <code>shared/lib</code>
+  directory of your servlet container (i.e., Tomcat most likely; if the directory doesn't exist,
+  you can create it):
+  </para>
+
+  <itemizedlist>
+  <listitem>
+  <para><code>SimpleServer/lib/config-xml.jar</code>
+  </para>
+  </listitem>
+  <listitem>
+  <para><code>SimpleServer/lib/jsr173_1.0_api.jar</code>
+  </para>
+  </listitem>
+  <listitem>
+  <para><code>SimpleServer/lib/xbean.jar</code>
+  </para>
+  </listitem>
+  <listitem>
+  <para><code>SimpleServer/target/uimaj-simple-server.jar</code>
+  </para>
+  </listitem>
+  </itemizedlist>
+  
+  <para>
+  One more file you need to copy there is <code>uima-core.jar</code>.  You can either build it from
+  source, or grab it from the <code>lib</code> directory of an Apache UIMA distribution.  Note: the
+  SimpleServer requires at least version 2.2.1 of UIMA.
+  </para>
+  
+  </section>
+  
+  <section>
+  <title>Build the WhitespaceTokenizer</title>
+  
+  <para>Extract the WhitespaceTokenizer sandbox project from Subversion and build it with "mvn install".
+  Note that the WhitespaceTokenizer depends on the PearPackagingMavenPlugin sandbox project, so you
+  will need to extract and build that one as well.
+  </para>
+  
+  <para>When you have successfully built the WhitespaceTokenizer, you'll end up with a pear file in
+  <code>WhitespaceTokenizer/target/WhitespaceTokenizer.pear</code>.  You'll need this file in the
+  next step.
+  </para>
+  
+  </section>
+  
+  <section>
+  <title>Create a UIMA webapp</title>
+  
+  <para>Create a subdirectory <code>webapps/uima</code> in your Tomcat directory.  This is where all
+  your simple services will live.  Now create further subdirectories <code>webapps/uima/resources</code>
+  and <code>webapps/uima/WEB-INF</code> (webapp metadata) and <code>webapps/uima/resources</code>
+  (UIMA analysis).
+  </para>
+  
+  <para>Copy the whitespace tokenizer pear file from your workspace
+  (<code>WhitespaceTokenizer/target/WhitespaceTokenizer.pear</code>) to <code>webapps/uima/resources</code>
+  in your Tomcat directory.  Copy a corresponding SimpleServer output mapping file 
+  <code>SimpleServer/src/main/resources/samples/WhitespaceTokenizer.xml</code> also to 
+  <code>webapps/uima/resources</code>.
+  </para>
+  
+  <para>Finally, copy <code>SimpleServer/src/main/resources/samples/web.xml</code> to
+  <code>webapps/uima/WEB-INF</code>.
+  </para>
+  
+  </section>
+  
+  <section>
+  <title>Trying it out</title>
+  
+  <para>This is it, your first simple service should be ready to run.  Start (or restart) Tomcat and
+  direct your browser to the following URL: <ulink url="http://127.0.0.1:8080/uima/ws-tokenizer?mode=form"></ulink>.
+  Type in some text, check the "inline XML" radio button, and hit "Submit Query".  You should see
+  your text split up into sentences and tokens.
+  </para>
+  
+  </section>
+
+  </section>
+  
+  
   
 </chapter>
 
