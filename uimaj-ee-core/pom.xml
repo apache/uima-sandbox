@@ -14,14 +14,7 @@
 		<version>2.2.1-incubating</version>
 	</parent>
 	<dependencies>
-	
-	<dependency>
-    	<groupId>com.bea.wlplatform</groupId>
-    	<artifactId>commonj-twm</artifactId>
-    	<version>1.1</version>
-		<scope>compile</scope>
-    </dependency>
-	
+		
 	<dependency>
     	<groupId>commons-pool</groupId>
     	<artifactId>commons-pool</artifactId>
