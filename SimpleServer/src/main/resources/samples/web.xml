@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+                         "http://java.sun.com/dtd/web-app_2_3.dtd">
+                         
+<!-- Sample web.xml for UIMA SimpleServer -->
+<web-app>
+  <display-name>UIMA REST service</display-name>
+  <description>UIMA REST service for simple application access of UIMA analysis</description>
+
+  <servlet>
+    <servlet-name>WhitespaceTokenizer</servlet-name>
+    <servlet-class>org.apache.uima.simpleserver.servlet.SimpleServerServlet</servlet-class>
+    <init-param>
+      <param-name>PearPath</param-name>
+      <param-value>resources/WhitespaceTokenizer.pear</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ResultSpecFile</param-name>
+      <param-value>resources/WhitespaceTokenizer.xml</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WhitespaceTokenizer</servlet-name>
+    <url-pattern>/ws-tokenizer</url-pattern>
+  </servlet-mapping>
+
+
+</web-app>
