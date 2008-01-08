@@ -9,5 +9,5 @@ public class JmsConstants
     	return Thread.currentThread().getName();
     }
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

@@ -1278,5 +1278,5 @@ implements UimaAsynchronousEngine, MessageListener
 			return wasSignaled;
 		}
 	}
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

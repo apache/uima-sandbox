@@ -46,5 +46,5 @@ public class InvalidJMSMessageHandler extends ErrorHandlerBase implements ErrorH
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

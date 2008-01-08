@@ -3,26 +3,25 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.uima</groupId>
-	<artifactId>uimaj-adapter-jms</artifactId>
+	<artifactId>uimaj-ee-jms</artifactId>
 	<packaging>jar</packaging>
-	<version>2.2.1-incubating</version>
+	<version>${uimaj-release-version}</version>
 	<name>Apache UIMA Java Collection Processing Engine</name>
 	<url>http://incubator.apache.org/uima</url>
 	<parent>
 		<groupId>org.apache.uima</groupId>
 		<artifactId>uimaj</artifactId>
-		<version>2.2.0-incubating</version>
+		<version>2.3.0-incubating-SNAPSHOT</version>
 	</parent>
-	<dependencies>
-	
+	<dependencies>	
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-core</artifactId>
-			<version>2.2.0-incubating</version>
+			<version>${uimaj-release-version}</version>
 			<scope>compile</scope>
 		</dependency>
 
-        <dependency>
+    <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring</artifactId>
 			<version>2.0.4</version>
@@ -36,26 +35,13 @@
 				
 		<dependency>
 		    <groupId>org.apache.uima</groupId>
-		    <artifactId>uimaj-aae</artifactId>
-			<version>2.2.1-incubating</version>
+		    <artifactId>uimaj-ee-core</artifactId>
+			<version>${uimaj-release-version}</version>
 			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>
 	<build>
-		<finalName>uima-jms-common</finalName>
-		<plugins>
-			
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<configuration>
-				
-				<source>1.5</source>
-				<target>1.5</target>
-			</configuration>		
-		</plugin>
-
-		</plugins>		
+		<finalName>uima-ee-jms</finalName>
 	</build>	
 </project>
