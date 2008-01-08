@@ -85,5 +85,5 @@ public class JMSExceptionHandler extends ErrorHandlerBase implements ErrorHandle
 	}
 	
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }
