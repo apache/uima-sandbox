@@ -32,7 +32,9 @@ import junit.framework.TestCase;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryFileParserImpl;
+import org.apache.uima.annotator.dict_annot.dictionary.impl.FeaturePathInfo;
 import org.apache.uima.annotator.dict_annot.dictionary.impl.HashMapDictionaryBuilder;
+import org.apache.uima.annotator.dict_annot.impl.FeaturePathInfo_impl;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Type;
@@ -60,12 +62,12 @@ public class DictionaryMatcherTest extends TestCase {
     * @param matches
     *           match list
     */
-   public void match(Dictionary dict, AnnotationFS[] annotFSs,
+   public void match(Dictionary dict, AnnotationFS[] annotFSs, FeaturePathInfo featPathInfo,
          ArrayList<String> matches) {
       int currentPos = 0;
       while (currentPos < annotFSs.length) {
 
-         DictionaryMatch dictMatch = dict.matchEntry(currentPos, annotFSs);
+         DictionaryMatch dictMatch = dict.matchEntry(currentPos, annotFSs, featPathInfo);
          if (dictMatch != null) {
             // we have found a match starting at currentPos
             int matchLength = dictMatch.getMatchLength();
@@ -96,11 +98,12 @@ public class DictionaryMatcherTest extends TestCase {
             .getFile("DictionaryMatchTests/MultiWords.xml");
       InputStream stream = new BufferedInputStream(
             new FileInputStream(dictFile));
- 
+
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
-      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream, dictBuilder);
+      fileParser.parseDictionaryFile(dictFile.getAbsolutePath(), stream,
+            dictBuilder);
 
       Dictionary dict = dictBuilder.getDictionary();
 
@@ -142,7 +145,7 @@ public class DictionaryMatcherTest extends TestCase {
 
       // check matches for the CAS
       ArrayList<String> matches = new ArrayList<String>();
-      match(dict, annotFSs, matches);
+      match(dict, annotFSs, new FeaturePathInfo_impl(), matches);
 
       // check match results
       Assert.assertEquals("new", matches.get(0));

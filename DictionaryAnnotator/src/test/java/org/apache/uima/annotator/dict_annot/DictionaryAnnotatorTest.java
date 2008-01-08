@@ -23,11 +23,18 @@ import java.io.File;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.uima.UIMAFramework;
+import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.annotator.dict_annot.impl.DictionaryAnnotatorProcessException;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.Feature;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.test.junit_extension.AnnotatorTester;
 import org.apache.uima.test.junit_extension.JUnitExtension;
+import org.apache.uima.util.XMLInputSource;
 
 /**
  * Dictionary annotator test. This test class tests the dictionary annotator
@@ -128,6 +135,94 @@ public class DictionaryAnnotatorTest extends TestCase {
       }
       Assert.assertTrue(foundMessage);
 
+   }
+
+   /**
+    * Test the dictionary annotator processing with a simple feature path setting.
+    * 
+    * @throws Exception
+    */
+   public void testDictionaryAnnotatorWithSimpleFeaturePath() throws Exception {
+
+      AnalysisEngine ae = null;
+      // Create an XML input source from the specifier file.
+      XMLInputSource in = new XMLInputSource(
+            JUnitExtension
+                  .getFile("DictionaryAnnotatorTests/DictionaryAnnotatorFeaturePath.xml"));
+      // Parse the specifier.
+      ResourceSpecifier specifier = UIMAFramework.getXMLParser()
+            .parseResourceSpecifier(in);
+      // Create the Text Analysis Engine.
+      ae = UIMAFramework.produceAnalysisEngine(specifier);
+
+      // Create a new CAS and set data
+      CAS cas = ae.newCAS();
+      cas.setDocumentText("featurePath");
+      cas.setDocumentLanguage("en");
+
+      Feature feat = cas.getDocumentAnnotation().getType().getFeatureByBaseName("featureToAnalyze");
+      cas.getDocumentAnnotation().setStringValue(feat, "nEw yOrk City");
+
+      // Process cas
+      ae.process(cas);
+
+      // define result interested in
+      String[] tofs = { "org.apache.uima.DictionaryEntry" };
+
+      // compare results
+      File outputFile = new File(JUnitExtension
+            .getFile("DictionaryAnnotatorTests"),
+            "dictionaryAnnotFeaturePathTest_testoutput.txt");
+      AnnotatorTester.checkResult(cas, tofs, JUnitExtension
+            .getFile("DictionaryAnnotatorTests/dictionaryAnnotFeaturePathTestRef.txt"),
+            outputFile);
+   }
+
+   /**
+    * Test the dictionary annotator processing with an advanced feature path setting.
+    * 
+    * @throws Exception
+    */
+   public void testDictionaryAnnotatorWithAdvancedFeaturePath() throws Exception {
+
+      AnalysisEngine ae = null;
+      // Create an XML input source from the specifier file.
+      XMLInputSource in = new XMLInputSource(
+            JUnitExtension
+                  .getFile("DictionaryAnnotatorTests/DictionaryAnnotatorAdvancedFeaturePath.xml"));
+      // Parse the specifier.
+      ResourceSpecifier specifier = UIMAFramework.getXMLParser()
+            .parseResourceSpecifier(in);
+      // Create the Text Analysis Engine.
+      ae = UIMAFramework.produceAnalysisEngine(specifier);
+
+      // Create a new CAS and set data
+      CAS cas = ae.newCAS();
+      cas.setDocumentText("featurePath");
+      cas.setDocumentLanguage("en");
+
+      Type subAnnotationType = cas.getTypeSystem().getType("org.apache.uima.SubAnnotation");
+      Feature feat = subAnnotationType.getFeatureByBaseName("featureToAnalyze");
+      AnnotationFS fs = cas.createAnnotation(subAnnotationType, 0, 4);
+      fs.setStringValue(feat, "nEw yOrk City");
+      cas.addFsToIndexes(fs);
+      
+      Feature subAnnotFeat = cas.getDocumentAnnotation().getType().getFeatureByBaseName("subAnnotation");
+      cas.getDocumentAnnotation().setFeatureValue(subAnnotFeat, fs);
+
+      // Process cas
+      ae.process(cas);
+
+      // define result interested in
+      String[] tofs = { "org.apache.uima.DictionaryEntry" };
+
+      // compare results
+      File outputFile = new File(JUnitExtension
+            .getFile("DictionaryAnnotatorTests"),
+            "dictionaryAnnotFeaturePathTest_testoutput.txt");
+      AnnotatorTester.checkResult(cas, tofs, JUnitExtension
+            .getFile("DictionaryAnnotatorTests/dictionaryAnnotFeaturePathTestRef.txt"),
+            outputFile);
    }
 
 }
