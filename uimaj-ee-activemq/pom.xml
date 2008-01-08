@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.uima</groupId>
+	<artifactId>uimaj-adapter-activemq</artifactId>
+	<packaging>jar</packaging>
+	<version>2.2.1-incubating</version>
+	<name>Apache UIMA Java Collection Processing Engine</name>
+	<url>http://incubator.apache.org/uima</url>
+	<parent>
+		<groupId>org.apache.uima</groupId>
+		<artifactId>uimaj</artifactId>
+		<version>2.2.0-incubating</version>
+	</parent>
+	<dependencies>
+	
+	<dependency>
+    	<groupId>com.bea.wlplatform</groupId>
+    	<artifactId>commonj-twm</artifactId>
+    	<version>1.1</version>
+		<scope>compile</scope>
+    </dependency>
+	
+	<dependency>
+    	<groupId>commons-pool</groupId>
+    	<artifactId>commons-pool</artifactId>
+    	<version>20030825.183949</version>
+		<scope>compile</scope>
+	</dependency> 
+		
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>uimaj-core</artifactId>
+			<version>2.2.0-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>uimaj-examples</artifactId>
+			<version>2.2.0-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring</artifactId>
+			<version>2.0.4</version>
+		</dependency> 
+
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.activemq</groupId>
+		    <artifactId>activemq-core</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+		    <artifactId>activemq-optional</artifactId>
+		    <version>4.1.1</version>
+		</dependency> 				
+		
+		<dependency>
+		    <groupId>org.apache.uima</groupId>
+		    <artifactId>uimaj-aae</artifactId>
+			<version>2.2.1-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.uima</groupId>
+		    <artifactId>uimaj-adapter-jms</artifactId>
+			<version>2.2.1-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			<version>6.0.1</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>6.0.1</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>servlet-api-2.5</artifactId>
+			<version>6.0.1</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>xmlpull</groupId>
+			<artifactId>xmlpull</artifactId>
+			<version>1.1.3.4d_b4_min</version>
+		</dependency> 
+	
+		<dependency>
+			<groupId>xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		
+ <dependency>
+  <groupId>org.apache.activemq</groupId> 
+  <artifactId>activeio-core</artifactId> 
+  <version>3.0.0-incubator</version> 
+  </dependency>		
+		
+	
+	</dependencies>
+	<build>
+		<finalName>uimaj-ee-activemq</finalName>
+		<plugins>
+		<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>-Xmx300M</argLine>
+				</configuration>
+		</plugin>		
+			
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<configuration>
+				
+				<source>1.5</source>
+				<target>1.5</target>
+			</configuration>		
+		</plugin>
+
+		</plugins>		
+	</build>	
+</project>

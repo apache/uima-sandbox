@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   
+<analysisEngineDeploymentDescription 
+  xmlns="http://uima.apache.org/resourceSpecifier">
+  
+  <name>Simple Cas Multiplier</name>
+  <description>Deploys the Simple Cas Multiplier</description>
+  
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/> 
+    <service>
+      <inputQueue endpoint="TestMultiplierQueue" brokerURL="tcp://localhost:8118" prefetch="0"/>
+      <topDescriptor>
+       <import location="../descriptors/multiplier/SimpleCasGenerator.xml"/> 
+      </topDescriptor>
+      <analysisEngine>
+      	        <casMultiplier poolSize="5"/> 
+      </analysisEngine>
+    
+      
+    </service>
+  </deployment>
+
+</analysisEngineDeploymentDescription>
