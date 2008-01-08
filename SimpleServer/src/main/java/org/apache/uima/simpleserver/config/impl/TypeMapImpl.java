@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.uima.simpleserver.config.Filter;
-import org.apache.uima.simpleserver.config.SimpleFilter;
 import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.TypeMap;
 

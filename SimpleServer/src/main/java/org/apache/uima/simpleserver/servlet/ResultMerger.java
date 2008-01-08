@@ -59,6 +59,8 @@ import org.xml.sax.InputSource;
  * and sends the requests simultaneously to the URLs received as 
  * parameters "url1", "url2", etc. 
  * 
+ * TODO: does not currently work, needs to be fixed.
+ * 
  */
 public class ResultMerger extends SimpleServerServlet {
 
@@ -273,7 +275,7 @@ class ServiceReaderThread extends Thread {
       if (resultElements.item(i) instanceof Element) {
         Element element = (Element) resultElements.item(i);
         // create a ResultEntry object
-        ResultEntryImpl entry = new ResultEntryImpl(element.getNodeName());
+        ResultEntryImpl entry = new ResultEntryImpl(element.getNodeName(), 0, 0);
         // fill the ResultEntry with data read from the element
         NamedNodeMap attributes = element.getAttributes();
         int k = attributes.getLength();

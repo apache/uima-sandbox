@@ -78,7 +78,8 @@ public class ResultExtractor {
         // Check that there either is no filter, or the FS passes the filter.
         if ((filter == null) || filter.match(annotation)) {
           // Create a new result entry, fill with attributes and add result set.
-          ResultEntryImpl resultEntry = new ResultEntryImpl(tspec.getOutputTag());
+          ResultEntryImpl resultEntry = new ResultEntryImpl(tspec.getOutputTag(), annotation
+              .getBegin(), annotation.getEnd());
           makeOutputs(resultEntry, annotation, tspec);
           resultEntries.add(resultEntry);
         }

@@ -31,13 +31,27 @@ import org.apache.uima.simpleserver.output.ResultEntry;
  * No sophisticated logic, just a bean-like class.
  */
 public class ResultEntryImpl implements ResultEntry {
-  private String entryName;
+
+  private final String entryName;
+
+  private final int begin;
+  
+  private final int end;
 
   private List<String> attributeNames;
 
   private Map<String, String> attributes;
 
   private String coveredText = null;
+  
+  public ResultEntryImpl(String entryName, int begin, int end) {
+    super();
+    this.entryName = entryName;
+    this.begin = begin;
+    this.end = end;
+    this.attributes = new HashMap<String, String>();
+    this.attributeNames = new LinkedList<String>();
+  }
 
   public String getCoveredText() {
     return this.coveredText;
@@ -54,17 +68,6 @@ public class ResultEntryImpl implements ResultEntry {
    */
   public String getEntryName() {
     return this.entryName;
-  }
-
-  public void setEntryName(String entryName) {
-    this.entryName = entryName;
-  }
-
-  public ResultEntryImpl(String entryName) {
-    super();
-    this.entryName = entryName;
-    this.attributes = new HashMap<String, String>();
-    this.attributeNames = new LinkedList<String>();
   }
 
   /*
@@ -90,5 +93,19 @@ public class ResultEntryImpl implements ResultEntry {
    */
   public List<String> getAttributeNames() {
     return this.attributeNames;
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.uima.simpleserver.output.ResultEntry#getBegin()
+   */
+  public int getBegin() {
+    return this.begin;
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.uima.simpleserver.output.ResultEntry#getEnd()
+   */
+  public int getEnd() {
+    return this.end;
   }
 }

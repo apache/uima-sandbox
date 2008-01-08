@@ -26,4 +26,7 @@
     <type name="org.apache.uima.TokenAnnotation" outputTag="token"
         outputCoveredText="true">
     </type>
+    <type name="org.apache.uima.SentenceAnnotation" outputTag="sentence"
+        outputCoveredText="true">
+    </type>
 </uimaSimpleServerSpec>

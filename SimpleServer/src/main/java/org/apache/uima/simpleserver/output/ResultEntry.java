@@ -48,4 +48,8 @@ public interface ResultEntry {
    */
   public String getCoveredText();
   
+  public int getBegin();
+  
+  public int getEnd();
+  
 }

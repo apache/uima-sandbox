@@ -26,14 +26,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /*
- * This class contains static methods responsible for creation of 
- * inline-xml from the given Result object.
+ * This class contains static methods responsible for creation of inline-xml from the given Result
+ * object.
  */
 public class InlineXMLGenerator {
 
   /*
-   * main method of this class - decides, which annotations should be taken, and
-   * produces the string with inline-xml.
+   * main method of this class - decides, which annotations should be taken, and produces the string
+   * with inline-xml.
    */
   public static String getInlineXML(Result result) {
     // a list of all positions where some tags begin
@@ -65,16 +65,11 @@ public class InlineXMLGenerator {
     // first of all, we decide which annotions to take
     // this loop iterates over all available annotations
     loop: for (ResultEntry entry : result.getResultEntries()) {
-      String strBegin = entry.getAttriuteValue("begin");
-      String strEnd = entry.getAttriuteValue("end");
-      if ((strBegin == null) || (strEnd == null)) {
-        continue loop;
-      }
       Integer begin;
       Integer end;
       try {
-        begin = new Integer(strBegin);
-        end = new Integer(strEnd);
+        begin = new Integer(entry.getBegin());
+        end = new Integer(entry.getEnd());
       } catch (NumberFormatException e) {
         // we don't take annotations without features "begin" and "end"
         continue loop;
@@ -202,8 +197,7 @@ public class InlineXMLGenerator {
   }
 
   /*
-   * sorts the beginning tags by length descending and adds them to the given
-   * string buffer
+   * sorts the beginning tags by length descending and adds them to the given string buffer
    */
   private static void printBeginTags(List<ResultEntry> list, StringBuffer sb) {
     while (!list.isEmpty()) {
@@ -222,8 +216,7 @@ public class InlineXMLGenerator {
   }
 
   /*
-   * sorts the ending tags by length ascending and adds them to the given string
-   * buffer
+   * sorts the ending tags by length ascending and adds them to the given string buffer
    */
   private static void printEndTags(List<ResultEntry> list, StringBuffer sb) {
     while (!list.isEmpty()) {
@@ -255,11 +248,7 @@ public class InlineXMLGenerator {
    * gets the length of an annotation
    */
   private static int len(ResultEntry entry) {
-    String strBegin = entry.getAttriuteValue("begin");
-    String strEnd = entry.getAttriuteValue("end");
-    int b = Integer.parseInt(strBegin);
-    int e = Integer.parseInt(strEnd);
-    return e - b + 1;
+    return entry.getEnd() - entry.getBegin() + 1;
   }
 
   /*
@@ -322,8 +311,7 @@ public class InlineXMLGenerator {
   }
 
   /*
-   * escapes the XML characters in the given text and adds the result to the
-   * given string buffer
+   * escapes the XML characters in the given text and adds the result to the given string buffer
    */
   public static void normalize(String aStr, StringBuffer aResultBuf, boolean aNewlinesToSpaces) {
     if (aStr != null) {
@@ -360,21 +348,16 @@ public class InlineXMLGenerator {
   }
 
   /*
-   * determines whether the given annotation has a conflict with another
-   * annotation with specified begin and end positions.
+   * determines whether the given annotation has a conflict with another annotation with specified
+   * begin and end positions.
    */
   private static boolean isConflict(ResultEntry entry, int begin, int end) {
-    String strBegin = entry.getAttriuteValue("begin");
-    String strEnd = entry.getAttriuteValue("end");
-    int b = Integer.parseInt(strBegin);
-    int e = Integer.parseInt(strEnd);
-    return isConflict(b, e, begin, end);
+    return isConflict(entry.getBegin(), entry.getEnd(), begin, end);
   }
 
   /*
-   * determines whether the anotations with begin positions b1 and b2 and end
-   * positions e1 and e2 cross each other, producing a conflict in the xml
-   * output
+   * determines whether the anotations with begin positions b1 and b2 and end positions e1 and e2
+   * cross each other, producing a conflict in the xml output
    */
   private static boolean isConflict(int b1, int e1, int b2, int e2) {
     if (b1 == b2) {
