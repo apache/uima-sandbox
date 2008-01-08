@@ -6,5 +6,5 @@ public class UIMAEE_Constants
 	public static final String Terminate = "terminate";
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

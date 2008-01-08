@@ -91,5 +91,5 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 		// TODO Auto-generated method stub
 
 	}
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

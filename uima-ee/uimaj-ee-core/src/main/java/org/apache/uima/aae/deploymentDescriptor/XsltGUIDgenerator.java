@@ -21,5 +21,5 @@ public class XsltGUIDgenerator {
     return localhost + new UID().toString();
   }
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

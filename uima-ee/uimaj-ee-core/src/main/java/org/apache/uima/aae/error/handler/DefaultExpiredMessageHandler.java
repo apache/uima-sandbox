@@ -67,5 +67,5 @@ public class DefaultExpiredMessageHandler extends ErrorHandlerBase implements Er
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

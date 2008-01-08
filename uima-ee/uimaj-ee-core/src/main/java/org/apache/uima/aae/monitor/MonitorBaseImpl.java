@@ -140,5 +140,5 @@ public class MonitorBaseImpl implements Monitor
 		return 0;
 		
 	}
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

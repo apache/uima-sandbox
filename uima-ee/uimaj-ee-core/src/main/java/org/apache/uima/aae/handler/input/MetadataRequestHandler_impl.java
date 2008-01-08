@@ -85,5 +85,5 @@ public class MetadataRequestHandler_impl extends HandlerBase
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

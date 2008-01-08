@@ -61,5 +61,5 @@ public class AnalysisEngineProcessExceptionHandler extends ErrorHandlerBase impl
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

@@ -30,5 +30,5 @@ public class UimaEEServiceException extends Exception
 		// TODO Auto-generated constructor stub
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

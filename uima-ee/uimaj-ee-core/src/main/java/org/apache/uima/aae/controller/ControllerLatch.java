@@ -42,5 +42,5 @@ public class ControllerLatch
 		}
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

@@ -93,6 +93,6 @@ public class CpcErrorHandler  extends ErrorHandlerBase implements ErrorHandler
 		// TODO Auto-generated method stub
 
 	}
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 
 }

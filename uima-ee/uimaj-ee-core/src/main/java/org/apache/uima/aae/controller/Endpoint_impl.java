@@ -493,5 +493,5 @@ public class Endpoint_impl implements Endpoint, Cloneable
 		initialHeapSize = aHeapSize;
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

@@ -188,5 +188,5 @@ public class AsynchAECasManager_impl
 		return initialHeapSize;
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

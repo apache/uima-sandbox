@@ -43,5 +43,5 @@ private static final Class CLASS_NAME = UnknownDestinationHandler.class;
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

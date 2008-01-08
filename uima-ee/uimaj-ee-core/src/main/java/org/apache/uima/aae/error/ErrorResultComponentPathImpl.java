@@ -33,5 +33,5 @@ public class ErrorResultComponentPathImpl implements ErrorResultComponentPath
 	{
 		return pathList.iterator();
 	}
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

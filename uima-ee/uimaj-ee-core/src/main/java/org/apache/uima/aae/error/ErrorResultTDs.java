@@ -19,5 +19,5 @@ public interface ErrorResultTDs extends Serializable
 		public boolean wasDisabled();
 	}
 	
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

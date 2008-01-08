@@ -7,5 +7,5 @@ public class UIMAMessage
 	public static final String RawMsg ="RawMsg";
 	
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

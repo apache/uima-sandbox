@@ -73,5 +73,5 @@ public class ErrorResultTDsImpl implements ErrorResultTDs
 			return wasDisabled;
 		}
 	}
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

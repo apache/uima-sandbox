@@ -16,5 +16,5 @@ public class ErrorHandlerListenerBase implements ErrorHandlerListener
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

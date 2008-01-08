@@ -418,6 +418,6 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		
 		return true;
 	}
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 
 }

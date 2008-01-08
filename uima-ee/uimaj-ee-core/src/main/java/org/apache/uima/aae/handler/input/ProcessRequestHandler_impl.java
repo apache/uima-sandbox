@@ -663,5 +663,5 @@ System.out.println(getController().getName()+" ::::::: Processing Release CAS Re
 		}
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

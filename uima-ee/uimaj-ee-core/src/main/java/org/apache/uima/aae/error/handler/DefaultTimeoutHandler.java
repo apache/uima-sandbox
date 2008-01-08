@@ -125,5 +125,5 @@ public class DefaultTimeoutHandler extends ErrorHandlerBase implements ErrorHand
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

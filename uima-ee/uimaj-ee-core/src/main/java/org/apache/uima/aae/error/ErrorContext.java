@@ -34,5 +34,5 @@ public class ErrorContext
 		return contextMap.keySet().iterator();
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

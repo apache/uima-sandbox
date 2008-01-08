@@ -45,5 +45,5 @@ public class StatisticBase implements Statistic
 	}
 	
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }
