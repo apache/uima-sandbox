@@ -43,5 +43,5 @@ public class DefaultDelegateErrorHandler extends ErrorHandlerBase implements Err
 		return false;
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

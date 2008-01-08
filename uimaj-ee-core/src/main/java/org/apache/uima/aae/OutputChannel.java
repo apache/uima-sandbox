@@ -38,5 +38,5 @@ public interface OutputChannel extends Channel
 	
 	public void stop();
 	
-    static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+    
 }

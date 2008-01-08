@@ -21,5 +21,5 @@ public interface Handler
 	public boolean hasDelegateHandler();
 	public String getName();
 
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

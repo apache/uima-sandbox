@@ -13,5 +13,5 @@ public interface InputChannel extends Channel
 	public ServiceInfo getServiceInfo();
 //	public void stop() throws Exception;
 	public boolean isStopped();
-    static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+    
 }

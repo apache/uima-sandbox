@@ -138,5 +138,5 @@ public interface AnalysisEngineController extends ControllerLifecycle
 
 	public JmxManagement getManagementInterface();
 	
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

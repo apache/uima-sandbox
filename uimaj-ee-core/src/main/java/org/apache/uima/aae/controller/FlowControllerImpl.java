@@ -83,5 +83,5 @@ public class FlowControllerImpl extends FlowController_ImplBase
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

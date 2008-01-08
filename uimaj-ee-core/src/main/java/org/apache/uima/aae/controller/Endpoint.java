@@ -109,5 +109,5 @@ public interface Endpoint
 	public void setInitialFsHeapSize(int aHeapSize);
 	
 	
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

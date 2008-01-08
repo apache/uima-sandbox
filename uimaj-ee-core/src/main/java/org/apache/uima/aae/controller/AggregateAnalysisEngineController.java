@@ -92,5 +92,5 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	
 	public Map getDestinations();
 
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

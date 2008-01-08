@@ -13,5 +13,5 @@ public abstract class BaseStatistic //implements Statistic
 		return name;
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

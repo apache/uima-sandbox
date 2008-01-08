@@ -22,5 +22,5 @@ public interface MessageContext
 	public long getMessageArrivalTime();
 	public String getEndpointName();
 
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

@@ -43,5 +43,5 @@ public interface ErrorResult extends Serializable
 	 */
 	public ErrorResultTDs getTDs();
 	
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

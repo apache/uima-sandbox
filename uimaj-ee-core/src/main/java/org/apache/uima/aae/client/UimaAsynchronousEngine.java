@@ -148,5 +148,5 @@ public interface UimaAsynchronousEngine
 	  
 	  public void undeploy( String aSpringContainerId ) throws Exception;
 
-public static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

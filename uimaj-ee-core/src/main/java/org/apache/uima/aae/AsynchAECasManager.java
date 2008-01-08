@@ -28,5 +28,5 @@ public interface AsynchAECasManager
 	public void setInitialFsHeapSize( long aSizeInBytes);
 	public long getInitialFsHeapSize();
 	
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

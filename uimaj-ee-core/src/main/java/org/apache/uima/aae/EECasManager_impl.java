@@ -60,5 +60,5 @@ protected void finalize() throws Throwable
 	casPoolMap.clear();
 }
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

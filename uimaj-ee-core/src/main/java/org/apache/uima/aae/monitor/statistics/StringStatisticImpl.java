@@ -24,5 +24,5 @@ public class StringStatisticImpl extends BaseStatistic implements StringStatisti
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

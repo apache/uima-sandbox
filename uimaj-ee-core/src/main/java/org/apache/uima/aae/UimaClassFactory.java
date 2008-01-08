@@ -193,5 +193,5 @@ public class UimaClassFactory
     }
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

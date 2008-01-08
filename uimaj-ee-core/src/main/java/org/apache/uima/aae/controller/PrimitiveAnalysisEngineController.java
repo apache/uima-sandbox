@@ -12,5 +12,5 @@ public interface PrimitiveAnalysisEngineController extends AnalysisEngineControl
 	public PrimitiveServiceInfo getServiceInfo();
 	public void addAbortedCasReferenceId( String aCasReferenceId );
 	
-  static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+  
 }

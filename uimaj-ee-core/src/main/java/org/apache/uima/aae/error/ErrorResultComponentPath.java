@@ -10,5 +10,5 @@ public interface ErrorResultComponentPath extends Serializable
 	public void add( String aPath, int anInsertPosition);
 	public String get( int aPosition );
 	
-	static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

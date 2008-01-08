@@ -88,5 +88,5 @@ public class ErrorHandlerChain extends LinkedList
 		}
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

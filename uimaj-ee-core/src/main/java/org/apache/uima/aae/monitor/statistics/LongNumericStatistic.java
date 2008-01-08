@@ -39,5 +39,5 @@ implements LongNumericStatisticMBean
 		return value;
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

@@ -39,5 +39,5 @@ public interface Monitor
 	public long thresholdMapSize();
 	
 	
-    static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+    
 }

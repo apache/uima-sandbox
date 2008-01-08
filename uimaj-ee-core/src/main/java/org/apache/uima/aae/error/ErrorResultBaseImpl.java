@@ -148,5 +148,5 @@ public class ErrorResultBaseImpl implements ErrorResult
 			System.out.println( ((TD)it2.next()).gatPath());
 		}
 	}
-	private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+	
 }

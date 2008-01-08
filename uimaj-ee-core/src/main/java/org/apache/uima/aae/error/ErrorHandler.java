@@ -19,5 +19,5 @@ public interface ErrorHandler
 	public boolean handleError( Throwable t, ErrorContext anErrorContext, AnalysisEngineController aController);
 	public Map getEndpointThresholdMap();
 	
-public static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

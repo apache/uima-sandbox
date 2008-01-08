@@ -21,5 +21,5 @@ public class UimaEEProcessCasTimeout extends Exception
 		super(message, cause);
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

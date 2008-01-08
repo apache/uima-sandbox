@@ -20,5 +20,5 @@ public class AsynchAEExceptionHandler extends ErrorHandlerBase implements ErrorH
 		return false;
 	}
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

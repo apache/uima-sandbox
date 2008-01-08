@@ -10,5 +10,5 @@ public class UIDGenerator implements UniqueIdGenerator
 	}
 
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }

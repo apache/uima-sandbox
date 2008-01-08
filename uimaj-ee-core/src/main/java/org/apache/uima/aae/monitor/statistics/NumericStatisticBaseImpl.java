@@ -14,5 +14,5 @@ extends BaseStatistic implements NumericStatistic
 	
 	public abstract void decrement();
 
-private static final String copyright = com.ibm.uima.copyright.Copyright.COPYRIGHT;
+
 }
