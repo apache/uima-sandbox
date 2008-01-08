@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- modify lib.dir and activemq.dir properties to 
+     be the locations where the output goes -->
+
+<!-- files unzipped into unique temp dir, which is erased at the end -->
+
+<project name="install-oss" default="all">
+
+  <target name="all" depends="once, check, alert, install, cleanup"/>
+  
+  <target name="install" depends="get-saxon, get-activemq, get-spring"/>
+    
+
+  
+  <target name="once" unless="more-than-once">
+    <property name="more-than-once" value="true"/>
+    <condition property="is.windows">
+      <os family="windows"/>
+    </condition>
+
+    <condition property="is.unix">
+      <os family="unix"/>
+    </condition>
+    
+    
+    <condition property="tmp.start" value="/tmp">
+      <os family="unix"/>
+    </condition>
+    <condition property="tmp.start" value="c:/temp">
+      <os family="windows"/>
+    </condition>
+    
+    <tempfile property="tmp.dir"  
+      destdir="${tmp.start}"
+      prefix="uima_ee_"/>
+    <mkdir dir="${tmp.dir}"/>
+    
+    <property name="lib.dir" location="${tmp.start}/uima_ee_test/lib"/>
+    <property name="activemq.dir" location="${tmp.start}/uima_ee_test/activemq"/>
+  </target>
+
+  <target name="check">
+    <available file="${lib.dir}/saxon8.jar"                               property="saxon.available"/>
+    <available file="${lib.dir}/spring.jar"                               property="spring.available"/>
+    <available file="${activemq.dir}/apache-activemq-4.1.1/lib/activemq-core-4.1.1.jar" property="activemq.available"/>
+    <condition property="already.alerted">
+      <and>
+        <isset property="saxon.available"/>
+        <isset property="spring.available"/>
+        <isset property="activemq.available"/>
+      </and>
+    </condition>
+  </target>
+  
+  <target name="alert" unless="already.alerted">
+     <property name="already.alerted" value="true"/>
+    <input message="The UIMA EE distribution depends on several open source packages.&#xA;
+If you proceed, these packages will be downloaded from their distribution&#xA;
+sites on the Internet if needed.&#xA;&#xA;
+     IBM is not distributing these packages.&#xA;&#xA;
+Each package will come with its own licensing terms and conditions,&#xA;
+and you must agree to accept their licenses when asked.&#xA;Do you agree?"
+      validargs="y,n" addproperty="ok.to.download.answer"/>
+    
+    <antcall target="failtest">
+      <param name="common.download.yn" value="${ok.to.download.answer}"/>
+    </antcall>
+
+  </target>
+  
+  
+  <!-- ======================================================================== -->
+  <!-- == Subroutine: Download Saxon                                         == -->
+  <!-- ======================================================================== -->
+  
+  <target name="get-saxon" unless="saxon.available">     
+    <input
+      message="Downloading and unzipping Saxon's free XSLT package,&#xA;
+licensed under the Mozilla Public License Version 1.0;&#xA;
+you may not use this package except in compliance with the License.&#xA;&#xA; 
+You may obtain a copy of the License at http://www.mozilla.org/MPL/&#xA;&#xA;Ok to download?"
+      validargs="y,n" addproperty="ok.download.saxon"/>
+    
+    <antcall target="failtest">
+      <param name="common.download.yn" value="${ok.download.saxon}"/>
+    </antcall>
+    
+    <get src="http://downloads.sourceforge.net/saxon/saxonb8-9-0-3j.zip"
+             dest="${tmp.dir}/saxon.zip"/>
+    <unzip src="${tmp.dir}/saxon.zip" dest="${tmp.dir}/saxon"/>
+    <copy file="${tmp.dir}/saxon/saxon8.jar" tofile="${lib.dir}/saxon8.jar"/>
+  </target>
+
+  <!-- ======================================================================== -->
+  <!-- == Subroutine: Download Spring                                        == -->
+  <!-- ======================================================================== -->
+  
+  <target name="get-spring" unless="spring.available">
+    <input
+      message="Downloading and unzipping the Spring framework,&#xA;
+licensed under the Apache License, Version 2.0&#xA;
+you may not use this package except in compliance with the License.&#xA;&#xA; 
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.html&#xA;&#xA;Ok to download?"
+      validargs="y,n" addproperty="ok.download.spring"/>
+    
+    <antcall target="failtest">
+      <param name="common.download.yn" value="${ok.download.spring}"/>
+    </antcall>
+    
+    <get src="http://downloads.sourceforge.net/springframework/spring-framework-2.0.4.zip?use_mirror=superb-east"
+             dest="${tmp.dir}/spring.zip"/>
+    <unzip src="${tmp.dir}/spring.zip" dest="${tmp.dir}/spring"/>
+    <copy file="${tmp.dir}/spring/spring-framework-2.0.4/dist/spring.jar" todir="${lib.dir}"/>
+    
+    <copy file="${activemq.dir}/apache-activemq-4.1.1/lib/commons-logging-1.1.jar"
+          tofile="${lib.dir}/commons-logging.jar"/>
+    
+    <copy file="${activemq.dir}/apache-activemq-4.1.1/lib/optional/commons-pool-1.2.jar"
+          tofile="${lib.dir}/commons-pool.jar"/>
+    
+    <get src="http://ftpna2.bea.com/pub/downloads/commonj/commonj-twm.jar"
+          dest="${lib.dir}/commonj-twm.jar"/>
+    
+  </target>
+
+  <!-- ======================================================================== -->
+  <!-- == Subroutine: Download activemq                                      == -->
+  <!-- ======================================================================== -->
+  
+  <target name="get-activemq" unless="activemq.available">
+    <input
+      message="Downloading and unzipping the activemq framework,&#xA;
+licensed under the Apache License, Version 2.0&#xA;
+you may not use this package except in compliance with the License.&#xA;&#xA; 
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.html&#xA;&#xA;Ok to download?"
+      validargs="y,n" addproperty="ok.download.activemq"/>
+    
+    <antcall target="failtest">
+      <param name="common.download.yn" value="${ok.download.activemq}"/>
+    </antcall>
+
+    <antcall target="get-activemq-unix"/>
+    <antcall target="get-activemq-windows"/>
+  </target>
+  
+  <target name="get-activemq-unix" if="is.unix">
+    <get src="http://mirror.x10.com/mirror/apache/activemq/apache-activemq/4.1.1/apache-activemq-4.1.1.tar.gz"
+         dest="${tmp.dir}/activemq.tar.gz"/>
+    <gunzip src="${tmp.dir}/activemq.tar.gz"/>
+    <untar src="${tmp.dir}/activemq.tar" dest="${activemq.dir}"/>
+    <!-- set permissions on script files since ant's untar task doesn't support it -->
+    <chmod perm="755">
+      <fileset dir="${activemq.dir}/apache-activemq-4.1.1/bin" excludes="*.jar"/>
+    </chmod>    
+  </target>
+  
+  <target name="get-activemq-windows" if="is.windows">
+    <get src="http://mirror.x10.com/mirror/apache/activemq/apache-activemq/4.1.1/apache-activemq-4.1.1.zip"
+         dest="${tmp.dir}/activemq.zip"/>
+    <unzip src="${tmp.dir}/activemq.zip" dest="${activemq.dir}"/>
+  </target>
+  
+  <!-- always called via ant-call so need.to.fail can be repeatedly set -->
+  
+  <target name="failtest" depends="set.failtest.prop, conditional.fail"/>
+  
+  <target name="set.failtest.prop">
+    <condition property="need.to.fail">
+      <equals arg1="n" arg2="${common.download.yn}"/>
+    </condition>
+  </target>
+  
+  <target name="conditional.fail" if="need.to.fail">
+    <antcall target="cleanup"/>
+    <fail message="Download aborted by user."/>
+  </target>
+
+  <target name="cleanup">
+    <delete dir="${tmp.dir}" quiet="true"/>
+  </target>
+    
+</project>
