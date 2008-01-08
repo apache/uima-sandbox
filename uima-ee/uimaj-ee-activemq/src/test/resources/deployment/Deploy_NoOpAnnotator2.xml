@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   
+<analysisEngineDeploymentDescription 
+  xmlns="http://uima.apache.org/resourceSpecifier">
+  
+  <name>NoOp Annotator2</name>
+  <description>Deploys the NoOp Annotator Primitive AE</description>
+  
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/> 
+    <service>
+      <inputQueue endpoint="NoOpAnnotatorQueue2" brokerURL="tcp://localhost:8118" prefetch="1"/>
+      <topDescriptor>
+       <import location="../descriptors/analysis_engine/NoOpAnnotator2.xml"/> 
+      </topDescriptor>
+      <analysisEngine>
+      <asyncPrimitiveErrorConfiguration>
+           <!-- <processCasErrors thresholdCount="4" thresholdWindow="10" thresholdAction="terminate" /> -->
+           <collectionProcessCompleteErrors additionalErrorAction="terminate" />
+      </asyncPrimitiveErrorConfiguration>
+      </analysisEngine>
+    
+      
+    </service>
+  </deployment>
+
+</analysisEngineDeploymentDescription>
+

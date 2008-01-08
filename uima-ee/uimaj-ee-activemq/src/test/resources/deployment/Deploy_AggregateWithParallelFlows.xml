@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<analysisEngineDeploymentDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  
+  <name>Top Level TAE</name>
+  <description></description>
+  
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/>
+    <service>
+      <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
+      <topDescriptor>
+        <import location="../descriptors/analysis_engine/SimpleTestAggregateWithParallelFlows.xml"/>
+      </topDescriptor>
+      <analysisEngine>
+        <delegates>
+        
+          <analysisEngine key="TestMultiplier">
+	        <casMultiplier poolSize="1"/> 
+          </analysisEngine>
+
+          <remoteAnalysisEngine key="NoOp1">
+	                  <inputQueue endpoint="NoOpAnnotatorQueueLongDelay" brokerURL="tcp://localhost:8118"/>
+	                  <serializer method="xmi"/>
+                      <asyncAggregateErrorConfiguration>
+                            <getMetadataErrors maxRetries="0" timeout="4000" errorAction="disable" />
+                            <processCasErrors maxRetries="0" thresholdCount="1" timeout="4000" continueOnRetryFailure="true" thresholdAction="disable" />
+                      </asyncAggregateErrorConfiguration>
+          </remoteAnalysisEngine>
+
+          <remoteAnalysisEngine key="NoOp2">
+	                  <inputQueue endpoint="NoOpAnnotatorQueue2" brokerURL="tcp://localhost:8118"/>
+	                  <serializer method="xmi"/>
+                      <asyncAggregateErrorConfiguration>
+                            <getMetadataErrors maxRetries="0" timeout="4000" errorAction="terminate" />
+                            <processCasErrors maxRetries="0" thresholdCount="1" timeout="4000" thresholdAction="terminate" />
+                      </asyncAggregateErrorConfiguration>
+          </remoteAnalysisEngine>
+
+          <remoteAnalysisEngine key="NoOp3">
+	                  <inputQueue endpoint="NoOpAnnotatorQueue" brokerURL="tcp://localhost:8118"/>
+	                  <serializer method="xmi"/>
+                      <asyncAggregateErrorConfiguration>
+                            <getMetadataErrors maxRetries="0" timeout="4000" errorAction="terminate" />
+                            <processCasErrors maxRetries="0" thresholdCount="1" timeout="4000" thresholdAction="terminate" />
+                      </asyncAggregateErrorConfiguration>
+          </remoteAnalysisEngine>
+
+          <remoteAnalysisEngine key="NoOp4">
+	                  <inputQueue endpoint="NoOpAnnotatorQueue3" brokerURL="tcp://localhost:8118"/>
+	                  <serializer method="xmi"/>
+                      <asyncAggregateErrorConfiguration>
+                            <getMetadataErrors maxRetries="0" timeout="4000" errorAction="terminate" />
+                            <processCasErrors maxRetries="0" thresholdCount="1" timeout="4000" thresholdAction="terminate" />
+                      </asyncAggregateErrorConfiguration>
+          </remoteAnalysisEngine>
+
+        </delegates>
+      </analysisEngine>
+    </service>
+  </deployment>
+  
+</analysisEngineDeploymentDescription>

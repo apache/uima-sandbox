@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>true</primitive>
+  <annotatorImplementationName>org.apache.uima.ae.noop.NoOpAnnotator</annotatorImplementationName>
+  <analysisEngineMetaData>
+    <name>NoOp Annotator</name>
+    <description>Annotator That Does Nothin</description>
+    <version>1.0</version>
+    <vendor>The Apache Software Foundation</vendor>
+    
+    <configurationParameters>
+          <configurationParameter>
+        <name>ErrorFrequency</name>
+        <description>Frequency of Generated Errors</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+
+      <configurationParameter>
+        <name>ProcessDelay</name>
+        <description>Process Delay</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+
+    
+    </configurationParameters>
+    
+    <configurationParameterSettings>
+          <nameValuePair>
+        <name>ErrorFrequency</name>
+        <value>
+          <integer>1</integer>
+        </value>
+      </nameValuePair>
+
+          <nameValuePair>
+        <name>ProcessDelay</name>
+        <value>
+          <integer>0</integer>
+        </value>
+      </nameValuePair>
+    
+    </configurationParameterSettings>
+    
+    
+    
+    <typeSystemDescription>
+    </typeSystemDescription>
+    
+    <capabilities>
+    </capabilities>
+	
+    <operationalProperties>
+		<modifiesCas>true</modifiesCas>
+		<multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+		<outputsNewCASes>false</outputsNewCASes>
+	</operationalProperties>	  
+  </analysisEngineMetaData>
+</analysisEngineDescription>
+

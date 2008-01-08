@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   
+<analysisEngineDeploymentDescription 
+  xmlns="http://uima.apache.org/resourceSpecifier">
+  
+  <name>Room Number Annotator</name>
+  <description>Deploys the Room Number Annotator Primitive AE</description>
+  
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/> 
+    <service>
+      <inputQueue endpoint="RoomNumberAnnotatorQueue" brokerURL="tcp://localhost:8118"/>
+      <topDescriptor>
+       <import location="../descriptors/tutorial/ex2/RoomNumberAnnotator.xml"/> 
+      </topDescriptor>
+    </service>
+  </deployment>
+
+</analysisEngineDeploymentDescription>

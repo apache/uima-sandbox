@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<analysisEngineDeploymentDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  
+  <name>Top Level TAE</name>
+  <description></description>
+  
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/>
+    <service>
+      <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
+      <topDescriptor>
+        <import location="../descriptors/analysis_engine/SimpleTestAggregate.xml"/>
+      </topDescriptor>
+      <analysisEngine>
+        <delegates>
+        
+          <analysisEngine key="TestMultiplier">
+	        <casMultiplier poolSize="5"/> 
+          </analysisEngine>
+
+          <remoteAnalysisEngine key="NoOp">
+	                  <inputQueue endpoint="NoOpAnnotatorQueue" brokerURL="tcp://localhost:8118"/>
+	                  <serializer method="xmi"/>
+                      <asyncAggregateErrorConfiguration>
+                            <getMetadataErrors maxRetries="3" timeout="5000" errorAction="continue" />
+                            <processCasErrors maxRetries="0" timeout="5000" thresholdCount="1" thresholdAction="terminate" />
+                      </asyncAggregateErrorConfiguration>
+          </remoteAnalysisEngine>
+
+        </delegates>
+      </analysisEngine>
+    </service>
+  </deployment>
+  
+</analysisEngineDeploymentDescription>
