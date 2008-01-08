@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Apache UIMA Runtime Fragment for Tooling
+Bundle-SymbolicName: org.apache.uima.runtime.fragments.tools
+Bundle-Version: 0.1.6
+Bundle-Vendor: IBM
+Fragment-Host: org.apache.uima.runtime;bundle-version="[2.1.0,2.9.0)"
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.variables
+Bundle-ClassPath: .
+Export-Package: org.apache.uima.aae.deployment,
+ org.apache.uima.aae.deployment.impl,
+ org.apache.uima.application.metadata,
+ org.apache.uima.application.metadata.impl,
+ org.apache.uima.application.util,
+ org.apache.uima.cpe.model,
+ org.apache.uima.tools.debug.util
