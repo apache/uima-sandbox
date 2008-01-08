@@ -151,14 +151,15 @@ public class HashMapDictionary implements Dictionary {
     * @see org.apache.uima.annotator.dict_annot.Dictionary#matchEntry(int,
     *      java.lang.String[])
     */
-   public DictionaryMatch matchEntry(int pos, AnnotationFS[] annotFSs) {
+   public DictionaryMatch matchEntry(int pos, AnnotationFS[] annotFSs,
+         FeaturePathInfo featPathInfo) {
 
       // create a dictionary match object
       DictionaryMatchImpl match = new DictionaryMatchImpl();
       int offset = 0;
 
       // check dictionary matches
-      checkMatches(pos, annotFSs, this.dictionary, match, offset);
+      checkMatches(pos, annotFSs, featPathInfo, this.dictionary, match, offset);
 
       // check if a match was found that is valid
       if (match.isValidMatch()) {
@@ -332,27 +333,29 @@ public class HashMapDictionary implements Dictionary {
     *           that is discovered
     */
    private void checkMatches(int pos, AnnotationFS[] annotFSs,
-         HashMap<String, DictionaryEntry> dict, DictionaryMatchImpl match,
-         int offset) {
+         FeaturePathInfo featPathInfo, HashMap<String, DictionaryEntry> dict,
+         DictionaryMatchImpl match, int offset) {
 
       // check if the current token that is investigated is available in the
       // current map
-      if (dict.containsKey(normalizeString(annotFSs[pos + offset]
-            .getCoveredText()))) {
-         // token is available in the map, get the dictionary entry object
-         DictionaryEntry currentEntry = dict.get(normalizeString(annotFSs[pos
-               + offset].getCoveredText()));
-         // add match to the match object
-         match.storeMatch(currentEntry.getEntryMetaData(), currentEntry
-               .isComplete());
+      String value = featPathInfo.getValue(annotFSs[pos + offset]);
+      if (value != null) {
+         String normalizedValue = normalizeString(value);
+         if (dict.containsKey(normalizedValue)) {
+            // token is available in the map, get the dictionary entry object
+            DictionaryEntry currentEntry = dict.get(normalizedValue);
+            // add match to the match object
+            match.storeMatch(currentEntry.getEntryMetaData(), currentEntry
+                  .isComplete());
 
-         // increase offset to investigate the next token
-         offset++;
-         // if further tokens are available ....
-         if (annotFSs.length > pos + offset) {
-            // ... investigate them
-            checkMatches(pos, annotFSs, currentEntry.getSubBranch(), match,
-                  offset);
+            // increase offset to investigate the next token
+            offset++;
+            // if further tokens are available ....
+            if (annotFSs.length > pos + offset) {
+               // ... investigate them
+               checkMatches(pos, annotFSs, featPathInfo, currentEntry
+                     .getSubBranch(), match, offset);
+            }
          }
       }
    }

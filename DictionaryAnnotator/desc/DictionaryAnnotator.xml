@@ -41,6 +41,14 @@
           <multiValued>false</multiValued>
           <mandatory>true</mandatory>
        </configurationParameter>
+
+       <configurationParameter>
+          <name>InputMatchFeaturePath</name>
+          <description></description>
+          <type>String</type>
+          <multiValued>false</multiValued>
+          <mandatory>false</mandatory>
+       </configurationParameter>
 	
     </configurationParameters>
     
@@ -61,7 +69,7 @@
           	   <string>org.apache.uima.TokenAnnotation</string> 
           </value>
        </nameValuePair>      
-    
+     
     </configurationParameterSettings>
     <typeSystemDescription>
       <types>

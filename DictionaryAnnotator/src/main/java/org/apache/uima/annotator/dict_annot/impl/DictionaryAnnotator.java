@@ -69,17 +69,26 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
    // InputMatchType configuration parameter name
    private static final String INPUT_MATCH_TYPE = "InputMatchType";
 
+   // InputMatchFeaturePath configuration parameter name
+   private static final String INPUT_MATCH_FEATURE_PATH = "InputMatchFeaturePath";
+
    // annotator logger
    private Logger logger;
 
    // input match type name
    private String inputMatchTypeStr;
 
+   // input match feature path
+   private String inputMatchFeaturePathStr;
+
    // input match type
    private Type inputMatchType;
 
    // dictionaries used with this annotator
    private Dictionary[] dictionaries;
+
+   // featurePathInfo object
+   private FeaturePathInfo_impl featurePathInfo;
 
    /*
     * (non-Javadoc)
@@ -115,7 +124,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
 
             // check for dictionary matches at the current token position
             DictionaryMatch dictMatch = this.dictionaries[i].matchEntry(
-                  currentPos, annotFSs);
+                  currentPos, annotFSs, this.featurePathInfo);
 
             // check if we have a dictionary match
             if (dictMatch != null) {
@@ -161,6 +170,17 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       // get input match type
       this.inputMatchTypeStr = (String) this.getContext()
             .getConfigParameterValue(INPUT_MATCH_TYPE);
+
+      // get input match feature path
+      this.inputMatchFeaturePathStr = (String) this.getContext()
+            .getConfigParameterValue(INPUT_MATCH_FEATURE_PATH);
+
+      // initialize feature path - this must only be done if a feature path was
+      // specified
+      this.featurePathInfo = new FeaturePathInfo_impl(); 
+      if (this.inputMatchFeaturePathStr != null) {
+         this.featurePathInfo.initialize(this.inputMatchFeaturePathStr);
+      }
 
       // create dictionary builder
       DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
@@ -223,6 +243,12 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
          throw new DictionaryAnnotatorProcessException(
                "dictionary_annotator_error_resolving_types",
                new Object[] { this.inputMatchTypeStr });
+      }
+
+      // validate featurePath for given type - this must only be done if a
+      // feature path was specified
+      if (this.inputMatchFeaturePathStr != null) {
+         this.featurePathInfo.typeSystemInit(this.inputMatchType);
       }
    }
 

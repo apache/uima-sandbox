@@ -18,6 +18,7 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary;
 
+import org.apache.uima.annotator.dict_annot.dictionary.impl.FeaturePathInfo;
 import org.apache.uima.cas.text.AnnotationFS;
 
 
@@ -60,10 +61,13 @@ public interface Dictionary {
     * @param annotFSs 
     *           input annotation FS array
     * 
+    * @param featPathInfo 
+    *           featurePath information for the matching
+    *           
     * @return returns a DictionaryMatch object in case a match was found. If no
     *         match was found, null is returned
     */
-   public DictionaryMatch matchEntry(int pos, AnnotationFS[] annotFSs);
+   public DictionaryMatch matchEntry(int pos, AnnotationFS[] annotFSs, FeaturePathInfo featPathInfo);
    
    /**
     * Returns the number of entries that are stored in the dictionary.
