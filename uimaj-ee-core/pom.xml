@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.uima</groupId>
+	<artifactId>uimaj-aae</artifactId>
+	<packaging>jar</packaging>
+	<version>2.2.1-incubating</version>
+	<name>Apache UIMA Java Collection Processing Engine</name>
+	<url>http://incubator.apache.org/uima</url>
+	<parent>
+		<groupId>org.apache.uima</groupId>
+		<artifactId>uimaj</artifactId>
+		<version>2.2.0-incubating</version>
+	</parent>
+	<dependencies>
+	
+	<dependency>
+    	<groupId>com.bea.wlplatform</groupId>
+    	<artifactId>commonj-twm</artifactId>
+    	<version>1.1</version>
+		<scope>compile</scope>
+    </dependency>
+	
+	<dependency>
+    	<groupId>commons-pool</groupId>
+    	<artifactId>commons-pool</artifactId>
+    	<version>20030825.183949</version>
+		<scope>compile</scope>
+	</dependency> 
+
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>uimaj-core</artifactId>
+			<version>2.2.0-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+
+       <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring</artifactId>
+    <version>2.0.4</version>
+</dependency> 
+
+	</dependencies>
+	<build>
+		<finalName>uima-ee</finalName>
+		<plugins>
+			
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<configuration>
+				
+				<source>1.5</source>
+				<target>1.5</target>
+			</configuration>		
+		</plugin>
+
+		</plugins>
+
+			
+	</build>	
+</project>
