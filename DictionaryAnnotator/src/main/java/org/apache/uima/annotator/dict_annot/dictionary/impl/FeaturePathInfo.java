@@ -18,6 +18,7 @@
  */
 package org.apache.uima.annotator.dict_annot.dictionary.impl;
 
+import org.apache.uima.annotator.dict_annot.impl.Condition;
 import org.apache.uima.cas.text.AnnotationFS;
 
 /**
@@ -42,4 +43,19 @@ public interface FeaturePathInfo {
     * @return featurePath string value
     */
    public String getFeaturePath();
+
+   /**
+    * Returns true if the featurePath value for the given annotation match the
+    * specified condition.
+    * 
+    * It returns false if no featurePath was specified!
+    * 
+    * @param annotFS
+    *           current annotation to check
+    * @param condition
+    *           condition for the match
+    * 
+    * @return returns true if the conditions match the featurePath value
+    */
+   public boolean match(AnnotationFS annotFS, Condition condition);
 }

@@ -72,6 +72,15 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
    // InputMatchFeaturePath configuration parameter name
    private static final String INPUT_MATCH_FEATURE_PATH = "InputMatchFeaturePath";
 
+   // InputMatchFilterFeaturePath configuration parameter name
+   private static final String INPUT_MATCH_FILTER_FEATURE_PATH = "InputMatchFilterFeaturePath";
+
+   // FilterConditionOperator configuration parameter name
+   private static final String FILTER_CONDITION_OPERATOR = "FilterConditionOperator";
+
+   // FilterConditionValue configuration parameter name
+   private static final String FILTER_CONDITION_VALUE = "FilterConditionValue";
+
    // annotator logger
    private Logger logger;
 
@@ -81,14 +90,29 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
    // input match feature path
    private String inputMatchFeaturePathStr;
 
+   // input match feature path
+   private String inputMatchFilterFeaturePathStr;
+
+   // input match feature path
+   private String filterConditionOperator;
+
+   // input match feature path
+   private String filterConditionValue;
+
    // input match type
    private Type inputMatchType;
 
    // dictionaries used with this annotator
    private Dictionary[] dictionaries;
 
-   // featurePathInfo object
-   private FeaturePathInfo_impl featurePathInfo;
+   // inputMatchFeaturePath object
+   private FeaturePathInfo_impl inputMatchFeaturePath;
+
+   // inputMatchFilterFeaturePath object
+   private FeaturePathInfo_impl inputMatchFilterFeaturePath;
+
+   // filterCondition object
+   private Condition filterCondition;
 
    /*
     * (non-Javadoc)
@@ -101,7 +125,19 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       FSIterator it = cas.getAnnotationIndex(this.inputMatchType).iterator();
       ArrayList<AnnotationFS> inputTypeAnnots = new ArrayList<AnnotationFS>();
       while (it.hasNext()) {
-         inputTypeAnnots.add((AnnotationFS) it.next());
+         // get next annotation FS
+         AnnotationFS annotFS = (AnnotationFS) it.next();
+         // check if we have to filter the annotation
+         if (this.inputMatchFilterFeaturePathStr != null) {
+            // check annotation filter condition
+            if (this.inputMatchFilterFeaturePath.match(annotFS,
+                  this.filterCondition)) {
+               inputTypeAnnots.add(annotFS);
+            }
+         } else { // no annotation filter specified
+            inputTypeAnnots.add(annotFS);
+         }
+
       }
       AnnotationFS[] annotFSs = inputTypeAnnots.toArray(new AnnotationFS[] {});
 
@@ -124,7 +160,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
 
             // check for dictionary matches at the current token position
             DictionaryMatch dictMatch = this.dictionaries[i].matchEntry(
-                  currentPos, annotFSs, this.featurePathInfo);
+                  currentPos, annotFSs, this.inputMatchFeaturePath);
 
             // check if we have a dictionary match
             if (dictMatch != null) {
@@ -175,11 +211,71 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
       this.inputMatchFeaturePathStr = (String) this.getContext()
             .getConfigParameterValue(INPUT_MATCH_FEATURE_PATH);
 
-      // initialize feature path - this must only be done if a feature path was
-      // specified
-      this.featurePathInfo = new FeaturePathInfo_impl(); 
+      // initialize inputMatchFeaturePath - this must only be done if a feature
+      // path was specified
+      this.inputMatchFeaturePath = new FeaturePathInfo_impl();
       if (this.inputMatchFeaturePathStr != null) {
-         this.featurePathInfo.initialize(this.inputMatchFeaturePathStr);
+         this.inputMatchFeaturePath.initialize(this.inputMatchFeaturePathStr);
+      }
+
+      // get input match filter feature path
+      this.inputMatchFilterFeaturePathStr = (String) this.getContext()
+            .getConfigParameterValue(INPUT_MATCH_FILTER_FEATURE_PATH);
+
+      // initialize inputMatchFilterFeaturePath - this must only be done if a
+      // feature path was specified
+      this.inputMatchFilterFeaturePath = new FeaturePathInfo_impl();
+      if (this.inputMatchFilterFeaturePathStr != null) {
+         this.inputMatchFilterFeaturePath
+               .initialize(this.inputMatchFilterFeaturePathStr);
+      }
+
+      // get filter condition operator
+      this.filterConditionOperator = (String) this.getContext()
+            .getConfigParameterValue(FILTER_CONDITION_OPERATOR);
+
+      // get filter condition value
+      this.filterConditionValue = (String) this.getContext()
+            .getConfigParameterValue(FILTER_CONDITION_VALUE);
+
+      // check filter condition if we have a filter condition feature path
+      if (this.inputMatchFilterFeaturePathStr != null) {
+         if (this.filterConditionOperator == null) {
+            throw new DictionaryAnnotatorConfigException(
+                  "dictionary_annotator_error_missing_config_parameter",
+                  new Object[] { FILTER_CONDITION_OPERATOR });
+         }
+         if (this.filterConditionValue == null) {
+            throw new DictionaryAnnotatorConfigException(
+                  "dictionary_annotator_error_missing_config_parameter",
+                  new Object[] { FILTER_CONDITION_VALUE });
+         }
+
+         // get condition operator
+         FilterOp operator = Condition
+               .getOperator(this.filterConditionOperator);
+         if (operator == null) {
+            throw new DictionaryAnnotatorConfigException(
+                  "dictionary_annotator_error_condition_operator_not_valid",
+                  new Object[] { this.filterConditionOperator });
+         }
+
+         // create new Condition object
+         this.filterCondition = new Condition(operator,
+               this.filterConditionValue);
+
+         // log filter condition
+         StringBuffer buffer = new StringBuffer();
+         buffer.append(this.inputMatchTypeStr);
+         buffer.append(":");
+         buffer.append(this.inputMatchFilterFeaturePathStr);
+         buffer.append(" ");
+         buffer.append(operator.toString());
+         buffer.append(" ");
+         buffer.append(this.filterConditionValue);
+         this.logger.logrb(Level.CONFIG, "DictionaryAnnotator", "initialize",
+               MESSAGE_DIGEST, "dictionary_annotator_filter_feature_condition",
+               new Object[] { buffer.toString() });
       }
 
       // create dictionary builder
@@ -245,10 +341,18 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
                new Object[] { this.inputMatchTypeStr });
       }
 
-      // validate featurePath for given type - this must only be done if a
+      // validate inputMatchFeaturePath for given type - this must only be done
+      // if a
       // feature path was specified
       if (this.inputMatchFeaturePathStr != null) {
-         this.featurePathInfo.typeSystemInit(this.inputMatchType);
+         this.inputMatchFeaturePath.typeSystemInit(this.inputMatchType);
+      }
+
+      // validate inputMatchFilterfeaturePath for given type - this must only be
+      // done if a
+      // feature path was specified
+      if (this.inputMatchFilterFeaturePathStr != null) {
+         this.inputMatchFilterFeaturePath.typeSystemInit(this.inputMatchType);
       }
    }
 

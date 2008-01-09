@@ -49,6 +49,30 @@
           <multiValued>false</multiValued>
           <mandatory>false</mandatory>
        </configurationParameter>
+
+       <configurationParameter>
+          <name>InputMatchFilterFeaturePath</name>
+          <description></description>
+          <type>String</type>
+          <multiValued>false</multiValued>
+          <mandatory>false</mandatory>
+       </configurationParameter>
+
+       <configurationParameter>
+          <name>FilterConditionOperator</name>
+          <description></description>
+          <type>String</type>
+          <multiValued>false</multiValued>
+          <mandatory>false</mandatory>
+       </configurationParameter>
+
+       <configurationParameter>
+          <name>FilterConditionValue</name>
+          <description></description>
+          <type>String</type>
+          <multiValued>false</multiValued>
+          <mandatory>false</mandatory>
+       </configurationParameter>
 	
     </configurationParameters>
     
