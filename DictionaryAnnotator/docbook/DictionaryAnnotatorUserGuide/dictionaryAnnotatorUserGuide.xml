@@ -36,8 +36,90 @@
 	<preface>
 		<title>Introduction</title>
 		<para>
-			Dictionary Annotator introduction
+			The Dictionary Annotator (DictionaryAnnotator) is an
+			Apache UIMA analysis engine that annotates words based on
+			dictionary entries. For each detected word in the document text 
+			which is available in the dictionary a new annotation is created.
+
+			The annotator can be configured with one or more independent 
+			dictionaries for the lookup. The dictionaries can be created easily with the
+			provided dictionary creator command line tooling. For advanced usage
+			of the annotator the matching can be improved by specifying 
+			multi word capabilities, match input type properties and input type 
+			filtering settings.  
 		</para>
 	</preface>
 
+	<chapter id="sandbox.dictAnnotator.processingOverview">
+		<title>Processing Overview</title>
+		<para>
+			To work with the DictionaryAnnotator at first a dictionary must be 
+			created. Out-of-the-box the annotator does not provide any dictionary.
+			To create a dictionary you have to provide a list of dictionary entries
+			to the dictionary creator which immediately creates a new dictionary.
+			The created dictionary can now be used to configure the annotator to
+			lookup words. For each dictionary the output type for the created
+			annotation beside some other metadata capabilities can be configured.
+			The dictionary is able to work with single word entries like "Apache" or with
+			multi word entries like "Apache UIMA".
+		</para>
+		<para>
+			After the annotator is configured with the created dictionary the lookup
+			strategy settings must be defined. The dictionary lookup inside the annotator 
+			is based on tokens.	Tokens are used to look for dictionary entries. The kind of 
+			tokens that are used for the lookup can be configured and enhanced with
+			filter capabilities. To improve the dictionary lookup the
+			tokenization of the dictionary entries and the tokenization of the 
+			document text should be the same. This can be achieved when using the
+			dictionary creator with some advanced settings.
+		</para>
+		<para>
+		    During the annotator processing for each word of the document text 
+		    that is available in the dictionary a new annotation with the dictionary 
+		    output type is created. These annotations can in a next step be used to do 
+		    some further processing.
+		</para>
+	</chapter>
+
+	<chapter id="sandbox.dictAnnotator.dictionaryCreation">
+		<title>Dictionary Creation</title>
+		<section id="sandbox.dictAnnotator.dictionaryCreation.DictionaryCreator">
+			<title>Dictionary Creator</title>
+			<para>
+
+			</para>
+		</section>
+		
+		<section id="sandbox.dictAnnotator.dictionaryCreation.DictionaryFormat">
+			<title>Dictionary Format</title>
+			<para>
+
+			</para>
+		</section>
+	</chapter>
+	
+	<chapter id="sandbox.dictAnnotator.annotatorConfiguration">
+		<title>Annotator Configuration</title>
+
+		<section id="sandbox.dictAnnotator.annotatorConfiguration.DictionaryFiles">
+			<title>Dictionary Files</title>
+			<para>
+
+			</para>
+		</section>
+
+		<section id="sandbox.dictAnnotator.annotatorConfiguration.InputTokenType">
+			<title>Input Match Type</title>
+			<para>
+
+			</para>
+		</section>
+		
+		<section id="sandbox.dictAnnotator.annotatorConfiguration.InputTokenFilter">
+			<title>Input Match Type Filters</title>
+			<para>
+
+			</para>
+		</section>
+	</chapter>
 </book>
