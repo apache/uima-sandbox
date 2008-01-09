@@ -35,7 +35,7 @@ import org.apache.uima.util.XMLInputSource;
  * Dictionary annotator test. This test class tests the dictionary annotator
  * code with input filter featurePath settings
  */
-public class DictionaryAnnotatorTestFilterFeaturePath extends TestCase {
+public class DictionaryAnnotatorFilterFeaturePathTest extends TestCase {
 
    /**
     * Test the dictionary annotator processing with an simple input filter
