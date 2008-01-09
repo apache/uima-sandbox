@@ -37,6 +37,7 @@
       <!-- because properties weren't used before -->
       <uimaj-version>2.2.1</uimaj-version>
       <uimaj-release-version>${uimaj-version}-incubating</uimaj-release-version>
+      <uimaj-release-eclipse-version>${uimaj-version}.incubating</uimaj-release-eclipse-version>
       <uimaj-base-version>${uimaj-version}</uimaj-base-version>
       <uimaj-ee-version>0.7.0</uimaj-ee-version>
       <uimaj-ee-release-version>${uimaj-ee-version}-incubating-SNAPSHOT</uimaj-ee-release-version>
@@ -85,6 +86,8 @@
     <module>../uimaj-ee-core</module>
     <module>../uimaj-ee-activemq</module>
     <module>../uimaj-ee-jms</module>
+    <module>../uimaj-ep-deployeditor</module>
+    <module>../uimaj-ep-runtime-deployeditor</module>
   </modules>
   <repositories>
     <repository>
