@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Apache UIMA Runtime Fragment for Tooling
 Bundle-SymbolicName: org.apache.uima.runtime.fragments.tools
 Bundle-Version: 0.1.6
-Bundle-Vendor: IBM
+Bundle-Vendor: Apache Software Foundation
 Fragment-Host: org.apache.uima.runtime;bundle-version="[2.1.0,2.9.0)"
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.variables
