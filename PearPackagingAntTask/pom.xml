@@ -6,9 +6,6 @@
 	<name>Apache UIMA PEAR packaging ANT task</name>
 	<version>2.3.0-incubating-SNAPSHOT</version>
 	<url>http://incubator.apache.org/uima</url>
-	<build>
-		<finalName>uimaj-pear-task</finalName>
-	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
@@ -22,6 +19,40 @@
 			<version>1.7.0</version>
 		</dependency>
 	</dependencies>
+	
+	<build>
+		<finalName>uimaj-pear-task</finalName>
+		
+		<plugins>
+		   <plugin>
+	          <groupId>org.apache.maven.plugins</groupId>
+	          <artifactId>maven-compiler-plugin</artifactId>
+	          <configuration>
+	            <source>1.5</source>
+	            <target>1.5</target>
+	          </configuration>
+	        </plugin>
+	        
+	        <plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<ant antfile="build_documentation.xml"/>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+	        
+		</plugins>
+	</build>
+	
 	<repositories>
       <repository>
         <id>ApacheIncubatorRepository</id>
