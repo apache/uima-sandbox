@@ -424,5 +424,4 @@ public class UIMA_Service
 		}
 	}
 
-	
 }
