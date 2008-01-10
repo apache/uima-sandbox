@@ -6,5 +6,4 @@ public interface DelegateManager
 	public void enableDelegate( String aDelegateName );
 	public void skipDelegate( String aDelegateName, String aCasReferenceId );
 
-	
 }

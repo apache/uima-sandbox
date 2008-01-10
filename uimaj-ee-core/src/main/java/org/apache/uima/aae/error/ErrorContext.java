@@ -34,5 +34,4 @@ public class ErrorContext
 		return contextMap.keySet().iterator();
 	}
 
-
 }

@@ -24,5 +24,4 @@ public class StringStatisticImpl extends BaseStatistic implements StringStatisti
 	}
 
 
-
 }

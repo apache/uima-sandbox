@@ -12,5 +12,4 @@ public interface PrimitiveAnalysisEngineController extends AnalysisEngineControl
 	public PrimitiveServiceInfo getServiceInfo();
 	public void addAbortedCasReferenceId( String aCasReferenceId );
 	
-  
 }

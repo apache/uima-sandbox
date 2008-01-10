@@ -13,5 +13,4 @@ public abstract class BaseStatistic //implements Statistic
 		return name;
 	}
 
-
 }

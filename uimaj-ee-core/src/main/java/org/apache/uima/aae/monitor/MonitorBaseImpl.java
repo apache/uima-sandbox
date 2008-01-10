@@ -140,5 +140,4 @@ public class MonitorBaseImpl implements Monitor
 		return 0;
 		
 	}
-
 }

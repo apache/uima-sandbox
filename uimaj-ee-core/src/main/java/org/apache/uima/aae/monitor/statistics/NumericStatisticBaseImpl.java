@@ -14,5 +14,4 @@ extends BaseStatistic implements NumericStatistic
 	
 	public abstract void decrement();
 
-
 }

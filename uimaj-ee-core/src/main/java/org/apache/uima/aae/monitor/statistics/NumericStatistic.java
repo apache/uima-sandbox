@@ -5,5 +5,4 @@ public interface NumericStatistic extends Statistic
 	public void increment();
 	public void decrement();
 
-
 }

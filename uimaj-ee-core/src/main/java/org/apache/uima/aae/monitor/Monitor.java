@@ -39,5 +39,4 @@ public interface Monitor
 	public long thresholdMapSize();
 	
 	
-    
 }

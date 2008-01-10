@@ -33,7 +33,7 @@ import org.apache.uima.util.Level;
  * the C++ service to the UIMA framework logger and to allow the proxy to send
  * JMX and administrative requests such as shutdown.
  * 
- * 
+ * @author bsiyer
  * 
  */
 public class UimacppServiceController implements ControllerLifecycle {
@@ -153,7 +153,7 @@ public class UimacppServiceController implements ControllerLifecycle {
         startService();
 
         /** register with JMX - for now register with the platform MBean server */
-        mbean = new UimacppServiceManagement("org.apache.uima:type=ee.jms.services",commandConnection, aeDesc,
+        mbean = new UimacppServiceManagement("org.apache.uima:type=ee.jms.services,",commandConnection, aeDesc,
             numInstances, brokerURL, queueName);
         JmxMBeanAgent.registerMBean(mbean, null);
 
@@ -773,7 +773,7 @@ class LoggerHandler implements Runnable {
 
 /**
  * accept socket connection from C++ service.
- * 
+ * @author bsiyer
  *
  */
 class ConnectionHandler implements Runnable {

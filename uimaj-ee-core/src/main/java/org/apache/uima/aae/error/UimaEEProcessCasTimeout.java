@@ -21,5 +21,4 @@ public class UimaEEProcessCasTimeout extends Exception
 		super(message, cause);
 	}
 
-
 }

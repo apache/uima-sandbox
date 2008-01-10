@@ -19,5 +19,4 @@ public interface ErrorResultTDs extends Serializable
 		public boolean wasDisabled();
 	}
 	
-	
 }

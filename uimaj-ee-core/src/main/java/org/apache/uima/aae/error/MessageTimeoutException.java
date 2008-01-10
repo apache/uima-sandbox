@@ -23,5 +23,4 @@ public class MessageTimeoutException extends Exception
 	}
 
 
-
 }

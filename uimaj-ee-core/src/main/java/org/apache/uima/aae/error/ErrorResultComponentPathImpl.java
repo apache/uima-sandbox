@@ -33,5 +33,4 @@ public class ErrorResultComponentPathImpl implements ErrorResultComponentPath
 	{
 		return pathList.iterator();
 	}
-	
 }

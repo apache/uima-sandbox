@@ -7,5 +7,4 @@ public class TimerStats extends HashMap<String,Long>
 	static final long serialVersionUID = -1L;
 
 
-
 }

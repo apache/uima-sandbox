@@ -19,174 +19,160 @@ import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.XMLInputSource;
 
-public class AsynchAECasManager_impl 
-		implements AsynchAECasManager
-{
-	private static final Class CLASS_NAME = AsynchAECasManager_impl.class;
-	private String contextName;
+public class AsynchAECasManager_impl implements AsynchAECasManager {
+  private static final Class CLASS_NAME = AsynchAECasManager_impl.class;
 
-	private CasManager casManager;
+  private String contextName;
 
-	private int casPoolSize = 1;
+  private CasManager casManager;
 
-	private boolean initialized;
+  private int casPoolSize = 1;
 
-	private Map descriptorMap;
-	
-	private Map processingResourceMap = new HashMap();
-	
-	private ResourceManager resourceManager;
-	
-	private long initialHeapSize = 0;//2000000;  // Default
-	
-	public AsynchAECasManager_impl(ResourceManager aResourceManager, Map aDescriptorMap)
-	{
-		this( aResourceManager );
-		descriptorMap = aDescriptorMap;
-	}
-	public AsynchAECasManager_impl(ResourceManager aResourceManager)
-	{
-		casManager = new EECasManager_impl(aResourceManager);
-		aResourceManager.setCasManager(casManager);
-		resourceManager = aResourceManager;
-	}
-	
-	public ResourceManager getResourceManager()
-	{
-		return resourceManager;
-	}
-	public void initialize(String aContextName) throws Exception
-	{
+  private boolean initialized;
 
-		initialize(getCasPoolSize(), aContextName);
-	}
+  private Map descriptorMap;
 
-	public void initialize(int aCasPoolSize, String aContextName) throws Exception
-	{
-		Properties performanceTuningSettings = new Properties();
-		if ( initialHeapSize > 0 )
-		{
-			performanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, 
-					new Integer((int)initialHeapSize).toString() );
-		}
-		initialize( aCasPoolSize, aContextName, performanceTuningSettings);
-	}
-	
-	public void initialize(int aCasPoolSize, String aContextName, Properties aPerformanceTuningSettings) throws Exception
-	{
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
-                "getEndpointConnection", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_primary_cas_pool_init__CONFIG",
-                new Object[] { aCasPoolSize, aContextName  });
-		//	Create CAS Pool for incoming messages
-		casManager.defineCasPool(aContextName, aCasPoolSize, aPerformanceTuningSettings);
-		contextName = aContextName;
-		setInitialized(true);
-		if ( aPerformanceTuningSettings != null )
-		{
-			System.out.println("CasManager Iniatialized Cas Pool:"+aContextName+". Cas Pool Size:"+aCasPoolSize+
-		              " Initial Cas Heap Size:"+aPerformanceTuningSettings.get(UIMAFramework.CAS_INITIAL_HEAP_SIZE)+" cells" );
-		}
-	}
-	
-	public int getCasPoolSize()
-	{
-		return casPoolSize;
-	}
+  private Map processingResourceMap = new HashMap();
 
-	public void setCasPoolSize(int casPoolSize)
-	{
-		this.casPoolSize = casPoolSize;
-		setInitialized(true);
-	}
+  private ResourceManager resourceManager;
 
-	public String getCasManagerContext()
-	{
-		return contextName;
-	}
-    public CasManager getInternalCasManager()
-    {
-    	return casManager;
+  private long initialHeapSize = 0;// 2000000; // Default
+
+  public AsynchAECasManager_impl(ResourceManager aResourceManager, Map aDescriptorMap) {
+    this(aResourceManager);
+    descriptorMap = aDescriptorMap;
+  }
+
+  public AsynchAECasManager_impl(ResourceManager aResourceManager) {
+    casManager = new EECasManager_impl(aResourceManager);
+    aResourceManager.setCasManager(casManager);
+    resourceManager = aResourceManager;
+  }
+
+  public ResourceManager getResourceManager() {
+    return resourceManager;
+  }
+
+  public void initialize(String aContextName) throws Exception {
+
+    initialize(getCasPoolSize(), aContextName);
+  }
+
+  public void initialize(int aCasPoolSize, String aContextName) throws Exception {
+    Properties performanceTuningSettings = new Properties();
+    if (initialHeapSize > 0) {
+      performanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, new Integer(
+              (int) initialHeapSize).toString());
     }
-	public boolean isInitialized()
-	{
-		return initialized;
-	}
+    initialize(aCasPoolSize, aContextName, performanceTuningSettings);
+  }
 
-	public void setInitialized(boolean initialized)
-	{
-		this.initialized = initialized;
-	}
+  public void initialize(int aCasPoolSize, String aContextName,
+          Properties aPerformanceTuningSettings) throws Exception {
+    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+            "getEndpointConnection", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+            "UIMAEE_primary_cas_pool_init__CONFIG", new Object[] { aCasPoolSize, aContextName });
+    // Create CAS Pool for incoming messages
+    casManager.defineCasPool(aContextName, aCasPoolSize, aPerformanceTuningSettings);
+    contextName = aContextName;
+    setInitialized(true);
+    if (aPerformanceTuningSettings != null) {
+      System.out.println("CasManager Iniatialized Cas Pool:" + aContextName + ". Cas Pool Size:"
+              + aCasPoolSize + " Initial Cas Heap Size:"
+              + aPerformanceTuningSettings.get(UIMAFramework.CAS_INITIAL_HEAP_SIZE) + " cells");
+    }
+  }
 
-	public void addMetadata(ProcessingResourceMetaData meta)
-	{
-		casManager.addMetaData(meta);
-	}
+  public int getCasPoolSize() {
+    return casPoolSize;
+  }
 
-	public void setMetadata(ProcessingResourceMetaData meta)
-	{
-		addMetadata(meta);
-	}
+  public void setCasPoolSize(int casPoolSize) {
+    this.casPoolSize = casPoolSize;
+    setInitialized(true);
+  }
 
-	/**
-	 * Constructs and returns a <code>ProcessingResourceMetaData</code> object
-	 * that contains the type system, indexes, and type priorities definitions
-	 * for the CAS.
-	 * 
-	 * @return processing resource metadata object containing the relevant parts
-	 *         of the CAS definition
-	 */
-	public ProcessingResourceMetaData getMetadata() throws ResourceInitializationException
-	{
-		CasDefinition casDefinition = casManager.getCasDefinition();
-		ProcessingResourceMetaData md = UIMAFramework.getResourceSpecifierFactory().createProcessingResourceMetaData();
-		md.setTypeSystem(casDefinition.getTypeSystemDescription());
-		md.setTypePriorities(casDefinition.getTypePriorities());
-		FsIndexCollection indColl = UIMAFramework.getResourceSpecifierFactory().createFsIndexCollection();
-		indColl.setFsIndexes(casDefinition.getFsIndexDescriptions());
-		md.setFsIndexCollection(indColl);
-		return md;
-	}
-	public Map getMetadataAsMap() throws ResourceInitializationException
-	{
-		return processingResourceMap;
-	}
+  public String getCasManagerContext() {
+    return contextName;
+  }
 
-	public void setMetadata( String aDescriptorName ) throws Exception
-	{
-		AnalysisEngineDescription specifier = 
-			UIMAFramework.getXMLParser().parseAnalysisEngineDescription(new XMLInputSource(new File(aDescriptorName )));
-		
-		AnalysisEngineMetaData meta = specifier.getAnalysisEngineMetaData();
-		addMetadata(meta);
-	}
-	private void addProcessingResourceMetadata(String mapkey,  String aDescriptorName ) throws Exception
-	{
-		AnalysisEngineDescription specifier = 
-			UIMAFramework.getXMLParser().parseAnalysisEngineDescription(new XMLInputSource(new File(aDescriptorName )));
-		
-		AnalysisEngineMetaData meta = specifier.getAnalysisEngineMetaData();
-		addMetadata(meta);
-		processingResourceMap.put(mapkey,meta );
-	}
-	public CAS getNewCas()
-	{
-		return casManager.getCas(contextName);
-	}
-	public CAS getNewCas(String aContext)
-	{
-		return casManager.getCas(aContext);
-	}
+  public CasManager getInternalCasManager() {
+    return casManager;
+  }
 
-	public void setInitialFsHeapSize( long aSizeInBytes)
-	{
-		//	Heap size is defined in terms of bytes. Uima core expects number of cells.
-		//	Each cell is 4 bytes. Divide heapSize expressed in bytes by 4.
-		initialHeapSize = aSizeInBytes/4;
-	}
-	public long getInitialFsHeapSize()
-	{
-		return initialHeapSize;
-	}
+  public boolean isInitialized() {
+    return initialized;
+  }
 
+  public void setInitialized(boolean initialized) {
+    this.initialized = initialized;
+  }
+
+  public void addMetadata(ProcessingResourceMetaData meta) {
+    casManager.addMetaData(meta);
+  }
+
+  public void setMetadata(ProcessingResourceMetaData meta) {
+    addMetadata(meta);
+  }
+
+  /**
+   * Constructs and returns a <code>ProcessingResourceMetaData</code> object that contains the
+   * type system, indexes, and type priorities definitions for the CAS.
+   * 
+   * @return processing resource metadata object containing the relevant parts of the CAS definition
+   */
+  public ProcessingResourceMetaData getMetadata() throws ResourceInitializationException {
+    CasDefinition casDefinition = casManager.getCasDefinition();
+    ProcessingResourceMetaData md = UIMAFramework.getResourceSpecifierFactory()
+            .createProcessingResourceMetaData();
+    md.setTypeSystem(casDefinition.getTypeSystemDescription());
+    md.setTypePriorities(casDefinition.getTypePriorities());
+    FsIndexCollection indColl = UIMAFramework.getResourceSpecifierFactory()
+            .createFsIndexCollection();
+    indColl.setFsIndexes(casDefinition.getFsIndexDescriptions());
+    md.setFsIndexCollection(indColl);
+    return md;
+  }
+
+  public Map getMetadataAsMap() throws ResourceInitializationException {
+    return processingResourceMap;
+  }
+
+  public void setMetadata(String aDescriptorName) throws Exception {
+    AnalysisEngineDescription specifier = UIMAFramework.getXMLParser()
+            .parseAnalysisEngineDescription(new XMLInputSource(new File(aDescriptorName)));
+
+    AnalysisEngineMetaData meta = specifier.getAnalysisEngineMetaData();
+    addMetadata(meta);
+  }
+
+  private void addProcessingResourceMetadata(String mapkey, String aDescriptorName)
+          throws Exception {
+    AnalysisEngineDescription specifier = UIMAFramework.getXMLParser()
+            .parseAnalysisEngineDescription(new XMLInputSource(new File(aDescriptorName)));
+
+    AnalysisEngineMetaData meta = specifier.getAnalysisEngineMetaData();
+    addMetadata(meta);
+    processingResourceMap.put(mapkey, meta);
+  }
+
+  public CAS getNewCas() {
+    return casManager.getCas(contextName);
+  }
+
+  public CAS getNewCas(String aContext) {
+    return casManager.getCas(aContext);
+  }
+
+  public void setInitialFsHeapSize(long aSizeInBytes) {
+    // Heap size is defined in terms of bytes. Uima core expects number of cells.
+    // Each cell is 4 bytes. Divide heapSize expressed in bytes by 4.
+    initialHeapSize = aSizeInBytes / 4;
+  }
+
+  public long getInitialFsHeapSize() {
+    return initialHeapSize;
+  }
 
 }

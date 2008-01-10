@@ -219,7 +219,11 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				if ( ((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes() )
 				{
-					System.out.println(getName()+"-Initializing CAS Pool for Context:"+getUimaContextAdmin().getQualifiedContextName());					
+					System.out.println(getName()+"-Initializing CAS Pool for Context:"+getUimaContextAdmin().getQualifiedContextName());
+					System.out.println(getComponentName()+"-CasMultiplier Cas Pool Size="+aComponentCasPoolSize+" Cas Initialial Heap Size:"+anInitialCasHeapSize);
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+		                    "C'tor", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_multiplier_cas_pool_config_INFO",
+		                    new Object[] { getComponentName(), aComponentCasPoolSize, anInitialCasHeapSize });
 					initializeComponentCasPool(aComponentCasPoolSize, anInitialCasHeapSize);
 				}
 			}
@@ -487,9 +491,10 @@ implements AnalysisEngineController, EventSubscriber
 			EECasManager_impl cm = (EECasManager_impl) getResourceManager().getCasManager();
 			cm.setInitialCasHeapSize(anInitialCasHeapSize);
 			cm.setPoolSize(getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize);
+			System.out.println("Component:"+getComponentName()+" Cas Pool:"+getUimaContextAdmin().getQualifiedContextName()+" Size:"+aComponentCasPoolSize+" Cas Heap Size:"+anInitialCasHeapSize/4 +" cells");
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "initializeComponentCasPool", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_pool_config_INFO",
-	                new Object[] { getName(), getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize });
+	                new Object[] { getComponentName(), getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize, anInitialCasHeapSize/4});
 		}
 
 	}
@@ -1592,5 +1597,4 @@ implements AnalysisEngineController, EventSubscriber
 	  {
 		  
 	  }
-
 }

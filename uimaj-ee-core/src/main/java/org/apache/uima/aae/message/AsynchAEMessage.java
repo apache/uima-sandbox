@@ -54,5 +54,4 @@ public interface AsynchAEMessage
 	public static final int Response = 3001;
 	
 
-    
 }

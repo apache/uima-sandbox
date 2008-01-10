@@ -73,5 +73,4 @@ public class ErrorResultTDsImpl implements ErrorResultTDs
 			return wasDisabled;
 		}
 	}
-	
 }

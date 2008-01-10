@@ -27,5 +27,4 @@ public class InvalidMessageException extends Exception
 		super(message, cause);
 	}
 
-
 }

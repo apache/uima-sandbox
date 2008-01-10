@@ -138,5 +138,4 @@ public interface AnalysisEngineController extends ControllerLifecycle
 
 	public JmxManagement getManagementInterface();
 	
-	
 }

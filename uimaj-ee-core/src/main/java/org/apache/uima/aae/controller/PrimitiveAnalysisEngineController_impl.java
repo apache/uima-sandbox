@@ -590,5 +590,4 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			aeList = null;
 		}
 	}
-	
 }

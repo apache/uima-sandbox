@@ -100,5 +100,4 @@ public class Threshold
 	{
 		this.action = action;
 	}
-	
 }
