@@ -87,9 +87,13 @@ implements UimaEEAdminContext, ApplicationListener
 					listenerContainer.setRecoveryInterval(0);
 					listenerContainer.shutdown();
 					listenerContainer.destroy();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
-			                "spinThreadForListenerShutdown.run()", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stop_listener__INFO",
-			                new Object[] {  listenerContainer.getEndpointName() });
+					String eName = listenerContainer.getEndpointName();
+					if ( eName != null )
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+				                "spinThreadForListenerShutdown.run()", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stop_listener__INFO",
+				                new Object[] { eName  });
+					}
 				}
 				catch( Exception e) { e.printStackTrace();}
 			}
@@ -151,7 +155,6 @@ implements UimaEEAdminContext, ApplicationListener
 		}
 		
 	}
-	
 	
 
 }
