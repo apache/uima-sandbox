@@ -45,7 +45,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 		Map<String, Object> appCtx = new HashMap();
 		appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, System.getenv("UIMA_HOME") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "dd2spring.xsl"); // C:/uima-ee-rc8/bin/dd2spring.xsl");
 		appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + "saxon8.jar");
-		appCtx.put(UimaAsynchronousEngine.UimaEeDebug, UimaAsynchronousEngine.UimaEeDebug);
+//		appCtx.put(UimaAsynchronousEngine.UimaEeDebug, UimaAsynchronousEngine.UimaEeDebug);
 		String containerId = eeUimaEngine.deploy(aDeploymentDescriptorPath, appCtx);
 		return containerId;
 	}
