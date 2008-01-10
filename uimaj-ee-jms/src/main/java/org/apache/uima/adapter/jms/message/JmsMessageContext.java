@@ -244,6 +244,4 @@ public class JmsMessageContext implements MessageContext
 		return null;
 	}
 
-
-
 }
