@@ -92,7 +92,7 @@
         </dependency>
 	</dependencies>
 	<build>
-		<finalName>uimaj-simple-server</finalName>
+		<finalName>uima-simple-server</finalName>
 		<resources></resources>
 		<plugins>
 			<plugin>
