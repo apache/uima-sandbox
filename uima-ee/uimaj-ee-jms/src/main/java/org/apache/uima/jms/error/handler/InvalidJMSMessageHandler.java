@@ -44,7 +44,4 @@ public class InvalidJMSMessageHandler extends ErrorHandlerBase implements ErrorH
 		}
 		return false;
 	}
-
-
-
 }

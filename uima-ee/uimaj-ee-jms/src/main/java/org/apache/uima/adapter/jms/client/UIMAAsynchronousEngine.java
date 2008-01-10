@@ -16,5 +16,4 @@ public interface UIMAAsynchronousEngine
 	public CAS getCAS() throws Exception;
 	public void process( URI aCollection ) throws ResourceProcessException;
 
-	
 }
