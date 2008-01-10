@@ -5,5 +5,4 @@ public interface UIMAStatistic
 	public void reset();
 	public String getName();
 
-
 }

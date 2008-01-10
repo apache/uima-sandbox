@@ -19,5 +19,4 @@ public class SimpleSwitch implements SimpleSwitchMBean
 	}
 
 
-
 }

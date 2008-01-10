@@ -43,5 +43,4 @@ public interface ErrorResult extends Serializable
 	 */
 	public ErrorResultTDs getTDs();
 	
-	
 }

@@ -43,5 +43,4 @@ private static final Class CLASS_NAME = UnknownDestinationHandler.class;
 	}
 
 
-
 }

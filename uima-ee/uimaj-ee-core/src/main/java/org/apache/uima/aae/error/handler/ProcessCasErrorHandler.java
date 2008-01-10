@@ -318,7 +318,17 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 
 		if (aController instanceof AggregateAnalysisEngineController)
 		{
-			if ( threshold != null && continueOnError(key, threshold, casReferenceId, t, aController))
+			boolean flowControllerContinueFlag = false;
+			try
+			{
+				//	Consult Flow Controller to determine if it is ok to continue dispite the error
+				flowControllerContinueFlag = 
+					((AggregateAnalysisEngineController) aController).continueOnError(casReferenceId, key, (Exception) t );
+			}
+			catch( Exception exc) {}
+			
+//			if ( threshold != null && continueOnError(key, threshold, casReferenceId, t, aController))
+			if ( threshold != null && flowControllerContinueFlag )
 			{
 				if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( cacheEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) )
 				{
@@ -418,6 +428,5 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		
 		return true;
 	}
-	
 
 }

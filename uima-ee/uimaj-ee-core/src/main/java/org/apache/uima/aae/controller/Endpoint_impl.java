@@ -493,5 +493,4 @@ public class Endpoint_impl implements Endpoint, Cloneable
 		initialHeapSize = aHeapSize;
 	}
 
-
 }

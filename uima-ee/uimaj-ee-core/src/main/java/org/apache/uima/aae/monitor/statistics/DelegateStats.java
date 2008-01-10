@@ -8,5 +8,4 @@ public class DelegateStats extends HashMap implements Serializable
 	static final long serialVersionUID = -1L;
 
 
-
 }

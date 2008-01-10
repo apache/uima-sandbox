@@ -138,15 +138,46 @@ public interface UimaAsynchronousEngine
 	  public ProcessingResourceMetaData getMetaData() throws ResourceInitializationException;
 	  
 	  /**
-	   * Send a CAS, wait for response, and deserialize into same CAS. 
+	   * Send a CAS, wait for response, and deserialize into same CAS. This is a synchronous call
+	   * to the Uima EE service. 
 	   */
 	  public void sendAndReceiveCAS(CAS aCAS) throws ResourceProcessException;
 	
+	  /**
+	   * Deploys Uima EE service using provided deployment descriptor. The service is deployed
+	   * in the same jvm as the client.
+	   * 
+	   * @param aDeploymentDescriptor - deployment descriptor for the uima ee service
+	   * @param anApplicationContext - initialization parameters needed to configure the client and service
+	   * 
+	   * @return - the id of the container in which the uima service was deployed
+	   * 
+	   * @throws Exception
+	   */
 	  public String deploy( String aDeploymentDescriptor, Map anApplicationContext) throws Exception;
 	  
+	  /**
+	   * Deploys Uima EE services using provided deployment descriptors. Each descriptor contains an
+	   * assembly of related uima ee services. Uima EE services specified in each deployment descriptor
+	   * will be deployed in a separate container.
+	   * 
+	   * @param aDeploymentDescriptorList - a list of deployment descriptors 
+	   * @param anApplicationContext - initialization parameters needed to configure the client and services
+	   * 
+	   * @return - the ids of the container in which the uima service was deployed
+	   * 
+	   * @throws Exception
+	   */
 	  public String deploy( String[] aDeploymentDescriptorList,  Map anApplicationContext ) throws Exception;
 	  
+	  /**
+	   * Un-deploys specified Uima EE service. The service is running in a container with a unique id. The 
+	   * container with a given id will be stopped and all components running therein will be also stopped.
+	   * 
+	   * @param aSpringContainerId - an id of the container which hosts a service to be stopped
+	   * 
+	   * @throws Exception
+	   */
 	  public void undeploy( String aSpringContainerId ) throws Exception;
-
 
 }

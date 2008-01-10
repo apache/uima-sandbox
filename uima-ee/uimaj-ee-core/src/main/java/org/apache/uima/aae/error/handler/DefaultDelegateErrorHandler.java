@@ -43,5 +43,4 @@ public class DefaultDelegateErrorHandler extends ErrorHandlerBase implements Err
 		return false;
 	}
 
-
 }

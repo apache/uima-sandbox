@@ -7,5 +7,4 @@ public class UIMAMessage
 	public static final String RawMsg ="RawMsg";
 	
 
-
 }

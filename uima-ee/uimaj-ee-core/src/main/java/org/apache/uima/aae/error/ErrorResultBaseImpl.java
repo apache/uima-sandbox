@@ -148,5 +148,4 @@ public class ErrorResultBaseImpl implements ErrorResult
 			System.out.println( ((TD)it2.next()).gatPath());
 		}
 	}
-	
 }

@@ -5,5 +5,4 @@ public interface SimpleSwitchMBean
 	public void flip();
 	public int getState();
 
-
 }

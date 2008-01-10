@@ -6,5 +6,4 @@ public class Statistics extends HashMap
 {
 
 
-
 }

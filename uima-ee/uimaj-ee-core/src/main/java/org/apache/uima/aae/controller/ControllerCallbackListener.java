@@ -4,5 +4,4 @@ public interface ControllerCallbackListener
 {
 	public void notifyOnTermination( String aMessage );
 
-	
 }

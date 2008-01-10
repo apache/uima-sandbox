@@ -88,5 +88,4 @@ public class ErrorHandlerChain extends LinkedList
 		}
 	}
 
-
 }

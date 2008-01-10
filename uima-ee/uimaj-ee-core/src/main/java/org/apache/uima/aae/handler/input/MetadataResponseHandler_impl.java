@@ -72,5 +72,4 @@ public class MetadataResponseHandler_impl extends HandlerBase
 		}
 	}
 
-
 }

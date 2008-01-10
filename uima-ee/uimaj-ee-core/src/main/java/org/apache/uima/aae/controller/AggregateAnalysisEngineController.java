@@ -92,5 +92,4 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	
 	public Map getDestinations();
 
-	
 }

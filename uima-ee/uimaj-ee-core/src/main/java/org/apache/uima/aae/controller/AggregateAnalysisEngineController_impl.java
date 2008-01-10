@@ -1843,5 +1843,4 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		super.stop();
 		cleanUp();
 	}
-	
 }

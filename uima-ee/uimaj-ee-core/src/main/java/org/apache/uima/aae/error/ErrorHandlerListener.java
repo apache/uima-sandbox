@@ -6,5 +6,4 @@ public interface ErrorHandlerListener
 {
 	public void onError( Throwable t, ErrorContext anErrorContext, AnalysisEngineController aController );
 
-	
 }

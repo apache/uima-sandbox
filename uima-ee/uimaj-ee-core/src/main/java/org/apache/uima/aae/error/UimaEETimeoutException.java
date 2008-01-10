@@ -21,5 +21,4 @@ public class UimaEETimeoutException extends Exception
 		super(message, cause);
 	}
 
-
 }

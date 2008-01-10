@@ -21,5 +21,4 @@ public class UimaEEMetaRequestTimeout extends Exception
 		super(message, cause);
 	}
 
-
 }

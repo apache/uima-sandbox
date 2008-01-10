@@ -121,5 +121,4 @@ public class DefaultHandler extends ErrorHandlerBase implements ErrorHandler
 		return true;
 	}
 
-
 }

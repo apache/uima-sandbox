@@ -21,5 +21,4 @@ public class UimaEECollectionProcessCompleteTimeout extends Exception
 		super(message, cause);
 	}
 
-
 }

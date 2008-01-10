@@ -6,5 +6,4 @@ public interface NumericStatisticBean// extends UIMAStatistic
 	public void increment();
 	public void decrement();
 
-
 }

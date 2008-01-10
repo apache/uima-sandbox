@@ -21,5 +21,4 @@ public interface Handler
 	public boolean hasDelegateHandler();
 	public String getName();
 
-	
 }

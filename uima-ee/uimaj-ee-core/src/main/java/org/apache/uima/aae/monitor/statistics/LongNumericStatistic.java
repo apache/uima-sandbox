@@ -39,5 +39,4 @@ implements LongNumericStatisticMBean
 		return value;
 	}
 
-
 }

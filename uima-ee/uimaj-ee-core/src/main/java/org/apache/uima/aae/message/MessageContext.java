@@ -22,5 +22,4 @@ public interface MessageContext
 	public long getMessageArrivalTime();
 	public String getEndpointName();
 
-	
 }
