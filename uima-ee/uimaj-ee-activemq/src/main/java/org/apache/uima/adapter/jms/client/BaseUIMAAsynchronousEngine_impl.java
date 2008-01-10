@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
 
+import javax.jms.Destination;
 import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
@@ -17,6 +19,7 @@ import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.ControllerLifecycle;
+import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.cas.CAS;
@@ -42,20 +45,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
- * Uima EE client code
+ * Uima EE client code 
  * 
- * 
+ *
  */
-public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineCommon_impl implements UimaAsynchronousEngine, MessageListener
+public class BaseUIMAAsynchronousEngine_impl 
+	extends BaseUIMAAsynchronousEngineCommon_impl 
+	implements UimaAsynchronousEngine, MessageListener
 {
 	private static final Class CLASS_NAME = BaseUIMAAsynchronousEngine_impl.class;
-
-	/**
-	 * Helper method to create JMS Text Message
-	 */
+	
 	protected TextMessage createTextMessage() throws ResourceInitializationException
 	{
-		return new ActiveMQTextMessage();
+		return 	new ActiveMQTextMessage();
 	}
 
 	/**
@@ -80,62 +82,36 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			throw new ResourceProcessException(e);
 		}
 	}
-	/**
-	 * Helper method to set common properties in the JMS Message
-	 * @param msg
-	 * @throws Exception
-	 */
-	private void setCommonProperties( TextMessage msg ) throws Exception
-	{
-		//	Identify this client's queue
-		msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
-		//	Identify client's broker 
-		msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
-		//	Indicate that this is Request message
-		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
-		//	Indicate that this is GetMeta command
-		//	Set the Consumer destination. The service must reply to this destination
-		msg.setJMSReplyTo(consumerDestination);
-	}
-	/**
-	 * Initialize JMS Message with properties relevant to GetMeta request.
-	 */
 	protected void setMetaRequestMessage(TextMessage msg) throws Exception
 	{
-		setCommonProperties(msg);
+		msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
+
+		msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
+		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
 		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.GetMeta);
-		//	Set carge to empty String. This is needed for non-tcp protocols.
+		msg.setJMSReplyTo(consumerDestination);
 		((ActiveMQTextMessage) msg).setText("");
 	}
-
 	/**
 	 * Initialize JMS Message with properties relevant to Process CAS request.
 	 */
 	protected void setCASMessage(String casReferenceId, CAS aCAS, TextMessage msg) throws ResourceProcessException
 	{
-		try
-		{
-			setCommonProperties(msg);
+		try{
+			msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
+	
+			msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
+			msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
 			msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.Process);
 			msg.setStringProperty(AsynchAEMessage.CasReference, casReferenceId);
 			msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload);
 			msg.setText(serializeCAS(aCAS));
+			msg.setJMSReplyTo(consumerDestination);
 		}
 		catch (Exception e)
 		{
 			throw new ResourceProcessException(e);
 		}
-	}
-	/**
-	 * Initialize JMS Message with properties relevant to CPC request.
-	 */
-	public void setCPCMessage(TextMessage msg) throws Exception
-	{
-		setCommonProperties(msg);
-		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.CollectionProcessComplete);
-		msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None);
-		msg.setBooleanProperty(AsynchAEMessage.RemoveEndpoint, true);
-		msg.setText("");
 	}
 	
 	
@@ -236,15 +212,19 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		}
 	}
 
-	/**
-	 * Return a new session from an established connection. If the connection is
-	 * not established yet, it will be created.
-	 *
-	 * @param aBrokerURI - URL of the broker
-	 * @return - valid session object
-	 * @throws Exception -
-	 */
-	protected Session getSession(String aBrokerURI) throws Exception
+	public void setCPCMessage(TextMessage msg) throws Exception
+	{
+		msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
+		msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
+		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
+		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.CollectionProcessComplete);
+		msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None);
+		msg.setBooleanProperty(AsynchAEMessage.RemoveEndpoint, true);
+		msg.setJMSReplyTo(consumerDestination);
+		msg.setText("");
+	}
+
+	private void validateConnection(String aBrokerURI) throws Exception
 	{
 		if (connection == null)
 		{
@@ -252,17 +232,23 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			connection = factory.createConnection();
 			connection.start();
 		}
+	}
+	protected Session getSession(String aBrokerURI) throws Exception
+	{
+		validateConnection(aBrokerURI);
 		session = connection.createSession(false, 0);
 		return session;
 	}
-	/**
-	 * Create a JMS producer that is connected to a given queue. 
-	 * 
-	 * @param aBrokerURI - broker managing a service queue
-	 * @param aQueueName - service queue to which connection is made
-	 * 
-	 * @throws Exception
-	 */
+
+	protected MessageProducer lookupProducerForEndpoint( Endpoint anEndpoint ) throws Exception
+	{
+		if ( connection == null || producerSession == null )
+		{
+			throw new ResourceInitializationException();
+		}
+		Destination dest = producerSession.createQueue(anEndpoint.getEndpoint());
+		return producerSession.createProducer(dest);
+	}
 	public void initializeProducer(String aBrokerURI, String aQueueName) throws Exception
 	{
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "initializeProducer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_init_jms_producer_INFO", new Object[] { aBrokerURI, aQueueName });
@@ -624,6 +610,13 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		{
 		}
 	}
+	public void setReleaseCASMessage(TextMessage msg, String aCasReferenceId)
+	throws Exception 
+	{
+		msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
+		msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
+		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.ReleaseCAS); 
+	}
 
-	
 }

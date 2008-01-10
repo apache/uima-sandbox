@@ -13,11 +13,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.jms.Message;
 
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
+import org.apache.uima.aae.client.UimaEEProcessStatusImpl;
 import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.EntityProcessStatus;
+import org.apache.uima.resource.ResourceProcessException;
+import org.apache.uima.util.ProcessTrace;
+import org.apache.uima.util.impl.ProcessTrace_impl;
 
 public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEEStatusCallbackListener
 {
@@ -472,8 +476,23 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 				{
 					CAS cas = uimaClient.getCAS();
 					cas.setDocumentText(text);
-					// Send CAS and wait for a response
-					uimaClient.sendAndReceiveCAS(cas);
+					ProcessTrace pt = new ProcessTrace_impl();
+					UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
+
+					try
+					{
+						// Send CAS and wait for a response
+						uimaClient.sendAndReceiveCAS(cas);
+					}
+					catch( ResourceProcessException rpe)
+					{
+						status.addEventStatus("Process", "Failed", rpe);
+					}
+					finally
+					{
+						entityProcessComplete(cas, status);
+						cas.release();
+					}
 				}
 				System.out.println(">>>>>>>>Thread::" + Thread.currentThread().getId() + " Is Exiting - Completed Full Run");
 			}

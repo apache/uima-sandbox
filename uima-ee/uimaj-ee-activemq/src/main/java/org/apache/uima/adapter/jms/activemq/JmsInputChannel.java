@@ -612,9 +612,13 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			if ( mL != null && mL.isRunning() )
 			{
 				stopped = true;
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-	                    "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_jms_transport__INFO",
-	                    new Object[] { mL.getEndpointName() /*endpointName */});
+				String eName = mL.getEndpointName();
+				if ( eName != null )
+				{
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+		                    "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_jms_transport__INFO",
+		                    new Object[] { eName /* mL.getEndpointName()*/ /*endpointName */});
+				}
 				mL.closeConnection();
 				mL.stop();
 			}
@@ -654,5 +658,4 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		}.start();
 	}
 */	
-
 }

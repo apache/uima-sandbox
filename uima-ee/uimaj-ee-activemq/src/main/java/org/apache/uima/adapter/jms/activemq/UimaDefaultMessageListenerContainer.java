@@ -49,10 +49,13 @@ implements ExceptionListener
 		if ( !(t instanceof javax.jms.IllegalStateException ) )
 		{
 			t.printStackTrace();
-			final String endpoint = ((ActiveMQQueue)getDestination()).getPhysicalName();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+			final String endpoint = 
+				(getDestination() == null) ? "" : ((ActiveMQQueue)getDestination()).getPhysicalName(); 
+				
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
 	                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_listener_exception__WARNING",
 	                new Object[] {  endpoint, getBrokerUrl() });
+			
 
 			if ( disableListener(t) )
 			{
@@ -126,8 +129,11 @@ implements ExceptionListener
 	}
 	public String getEndpointName()
 	{
-		
-		return ((ActiveMQDestination)getDestination()).getPhysicalName();
+		if ( getDestination() != null )
+		{
+			return ((ActiveMQDestination)getDestination()).getPhysicalName();
+		}
+		return null;
 	}
 	public String getBrokerUrl()
 	{
@@ -178,6 +184,5 @@ implements ExceptionListener
 	{
 		endpoint = anEndpoint;
 	}
-
 
 }

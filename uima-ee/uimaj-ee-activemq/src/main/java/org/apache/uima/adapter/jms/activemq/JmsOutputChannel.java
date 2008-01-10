@@ -299,66 +299,6 @@ public class JmsOutputChannel implements OutputChannel
 		return endpointConnection;
 	}
 
-	public void sendRequest( String aCasReferenceId, Endpoint anEndpoint) throws AsynchAEException
-	{
-		
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE",
-                new Object[] { anEndpoint.getEndpoint() });
-
-		try
-		{
-			if (anEndpoint.isRemote())
-			{
-				long t1 = System.nanoTime();
-				String serializedCAS = getSerializedCasAndReleaseIt(false, aCasReferenceId,anEndpoint, anEndpoint.isRetryEnabled());
-				if ( analysisEngineController instanceof AggregateAnalysisEngineController )
-				{
-					String delegateKey
-					 	= ((AggregateAnalysisEngineController)analysisEngineController).
-					 		lookUpDelegateKey(anEndpoint.getEndpoint());
-					if ( delegateKey != null)
-					{
-						long timeToSerialize = System.nanoTime() - t1;
-						((AggregateAnalysisEngineController)analysisEngineController).
-							incrementCasSerializationTime(delegateKey, timeToSerialize);
-						
-						analysisEngineController.
-							getServicePerformance().
-								incrementCasSerializationTime(timeToSerialize);
-					}
-				}
-
-				if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
-				{
-		            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-		                    "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_serialized_cas__FINEST",
-		                    new Object[] { getAnalysisEngineController().getComponentName(), anEndpoint.getEndpoint(),aCasReferenceId,serializedCAS  });
-				}
-				
-				
-				//	Send process request to remote delegate and start timeout timer
-				sendCasToRemoteEndpoint(true, serializedCAS, null, aCasReferenceId, anEndpoint, true, 0);
-			}
-			else
-			{
-				sendCasToCollocatedDelegate(true, aCasReferenceId, null, anEndpoint, true,0 );
-			}
-		}
-		catch( ServiceShutdownException e)
-		{
-			e.printStackTrace();
-		}
-
-		catch ( AsynchAEException e)
-		{
-			throw e;
-		}
-		catch ( Exception e)
-		{
-			throw new AsynchAEException(e);
-		}
-	}
 	/**
 	 * Sends request message to a delegate.
 	 * 
@@ -479,6 +419,66 @@ public class JmsOutputChannel implements OutputChannel
 		}
 	}
 
+	public void sendRequest( String aCasReferenceId, Endpoint anEndpoint) throws AsynchAEException
+	{
+		
+		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE",
+                new Object[] { anEndpoint.getEndpoint() });
+
+		try
+		{
+			if (anEndpoint.isRemote())
+			{
+				long t1 = System.nanoTime();
+				String serializedCAS = getSerializedCasAndReleaseIt(false, aCasReferenceId,anEndpoint, anEndpoint.isRetryEnabled());
+				if ( analysisEngineController instanceof AggregateAnalysisEngineController )
+				{
+					String delegateKey
+					 	= ((AggregateAnalysisEngineController)analysisEngineController).
+					 		lookUpDelegateKey(anEndpoint.getEndpoint());
+					if ( delegateKey != null)
+					{
+						long timeToSerialize = System.nanoTime() - t1;
+						((AggregateAnalysisEngineController)analysisEngineController).
+							incrementCasSerializationTime(delegateKey, timeToSerialize);
+						
+						analysisEngineController.
+							getServicePerformance().
+								incrementCasSerializationTime(timeToSerialize);
+					}
+				}
+
+				if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
+				{
+		            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+		                    "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_serialized_cas__FINEST",
+		                    new Object[] { getAnalysisEngineController().getComponentName(), anEndpoint.getEndpoint(),aCasReferenceId,serializedCAS  });
+				}
+				
+				
+				//	Send process request to remote delegate and start timeout timer
+				sendCasToRemoteEndpoint(true, serializedCAS, null, aCasReferenceId, anEndpoint, true, 0);
+			}
+			else
+			{
+				sendCasToCollocatedDelegate(true, aCasReferenceId, null, anEndpoint, true,0 );
+			}
+		}
+		catch( ServiceShutdownException e)
+		{
+			e.printStackTrace();
+		}
+
+		catch ( AsynchAEException e)
+		{
+			throw e;
+		}
+		catch ( Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+	}
 	/**
 	 * Sends request message to process CAS to the given destinations. This method enables
 	 * processing of the same CAS in multiple Analysis Engines at the same time. 
@@ -489,6 +489,7 @@ public class JmsOutputChannel implements OutputChannel
 	 */
 	public void sendRequest( String aCasReferenceId, Endpoint[] endpoints) throws AsynchAEException
 	{
+		Endpoint currentEndpoint = null;
 		try
 		{
 			boolean cacheSerializedCas = endpointRetryEnabled(endpoints);
@@ -503,7 +504,7 @@ public class JmsOutputChannel implements OutputChannel
 				if (endpoints[i].isRemote())
 				{
 
-					
+					currentEndpoint = endpoints[i];
 					if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 					{
 			            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
@@ -523,13 +524,19 @@ public class JmsOutputChannel implements OutputChannel
 				}
 			}
 		}
-		catch ( AsynchAEException e)
-		{
-			throw e;
-		}
+//		catch ( AsynchAEException e)
+//		{
+//			throw e;
+//		}
 		catch ( Exception e)
 		{
-			throw new AsynchAEException(e);
+//			throw new AsynchAEException(e);
+			// Handle the error
+			ErrorContext errorContext = new ErrorContext();
+			errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+			errorContext.add(AsynchAEMessage.Endpoint, currentEndpoint);
+			errorContext.add(AsynchAEMessage.CasReference, aCasReferenceId);
+			getAnalysisEngineController().getErrorHandlerChain().handle(e, errorContext, getAnalysisEngineController());
 		}
 	}
 	
@@ -1436,6 +1443,5 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		return null;
 	}
-
 
 }

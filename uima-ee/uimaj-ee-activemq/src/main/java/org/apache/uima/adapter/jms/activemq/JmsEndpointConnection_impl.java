@@ -174,7 +174,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_conn_started__FINE",
 	                new Object[] { endpoint, serverUri });
-			if ( controller != null && controller.getInputChannel() != null)
+			if ( controller != null )
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_open_to_endpoint__FINE", new Object[] { controller.getComponentName(), getEndpoint(), controller.getInputChannel().getServerUri() });
 
 //			setOpen(true);
@@ -526,7 +526,6 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		}
 		controller = null;
 	}
-	
 	
 	
 }
