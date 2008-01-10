@@ -243,7 +243,7 @@ public class SimpleServerServlet extends HttpServlet {
         this.server.configureAnalysisEngine(descriptor, resultSpec);
       } else if (descriptorPath == null) {
         File pear = new File(this.baseWebappDirectory.getAbsoluteFile(), pearPath);
-        this.server.configurePear(pear, new File(pearPath), resultSpec);
+        this.server.configurePear(pear, pear.getParentFile(), resultSpec);
       }
     } catch (Exception e) {
       getLogger().log(Level.SEVERE, "UIMA Simple Service configuaration failed", e);
