@@ -43,7 +43,7 @@
       <uimaj-ee-release-version>${uimaj-ee-version}-incubating-SNAPSHOT</uimaj-ee-release-version>
       <uimaj-ee-release-eclipse-version>${uimaj-ee-version}.incubating-SNAPSHOT</uimaj-ee-release-eclipse-version>
   </properties>
-  <version>${uimaj-ee-release-version}</version>
+  <version>0.7.0-incubating-SNAPSHOT</version>
 
   <name>Apache UIMA Asynch Scaleout framework</name>
   <url>http://incubator.apache.org/uima</url>
