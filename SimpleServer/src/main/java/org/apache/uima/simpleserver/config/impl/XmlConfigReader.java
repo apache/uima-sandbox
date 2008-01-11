@@ -32,10 +32,12 @@ import org.apache.incubator.uima.simpleserver.config.xml.And;
 import org.apache.incubator.uima.simpleserver.config.xml.FilterOperator;
 import org.apache.incubator.uima.simpleserver.config.xml.FilterType;
 import org.apache.incubator.uima.simpleserver.config.xml.Or;
+import org.apache.incubator.uima.simpleserver.config.xml.OutputType;
 import org.apache.incubator.uima.simpleserver.config.xml.SimpleFilterType;
 import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType;
 import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument;
 import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType.Filters;
+import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType.Outputs;
 import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument.UimaSimpleServerSpec;
 import org.apache.uima.cas.impl.TypeSystemUtils;
 import org.apache.uima.simpleserver.SimpleServerException;
@@ -45,6 +47,7 @@ import org.apache.uima.simpleserver.config.ConfigFactory;
 import org.apache.uima.simpleserver.config.Filter;
 import org.apache.uima.simpleserver.config.FilterOp;
 import org.apache.uima.simpleserver.config.OrFilter;
+import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.ServerSpec;
 import org.apache.uima.simpleserver.config.SimpleFilter;
 import org.apache.uima.simpleserver.config.TypeMap;
@@ -145,8 +148,25 @@ public final class XmlConfigReader {
         filter = readFilter(filterBean.getFilter());
       }
     }
-    return ConfigFactory.newTypeMap(typeBean.getName(), filter, typeBean.getOutputTag(),
-        coveredText, typeBean.getShortDescription(), typeBean.getLongDescription());
+    
+    //create a type map with the given information
+    TypeMap typeMap = ConfigFactory.newTypeMap(typeBean.getName(), filter, typeBean.getOutputTag(),
+          coveredText, typeBean.getShortDescription(), typeBean.getLongDescription());
+
+    //check if for the current type output features are mapped 
+    if(typeBean.getOutputs() != null) {
+       Outputs outputBean = typeBean.getOutputs();
+       //get mapped output features
+       OutputType[] outputTypes = outputBean.getOutputArray();
+       for(int i = 0; i < outputTypes.length; i++) {
+          // parse output feature featurePath
+          List<String> featurePath = parseFeaturePath(outputTypes[i].getFeaturePath());
+          Output output = new OutputImpl(featurePath, outputTypes[i].getOutputAttribute(), outputTypes[i].getShortDescription(), outputTypes[i].getLongDescription());
+          //add output feature to the typeMap
+          typeMap.addOutput(output);
+       }
+    }
+    return typeMap;
   }
 
   // Process a filter bean.

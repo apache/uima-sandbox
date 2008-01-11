@@ -110,7 +110,7 @@ public class ResultExtractor {
       if (feat == null) {
         return null;
       }
-      int typeClass = TypeSystemUtils.classifyType(fs.getType());
+      int typeClass = TypeSystemUtils.classifyType(feat.getRange());
       if (typeClass == LowLevelCAS.TYPE_CLASS_FS) {
         fs = fs.getFeatureValue(feat);
         if (fs == null) {
