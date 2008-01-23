@@ -38,12 +38,16 @@ import org.apache.uima.util.Logger;
 public class Concept_impl implements Concept {
 
    private ArrayList<Annotation> annotations;
+   
+   private Annotation[] annotArray;
 
    private String name;
 
    private ArrayList<Rule> rules;
 
    private boolean processAllRules;
+   
+   private Rule[] ruleList;
 
    /**
     * @param name
@@ -53,6 +57,8 @@ public class Concept_impl implements Concept {
       this.processAllRules = processAllRules;
       this.annotations = new ArrayList<Annotation>();
       this.rules = new ArrayList<Rule>();
+      this.ruleList = null;
+      this.annotArray = null;
    }
 
    /*
@@ -62,6 +68,7 @@ public class Concept_impl implements Concept {
     */
    public void addAnnotation(Annotation aAnnotation) {
       this.annotations.add(aAnnotation);
+      this.annotArray = this.annotations.toArray(new Annotation[0]);
    }
 
    /*
@@ -70,7 +77,7 @@ public class Concept_impl implements Concept {
     * @see org.apache.uima.annotator.regex.Rule#getInstructions()
     */
    public Annotation[] getAnnotations() {
-      return this.annotations.toArray(new Annotation[0]);
+      return this.annotArray;
    }
 
    /*
@@ -80,6 +87,11 @@ public class Concept_impl implements Concept {
     */
    public void addRule(Rule aRule) {
       this.rules.add(aRule);
+      
+      //create ruleList array
+      this.ruleList = this.rules.toArray(new Rule[0]);
+      // sort rules array by confidence
+      Arrays.sort(this.ruleList, new RuleComparator());
    }
 
    /*
@@ -97,11 +109,7 @@ public class Concept_impl implements Concept {
     * @see org.apache.uima.annotator.regex.Concept#getRules()
     */
    public Rule[] getRules() {
-      // get rules array
-      Rule[] ruleList = this.rules.toArray(new Rule[0]);
-      // sort rules array by confidence
-      Arrays.sort(ruleList, new RuleComparator());
-      return ruleList;
+      return this.ruleList;
    }
 
    /*
@@ -120,9 +128,8 @@ public class Concept_impl implements Concept {
    public void typeInit(TypeSystem ts) throws ResourceInitializationException {
 
       // initialize all rules for this concept
-      Rule[] ruleList = getRules();
-      for (int i = 0; i < ruleList.length; i++) {
-         ((Rule_impl) ruleList[i]).typeInit(ts);
+      for (int i = 0; i < this.ruleList.length; i++) {
+         ((Rule_impl) this.ruleList[i]).typeInit(ts);
       }
 
       // initialize all annotations for this concept
@@ -141,13 +148,12 @@ public class Concept_impl implements Concept {
     */
    public void initialize(Logger logger) throws RegexAnnotatorConfigException {
 
-      // get a list of rules and annotations
-      Rule[] ruleList = this.getRules();
+      // get a list of annotations
       Annotation[] annots = getAnnotations();
 
       // initialize all rules for this concept
-      for (int i = 0; i < ruleList.length; i++) {
-         ((Rule_impl) ruleList[i]).initialize();
+      for (int i = 0; i < this.ruleList.length; i++) {
+         ((Rule_impl) this.ruleList[i]).initialize();
       }
 
       // initialize all annotations for this concept
@@ -157,9 +163,9 @@ public class Concept_impl implements Concept {
 
       // check duplicate rule IDs within the same concept
       // store ruleIDs for one concept
-      HashSet<String> ruleIds = new HashSet<String>(ruleList.length);
-      for (int x = 0; x < ruleList.length; x++) {
-         String ruleID = ruleList[x].getId();
+      HashSet<String> ruleIds = new HashSet<String>(this.ruleList.length);
+      for (int x = 0; x < this.ruleList.length; x++) {
+         String ruleID = this.ruleList[x].getId();
          // if no ruleID was specified, skip rule
          if (ruleID == null) {
             continue;
@@ -248,12 +254,11 @@ public class Concept_impl implements Concept {
       }
       buffer.append("\nProcessAllConceptRules: " + this.processAllRules + "\n");
       
-      Rule[] ruleList = getRules();
-      if (ruleList.length > 0) {
+      if (this.ruleList.length > 0) {
          buffer.append("\nConcept rules: \n");
       }
-      for (int i = 0; i < ruleList.length; i++) {
-         buffer.append(ruleList[i].toString());
+      for (int i = 0; i < this.ruleList.length; i++) {
+         buffer.append(this.ruleList[i].toString());
       }
 
       Annotation[] annots = getAnnotations();

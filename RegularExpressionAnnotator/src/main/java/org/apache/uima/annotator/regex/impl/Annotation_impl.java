@@ -46,6 +46,8 @@ public class Annotation_impl implements Annotation {
    private final String validationClass;
 
    private Validation validator;
+   
+   private boolean hasValidator;
 
    private ArrayList<Feature> features;
 
@@ -66,6 +68,7 @@ public class Annotation_impl implements Annotation {
       this.features = new ArrayList<Feature>();
       this.validationClass = validationClass;
       this.validator = null;
+      this.hasValidator = false;
    }
 
    /*
@@ -119,7 +122,6 @@ public class Annotation_impl implements Annotation {
     * @see org.apache.uima.annotator.regex.Annotation#getFeatures()
     */
    public Feature[] getFeatures() {
-
       return this.features.toArray(new Feature[0]);
    }
 
@@ -143,10 +145,7 @@ public class Annotation_impl implements Annotation {
     * @see org.apache.uima.annotator.regex.Annotation#hasValidator()
     */
    public boolean hasValidator() {
-      if (this.validator != null) {
-         return true;
-      }
-      return false;
+      return this.hasValidator;
    }
 
    /**
@@ -193,6 +192,7 @@ public class Annotation_impl implements Annotation {
             Object obj = validatorClass.newInstance();
             if (obj instanceof Validation) {
                this.validator = (Validation) obj;
+               this.hasValidator = true;
             } else {
                throw new RegexAnnotatorConfigException(
                      "regex_annotator_error_custom_validator_wrong_interface",

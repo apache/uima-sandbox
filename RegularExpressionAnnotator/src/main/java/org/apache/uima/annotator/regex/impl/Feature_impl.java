@@ -34,6 +34,8 @@ public class Feature_impl implements Feature {
 
    private final int normalizationType;
 
+   private final boolean hasNormalizer;
+
    private final String name;
 
    private final String value;
@@ -53,6 +55,12 @@ public class Feature_impl implements Feature {
       this.normalizationType = normalizationType;
       this.implClass = implClass;
       this.normalizer = null;
+
+      if (this.normalizationType > 0) {
+         this.hasNormalizer = true;
+      } else {
+         this.hasNormalizer = false;
+      }
    }
 
    /*
@@ -91,20 +99,24 @@ public class Feature_impl implements Feature {
       return this.feature;
    }
 
-   /* (non-Javadoc)
-    * @see org.apache.uima.annotator.regex.Feature#normalize(java.lang.String, java.lang.String)
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.apache.uima.annotator.regex.Feature#normalize(java.lang.String,
+    *      java.lang.String)
     */
    public String normalize(String input, String ruleId) throws Exception {
-      // check normalizer type
-      if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
-         return this.normalizer.normalize(input, ruleId);
-      } else if (this.normalizationType == Feature.TO_LOWER_NORMALIZATION) {
-         return input.toLowerCase();
-      } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {
-         return input.toUpperCase();
-      } else {
-         return input;
+      if (this.hasNormalizer) {
+         // check normalizer type
+         if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
+            return this.normalizer.normalize(input, ruleId);
+         } else if (this.normalizationType == Feature.TO_LOWER_NORMALIZATION) {
+            return input.toLowerCase();
+         } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {
+            return input.toUpperCase();
+         }
       }
+      return input;
    }
 
    /**
@@ -186,16 +198,17 @@ public class Feature_impl implements Feature {
       }
       buffer.append("\n  Value: ");
       buffer.append(this.value);
-      if(this.normalizationType > 0) {
+      if (this.normalizationType > 0) {
          if (this.normalizationType == Feature.TO_LOWER_NORMALIZATION) {
             buffer.append("\n  Normalization: ToLowerCase");
          } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {
             buffer.append("\n  Normalization: ToUpperCase");
-         } if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
+         }
+         if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
             buffer.append("\n  Normalization: " + this.implClass);
          }
       }
-             
+
       buffer.append("\n");
 
       return buffer.toString();

@@ -620,7 +620,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             continue;
          }
 
-         // set default validation value to true, of by default all annotations
+         // set default validation value to true, by default all annotations
          // are created
          boolean validation = true;
 
