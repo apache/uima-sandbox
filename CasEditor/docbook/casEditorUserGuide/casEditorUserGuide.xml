@@ -190,7 +190,7 @@
 			<screenshot>
 				<mediaobject>
 					<imageobject>
-						<imagedata scale="100" format="PNG"
+						<imagedata scale="70" format="PNG"
 							fileref="&imgroot;Properties.png" />
 					</imageobject>
 				</mediaobject>
