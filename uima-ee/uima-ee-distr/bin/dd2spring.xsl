@@ -398,7 +398,7 @@
                                              else f:getInternalInputQueueName($aeDelegate)}"/>
         
         <xsl:if test="$remoteAnalysisEngine/u:replyQueue[@location eq 'remote'] and 
-                      not(f:isTempQ($remoteAnalysisEngine))">
+                      not(f:isRmtTempQ($remoteAnalysisEngine))">
           <xsl:sequence
             select="f:generateLineComment('Queue name used for replies, on the remote broker',5)"/>
           <property name="replyToEndpoint"
@@ -436,7 +436,10 @@
             value="{$remoteAnalysisEngine/serializer/@method}"/>
         </xsl:if>
         
-        <!--xsl:if test="f:isTempQ($remoteAnalysisEngine)">
+        <xsl:if test="f:isRmtTempQ($remoteAnalysisEngine)">
+          <property name="tempReplyDestination" value="true"/>
+        </xsl:if>
+        <!--
           <xsl:variable name="msgListenerContainerID" 
              select="concat('asAggr_return_msgLsnrCntnr_', $aeNameUnique,
              if ($remoteAnalysisEngine/@key) then concat('_', $remoteAnalysisEngine/@key) else '')"/> 
@@ -501,7 +504,7 @@
         <xsl:variable name="returnQ_ID" select="f:getRemoteReturnQueueID($analysisEngine, .)"/>
         <xsl:variable name="returnQ_ID_GUID" select="f:getRemoteReturnQueueName($analysisEngine, .)"/>
         
-        <xsl:if test="not(f:isTempQ(.))">
+        <xsl:if test="not(f:isRmtTempQ(.))">
           <xsl:sequence
             select="f:generateLineComment(('return queue for http or tcp remote service', 'on remote broker'), 3)"/>
           <bean id="{$returnQ_ID}" class="org.apache.activemq.command.ActiveMQQueue">
@@ -516,7 +519,7 @@
           <xsl:with-param name="q_ID" select="$returnQ_ID"/>
           <!-- if tempQ, use endpoint bean id instead of endpoint name in next parm -->
           <xsl:with-param name="q_endpointName"
-            select="if (f:isTempQ(.)) then f:getEndpointName(@key, concat($uniq, '.', position())) 
+            select="if (f:isRmtTempQ(.)) then f:getEndpointName(@key, concat($uniq, '.', position())) 
                              else $returnQ_ID_GUID"/>
           <xsl:with-param name="queueFactoryID" select="$brokerID"/>
           <xsl:with-param name="inputOrReturn" select="'return'"/>
@@ -918,7 +921,7 @@
     <bean id="{$q_listenerID}"
         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
       <property name="messageHandler" ref="{$msgHandlerChainID}"/>
-      <property name="endpointName" value="{if (f:isTempQ($remote)) then '' else $q_endpointName}"/>
+      <property name="endpointName" value="{if (f:isRmtTempQ($remote)) then '' else $q_endpointName}"/>
       <property name="controller" ref="{$ctlrID}"/>
       <xsl:if test="$inputOrReturn eq 'input'">
         <property name="listenerContainer" ref="{$msgListenerContainerID}"/>
@@ -943,7 +946,7 @@
       
       <xsl:sequence select="f:generateLineComment(concat($inputOrReturn, ' Queue'), 5)"/>
       <xsl:choose>
-        <xsl:when test="f:isTempQ($remote)">
+        <xsl:when test="f:isRmtTempQ($remote)">
           <property name="destinationResolver" ref="{f:getDestinationResolverID($aeNameUnique, $remote/@key)}"/>
           <property name="destinationName" value="" />
           <property name="targetEndpoint" ref="{$q_endpointName}" />
@@ -962,7 +965,7 @@
       </xsl:if>
     </bean>
     
-    <xsl:if test="f:isTempQ($remote)">
+    <xsl:if test="f:isRmtTempQ($remote)">
       <xsl:sequence select="f:generateLineComment((
         '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
         concat('Destination Resolver for ',$remote/@key),
@@ -2035,7 +2038,7 @@
     </xsl:choose>    
   </xsl:function>
  
-  <xsl:function name="f:isTempQ">
+  <xsl:function name="f:isRmtTempQ">
     <xsl:param name="rmtNode"/>
     <!--xsl:message select="not($noTempQueues) and 
       ($rmtNode/u:replyQueue/@location eq 'remote') and
