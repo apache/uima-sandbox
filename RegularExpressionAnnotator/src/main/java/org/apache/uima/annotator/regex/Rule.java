@@ -34,6 +34,15 @@ public interface Rule {
 
    public static final int MATCH_COMPLETE = 3;
 
+   public static final String MATCH_GROUP_START = "\\m";
+   
+   public static final String MATCH_GROUP_REGEX_BEGIN = "\\\\m\\{";
+
+   public static final String MATCH_GROUP_REGEX_END = "\\}";
+
+   public static final Pattern MATCH_GROUP_REGEX_PATTERN = Pattern
+         .compile(MATCH_GROUP_REGEX_BEGIN + "(\\w+)" + MATCH_GROUP_REGEX_END);
+
    /**
     * Get the regular expression of this rule.
     * 
@@ -127,5 +136,15 @@ public interface Rule {
     * @return true if a featurePath was specified for this rule
     */
    public boolean isFeaturePathMatch();
+
+   /**
+    * Returns the match group number for the given match group name or -1 if
+    * the match group name is not available.
+    * 
+    * @param matchGroupName match group name
+    * 
+    * @return returns the match group number for the given name or -1 if the match group does not exist.
+    */
+   public int getMatchGroupNumber(String matchGroupName);
 
 }

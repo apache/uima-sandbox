@@ -19,6 +19,7 @@
 package org.apache.uima.annotator.regex.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,9 +27,9 @@ import java.util.regex.Pattern;
 import org.apache.uima.annotator.regex.Feature;
 import org.apache.uima.annotator.regex.FeaturePath;
 import org.apache.uima.annotator.regex.FilterFeature;
+import org.apache.uima.annotator.regex.RegexVariables;
 import org.apache.uima.annotator.regex.Rule;
 import org.apache.uima.annotator.regex.RuleException;
-import org.apache.uima.annotator.regex.RegexVariables;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -76,6 +77,8 @@ public class Rule_impl implements Rule {
 
    // concept variables
    private RegexVariables variables;
+   
+   private HashMap<String,Integer> matchGroupNames;
 
    /**
     * Constructor to create a new Rule object.
@@ -111,6 +114,7 @@ public class Rule_impl implements Rule {
          this.isFeaturePathMatch = true;
       }
       this.variables = variables;
+      this.matchGroupNames = new HashMap<String,Integer>();
    }
 
    /*
@@ -281,6 +285,11 @@ public class Rule_impl implements Rule {
          replaceRegexVariables();
       }
 
+      // evaluate match group names
+      if (this.regex.indexOf(Rule.MATCH_GROUP_START) > -1) {
+         evaluateMatchGroupNames();
+      }
+
       // compile regex
       this.pattern = Pattern.compile(this.regex);
 
@@ -300,6 +309,18 @@ public class Rule_impl implements Rule {
       RuleException[] ruleExceptions = getExceptions();
       for (int i = 0; i < ruleExceptions.length; i++) {
          ((RuleException_impl) ruleExceptions[i]).initialize();
+      }
+   }
+
+   /* (non-Javadoc)
+    * @see org.apache.uima.annotator.regex.Rule#getMatchGroupNumber(java.lang.String)
+    */
+   public int getMatchGroupNumber(String matchGroupName) {
+      Integer value = this.matchGroupNames.get(matchGroupName.toLowerCase());
+      if(value != null) {
+         return value.intValue();
+      } else {
+         return -1;
       }
    }
 
@@ -352,6 +373,51 @@ public class Rule_impl implements Rule {
                            variableName, this.id });
             }
          }
+      }
+   }
+
+   /**
+    * replace the variables used in the regular expression pattern
+    * 
+    * @throws RegexAnnotatorConfigException
+    */
+   private void evaluateMatchGroupNames() {
+      // create a regex matcher for the match group pattern
+      Matcher matcher = Rule.MATCH_GROUP_REGEX_PATTERN
+            .matcher(this.regex);
+
+      // find all match group names in the regular expression
+      int pos = 0;
+      while (matcher.find(pos)) {
+
+         // get match area for match group 1
+         int varStart = matcher.start(1);
+         int varEnd = matcher.end(1);
+
+         // count match groups
+         int groupCounter = 1;
+         for (int i = 0; i < varEnd; i++) {
+            if (this.regex.charAt(i) == '(') {
+               groupCounter++;
+            }
+         }
+         // add match group 1 content (match group name) to the variable list
+         this.matchGroupNames.put(this.regex.substring(varStart, varEnd).toLowerCase(), new Integer(
+               groupCounter));
+
+         // current end match position
+         pos = matcher.end();
+      }
+
+      // replace all found match group names in the regular expression - never
+      // needed
+      for (String matchGroupName : this.matchGroupNames.keySet()) {
+
+         // create variable expression that must be replaced
+         String matchGroupNamePattern = Rule.MATCH_GROUP_REGEX_BEGIN
+               + matchGroupName + Rule.MATCH_GROUP_REGEX_END;
+         // replace variable with the variable value
+         this.regex = this.regex.replaceAll(matchGroupNamePattern, "");
       }
    }
 

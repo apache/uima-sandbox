@@ -672,7 +672,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   // we have no reference feature
                   // replace match groups in the feature value
                   String featureValue = replaceMatchGroupValues(features[f]
-                        .getValue(), matcher);
+                        .getValue(), matcher, concept.getRules()[ruleIndex]);
 
                   // do featureValue normalization
                   try {
@@ -778,7 +778,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             // we have no reference feature
             // replace match groups in the feature value
             String featureValue = replaceMatchGroupValues(updateFeatures[f]
-                  .getValue(), matcher);
+                  .getValue(), matcher, concept.getRules()[ruleIndex]);
 
             // do featureValue normalization
             try {
@@ -840,7 +840,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     * 
     * @return returns the replaced match group value content
     */
-   private String replaceMatchGroupValues(String featureValue, Matcher matcher) {
+   private String replaceMatchGroupValues(String featureValue, Matcher matcher,
+         Rule rule) throws RegexAnnotatorProcessException{
       StringBuffer replaced = new StringBuffer();
       int pos = 0;
       int end = featureValue.length();
@@ -866,20 +867,48 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             // this must be a match group $n since all other $ characters must
             // be escaped with a \ which is handled above.
             // skip $ character we are only interested in the match group number
+            // or name
+            // match group name syntax is ${match group name}
             ++pos;
             if (pos < end) {
-               // get match group number
+               // get next char to check if we have a match group number or a
+               // match group name
                c = featureValue.charAt(pos);
-               // convert match group number to integer value
-               int groupNumber = c - '0';
+
+               int groupNumber = -1;
+               if (c == '{') {
+                  // we have a match group name
+                  // skip grace '{'
+                  ++pos;
+                  // get match group name
+                  int matchNameEnd = featureValue.indexOf("}", pos);
+                  if (matchNameEnd > -1) {
+                     String matchGroupName = featureValue.substring(pos,
+                           matchNameEnd);
+                     // get match group number for the given match group name
+                     groupNumber = rule.getMatchGroupNumber(matchGroupName);
+                     if (groupNumber == -1) {
+                        throw new RegexAnnotatorProcessException(
+                              "regex_annotator_error_match_group_name_not_found",
+                              new Object[] { matchGroupName, rule.getId() });
+                     }
+                     // set pos to the end of the match group name syntax
+                     pos = matchNameEnd + 1;
+                  }
+               } else {
+                  // we have a match group number
+                  // convert match group number to integer value
+                  groupNumber = c - '0';
+                  // skip match group number
+                  ++pos;
+               }
+
                // get match group content
                String groupMatch = matcher.group(groupNumber);
                // add match group content to the output
                if (groupMatch != null) {
                   replaced.append(groupMatch);
                }
-               // skip match group number
-               ++pos;
             }
          } else {
             // default output character that is added to the output
