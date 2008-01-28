@@ -67,6 +67,12 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
    public void setDictionaryProperties(String language, String typeName,
          boolean caseNormalization, boolean multiWordEntries,
          String multiWordSeparator) {
+
+      // create a new dictionary if the settings changed.
+      if (!caseNormalization) {
+         this.dictionary = new HashMapDictionary(caseNormalization);
+      }
+
       this.dictionary.setDictionaryLanguage(language);
       this.dictionary.setTypeName(typeName);
       this.createMultiWordEntries = multiWordEntries;
@@ -74,11 +80,6 @@ public class HashMapDictionaryBuilder implements DictionaryBuilder {
       // set multi-word separator
       if (multiWordSeparator != null) {
          this.multiWordSeparator = multiWordSeparator;
-      }
-
-      // create a new dictionary if the settings changed.
-      if (!caseNormalization) {
-         this.dictionary = new HashMapDictionary(caseNormalization);
       }
    }
 
