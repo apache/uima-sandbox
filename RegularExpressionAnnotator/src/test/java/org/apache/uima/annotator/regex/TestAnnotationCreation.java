@@ -44,7 +44,7 @@ public class TestAnnotationCreation extends TestCase {
     AnnotatorTester annotTester = new AnnotatorTester(JUnitExtension
             .getFile("annotationCreation/RegExAnnotCreateAnnot.xml"));
     CAS cas = annotTester
-            .performTest("AnnotationCreationTestThatTestsTheVariousMatchGroups)", "en");
+            .performTest("AnnotationCreationTestThatTestsTheVariousMatchGroupsNumbers)", "en");
 
     // define result interested in
     String[] tofs = { "org.apache.uima.TestAnnot", "org.apache.uima.TestAnnot:testFeature",
@@ -52,7 +52,8 @@ public class TestAnnotationCreation extends TestCase {
         "org.apache.uima.TestAnnot1:testFeature", "org.apache.uima.TestAnnot1:testFeature1",
         "org.apache.uima.TestAnnot2", "org.apache.uima.TestAnnot2:testFeature",
         "org.apache.uima.TestAnnot2:testFeature1", "org.apache.uima.TestAnnot3",
-        "org.apache.uima.TestAnnot3:testFeature", "org.apache.uima.TestAnnot3:testFeature1" };
+        "org.apache.uima.TestAnnot3:testFeature", "org.apache.uima.TestAnnot3:testFeature1",
+        "org.apache.uima.TestAnnot4"};
 
     // compare results
     File outputFile = new File(JUnitExtension.getFile("annotationCreation"),

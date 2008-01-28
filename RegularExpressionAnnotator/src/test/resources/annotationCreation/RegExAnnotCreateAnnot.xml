@@ -119,6 +119,13 @@
             </featureDescription>
           </features>
         </typeDescription>
+        <typeDescription>
+          <name>org.apache.uima.TestAnnot4</name>
+          <description/>
+          <supertypeName>uima.tcas.Annotation</supertypeName>
+          <features>
+          </features>
+        </typeDescription>
         
       </types>
     </typeSystemDescription>
@@ -129,6 +136,7 @@
     		<type>org.apache.uima.TestAnnot1</type>
     		<type>org.apache.uima.TestAnnot2</type>
     		<type>org.apache.uima.TestAnnot3</type>
+    		<type>org.apache.uima.TestAnnot4</type>
   		</priorityList>
 	</typePriorities>
     

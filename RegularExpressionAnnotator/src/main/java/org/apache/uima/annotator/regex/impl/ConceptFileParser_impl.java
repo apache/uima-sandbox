@@ -218,10 +218,10 @@ public class ConceptFileParser_impl implements ConceptFileParser {
          for (int a = 0; a < annotationList.length; a++) {
 
             // create annotation position objects
-            int beginMatchGroup = annotationList[a].getBegin().getGroup();
+            int beginMatchGroup = annotationList[a].getBegin().getGroup().intValue();
             int beginLocation = annotationList[a].getBegin().getLocation()
                   .intValue();
-            int endMatchGroup = annotationList[a].getEnd().getGroup();
+            int endMatchGroup = annotationList[a].getEnd().getGroup().intValue();
             int endLocation = annotationList[a].getEnd().getLocation()
                   .intValue();
 

@@ -154,14 +154,7 @@
 
   <xs:element name="begin">
 	<xs:complexType>
-	  <xs:attribute name="group" use="required">
-	    <xs:simpleType>
-		  <xs:restriction base="xs:integer">
-		    <xs:minInclusive value="0" />
-			<xs:maxInclusive value="9" />
-		  </xs:restriction>
-		</xs:simpleType>
-	  </xs:attribute>
+	  <xs:attribute name="group" use="required" type="xs:integer"/>
 	  <xs:attribute name="location" use="optional" default="start">
 	    <xs:simpleType>
 	      <xs:restriction base="xs:string">
@@ -175,14 +168,7 @@
 
   <xs:element name="end">
 	<xs:complexType>
-	  <xs:attribute name="group" use="required">
-		<xs:simpleType>
-		  <xs:restriction base="xs:integer">
-			<xs:minInclusive value="0" />
-			<xs:maxInclusive value="9" />
-		  </xs:restriction>
-		</xs:simpleType>
-	  </xs:attribute>
+	  <xs:attribute name="group" use="required" type="xs:integer"/>
 	  <xs:attribute name="location" use="optional" default="end">
 		<xs:simpleType>
 		  <xs:restriction base="xs:string">
