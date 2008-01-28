@@ -771,7 +771,7 @@
 						<para>
 							<code>group</code>
 							- identifies the capturing group number within the regular expression pattern for the 
-							current rule. The value can be a single number from 0 to 9, where 0 denotes 
+							current rule. The value is a positive number where 0 denotes 
 							the whole match, 1 the first capturing group, 2 the second one, and so on.
 						</para>
 					</listitem>
@@ -903,6 +903,36 @@ public class SampleValidator implements
 				  The content of the <code>&lt;setFeature></code> element specifies the value of the
 				  UIMA feature that is set. As value a literal, a capturing group or a combination of
 				  both can be used.
+				  To add the value of a capturing group there are two ways to do it.
+				  The first notation is <code>$</code> followed by the capturing group number from 0 to 9
+				  e.g. $0 for capturing group 0 or $7 for capturing group 7.
+				  The second notation to get the value of a capturing group are capturing group names. 
+				  If the rule contains named capturing groups these groups can be accessed 
+				  with <code>${matchGroupName}</code>. For the access of capturing
+				  groups greater than 9 capturing group names must be used. An example for capturing group names is 
+				  shown below:
+				</para>
+				<para>
+				To add a name to a capturing group just add the following fragment <code>\m{groupname}</code>
+				in front of the capturing group start parenthesis.
+				<programlisting><emphasis><![CDATA[<concept name="capturingGroupNames">
+   <rules>
+      <rule ruleId="ID1" 
+         regEx="My \m{groupName}(named capturing group) example" 
+         matchStrategy="matchAll" 
+         matchType="uima.tcas.DocumentAnnotation"/>
+   </rules>
+   <createAnnotations>	
+      <annotation type="org.apache.uima.TestAnnot">
+         <begin group="0"/>
+         <end group="0"/>
+         <setFeature name="testFeature0" type="String">
+            ${groupName}
+         </setFeature>		
+      </annotation>
+   </createAnnotations>
+</concept>    
+]]></emphasis></programlisting>
 				</para>
 				<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureTypes">
 				<title>Features Types</title>
@@ -1282,14 +1312,7 @@ public class CustomNormalizer
 
   <xs:element name="begin">
 	<xs:complexType>
-	  <xs:attribute name="group" use="required">
-	    <xs:simpleType>
-		  <xs:restriction base="xs:integer">
-		    <xs:minInclusive value="0"/>
-			<xs:maxInclusive value="9"/>
-		  </xs:restriction>
-		</xs:simpleType>
-	  </xs:attribute>
+	  <xs:attribute name="group" use="required" type="xs:integer"/>
 	  <xs:attribute name="location" use="optional" default="start">
 	    <xs:simpleType>
 	      <xs:restriction base="xs:string">
@@ -1303,14 +1326,7 @@ public class CustomNormalizer
 
   <xs:element name="end">
 	<xs:complexType>
-	  <xs:attribute name="group" use="required">
-		<xs:simpleType>
-		  <xs:restriction base="xs:integer">
-			<xs:minInclusive value="0"/>
-			<xs:maxInclusive value="9"/>
-		  </xs:restriction>
-		</xs:simpleType>
-	  </xs:attribute>
+	  <xs:attribute name="group" use="required" type="xs:integer"/>
 	  <xs:attribute name="location" use="optional" default="end">
 		<xs:simpleType>
 		  <xs:restriction base="xs:string">
