@@ -124,6 +124,35 @@ public class TestSetFeatureValues extends TestCase {
    }
 
    /**
+    * test match group names. Use Rule with id=ID3
+    * 
+    * @throws Exception
+    */
+   public void testSetFeatureValues3() throws Exception {
+
+      // create annotation tester with the regex annotator specifier
+      AnnotatorTester annotTester = new AnnotatorTester(JUnitExtension
+            .getFile("setFeatureValues/RegExAnnotFeatureValues.xml"));
+      CAS cas = annotTester.performTest("RuleRegex32.4", "en");
+
+      // define result interested in
+      String[] tofs = { "org.apache.uima.TestAnnot",
+            "org.apache.uima.TestAnnot:testFeature0",
+            "org.apache.uima.TestAnnot:testFeature1",
+            "org.apache.uima.TestAnnot:testFeature2",
+            "org.apache.uima.TestAnnot:testFeature3",
+            "org.apache.uima.TestAnnot:testFeature4",
+            "org.apache.uima.TestAnnot:testFeature7" };
+
+      // compare results
+      File outputFile = new File(JUnitExtension.getFile("setFeatureValues"),
+            "featureValues3_testoutput.txt");
+      AnnotatorTester.checkResult(cas, tofs, JUnitExtension
+            .getFile("setFeatureValues/featureValuesRef3.txt"), outputFile);
+
+   }
+
+   /**
     * test all setFeature values for confidence and ruleID without have
     * specified these values in the concept file.
     * 

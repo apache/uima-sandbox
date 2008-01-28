@@ -68,6 +68,24 @@
 		 	</annotation>
 	 	</createAnnotations>
     </concept>    
+
+    <concept name="matchGroupNames">
+    	<rules>
+      		<rule ruleId="ID1" regEx="\m{group1}(Rule)\m{group2}(Regex)\m{group3}(3)\m{group4}(2.4)" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" confidence="0.5"/>
+	    </rules>
+	    <createAnnotations>	
+			<annotation id="testannot" type="org.apache.uima.TestAnnot">
+				<begin group="0"/>
+				<end group="0"/>
+				<setFeature name="testFeature0" type="String">{${group1}}\$</setFeature>		
+				<setFeature name="testFeature1" type="String">${GroUp1}${group2}${group3}${group4}</setFeature>
+				<setFeature name="testFeature2" type="String">${group2} with additions</setFeature>
+				<setFeature name="testFeature3" type="String">value only</setFeature>
+				<setFeature name="testFeature4" type="String">first $1</setFeature>	
+	    		<setFeature name="testFeature7" type="Float">${group4}</setFeature>				
+		 	</annotation>
+	 	</createAnnotations>
+    </concept>    
     
     <concept name="minimalConfigWithoutHavingRuleIDAndConfidence">
     	<rules>
