@@ -82,8 +82,30 @@
               <name>confidence</name>
               <description/>
               <rangeTypeName>uima.cas.Float</rangeTypeName>
+            </featureDescription>            
+          </features>
+        </typeDescription>
+
+        <typeDescription>
+          <name>org.apache.uima.MoneyAmount</name>
+          <description/>
+          <supertypeName>uima.tcas.Annotation</supertypeName>
+          <features>
+            <featureDescription>
+              <name>amount</name>
+              <description/>
+              <rangeTypeName>uima.cas.Float</rangeTypeName>
             </featureDescription>
-            
+            <featureDescription>
+              <name>amountText</name>
+              <description/>
+              <rangeTypeName>uima.cas.String</rangeTypeName>
+            </featureDescription>
+            <featureDescription>
+              <name>currency</name>
+              <description/>
+              <rangeTypeName>uima.cas.String</rangeTypeName>
+            </featureDescription>
           </features>
         </typeDescription>
 

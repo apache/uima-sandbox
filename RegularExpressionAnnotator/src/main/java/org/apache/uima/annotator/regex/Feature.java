@@ -33,6 +33,7 @@ public interface Feature {
   public static final int CUSTOM_NORMALIZATION = 1;
   public static final int TO_LOWER_NORMALIZATION = 2;
   public static final int TO_UPPER_NORMALIZATION = 3;
+  public static final int TRIM_NORMALIZATION = 4;
 
   /**
 	 * Get the feature name of this feature

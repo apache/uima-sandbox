@@ -203,6 +203,7 @@
 			    <xs:enumeration value="Custom" />
 				<xs:enumeration value="ToLowerCase" />
 				<xs:enumeration value="ToUpperCase" />
+				<xs:enumeration value="Trim" />
 			  </xs:restriction>
 			</xs:simpleType>
 		  </xs:attribute>

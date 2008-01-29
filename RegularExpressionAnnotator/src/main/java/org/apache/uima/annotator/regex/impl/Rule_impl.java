@@ -77,8 +77,8 @@ public class Rule_impl implements Rule {
 
    // concept variables
    private RegexVariables variables;
-   
-   private HashMap<String,Integer> matchGroupNames;
+
+   private HashMap<String, Integer> matchGroupNames;
 
    /**
     * Constructor to create a new Rule object.
@@ -114,7 +114,7 @@ public class Rule_impl implements Rule {
          this.isFeaturePathMatch = true;
       }
       this.variables = variables;
-      this.matchGroupNames = new HashMap<String,Integer>();
+      this.matchGroupNames = new HashMap<String, Integer>();
    }
 
    /*
@@ -312,12 +312,14 @@ public class Rule_impl implements Rule {
       }
    }
 
-   /* (non-Javadoc)
+   /*
+    * (non-Javadoc)
+    * 
     * @see org.apache.uima.annotator.regex.Rule#getMatchGroupNumber(java.lang.String)
     */
    public int getMatchGroupNumber(String matchGroupName) {
       Integer value = this.matchGroupNames.get(matchGroupName.toLowerCase());
-      if(value != null) {
+      if (value != null) {
          return value.intValue();
       } else {
          return -1;
@@ -383,9 +385,10 @@ public class Rule_impl implements Rule {
     */
    private void evaluateMatchGroupNames() {
       // create a regex matcher for the match group pattern
-      Matcher matcher = Rule.MATCH_GROUP_REGEX_PATTERN
-            .matcher(this.regex);
+      Matcher matcher = Rule.MATCH_GROUP_REGEX_PATTERN.matcher(this.regex);
 
+      ArrayList<String> names = new ArrayList<String>();
+      
       // find all match group names in the regular expression
       int pos = 0;
       while (matcher.find(pos)) {
@@ -398,12 +401,17 @@ public class Rule_impl implements Rule {
          int groupCounter = 1;
          for (int i = 0; i < varEnd; i++) {
             if (this.regex.charAt(i) == '(') {
-               groupCounter++;
+               if (this.regex.charAt(i + 1) != '?') {
+                  groupCounter++;
+               }
             }
          }
-         // add match group 1 content (match group name) to the variable list
-         this.matchGroupNames.put(this.regex.substring(varStart, varEnd).toLowerCase(), new Integer(
+         String matchGroupName = this.regex.substring(varStart, varEnd);
+         // add first match group content (match group name) to the variable list
+         this.matchGroupNames.put(matchGroupName.toLowerCase(), new Integer(
                groupCounter));
+         // store match group name with original case
+         names.add(matchGroupName);
 
          // current end match position
          pos = matcher.end();
@@ -411,7 +419,7 @@ public class Rule_impl implements Rule {
 
       // replace all found match group names in the regular expression - never
       // needed
-      for (String matchGroupName : this.matchGroupNames.keySet()) {
+      for (String matchGroupName : names) {
 
          // create variable expression that must be replaced
          String matchGroupNamePattern = Rule.MATCH_GROUP_REGEX_BEGIN

@@ -47,7 +47,7 @@
 				<setFeature name="testFeature4" type="String">frist $0</setFeature>	
 				<setFeature name="testFeature10" type="String" normalization="ToLowerCase">VALUE OnLy</setFeature>			
 				<setFeature name="testFeature11" type="String" normalization="ToUpperCase">value only</setFeature>
-				<setFeature name="testFeature12" type="String" normalization="ToLowerCase">$0</setFeature>			
+				<setFeature name="testFeature12" type="String" normalization="Trim">$0</setFeature>			
 				<setFeature name="testFeature13" type="String" normalization="ToUpperCase">$1 test $2</setFeature>
 				<setFeature name="testFeature14" type="String" normalization="Custom" class="org.apache.uima.annotator.regex.CustomTestNormalizer">$1 test $2</setFeature>
 				

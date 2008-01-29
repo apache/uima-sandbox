@@ -114,6 +114,8 @@ public class Feature_impl implements Feature {
             return input.toLowerCase();
          } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {
             return input.toUpperCase();
+         } else if (this.normalizationType == Feature.TRIM_NORMALIZATION) {
+            return input.trim();
          }
       }
       return input;
@@ -203,6 +205,8 @@ public class Feature_impl implements Feature {
             buffer.append("\n  Normalization: ToLowerCase");
          } else if (this.normalizationType == Feature.TO_UPPER_NORMALIZATION) {
             buffer.append("\n  Normalization: ToUpperCase");
+         } else if (this.normalizationType == Feature.TRIM_NORMALIZATION) {
+            buffer.append("\n  Normalization: Trim");
          }
          if (this.normalizationType == Feature.CUSTOM_NORMALIZATION) {
             buffer.append("\n  Normalization: " + this.implClass);

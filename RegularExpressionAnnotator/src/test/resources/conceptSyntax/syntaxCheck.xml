@@ -52,6 +52,7 @@
 				<setFeature name="testFeature1" type="Reference">testannot1</setFeature>
 				<setFeature name="confidenceValue" type="Confidence"/>
 				<setFeature name="ruleId" type="RuleId" normalization="ToUpperCase"/>
+				<setFeature name="testFeature2" type="RuleId" normalization="Trim"/>
 		 	</annotation>
 		 			 	
 		 	<annotation id="testannot1" type="org.apache.uima.TestAnnot1" validate="my.package.Validator">

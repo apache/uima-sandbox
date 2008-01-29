@@ -73,6 +73,11 @@ Feature:
   Type: ruleId
   Value: 
   Normalization: ToUpperCase
+Feature: 
+  Name: testFeature2
+  Type: ruleId
+  Value: 
+  Normalization: Trim
 
 Annotation: 
   ID: testannot1
