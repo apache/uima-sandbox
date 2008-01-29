@@ -1022,6 +1022,13 @@ public class SampleValidator implements
 									- normalize the feature value to upper case before it is assigned to the annotation.
 								</para>
 							</listitem>
+							<listitem>
+								<para>
+									<code>Trim</code>
+									- remove all leading and trailing whitespace characters from the feature value before 
+									it is assigned to the annotation.
+								</para>
+							</listitem>
 						</itemizedlist>
 						Built-in normalization configuration:
 						<programlisting><emphasis><![CDATA[<setFeature name="normalizedFeature" type="String" 
@@ -1361,6 +1368,7 @@ public class CustomNormalizer
 			    <xs:enumeration value="Custom" />
 				<xs:enumeration value="ToLowerCase" />
 				<xs:enumeration value="ToUpperCase" />
+				<xs:enumeration value="Trim" />
 			  </xs:restriction>
 			</xs:simpleType>
 		  </xs:attribute>
