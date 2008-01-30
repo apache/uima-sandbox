@@ -36,13 +36,13 @@
 	<preface>
 		<title>Introduction</title>
 		<para>
-			The Dictionary Annotator (DictionaryAnnotator) is an
+			The DictionaryAnnotator is an
 			Apache UIMA analysis engine that annotates words based on
-			dictionary entries. For each detected word in the document text 
-			which is available in the dictionary a new annotation is created.
+			dictionary entries. For each word in the document text 
+			that is available in the dictionary a new annotation is created.
 
 			The annotator can be configured with one or more independent 
-			dictionaries for the lookup. The dictionaries can be created easily with the
+			dictionaries. The dictionaries can be created easily with the
 			provided dictionary creator command line tooling. For advanced usage
 			of the annotator the matching can be improved by specifying 
 			multi word capabilities, match input type properties and input type 
@@ -53,30 +53,30 @@
 	<chapter id="sandbox.dictAnnotator.processingOverview">
 		<title>Processing Overview</title>
 		<para>
-			To work with the DictionaryAnnotator at first a dictionary must be 
-			created. Out-of-the-box the annotator does not provide any dictionary.
-			To create a dictionary you have to provide a list of dictionary entries
-			to the dictionary creator which immediately creates a new dictionary.
-			The created dictionary can now be used to configure the annotator to
-			lookup words. For each dictionary the output type for the created
-			annotation beside some other metadata capabilities can be configured.
+			To use the DictionaryAnnotator at first a dictionary must be 
+			created. Out-of-the-box the annotator does not provide any dictionary but
+			they can easily be created by yourself. To create a dictionary you call
+			the dictionary creator tooling with a list of dictionary entry words.
+			The output, the created dictionary, can then be used to configure the annotator with
+			a dictionary. For each dictionary the output type for the created
+			annotation beside some other meta data capabilities can be set.
 			The dictionary is able to work with single word entries like "Apache" or with
 			multi word entries like "Apache UIMA".
 		</para>
 		<para>
 			After the annotator is configured with the created dictionary the lookup
 			strategy settings must be defined. The dictionary lookup inside the annotator 
-			is based on tokens.	Tokens are used to look for dictionary entries. The kind of 
-			tokens that are used for the lookup can be configured and enhanced with
-			filter capabilities. To improve the dictionary lookup the
-			tokenization of the dictionary entries and the tokenization of the 
-			document text should be the same. This can be achieved when using the
-			dictionary creator with some advanced settings.
+			works with tokens. A token is a word or an arbitrary text fragment that is used to 
+			do the dictionary lookup. If a token match a dictionary entry an annotation is created.
+			The kind of tokens that are used for the lookup can be configured and can be enhanced with
+			filter capabilities. To improve the dictionary lookup it is recommended that the
+			tokenization for the dictionary entries and the tokenization for the document text is the same. 
+			This can be achieved when using the	dictionary creator with some advanced settings.
 		</para>
 		<para>
-		    During the annotator processing for each word of the document text 
+		    During the annotator processing for each token in the document text 
 		    that is available in the dictionary a new annotation with the dictionary 
-		    output type is created. These annotations can in a next step be used to do 
+		    output type is created. These annotations can in a succeeding step be used to do 
 		    some further processing.
 		</para>
 	</chapter>
@@ -86,14 +86,177 @@
 		<section id="sandbox.dictAnnotator.dictionaryCreation.DictionaryCreator">
 			<title>Dictionary Creator</title>
 			<para>
-
+				The DictionaryCreator command line tool should be used to create the 
+				DictionaryAnnotator dictionaries. The input for the DictionaryCreator 
+				is a text file that contains the dictionary entries - one per line - since each 
+				line of the input is treated as one dictionary entry. The output
+				of the DictionaryCreator is the dictionary as XML file. The usage below shows all  
+				possible settings.
 			</para>
+			<para>
+			<programlisting><![CDATA[java 
+  -cp uimaj-an-dictionary.jar 
+  org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryCreator
+  -input <InputFile> 
+  -encoding <InputFileEncoding> 
+  -output <OutputFile> 
+  [-tokenizer <TokenizerPear> -tokenType <tokenType>] 
+  [-separator <separatorChar>]
+  [-lang <dictionaryLanguage>]]]></programlisting>
+			</para>
+			<para>
+			    When just using the mandatory settings the input content for the dictionary
+			    is tokenized/separated by using the whitespace character. This means that if 
+			    the line contains a whitespace character as in the line "Apache UIMA"
+			    the dictionary entry is treated as multi word entry where the mutli word 
+			    consists of the two tokens "Apache" and "UIMA". If the line just contains "DictionaryAnnotator"
+			    the dictionary entry in treated as single word entry and has only one token
+			    called "DictionaryAnnotator". A sample XML dictionary file is shown below. 
+			   <programlisting><![CDATA[<dictionary 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xsi:noNamespaceSchemaLocation="dictionary.xsd">
+   <typeCollection>
+      <dictionaryMetaData 
+         caseNormalization="true" 
+         multiWordEntries="true" 
+         multiWordSeparator="	"/>
+      <typeDescription>
+         <typeName> ADD DICTIONARY OUTPUT TYPE HERE</typeName>
+      </typeDescription>
+      <entries>
+         <entry>
+            <key>DictionaryAnnotator</key>
+         </entry>
+         <entry>
+            <key>Apache UIMA</key>
+         </entry>
+      </entries>
+   </typeCollection>
+</dictionary>]]></programlisting> 
+			</para>
+			<para>
+			    In addition to the default creation, the DictionaryCreator can be configured with 
+			    additional parameters. These are:
+			    <itemizedlist>
+						<listitem>
+							<para>
+								<code>tokenization &lt;TokenizerPearFile></code>
+								To use an Apache UIMA tokenization annotator PEAR file that tokenize 
+								the input instead of the simple whitespace tokenization that is done
+								by default. When using a special tokenizer
+								the <code>tokenType &lt;tokenType></code> parameter must also be set.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<code>tokenType &lt;tokenType></code>
+								Specifies the token type to get	the tokens created by the tokenizer.
+								These tokens are used to create the single or multi word dictionary entries 
+								for	each line of the input.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<code>language &lt;languageCode></code>
+								In some cases it is necessary to specify the language for the created dictionary
+								and for the tokenization.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<code>separator &lt;separatorChar></code>
+								If no special tokenizer is used for the tokenization of the input dictionary content, 
+								by default the whitespace character is used to tokenizer the content. If another
+								separator character should be used, it can be specified by using this parameter.
+							</para>
+						</listitem>
+			    </itemizedlist>
+			 </para>
+			 <para>
+			   After the dictionary is created, it is necessary to update the created dictionary 
+			   with some additional meta data. The most important one that must be set is the 
+			   <code>typeName</code> entry. The <code>typeName</code> entry after the creation looks like
+			   <code>&lt;typeName> ADD DICTIONARY OUTPUT TYPE HERE&lt;/typeName></code> and must
+			   be updated with the UIMA type that should be used if the DictionaryAnnotator creates
+			   an annotation for a word based on this dictionary. For more details about the other
+			   meta data entries of the dictionary, please refer to  
+			   <xref linkend="sandbox.dictAnnotator.dictionaryCreation.DictionaryFormat"/>.
+			 </para>
 		</section>
 		
 		<section id="sandbox.dictAnnotator.dictionaryCreation.DictionaryFormat">
-			<title>Dictionary Format</title>
+			<title>Dictionary XML Format</title>
 			<para>
-
+				The Dictionary XML Format is shown with an example below:
+			</para>
+			<para>
+			   <programlisting><![CDATA[<dictionary 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xsi:noNamespaceSchemaLocation="dictionary.xsd">
+   <typeCollection>
+      <dictionaryMetaData 
+         caseNormalization="true" 
+         multiWordEntries="true" 
+         multiWordSeparator="	"/>
+      <languageId>en</languageId>
+      <typeDescription>
+         <typeName>org.apache.uima.DictionaryEntry</typeName>
+      </typeDescription>
+      <entries>
+         <entry>
+            <key>DictionaryAnnotator</key>
+         </entry>
+         <entry>
+            <key>Apache UIMA</key>
+         </entry>
+      </entries>
+   </typeCollection>
+</dictionary>]]></programlisting>
+			</para>
+			<para>
+			  The <code>&lt;dictionaryMetaData></code> element specifies how the dictionary is used
+			  inside the DictionaryAnnoator. The attributes for the element are:
+			  <itemizedlist>
+			     <listitem>
+			        <para>
+			           <code>caseNormalization</code>
+						If this parameter is set to <code>true</code> all dictionary entries are treated
+						case normalized. This means that the dictionary matching is not case sensitive.
+					</para>
+				 </listitem>
+			     <listitem>
+			        <para>
+			           <code>multiWordSeparator</code>
+						Specifies the multi word separator character that is used in the XML document 
+						for multi words. For DictionaryCreator created XML dictionary files this is by default
+						the tab character.  
+					</para>
+				 </listitem>
+			     <listitem>
+			        <para>
+			           <code>multiWordEntries</code>
+						If this parameter is <code>true</code> the dictionary is treated as 
+						multi word dictionary. This means that dictionary entries that are separated by
+						the <code>multiWordSpearator</code> are treated as multi words. So for example if
+						you have "Apache UIMA" and treat this entry as multi word the document text must
+						have after the tokenization two tokens "Apache" and "UIMA" to match the dictionary 
+						entry. 
+					</para>
+				 </listitem>
+			  </itemizedlist>
+			</para>
+			<para>
+			   The <code>&lt;languageId></code> element specifies the language for the dictionary. Sometimes it
+			   is necessary to specify the language for the dictionary if it only contains for example English 
+			   content.
+			</para>
+			<para>
+			   The <code>&lt;typeName></code> element specifies the output type that is used if 
+			   an annotation is created for an dictionary entry. 
+			</para>
+			<para>
+			   The <code>&lt;key></code> elements specifies the dictionary entries. For each entry
+			   an own <code>&lt;key></code> element is used. 
 			</para>
 		</section>
 	</chapter>
