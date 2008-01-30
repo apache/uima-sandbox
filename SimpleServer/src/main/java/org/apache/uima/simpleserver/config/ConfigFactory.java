@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.uima.simpleserver.config.impl.AndFilterImpl;
 import org.apache.uima.simpleserver.config.impl.ConditionImpl;
 import org.apache.uima.simpleserver.config.impl.OrFilterImpl;
+import org.apache.uima.simpleserver.config.impl.OutputImpl;
 import org.apache.uima.simpleserver.config.impl.SimpleFilterImpl;
 import org.apache.uima.simpleserver.config.impl.ServerSpecImpl;
 import org.apache.uima.simpleserver.config.impl.TypeMapImpl;
@@ -83,14 +84,32 @@ public final class ConfigFactory {
     return new TypeMapImpl(typeName, filter, outputTag, coveredText, shortDescription,
         longDescription);
   }
+  
+  /**
+   * Create a new output mapping.
+   * 
+   * @param path
+   *          Feature path whose value will be output.
+   * @param attribute
+   *          XML attribute that will contain the output.
+   * @param shortDescription
+   *          A short description of the output mapping.
+   * @param longDescription
+   *          A verbose description of the output mapping.
+   * @return A new output mapping. Can be added to a type map.
+   */
+  public static Output newOutput(List<String> path, String attribute, String shortDescription,
+      String longDescription) {
+    return new OutputImpl(path, attribute, shortDescription, longDescription);
+  }
 
   /**
    * Create a new Filter.
    * 
    * @param featurePath
-   *                Feature path whose value the filter operates on. Must not be null.
+   *          Feature path whose value the filter operates on. Must not be null.
    * @param condition
-   *                The condition the path's value must satisfy.
+   *          The condition the path's value must satisfy.
    * @return A new Filter.
    */
   public static SimpleFilter newSimpleFilter(List<String> featurePath, Condition condition) {

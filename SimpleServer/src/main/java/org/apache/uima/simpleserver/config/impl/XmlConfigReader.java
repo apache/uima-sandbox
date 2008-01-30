@@ -153,18 +153,19 @@ public final class XmlConfigReader {
     TypeMap typeMap = ConfigFactory.newTypeMap(typeBean.getName(), filter, typeBean.getOutputTag(),
           coveredText, typeBean.getShortDescription(), typeBean.getLongDescription());
 
-    //check if for the current type output features are mapped 
-    if(typeBean.getOutputs() != null) {
-       Outputs outputBean = typeBean.getOutputs();
-       //get mapped output features
-       OutputType[] outputTypes = outputBean.getOutputArray();
-       for(int i = 0; i < outputTypes.length; i++) {
-          // parse output feature featurePath
-          List<String> featurePath = parseFeaturePath(outputTypes[i].getFeaturePath());
-          Output output = new OutputImpl(featurePath, outputTypes[i].getOutputAttribute(), outputTypes[i].getShortDescription(), outputTypes[i].getLongDescription());
-          //add output feature to the typeMap
-          typeMap.addOutput(output);
-       }
+    // check if for the current type output features are mapped
+    if (typeBean.getOutputs() != null) {
+      Outputs outputBean = typeBean.getOutputs();
+      // get mapped output features
+      OutputType[] outputTypes = outputBean.getOutputArray();
+      for (int i = 0; i < outputTypes.length; i++) {
+        // parse output feature featurePath
+        List<String> featurePath = parseFeaturePath(outputTypes[i].getFeaturePath());
+        Output output = ConfigFactory.newOutput(featurePath, outputTypes[i].getOutputAttribute(),
+            outputTypes[i].getShortDescription(), outputTypes[i].getLongDescription());
+        // add output feature to the typeMap
+        typeMap.addOutput(output);
+      }
     }
     return typeMap;
   }
