@@ -17,6 +17,10 @@
  * under the License.
  */
 
+
+
+// 
+
 package org.apache.uima.examples.tagger;
 
 import java.util.List;
@@ -26,6 +30,8 @@ import java.util.List;
  * to compute the most probable path of parts of speech for a given sequence of tokens
  * @see Viterbi
  */
+
+// AT THE MOMENT IS USELESS TODO: check if we need it at all..and integrate if :)
 
 public interface Tagger {
 

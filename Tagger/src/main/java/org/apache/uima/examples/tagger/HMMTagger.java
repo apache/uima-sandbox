@@ -53,27 +53,12 @@ import org.apache.uima.resource.ResourceInitializationException;
 public class HMMTagger extends JCasAnnotator_ImplBase{
 
   
-  //public static final String PARAM_FILE = "tagger.properties";
-  
-  /**
-   * Defines whether {@code TRAINING} of a new model should be done, or whether we apply a ready pre-trained model from a parameter file
-   */
-  boolean  TRAINING=false;
-  
-  /**
-   * Defines whether smoothing should be applied to UNKNOWN
-   */
-  boolean SMOOTHING=false;
   /**
    * Model file name
    */
    String MODEL;
   
-  /**
-   * Training corpus file name
-   */
-  String T_CORPUS;
-  
+
   /**
    * for a bigram model: N = 2, for a trigram model N=3 
    * N is defined in parameter file
@@ -109,19 +94,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase{
       in.close();
       
       MODEL = defaultProps.getProperty("MODEL");
-      String train = defaultProps.getProperty("TRAINING");
-      
-      if (train == "true") {
-        TRAINING = true ; 
-      } else {TRAINING = false; }
-      
-      T_CORPUS = defaultProps.getProperty("T_CORPUS");
-      
-      String smooth = defaultProps.getProperty("SMOOTHING");
-      if (smooth == "true") {
-        SMOOTHING = true ; 
-      } else {SMOOTHING = false;}
-      
+     
       String n = defaultProps.getProperty("N");
       N = Integer.parseInt(n);
 
@@ -138,8 +111,8 @@ public class HMMTagger extends JCasAnnotator_ImplBase{
    * @param filename model file
    * @return {@link ModelGeneration}
    */
-  public ModelGeneration get_model(String filename){
-  // filename = "brown_model_trigramm.dat"; // model - trigram file
+  public static ModelGeneration get_model(String filename){
+ 
     System.out.println("The used model is:" + filename);
     InputStream model = null; 
     ModelGeneration oRead = null;
@@ -157,53 +130,6 @@ public class HMMTagger extends JCasAnnotator_ImplBase{
     return oRead;
   }
   
-  /**
-   * Initiates {@code MODEL} used for current tagging.
-   * If {@link #TRAINING} is defined, then trains a new Model from a reference corpus;
-   * otherwise reads a ready model from {@link #MODEL} defined in parameter file   
-   */
-  
-  public void init(){
-  
-  }
-  
- 
- /**
-  * Trains a new model {@link #N} - gram probabilistic model from a predefined training corpus ({@code #T_CORPUS}),
-  * write a new model to the {@link #MODEL} - file
-  */
-  
-  public void train() {
-      my_model = new ModelGeneration(N, T_CORPUS, MODEL);
-   }
-    
-  /**
-   * TODO Tests tagging results
-   */
-   
-  public void test(){
-     }
-  
-  public boolean set_smoothing() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-  
-  /*
-  public static double log2(double d){
-    return  Math.log(d)/Math.log(2.0);
-  }
- 
-  
-  public List process(List wordList) {
-   // Viterbi v = new Viterbi();
-   
-    List sent_tagging = Viterbi.process(N, wordList, END_OF_SENT_TAG,  null , my_model.transition_probs, my_model.word_probs);
-    System.out.println(sent_tagging);
-    return sent_tagging;
-   }
- */
- 
   
   /**
    * Process a CAS.
@@ -212,8 +138,8 @@ public class HMMTagger extends JCasAnnotator_ImplBase{
    */
   public void process(JCas aJCas) throws AnalysisEngineProcessException {
 
-    ArrayList tokenList = new ArrayList();
-    ArrayList wordList = new ArrayList();
+    ArrayList<TokenAnnotation> tokenList = new ArrayList<TokenAnnotation>();
+    ArrayList<String> wordList = new ArrayList<String>();
   
 
     AnnotationIndex sentenceIndex = aJCas.getAnnotationIndex(SentenceAnnotation.type);
@@ -237,8 +163,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase{
         wordList.add(token.getCoveredText());
       }
   
-    List wordTagList = Viterbi.process(N, wordList, END_OF_SENT_TAG,  null , my_model.transition_probs, my_model.word_probs);
-    System.out.println(wordTagList);
+      List<String> wordTagList = Viterbi.process(N, wordList, END_OF_SENT_TAG,  my_model.suffix_tree , my_model.suffix_tree_capitalized, my_model.transition_probs, my_model.word_probs, my_model.lambdas2, my_model.lambdas3, my_model.theta);
     
       try {
         for (int i = 0; i < tokenList.size(); i++) {

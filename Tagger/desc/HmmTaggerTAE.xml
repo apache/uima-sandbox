@@ -45,11 +45,11 @@
     <capabilities>
       <capability>
         <inputs>
-          <type allAnnotatorFeatures="true">org.apache.uima.examples.tokenizer.Token</type>
-          <type allAnnotatorFeatures="true">org.apache.uima.examples.tokenizer.Sentence</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.TokenAnnotation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.SentenceAnnotation</type>
         </inputs>
         <outputs>
-          <type allAnnotatorFeatures="true">org.apache.uima.examples.tokenizer.Token</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.TokenAnnotation</type>
         </outputs>
         <languagesSupported>
           <language>en</language>
