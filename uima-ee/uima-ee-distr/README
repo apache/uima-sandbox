@@ -1,15 +1,17 @@
-UIMA Enterprise Edition (UIMA EE) Version 0.6.5 README
-----------------------------------------------------
+     Apache UIMA Asynchronous Scaleout (UIMA-AS) Version 0.7.0 README
+     ----------------------------------------------------------------
 
 *****************************************************************************
-* This is an alpha release of UIMA EE.
+* This is an alpha release of UIMA-AS.
 *****************************************************************************
 
-*** This package is for Internal IBM use only and cannot be redistributed ***
-*** This package is for Internal IBM use only and cannot be redistributed ***
-*** This package is for Internal IBM use only and cannot be redistributed ***
-
-0. Changes in the 0.6.5 release
+0. 
+    Changes in the 0.7.0 release
+  - Development has been moved to Apache, in the Apache UIMA incubator project
+  - Package names are changed to org.apache.uima...
+  - Name has been changed to Apache UIMA Asynchronous Scaleout (Apache UIMA-AS)
+    
+    Changes in the 0.6.5 release
   - Added Component Descriptor Editor (CDE) support for UIMA deployment descriptors
   - Use temp queues for remote delegates connected by http or with the optional element: <replyQueue location="remote"/>
   - Fixed hang with action=terminate for aggregate services with remote CAS multipliers or delegates having no timeout
@@ -57,24 +59,28 @@ UIMA Enterprise Edition (UIMA EE) Version 0.6.5 README
   - Several memory leaks fixed.
 
 
-1. Contents of this Distribution
-This UIMA EE distribution consists of an Apache UIMA 2.2.1-05 distribution,
-Apache ANT, plus UIMA EE components.
+1. Contents of Apache UIMA-AS binary distribution
+The Apache UIMA-AS binary distribution includes 
+  - Apache UIMA (base) 
+  - Apache UIMA Asynchronous Scaleout extensions
+  - Apache ANT
+  - Apache ActiveMQ
+  - Spring Framework
 
-Apache UIMA and Apache ANT are licensed under the Apache 2.0 license, included here
-in the file APACHE.LICENSE.
+All of these components are licensed under the Apache 2.0 license, included here
+in the file LICENSE.
 
-New UIMA EE components include:
+UIMA-AS components include:
 
   bin/startBroker.sh/bat: starts the ActiveMQ broker, which must be running before
       UIMA EE services can be deployed.
-  bin/deployAsyncService.sh/bat: deploys an AnalysisEngine as a UIMA EE
-      service.  Takes one or more UIMA EE Deployment Descriptors as arguments.
-  bin/runRemoteAsyncAE.sh/bat: Calls a UIMA EE service. Takes arguments specifying the
+  bin/deployAsyncService.sh/bat: deploys an AnalysisEngine as a UIMA-AS
+      service.  Takes one or more UIMA-AS Deployment Descriptors as arguments.
+  bin/runRemoteAsyncAE.sh/bat: Calls a UIMA-AS service. Takes arguments specifying the
       location of the service, and an optional CollectionReader descriptor file used to
       obtain the CASes to be processed by the service.
 
-  docs/pdf/uima_async_scaleout.pdf: UIMA EE documentation, including the specification
+  docs/pdf/uima_async_scaleout.pdf: UIMA-AS documentation, including the specification
       for the deployment descriptor file syntax.
 
   examples/deploy/ee/...  (Sample Deployment Descriptors)
@@ -97,7 +103,6 @@ New UIMA EE components include:
 
   src/org/apache/uima/examples/ee/RunRemoteAsyncAE.java:  Sample client code showing how
        to call an Asynchronous UIMA Service.
-
 
 2. Installation and Setup
 
@@ -307,3 +312,14 @@ the name of the broker's machine.  For more details see http://activemq.apache.o
 
   1. Only one remote CAS multiplier per aggregate is supported.
   2. The thresholdWindow feature is not working and should not be specified.
+
+Disclaimer
+-----------
+
+Apache UIMA is an effort undergoing incubation at The Apache Software
+Foundation (ASF). Incubation is required of all newly accepted projects
+until a further review indicates that the infrastructure, communications,
+and decision making process have stabilized in a manner consistent with
+other successful ASF projects. While incubation status is not necessarily
+a reflection of the completeness or stability of the code, it does
+indicate that the project has yet to be fully endorsed by the ASF.
