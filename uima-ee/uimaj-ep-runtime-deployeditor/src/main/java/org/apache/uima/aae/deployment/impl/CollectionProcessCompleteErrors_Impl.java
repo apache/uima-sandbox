@@ -1,11 +1,3 @@
-/**
- * 
- * Project UIMA Tooling
- * 
- * 
- * creation date: Aug 11, 2007, 10:29:51 PM
- * source:  GetMetadataErrors.java
- */
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

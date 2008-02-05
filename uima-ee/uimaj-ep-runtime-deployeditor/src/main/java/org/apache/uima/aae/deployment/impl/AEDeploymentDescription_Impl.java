@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 /**
  * 
  * Project UIMA Tooling
@@ -32,6 +51,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.deployment.AEDeploymentConstants;
 import org.apache.uima.aae.deployment.AEDeploymentDescription;
 import org.apache.uima.aae.deployment.AEService;
@@ -74,6 +94,7 @@ implements AEDeploymentDescription, AEDeploymentConstants
   protected String        provider = "";
 
   protected int           casPoolSize = DEFAULT_CAS_POOL_SIZE;
+  protected int           initialFsHeapSize = DEFAULT_CAS_INITIAL_HEAP_SIZE;
   protected AEService     aeService;
 
   /*************************************************************************/
@@ -140,7 +161,7 @@ implements AEDeploymentDescription, AEDeploymentConstants
    * 
    *   
    * <deployment protocol="jms" provider="activemq">
-   *   <casPool numberOfCASes="5"/> 
+   *   <casPool numberOfCASes="5" initialFsHeapSize /> 
    *   
    *   <service>
    *     <inputQueue endpoint="MeetingDetectorTaeQueue" brokerURL="tcp://localhost:61616"/>
@@ -209,7 +230,7 @@ implements AEDeploymentDescription, AEDeploymentConstants
       }
       Element elem = (Element)curNode;
       if (TAG_CASPOOL.equalsIgnoreCase(elem.getTagName())) {
-        String val = DDParserUtil.checkAndGetAttributeValue(TAG_CASPOOL, TAG_ATTR_NUMBER_OF_CASES, elem);
+        String val = DDParserUtil.checkAndGetAttributeValue(TAG_CASPOOL, TAG_ATTR_NUMBER_OF_CASES, elem, true);
         if (val != null && val.trim().length() > 0) {
           try {
             casPoolSize = Integer.parseInt(val);
@@ -217,6 +238,18 @@ implements AEDeploymentDescription, AEDeploymentConstants
             e.printStackTrace();
             throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
                     new Object[] { TAG_CASPOOL }, e);
+          }
+        }
+        
+        // Check for Optional "initialFsHeapSize"
+        val = DDParserUtil.checkAndGetAttributeValue(TAG_CASPOOL, TAG_ATTR_INIT_SIZE_OF_CAS_HEAP, elem, false);
+        if (val != null && val.trim().length() > 0) {
+          try {
+            initialFsHeapSize = Integer.parseInt(val);
+          } catch (NumberFormatException e) {
+            e.printStackTrace();
+            throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                    new Object[] { TAG_ATTR_INIT_SIZE_OF_CAS_HEAP }, e);
           }
         }
 
@@ -274,6 +307,8 @@ implements AEDeploymentDescription, AEDeploymentConstants
     // <TAG_CASPOOL>
     attrs.addAttribute("", TAG_ATTR_NUMBER_OF_CASES, TAG_ATTR_NUMBER_OF_CASES,
             null, ""+casPoolSize);
+    attrs.addAttribute("", TAG_ATTR_INIT_SIZE_OF_CAS_HEAP, TAG_ATTR_INIT_SIZE_OF_CAS_HEAP,
+            null, ""+initialFsHeapSize);
     aContentHandler.startElement("", "", TAG_CASPOOL, attrs);        
     // </TAG_CASPOOL>
     aContentHandler.endElement("", "", TAG_CASPOOL);        
@@ -490,6 +525,14 @@ implements AEDeploymentDescription, AEDeploymentConstants
    */
   public void setCasPoolSize(int casPoolSize) {
     this.casPoolSize = casPoolSize;
+  }
+
+  public int getInitialFsHeapSize() {
+    return initialFsHeapSize;
+  }
+
+  public void setInitialFsHeapSize(int initialSize) {
+    initialFsHeapSize = initialSize;
   }
 
 }

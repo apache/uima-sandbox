@@ -1,11 +1,3 @@
-/**
- * 
- * Project UIMA Tooling
- * 
- * 
- * creation date: Mar 26, 2006, 4:07:18 PM
- * source:  CpeCasProcessorsSettings.java
- */
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

@@ -37,7 +37,7 @@ public class DDParserUtil {
    * @return String
    */
   static public String checkAndGetAttributeValue (String parentElementName, String attributeName, 
-          Element aElement) throws InvalidXMLException {
+          Element aElement, boolean throwException) throws InvalidXMLException {
     // Check for attributeName attribute
     boolean found = false;
     String val = null;
@@ -45,27 +45,28 @@ public class DDParserUtil {
     if (map != null) {
       for (int i=0; i<map.getLength(); ++i) {
         Node item = map.item(i);
+        
         String name = item.getNodeName();
-        val = item.getNodeValue();
-        if (val == null) {
-          val = "";
-        } else {
-          val = val.trim();
-        }
         if (attributeName.equalsIgnoreCase(name)) {
           // Found
           found = true;
+          val = item.getNodeValue();
+          if (val == null) {
+            val = "";
+          } else {
+            val = val.trim();
+          }
           break;
 
-        } else {
-          throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
-                  new Object[]{name, parentElementName});
+//        } else {
+//          throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+//                  new Object[]{name, parentElementName});
         }
       }
     }
 
     // Check for missing attributes
-    if (!found) {
+    if (!found && throwException) {
       throw new InvalidXMLException(InvalidXMLException.ELEMENT_NOT_FOUND,
               new Object[]{attributeName, parentElementName});
     }

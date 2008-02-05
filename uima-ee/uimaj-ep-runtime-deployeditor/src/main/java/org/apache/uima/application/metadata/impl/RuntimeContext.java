@@ -1,11 +1,3 @@
-/**
- * 
- * Project UIMA Tooling
- * 
- * 
- * creation date: Jul 8, 2006, 10:47:33 AM
- * source:  RuntimeContext.java
- */
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

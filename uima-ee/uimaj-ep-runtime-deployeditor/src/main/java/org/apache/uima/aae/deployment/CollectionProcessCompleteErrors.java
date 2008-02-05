@@ -24,6 +24,10 @@ public interface CollectionProcessCompleteErrors
     final static public int        KIND_TIMEOUT                = 1;
     final static public int        KIND_ADDITIONA_ERROR_ACTION = 2;
     
+    // String name used in the table view
+    final static String NAME_TIMEOUT                = "Timeout (in millisec)";    
+    final static String NAME_ADDITIONA_ERROR_ACTION = "Additional Error Action";    
+
     public CollectionProcessCompleteErrors clone(AsyncAEErrorConfiguration parent);
     
     public AsyncAEErrorConfiguration getParent();

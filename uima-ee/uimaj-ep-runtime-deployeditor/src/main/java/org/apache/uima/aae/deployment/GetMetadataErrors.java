@@ -25,6 +25,11 @@ public interface GetMetadataErrors
     final static int        KIND_TIMEOUT        = 2;
     final static int        KIND_ERRORACTION    = 3;
 
+    // String name used in the table view
+    final static String NAME_MAX_RETRIES    = "Max Retries";
+    final static String NAME_TIMEOUT        = "Timeout (in millisec)";
+    final static String NAME_ERRORACTION    = "Error Action";
+
     public GetMetadataErrors clone(AsyncAEErrorConfiguration parent);
     
     public AsyncAEErrorConfiguration getParent();
