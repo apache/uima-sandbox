@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.uima.aae.deployment.AEDeploymentDescription;
 import org.apache.uima.aae.deployment.AEDeploymentMetaData;
 import org.apache.uima.aae.deployment.AsyncAEErrorConfiguration;
+import org.apache.uima.aae.deployment.AsyncAggregateErrorConfiguration;
 import org.apache.uima.aae.deployment.CollectionProcessCompleteErrors;
 import org.apache.uima.aae.deployment.GetMetadataErrors;
 import org.apache.uima.aae.deployment.ProcessCasErrors;
@@ -276,6 +277,8 @@ public class DDEInformationControl extends PopupDialog implements IInformationCo
     if (obj == null) {
       return;
     }
+    boolean isAsyncAggErrorConfig = (obj instanceof AsyncAggregateErrorConfiguration);
+    
     GetMetadataErrors getGetMetadataErrors = obj.getGetMetadataErrors();
     if (getGetMetadataErrors != null) {
       buf.append("<li><b>GetMetadataErrors</b></li>");
@@ -287,9 +290,19 @@ public class DDEInformationControl extends PopupDialog implements IInformationCo
     ProcessCasErrors processCasErrors = obj.getProcessCasErrors();
     if (processCasErrors != null) {
       buf.append("<li><b>ProcessCasErrors</b></li>");
-      buf.append("<li bindent=\"20\">ThresholdCount: " + processCasErrors.getThresholdCount()
-              + " ; ThresholdWindow: " + processCasErrors.getThresholdWindow()
-              + " ; ThresholdAction: " + processCasErrors.getThresholdAction() + "</li>");
+      if (isAsyncAggErrorConfig) {
+        buf.append("<li bindent=\"20\">CAS Max Retries: " + processCasErrors.getMaxRetries()
+              + " ; CAS Timeout: " + processCasErrors.getTimeout()
+              + " ; CAS Continue On Failure: " + processCasErrors.isContinueOnRetryFailure() + "</li>");
+        buf.append("<li bindent=\"20\">Delegate Threshold Count: " + processCasErrors.getThresholdCount()
+                + " ; Delegate Threshold Window: " + processCasErrors.getThresholdWindow()
+                + " ; Delegate Threshold Action: " + processCasErrors.getThresholdAction() + "</li>");
+      } else {
+        buf.append("<li bindent=\"20\">Threshold Count: " + processCasErrors.getThresholdCount()
+                + " ; Threshold Window: " + processCasErrors.getThresholdWindow()
+                + " ; Threshold Action: " + processCasErrors.getThresholdAction() + "</li>");
+        
+      }
     }
 
     CollectionProcessCompleteErrors collProcessCompleteErrors = obj
@@ -297,7 +310,7 @@ public class DDEInformationControl extends PopupDialog implements IInformationCo
     if (collProcessCompleteErrors != null) {
       buf.append("<li><b>CollectionProcessCompleteErrors</b></li>");
       buf.append("<li bindent=\"20\">Timeout: " + collProcessCompleteErrors.getTimeout()
-              + " ; Additional ErrorAction: "
+              + " ; Additional Error Action: "
               + collProcessCompleteErrors.getAdditionalErrorAction() + "</li>");
     }
 

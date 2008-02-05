@@ -121,6 +121,24 @@ public class ErrorsConfigLabelProvider extends LabelProvider implements IColorPr
   public String getColumnText(Object obj, int index) {
     if (index == COLUMN_NAME) {
       if (obj instanceof NameValuePair) {
+        int id = ((NameValuePair) obj).getId();
+
+        if ( ((NameValuePair) obj).getParent() instanceof ProcessCasErrors) {
+          // Blank out Threshold Window and Action if Threshold Count = 0
+          ProcessCasErrors pce = (ProcessCasErrors) ((NameValuePair) obj).getParent();
+          if (pce.getThresholdCount() == 0) {
+            if (id == ProcessCasErrors.KIND_THRESHOLD_WINDOW
+                    || id == ProcessCasErrors.KIND_THRESHOLD_ACTION) {
+              return "";
+            }
+          }
+        } else if ( ((NameValuePair) obj).getParent() instanceof GetMetadataErrors) {
+          // Blank out Error Action if Timeout = 0
+          GetMetadataErrors gme = (GetMetadataErrors) ((NameValuePair) obj).getParent();
+          if (gme.getTimeout() == 0 && id == GetMetadataErrors.KIND_ERRORACTION) {
+            return "";
+          }
+        }
         return ((NameValuePair) obj).getName();
       }
       return getText(obj);
@@ -128,6 +146,7 @@ public class ErrorsConfigLabelProvider extends LabelProvider implements IColorPr
     } else if (index == COLUMN_VALUE) {
       if (obj instanceof NameValuePair) {
         int id = ((NameValuePair) obj).getId();
+        
         if ( ((NameValuePair) obj).getParent() instanceof GetMetadataErrors) {
           if (id == GetMetadataErrors.KIND_TIMEOUT) {
             if ( ((NameValuePair) obj).getValue() == Integer.valueOf(0) ) {
@@ -137,9 +156,17 @@ public class ErrorsConfigLabelProvider extends LabelProvider implements IColorPr
             if ( ((NameValuePair) obj).getValue() == Integer.valueOf(0) ) {
               return AEDeploymentConstants.ERROR_KIND_STRING_NO_RETRIES;              
             }
+          } else if (id == GetMetadataErrors.KIND_ERRORACTION) {
+            // If Timeout=0, blank out action
+            GetMetadataErrors gme = (GetMetadataErrors) ((NameValuePair) obj).getParent();
+            if (gme.getTimeout() == 0) {
+              return "";
+            }
+
           }
 
         } else if ( ((NameValuePair) obj).getParent() instanceof ProcessCasErrors) {
+          ProcessCasErrors pce = (ProcessCasErrors) ((NameValuePair) obj).getParent();
           if (id == ProcessCasErrors.KIND_TIMEOUT) {
             if ( ((NameValuePair) obj).getValue() == Integer.valueOf(0) ) {
               return AEDeploymentConstants.ERROR_KIND_STRING_NO_TIMEOUT;              
@@ -151,6 +178,20 @@ public class ErrorsConfigLabelProvider extends LabelProvider implements IColorPr
           } else if (id == ProcessCasErrors.KIND_THRESHOLD_COUNT) {
             if ( ((NameValuePair) obj).getValue() == Integer.valueOf(0) ) {
               return AEDeploymentConstants.ERROR_KIND_STRING_NO_THRESHOLD_COUNT;              
+            }
+          } else if (id == ProcessCasErrors.KIND_THRESHOLD_WINDOW) {
+            // Blank out Threshold Window and Action if Threshold Count = 0
+            if (pce.getThresholdCount() == 0) {
+              return "";
+            } else {
+              if ( ((NameValuePair) obj).getValue() == Integer.valueOf(0) ) {
+                return AEDeploymentConstants.ERROR_KIND_STRING_NO_THRESHOLD_WINDOW;              
+              }
+            }
+          } else if (id == ProcessCasErrors.KIND_THRESHOLD_ACTION) {
+            // Blank out Threshold Window and Action if Threshold Count = 0
+            if (pce.getThresholdCount() == 0) {
+              return "";
             }
           }
           

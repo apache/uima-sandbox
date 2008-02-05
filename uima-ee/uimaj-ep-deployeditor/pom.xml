@@ -39,7 +39,25 @@
 			<version>${uimaj-release-eclipse-version}</version>
 			<scope>provided</scope>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-core</artifactId>
+      <version>${uimaj-release-version}</version>
+      <scope>compile</scope>
+    </dependency>   
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-tools</artifactId>
+      <version>${uimaj-release-version}</version>
+      <scope>compile</scope>
+    </dependency> 
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-ep-runtime-deployeditor</artifactId>
+      <version>${uimaj-release-eclipse-version}</version>
+      <scope>compile</scope>      
+    </dependency>
+  </dependencies>
 	<build>
 		<finalName>uima-ep-deployeditor</finalName>	
 		<plugins>

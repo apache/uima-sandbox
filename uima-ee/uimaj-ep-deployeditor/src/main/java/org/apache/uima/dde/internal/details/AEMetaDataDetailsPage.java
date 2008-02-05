@@ -614,7 +614,6 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
   }
 
   protected void showStatus(String msg, int msgType) {
-    Trace.err(msg==null? "Clear msg": msg);
     FormMessage.setMessage(mform.getForm().getForm(), msg, msgType);    
   }
 
@@ -665,7 +664,6 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
   }
 
   public void selectionChanged(IFormPart part, ISelection selection) {
-    Trace.err();
     if (selection == null || !(selection instanceof IStructuredSelection)) {
       return;
     }

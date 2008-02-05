@@ -41,6 +41,8 @@ import org.apache.uima.dde.internal.page.AEConfigurationPage;
 import org.apache.uima.dde.internal.page.OverviewPage;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceSpecifier;
+import org.apache.uima.resource.URISpecifier;
+import org.apache.uima.resource.metadata.Import;
 import org.apache.uima.taeconfigurator.CDEpropertyPage;
 import org.apache.uima.taeconfigurator.InternalErrorCDE;
 import org.apache.uima.taeconfigurator.Messages;
@@ -552,5 +554,12 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
 //    sRelativePath += sFullPath.substring(commonPrefix.length());
 //    return sRelativePath;
 //  }
+
+  /**
+   * Open top level's Xml descriptor in new window
+   */
+  public void openTopLevelXmlDescriptor(Import importItem) {
+    cde.open(cde.getAbsolutePathFromImport(importItem));
+  }
 
 }

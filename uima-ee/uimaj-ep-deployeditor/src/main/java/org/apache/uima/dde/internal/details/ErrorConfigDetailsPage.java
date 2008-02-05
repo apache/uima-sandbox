@@ -391,26 +391,6 @@ public class ErrorConfigDetailsPage implements IDetailsPage {
           return;
         }
 
-        // Identify the selected column
-        // boolean found = false;
-        // int column = -1;
-        // Point pt = new Point (e.x, e.y);
-        // Trace.err("pt: " + pt);
-        // for (int i=0; i<table.getColumnCount (); i++) {
-        // Rectangle rect = item.getBounds (i);
-        // Trace.err("rect: " + rect);
-        // if (rect.contains (pt)) {
-        // found = true;
-        // column = i;
-        // break;
-        // }
-        // }
-        // if (found) {
-        // Trace.err("Click at column: " + column);
-        // } else {
-        // Trace.err("Click at column: NOT FOUND");
-        // }
-
         final NameValuePair nvp = (NameValuePair) item.getData();
         if (nvp == null) {
           Trace.err("No item's object");
@@ -426,7 +406,8 @@ public class ErrorConfigDetailsPage implements IDetailsPage {
           String value = item.getText(1);
           if (value.equals(AEDeploymentConstants.ERROR_KIND_STRING_NO_TIMEOUT)
                   || value.equals(AEDeploymentConstants.ERROR_KIND_STRING_NO_RETRIES)
-                  || value.equals(AEDeploymentConstants.ERROR_KIND_STRING_NO_THRESHOLD_COUNT)) {
+                  || value.equals(AEDeploymentConstants.ERROR_KIND_STRING_NO_THRESHOLD_COUNT)
+                  || value.equals(AEDeploymentConstants.ERROR_KIND_STRING_NO_THRESHOLD_WINDOW)) {
             value = "0";
           }
           int level = Integer.parseInt(value);
@@ -552,10 +533,11 @@ public class ErrorConfigDetailsPage implements IDetailsPage {
             });
             combo.addSelectionListener(new SelectionAdapter() {
               public void widgetSelected(SelectionEvent e) {
+                String selection = combo.getText();
                 int id = nvp.getId();
-                item.setText(1, combo.getText());
+                item.setText(1,selection);
                 ProcessCasErrors processCasErrors = (ProcessCasErrors) obj;
-                processCasErrors.setValueById(id, combo.getText());
+                processCasErrors.setValueById(id, selection);
                 processCasErrorsViewer.refresh();
                 multiPageEditor.setFileDirty();
               }

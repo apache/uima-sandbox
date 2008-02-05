@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: UIMA Deployment Descriptor Editor Plug-in
 Bundle-SymbolicName: org.apache.uima.editors.dde;singleton:=true
-Bundle-Version: 0.5.2
+Bundle-Version: 0.1.0
 Bundle-Activator: org.apache.uima.editors.dde.internal.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -29,4 +29,4 @@ Export-Package: org.apache.uima.dde.internal,
  org.apache.uima.tools.internal.cde.uima.util,
  org.apache.uima.tools.internal.ui.forms,
  org.apache.uima.tools.internal.uima.util
-Bundle-ClassPath: uima-ep-dde.jar
+Bundle-ClassPath: uima-ep-deployeditor.jar
