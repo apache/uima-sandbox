@@ -20,8 +20,8 @@
 package org.apache.uima.dde.internal.page;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
@@ -29,33 +29,39 @@ import org.apache.uima.aae.deployment.AEDeploymentDescription;
 import org.apache.uima.aae.deployment.AEService;
 import org.apache.uima.aae.deployment.AsyncAEErrorConfiguration;
 import org.apache.uima.aae.deployment.AsyncAggregateErrorConfiguration;
-import org.apache.uima.aae.deployment.AsyncPrimitiveErrorConfiguration;
 import org.apache.uima.aae.deployment.impl.AEDelegates_Impl;
 import org.apache.uima.aae.deployment.impl.AEDeploymentMetaData_Impl;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.dde.internal.DeploymentDescriptorEditor;
 import org.apache.uima.dde.internal.Messages;
 import org.apache.uima.resource.ResourceSpecifier;
+import org.apache.uima.resource.URISpecifier;
 import org.apache.uima.resource.metadata.Import;
 import org.apache.uima.taeconfigurator.editors.ui.FileAndShortName;
 import org.apache.uima.taeconfigurator.editors.ui.Utility;
 import org.apache.uima.taeconfigurator.files.MultiResourceSelectionDialog;
-import org.apache.uima.taeconfigurator.files.MultiResourceSelectionDialogWithFlowOption;
 import org.apache.uima.tools.debug.util.Trace;
 import org.apache.uima.tools.internal.cde.uima.util.UimaDescriptionUtils;
 import org.apache.uima.tools.internal.ui.forms.FormSection;
 import org.apache.uima.tools.internal.ui.forms.FormSection2;
-import org.apache.uima.tools.internal.uima.util.WorkspaceResourceDialog;
 import org.apache.uima.util.InvalidXMLException;
+import org.apache.uima.util.XMLInputSource;
+import org.apache.uima.util.XMLizable;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.DecoratedField;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.PopupList;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusAdapter;
@@ -67,17 +73,20 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.AbstractFormPart;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.forms.FormColors;
-import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
@@ -118,7 +127,7 @@ public class OverviewPage extends AbstractHeaderPage {
 
   private Text endPoint;
   
-//  private Spinner prefetch;
+  private Spinner initialFsHeapSize;
 
   private Spinner casPoolSize;
 
@@ -143,6 +152,7 @@ public class OverviewPage extends AbstractHeaderPage {
   private Text version;
   private Text vendor;
   private boolean ignoreUpdate = false; // Used to update Text without setting dirty flag
+  private Action openAction;
   
   /** ********************************************************************** */
 
@@ -204,55 +214,9 @@ public class OverviewPage extends AbstractHeaderPage {
       if (event.getSource() == casPoolSize) {
         aeDeploymentDescription.setCasPoolSize(casPoolSize.getSelection());
         multiPageEditor.setFileDirty();
-/*        
-      } else if (event.getSource() == importByLocation) {
-        if ( !importByLocation.getSelection() ) {
-          return;
-        }
-        if (topDescriptorField.getText().trim().length() == 0) {
-          return;
-        }
-        try {
-          URL url = aeService.getImportDescriptor().findAbsoluteUrl(multiPageEditor.createResourceManager());
-          Import importDescriptor = UimaDescriptionUtils.createByLocationImport(multiPageEditor.getFile(),
-                    new File(url.getPath()).getAbsolutePath());
-          aeService.setImportDescriptor(importDescriptor);
-          isImportByLocation = true;
-          //Trace.err("Change to Location:" + importDescriptor.getLocation());
-          topDescriptorField.setText(importDescriptor.getLocation());
-          
-        } catch (InvalidXMLException e1) {
-          // TODO Auto-generated catch block
-          e1.printStackTrace();
-        } catch (MalformedURLException e1) {
-          // TODO Auto-generated catch block
-          e1.printStackTrace();
-        }
+      } else if (event.getSource() == initialFsHeapSize) {
+        aeDeploymentDescription.setInitialFsHeapSize(initialFsHeapSize.getSelection());
         multiPageEditor.setFileDirty();
-        
-      } else if (event.getSource() == importByName) {
-        if ( !importByName.getSelection() ) {
-          return;
-        }
-        if (topDescriptorField.getText().trim().length() == 0) {
-          return;
-        }
-        try {
-          URL url = aeService.getImportDescriptor().findAbsoluteUrl(multiPageEditor.createResourceManager());
-          Import importDescriptor = UimaDescriptionUtils.createByNameImport(new File(url.getPath()).getAbsolutePath(),
-                  multiPageEditor.createResourceManager());
-          aeService.setImportDescriptor(importDescriptor);
-          isImportByLocation = false;
-          // Trace.err("Change to Name:" + importDescriptor.getName());
-          topDescriptorField.setText(importDescriptor.getName());
-
-        } catch (InvalidXMLException e1) {
-          // TODO Auto-generated catch block
-          e1.printStackTrace();
-        }
-
-        multiPageEditor.setFileDirty();
-*/
       }
     }
   };
@@ -463,6 +427,13 @@ public class OverviewPage extends AbstractHeaderPage {
     casPoolSize.setSelection(aeDeploymentDescription.getCasPoolSize());
     casPoolSize.addSelectionListener(asynAggregateListener);
 
+    // initialFsHeapSize (default size is 2M)
+    initialFsHeapSize = FormSection2.createLabelAndSpinner(toolkit, sectionClient,
+            "Initial size of CAS heap (in bytes):", SWT.BORDER, 1, 
+            Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
+    initialFsHeapSize.setSelection(aeDeploymentDescription.getInitialFsHeapSize());
+    initialFsHeapSize.addSelectionListener(asynAggregateListener);
+    
     // ////////////////////////////////////////
 
     // Top descriptor
@@ -533,6 +504,8 @@ public class OverviewPage extends AbstractHeaderPage {
         // updateFileList(inputDocPathField.getText().trim());
       }
     });
+    
+    createContextMenu();
 
     // Name or Location
     toolkit.createLabel(sectionClient, "", SWT.NONE);
@@ -545,16 +518,6 @@ public class OverviewPage extends AbstractHeaderPage {
     nameOrLocation.setLayoutData(td);
     toolkit.paintBordersFor(nameOrLocation);
     
-//    toolkit.createLabel(nameOrLocation, "Import by:", SWT.NONE);
-//    importByLocation = toolkit.createButton(nameOrLocation, "Location", SWT.RADIO);
-//    importByName = toolkit.createButton(nameOrLocation, "Name", SWT.RADIO);
-//    if (isImportByLocation) {
-//      importByLocation.setSelection(true);
-//    } else {
-//      importByName.setSelection(true);      
-//    }
-//    importByLocation.addSelectionListener(asynAggregateListener);
-//    importByName.addSelectionListener(asynAggregateListener);
     importByNameOrLocation = FormSection.createLabelAndLabel(toolkit, nameOrLocation, "Import by:",
             "(Name or Location)", 200, 20);
     if (imp != null) {
@@ -569,6 +532,40 @@ public class OverviewPage extends AbstractHeaderPage {
     return section;
   } // createServiceSection
 
+  private void createContextMenu() {
+    // Create Open Action
+    openAction = new Action("Open in new window") {
+      public void run() {
+        String xml = topDescriptorField.getText().trim();
+        // Trace.err("Xml: " + xml);
+        multiPageEditor.openTopLevelXmlDescriptor(aeService.getImportDescriptor());
+      }
+    };
+    
+    //  Create menu manager.
+    MenuManager menuMgr = new MenuManager();
+    menuMgr.setRemoveAllWhenShown(true);
+    menuMgr.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager mgr) {
+        fillContextMenu(mgr);
+      }
+    });
+    //  Create menu.
+    Menu menu = menuMgr.createContextMenu(topDescriptorField);
+    topDescriptorField.setMenu(menu);
+    
+    //  Register menu for extension.
+    // getSite().registerContextMenu(menuMgr, topDescriptorField);
+  }
+ 
+  private void fillContextMenu(IMenuManager mgr) {
+    String xml = topDescriptorField.getText().trim();
+    if (xml.length() > 0) {
+      mgr.add(openAction);
+    }
+    // mgr.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+  }
+  
   /** ********************************************************************** */
 
   protected void updateTopDescriptor(String fileFullPath, boolean byLocation) {
@@ -730,6 +727,7 @@ public class OverviewPage extends AbstractHeaderPage {
     endPoint.setText(aeService.getEndPoint());
     
     casPoolSize.setSelection(aeDeploymentDescription.getCasPoolSize());
+    initialFsHeapSize.setSelection(aeDeploymentDescription.getInitialFsHeapSize());
     
     String topDescriptor = null;
     Import imp = aeService.getImportDescriptor();

@@ -50,18 +50,25 @@ public class ErrorConfigContentProvider implements IStructuredContentProvider {
       }
       
       objs = new Object[3];
-      objs[0] = new NameValuePair(getMetadataErrors, GetMetadataErrors.KIND_MAX_RETRIES,
-              "Max Retries", getMetadataErrors.getMaxRetries(), Integer.class);
-      objs[1] = new NameValuePair(getMetadataErrors, GetMetadataErrors.KIND_TIMEOUT, "Timeout (in msec)",
+      objs[0] = new NameValuePair(getMetadataErrors, GetMetadataErrors.KIND_TIMEOUT, 
+              GetMetadataErrors.NAME_TIMEOUT,
               getMetadataErrors.getTimeout(), Integer.class);
-      objs[2] = new NameValuePair(getMetadataErrors, GetMetadataErrors.KIND_ERRORACTION,
-              "Error Action", getMetadataErrors.getErrorAction(), String.class);
+      objs[1] = new NameValuePair(getMetadataErrors, GetMetadataErrors.KIND_ERRORACTION,
+              GetMetadataErrors.NAME_ERRORACTION,
+              getMetadataErrors.getErrorAction(), String.class);
+      objs[2] = new NameValuePair(getMetadataErrors, GetMetadataErrors.KIND_MAX_RETRIES,
+              GetMetadataErrors.NAME_MAX_RETRIES, 
+              getMetadataErrors.getMaxRetries(), Integer.class);
+      // ((NameValuePair) objs[0]).setStatusFlags(status);
+      // ((NameValuePair) objs[1]).setStatusFlags(status);
       ((NameValuePair) objs[2]).setStatusFlags(status);
       return objs;
 
     } else if (inputElement instanceof ProcessCasErrors) {
       ProcessCasErrors processCasErrors = (ProcessCasErrors) inputElement;
       AsyncAEErrorConfiguration parent = processCasErrors.getParent();
+      DeploymentMetaData_Impl parentMetaData = parent.gParentObject();
+      
       if (parent instanceof AsyncAggregateErrorConfiguration) {
         count = 6;
       } else {
@@ -69,21 +76,49 @@ public class ErrorConfigContentProvider implements IStructuredContentProvider {
       }
       objs = new Object[count];
       
+      // Set names
+      String nameThresholdCount;
+      String nameThresholdWindow;
+      String nameThresholdAction;
+      
       if (count == 6) {
+        // For AsyncAggregateErrorConfiguration
         objs[0] = new NameValuePair(processCasErrors, ProcessCasErrors.KIND_MAX_RETRIES,
-                "Max Retries", processCasErrors.getMaxRetries(), Integer.class);
-        objs[1] = new NameValuePair(processCasErrors, ProcessCasErrors.KIND_TIMEOUT, "Timeout (in msec)",
+                ProcessCasErrors.NAME_MAX_RETRIES, 
+                processCasErrors.getMaxRetries(), Integer.class);
+        objs[1] = new NameValuePair(processCasErrors, ProcessCasErrors.KIND_TIMEOUT, 
+                ProcessCasErrors.NAME_TIMEOUT,
                 processCasErrors.getTimeout(), Integer.class);
         objs[2] = new NameValuePair(processCasErrors, ProcessCasErrors.KIND_CONTINUE_ON_RETRY,
-                "Continue On Retry Failure", processCasErrors.isContinueOnRetryFailure(),
+                ProcessCasErrors.NAME_CONTINUE_ON_RETRY, 
+                processCasErrors.isContinueOnRetryFailure(),
                 Boolean.class);
+        if ( (parentMetaData instanceof AEDeploymentMetaData) 
+                && !((AEDeploymentMetaData) parentMetaData).isAsync() ) {
+          ((NameValuePair) objs[0]).setStatusFlags(NameValuePair.STATUS_NON_EDITABLE);
+          ((NameValuePair) objs[2]).setStatusFlags(NameValuePair.STATUS_NON_EDITABLE);
+          
+        }
+
+        nameThresholdCount = ProcessCasErrors.NAME_DELEGATE_THRESHOLD_COUNT;
+        nameThresholdWindow = ProcessCasErrors.NAME_DELEGATE_THRESHOLD_WINDOW;
+        nameThresholdAction = ProcessCasErrors.NAME_DELEGATE_THRESHOLD_ACTION;
+      } else {
+        // For AsyncPrimitiveErrorConfiguration
+        nameThresholdCount = ProcessCasErrors.NAME_THRESHOLD_COUNT;
+        nameThresholdWindow = ProcessCasErrors.NAME_THRESHOLD_WINDOW;
+        nameThresholdAction = ProcessCasErrors.NAME_THRESHOLD_ACTION;
       }
       objs[count-3] = new NameValuePair(processCasErrors, ProcessCasErrors.KIND_THRESHOLD_COUNT,
-              "Threshold Count", processCasErrors.getThresholdCount(), Integer.class);
+              nameThresholdCount, 
+              processCasErrors.getThresholdCount(), Integer.class);
       objs[count-2] = new NameValuePair(processCasErrors, ProcessCasErrors.KIND_THRESHOLD_WINDOW,
-              "Threshold Window", processCasErrors.getThresholdWindow(), Integer.class);
+              nameThresholdWindow, 
+              processCasErrors.getThresholdWindow(), Integer.class);
       objs[count-1] = new NameValuePair(processCasErrors, ProcessCasErrors.KIND_THRESHOLD_ACTION,
-              "Threshold Action", processCasErrors.getThresholdAction(), String.class);
+              nameThresholdAction, 
+              processCasErrors.getThresholdAction(), String.class);
+      
       if (processCasErrors.getThresholdCount() == 0) {
         status = NameValuePair.STATUS_NON_EDITABLE;
         ((NameValuePair) objs[count-2]).setStatusFlags(NameValuePair.STATUS_NON_EDITABLE);
@@ -101,10 +136,12 @@ public class ErrorConfigContentProvider implements IStructuredContentProvider {
 
       objs = new Object[2];
       objs[0] = new NameValuePair(completeErrors, CollectionProcessCompleteErrors.KIND_TIMEOUT,
-              "Timeout (in msec)", completeErrors.getTimeout(), Integer.class);
+              CollectionProcessCompleteErrors.NAME_TIMEOUT, 
+              completeErrors.getTimeout(), Integer.class);
       objs[1] = new NameValuePair(completeErrors,
               CollectionProcessCompleteErrors.KIND_ADDITIONA_ERROR_ACTION,
-              "Additional Error Action", completeErrors.getAdditionalErrorAction(), String.class);
+              CollectionProcessCompleteErrors.NAME_ADDITIONA_ERROR_ACTION, 
+              completeErrors.getAdditionalErrorAction(), String.class);
       if (completeErrors.getParent() instanceof AsyncPrimitiveErrorConfiguration) {
         ((NameValuePair) objs[1]).setStatusFlags(NameValuePair.STATUS_NON_EDITABLE);
       }
