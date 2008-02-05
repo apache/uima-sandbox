@@ -26,6 +26,7 @@ package org.apache.uima.aae.deployment;
 public interface AEDeploymentConstants 
 {
     final static int        DEFAULT_CAS_POOL_SIZE       = 5;
+    final static int        DEFAULT_CAS_INITIAL_HEAP_SIZE = 2000000;
     final static int        DEFAULT_SCALEOUT_INSTANCES  = 1;
     final static int        DEFAULT_CAS_MULTIPLIER_POOL_SIZE  = 1;
     final static boolean    DEFAULT_ASYNC               = false;
@@ -47,7 +48,9 @@ public interface AEDeploymentConstants
 
     final static public String ERROR_KIND_STRING_NO_TIMEOUT     = "no timeout";
     final static public String ERROR_KIND_STRING_NO_RETRIES     = "no retries";
-    final static public String ERROR_KIND_STRING_NO_THRESHOLD_COUNT = "disable";
+    final static public String ERROR_KIND_STRING_NO_THRESHOLD_COUNT = "no threshold";
+    final static public String ERROR_KIND_STRING_NO_THRESHOLD_WINDOW = "no window";
+    final static public String ERROR_KIND_STRING_NO_THRESHOLD_ACTION = "no action";
     
     /*    
     // GetMetadataErrors
@@ -118,6 +121,7 @@ public interface AEDeploymentConstants
     final static public String TAG_ATTR_NAME               = "name";
     final static public String TAG_ATTR_PROTOCOL           = "protocol";
     final static public String TAG_ATTR_NUMBER_OF_CASES    = "numberOfCASes";
+    final static public String TAG_ATTR_INIT_SIZE_OF_CAS_HEAP = "initialFsHeapSize";
 
     final static public String TAG_ATTR_KEY                = "key";
     final static public String TAG_ATTR_ASYNC              = "async";

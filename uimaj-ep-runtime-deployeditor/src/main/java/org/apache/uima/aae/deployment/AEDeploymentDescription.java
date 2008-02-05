@@ -141,5 +141,9 @@ public interface AEDeploymentDescription extends MetaDataObject {
      * @param casPoolSize the casPoolSize to set
      */
     public void setCasPoolSize(int casPoolSize);
+    
+    public int getInitialFsHeapSize ();
+    
+    public void setInitialFsHeapSize(int initialSize);
 
 }

@@ -37,7 +37,12 @@
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-ep-runtime</artifactId>
 			<version>${uimaj-release-eclipse-version}</version>
-			<scope>provided</scope>
+      <!-- don't use provided scope here, because then
+           eclipse:eclipse is set up to ref the uimaj-ep-runtime
+           project directly, and it has no content 
+           "compile" makes eclipse:eclipse ref the 
+           jar that maven built in the local repository -->
+			<scope>compile</scope>
 		</dependency>
     <dependency>
       <groupId>org.eclipse.core</groupId>

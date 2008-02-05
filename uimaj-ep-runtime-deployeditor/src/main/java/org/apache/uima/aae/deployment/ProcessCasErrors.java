@@ -27,6 +27,18 @@ public interface ProcessCasErrors
     final static int        KIND_TIMEOUT            = 4;
     final static int        KIND_MAX_RETRIES        = 5;
     final static int        KIND_CONTINUE_ON_RETRY  = 6;
+    
+    // String name used in the table view
+    final static String NAME_THRESHOLD_COUNT    = "Threshold Count";
+    final static String NAME_THRESHOLD_WINDOW   = "Threshold Window";
+    final static String NAME_THRESHOLD_ACTION   = "Threshold Action";
+    final static String NAME_DELEGATE_THRESHOLD_COUNT    = "Delegate Threshold Count";
+    final static String NAME_DELEGATE_THRESHOLD_WINDOW   = "Delegate Threshold Window";
+    final static String NAME_DELEGATE_THRESHOLD_ACTION   = "Delegate Threshold Action";
+    final static String NAME_MAX_RETRIES        = "CAS Max Retries";
+    final static String NAME_TIMEOUT            = "CAS Timeout (in millisec)";    
+    final static String NAME_CONTINUE_ON_RETRY  = "CAS Continue On Failure";
+
 
     public ProcessCasErrors clone(AsyncAEErrorConfiguration parent);
     

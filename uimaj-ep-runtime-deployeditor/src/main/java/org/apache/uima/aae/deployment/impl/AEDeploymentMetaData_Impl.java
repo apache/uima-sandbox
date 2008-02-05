@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 /**
  * 
  * Project UIMA Tooling
@@ -302,7 +321,7 @@ AEDeploymentConstants, AEDeploymentMetaData {
 
       if (AEDeploymentConstants.TAG_SCALE_OUT.equalsIgnoreCase(elem.getTagName())) {
         int n;
-        val = DDParserUtil.checkAndGetAttributeValue(TAG_SCALE_OUT, TAG_ATTR_NUMBER_OF_INSTANCES, elem);
+        val = DDParserUtil.checkAndGetAttributeValue(TAG_SCALE_OUT, TAG_ATTR_NUMBER_OF_INSTANCES, elem, true);
         if (val == null || val.trim().length() == 0) {
           n = 0;
         } else {
@@ -319,7 +338,7 @@ AEDeploymentConstants, AEDeploymentMetaData {
       } else if (TAG_CAS_MULTIPLIER.equalsIgnoreCase(elem.getTagName())) {
         // Get "poolSize" attribute
         int n;
-        val = DDParserUtil.checkAndGetAttributeValue(TAG_CAS_MULTIPLIER, TAG_ATTR_POOL_SIZE, elem);
+        val = DDParserUtil.checkAndGetAttributeValue(TAG_CAS_MULTIPLIER, TAG_ATTR_POOL_SIZE, elem, true);
         if (val == null || val.trim().length() == 0) {
           n = 0;
         } else {
@@ -394,6 +413,49 @@ AEDeploymentConstants, AEDeploymentMetaData {
       if (cls == AsyncAggregateErrorConfiguration.class) {
         asyncAEErrorConfiguration.getGetMetadataErrors().setTimeout(0);
       }
+    } else {      
+      // Validate some values 
+      if (!isTopAnalysisEngine) {
+        int value;
+        String s;
+        boolean b;
+        if (!isAsync()) {
+          // For co-located delegates
+          // Check for GetMetadataErrors
+          if ( (value=asyncAEErrorConfiguration.getGetMetadataErrors().getMaxRetries()) != 0) {
+            throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                    new Object[]{value, TAG_ATTR_MAX_RETRIES});
+//          } else if ( (value=asyncAEErrorConfiguration.getGetMetadataErrors().getTimeout()) != 0) {
+//            throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+//                    new Object[]{value, TAG_ATTR_TIMEOUT});
+//          } else if ( !(s=asyncAEErrorConfiguration.getGetMetadataErrors().getErrorAction()).equals("terminate")) {
+//            throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+//                    new Object[]{s, TAG_ATTR_ERROR_ACTION});
+          }
+          
+          // Check for ProcessCasErrors
+          if ( (value=asyncAEErrorConfiguration.getProcessCasErrors().getMaxRetries()) != 0) {
+            throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                    new Object[]{value, TAG_ATTR_MAX_RETRIES});
+          } else if ( (b=asyncAEErrorConfiguration.getProcessCasErrors().isContinueOnRetryFailure()) ) {
+            throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                    new Object[]{b, TAG_ATTR_CONTINUE_ON_RETRY_FAILURE});
+          }
+        }
+        
+        // Check for Threshold Count = 0
+//        if ( asyncAEErrorConfiguration.getProcessCasErrors().getThresholdCount() == 0) {
+//          if ( (value=asyncAEErrorConfiguration.getProcessCasErrors().getThresholdWindow()) != 0 ) {
+//            throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+//                    new Object[]{value, TAG_ATTR_THRESHOLD_WINDOW});            
+//          }
+//          if ( !(s=asyncAEErrorConfiguration.getProcessCasErrors().getThresholdAction()).equals("disable")) {
+//            throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+//                  new Object[]{s, TAG_ATTR_THRESHOLD_ACTION});
+//          }
+//        }
+      }
+
     }
 
   }

@@ -1,11 +1,3 @@
-/**
- * 
- * Project UIMA Tooling
- * 
- * 
- * creation date: Aug 11, 2007, 12:01:48 PM
- * source:  RemoteAEDeploymentMetaData_Impl.java
- */
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -135,7 +127,7 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
         } else if (AEDeploymentConstants.TAG_CAS_MULTIPLIER.equalsIgnoreCase(elem.getTagName())) {
           // Get "poolSize" attribute
           int n;
-          val = DDParserUtil.checkAndGetAttributeValue(TAG_CAS_MULTIPLIER, TAG_ATTR_POOL_SIZE, elem);
+          val = DDParserUtil.checkAndGetAttributeValue(TAG_CAS_MULTIPLIER, TAG_ATTR_POOL_SIZE, elem, true);
           if (val == null || val.trim().length() == 0) {
             n = 0;
           } else {
@@ -151,11 +143,11 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
 
         } else if (TAG_REPLY_QUEUE.equalsIgnoreCase(elem.getTagName())) {
           // setReplyQueueLocation(elem.getAttribute(TAG_ATTR_LOCATION));
-          setReplyQueueLocation(DDParserUtil.checkAndGetAttributeValue(TAG_REPLY_QUEUE, TAG_ATTR_LOCATION, elem));
+          setReplyQueueLocation(DDParserUtil.checkAndGetAttributeValue(TAG_REPLY_QUEUE, TAG_ATTR_LOCATION, elem, true));
 
         } else if (TAG_SERIALIZER.equalsIgnoreCase(elem.getTagName())) {
           // setSerializerMethod(elem.getAttribute(TAG_ATTR_METHOD));
-          setSerializerMethod(DDParserUtil.checkAndGetAttributeValue(TAG_SERIALIZER, TAG_ATTR_METHOD, elem));
+          setSerializerMethod(DDParserUtil.checkAndGetAttributeValue(TAG_SERIALIZER, TAG_ATTR_METHOD, elem, true));
 
         } else if (TAG_ASYNC_AGGREGATE_ERROR_CONFIGURATION.equalsIgnoreCase(elem.getTagName())) {
           errorConfiguration = (AsyncAggregateErrorConfiguration) aParser.buildObject(elem, aOptions); 
