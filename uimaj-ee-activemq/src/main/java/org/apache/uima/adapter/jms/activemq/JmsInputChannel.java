@@ -508,6 +508,13 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				{
 					aMessage.acknowledge();
 				}
+				String msgSentFromIP = null;
+
+				if ( aMessage.getIntProperty(AsynchAEMessage.MessageType) == AsynchAEMessage.Response && 
+					 aMessage.propertyExists(AsynchAEMessage.ServerIP)) 
+				{
+					msgSentFromIP = aMessage.getStringProperty(AsynchAEMessage.ServerIP);
+				}
 //				System.out.println("***********************************************************************************" +
 //						"           \n**CONTROLLER::"+controller.getName()+"**** Received New Message From [ "+aMessage.getStringProperty(AsynchAEMessage.MessageFrom)+" ]**************" +
 //						"           \n**MSGTYPE::"+messageType+" COMMAND:"+command + " Cas Reference Id::"+casRefId+
@@ -517,9 +524,19 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 
 				if ( controller != null && msgFrom != null )
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-		                    "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_new_message__FINE",
-		                    new Object[] { controller.getComponentName(), msgFrom, messageType, command, casRefId });
+					if ( msgSentFromIP != null )
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+			                    "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_new_message_with_ip__FINE",
+			                    new Object[] { controller.getComponentName(), msgFrom, msgSentFromIP, messageType, command, casRefId });
+						
+					}
+					else
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+			                    "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_new_message__FINE",
+			                    new Object[] { controller.getComponentName(), msgFrom, messageType, command, casRefId });
+					}
 				}
 				//	Delegate processing of the message contained in the MessageContext to the
 				//	chain of handlers

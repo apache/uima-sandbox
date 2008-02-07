@@ -84,9 +84,12 @@ implements UimaEEAdminContext, ApplicationListener
 				if ( listenerEntry != null && listenerEntry.isStopped() == false )
 				{
 					listenerEntry.setStopped(true);
+					if ( listenerMap.get(anEndpointName) != null )
+					{
 					UimaDefaultMessageListenerContainer listenerContainer = 
 						((ListenerEntry)listenerMap.get(anEndpointName)).getListenerContainer();
 					spinThreadForListenerShutdown(listenerContainer);
+					}
 				}
 			}				
 		}

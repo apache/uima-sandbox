@@ -24,23 +24,32 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.UIDGenerator;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.ControllerCallbackListener;
+import org.apache.uima.aae.controller.ControllerLifecycle;
+import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.BrokerDeployer;
+import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
 import org.apache.uima.adapter.jms.activemq.UimaEEAdminSpringContext;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
+import org.apache.uima.util.UimaVersion;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-public class UIMA_Service
+public class UIMA_Service implements ControllerCallbackListener
 {
 	private static final Class CLASS_NAME = UIMA_Service.class;
 
@@ -49,6 +58,9 @@ public class UIMA_Service
 	private TransportConnector stompConnector;
 	private TransportConnector httpConnector;
 	private Object semaphore = new Object();
+	protected boolean serviceInitializationCompleted;
+	protected boolean serviceInitializationException;
+	protected Object serviceMonitor = new Object();
 
 	public void startInternalBroker() throws Exception
 	{
@@ -287,6 +299,43 @@ public class UIMA_Service
 		System.out.println(" Arguments to the program are as follows : \n" + "-d path-to-UIMA-Deployment-Descriptor [-d path-to-UIMA-Deployment-Descriptor ...] \n" + "-saxon path-to-saxon.jar \n" + "-xslt path-to-dd2spring-xslt\n" + "   or\n"
 				+ "path to Spring XML Configuration File which is the output of running dd2spring\n");
 	}
+	protected void waitForServiceNotification() throws Exception {
+
+		while (!serviceInitializationCompleted) {
+			if (serviceInitializationException) {
+				throw new ResourceInitializationException();
+			}
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
+
+			synchronized (serviceMonitor) {
+				serviceMonitor.wait();
+			}
+			if (serviceInitializationException) {
+				throw new ResourceInitializationException();
+			}
+		}
+	}
+	public void notifyOnInitializationFailure(Exception e) {
+
+		// Initialization exception. Notify blocking thread and indicate a
+		// problem
+		serviceInitializationException = true;
+		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
+		synchronized (serviceMonitor) {
+			serviceMonitor.notifyAll();
+		}
+
+	}
+
+	public void notifyOnInitializationSuccess() {
+		serviceInitializationCompleted = true;
+		synchronized (serviceMonitor) {
+			serviceMonitor.notifyAll();
+		}
+	}
+
+	public void notifyOnTermination(String message) {
+	}
 
 	/**
 	 * The main routine for starting the deployment of a UIMA-EE instance. The
@@ -307,6 +356,7 @@ public class UIMA_Service
 	 */
 	public static void main(String[] args)
 	{
+		UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-EE version " + UimaVersion.getVersion());
 
 		String[] springConfigFileArray =
 		{};
@@ -350,13 +400,13 @@ public class UIMA_Service
 				String deploymentDescriptor = deploymentDescriptors[dd];
 
 				File springConfigFile = aDd2Spring.convertDd2Spring(deploymentDescriptor, xslTransform, saxonURL, uimaAsDebug);
-				springConfigFileArray[dd] = "file:" + springConfigFile.getAbsolutePath();
 
 				// if any are bad, fail
 				if (null == springConfigFile)
 				{
 					return;
 				}
+				springConfigFileArray[dd] = "file:" + springConfigFile.getAbsolutePath();
 
 				// get the descriptor to register with the engine controller
 				String deployDescriptor = "";
@@ -395,51 +445,15 @@ public class UIMA_Service
 		}
 
 		// now try to deploy the array of spring context files
-		for (int cf = 0; cf < springConfigFileArray.length; cf++)
+		SpringContainerDeployer springDeployer =
+			new SpringContainerDeployer();
+		try
 		{
-			try
-			{
-				ApplicationContext ctx = new FileSystemXmlApplicationContext(springConfigFileArray[cf]);
-
-				UimaEEAdminSpringContext springAdminContext = new UimaEEAdminSpringContext((FileSystemXmlApplicationContext) ctx);
-				String topLevelBroker = null;
-
-				String[] factoryBeans = ctx.getBeanNamesForType(org.apache.activemq.ActiveMQConnectionFactory.class);
-				for (int i = 0; factoryBeans != null && i < factoryBeans.length; i++)
-				{
-					if (factoryBeans[i].startsWith("qBroker_tcp_c"))
-					{
-						ActiveMQConnectionFactory factory = (ActiveMQConnectionFactory) ctx.getBean(factoryBeans[i]);
-						topLevelBroker = factory.getBrokerURL();
-						break;
-					}
-				}
-
-				String[] controllers = ctx.getBeanNamesForType(org.apache.uima.aae.controller.AnalysisEngineController.class);
-				for (int i = 0; controllers != null && i < controllers.length; i++)
-				{
-					AnalysisEngineController controller = (AnalysisEngineController) ctx.getBean(controllers[i]);
-					controller.setUimaEEAdminContext(springAdminContext);
-					if (controller.isTopLevelComponent())
-					{
-						controller.getInputChannel().setServerUri(topLevelBroker);
-						controller.setDeployDescriptor(deployedDescriptors[cf]);
-						if (controller instanceof AggregateAnalysisEngineController)
-						{
-							String[] brokerDeployerBeanName = ctx.getBeanNamesForType(org.apache.uima.adapter.jms.activemq.BrokerDeployer.class);
-							if (brokerDeployerBeanName != null && brokerDeployerBeanName.length > 0)
-							{
-								springAdminContext.setBroker(((BrokerDeployer) ctx.getBean(brokerDeployerBeanName[0])).getBroker());
-							}
-						}
-					}
-				}
-				((AbstractApplicationContext) ctx).registerShutdownHook();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
+			springDeployer.deploy(springConfigFileArray);
+		}
+		catch( Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 
