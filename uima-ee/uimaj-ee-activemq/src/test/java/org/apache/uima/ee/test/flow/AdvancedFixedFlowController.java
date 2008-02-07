@@ -147,24 +147,21 @@ public class AdvancedFixedFlowController extends CasFlowController_ImplBase {
    */
   public void removeAnalysisEngines(Collection aKeys) throws AnalysisEngineProcessException {
     //Remove keys from Sequence
-    int i = 0;
-    while (i < mSequence.size()) {
+    for (int i = 0; i < mSequence.size(); ++i) {
       Step step = (Step)mSequence.get(i);
       if (step instanceof SimpleStep && aKeys.contains(((SimpleStep)step).getAnalysisEngineKey())) {
-        mSequence.remove(i);
+        mSequence.set(i, null);
       }
       else if (step instanceof ParallelStep) {
         Collection keys = new ArrayList(((ParallelStep)step).getAnalysisEngineKeys());
         keys.removeAll(aKeys);
         if (keys.isEmpty()) {
-          mSequence.remove(i);
+          mSequence.set(i, null);
         }
         else {
-          mSequence.set(i++, new ParallelStep(keys));
+          mSequence.set(i, new ParallelStep(keys));
         }
       }
-      else
-        i++;
     }
   }
 
@@ -234,12 +231,16 @@ public class AdvancedFixedFlowController extends CasFlowController_ImplBase {
         casMultiplierProducedNewCas = false;
       }
 
-      if (currentStep >= mSequence.size()) {
-        return new FinalStep(); // this CAS has finished the sequence
-      }
+      // Get next in sequence, skipping any disabled ones
+      Step nextStep;
+      do {
+        if (currentStep >= mSequence.size()) {
+          return new FinalStep(); // this CAS has finished the sequence
+        }
+        nextStep = (Step) mSequence.get(currentStep++);
+      } while (nextStep == null);
 
       // if next step is a CasMultiplier, set wasPassedToCasMultiplier to true for next time
-      Step nextStep = (Step)mSequence.get(currentStep++);
       if (stepContainsCasMultiplier(nextStep))
         wasPassedToCasMultiplier = true;
 

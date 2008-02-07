@@ -32,9 +32,12 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQMessageConsumer;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.error.ServiceShutdownException;
+import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.JmsOutputChannel;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.adapter.jms.message.JmsMessageContext;
@@ -68,6 +71,52 @@ public class TestUimaEE extends BaseTestSupport
 		System.out.println("UIMA_HOME="+System.getenv("UIMA_HOME")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"dd2spring.xsl");
 	}
 	/**
+	 * Tests handling of multiple calls to initialize(). A subsequent call to
+	 * initialize should result in ResourceInitializationException.
+	 * 
+	 * @throws Exception
+	 */
+	public void testInvalidInitializeCall() throws Exception
+	{
+		System.out.println("-------------- testInvalidInitializeCall -------------");
+		//	Instantiate Uima EE Client
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		super.setExpectingServiceShutdown();
+
+		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
+		Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue" );
+
+		try
+		{
+			initialize(eeUimaEngine, appCtx);
+			waitUntilInitialized();
+			System.out.println("First Initialize Call Completed");
+			eeUimaEngine.initialize(appCtx);
+			fail("Subsequent call to initialize() did not return expected exception:"+ UIMA_IllegalStateException.class+" Subsequent call to initialize succeeded with no error");
+		}
+		catch( ResourceInitializationException e)
+		{
+			if ( e.getCause() != null && !(e.getCause() instanceof UIMA_IllegalStateException ) )
+			{
+				fail("Invalid Exception Thrown. Expected:"+ UIMA_IllegalStateException.class+" Received:"+ e.getClass());
+			}
+			else
+			{
+				System.out.println("Received Expected Exception:"+ UIMA_IllegalStateException.class);
+			}
+		}
+		catch( ServiceShutdownException e)
+		{
+			//	expected
+		}
+		finally
+		{
+			eeUimaEngine.stop();
+		}
+	}
+
+	
+	/**
 	 * Tests deployment of a primitive Uima EE Service (PersontTitleAnnotator). Deploys the primitive
 	 * in the same jvm using Uima EE Client API and blocks on a monitor until the Uima Client calls initializationComplete()
 	 * method. Once the primitive service starts it is expected to send its metadata to the Uima client
@@ -84,7 +133,8 @@ public class TestUimaEE extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		//	Deploy Uima EE Primitive Service 
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
-		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 0, PROCESS_LATCH);
+		super.setExpectingServiceShutdown();
+		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 0, EXCEPTION_LATCH);
 	}
 	/**
 	 * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
@@ -95,9 +145,11 @@ public class TestUimaEE extends BaseTestSupport
 	{
 		System.out.println("-------------- testDeployAggregateService -------------");
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		System.setProperty(JmsConstants.SessionTimeoutOverride, "2500000");
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
-		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
+		super.setExpectingServiceShutdown();
+		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, EXCEPTION_LATCH);
 	}
 	/**
 	 * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
@@ -113,7 +165,40 @@ public class TestUimaEE extends BaseTestSupport
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
-  
+  /**
+   * Tests exception thrown in the Uima EE Client when the Collection Reader is added after
+   * the uima ee client is initialized
+   * 
+   * @throws Exception
+   */
+/*	
+
+  public void testCollectionReader() throws Exception
+  {
+    System.out.println("-------------- testCollectionReader -------------");
+    //  Instantiate Uima EE Client
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
+    super.setExpectingServiceShutdown();
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue" );
+    // reduce the cas pool size and reply window
+    appCtx.remove(UimaAsynchronousEngine.CasPoolSize);
+    appCtx.put(UimaAsynchronousEngine.CasPoolSize, Integer.valueOf(2));
+    appCtx.remove(UimaAsynchronousEngine.ReplyWindow);
+    appCtx.put(UimaAsynchronousEngine.ReplyWindow, 1);
+    // set the collection reader
+    File collectionReaderDescriptor = new File("resources/descriptors/collection_reader/FileSystemCollectionReader.xml");
+    CollectionReaderDescription collectionReaderDescription = UIMAFramework.getXMLParser()
+      .parseCollectionReaderDescription(new XMLInputSource(collectionReaderDescriptor));
+    CollectionReader collectionReader = UIMAFramework
+      .produceCollectionReader(collectionReaderDescription);
+    eeUimaEngine.setCollectionReader(collectionReader);
+    initialize(eeUimaEngine, appCtx);
+    waitUntilInitialized();
+    runCrTest(eeUimaEngine, 7);
+    eeUimaEngine.stop();
+  }
+ */ 
   /**
 	 * Tests exception thrown in the Uima EE Client when the Collection Reader is added after
 	 * the uima ee client is initialized
@@ -166,7 +251,35 @@ public class TestUimaEE extends BaseTestSupport
 	    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFlowControllerExceptionOnDisable.xml");
 	    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH); //PC_LATCH);
 	  }
-	
+  
+  /**
+   * Tests the shutdown due to a failure in the Flow Controller when initializing
+   * 
+   * @throws Exception
+   */
+  public void testTerminateOnFlowControllerExceptionOnInitialization() throws Exception {
+    System.out.println("-------------- testTerminateOnFlowControllerExceptionOnInitialization -------------");
+    
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    String[] containerIds = new String[2];
+    try {
+        containerIds[0] = deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+    	containerIds[1] = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFlowControllerExceptionOnInitialization.xml");
+      fail("Expected ResourceInitializationException. Instead, the Aggregate Deployed Successfully");
+    } catch (ResourceInitializationException e) {
+      System.out.println("\nExpected Initialization Exception was received - cause: "+e.getCause());
+    } catch (Exception e) {
+      fail("Expected ResourceInitializationException. Instead Got:" + e.getClass());
+    }
+    finally
+    {
+    	eeUimaEngine.undeploy(containerIds[0]);
+    	eeUimaEngine.undeploy(containerIds[1]);
+    }
+    
+    
+  }
+    
 	/**
 	 * Deploys a Primitive Uima EE service and sends 5 CASes to it.
 	 * 
@@ -180,6 +293,7 @@ public class TestUimaEE extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		//	Deploy Uima EE Primitive Service 
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
+		super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 5, PROCESS_LATCH);
 	}
 	/**
@@ -192,6 +306,7 @@ public class TestUimaEE extends BaseTestSupport
 		System.out.println("-------------- testSynchCallProcessWithMultipleThreads -------------");
 		int howManyCASesPerRunningThread = 100;
 		int howManyRunningThreads = 4;
+		super.setExpectingServiceShutdown();
 		runTestWithMultipleThreads(relativePath+"/Deploy_PersonTitleAnnotator.xml", "PersonTitleAnnotatorQueue", howManyCASesPerRunningThread, howManyRunningThreads, 0 );
 	}
 	/**
@@ -206,6 +321,7 @@ public class TestUimaEE extends BaseTestSupport
 	    System.out.println("-------------- testTimeoutInSynchCallProcessWithMultipleThreads -------------");
 		int howManyCASesPerRunningThread = 100;
 		int howManyRunningThreads = 4;
+		super.setExpectingServiceShutdown();
 		runTestWithMultipleThreads(relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml", "NoOpAnnotatorQueueLongDelay", howManyCASesPerRunningThread, howManyRunningThreads, 2000 );
 		
 	}
@@ -299,6 +415,7 @@ public class TestUimaEE extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_ComplexAggregateWith1MillionDocs.xml");
+		super.setExpectingServiceShutdown();
 		//	Spin a thread to cancel Process after 20 seconds
 		spinShutdownThread( eeUimaEngine, 20000 );
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,PROCESS_LATCH);
@@ -312,7 +429,7 @@ public class TestUimaEE extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMultiplier.xml");
 		//	Spin a thread to cancel Process after 20 seconds
 		spinShutdownThread( eeUimaEngine, 20000 );
-		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,PROCESS_LATCH);
+		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,EXCEPTION_LATCH);
 	}
 	/**
 	 * Test correct reply from the service when its process method fails. Deploys the Primitive
@@ -426,6 +543,8 @@ public class TestUimaEE extends BaseTestSupport
 	    appCtx.put(UimaAsynchronousEngine.CasPoolSize, Integer.valueOf(2));
 	    appCtx.remove(UimaAsynchronousEngine.ReplyWindow);
 	    appCtx.put(UimaAsynchronousEngine.ReplyWindow, 1);
+	    super.setExpectingServiceShutdown();
+
 	    // set the collection reader
 	    String filename = super.getFilepathFromClassloader("descriptors/collection_reader/FileSystemCollectionReader.xml");
 	    if ( filename == null )
@@ -433,7 +552,6 @@ public class TestUimaEE extends BaseTestSupport
 	    	fail("Unable to find file:"+"descriptors/collection_reader/FileSystemCollectionReader.xml"+ "in classloader");
 	    }
 	    File collectionReaderDescriptor = new File(filename);
-//	    File collectionReaderDescriptor = new File("resources/descriptors/collection_reader/FileSystemCollectionReader.xml");
 	    CollectionReaderDescription collectionReaderDescription = UIMAFramework.getXMLParser()
 	      .parseCollectionReaderDescription(new XMLInputSource(collectionReaderDescriptor));
 	    CollectionReader collectionReader = UIMAFramework
@@ -479,12 +597,12 @@ public class TestUimaEE extends BaseTestSupport
   {
     System.out.println("-------------- testTerminateOnInitializationFailure -------------");
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
-    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlow.xml");
-    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
-    exceptionCountLatch = new CountDownLatch(1);
     try
     {
+        deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+        deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlow.xml");
+        Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+        exceptionCountLatch = new CountDownLatch(1);
         initialize(eeUimaEngine, appCtx);
 		fail("Expected ResourceInitializationException. Instead, the Aggregate Reports Successfull Initialization");
     }
@@ -515,17 +633,17 @@ public class TestUimaEE extends BaseTestSupport
     System.out.println("---------------------- The Uima Client Times Out After 20 seconds --------------------------");
     System.out.println("-- The test requires 1 minute to complete due to 60 second delay in Spring Listener ----");
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-	//	Deploy remote service
-	deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
-	//	Deploy top level aggregate that communicates with the remote via Http Tunnelling
-	deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithHttpDelegate.xml");
-	//	Initialize and run the Test. Wait for a completion and cleanup resources.
-	Map<String, Object> appCtx = new HashMap();
-	appCtx.put(UimaAsynchronousEngine.ServerUri, String.valueOf(broker.getMasterConnectorURI()));
-	appCtx.put(UimaAsynchronousEngine.Endpoint, "TopLevelTaeQueue");
-	appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 20000);
 	try
 	{
+		//	Deploy remote service
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		//	Deploy top level aggregate that communicates with the remote via Http Tunnelling
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithHttpDelegate.xml");
+		//	Initialize and run the Test. Wait for a completion and cleanup resources.
+		Map<String, Object> appCtx = new HashMap();
+		appCtx.put(UimaAsynchronousEngine.ServerUri, String.valueOf(broker.getMasterConnectorURI()));
+		appCtx.put(UimaAsynchronousEngine.Endpoint, "TopLevelTaeQueue");
+		appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 20000);
 		runTest(appCtx,eeUimaEngine, String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue", 1, EXCEPTION_LATCH );
 		fail("Expected ResourceInitializationException. Instead, the Aggregate Reports Successfull Initialization");
 	}
@@ -549,13 +667,13 @@ public class TestUimaEE extends BaseTestSupport
   {
     System.out.println("-------------- testTerminateOnInitializationFailureWithAggregateForcedShutdown -------------");
 	BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-	//	Deploy remote service
-	deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
-	//	Deploy top level aggregate that communicates with the remote via Http Tunnelling
-	deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithHttpDelegateNoRetries.xml");
 	//	Initialize and run the Test. Wait for a completion and cleanup resources.
 	try
 	{
+		//	Deploy remote service
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		//	Deploy top level aggregate that communicates with the remote via Http Tunnelling
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithHttpDelegateNoRetries.xml");
 		runTest(null,eeUimaEngine, String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue", 10, EXCEPTION_LATCH );
 		fail("Expected ResourceInitializationException. Instead, the Aggregate Reports Successfull Initialization");
 	}
@@ -571,6 +689,35 @@ public class TestUimaEE extends BaseTestSupport
 	
   }
   
+  /**
+   * This tests some of the error handling.  Each annotator writes a file and throws an  exception.
+   * After the CAS is processed the presence/absence of certain files indicates success or failure.
+   * The first annotator fails and lets the CAS proceed, so should write only one file.
+   * The second annotator fails and is retried 2 times, and doesn't let the CAS proceed, so should write 3 files.
+   * The third annotator should not see the CAS, so should not write any files
+   *  
+   * @throws Exception
+   */
+  public void testContinueOnRetryFailure() throws Exception
+  {
+    System.out.println("-------------- testContinueOnRetryFailure -------------");
+    File tempDir = new File("temp");
+    deleteAllFiles(tempDir);
+    tempDir.mkdir();
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_WriterAnnotatorA.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_WriterAnnotatorB.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithContinueOnRetryFailures.xml");
+    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+    if ( !(new File(tempDir, "WriterAnnotatorB.3")).exists()
+            || (new File(tempDir, "WriterAnnotatorB.4")).exists()) {
+      fail("Second annotator should have run 3 times");
+    }
+    if ((new File(tempDir, "WriterAnnotatorC.1")).exists()) {
+      fail("Third annotator should not have seen CAS");
+    }
+  }
+
   public void testDeployAgainAndAgain() throws Exception
 	  {
 	    System.out.println("-------------- testDeployAgainAndAgain -------------");
@@ -667,4 +814,14 @@ public class TestUimaEE extends BaseTestSupport
 		return ((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData();
 	}
 
+	private static boolean deleteAllFiles(File directory) {
+		if (directory.isDirectory()) {
+			String[] files = directory.list();
+			for (int i=0; i<files.length; i++) {
+				deleteAllFiles(new File(directory, files[i]));
+			}
+		}
+		// Now have an empty directory or simple file
+		return directory.delete();
+	}
 }
