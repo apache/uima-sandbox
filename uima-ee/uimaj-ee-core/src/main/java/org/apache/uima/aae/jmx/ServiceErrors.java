@@ -48,7 +48,7 @@ public class ServiceErrors implements ServiceErrorsMBean
 		return errors;
 	}
 	
-	public long getProcessErrors()
+	public synchronized long getProcessErrors()
 	{
 		return processErrors;
 	}
@@ -58,7 +58,7 @@ public class ServiceErrors implements ServiceErrorsMBean
 		processErrors++;
 	}
 	
-	public long getMetadataErrors()
+	public synchronized long getMetadataErrors()
 	{
 		return metadataErrrors;
 	}
@@ -67,7 +67,7 @@ public class ServiceErrors implements ServiceErrorsMBean
 		metadataErrrors++;
 	}
 	
-	public long getCpcErrors()
+	public synchronized long getCpcErrors()
 	{
 		return cpcErrors;
 	}
@@ -77,7 +77,7 @@ public class ServiceErrors implements ServiceErrorsMBean
 		cpcErrors++;
 	}
 	
-	public void reset()
+	public synchronized void reset()
 	{
 		cpcErrors = 0;
 		metadataErrrors = 0;

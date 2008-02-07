@@ -96,6 +96,45 @@ public class InProcessCache implements InProcessCacheMBean
 		cache.clear();
 	}
 	
+	/**
+	 * Checks if a given input CAS is in pending state. CAS is in pending state if it has been
+	 * fully processed, *but* its subordinate CASes are still in play. Input CAS is only
+	 * returned back to the client if all if its subordinate CASes are fully processed. 
+	 * 
+	 * @param anInputCASReferenceId
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean isInputCASPendingReply( String anInputCASReferenceId ) throws Exception
+	{
+    if ( anInputCASReferenceId == null )
+    {
+      return false;
+    }
+    CacheEntry inputCASEntry =
+      getCacheEntryForCAS( anInputCASReferenceId );
+
+    return inputCASEntry.isPendingReply();
+	}
+	
+	public boolean producedCASesStillInPlay( String anInputCASReferenceId, String aSubordinateCASReferenceId ) throws Exception
+	{
+    Iterator it = cache.keySet().iterator();
+    while( it.hasNext())
+    {
+      String key = (String) it.next();
+      CacheEntry entry = (CacheEntry) cache.get(key);
+      if ( entry != null && aSubordinateCASReferenceId != null && aSubordinateCASReferenceId.equals(key))
+      {
+        continue;   // dont count the current subordinate
+      }
+      if ( entry != null && anInputCASReferenceId.equals( entry.getInputCasReferenceId()))
+      {
+        return true;
+      }
+    }
+	  return false;
+	}
 	public void releaseCASesProducedFromInputCAS( String anInputCASReferenceId )
 	{
 		if ( anInputCASReferenceId == null )
@@ -375,6 +414,14 @@ public class InProcessCache implements InProcessCacheMBean
 		CacheEntry casRefEntry = getEntry(aCasReferenceId);
 		return casRefEntry.getStartTime();
 	}
+	public synchronized String register(String anInputCasRefId, long aCurrentSequence, CAS aCAS, MessageContext aMessageContext, OutOfTypeSystemData otsd)
+	throws AsynchAEException
+	{
+		String casReferenceId = anInputCasRefId+"."+String.valueOf(aCurrentSequence); 
+
+		register(aCAS, aMessageContext, otsd, casReferenceId);
+		return casReferenceId;
+	}
 	public synchronized String register(CAS aCAS, MessageContext aMessageContext, OutOfTypeSystemData otsd)
 	throws AsynchAEException
 	{
@@ -530,6 +577,8 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private boolean aborted = false;
 
+		private boolean pendingReply = false;
+		
 		protected CacheEntry(CAS aCas, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
 		{
 			cas = aCas;
@@ -776,6 +825,12 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			this.aborted = aborted;
 		}
+    public boolean isPendingReply() {
+      return pendingReply;
+    }
+    public void setPendingReply(boolean pendingReply) {
+      this.pendingReply = pendingReply;
+    }
 
 	}	
 

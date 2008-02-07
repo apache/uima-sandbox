@@ -61,6 +61,7 @@ import org.apache.uima.flow.ParallelStep;
 import org.apache.uima.flow.SimpleStep;
 import org.apache.uima.flow.Step;
 import org.apache.uima.resource.ResourceConfigurationException;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.resource.metadata.ResourceMetaData;
 import org.apache.uima.util.Level;
@@ -158,8 +159,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	 */
 	public AggregateAnalysisEngineController_impl(AnalysisEngineController aParentController, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, Map aDestinationMap) throws Exception
 	{
-//		super(aParentController, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, aDestinationMap);
-//		this.initialize();
 		this(aParentController, anEndpointName, aDescriptor, aCasManager, anInProcessCache, aDestinationMap, null);
 	}
 
@@ -325,29 +324,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 		}
 
-		
-		
-		
-/*		
-		Iterator it = destinationMap.keySet().iterator();
-
-		while (it.hasNext())
-		{
-			String key = (String) it.next();
-			Endpoint_impl endpoint = (Endpoint_impl) destinationMap.get(key);
-			if ( endpoint != null)
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-		                "mapEndpointsToKeys", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_endpoint_to_key_map__FINE",
-		                new Object[] {getName(), key,  endpoint.getEndpoint()  });
-				if (destinationToKeyMap == null)
-				{
-					destinationToKeyMap = new HashMap();
-				}
-				destinationToKeyMap.put(endpoint.getEndpoint(), key);
-			}
-		}
-*/
 	}
 	/**
 	 * 
@@ -366,17 +342,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 		}
 
-/*		
-		Iterator it = destinationMap.keySet().iterator();
-		while (it.hasNext())
-		{
-			Endpoint endpoint = (Endpoint) destinationMap.get((String) it.next());
-			if (endpoint != null && endpoint.completedProcessingCollection() == false)
-			{
-				return false;
-			}
-		}
-*/		
 		return true;
 	}
 	public Map getDelegateStats()
@@ -412,24 +377,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			{
 				
 				sendCpcReply();
-/*				
-				Iterator it = delegateStats.keySet().iterator();
-				while( it.hasNext())
-				{
-					String delegateKey = (String)it.next();
-					//	log delegate stats
-					logStats( delegateKey, (HashMap)delegateStats.get(delegateKey));
-				}
-
-				if ( isTopLevelComponent() )
-				{
-					//	Log this controller's stats
-					logStats();
-				}
-				getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, clientEndpoint);
-				clientEndpoint = null;
-				clearStats();
-*/				
 			}
 		}
 		catch ( Exception e)
@@ -582,21 +529,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					endpoint.startCollectionProcessCompleteTimer();
 				}
 			}
-			
-/*			
-			Set keySet = destinationMap.keySet();
-			Iterator it = keySet.iterator();
-			//	Send CPC Request to all delegates
-			while (it.hasNext())
-			{
-				Endpoint endpoint = (Endpoint) destinationMap.get((String) it.next());
-				if ( endpoint != null )
-				{
-					getOutputChannel().sendRequest(AsynchAEMessage.CollectionProcessComplete, endpoint);
-					endpoint.startCollectionProcessCompleteTimer();
-				}
-			}
-*/			
 		}
 	}
 
@@ -955,6 +887,13 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	public void sendRequestForMetadataToRemoteDelegates() throws AsynchAEException
 	{
+		for( int i=0; i < childControllerList.size(); i++ )
+		{
+			if (  childControllerList.get(i) instanceof AggregateAnalysisEngineController )
+			{
+				(( AggregateAnalysisEngineController)childControllerList.get(i)).sendRequestForMetadataToRemoteDelegates();
+			}
+		}
 		Endpoint[] remoteEndpoints = new Endpoint[destinationMap.size()];
 
 		//	First copy endpoints to an array so that we dont get Concurrent access problems
@@ -977,7 +916,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				Endpoint endpoint = ((Endpoint) destinationMap.get(key));
 				if ( key != null && endpoint != null)
 				{
-//					ServiceInfo serviceInfo = ((Endpoint) destinationMap.get(key)).getServiceInfo();
 					ServiceInfo serviceInfo = endpoint.getServiceInfo();
 					PrimitiveServiceInfo pServiceInfo = new PrimitiveServiceInfo();
 					pServiceInfo.setBrokerURL(serviceInfo.getBrokerURL());
@@ -987,17 +925,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					
 					registerWithAgent(pServiceInfo, super.getManagementInterface().getJmxDomain()
 							+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
-//					registerWithAgent(pServiceInfo, getJMXDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
 
 					ServicePerformance servicePerformance = new ServicePerformance();
 					
-//					registerWithAgent(servicePerformance, getJMXDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
 					registerWithAgent(servicePerformance, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
 
 					ServiceErrors serviceErrors = new ServiceErrors();
 					
 					registerWithAgent(serviceErrors, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceErrors.getLabel());
-//					registerWithAgent(serviceErrors, getJMXDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceErrors.getLabel());
 					remoteIndex++;
 
 					serviceErrorMap.put(key, serviceErrors);
@@ -1014,9 +949,41 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	private void finalStep(FinalStep aStep, String aCasReferenceId)// throws AsynchAEException
 	{
 		Endpoint endpoint=null;
+    CacheEntry inputCASCacheEntry = null;
+    boolean replyWithInputCAS = false;
+    
+    
 		try
 		{
 			CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+/*
+			System.out.println("Aggregate.finalStep() - Cache Size:::"+getInProcessCache().getSize()+"-Input CAS RefId::::::::::::::::::::::"+cacheEntry.getInputCasReferenceId());
+			
+			
+			if ( cacheEntry.getInputCasReferenceId() == null )  // This is an input CAS  
+			{
+			  // Check the cache to see if there are any subordinate CASes (those produced from the input CAS) still in-play
+			  if ( getInProcessCache().producedCASesStillInPlay(aCasReferenceId, null))
+			  {
+		      System.out.println("Aggregate.finalStep() - Input CAS In Final Step - There are still subordinate CASes in-play");
+			    cacheEntry.setPendingReply(true);
+			    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			    // Leave input CAS in pending state. It will be returned to the client
+			    // *only* if the last subordinate CAS is fully processed.
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			    return;
+			  }
+			}
+			else 
+      {
+			  inputCASCacheEntry =
+			    getInProcessCache().getCacheEntryForCAS(cacheEntry.getInputCasReferenceId());      
+			  if ( !getInProcessCache().producedCASesStillInPlay(cacheEntry.getInputCasReferenceId(), aCasReferenceId) )
+			  {
+			    replyWithInputCAS = true;
+			  }
+      }
+*/
 			
 			// Cas Processing has been completed. Check if the CAS should be sent to
 			// the client.
@@ -1048,10 +1015,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				else
 				{
 					endpoint = getMessageOrigin(aCasReferenceId);
-//					if (endpoint != null)
-//					{
-//						originMap.remove(aCasReferenceId);
-//					}
 				}
 				if ( endpoint != null )
 				{
@@ -1088,7 +1051,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						// Send response to the given endpoint
 						getOutputChannel().sendReply(aCasReferenceId, endpoint);
 					}
-
+					
 				}
 				// If the destination for the reply is in the same jvm dont remove
 				// the entry from the cache. The client may need to retrive CAS by reference
@@ -1108,7 +1071,25 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				
 			}
-
+/*
+			if ( replyWithInputCAS )
+			{
+        if (isTopLevelComponent())
+        {
+          endpoint = getInProcessCache().getEndpoint(null, cacheEntry.getInputCasReferenceId());
+        }
+        else
+        {
+          endpoint = getMessageOrigin(cacheEntry.getInputCasReferenceId());
+        }
+        // Send response to the given endpoint
+        getOutputChannel().sendReply(cacheEntry.getInputCasReferenceId(), endpoint);
+        synchronized (getInProcessCache())
+        {
+          dropCAS(inputCASCacheEntry.getCasReferenceId(), true);
+        }
+			}
+*/
 			String casMultiplierKey = cacheEntry.getCasMultiplierKey();
 			if ( isNewCas  && casMultiplierKey != null ) //&& cacheEntry.shouldSendRequestToFreeCas())
 			{
@@ -1120,6 +1101,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				endpoint = null;
 			}
+			
+
+
 			
 			
 			
@@ -1414,6 +1398,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 							unregisteredDelegateList.remove(i);
 						}
 					}
+/*
 					//	When all collocated delegates reply with metadata send request for meta to
 					//	remote delegates.
 					if ( unregisteredDelegateList.size() == 0 )
@@ -1421,6 +1406,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						requestForMetaSentToRemotes = true;
 						sendRequestForMetadataToRemoteDelegates();
 					}
+					*/
 				}
 
 				
@@ -1482,9 +1468,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					getUimaContextAdmin(), 
 					((AnalysisEngineDescription)getResourceSpecifier()).getSofaMappings(),
 					super.getManagementInterface());
-        			//super.getManagementInterface().getJmxDomain());
-					//getJMXDomain());
-
 		
 		if (disabledDelegateList.size() > 0)
 		{
@@ -1498,7 +1481,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		// the controller before it is initialized.
 		latch.openLatch(getName(), isTopLevelComponent(), true);
 		initialized = true;
-
+		
+		//  Notify client listener that the initialization of the controller was successfull
+		notifyListenersWithInitializationStatus(null);
 	}
 
 	private String findKeyForValue(String fromDestination)
@@ -1519,24 +1504,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 		}
 
-/*		
-		
-		Set set = destinationMap.keySet();
-		Iterator it = set.iterator();
-		while (it.hasNext())
-		{
-			String key = (String) it.next();
-			Endpoint endpoint = (Endpoint) destinationMap.get(key);
-			if ( endpoint != null )
-			{
-				String value = endpoint.getEndpoint();
-				if (value.equals(fromDestination))
-				{
-					return key;
-				}
-			}
-		}
-*/
 		return null;
 	}
 
@@ -1562,23 +1529,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		{
 			return true;    // 	All delegates responded to GetMeta request
 		}
-/*		
-		Set set = destinationMap.keySet();
-		Iterator it = set.iterator();
-		while (it.hasNext())
-		{
-			String key = (String) it.next();
-			Endpoint endpoint = (Endpoint) destinationMap.get(key);
-			if (endpoint != null && endpoint.isInitialized() == false)
-			{
-				return false;
-			}
-		}
-		typeSystemsMerged = true;
-		return typeSystemsMerged;
-*/		
-
-		
 		return false;
 	}
 
@@ -1789,19 +1739,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				endpoint.cancelTimer();
 			}
 		}
-		
-/*		
-		Iterator it = destinationMap.keySet().iterator();
-		while( it.hasNext() )
-		{
-			String delegateKey = (String) it.next();
-			Endpoint endpoint = (Endpoint) destinationMap.get(delegateKey);
-			if ( endpoint != null  )
-			{
-				endpoint.cancelTimer();
-			}
-		}
-*/
 	
 	}
 
