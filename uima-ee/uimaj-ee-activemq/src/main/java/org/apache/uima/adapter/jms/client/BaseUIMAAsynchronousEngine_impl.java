@@ -18,27 +18,32 @@
  */
 
 package org.apache.uima.adapter.jms.client;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
-
+import java.util.Set;
+import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalArgumentException;
+import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.AsynchAECasManager_impl;
+import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
+import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.ControllerCallbackListener;
 import org.apache.uima.aae.controller.ControllerLifecycle;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.error.UimaEEMetaRequestTimeout;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.cas.CAS;
@@ -48,6 +53,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.Level;
+import org.apache.uima.util.UimaVersion;
 import org.apache.uima.adapter.jms.service.Dd2spring;
 import org.apache.uima.aae.UIDGenerator;
 
@@ -58,22 +64,35 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
+import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
 import org.apache.uima.adapter.jms.activemq.UimaEEAdminSpringContext;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-/**
- * Uima EE client code 
- * 
- *
- */
-public class BaseUIMAAsynchronousEngine_impl 
-	extends BaseUIMAAsynchronousEngineCommon_impl 
-	implements UimaAsynchronousEngine, MessageListener
+public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineCommon_impl implements UimaAsynchronousEngine, MessageListener, ControllerCallbackListener 
 {
 	private static final Class CLASS_NAME = BaseUIMAAsynchronousEngine_impl.class;
+	private MessageSender sender = null;
+	private MessageProducer producer;
+	private String brokerURI = null;
+	private Session session = null;
+	private Session consumerSession = null;
+
+	private Connection connection = null;
+	private boolean serviceInitializationException;
+	private boolean serviceInitializationCompleted;
 	
+	private Object serviceMonitor = new Object();
+	
+	private Queue consumerDestination = null;
+	private Session producerSession = null;
+
+	public BaseUIMAAsynchronousEngine_impl() {
+        UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-EE version " + UimaVersion.getVersion());
+	}
+
+
 	protected TextMessage createTextMessage() throws ResourceInitializationException
 	{
 		return 	new ActiveMQTextMessage();
@@ -92,9 +111,9 @@ public class BaseUIMAAsynchronousEngine_impl
 	 */
 	public String getEndPointName() throws ResourceProcessException
 	{
-		try
-		{
-			return (((ActiveMQDestination) producer.getDestination()).getPhysicalName());
+		try{
+			return ((ActiveMQDestination)sender.getMessageProducer().getDestination()).getPhysicalName();
+			//return (((ActiveMQDestination) producer.getDestination()).getPhysicalName());
 		}
 		catch (Exception e)
 		{
@@ -114,18 +133,11 @@ public class BaseUIMAAsynchronousEngine_impl
 	/**
 	 * Initialize JMS Message with properties relevant to Process CAS request.
 	 */
-	protected void setCASMessage(String casReferenceId, CAS aCAS, TextMessage msg) throws ResourceProcessException
+	protected void setCASMessage(String aCasReferenceId, CAS aCAS, TextMessage msg) throws ResourceProcessException
 	{
 		try{
-			msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
-	
-			msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
-			msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
-			msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.Process);
-			msg.setStringProperty(AsynchAEMessage.CasReference, casReferenceId);
-			msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload);
+			setCommonProperties(aCasReferenceId, msg);
 			msg.setText(serializeCAS(aCAS));
-			msg.setJMSReplyTo(consumerDestination);
 		}
 		catch (Exception e)
 		{
@@ -133,11 +145,35 @@ public class BaseUIMAAsynchronousEngine_impl
 		}
 	}
 	
+	protected void setCASMessage(String aCasReferenceId, String aSerializedCAS, TextMessage msg) throws ResourceProcessException
+	{
+		try{
+			setCommonProperties(aCasReferenceId, msg);
+			msg.setText(aSerializedCAS);
+		}
+		catch (Exception e)
+		{
+			throw new ResourceProcessException(e);
+		}
+	}
+    protected void setCommonProperties( String aCasReferenceId, TextMessage msg) throws ResourceProcessException
+    {
+		try{
+			msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
 	
-	/**
-	 * Force all threads to stop and than do cleanup of resources.
-	 * 
-	 */
+			msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
+			msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
+			msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.Process);
+			msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+			msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload);
+			msg.setJMSReplyTo(consumerDestination);
+		}
+		catch (Exception e)
+		{
+			throw new ResourceProcessException(e);
+		}
+    	
+    }
 	public void stop()
 	{
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_as_client_INFO", new Object[] {});
@@ -146,70 +182,22 @@ public class BaseUIMAAsynchronousEngine_impl
 		{
 			return;
 		}
-
+		super.stop();
 		running = false;
 
 		try
 		{
-			//	Close JMS 
-			producerSession.close();
-			consumerSession.close();
-			consumer.close();
-			session.close();
-			connection.close();
-			connection = null;
-
-			// Unblock threads
-			if (threadMonitorMap.size() > 0)
+			if ( sender != null )
 			{
-				Iterator it = threadMonitorMap.keySet().iterator();
-				while (it.hasNext())
-				{
-					long key = ((Long) it.next()).longValue();
-					ThreadMonitor threadMonitor = (ThreadMonitor) threadMonitorMap.get(key);
-					synchronized (threadMonitor.getMonitor())
-					{
-						threadMonitor.setWasSignaled();
-						threadMonitor.getMonitor().notifyAll();
-					}
-				}
+				sender.doStop();
 			}
-
-			// Unlock all 3 gates
-			synchronized (cpcGate)
+			if ( initialized )
 			{
-				cpcGate.notifyAll();
+	      consumerSession.close();
+	      consumer.close();
+	      connection.close();
+	      connection = null;
 			}
-			synchronized (endOfCollectionMonitor)
-			{
-				receivedCpcReply = true;
-				endOfCollectionMonitor.notifyAll();
-			}
-			synchronized (metadataReplyMonitor)
-			{
-				receivedMetaReply = true;
-				metadataReplyMonitor.notifyAll();
-			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopped_as_client_INFO", new Object[] {});
-			//	Undeploy all containers from the registry in case the services
-			//	are collocated with this client
-			for (Iterator i = springContainerRegistry.entrySet().iterator(); i.hasNext();)
-			{
-				Map.Entry entry = (Map.Entry) i.next();
-				Object key = entry.getKey();
-				undeploy((String) key);
-			}
-			asynchManager = null;
-			springContainerRegistry.clear();
-			listeners.clear();
-
-			// Cancel any timers
-			Iterator iter = clientCache.values().iterator();
-			while (iter.hasNext())
-			{
-				((ClientRequest) iter.next()).cancelTimer();
-			}
-			clientCache.clear();
 		}
 		catch (Exception e)
 		{
@@ -242,6 +230,16 @@ public class BaseUIMAAsynchronousEngine_impl
 		msg.setJMSReplyTo(consumerDestination);
 		msg.setText("");
 	}
+	protected Connection getConnection( String aBrokerURI ) throws Exception
+	{
+		if (connection == null )
+		{
+			ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(aBrokerURI);
+			connection = factory.createConnection();
+			connection.start();
+		}
+		return connection;
+	}
 
 	private void validateConnection(String aBrokerURI) throws Exception
 	{
@@ -273,11 +271,47 @@ public class BaseUIMAAsynchronousEngine_impl
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "initializeProducer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_init_jms_producer_INFO", new Object[] { aBrokerURI, aQueueName });
 
 		brokerURI = aBrokerURI;
-		producerSession = getSession(aBrokerURI);
-		Queue producerDestination = producerSession.createQueue(aQueueName);
-		producer = producerSession.createProducer(producerDestination);
-		producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-		return;
+		//	Create a worker thread for sending messages. Jms sessions are single threaded
+		//	and it is illegal (per JMS spec) to use the same sesssion from multiple threads.
+		//  The worker thread solves this problem. As it is the only thread that owns the
+		//	session and uses it to create message producer.
+		//	The worker thread blocks waiting for messages from application threads. The 
+		//  application	threads add messages to the shared "queue" (in-memory queue not 
+		//  jms queue) and the worker thread consumes them. The worker thread is not 
+		//	serialializing CASes. This work is done in application threads. 
+
+		//	create a worker object. This doesnt start the thread yet
+		sender = 
+			new ActiveMQMessageSender( getConnection(aBrokerURI), super.pendingMessageList, aQueueName, this);
+		producerInitialized = false;
+		Thread t = new Thread( (BaseMessageSender) sender);
+		//	Start the worker thread. The jms session and message producer are created. Once
+		//	the message producer is created, the worker thread notifies this thread by
+		//	calling onProducerInitialized() where the global flag 'producerInitialized' is 
+		//	set to true. After the notification, the worker thread notifies this instance
+		//	that the producer is fully initialized and finally begins to wait for messages
+		//	in pendingMessageList. Upon arrival, each message is removed from 
+		//	pendingMessageList and it is sent to a destination.
+		
+////		Thread t = new Thread((BaseMessageSender)messageDispatcher); //.doStart();
+		t.start();
+		//	Wait until the worker thread is fully initialized
+		while( !producerInitialized )
+		{
+			synchronized( sender )
+			{
+				//	blocks here. The worker thread will signal when it is fully initialized 
+				sender.wait();
+			}
+		}
+		//	Check if the worker thread failed to initialize
+		if ( sender.failed())
+		{
+			//	Worker thread failed to initialize. Log the reason and stop the uima ee client
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "initializeProducer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_worker_thread_failed_to_initialize__WARNING", new Object[] { sender.getReasonForFailure() });
+			stop();
+			return;
+		}
 	}
 	/**
 	 * Create a JMS Consumer on a temporary queue. Service replies will be handled by 
@@ -297,6 +331,10 @@ public class BaseUIMAAsynchronousEngine_impl
 
 	public void initialize(String[] configFiles, Map anApplicationContext) throws ResourceInitializationException
 	{
+		if ( running )
+		{
+			throw new ResourceInitializationException(new UIMA_IllegalStateException());
+		}
 		reset();
 
 		if (anApplicationContext != null)
@@ -321,8 +359,16 @@ public class BaseUIMAAsynchronousEngine_impl
 		initialized = true;
 	}
 
-	public void initialize(Map anApplicationContext) throws ResourceInitializationException
+	/**
+	 * Initialize the uima ee client. Takes initialization parameters from the
+	 * <code>anApplicationContext</code> map.
+	 */
+	public synchronized void initialize(Map anApplicationContext) throws ResourceInitializationException
 	{
+		if ( running )
+		{
+			throw new ResourceInitializationException(new UIMA_IllegalStateException());
+		}
 		reset();
 		Properties performanceTuningSettings = null;
 
@@ -394,7 +440,7 @@ public class BaseUIMAAsynchronousEngine_impl
 			if (abort || !running)
 			{
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_aborting_as_WARNING", new Object[] { "Metadata Timeout" });
-				throw new ResourceInitializationException();
+				throw new ResourceInitializationException(new UimaEEMetaRequestTimeout());
 			}
 			else
 			{
@@ -425,30 +471,6 @@ public class BaseUIMAAsynchronousEngine_impl
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_as_initialized_CONFIG", new Object[] { "" });
 
 	}
-
-	/**
-	 * 
-	 */
-	public String deploy(String[] aDeploymentDescriptorList, Map anApplicationContext) throws Exception
-	{
-		if (aDeploymentDescriptorList == null)
-		{
-			throw new ResourceConfigurationException(UIMA_IllegalArgumentException.ILLEGAL_ARGUMENT, new Object[] { "Null", "DeploymentDescriptorList", "deploy()" });
-		}
-
-		if (aDeploymentDescriptorList.length == 0)
-		{
-			throw new ResourceConfigurationException(ResourceConfigurationException.MANDATORY_VALUE_MISSING, new Object[] { "DeploymentDescriptorList" });
-		}
-		String[] springContextFiles = new String[aDeploymentDescriptorList.length];
-
-		for (int i = 0; i < aDeploymentDescriptorList.length; i++)
-		{
-			springContextFiles[i] = generateSpringContext(aDeploymentDescriptorList[i], anApplicationContext);
-		}
-		return deploySpringContainer(springContextFiles);
-	}
-
 	/**
 	 * First generates a Spring context from a given deploy descriptor and than
 	 * deploys the context into a Spring Container.
@@ -461,11 +483,55 @@ public class BaseUIMAAsynchronousEngine_impl
 	 * @return - a unique spring container id
 	 * 
 	 */
-	public String deploy(String aDeploymentDescriptor, Map anApplicationContext) throws Exception
-	{
+	public String deploy(String aDeploymentDescriptor, Map anApplicationContext) throws Exception {
 		String springContext = generateSpringContext(aDeploymentDescriptor, anApplicationContext);
-		return deploySpringContainer(new String[] { springContext });
+		
+		SpringContainerDeployer springDeployer =
+			new SpringContainerDeployer(springContainerRegistry);
+		try
+		{
+			return springDeployer.deploy(springContext );
+		}
+		catch( ResourceInitializationException e)
+		{
+			running = true;
+			throw e;
+		}
+		//return deploySpringContainer(new String[] { springContext });
 	}
+
+
+	/**
+	 * 
+	 */
+	public String deploy(String[] aDeploymentDescriptorList, Map anApplicationContext) throws Exception {
+		if (aDeploymentDescriptorList == null) {
+			throw new ResourceConfigurationException(UIMA_IllegalArgumentException.ILLEGAL_ARGUMENT, new Object[] { "Null", "DeploymentDescriptorList", "deploy()" });
+		}
+
+		if (aDeploymentDescriptorList.length == 0) {
+			throw new ResourceConfigurationException(ResourceConfigurationException.MANDATORY_VALUE_MISSING, new Object[] { "DeploymentDescriptorList" });
+		}
+		String[] springContextFiles = new String[aDeploymentDescriptorList.length];
+
+		for (int i = 0; i < aDeploymentDescriptorList.length; i++) {
+			springContextFiles[i] = generateSpringContext(aDeploymentDescriptorList[i], anApplicationContext);
+		}
+
+		SpringContainerDeployer springDeployer =
+			new SpringContainerDeployer(springContainerRegistry);
+		try
+		{
+			return springDeployer.deploy(springContextFiles);
+		}
+		catch( ResourceInitializationException e)
+		{
+			running = true;
+			throw e;
+		}
+
+	}
+
 
 	/**
 	 * Undeploys Spring container with a given container Id. All deployed Spring
@@ -473,7 +539,13 @@ public class BaseUIMAAsynchronousEngine_impl
 	 * 
 	 */
 	public void undeploy(String aSpringContainerId) throws Exception
+		
 	{
+		if ( aSpringContainerId == null )
+		{
+			return;
+		}
+
 		UimaEEAdminSpringContext adminContext = null;
 		synchronized (springContainerRegistry)
 		{
@@ -566,45 +638,52 @@ public class BaseUIMAAsynchronousEngine_impl
 		return springContextFile.getAbsolutePath();
 	}
 
-	protected String deploySpringContainer(String[] springContextFiles) throws ResourceInitializationException
-	{
+	/**
+	 * Deploys provided context files ( and beans) in a new Spring container.
+	 * 
+	 */
+	protected String deploySpringContainer(String[] springContextFiles) throws ResourceInitializationException {
+
+		SpringContainerDeployer springDeployer =
+			new SpringContainerDeployer();
 		try
 		{
-			for (int i = 0; i < springContextFiles.length; i++)
-			{
-				springContextFiles[i] = "file:" + springContextFiles[i];
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "deploySpringContainer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_deploy_container__CONFIG", new Object[] { springContextFiles[i] });
-			}
-
-			ApplicationContext ctx = new FileSystemXmlApplicationContext(springContextFiles);
-			UimaEEAdminSpringContext springAdminContext = new UimaEEAdminSpringContext((FileSystemXmlApplicationContext) ctx);
-			String[] brokerDeployer = ctx.getBeanNamesForType(org.apache.uima.adapter.jms.activemq.BrokerDeployer.class);
-			String[] controllers = ctx.getBeanNamesForType(org.apache.uima.aae.controller.AnalysisEngineController.class);
-			for (int i = 0; controllers != null && i < controllers.length; i++)
-			{
-				AnalysisEngineController cntlr = (AnalysisEngineController) ctx.getBean(controllers[i]);
-				cntlr.setUimaEEAdminContext(springAdminContext);
-				if (cntlr.isTopLevelComponent())
-				{
-					((FileSystemXmlApplicationContext) ctx).setDisplayName(cntlr.getComponentName());
-				}
-			}
-
-			String containerId = new UIDGenerator().nextId();
-			synchronized (springContainerRegistry)
-			{
-				springContainerRegistry.put(containerId, springAdminContext);
-			}
-			return containerId;
+			return springDeployer.deploy(springContextFiles);
 		}
-		catch (Exception e)
+		catch( ResourceInitializationException e)
 		{
-			e.printStackTrace();
-			throw new ResourceInitializationException(e);
-		}
-
+			// turn on the global flag so that the stop() can do the cleanup
+			running = true;
+			throw e;
+		}	
 	}
 
+
+
+	protected void waitForServiceNotification() throws Exception
+	{
+	  
+	  while( !serviceInitializationCompleted )
+	  {
+	    if ( serviceInitializationException )
+	    {
+	      throw new ResourceInitializationException();
+	    }
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
+
+
+	    synchronized( serviceMonitor )
+	    {
+	      serviceMonitor.wait();
+	    }
+      if ( serviceInitializationException )
+      {
+        throw new ResourceInitializationException();
+      }
+	  }
+	}
+	
+	
 	protected void deployEmbeddedBroker() throws Exception
 	{
 		// TBI
@@ -637,5 +716,29 @@ public class BaseUIMAAsynchronousEngine_impl
 		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
 		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.ReleaseCAS); 
 	}
+
+  public void notifyOnInitializationFailure(Exception e) {
+
+    //  Initialization exception. Notify blocking thread and indicate a problem
+    serviceInitializationException = true;
+		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
+    synchronized(serviceMonitor)
+    {
+      serviceMonitor.notifyAll();
+    }
+    
+  }
+
+  public void notifyOnInitializationSuccess() {
+    serviceInitializationCompleted =  true;
+    synchronized(serviceMonitor)
+    {
+      serviceMonitor.notifyAll();
+    }
+  }
+
+  public void notifyOnTermination(String message) {
+    
+  }
 
 }

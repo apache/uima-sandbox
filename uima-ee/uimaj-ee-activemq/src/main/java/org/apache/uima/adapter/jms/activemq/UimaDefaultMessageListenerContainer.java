@@ -53,7 +53,7 @@ implements ExceptionListener
 		super();
 		setRecoveryInterval(60000);
 		setAcceptMessagesWhileStopping(false);
-		
+		setExceptionListener(this);
 	}
 	private boolean disableListener( Throwable t)
 	{
@@ -68,18 +68,22 @@ implements ExceptionListener
 		if ( !(t instanceof javax.jms.IllegalStateException ) )
 		{
 			t.printStackTrace();
-			final String endpoint = 
-				(getDestination() == null) ? "" : ((ActiveMQQueue)getDestination()).getPhysicalName(); 
+			final String endpointName = 
+				(getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
 				
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-	                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_listener_exception__WARNING",
-	                new Object[] {  endpoint, getBrokerUrl() });
+	                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+	                new Object[] {  endpointName, getBrokerUrl(), t });
 			
 
 			if ( disableListener(t) )
 			{
+				if ( endpoint != null )
+				{
+					endpoint.setReplyDestinationFailed();
+				}
 				System.out.println("****** Unable To Connect Listener To Broker:"+getBrokerUrl());
-				System.out.println("****** Closing Listener on Queue:"+endpoint);
+				System.out.println("****** Closing Listener on Queue:"+endpointName);
 				setRecoveryInterval(0);
 				
 				//	Spin a shutdown thread to terminate listener. The thread is needed due
@@ -90,8 +94,8 @@ implements ExceptionListener
 						try
 						{
 							UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-					                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_diable_listener__WARNING",
-					                new Object[] {  endpoint, getBrokerUrl() });
+					                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_disable_listener__WARNING",
+					                new Object[] {  endpointName, getBrokerUrl() });
 							
 							shutdown();
 						}
@@ -110,6 +114,13 @@ implements ExceptionListener
 
 	protected void handleListenerException( Throwable t )
 	{
+		  t.printStackTrace();
+      String endpointName = 
+        (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
+      
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                "handleListenerException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+                new Object[] {  endpointName, getBrokerUrl(), t });
 			super.handleListenerException(t);
 		
 	}
@@ -196,7 +207,12 @@ implements ExceptionListener
 
 	public void onException(JMSException arg0)
 	{
-		System.out.println("Exception!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    String endpointName = 
+      (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
+    
+    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+              "onException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+              new Object[] {  endpointName, getBrokerUrl(), arg0});
 	}
 
 	public void setTargetEndpoint( Endpoint anEndpoint )
