@@ -72,6 +72,7 @@ import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaEEProcessStatusImpl;
 import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
 import org.apache.uima.adapter.jms.JmsConstants;
+import org.apache.uima.adapter.jms.message.PendingMessage;
 import org.apache.uima.aae.controller.Endpoint;
 
 public abstract class BaseUIMAAsynchronousEngineCommon_impl 
@@ -89,7 +90,6 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected List listeners = new ArrayList();
 
-	protected MessageProducer producer;
 
 	protected AsynchAECasManager asynchManager;
 
@@ -97,19 +97,13 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected Object metadataReplyMonitor = new Object();
 
-	protected String brokerURI = null;
 
 	protected boolean remoteService = false;
 
-	protected Session session = null;
 
-	protected Connection connection = null;
 
-	protected Session consumerSession = null;
 
-	protected Queue consumerDestination = null;
 
-	protected Session producerSession = null;
 
 	protected Object gater = new Object();
 
@@ -164,19 +158,22 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected MessageConsumer consumer = null;
 	
+	protected List pendingMessageList = new ArrayList();
+	protected boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
 	abstract protected TextMessage createTextMessage() throws Exception;
 	abstract protected void setMetaRequestMessage(TextMessage msg) throws Exception;
 	abstract protected void setCASMessage(String casReferenceId, CAS aCAS, TextMessage msg) throws Exception;
+	abstract protected void setCASMessage(String casReferenceId, String aSerializedCAS, TextMessage msg) throws Exception;
 	abstract public void setCPCMessage(TextMessage msg) throws Exception;
-	abstract public void setReleaseCASMessage( TextMessage msg, String casReferenceId ) throws Exception;
+//	abstract public void setReleaseCASMessage( TextMessage msg, String casReferenceId ) throws Exception;
 	abstract public void initialize(Map anApplicationContext) throws ResourceInitializationException;
 	abstract public void initialize(String[] configFiles, Map anApplicationContext) throws ResourceInitializationException;
 	abstract protected void cleanup() throws Exception;
 	abstract public String deploy(String[] aDeploymentDescriptorList, Map anApplicationContext) throws Exception;
 	abstract protected String deploySpringContainer(String[] springContextFiles) throws ResourceInitializationException;
-	abstract protected MessageProducer lookupProducerForEndpoint( Endpoint anEndpoint ) throws Exception;
-
+//	abstract protected MessageProducer lookupProducerForEndpoint( Endpoint anEndpoint ) throws Exception;
+  
 	public void addStatusCallbackListener(UimaEEStatusCallbackListener aListener)
 	{
 	    listeners.add(aListener);
@@ -214,7 +211,7 @@ implements UimaAsynchronousEngine, MessageListener
 		collectionReader = aCollectionReader;
 	}
 		
-	public void collectionProcessingComplete() throws ResourceProcessException
+	public synchronized void collectionProcessingComplete() throws ResourceProcessException
 	{
 		try
 		{
@@ -250,10 +247,13 @@ implements UimaAsynchronousEngine, MessageListener
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_started_cpc_request_timer_FINEST", new Object[] {});
 
-			TextMessage msg = createTextMessage();
-			setCPCMessage(msg);
-		    producer.send(msg);
-		    			
+			PendingMessage msg = new PendingMessage(AsynchAEMessage.CollectionProcessComplete);
+			synchronized( pendingMessageList )
+			{
+				pendingMessageList.add(msg);
+				pendingMessageList.notifyAll();
+			}
+
 			// Wait for CPC Reply. This blocks!
 			waitForCpcReply();
 
@@ -275,7 +275,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 	}
 
-	public void stop()
+	public synchronized void stop()
 	{
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_as_client_INFO", new Object[] {});
 
@@ -288,13 +288,6 @@ implements UimaAsynchronousEngine, MessageListener
 		
 		try
 		{
-			producerSession.close();
-			consumerSession.close();
-			consumer.close();
-			session.close();
-			connection.close();
-			connection = null;
-
 			//	Unblock threads
 			if( threadMonitorMap.size() > 0 )
 			{
@@ -383,9 +376,7 @@ implements UimaAsynchronousEngine, MessageListener
 	
 	protected void sendMetaRequest() throws Exception
 	{
-		TextMessage msg = createTextMessage();
-		setMetaRequestMessage(msg);		
-
+		PendingMessage msg = new PendingMessage(AsynchAEMessage.GetMeta);
 		ClientRequest requestToCache = new ClientRequest(uniqueIdentifier, this); //, metadataTimeout);
 		requestToCache.setIsRemote(remoteService);
 		requestToCache.setMetaRequest(true);
@@ -398,9 +389,11 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			requestToCache.startTimer();
 		}
-
-		producer.send(msg);		
-
+		synchronized( pendingMessageList )
+		{
+			pendingMessageList.add(msg);
+			pendingMessageList.notifyAll();
+		}
 	}
 
 	protected void waitForCpcReply()
@@ -445,7 +438,7 @@ implements UimaAsynchronousEngine, MessageListener
 		return null;
 	}
 
-	public void process() throws ResourceProcessException
+	public synchronized void process() throws ResourceProcessException
 	{
 		if (!initialized)
 		{
@@ -526,8 +519,10 @@ implements UimaAsynchronousEngine, MessageListener
 				return null;
 			}
 
-			TextMessage msg = createTextMessage();
-			setCASMessage(casReferenceId, aCAS, msg);
+			PendingMessage msg = new PendingMessage(AsynchAEMessage.Process);
+			String serializedCAS = serializeCAS(aCAS);
+			msg.put( AsynchAEMessage.CAS, serializedCAS);
+			msg.put( AsynchAEMessage.CasReference, casReferenceId);
 			requestToCache.setIsRemote(remoteService);
 			requestToCache.setEndpoint(getEndPointName());
 			requestToCache.setProcessTimeout(processTimeout);
@@ -538,7 +533,7 @@ implements UimaAsynchronousEngine, MessageListener
 				requestToCache.setCAS(aCAS);
 				//	Store the serialized CAS in case the timeout occurs and need to send the 
 				//	the offending CAS to listeners for reporting
-				requestToCache.setCAS(msg.getText());
+				requestToCache.setCAS(serializedCAS);
 			}
 
 			clientCache.put(casReferenceId, requestToCache);
@@ -547,7 +542,11 @@ implements UimaAsynchronousEngine, MessageListener
 			{
 				requestToCache.startTimer();
 			}
-			producer.send(msg);
+			synchronized( pendingMessageList )
+			{
+				pendingMessageList.add(msg);
+				pendingMessageList.notifyAll();
+			}
 			howManySent++;
 		}
 		catch (Exception e)
@@ -644,7 +643,7 @@ implements UimaAsynchronousEngine, MessageListener
 			// Adam - store ResouceMetaData in field so we can return it from getMetaData().
 			resourceMetadata = (ProcessingResourceMetaData) UIMAFramework.getXMLParser().parseResourceMetaData(in1);
 
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleMetadataReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_meta_reply_FINEST", new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), meta });
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleMetadataReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_meta_reply_FINEST", new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), meta });
 
 			asynchManager.addMetadata(resourceMetadata);
 			synchronized (metadataReplyMonitor)
@@ -684,7 +683,10 @@ implements UimaAsynchronousEngine, MessageListener
 		if (clientCache.containsKey(identifier))
 		{
 			request = (ClientRequest) clientCache.get(identifier);
+			if ( request != null )
+			{
 			request.cancelTimer();
+			}
 		}
 	}
 
@@ -737,11 +739,10 @@ implements UimaAsynchronousEngine, MessageListener
 			{
 				return;
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_process_reply_FINEST",
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_process_reply_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference) });
 
 			casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
-			//System.out.println("Receiving >>>>>>>>Thread::" + Thread.currentThread().getId()+" Handling Reply Cas >>>>>"+casReferenceId);
 			if (casReferenceId != null && !clientCache.containsKey(casReferenceId))
 			{
 				// Most likely expired message. Already handled as timeout. Discard the message and move on to the next
@@ -889,7 +890,10 @@ implements UimaAsynchronousEngine, MessageListener
 		if ( aCasReferenceId != null && clientCache.containsKey(aCasReferenceId ))
 		{
 			ClientRequest requestToCache = (ClientRequest)clientCache.get(aCasReferenceId);
+			if ( requestToCache != null )
+			{
 			requestToCache.removeEntry(aCasReferenceId);
+			}
 			clientCache.remove(aCasReferenceId);
 		}
 	}
@@ -932,6 +936,10 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_msg_FINEST", new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom) });
+			if ( !message.propertyExists(AsynchAEMessage.Command) )
+			{
+			  return;
+			}
 			int command = message.getIntProperty(AsynchAEMessage.Command);
 			if (AsynchAEMessage.CollectionProcessComplete == command)
 			{
@@ -1015,7 +1023,7 @@ implements UimaAsynchronousEngine, MessageListener
 			e.printStackTrace();
 		}
 	}
-
+/*
 	private void sendRequestToReleaseCas( String aCasReferenceId, Endpoint anEndpoint ) throws Exception
 	{
 			MessageProducer msgProducer =
@@ -1024,7 +1032,7 @@ implements UimaAsynchronousEngine, MessageListener
 			setReleaseCASMessage(tm, aCasReferenceId);
 			msgProducer.send(tm);
 	}
-	// Below methods added by Adam
+*/	
 	/**
 	 * Gets the ProcessingResourceMetadata for the asynchronous AnalysisEngine.
 	 */
@@ -1032,7 +1040,10 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 		return resourceMetadata;
 	}
-
+	/**
+	 * This is a synchronous method which sends a message to a destination and blocks waiting for
+	 * reply. 
+	 */
 	public void sendAndReceiveCAS(CAS aCAS) throws ResourceProcessException
 	{
 		if ( !running )
@@ -1059,7 +1070,6 @@ implements UimaAsynchronousEngine, MessageListener
 			cachedRequest.setSynchronousInvocation();
 			// send CAS. This call does not block. Instead we will block the sending thread below.
 			casReferenceId = sendCAS(aCAS, cachedRequest);
-			//System.out.println("Sent >>>>>>>>Thread::" + Thread.currentThread().getId()+" Cas Id>>>>>"+casReferenceId);
 
 			//cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
 			//	Block here
@@ -1424,5 +1434,18 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			return wasSignaled;
 		}
+	}
+	/**
+	 * Called when the producer thread is fully initialized
+	 */
+	protected void onProducerInitialized()
+	{
+		producerInitialized = true;
+	}
+	
+	public void onException(Exception aFailure, String aDestination)
+	{
+		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "onException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_error_while_sending_msg__WARNING", new Object[] {  aDestination, aFailure });
+		stop();
 	}
 }

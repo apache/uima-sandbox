@@ -25,7 +25,6 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.StatusCallbackListener;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
-import org.springframework.context.ApplicationContext;
 
 public interface UIMAAsynchronousEngine
 {
