@@ -51,7 +51,8 @@ public interface OutputChannel extends Channel
 
 	public void sendReply(Throwable t, String aCasReferenceId, Endpoint anEndpoint, int aCommand) throws AsynchAEException;
 	
-	
+	 public void bindWithClientEndpoint( Endpoint anEndpoint ) throws Exception;
+
 	
 	public void setServerURI( String aServerURI );
 	

@@ -590,6 +590,9 @@ public class UimacppServiceController implements ControllerLifecycle {
 		    throw new IOException(e.getMessage());
 	    }
     }
+    loggerConnection.close();
+    commandConnection.close();
+    server.close();
   } 
   
 
@@ -617,15 +620,17 @@ public class UimacppServiceController implements ControllerLifecycle {
   /**
    * 
    */
+/**
   public void finalize() throws UIMAException, IOException,
       InterruptedException {
     System.out.println("finalize ");
+    this.listeners=null; // prevent calling of listeners.
     shutdown();
     loggerConnection.close();
     commandConnection.close();
     server.close();
   }
-
+**/
   /**
    * test
    * 
@@ -917,11 +922,20 @@ class WaitThread implements Runnable {
 
   public void run() {
     int rc;
-    String message = "UIMA C++ service shutdown.";
+    String message = "WaitThread calling UIMA C++ service shutdown.";
     try {
       rc = uimacppProcess.waitFor();
       message += "rc=" + rc;
       System.out.println(message);
+      if (listeners != null) {
+          for (int i=0;i < listeners.size(); i++) {
+            ControllerCallbackListener listener = (ControllerCallbackListener) listeners.get(i);
+            if (listener != null) {
+              listener.notifyOnTermination(message);
+            }
+          }
+          listeners = null;
+      }
     } catch (InterruptedException e) {
       this.uimaLogger.log(Level.INFO, e.getMessage());
        message += e.getMessage();
@@ -932,6 +946,7 @@ class WaitThread implements Runnable {
              listener.notifyOnTermination(message);
            }
          }
+         listeners = null;
        }
     }
     

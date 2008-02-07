@@ -108,10 +108,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		this(aParentController, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, aComponentCasPoolSize, anInitialCasHeapSize, null);
 	}
 
-//	public PrimitiveAnalysisEngineController_impl(AnalysisEngineController aParentController, String anEndpointName, String anAnalysisEngineDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, int aWorkQueueSize, int anAnalysisEnginePoolSize, int aComponentCasPoolSize, long anInitialCasHeapSize) throws Exception
-//	{
-//		this(aParentController, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, aComponentCasPoolSize, null);
-//	}
 	public PrimitiveAnalysisEngineController_impl(AnalysisEngineController aParentController, String anEndpointName, String anAnalysisEngineDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, int aWorkQueueSize, int anAnalysisEnginePoolSize, int aComponentCasPoolSize, JmxManagement aJmxManagement) throws Exception
 	{
 		this(aParentController, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, aComponentCasPoolSize,0, aJmxManagement);
@@ -169,8 +165,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 
 			
 			getMonitor().setThresholds(getErrorHandlerChain().getThresholds());
-//			Statistics stats = getMonitor().getStatistics("");
-//			ComponentStatistics componentStatistics = new ComponentStatistics(stats);
 			// Initialize Cas Manager
 			if (getCasManagerWrapper() != null)
 			{
@@ -188,7 +182,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 					// All internal components of this Primitive have been initialized. Open the latch
 					// so that this service can start processing requests.
 					latch.openLatch(getName(), isTopLevelComponent(), true);
-
 				}
 				catch ( Exception e)
 				{
@@ -212,7 +205,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 		
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_initialized_controller__INFO", new Object[] { getComponentName() });
-
+		super.serviceInitialized = true;
 	}
 	public boolean isMultiplier()
 	{
@@ -239,7 +232,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 		catch ( Exception e)
 		{
-//			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
 			ErrorContext errorContext = new ErrorContext();
 			errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.CollectionProcessComplete);
 			errorContext.add(AsynchAEMessage.Endpoint, anEndpoint);
@@ -282,19 +274,32 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		
 		if ( stopped )
 		{
-// Abort			rejectAndReturnInputCAS(aCasReferenceId, anEndpoint);
 			return;
 		}
-		
+/*		
+		try
+		{
+		  //  Test to see if the connection to the reply endpoint can be created 
+		  //  If the client has died, dont waste time analyzing the CAS.
+		  getOutputChannel().bindWithClientEndpoint(anEndpoint);
+		}
+		catch( Exception e)
+		{
+		  if ( isTopLevelComponent() )
+		  {
+		    
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_client_drop_cas__INFO", new Object[] { getComponentName(), aCasReferenceId, anEndpoint.getEndpoint()});
+		    dropCAS(aCasReferenceId, true);
+		  }
+		  return;
+		}
+*/	
 		boolean processingFailed = false;
 		// This is a primitive controller. No more processing is to be done on the Cas. Mark the destination as final and return CAS in reply.
 		anEndpoint.setFinal(true);
 		AnalysisEngine ae = null;
 		try
 		{
-			//	Use empty string as key. Top level component stats are stored under this key.
-//			getMonitor().incrementCount("", Monitor.ProcessCount);
-			
 			// Checkout an instance of AE from the pool
 			ae = aeInstancePool.checkout();
 			
@@ -339,10 +344,10 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 						((CASImpl)aCAS).enableReset(true);
 					}
 					return;
-//					break;
 				}
 				OutOfTypeSystemData otsd = getInProcessCache().getOutOfTypeSystemData(aCasReferenceId);
 				MessageContext mContext = getInProcessCache().getMessageAccessorByReference(aCasReferenceId);
+				sequence++;
 				newCasReferenceId = getInProcessCache().register(casProduced, mContext, otsd);
 				CacheEntry entry = getInProcessCache().getCacheEntryForCAS(newCasReferenceId);
 				entry.setInputCasReferenceId(aCasReferenceId);
@@ -350,7 +355,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				synchronized(syncObject)
 				{
 					cmOutstandingCASes.add(newCasReferenceId);
-					getOutputChannel().sendReply(casProduced, aCasReferenceId, newCasReferenceId, anEndpoint, sequence++);
+					getOutputChannel().sendReply(casProduced, aCasReferenceId, newCasReferenceId, anEndpoint, sequence);
 				}
 			}
 
@@ -442,16 +447,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		if ( getAnalysisEngineMetadata().getOperationalProperties().getOutputsNewCASes() )
 		{
 			addConfigIntParameter(AnalysisEngineController.CasPoolSize, super.componentCasPoolSize);
-
-/*			
-			ConfigurationParameter cp = new ConfigurationParameter_impl();
-			cp.setMandatory(false);
-			cp.setMultiValued(false);
-			cp.setName(AnalysisEngineController.CasPoolSize);
-			cp.setType("Integer");
-			getAnalysisEngineMetadata().getConfigurationParameterDeclarations().addConfigurationParameter(cp);
-			getAnalysisEngineMetadata().getConfigurationParameterSettings().setParameterValue(AnalysisEngineController.CasPoolSize, super.componentCasPoolSize);
-	*/
 		}
 		getOutputChannel().sendReply(getAnalysisEngineMetadata(), anEndpoint, true);
 	}

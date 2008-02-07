@@ -213,26 +213,32 @@ public abstract class ErrorHandlerBase
     	boolean done = false;
     	String errorCounterKind = (aRetryCommand == AsynchAEMessage.GetMeta ) ? Monitor.GetMetaErrorRetryCount : Monitor.ProcessErrorRetryCount;
     	//	Handle errors in a loop. Retry until retry threshold is reached
+		int retryCount=0;
 		while(!done )
 		{
+/*			
 			if ( !exceedsThreshold(aThreshold, errorCounterKind, aKey, aController))
 			{
 				//	Increment number of retries
 				incrementStatistic(aController.getMonitor(), aKey, errorCounterKind );
 			}
+*/
 			//	Check if exceeding threshold
 			if ( shouldRetry(aThreshold, errorCounterKind, aKey, aController))
 			{
+				incrementStatistic(aController.getMonitor(), aKey, errorCounterKind );
 				try
 				{
 					switch( aRetryCommand )
 					{
 					case AsynchAEMessage.GetMeta:
+						System.out.println("Controller:"+aController.getComponentName()+" >>>>>>>>>> Retrying GetMeta");
 						//	Retry GetMeta
 						((AggregateAnalysisEngineController)aController).retryMetadataRequest(anEndpoint);
 						break;
 						
 					case AsynchAEMessage.Process:
+						System.out.println("Controller:"+aController.getComponentName()+" >>>>>>>>>> Retrying Process");
 						String casReferenceId = (String) anErrorContext.get(AsynchAEMessage.CasReference);
 						((AggregateAnalysisEngineController)aController).retryProcessCASRequest(casReferenceId, anEndpoint, true);
 						break;

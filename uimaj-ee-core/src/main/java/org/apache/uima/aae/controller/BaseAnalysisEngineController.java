@@ -142,6 +142,9 @@ implements AnalysisEngineController, EventSubscriber
 	
 	protected boolean allDelegatesAreRemote = false;
 	
+	protected List controllerListeners = new ArrayList();
+	
+	protected boolean serviceInitialized = false;
 	
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
@@ -648,7 +651,7 @@ implements AnalysisEngineController, EventSubscriber
 			registeredWithJMXServer = true;
 			registerServiceWithJMX(jmxContext, false);
 		}
-		
+/*		
 		if ( this instanceof AggregateAnalysisEngineController )
 		{
 			AggregateAnalysisEngineController aC = (AggregateAnalysisEngineController)this;
@@ -657,7 +660,7 @@ implements AnalysisEngineController, EventSubscriber
 				 aC.setRequestForMetaSentToRemotes();
 				 aC.sendRequestForMetadataToRemoteDelegates();
 			 }
-		}
+*/
 	}
 	public void addInputChannel( InputChannel anInputChannel )
 	{
@@ -1603,7 +1606,11 @@ implements AnalysisEngineController, EventSubscriber
 	   */
 	  public void addControllerCallbackListener(ControllerCallbackListener aListener)
 	  {
-		  
+		    controllerListeners.add(aListener); 
+		    if ( serviceInitialized )
+		    {
+          notifyListenersWithInitializationStatus(null);
+		    }
 	  }
 
 	  
@@ -1614,6 +1621,28 @@ implements AnalysisEngineController, EventSubscriber
 	   */
 	  public void removeControllerCallbackListener(ControllerCallbackListener aListener)
 	  {
-		  
+		    controllerListeners.remove(aListener);
+	  }
+
+	  public void notifyListenersWithInitializationStatus(Exception e)
+	  {
+      if ( controllerListeners.isEmpty())
+      {
+        return;
+      }
+      for( int i=0; i < controllerListeners.size(); i++ )
+      {
+        //  If there is an exception, notify listener with failure
+        if ( e != null )
+        {
+          ((ControllerCallbackListener)controllerListeners.get(i)).
+              notifyOnInitializationFailure(e);
+        }
+        else
+        {
+          ((ControllerCallbackListener)controllerListeners.get(i)).
+              notifyOnInitializationSuccess();
+        }
+      }
 	  }
 }

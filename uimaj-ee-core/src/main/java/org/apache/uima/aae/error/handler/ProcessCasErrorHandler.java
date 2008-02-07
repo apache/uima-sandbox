@@ -335,18 +335,21 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			}
 		}
 
-		if (aController instanceof AggregateAnalysisEngineController)
+		if (aController instanceof AggregateAnalysisEngineController && t instanceof Exception)
 		{
 			boolean flowControllerContinueFlag = false;
-			try
+			// if the deployment descriptor says no retries, dont care what the Flow Controller says
+			if ( threshold != null && threshold.getContinueOnRetryFailure() )
 			{
-				//	Consult Flow Controller to determine if it is ok to continue dispite the error
-				flowControllerContinueFlag = 
-					((AggregateAnalysisEngineController) aController).continueOnError(casReferenceId, key, (Exception) t );
+			  try
+			  {
+			    //	Consult Flow Controller to determine if it is ok to continue dispite the error
+			    flowControllerContinueFlag = 
+			      ((AggregateAnalysisEngineController) aController).continueOnError(casReferenceId, key, (Exception) t );
+			  }
+			  catch( Exception exc) {}
 			}
-			catch( Exception exc) {}
 			
-//			if ( threshold != null && continueOnError(key, threshold, casReferenceId, t, aController))
 			if ( threshold != null && flowControllerContinueFlag )
 			{
 				if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( cacheEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) )

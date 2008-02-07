@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.UimaContextAdmin;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.impl.CasManager_impl;
@@ -43,21 +44,37 @@ public class EECasManager_impl extends CasManager_impl
 		//	Each cell is 4 bytes. Divide heapSize expressed in bytes by 4.
 		initialCasHeapSize = anInitialCasHeapSize/4;
 	}
-	public void defineCasPool(String aRequestorContextName, int aMinimumSize, Properties aPerformanceTuningSettings)
+	public void defineCasPool(String aRequestorContextName, int aMinimumSize,
+	          Properties aPerformanceTuningSettings)
 	throws ResourceInitializationException
 	{
-		if ( aPerformanceTuningSettings == null && initialCasHeapSize > 0 )
+		if ( aPerformanceTuningSettings == null )
 		{
-			Properties performanceTuningSettings = new Properties();
-			performanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, 
+			aPerformanceTuningSettings = new Properties();
+		}
+		if ( initialCasHeapSize > 0 )
+		{
+			aPerformanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, 
 					new Integer((int)initialCasHeapSize).toString() );
-			super.defineCasPool(aRequestorContextName, aMinimumSize, performanceTuningSettings);
-		}
-		else
-		{
-			super.defineCasPool(aRequestorContextName, aMinimumSize, aPerformanceTuningSettings);
-		}
+		}	
+		super.defineCasPool(aRequestorContextName, aMinimumSize, aPerformanceTuningSettings);
 	}
+	@Override
+	public void defineCasPool(UimaContextAdmin aRequestorContext,
+			int aMinimumSize, Properties aPerformanceTuningSettings)
+			throws ResourceInitializationException {
+		if ( aPerformanceTuningSettings == null )
+		{
+			aPerformanceTuningSettings = new Properties();
+		}
+		if ( initialCasHeapSize > 0 )
+		{
+			aPerformanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, 
+					new Integer((int)initialCasHeapSize).toString() );
+		}	
+		super.defineCasPool(aRequestorContext, aMinimumSize, aPerformanceTuningSettings);
+	}
+
 	public void setPoolSize(String aRequestorContextName, int aSize )
 	{
 		casPoolMap.put(aRequestorContextName, aSize);

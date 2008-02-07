@@ -37,7 +37,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 {
 	private static final Class CLASS_NAME = Endpoint_impl.class;
 
-	private Object destination = null;
+	private volatile Object destination = null;
 	
 	private String endpoint;
 
@@ -47,7 +47,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 
 	private Timer timer;
 
-	private String replyTo;
+	private volatile String replyTo;
 	
 	private boolean waitingForResponse;
 
@@ -97,8 +97,10 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	
 	private boolean registeredWithParent;
 	
+	private boolean tempReplyDestination;
 		
 	private int initialHeapSize;
+	private volatile boolean replyDestinationFailed;
 	
 	public int getCommand()
 	{
@@ -510,6 +512,24 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	public void setInitialFsHeapSize(int aHeapSize)
 	{
 		initialHeapSize = aHeapSize;
+	}
+	public void setTempReplyDestination(boolean isTempReplyDestination )
+	{
+		tempReplyDestination = isTempReplyDestination;
+	}
+	
+	public boolean isTempReplyDestination()
+	{
+		return tempReplyDestination;
+	}
+	public void setReplyDestinationFailed()
+	{
+		replyDestinationFailed = true;
+	}
+	
+	public boolean replyDestinationFailed()
+	{
+		return replyDestinationFailed;
 	}
 
 }

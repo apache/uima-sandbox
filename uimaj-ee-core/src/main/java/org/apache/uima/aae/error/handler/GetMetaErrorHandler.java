@@ -19,6 +19,7 @@
 
 package org.apache.uima.aae.error.handler;
 
+import java.net.ConnectException;
 import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
@@ -57,6 +58,14 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 				aThreshold.getAction().trim().length() == 0 || 
 				ErrorHandler.TERMINATE.equalsIgnoreCase(aThreshold.getAction() ));
 	}
+	private boolean isConnectionFailure( Exception e)
+	{
+    if ( e != null && e.getCause() != null &&  e.getCause() instanceof ConnectException )
+    {
+      return true;
+    }
+    return false;
+	}
 	public boolean handleError(Throwable t, ErrorContext anErrorContext, AnalysisEngineController aController)
 	{
 		//	GetMeta errors are only handled by the Aggregate AS
@@ -73,7 +82,17 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 
 		if ( endpoint != null && aController instanceof AggregateAnalysisEngineController )
 		{
-			Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
+      if ( isConnectionFailure( (Exception)t ) )
+      {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_terminate_service__INFO",
+                new Object[] {aController.getComponentName(), endpoint.getEndpoint()});
+        aController.terminate();
+        aController.notifyListenersWithInitializationStatus((Exception)t);
+        return true;
+      }
+
+      Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
 	    	String key = ((AggregateAnalysisEngineController)aController).lookUpDelegateKey(endpoint.getEndpoint());
 	    	//	If threshold is not defined, assume action=terminate
 	    	if (  threshold == null || threshold.getMaxRetries() == 0 || 
@@ -88,6 +107,7 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 	    	                new Object[] {aController.getComponentName(), endpoint.getEndpoint()});
 //	    			aController.propagateShutdownEventToTheTopComponent();
 	    			aController.terminate();
+	    			aController.notifyListenersWithInitializationStatus((Exception)t);
 	    		}
 	    		else
 	    		{

@@ -22,5 +22,7 @@ package org.apache.uima.aae.controller;
 public interface ControllerCallbackListener
 {
 	public void notifyOnTermination( String aMessage );
+	public void notifyOnInitializationFailure( Exception e);
+	public void notifyOnInitializationSuccess();
 
 }

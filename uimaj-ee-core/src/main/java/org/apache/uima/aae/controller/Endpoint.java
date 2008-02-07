@@ -127,5 +127,10 @@ public interface Endpoint
 	
 	public void setInitialFsHeapSize(int aHeapSize);
 	
+	public void setTempReplyDestination(boolean isTempReplyDestination );
 	
+	public boolean isTempReplyDestination();
+	public void setReplyDestinationFailed();
+	
+	public boolean replyDestinationFailed();
 }

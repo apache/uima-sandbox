@@ -40,7 +40,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 		return label;
 	}
 
-	public void reset()
+	public synchronized void reset()
 	{
 		accumulatedIdleTime = 0;
 		numberOfCASesProcessed=0;
@@ -76,7 +76,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 		numberOfCASesProcessed++;
 	}
 
-	public double getCasDeserializationTime()
+	public synchronized double getCasDeserializationTime()
 	{
 		if ( casDeserializationTime > 0 )
 		{

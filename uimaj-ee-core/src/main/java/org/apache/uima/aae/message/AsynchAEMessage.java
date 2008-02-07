@@ -38,6 +38,7 @@ public interface AsynchAEMessage
 	public static final String CasSequence = "CasSequence";
 	public static final String ReplyToEndpoint = "ReplyToEndpoint";
 	
+	public static final String ServerIP = "ServerIP";
 	public static final String RemoveEndpoint = "RemoveEndpoint";
 	public static final String Aborted = "Aborted";
 
@@ -45,6 +46,7 @@ public interface AsynchAEMessage
 	public static final String TimeToDeserializeCAS = "TimeToDeserializeCAS";
 	public static final String TimeWaitingForCAS  = "TimeWaitingForCAS";
 	public static final String IdleTime  = "IdleTime";
+	public static final String CAS  = "CAS";
 
 	
 	public static final String Payload = "Payload";
