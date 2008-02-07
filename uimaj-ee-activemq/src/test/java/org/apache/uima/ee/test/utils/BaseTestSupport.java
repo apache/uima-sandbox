@@ -34,6 +34,7 @@ import javax.jms.Message;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaEEProcessStatusImpl;
 import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
+import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.cas.CAS;
@@ -58,12 +59,14 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 	protected Object initializeMonitor = new Object();
 	protected boolean isStopped = false;
 	protected long responseCounter = 0;
+	protected boolean expectingServiceShutdownException = false;
+	boolean serviceShutdownException = false;
 
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
 	{
 		Map<String, Object> appCtx = new HashMap();
 		appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, System.getenv("UIMA_HOME") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "dd2spring.xsl"); // C:/uima-ee-rc8/bin/dd2spring.xsl");
-		appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + "saxon8.jar");
+		appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + "MUST-NOT-BE-IN-CLASSPATH"+System.getProperty("file.separator")+"saxon8.jar");
 //		appCtx.put(UimaAsynchronousEngine.UimaEeDebug, UimaAsynchronousEngine.UimaEeDebug);
 		String containerId = eeUimaEngine.deploy(aDeploymentDescriptorPath, appCtx);
 		return containerId;
@@ -74,6 +77,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 		eeUimaEngine.addStatusCallbackListener(this);
 		eeUimaEngine.initialize(appCtx);
 	}
+	protected void setExpectingServiceShutdown()
+	{
+		expectingServiceShutdownException = true;
+	}
+
 
 	protected String getFilepathFromClassloader( String aFilename ) throws Exception
 	{
@@ -317,7 +325,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 				{
 					t2.join();
 
-					if (!isStopped && !unexpectedException)
+					if (!serviceShutdownException && !isStopped && !unexpectedException)
 					{
 						System.out.println("Sending CPC");
 
@@ -327,7 +335,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 				}
 
 				// If have skipped CPC trip the latch
-				if (unexpectedException && cpcLatch != null)
+				if ( serviceShutdownException || (unexpectedException && cpcLatch != null) )
 				{
 					cpcLatch.countDown();
 				}
@@ -388,7 +396,22 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 	{
 		if (aProcessStatus.isException())
 		{
-			System.out.println(" Process Received Reply Containing Exception");
+			if ( !expectingServiceShutdownException )
+				System.out.println(" Process Received Reply Containing Exception");
+			List list = aProcessStatus.getExceptions();
+			for( int i=0; i < list.size(); i++)
+			{
+				Exception e = (Exception)list.get(i);
+				if ( e instanceof ServiceShutdownException || 
+					 (e.getCause() != null && e.getCause() instanceof ServiceShutdownException ))
+				{
+					serviceShutdownException = true;
+				}
+				if ( !expectingServiceShutdownException )
+				{
+					e.printStackTrace();
+				}
+			}
 			if (exceptionCountLatch != null)
 			{
 				exceptionCountLatch.countDown();
@@ -399,8 +422,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 			}
 			else if (processCountLatch != null)
 			{
+				if ( !(serviceShutdownException && expectingServiceShutdownException) )
+				{
 				unexpectedException = true;
 				System.out.println(" ... when expecting normal completion!");
+				}
 				while (processCountLatch.getCount() > 0)
 				{
 					processCountLatch.countDown();
@@ -426,7 +452,10 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 			List exceptions = aStatus.getExceptions();
 			for (int i = 0; i < exceptions.size(); i++)
 			{
+				if ( !expectingServiceShutdownException )
+				{
 				((Throwable) exceptions.get(i)).printStackTrace();
+				}
 			}
 			if (exceptionCountLatch != null)
 				exceptionCountLatch.countDown();
@@ -535,7 +564,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 				uimaEEEngine.stop();
 				isStopped = true;
 				System.out.println(">>>> UIMA EE Engine Stopped");
+				if (cpcLatch != null )
 				cpcLatch.countDown();
+				if ( processCountLatch != null)
 				processCountLatch.countDown();
 			}
 		}, timeToRun);
