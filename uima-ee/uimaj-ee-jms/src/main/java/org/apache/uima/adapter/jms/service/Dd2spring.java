@@ -106,7 +106,7 @@ public class Dd2spring {
     try {
       mainStartClass = Class.forName("net.sf.saxon.Transform", true, saxonClassLoader);
     } catch (ClassNotFoundException e) {
-      System.err.println("Error - can't find Saxon jar to load for dd2spring transformation.");
+      System.err.println("Error - can't load Saxon jar from " + saxonClasspathURL + " for dd2spring transformation.");
       e.printStackTrace();
       UIMAFramework.getLogger(THIS_CLASS).logrb(Level.CONFIG, THIS_CLASS.getName(),
           "convertDD2Spring", JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
