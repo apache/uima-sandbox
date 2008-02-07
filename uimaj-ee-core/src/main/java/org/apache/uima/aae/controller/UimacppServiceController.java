@@ -96,9 +96,7 @@ public class UimacppServiceController implements ControllerLifecycle {
 
   private int initialFsHeapSize;
   
-  //private ControllerCallbackListener listener;
-  
-  private List listeners = new ArrayList();
+  private ArrayList<ControllerCallbackListener> listeners = new ArrayList<ControllerCallbackListener>();
   
   /**
    * Configure and start a Uima C++ service that connects to an ActiveMG
@@ -577,18 +575,19 @@ public class UimacppServiceController implements ControllerLifecycle {
     mbean.shutdown();
     if (jmxMgmt != null) {
       try {
-		    this.jmxMgmt.destroy();
-		    if (listeners != null) {
-		      for (int i=0;i < listeners.size(); i++) {
-		        ControllerCallbackListener listener = (ControllerCallbackListener) listeners.get(i);
-		        if (listener != null) {
-		          listener.notifyOnTermination("Uima C++ service shutdown.");
-		        }
-		      }
-		    }
+		    this.jmxMgmt.destroy();		    
 	    } catch (Exception e) {
 		    throw new IOException(e.getMessage());
 	    }
+    }
+    if (listeners != null) {
+      for (int i=0;i < listeners.size(); i++) {
+        ControllerCallbackListener listener = (ControllerCallbackListener) listeners.get(i);
+        if (listener != null) {
+          listener.notifyOnTermination("Uima C++ service shutdown.");
+        }
+      }
+      listeners.clear();
     }
     loggerConnection.close();
     commandConnection.close();
@@ -617,27 +616,14 @@ public class UimacppServiceController implements ControllerLifecycle {
     }
   }
 
-  /**
-   * 
-   */
-/**
-  public void finalize() throws UIMAException, IOException,
-      InterruptedException {
-    System.out.println("finalize ");
-    this.listeners=null; // prevent calling of listeners.
-    shutdown();
-    loggerConnection.close();
-    commandConnection.close();
-    server.close();
-  }
-**/
+ 
   /**
    * test
    * 
    * @param args
    */
   public static void main(String[] args) {
-    HashMap<String, String> envVarMap = new HashMap();
+    HashMap<String, String> envVarMap = new HashMap<String, String>();
     
     try {
     	if (System.getProperty("os.name").startsWith("Windows")) {
@@ -926,15 +912,14 @@ class WaitThread implements Runnable {
     try {
       rc = uimacppProcess.waitFor();
       message += "rc=" + rc;
-      System.out.println(message);
       if (listeners != null) {
-          for (int i=0;i < listeners.size(); i++) {
-            ControllerCallbackListener listener = (ControllerCallbackListener) listeners.get(i);
-            if (listener != null) {
-              listener.notifyOnTermination(message);
-            }
+        for (int i=0;i < listeners.size(); i++) {
+          ControllerCallbackListener listener = (ControllerCallbackListener) listeners.get(i);
+          if (listener != null) {
+            listener.notifyOnTermination(message);
           }
-          listeners = null;
+        }
+        listeners.clear();
       }
     } catch (InterruptedException e) {
       this.uimaLogger.log(Level.INFO, e.getMessage());
@@ -946,7 +931,7 @@ class WaitThread implements Runnable {
              listener.notifyOnTermination(message);
            }
          }
-         listeners = null;
+         listeners.clear(); 
        }
     }
     
