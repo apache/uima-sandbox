@@ -24,9 +24,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.*;
 
+import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
 
-// TODO: extra tag for non-recognized symbols (for which neither word nor suffix is available)
 
 /**
  * Viterbi Algorithm: Given a model and a sequence of observations, what is the most likely 
@@ -77,7 +78,7 @@ public class Viterbi {
    */
   @SuppressWarnings("unchecked")
   public static List process(int N, List<String> sentence, String END_OF_SENT_TAG,
-		  Map<String, Map<String, Double>> suffix_tree,Map<String,Map<String, Double>> suffix_tree_cap, Map<String, Double> transition_probs,
+      Map<String, Map<String, Double>> suffix_tree,Map<String,Map<String, Double>> suffix_tree_cap, Map<String, Double> transition_probs,
       Map<String, Map<String, Double>> word_probs, double[] lambdas2, double[] lambdas3, double theta) {
 
     sentence.add(0, END_OF_SENT_TAG);
@@ -104,87 +105,88 @@ public class Viterbi {
       
       if (i == 0) {
 
-    	  // lookup for the non-capitalized variant of the word for the first word in a sentence and
-    	  // weight by relative frequencies of the corresponding forms and sum them
-    	token = sentence.get(1);
-    	String non_cap = token.toLowerCase();
-    /*	Matcher m = p.matcher(token);
-		boolean b = m.matches();
-		
-    	if (b) {
-    		System.out.println(token);
-    		cardinals+=1;
-    		available_pos = word_probs.get("@card");
-    		//available_pos.put("CARD", 1.00);
-    	}
-    	else */
-    	if (word_probs.containsKey(token)| word_probs.containsKey(non_cap)) {
-        	if (ModelGeneration.capitalized(sentence.get(1)) & word_probs.containsKey(sentence.get(1))){
-        		available_pos = word_probs.get(sentence.get(1)); // here we get available states of the
-        	} else{
-          	  // if a lexicon contains a non-capitalized variant of a word
-          	  	if (word_probs.containsKey(non_cap)) {
-          		  available_pos = word_probs.get(non_cap); 
-          	  	}}
+        // lookup for the non-capitalized variant of the word for the first word in a sentence and
+        // weight by relative frequencies of the corresponding forms and sum them
+      token = sentence.get(1);
+      String non_cap = token.toLowerCase();
+    /*  Matcher m = p.matcher(token);
+    boolean b = m.matches();
+    
+      if (b) {
+        System.out.println(token);
+        cardinals+=1;
+        available_pos = word_probs.get("@card");
+        //available_pos.put("CARD", 1.00);
+      }
+      else */
+      if (word_probs.containsKey(token)| word_probs.containsKey(non_cap)) {
+          if (ModelGeneration.capitalized(sentence.get(1)) & word_probs.containsKey(sentence.get(1))){
+            available_pos = word_probs.get(sentence.get(1)); // here we get available states of the
+          } else{
+              // if a lexicon contains a non-capitalized variant of a word
+                if (word_probs.containsKey(non_cap)) {
+                available_pos = word_probs.get(non_cap); 
+                }}
         
         } else  
-        	// 2. smoothed suffix- the strategy described in (Brants, 2000)
+          // 2. smoothed suffix- the strategy described in (Brants, 2000)
         {
-        	Map<String, Map<String, Double>> suffix_tree_local;
-        	// if a word is capitalized ... 
-        	if (ModelGeneration.capitalized(sentence.get(1))){
-        		suffix_tree_local = suffix_tree_cap;
-        	} else {
-        		suffix_tree_local = suffix_tree;
-        	}
-        	
-        	char [] unknown = sentence.get(1).toCharArray();
-        	for (int j=0;j<unknown.length; j++){
-        		// get the longest suffix distribution from the suffix tree
-        		String suffix = sentence.get(1).substring(j, unknown.length);
-        		if(suffix_tree_local.containsKey(suffix)){ 
-        			// get available POS with corresponding counts for the longest suffix
-            		Map available_pos_zwischen =suffix_tree_local.get(suffix); 
-            		// smoothing by successive abstraction for the probabilities of the longest suffix, 
-        			for(int suf=j+1; suf<unknown.length;suf++){
-        				String subsuffix = sentence.get(1).substring(suf, unknown.length);
-        				Map pos = new HashMap();
-        				if(suffix_tree_local.containsKey(subsuffix)){ 
-        					pos = suffix_tree_local.get(subsuffix);
-        				   Iterator posValuePairs = pos.entrySet().iterator(); 
-        				    while(posValuePairs.hasNext()){
-        				    	 Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs.next();
-        				         Object key = entry.getKey();
-        				         Double value = (Double) entry.getValue();
-        				   	  	 if (available_pos_zwischen.containsKey(key)) {
-        				   	  		 double zwischen_prob = (value + theta*(Double)available_pos_zwischen.get(key))/(1+theta);
-        				   	  		 available_pos_zwischen.put(key, zwischen_prob);
-        				   	  	 }/* else {
-        				   	  		 available_pos_zwischen.put(key, value);
-        				   	  	 }*/
-        				    }
-        				} else {
-        					Iterator posValuePairs2 = available_pos_zwischen.entrySet().iterator(); 
-        				    while(posValuePairs2.hasNext()){
-        				    	 Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs2.next();
-        				         Object key = entry.getKey();
-        				         Double value = (Double) entry.getValue();
-        				   	  	 // smooth suffix probability P(suffix|tag)
-        				   	  	 double zwischen_prob = (0 + theta*value)/(1+theta);
-        				   	     pos.put(key, zwischen_prob);
-        				   	  	
-        				    } available_pos_zwischen = pos;
-        				}
-        				 
-        			}
-        			available_pos = available_pos_zwischen;
-        			break;
-        			}
-        		// 
-        		else if (j==unknown.length-1){
-        			available_pos = word_probs.get("Clinton");
-        		}
-        	}
+          Map<String, Map<String, Double>> suffix_tree_local;
+          // if a word is capitalized ... 
+          if (ModelGeneration.capitalized(sentence.get(1))){
+            suffix_tree_local = suffix_tree_cap;
+          } else {
+            suffix_tree_local = suffix_tree;
+          }
+          
+          char [] unknown = sentence.get(1).toCharArray();
+          for (int j=0;j<unknown.length; j++){
+            // get the longest suffix distribution from the suffix tree
+            String suffix = sentence.get(1).substring(j, unknown.length);
+            if(suffix_tree_local.containsKey(suffix)){ 
+              // get available POS with corresponding counts for the longest suffix
+                Map available_pos_zwischen =suffix_tree_local.get(suffix); 
+                // smoothing by successive abstraction for the probabilities of the longest suffix, 
+              for(int suf=j+1; suf<unknown.length;suf++){
+                String subsuffix = sentence.get(1).substring(suf, unknown.length);
+                Map pos = new HashMap();
+                if(suffix_tree_local.containsKey(subsuffix)){ 
+                  pos = suffix_tree_local.get(subsuffix);
+                   Iterator posValuePairs = pos.entrySet().iterator(); 
+                    while(posValuePairs.hasNext()){
+                       Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs.next();
+                         Object key = entry.getKey();
+                         Double value = (Double) entry.getValue();
+                         if (available_pos_zwischen.containsKey(key)) {
+                           double zwischen_prob = (value + theta*(Double)available_pos_zwischen.get(key))/(1+theta);
+                           available_pos_zwischen.put(key, zwischen_prob);
+                         }/* else {
+                           available_pos_zwischen.put(key, value);
+                         }*/
+                    }
+                } else {
+                  Iterator posValuePairs2 = available_pos_zwischen.entrySet().iterator(); 
+                    while(posValuePairs2.hasNext()){
+                       Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs2.next();
+                         Object key = entry.getKey();
+                         Double value = (Double) entry.getValue();
+                         // smooth suffix probability P(suffix|tag)
+                         double zwischen_prob = (0 + theta*value)/(1+theta);
+                         pos.put(key, zwischen_prob);
+                        
+                    } available_pos_zwischen = pos;
+                }
+                 
+              }
+              available_pos = available_pos_zwischen;
+              break;
+              }
+            // 
+            else if (j==unknown.length-1){
+            //  available_pos = word_probs.get("Clinton");
+              available_pos = word_probs.get("(");
+            }
+          }
         }
         all.putAll(init_probs(END_OF_SENT_TAG, available_pos));
         continue; // go over to the next token
@@ -207,81 +209,81 @@ public class Viterbi {
       // next token
       
    /*   Matcher m2 = p.matcher(token);
-	  boolean b = m2.matches();
-		
-  	  if (b) {
-  		cardinals+=1;
-  		 possible_pos_next = word_probs.get("@card");
-  		// possible_pos_next.put("CARD", 1.00);
-  	  }
-  	  else */
+    boolean b = m2.matches();
+    
+      if (b) {
+      cardinals+=1;
+       possible_pos_next = word_probs.get("@card");
+      // possible_pos_next.put("CARD", 1.00);
+      }
+      else */
       if (word_probs.containsKey(sentence.get(i + 1))) { // if the next token is known
         possible_pos_next = word_probs.get(sentence.get(i + 1)); // get possible POS of the next
      
       } else   
       {
-        	Map<String, Map<String, Double>> suffix_tree_local;
-        	// if a word is capitalized ... 
-        	if (ModelGeneration.capitalized(sentence.get(i+1))){
-        		suffix_tree_local = suffix_tree_cap;
-        	} else {
-        		suffix_tree_local = suffix_tree;
-        	}
-        	
-        	char [] unknown = sentence.get(i+1).toCharArray();
-        	for (int j=0;j<unknown.length; j++){
-        		// get the longest suffix distribution from the suffix tree
-        		String suffix = sentence.get(i+1).substring(j, unknown.length);
-        		if(suffix_tree_local.containsKey(suffix)){ 
-        			// get available POS with corresponding counts for the longest suffix
-            		Map available_pos_zwischen =suffix_tree_local.get(suffix); 
-            		// 
-        			for(int suf=j+1; suf<unknown.length;suf++){
-        				String subsuffix = sentence.get(i+1).substring(suf, unknown.length);
-        				Map pos = new HashMap();
-        				if(suffix_tree_local.containsKey(subsuffix)){ 
-        					pos = suffix_tree_local.get(subsuffix);
-        				   Iterator posValuePairs = pos.entrySet().iterator(); // iterate over words
-        				    while(posValuePairs.hasNext()){
-        				    	 Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs.next();
-        				         Object key = entry.getKey();
-        				         Double value = (Double) entry.getValue();
-        				   	  	 if (available_pos_zwischen.containsKey(key)) {
-        				   	  		 // smooth suffix probability P(suffix|tag)
-        				   	  		 double zwischen_prob = (value + theta*(Double)available_pos_zwischen.get(key))/(1+theta);
-        				   	  		 available_pos_zwischen.put(key, zwischen_prob);
-        				   	  	 }/* else {
-        				   	  		 available_pos_zwischen.put(key, value);
-        				   	  	 }*/
-        				    }
-        				} else {
-        					Iterator posValuePairs2 = available_pos_zwischen.entrySet().iterator(); // iterate over words
-        				    while(posValuePairs2.hasNext()){
-        				    	 Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs2.next();
-        				         Object key = entry.getKey();
-        				         Double value = (Double) entry.getValue();
-        				   	  	 // smooth suffix probability P(suffix|tag)
-        				   	  	 double zwischen_prob = (0 + theta*value)/(1+theta);
-        				   	     pos.put(key, zwischen_prob);
-        				   	  	
-        				    } available_pos_zwischen = pos;
-        				}
-        				 
-        			}
-        			possible_pos_next = available_pos_zwischen;
-        			break;
-        			}
-        		else if (j==unknown.length-1){
-        			possible_pos_next = word_probs.get("Clinton");
-      		}
-      	}
+          Map<String, Map<String, Double>> suffix_tree_local;
+          // if a word is capitalized ... 
+          if (ModelGeneration.capitalized(sentence.get(i+1))){
+            suffix_tree_local = suffix_tree_cap;
+          } else {
+            suffix_tree_local = suffix_tree;
+          }
+          
+          char [] unknown = sentence.get(i+1).toCharArray();
+          for (int j=0;j<unknown.length; j++){
+            // get the longest suffix distribution from the suffix tree
+            String suffix = sentence.get(i+1).substring(j, unknown.length);
+            if(suffix_tree_local.containsKey(suffix)){ 
+              // get available POS with corresponding counts for the longest suffix
+                Map available_pos_zwischen =suffix_tree_local.get(suffix); 
+                // 
+              for(int suf=j+1; suf<unknown.length;suf++){
+                String subsuffix = sentence.get(i+1).substring(suf, unknown.length);
+                Map pos = new HashMap();
+                if(suffix_tree_local.containsKey(subsuffix)){ 
+                  pos = suffix_tree_local.get(subsuffix);
+                   Iterator posValuePairs = pos.entrySet().iterator(); // iterate over words
+                    while(posValuePairs.hasNext()){
+                       Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs.next();
+                         Object key = entry.getKey();
+                         Double value = (Double) entry.getValue();
+                         if (available_pos_zwischen.containsKey(key)) {
+                           // smooth suffix probability P(suffix|tag)
+                           double zwischen_prob = (value + theta*(Double)available_pos_zwischen.get(key))/(1+theta);
+                           available_pos_zwischen.put(key, zwischen_prob);
+                         }/* else {
+                           available_pos_zwischen.put(key, value);
+                         }*/
+                    }
+                } else {
+                  Iterator posValuePairs2 = available_pos_zwischen.entrySet().iterator(); // iterate over words
+                    while(posValuePairs2.hasNext()){
+                       Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs2.next();
+                         Object key = entry.getKey();
+                         Double value = (Double) entry.getValue();
+                         // smooth suffix probability P(suffix|tag)
+                         double zwischen_prob = (0 + theta*value)/(1+theta);
+                         pos.put(key, zwischen_prob);
+                        
+                    } available_pos_zwischen = pos;
+                }
+                 
+              }
+              possible_pos_next = available_pos_zwischen;
+              break;
+              }
+            else if (j==unknown.length-1){
+              possible_pos_next = word_probs.get("(");
+          }
+        }
       }
-    	 
+       
       Iterator keyValuePairs_next = possible_pos_next.entrySet().iterator();
       for (int u = 0; u < possible_pos_next.size(); u++) // for every possible tag of the next
                                                           // token, if the token is known..
       {
-    	Map.Entry entry_next = (Map.Entry) keyValuePairs_next.next();
+      Map.Entry entry_next = (Map.Entry) keyValuePairs_next.next();
         String key_next = (String) entry_next.getKey();
         Double value_next = (Double) entry_next.getValue(); // get
         double total_prob = 0.0; // just for fun, for forward algorithm
@@ -324,7 +326,7 @@ public class Viterbi {
             ngram = path_local.get(path_local.size() - 1) + "_" + key_next;
        
           }  else if (N == 2) {
-        	  
+            
             ngram = path_local.get(path_local.size() - 1) + "_" + key_next;
             
           } else if (N == 3 && i != 1) {
@@ -339,35 +341,55 @@ public class Viterbi {
           /* -- till here -- */
 
           double pp = 0;
-
-          // If an n-gram is known
-          if (transition_probs.containsKey(ngram)) {
+          
+          // smoothing only unknown n-grams strategy
+    /*      if (transition_probs.containsKey(ngram)) {
             // P(t2|t1) || use logs because of small numbers: log(pq) = log(p) +
             // log(q); if model parameters are stored logged then only addition
             // is performed at runtime
             pp = value_next + transition_probs.get(ngram);
-          } else {
-            // System.err.println("UNKNOWN NGRAM");
+          } else { */
+       //      System.err.println("UNKNOWN NGRAM");
 
-            // TODO add unknown ngram handler
-            pp = value_next + 0.001; // vorl�ufig, zum testen
-            //          
-          }
+           // At the moment we smooth both - known and unknown n-grams (seems to perform better)
+           double ppp;
+           if (N ==3 && i==1){
+             double lambda1 = lambdas2[0];
+                 double lambda2 = lambdas2[1];
+               
+                 ppp = (transition_probs.containsKey(ngram)) ? ((lambda2*transition_probs.get(ngram))+(lambda1*transition_probs.get(key_next))) : (lambda1*transition_probs.get(key_next));
+                 pp = Math.log(value_next) + Math.log(ppp); // P(t|w) * P(t1,t2,t3)
+           }
+           else if (N==3){
+            double lambda1 = lambdas3[0];
+              double lambda2 = lambdas3[1];
+              double lambda3 = lambdas3[2];
+              
+              if(transition_probs.containsKey(ngram)){
+              
+                
+                ppp = (lambda3*transition_probs.get(ngram))+(lambda2*transition_probs.get(ngram2))+(lambda1*transition_probs.get(key_next));
+              } else {
+              //  System.out.println(ngram2);
+                 ppp = (transition_probs.containsKey(ngram2)) ? ((lambda2*transition_probs.get(ngram2))+(lambda1*transition_probs.get(key_next))) : (lambda1*transition_probs.get(key_next));
+              }pp = Math.log(value_next) + Math.log(ppp);
+            }
+           if (N ==2){
+             double lambda1 = lambdas2[0];
+                 double lambda2 = lambdas2[1];
+               
+                 ppp = (transition_probs.containsKey(ngram)) ? ((lambda2*transition_probs.get(ngram))+(lambda1*transition_probs.get(key_next))) : (lambda1*transition_probs.get(key_next));
+                 pp = Math.log(value_next) + Math.log(ppp);
+           }
+   
           vprob_local += pp;
 
           if (y == 0) {
             max_viterbi_prob = vprob_local;
-            // System.out.println("initial max_viterbi_prob"+max_viterbi_prob);
           }
-
-          // total_prob += prob_local; // sum is no more good as we changed to
-          // logarithms
-          // System.out.println("P("+sentence.get(i+1)+"|"+key_next+")*P("+ngram+")="+vprob_local);
-          if (vprob_local >= max_viterbi_prob) { // HIER ENTSCHEIDET WELCHE von
-            // den m�glichen states wird
-            // �bernehmen
+          if (vprob_local >= max_viterbi_prob) { 
+           
             max_viterbi_prob = vprob_local;
-
             max_viterbi_path = new ArrayList(path_local);
             max_viterbi_path.add(key_next);
           }

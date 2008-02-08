@@ -61,7 +61,7 @@
 				<directory>desc</directory>
 			</resource>
 		</resources>
-		
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -71,13 +71,22 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>-Xmx500M</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<repositories>
-      <repository>
-        <id>ApacheIncubatorRepository</id>
-        <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-      </repository>
-  </repositories>
+		<repository>
+			<id>ApacheIncubatorRepository</id>
+			<url>
+				http://people.apache.org/repo/m2-incubating-repository/
+			</url>
+		</repository>
+	</repositories>
 </project>
 

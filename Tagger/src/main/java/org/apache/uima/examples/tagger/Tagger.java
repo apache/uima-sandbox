@@ -23,47 +23,35 @@
 
 package org.apache.uima.examples.tagger;
 
-import java.util.List;
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
 
 /**
- * known implementations: - HMMTagger using Viterbi algorithm 
+ * General tagger interface in case one would want to define further types of taggers.
+ * 
+ * Known implementations: {@link HMMTagger} using {@link Viterbi} algorithm 
  * to compute the most probable path of parts of speech for a given sequence of tokens
- * @see Viterbi
+ * @see Viterbi, HMMTagger
  */
 
-// AT THE MOMENT IS USELESS TODO: check if we need it at all..and integrate if :)
 
 public interface Tagger {
 
-  /**
-   * Initiates smoothing procedure for unknown words and N-grams
-   * @return true or false, depending on whether {@code smoothing}  is set in a {@code param.txt} file
-   */
-  public boolean set_smoothing();
   
   /**
    * Instantiates {@code MODEL} for current tagger
    */
   
-  public void init(); 
+  public void initialize(UimaContext aContext) throws ResourceInitializationException;
   
   /**
    * Trains a new model for tagger, if a training is defined in {@code tagger.properties} file
    * @see ModelGenerator  
    */
   
-  public void train();
-  
-  /**
-   * Tags a sequence 
-   * @param wordList
-   */
-  
-  public List process(List wordList);
-  
-  /**
-   * Tests tagging accuracy if reference corpus is available
-   */
-  public void test();
+   
+  public void process(JCas aJCas) throws AnalysisEngineProcessException;
   
 }

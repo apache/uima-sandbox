@@ -35,32 +35,62 @@
 			</nameValuePair>
 		</configurationParameterSettings>
 		<typeSystemDescription>
-			<typeDescription>
-				<name>org.apache.uima.TokenAnnotation</name>
-				<description>Single token annotation</description>
-				<supertypeName>uima.tcas.Annotation</supertypeName>
-				<features>
-					<featureDescription>
-						<name>posTag</name>
-						<description>
-							contains part-of-speech of a corresponding
-							token
-						</description>
-						<rangeTypeName>uima.cas.String</rangeTypeName>
-					</featureDescription>
-				</features>
-			</typeDescription>
-			<typeDescription>
-				<name>org.apache.uima.SentenceAnnotation</name>
-				<description>sentence annotation</description>
-				<supertypeName>uima.tcas.Annotation</supertypeName>
-				<features>
-
-				</features>
-			</typeDescription>
+			<types>
+				<typeDescription>
+					<name>org.apache.uima.TokenAnnotation</name>
+					<description>Single token annotation</description>
+					<supertypeName>uima.tcas.Annotation</supertypeName>
+					<features>
+						<featureDescription>
+							<name>posTag</name>
+							<description>
+								contains part-of-speech of a
+								corresponding token
+							</description>
+							<rangeTypeName>
+								uima.cas.String
+							</rangeTypeName>
+						</featureDescription>
+					</features>
+				</typeDescription>
+				<typeDescription>
+					<name>org.apache.uima.SentenceAnnotation</name>
+					<description>sentence annotation</description>
+					<supertypeName>uima.tcas.Annotation</supertypeName>
+				</typeDescription>
+			</types>
 		</typeSystemDescription>
 		<typePriorities />
 		<fsIndexCollection />
+		<capabilities>
+			<capability>
+				<inputs>
+					<type>org.apache.uima.TokenAnnotation</type>
+					<type allAnnotatorFeatures="true">
+						org.apache.uima.SentenceAnnotation
+					</type>
+					<feature>
+						org.apache.uima.TokenAnnotation:end
+					</feature>
+					<feature>
+						org.apache.uima.TokenAnnotation:begin
+					</feature>
+				</inputs>
+				<outputs>
+					<type>org.apache.uima.TokenAnnotation</type>
+					<feature>
+						org.apache.uima.TokenAnnotation:posTag
+					</feature>
+					<feature>
+						org.apache.uima.TokenAnnotation:end
+					</feature>
+					<feature>
+						org.apache.uima.TokenAnnotation:begin
+					</feature>
+				</outputs>
+				<languagesSupported />
+			</capability>
+		</capabilities>
 		<operationalProperties>
 			<modifiesCas>true</modifiesCas>
 			<multipleDeploymentAllowed>true</multipleDeploymentAllowed>

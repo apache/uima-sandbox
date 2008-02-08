@@ -23,19 +23,27 @@ package org.apache.uima.examples.tagger;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
-public class TagMapping {
+import org.apache.uima.examples.tagger.trainAndTest.Token;
 
-  public static List<Token> map_tags(List<Token> tokens) {
+public class TagMapping implements MappingInterface{
+
+  /**
+   * Defines mapping for List<{@link Token}>
+   * E.g. if we need to map tags, given a list of {@code Tokens}, we need to map the 
+   * {@code pos} field of every {@code Token} to a different {@code pos}.  
+   * Basically the mapping performed in this class is just a case of simple "normalization",
+   * we just discard compound tags of the Brown corpus here.
+   */
+  @SuppressWarnings("unchecked")
+  public List map_tags(List tokens) {
 
     // for (int i=0; i<sentences.size(); i++){ // iterate over sentences
 
     List<Token> tokens2 = new ArrayList<Token>(tokens.size());
 
     for (int x = 0; x < tokens.size(); x++) { // iterate over tokens of the sentence with their
-                                              // corresponding POS
-      Token current_token = tokens.get(x);
+      // corresponding POS
+      Token current_token = (Token)tokens.get(x);
       String[] z = new String[2];
       if (current_token.pos.contains("+")) {
         z = current_token.pos.split("[+]");
@@ -68,5 +76,6 @@ public class TagMapping {
     return tokens2;
 
   }
+
 
 }
