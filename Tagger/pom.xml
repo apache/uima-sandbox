@@ -60,6 +60,12 @@
 			<resource>
 				<directory>desc</directory>
 			</resource>
+            <resource>
+                <directory>resources</directory>
+                <excludes>
+                    <exclude>**</exclude>
+                </excludes>
+            </resource>
 		</resources>
 
 		<plugins>

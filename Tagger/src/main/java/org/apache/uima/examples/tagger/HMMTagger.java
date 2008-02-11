@@ -25,13 +25,13 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.uima.SentenceAnnotation;
 import org.apache.uima.TokenAnnotation;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.analysis_engine.annotator.AnnotatorConfigurationException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
@@ -49,6 +49,10 @@ import org.apache.uima.resource.ResourceInitializationException;
  */
 
 public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
+  
+  private static final String model_file_param = "Model";
+  
+  private static final String n_param = "NGRAM_SIZE";
 
   /**
    * Model file name
@@ -76,31 +80,10 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
     super.initialize(aContext);
 
     try {
-      // Get configuration parameter values
-      String paramFile = (String) aContext.getConfigParameterValue("PARAM_FILE");
 
-      // create and load default properties
-      Properties defaultProps = new Properties();
-      FileInputStream in = new FileInputStream(paramFile);
-      defaultProps.load(in);
-      in.close();
-
-      MODEL = defaultProps.getProperty("MODEL");
-
-      String n = defaultProps.getProperty("N");
-      N = Integer.parseInt(n);
+      this.N = ((Integer) aContext.getConfigParameterValue(n_param)).intValue();
           
-      String b =  defaultProps.getProperty("DO_MAPPING");
-      DO_MAPPING = Boolean.valueOf(b);
-      
-      if (DO_MAPPING){
-        String m = defaultProps.getProperty("MAPPING");
-         MappingInterface klasse = (MappingInterface)(Class.forName(m)).newInstance();
-         MAPPING = klasse;
-      } else {
-        MAPPING = null;
-      }
-       my_model = get_model(MODEL);
+      my_model = get_model();
 
     } catch (Exception e) {
       throw new ResourceInitializationException(e);
@@ -117,6 +100,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
   public static ModelGeneration get_model(String filename) {
 
     System.out.println("The used model is:" + filename);
+    
     InputStream model = null;
     ModelGeneration oRead = null;
 
@@ -138,6 +122,37 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
     }
     return oRead;
   }
+  
+  private ModelGeneration get_model() throws AnnotatorConfigurationException {
+
+    IModelResource modelResource = null;
+    try {
+      modelResource = (IModelResource) getContext().getResourceObject(model_file_param);
+    } catch (Exception e) {
+      throw new AnnotatorConfigurationException(e);
+    }
+
+    InputStream model = modelResource.getInputStream();
+    ModelGeneration oRead = null;
+
+    try {
+      ObjectInputStream p = new ObjectInputStream(model);
+      oRead = (ModelGeneration) p.readObject();
+    }
+
+    catch (IOException e) {
+      System.err.println(e);
+    } catch (ClassNotFoundException e) {
+      System.err.println(e);
+    } finally {
+      try {
+        model.close();
+      } catch (Exception e) {
+      }
+    }
+    return oRead;
+  }
+
 
   /**
    * Process a CAS.
