@@ -310,6 +310,53 @@ public class TestUimaEE extends BaseTestSupport
 		runTestWithMultipleThreads(relativePath+"/Deploy_PersonTitleAnnotator.xml", "PersonTitleAnnotatorQueue", howManyCASesPerRunningThread, howManyRunningThreads, 0 );
 	}
 	/**
+	 * 
+	 * @throws Exception
+	 */
+	public void testPrimitiveProcessCallWithLongDelay() throws Exception
+	{
+	    System.out.println("-------------- testPrimitiveProcessCallWithLongDelay -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		//	Deploy Uima EE Primitive Service 
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml");
+		super.setExpectingServiceShutdown();
+		//	We expect 18000ms to be spent in process method
+		super.setExpectedProcessTime(6000);
+
+	    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"NoOpAnnotatorQueueLongDelay" );
+	    appCtx.remove(UimaAsynchronousEngine.ReplyWindow);
+	    appCtx.put(UimaAsynchronousEngine.ReplyWindow, 1);
+	    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"NoOpAnnotatorQueueLongDelay", 4, PROCESS_LATCH, true);
+	}
+	/**
+	 * Tests time spent in process CAS. The CAS is sent to three remote delegates each
+	 * with a delay of 6000ms in the process method. The aggregate is expected to sum
+	 * up the time spent in each annotator process method. The final sum is returned
+	 * to the client (the test) and compared against expected 18000ms. The test actually
+	 * allows for 20ms margin to account for any overhead (garbage collecting, slow cpu, etc)
+	 *  
+	 * @throws Exception
+	 */
+	public void testAggregateProcessCallWithLongDelay() throws Exception
+	{
+		
+	    System.out.println("-------------- testAggregateProcessCallWithLongDelay -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		//	Deploy Uima EE Primitive Services each with 6000ms delay in process()
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorAWithLongDelay.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorBWithLongDelay.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorCWithLongDelay.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithLongDelay.xml");
+		super.setExpectingServiceShutdown();
+		//	We expect 18000ms to be spent in process method
+		super.setExpectedProcessTime(18000);
+	    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue" );
+	    appCtx.remove(UimaAsynchronousEngine.ReplyWindow);
+	    //	make sure we only send 1 CAS at a time
+	    appCtx.put(UimaAsynchronousEngine.ReplyWindow, 1);
+	    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
+	}
+	/**
 	 * Tests shutdown while running with multiple/concurrent threads
 	 * The Annotator throws an exception and the Aggregate error handling is setup to terminate
 	 * on the first error.

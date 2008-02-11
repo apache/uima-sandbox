@@ -41,6 +41,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.EntityProcessStatus;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
+import org.apache.uima.util.ProcessTraceEvent;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 
 public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEEStatusCallbackListener
@@ -60,6 +61,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 	protected boolean isStopped = false;
 	protected long responseCounter = 0;
 	protected boolean expectingServiceShutdownException = false;
+	protected long expectedProcessTime = 0;
 	boolean serviceShutdownException = false;
 
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
@@ -80,6 +82,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 	protected void setExpectingServiceShutdown()
 	{
 		expectingServiceShutdownException = true;
+	}
+
+	protected void setExpectedProcessTime( long expectedTimeToProcess )
+	{
+		expectedProcessTime = expectedTimeToProcess;
 	}
 
 
@@ -437,6 +444,25 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 		{
 			System.out.println(" Received Reply Containing CAS");
 			processCountLatch.countDown();
+			List eList = aProcessStatus.getProcessTrace().getEventsByComponentName("UimaEE", false);
+			for( int i=0; i < eList.size(); i++)
+			{
+			  ProcessTraceEvent eEvent = (ProcessTraceEvent)eList.get(i);
+			  System.out.println("Received Process Event - "+eEvent.getDescription()+" Duration::"+eEvent.getDuration()+" ms"); // / (float) 1000000);
+			  //	Check if the running test wants to check how long the processing of CAS took
+			  if (  expectedProcessTime > 0 &&
+				    "Total Time In Process CAS".equals(eEvent.getDescription()))
+			  {
+				  //	Check if the expected duration exceeded actual duration for processing
+				  //	a CAS. Allow 50ms difference.
+				  if (eEvent.getDuration() > expectedProcessTime &&  (eEvent.getDuration() % expectedProcessTime ) > 50 ) 
+				  {
+					  System.out.println("!!!!!!!!!!!!! Expected Process CAS Duration of:"+expectedProcessTime+" ms. Instead Process CAS Took:"+eEvent.getDuration());
+					  unexpectedException = true;
+				  }
+			  }
+
+			}
 			incrementCASesProcessed();
 		}
 	}
@@ -530,7 +556,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 					try
 					{
 						// Send CAS and wait for a response
-						uimaClient.sendAndReceiveCAS(cas);
+						uimaClient.sendAndReceiveCAS(cas, pt);
 					}
 					catch( ResourceProcessException rpe)
 					{

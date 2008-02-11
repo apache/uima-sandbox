@@ -398,7 +398,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		return false;
 	}
 	
-	private synchronized void computeIdleTime()
+	private synchronized long computeIdleTime()
 	{
 		try
 		{
@@ -411,7 +411,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 					long t = System.nanoTime();
 					long delta = t-(long)lastReplyTime;
 					getController().saveIdleTime(delta, "", true);
-
+					return delta;
 				}
 			}
 		}
@@ -419,6 +419,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		{
 			e.printStackTrace();
 		}
+		return 0;
 	}
 
 	
@@ -454,17 +455,17 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
                 "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_msg__FINE",
                 new Object[] { endpointName });
 		JmsMessageContext messageContext = null;
-		
+		long idleTime = 0;
 		try
 		{
 			if ( isProcessRequest(aMessage) )
 			{
-				computeIdleTime();
+				idleTime = computeIdleTime();
 			}
 
 			//	Wrap JMS Message in MessageContext
 			messageContext = new JmsMessageContext( aMessage, endpointName );
-
+			messageContext.getEndpoint().setIdleTime(idleTime);
 			if ( jmsSession == null )
 			{
 				jmsSession = aJmsSession;
