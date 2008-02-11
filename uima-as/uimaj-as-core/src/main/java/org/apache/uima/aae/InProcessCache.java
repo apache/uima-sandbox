@@ -571,6 +571,7 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private long timeToSerializeCAS = 0;
 		
+		private long timeToProcessCAS = 0;
 		private String casMultiplierKey;
 		
 		private boolean sendRequestToFreeCas = true;
@@ -638,6 +639,10 @@ public class InProcessCache implements InProcessCacheMBean
 		public void incrementTimeToDeserializeCAS(long aTimeToDeserializeCAS)
 		{
 			timeToDeserializeCAS += aTimeToDeserializeCAS;
+		}
+		public void incrementTimeToProcessCAS(long aTimeToProcessCAS)
+		{
+			timeToProcessCAS += aTimeToProcessCAS;
 		}
 
 		public void setCasMultiplierKey( String aKey )
@@ -825,6 +830,13 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			this.aborted = aborted;
 		}
+		public long getTimeToProcessCAS() {
+			return timeToProcessCAS;
+		}
+		public void setTimeToProcessCAS(long timeToProcessCAS) {
+			this.timeToProcessCAS = timeToProcessCAS;
+		}
+
     public boolean isPendingReply() {
       return pendingReply;
     }

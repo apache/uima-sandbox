@@ -102,6 +102,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	private int initialHeapSize;
 	private volatile boolean replyDestinationFailed;
 	
+	private long idleTime=0;
 	public int getCommand()
 	{
 		return command;
@@ -532,4 +533,11 @@ public class Endpoint_impl implements Endpoint, Cloneable
 		return replyDestinationFailed;
 	}
 
+	public long getIdleTime() {
+		return idleTime;
+	}
+
+	public void setIdleTime(long idleTime) {
+		this.idleTime = idleTime;
+	}
 }

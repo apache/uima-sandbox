@@ -58,6 +58,55 @@ public class ProcessResponseHandler extends HandlerBase
 		super(aName);
 	}
 
+	private void aggregateDelegateStats(MessageContext aMessageContext, String aCasReferenceId) throws AsynchAEException
+	{
+		try
+		{
+			CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+			if ( entry == null )
+			{
+				throw new AsynchAEException("CasReferenceId:"+aCasReferenceId+" Not Found in the Cache.");
+			}
+			String inputCasReferenceId = entry.getInputCasReferenceId();
+			if ( inputCasReferenceId != null && 
+				 getController().getInProcessCache().entryExists(inputCasReferenceId) )
+			{
+				//	Get entry for the input CAS
+				entry = getController().
+							getInProcessCache().
+								getCacheEntryForCAS(inputCasReferenceId);
+			}
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeToSerializeCAS))
+			{
+				long timeToSerializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToSerializeCAS)).longValue();
+				entry.incrementTimeToSerializeCAS(timeToSerializeCAS);
+			}
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeToDeserializeCAS))
+			{
+				long timeToDeserializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToDeserializeCAS)).longValue();
+				entry.incrementTimeToDeserializeCAS(timeToDeserializeCAS);
+			}
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeWaitingForCAS))
+			{
+				long timeWaitingForCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeWaitingForCAS)).longValue();
+				entry.incrementTimeWaitingForCAS(timeWaitingForCAS);
+			}
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeInProcessCAS))
+			{
+				long timeInProcessCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeInProcessCAS)).longValue();
+				entry.incrementTimeToProcessCAS(timeInProcessCAS);
+			}
+			
+		}
+		catch( AsynchAEException e)
+		{
+			throw e;
+		}
+		catch( Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+	}
 	private void computeStats(MessageContext aMessageContext, String aCasReferenceId) throws AsynchAEException
 	{
 		if (aMessageContext.propertyExists(AsynchAEMessage.TimeInService))
@@ -80,6 +129,12 @@ public class ProcessResponseHandler extends HandlerBase
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "computeStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_time_spent_in_comms__FINE",
 	                new Object[] { aCasReferenceId, (double) totalTimeInComms / (double) 1000000, aMessageContext.getEndpoint() });
+		}
+		
+			if ( getController() instanceof AggregateAnalysisEngineController )
+			{
+				aggregateDelegateStats( aMessageContext, aCasReferenceId );
+			}			
 			
 			if ( aMessageContext.propertyExists(AsynchAEMessage.DelegateStats) )
 			{	
@@ -111,7 +166,6 @@ public class ProcessResponseHandler extends HandlerBase
 					}
 				}
 			}
-		}
 	}
 
 	private Endpoint lookupEndpoint(String anEndpointName, String aCasReferenceId)
