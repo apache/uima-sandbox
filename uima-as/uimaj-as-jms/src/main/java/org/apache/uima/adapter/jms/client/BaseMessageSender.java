@@ -29,6 +29,7 @@ import javax.jms.TextMessage;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
+import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngineCommon_impl.ClientRequest;
 import org.apache.uima.adapter.jms.message.PendingMessage;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.util.Level;
@@ -199,6 +200,12 @@ public abstract class BaseMessageSender implements Runnable,
 						JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
 						"UIMAJMS_sending_msg_to_endpoint__FINEST",
 						new Object[] { destination });
+				if ( pm.getMessageType() == AsynchAEMessage.Process )
+				{
+					ClientRequest cacheEntry = (ClientRequest)
+						engine.getCache().get(pm.get(AsynchAEMessage.CasReference));
+					cacheEntry.setCASDepartureTime(System.nanoTime());
+				}
 				producer.send(message);
 			} catch (Exception e) {
 				handleException(e, destination);
