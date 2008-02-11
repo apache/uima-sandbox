@@ -133,4 +133,7 @@ public interface Endpoint
 	public void setReplyDestinationFailed();
 	
 	public boolean replyDestinationFailed();
+	public void setIdleTime( long anIdleTime );
+	
+	public long getIdleTime();
 }

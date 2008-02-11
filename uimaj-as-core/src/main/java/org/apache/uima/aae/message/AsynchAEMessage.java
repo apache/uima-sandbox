@@ -19,6 +19,7 @@
 
 package org.apache.uima.aae.message;
 
+
 public interface AsynchAEMessage
 {
 	public static final String TotalTimeSpentInAnalytic = "TimeInAnalytic";
@@ -45,6 +46,7 @@ public interface AsynchAEMessage
 	public static final String TimeToSerializeCAS = "TimeToSerializeCAS";
 	public static final String TimeToDeserializeCAS = "TimeToDeserializeCAS";
 	public static final String TimeWaitingForCAS  = "TimeWaitingForCAS";
+	public static final String TimeInProcessCAS  = "TimeInProcessCAS";
 	public static final String IdleTime  = "IdleTime";
 	public static final String CAS  = "CAS";
 
