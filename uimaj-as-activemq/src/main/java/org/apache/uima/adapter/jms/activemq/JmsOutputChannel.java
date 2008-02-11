@@ -1014,7 +1014,7 @@ public class JmsOutputChannel implements OutputChannel
 	{
 		if ( anEndpoint.isFinal() )
 		{
-			aTextMessage.setLongProperty(AsynchAEMessage.TotalTimeSpentInAnalytic, (System.nanoTime()-anEndpoint.getEntryTime()));
+			//aTextMessage.setLongProperty(AsynchAEMessage.TotalTimeSpentInAnalytic, (System.nanoTime()-anEndpoint.getEntryTime()));
 			aTextMessage.setLongProperty("SENT-TIME", System.nanoTime());
 		}
 
@@ -1031,6 +1031,8 @@ public class JmsOutputChannel implements OutputChannel
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToSerializeCAS, entry.getTimeToSerializeCAS());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, entry.getTimeToDeserializeCAS());
+				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, entry.getTimeToProcessCAS() );
+				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, anEndpoint.getIdleTime() );
 				
 				String lookupKey = getAnalysisEngineController().getName();//getInProcessCache().getMessageAccessorByReference(aCasReferenceId).getEndpointName();
 				long arrivalTime = getAnalysisEngineController().getTime( aCasReferenceId, lookupKey); //serviceInputEndpoint);
@@ -1038,7 +1040,7 @@ public class JmsOutputChannel implements OutputChannel
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "populateStats", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timein_service__FINEST",
 	                    new Object[] { serviceInputEndpoint, (double)timeInService/(double)1000000 });
-				aTextMessage.setLongProperty(AsynchAEMessage.TimeInService, timeInService );
+//				aTextMessage.setLongProperty(AsynchAEMessage.TimeInService, timeInService );
 /*				
 				TimerStats timerStats = new TimerStats();
 				timerStats.put(AsynchAEMessage.TimeToSerializeCAS, entry.getTimeToSerializeCAS());
