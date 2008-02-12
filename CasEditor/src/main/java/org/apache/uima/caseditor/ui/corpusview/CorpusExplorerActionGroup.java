@@ -27,6 +27,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.SameShellProvider;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -230,5 +231,10 @@ final class CorpusExplorerActionGroup extends ActionGroup implements ICorpusExpl
     consumerCorpusActionGroup.dispose();
     uimaRefactorActionGroup.dispose();
     propertyAction.dispose();
+  }
+
+  void handleKeyPressed(KeyEvent e) {
+    refactorGroup.handleKeyPressed(e);
+    workspaceGroup.handleKeyPressed(e);
   }
 }

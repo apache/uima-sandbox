@@ -21,7 +21,9 @@ package org.apache.uima.caseditor.ui.corpusview;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -178,8 +180,23 @@ final class RefactorGroup extends ActionGroup {
         mDeleteAction.selectionChanged(selection);
         mRenameAction.selectionChanged(selection);
     }
-
-    /**
+  
+	void handleKeyPressed(KeyEvent e) {
+		if (e.keyCode == SWT.F2 && e.stateMask == 0) {
+			if (mRenameAction.isEnabled()) {
+				mRenameAction.run();
+				e.doit = false;
+			}
+		}
+		else if (e.keyCode == SWT.DEL && e.stateMask == 0) {
+			if (mDeleteAction.isEnabled()) {
+				mDeleteAction.run();
+				e.doit = false;
+			}
+		}
+	}
+  
+  /**
    * Destroy all swt elements which where created by this instance.
    */
   @Override

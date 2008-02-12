@@ -34,6 +34,8 @@ import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -76,7 +78,7 @@ public final class CorpusExplorerView extends ViewPart
                 new WorkbenchLabelProvider(), PlatformUI.getWorkbench()
                         .getDecoratorManager().getLabelDecorator()));
         
-        // performence optimization
+        // performance optimization
         mTreeViewer.setUseHashlookup(true); // TODO: change back to true
         
         initContextMenu();
@@ -131,7 +133,7 @@ public final class CorpusExplorerView extends ViewPart
     }
     
     /**
-     * Initializes the lsiteners.
+     * Initializes the listeners.
      */
     private void initListeners()
     {
@@ -170,6 +172,15 @@ public final class CorpusExplorerView extends ViewPart
                 mActions.updateActionBars();
             }
         });
+        
+        mTreeViewer.getTree().addKeyListener(new KeyListener(){
+
+			public void keyPressed(KeyEvent e) {
+				mActions.handleKeyPressed(e);
+			}
+
+			public void keyReleased(KeyEvent e) {
+			}});
     }
     
     /**
