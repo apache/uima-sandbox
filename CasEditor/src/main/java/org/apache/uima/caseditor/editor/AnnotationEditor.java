@@ -638,17 +638,22 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    */
   @Override
   public Object getAdapter(Class adapter) {
-    if (IContentOutlinePage.class.equals(adapter)) {
+	  
+	  
+    if (IContentOutlinePage.class.equals(adapter) && getDocument() != null) {
       if (mOutlinePage == null) {
         mOutlinePage = new AnnotationOutline(this);
       }
 
       return mOutlinePage;
-    } else if (CAS.class.equals(adapter)) {
+    } 
+    else if (CAS.class.equals(adapter) && getDocument() != null) {
       return getDocument().getCAS();
-    } else {
+    } 
+    else {
       return super.getAdapter(adapter);
     }
+    
   }
 
   @Override

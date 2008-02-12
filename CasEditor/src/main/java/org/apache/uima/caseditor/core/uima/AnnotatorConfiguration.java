@@ -29,7 +29,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.IPath;
 
 /**
  * TODO: add java doc here

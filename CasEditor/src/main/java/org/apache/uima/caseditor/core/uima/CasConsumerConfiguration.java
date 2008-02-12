@@ -30,7 +30,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.IPath;
 
 /**
  * TODO: add javadoc here

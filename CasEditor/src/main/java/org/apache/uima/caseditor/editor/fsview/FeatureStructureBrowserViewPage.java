@@ -314,7 +314,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
       // TODO: check if an AnnotationFS was created, if so
       // add it to the document
 
-      mEditor.getDocument().fireDocumentChanged();
+      mDocument.fireDocumentChanged();
 
       // inserts a new feature strucutre of current type
       if (mCurrentType == null) {
@@ -337,7 +337,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     }
   }
 
-  private AnnotationEditor mEditor;
+  private AnnotationDocument mDocument;
 
   private CAS mCAS;
 
@@ -356,13 +356,17 @@ public final class FeatureStructureBrowserViewPage extends Page {
   /**
    * Initializes a new instance.
    *
-   * @param editor
+   * @param document
    */
-  public FeatureStructureBrowserViewPage(AnnotationEditor editor) {
-    mCAS = editor.getDocument().getCAS();
-    mEditor = editor;
+  public FeatureStructureBrowserViewPage(AnnotationDocument document) {
+	
+	if (document == null) 
+		throw new IllegalArgumentException("document parameter must not be null!");
+	  
+    mCAS = document.getCAS();
+    mDocument = document;
 
-    mDeleteAction = new DeleteFeatureStructureAction(editor.getDocument());
+    mDeleteAction = new DeleteFeatureStructureAction(this.mDocument);
 
     mSelectAllAction = new SelectAllAction();
 
@@ -433,7 +437,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
     instanceListData.verticalAlignment = SWT.FILL;
     mFSList.getList().setLayoutData(instanceListData);
     mFSList
-            .setContentProvider(new FeatureStructureTreeContentProvider(mEditor.getDocument(), mCAS));
+            .setContentProvider(new FeatureStructureTreeContentProvider(mDocument, mCAS));
     mFSList.setLabelProvider(new FeatureStructureLabelProvider());
 
     mFSList.setUseHashlookup(true);

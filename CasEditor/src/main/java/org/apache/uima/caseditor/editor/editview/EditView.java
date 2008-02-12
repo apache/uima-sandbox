@@ -20,6 +20,7 @@
 package org.apache.uima.caseditor.editor.editview;
 
 
+import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.AnnotationEditorView;
 import org.eclipse.ui.IWorkbenchPart;
@@ -41,19 +42,24 @@ public final class EditView extends AnnotationEditorView {
 
   @Override
   protected PageRec doCreatePage(IWorkbenchPart part) {
-    PageRec result;
+	
+	// if its not possible to create a result the view
+	// unavailable message is displayed
+	  
+	PageRec result = null;
 
     if ((part instanceof AnnotationEditor)) {
       AnnotationEditor editor = (AnnotationEditor) part;
 
-      EditViewPage page = new EditViewPage(this, editor);
-      initPage(page);
-      page.createControl(getPageBook());
-
-      result = new PageRec(part, page);
-    } else {
-      // unable to create page, cause there is no cas
-      result = null;
+      AnnotationDocument document = editor.getDocument();
+      
+      if (document != null) {
+	      EditViewPage page = new EditViewPage(this, document);
+	      initPage(page);
+	      page.createControl(getPageBook());
+	
+	      result = new PageRec(part, page);
+      }
     }
 
     return result;

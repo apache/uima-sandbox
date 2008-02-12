@@ -41,7 +41,6 @@ import org.apache.uima.caseditor.Images;
 import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.caseditor.core.util.Primitives;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
-import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.ArrayValue;
 import org.apache.uima.caseditor.editor.FeatureStructureSelection;
 import org.apache.uima.caseditor.editor.FeatureValue;
@@ -535,9 +534,13 @@ final class EditViewPage extends Page implements ISelectionListener {
 
   private final EditView editView;
 
-  EditViewPage(EditView editView, AnnotationEditor editor) {
+  EditViewPage(EditView editView, AnnotationDocument document) {
+	  
+	if (editView == null || document == null)
+        throw new IllegalArgumentException("Parameters must not be null!");
+	 
     this.editView = editView;
-    document = editor.getDocument();
+    this.document = document;
   }
 
   @Override

@@ -120,8 +120,8 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 					return document;
 				}
 				catch (CoreException e) {
-					mElementErrorStatus.put(element, new Status(IStatus.INFO,
-							CasEditorPlugin.ID, IStatus.ERROR,
+					mElementErrorStatus.put(element, new Status(IStatus.ERROR,
+							CasEditorPlugin.ID, IStatus.OK,
 							"There is a problem with the document: " + e.getMessage(), e));
 				}
 			}
@@ -129,11 +129,11 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 				IStatus status;
 
 				if (nlpElement == null) {
-					status = new Status(IStatus.INFO, CasEditorPlugin.ID, IStatus.ERROR,
+					status = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK,
 							"Document not in a corpus folder!", null);
 				}
 				else {
-					status = new Status(IStatus.INFO, CasEditorPlugin.ID, IStatus.ERROR,
+					status = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK,
 							"Not a cas document!", null);
 				}
 
