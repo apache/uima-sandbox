@@ -62,9 +62,6 @@
 			</resource>
             <resource>
                 <directory>resources</directory>
-                <excludes>
-                    <exclude>**</exclude>
-                </excludes>
             </resource>
 		</resources>
 
