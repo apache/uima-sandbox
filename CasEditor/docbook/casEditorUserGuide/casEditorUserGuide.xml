@@ -88,9 +88,8 @@
 						<para>
 							<emphasis>CAS file</emphasis>
 							The CAS itself, it must be located in a
-							corpus folder and must end with ".xcas" to
-							be recognized as a CAS file. Currently only
-							xcas files are supported.
+							corpus folder and must end with ".xmi" or".xcas" to
+							be recognized as a CAS file.
 						</para>
 					</listitem>
 
