@@ -52,6 +52,12 @@
 			<version>2.3.0-incubating-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.apache.uima</groupId>
+            <artifactId>PearPackagingMavenPlugin</artifactId>
+            <version>2.3.0-incubating-SNAPSHOT</version>
+            <scope>package</scope>
+        </dependency>
 
 	</dependencies>
 	<build>
@@ -81,6 +87,24 @@
 					<argLine>-Xmx500M</argLine>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.uima</groupId>
+                <artifactId>PearPackagingMavenPlugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                          <classpath>$main_root/target/uimaj-tagger.jar;$main_root/desc</classpath>
+                          <mainComponentDesc>desc/HmmTagger.xml</mainComponentDesc>
+                          <componentId>HmmPosTagger</componentId>
+                        </configuration>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>    
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 	<repositories>
