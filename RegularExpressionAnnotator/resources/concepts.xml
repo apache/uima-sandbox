@@ -23,8 +23,8 @@
 
 	<concept name="emailAddressDetection">
 		<rules>
-			<rule
-				regEx="([a-zA-Z0-9!#$%*+'/=?^_-`{|}~.\x26]+)@([a-zA-Z0-9._-]+[a-zA-Z]{2,4})"
+			<rule       
+				regEx="([a-zA-Z0-9!#$%*+'/=?^_\x2D`{|}~.\x26]+)@([a-zA-Z0-9._-]+[a-zA-Z]{2,4})"
 				matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation" />
 		</rules>
 		<createAnnotations>
