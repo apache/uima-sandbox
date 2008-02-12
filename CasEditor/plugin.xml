@@ -207,7 +207,7 @@
 			class="org.apache.uima.caseditor.editor.AnnotationEditor"
 			name="Annotation Editor"
 			contributorClass="org.apache.uima.caseditor.editor.AnnotationEditorActionContributor"
-			id="org.apache.uima.caseditor.editor" extensions="xcas">
+			id="org.apache.uima.caseditor.editor" extensions="xcas,xmi">
 		</editor>
 	</extension>
 

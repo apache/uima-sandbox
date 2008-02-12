@@ -41,10 +41,14 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.XCASDeserializer;
 import org.apache.uima.cas.impl.XCASSerializer;
+import org.apache.uima.cas.impl.XmiCasDeserializer;
+import org.apache.uima.cas.impl.XmiCasSerializer;
+import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.AbstractDocument;
 import org.apache.uima.caseditor.core.model.DocumentElement;
+import org.apache.uima.caseditor.core.model.DocumentFormat;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.util.Span;
 import org.apache.uima.util.XMLSerializer;
@@ -54,263 +58,341 @@ import org.eclipse.core.runtime.Status;
 import org.xml.sax.SAXException;
 
 /**
- * TODO: add javdoc here
+ * This document implementation is based on an uima cas object.
  */
 public class DocumentUimaImpl extends AbstractDocument {
 
-  private final DocumentElement mDocumentElement;
+	private final DocumentElement mDocumentElement;
 
-  private final TypeSystem mTypeSystem;
+	private final TypeSystem mTypeSystem;
 
-  private final CAS mCAS;
+	private final CAS mCAS;
 
-  /**
-   * Initializes a new instance.
-   * 
-   * @param project
-   */
-  public DocumentUimaImpl(NlpProject project, DocumentElement element, InputStream in)
-          throws CoreException {
+	private final DocumentFormat format;
 
-    mTypeSystem = project.getTypesystemElement().getTypeSystem();
+	/**
+	 * Initializes a new instance.
+	 * 
+	 * @param project
+	 */
+	public DocumentUimaImpl(NlpProject project, DocumentElement element,
+			InputStream in, DocumentFormat format) throws CoreException {
 
-    if (mTypeSystem == null) {
-      throw new CoreException(new Status(IStatus.INFO, CasEditorPlugin.ID, IStatus.ERROR,
-              "Invalid typesystem!", null));
-    }
+		this.format = format;
 
-    mCAS = project.getTypesystemElement().getCAS();
+		mTypeSystem = project.getTypesystemElement().getTypeSystem();
 
-    mDocumentElement = element;
+		if (mTypeSystem == null) {
+			throw new CoreException(new Status(IStatus.INFO,
+					CasEditorPlugin.ID, IStatus.ERROR, "Invalid typesystem!",
+					null));
+		}
 
-    setContent(in);
-  }
+		mCAS = project.getTypesystemElement().getCAS();
 
-  /**
-   * Retrieves the {@link CAS}.
-   */
-  public CAS getCAS() {
-    return mCAS;
-  }
+		mDocumentElement = element;
 
-  /**
-   * Adds the given annotation to the {@link CAS}.
-   */
-  public void addFeatureStructure(FeatureStructure annotation) {
-    mCAS.getIndexRepository().addFS(annotation);
+		setContent(in);
+	}
 
-    fireAddedAnnotation(annotation);
-  }
+	/**
+	 * Retrieves the {@link CAS}.
+	 */
+	public CAS getCAS() {
+		return mCAS;
+	}
 
-  /**
-   * 
-   */
-  public void addFeatureStructures(Collection<FeatureStructure> annotations) {
-    for (FeatureStructure annotation : annotations) {
-      addFeatureStructure(annotation);
-    }
-  }
+	/**
+	 * Adds the given annotation to the {@link CAS}.
+	 */
+	public void addFeatureStructure(FeatureStructure annotation) {
+		mCAS.getIndexRepository().addFS(annotation);
 
-  /**
-   * Remove all annotations. TODO: implement it
-   */
-  public void removeAnnotation() {
-    // must be implemented
-  }
+		fireAddedAnnotation(annotation);
+	}
 
-  /**
-   * Internally removes an annotation from the {@link CAS}.
-   * 
-   * @param featureStructure
-   */
-  private void removeAnnotationInternal(FeatureStructure featureStructure) {
-    getCAS().getIndexRepository().removeFS(featureStructure);
-  }
+	/**
+	 * 
+	 */
+	public void addFeatureStructures(Collection<FeatureStructure> annotations) {
+		for (FeatureStructure annotation : annotations) {
+			addFeatureStructure(annotation);
+		}
+	}
 
-  /**
-   * Removes the annotations from the {@link CAS}.
-   */
-  public void removeFeatureStructure(FeatureStructure annotation) {
-    removeAnnotationInternal(annotation);
+	/**
+	 * Remove all annotations. TODO: implement it
+	 */
+	public void removeAnnotation() {
+		// must be implemented
+	}
 
-    fireRemovedAnnotation(annotation);
-  }
+	/**
+	 * Internally removes an annotation from the {@link CAS}.
+	 * 
+	 * @param featureStructure
+	 */
+	private void removeAnnotationInternal(FeatureStructure featureStructure) {
+		getCAS().getIndexRepository().removeFS(featureStructure);
+	}
 
-  /**
-   * Removes the given annotations from the {@link CAS}.
-   */
-  public void removeFeatureStructures(Collection<FeatureStructure> annotationsToRemove) {
+	/**
+	 * Removes the annotations from the {@link CAS}.
+	 */
+	public void removeFeatureStructure(FeatureStructure annotation) {
+		removeAnnotationInternal(annotation);
 
-    for (FeatureStructure annotationToRemove : annotationsToRemove) {
-      removeAnnotationInternal(annotationToRemove);
-    }
+		fireRemovedAnnotation(annotation);
+	}
 
-    if (annotationsToRemove.size() > 0) {
-      fireRemovedAnnotations(annotationsToRemove);
-    }
-  }
+	/**
+	 * Removes the given annotations from the {@link CAS}.
+	 */
+	public void removeFeatureStructures(
+			Collection<FeatureStructure> annotationsToRemove) {
 
-  /**
-   * Notifies clients about the changed annotation.
-   */
-  public void update(FeatureStructure annotation) {
-    fireUpdatedFeatureStructure(annotation);
-  }
+		for (FeatureStructure annotationToRemove : annotationsToRemove) {
+			removeAnnotationInternal(annotationToRemove);
+		}
 
-  /**
-   * Notifies clients about the changed annotation.
-   */
-  public void updateFeatureStructure(Collection<FeatureStructure> annotations) {
-    fireUpdatedFeatureStructures(annotations);
-  }
+		if (annotationsToRemove.size() > 0) {
+			fireRemovedAnnotations(annotationsToRemove);
+		}
+	}
 
-  public void changed() {
-    fireChanged();
-  }
+	/**
+	 * Notifies clients about the changed annotation.
+	 */
+	public void update(FeatureStructure annotation) {
+		fireUpdatedFeatureStructure(annotation);
+	}
 
-  /**
-   * Retrieves annotations of the given type from the {@link CAS}.
-   */
-  public Collection<AnnotationFS> getAnnotations(Type type) {
-    FSIndex annotationIndex = mCAS.getAnnotationIndex(type);
+	/**
+	 * Notifies clients about the changed annotation.
+	 */
+	public void updateFeatureStructure(Collection<FeatureStructure> annotations) {
+		fireUpdatedFeatureStructures(annotations);
+	}
 
-    StrictTypeConstraint typeConstrain = new StrictTypeConstraint(type);
+	public void changed() {
+		fireChanged();
+	}
 
-    FSIterator strictTypeIterator = mCAS.createFilteredIterator(annotationIndex.iterator(),
-            typeConstrain);
+	/**
+	 * Retrieves annotations of the given type from the {@link CAS}.
+	 */
+	public Collection<AnnotationFS> getAnnotations(Type type) {
+		FSIndex annotationIndex = mCAS.getAnnotationIndex(type);
 
-    return fsIteratorToCollection(strictTypeIterator);
-  }
+		StrictTypeConstraint typeConstrain = new StrictTypeConstraint(type);
 
-  private Collection<AnnotationFS> fsIteratorToCollection(FSIterator iterator) {
-    LinkedList<AnnotationFS> annotations = new LinkedList<AnnotationFS>();
-    while (iterator.hasNext()) {
-      AnnotationFS annotation = (AnnotationFS) iterator.next();
+		FSIterator strictTypeIterator = mCAS.createFilteredIterator(
+				annotationIndex.iterator(), typeConstrain);
 
-      annotations.addFirst(annotation);
-    }
+		return fsIteratorToCollection(strictTypeIterator);
+	}
 
-    return annotations;
-  }
+	private Collection<AnnotationFS> fsIteratorToCollection(FSIterator iterator) {
+		LinkedList<AnnotationFS> annotations = new LinkedList<AnnotationFS>();
+		while (iterator.hasNext()) {
+			AnnotationFS annotation = (AnnotationFS) iterator.next();
 
-  /**
-   * Retrieves the annotations in the given span.
-   */
-  @Override
-  public Collection<AnnotationFS> getAnnotation(Type type, Span span) {
-    ConstraintFactory cf = getCAS().getConstraintFactory();
+			annotations.addFirst(annotation);
+		}
 
-    Type annotationType = getCAS().getAnnotationType();
+		return annotations;
+	}
 
-    FeaturePath beginPath = getCAS().createFeaturePath();
-    beginPath.addFeature(annotationType.getFeatureByBaseName("begin"));
-    FSIntConstraint beginConstraint = cf.createIntConstraint();
-    beginConstraint.geq(span.getStart());
+	/**
+	 * Retrieves the annotations in the given span.
+	 */
+	@Override
+	public Collection<AnnotationFS> getAnnotation(Type type, Span span) {
+		ConstraintFactory cf = getCAS().getConstraintFactory();
 
-    FSMatchConstraint embeddedBegin = cf.embedConstraint(beginPath, beginConstraint);
+		Type annotationType = getCAS().getAnnotationType();
 
-    FeaturePath endPath = getCAS().createFeaturePath();
-    endPath.addFeature(annotationType.getFeatureByBaseName("end"));
-    FSIntConstraint endConstraint = cf.createIntConstraint();
-    endConstraint.leq(span.getEnd());
+		FeaturePath beginPath = getCAS().createFeaturePath();
+		beginPath.addFeature(annotationType.getFeatureByBaseName("begin"));
+		FSIntConstraint beginConstraint = cf.createIntConstraint();
+		beginConstraint.geq(span.getStart());
 
-    FSMatchConstraint embeddedEnd = cf.embedConstraint(endPath, endConstraint);
+		FSMatchConstraint embeddedBegin = cf.embedConstraint(beginPath,
+				beginConstraint);
 
-    FSMatchConstraint strictType = new StrictTypeConstraint(type);
+		FeaturePath endPath = getCAS().createFeaturePath();
+		endPath.addFeature(annotationType.getFeatureByBaseName("end"));
+		FSIntConstraint endConstraint = cf.createIntConstraint();
+		endConstraint.leq(span.getEnd());
 
-    FSMatchConstraint annotatioInSpanConstraint = cf.and(embeddedBegin, embeddedEnd);
+		FSMatchConstraint embeddedEnd = cf.embedConstraint(endPath,
+				endConstraint);
 
-    FSMatchConstraint annotationInSpanAndStrictTypeConstraint = cf.and(annotatioInSpanConstraint,
-            strictType);
+		FSMatchConstraint strictType = new StrictTypeConstraint(type);
 
-    FSIndex allAnnotations = getCAS().getAnnotationIndex(type);
+		FSMatchConstraint annotatioInSpanConstraint = cf.and(embeddedBegin,
+				embeddedEnd);
 
-    FSIterator annotationInsideSpanIndex = getCAS().createFilteredIterator(
-            allAnnotations.iterator(), annotationInSpanAndStrictTypeConstraint);
+		FSMatchConstraint annotationInSpanAndStrictTypeConstraint = cf.and(
+				annotatioInSpanConstraint, strictType);
 
-    return fsIteratorToCollection(annotationInsideSpanIndex);
-  }
+		FSIndex allAnnotations = getCAS().getAnnotationIndex(type);
 
-  /**
-   * Retrieves the given type from the {@link TypeSystem}.
-   */
-  public Type getType(String type) {
-    return getCAS().getTypeSystem().getType(type);
-  }
+		FSIterator annotationInsideSpanIndex = getCAS().createFilteredIterator(
+				allAnnotations.iterator(),
+				annotationInSpanAndStrictTypeConstraint);
 
-  /**
-   * Retrieves the text.
-   */
-  public String getText() {
-    return mCAS.getDocumentText();
-  }
+		return fsIteratorToCollection(annotationInsideSpanIndex);
+	}
 
-  /**
-   * Sets the content. The XCAS {@link InputStream} gets parsed.
-   */
-  private void setContent(InputStream content) throws CoreException {
+	/**
+	 * Retrieves the given type from the {@link TypeSystem}.
+	 */
+	public Type getType(String type) {
+		return getCAS().getTypeSystem().getType(type);
+	}
 
-    XCASDeserializer dezerializer = new XCASDeserializer(mTypeSystem);
+	/**
+	 * Retrieves the text.
+	 */
+	public String getText() {
+		return mCAS.getDocumentText();
+	}
 
-    SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-    saxParserFactory.setValidating(false);
+	/**
+	 * Sets the content. The XCAS {@link InputStream} gets parsed.
+	 */
+	private void setContent(InputStream content) throws CoreException {
 
-    SAXParser saxParser;
+		SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+		saxParserFactory.setValidating(false);
 
-    try {
-      saxParser = saxParserFactory.newSAXParser();
-      saxParser.parse(content, dezerializer.getXCASHandler(mCAS));
-    } catch (IOException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+		SAXParser saxParser;
 
-      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
+		try {
+			saxParser = saxParserFactory.newSAXParser();
+		} catch (ParserConfigurationException e) {
+			String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      throw new CoreException(s);
-    } catch (ParserConfigurationException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+			IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+					IStatus.OK, message, e);
 
-      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
+			throw new CoreException(s);
+		} catch (SAXException e) {
+			String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      throw new CoreException(s);
-    } catch (SAXException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+			IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+					IStatus.OK, message, e);
 
-      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
+			throw new CoreException(s);
+		}
 
-      throw new CoreException(s);
-    }
-  }
+		if (DocumentFormat.XCAS.equals(format)) {
+			XCASDeserializer dezerializer = new XCASDeserializer(mTypeSystem);
 
-  /**
-   * Serializes the {@link CAS} to the given {@link OutputStream} in the XCAS format.
-   */
-  public void serialize(OutputStream out) throws CoreException {
-    XCASSerializer xcasSerializer = new XCASSerializer(mCAS.getTypeSystem());
+			try {
+				saxParser.parse(content, dezerializer.getXCASHandler(mCAS));
+			} catch (IOException e) {
+				String message = (e.getMessage() != null ? e.getMessage() : "");
 
-    XMLSerializer xmlSerialzer = new XMLSerializer(out, true);
+				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+						IStatus.OK, message, e);
 
-    try {
-      xcasSerializer.serialize(mCAS, xmlSerialzer.getContentHandler());
-    } catch (IOException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+				throw new CoreException(s);
+			} catch (SAXException e) {
+				String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
+				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+						IStatus.OK, message, e);
 
-      throw new CoreException(s);
-    } catch (SAXException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+				throw new CoreException(s);
+			}
+		} else if (DocumentFormat.XMI.equals(format)) {
+			XmiCasDeserializer dezerializer = new XmiCasDeserializer(
+					mTypeSystem);
 
-      IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
+			try {
+				saxParser.parse(content, dezerializer.getXmiCasHandler(mCAS));
+			} catch (IOException e) {
+				String message = (e.getMessage() != null ? e.getMessage() : "");
 
-      throw new CoreException(s);
-    }
-  }
+				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+						IStatus.OK, message, e);
 
-  public DocumentElement getDocumentElement() {
-    return mDocumentElement;
-  }
+				throw new CoreException(s);
+			} catch (SAXException e) {
+				String message = (e.getMessage() != null ? e.getMessage() : "");
 
-  public void save() throws CoreException {
-    getDocumentElement().saveDocument();
-  }
+				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+						IStatus.OK, message, e);
+
+				throw new CoreException(s);
+			}
+		} else {
+			throw new CoreException(
+					new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK,
+							"Unkown file format!", null));
+		}
+	}
+
+	/**
+	 * Serializes the {@link CAS} to the given {@link OutputStream} in the XCAS
+	 * format.
+	 */
+	public void serialize(OutputStream out) throws CoreException {
+
+		if (DocumentFormat.XCAS.equals(format)) {
+			XCASSerializer xcasSerializer = new XCASSerializer(mCAS
+					.getTypeSystem());
+
+			XMLSerializer xmlSerialzer = new XMLSerializer(out, true);
+
+			try {
+				xcasSerializer
+						.serialize(mCAS, xmlSerialzer.getContentHandler());
+			} catch (IOException e) {
+				String message = (e.getMessage() != null ? e.getMessage() : "");
+
+				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+						IStatus.OK, message, e);
+
+				throw new CoreException(s);
+			} catch (SAXException e) {
+				String message = (e.getMessage() != null ? e.getMessage() : "");
+
+				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+						IStatus.OK, message, e);
+
+				throw new CoreException(s);
+			}
+		} else if (DocumentFormat.XMI.equals(format)) {
+			XmiCasSerializer xmiSerializer = new XmiCasSerializer(mCAS
+					.getTypeSystem());
+
+			XMLSerializer xmlSerialzer = new XMLSerializer(out, true);
+
+			try {
+				xmiSerializer.serialize(mCAS, xmlSerialzer.getContentHandler());
+			} catch (SAXException e) {
+				String message = (e.getMessage() != null ? e.getMessage() : "");
+
+				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
+						IStatus.OK, message, e);
+
+				throw new CoreException(s);
+			}
+		} else {
+			throw new CoreException(
+					new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK,
+							"Unkown file format!", null));
+		}
+	}
+
+	public DocumentElement getDocumentElement() {
+		return mDocumentElement;
+	}
+
+	public void save() throws CoreException {
+		getDocumentElement().saveDocument();
+	}
 }

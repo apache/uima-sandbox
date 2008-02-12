@@ -107,13 +107,26 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
               0, "Typesystem not available!", null));
     }
 
-	  DocumentUimaImpl document = mWorkingCopy.get();
+    DocumentUimaImpl document = mWorkingCopy.get();
 
     if (reload || document == null) {
 
     	InputStream in = mDocumentFile.getContents();
 
-    	document  = new DocumentUimaImpl(project, this, in);
+    	DocumentFormat format;
+    	
+    	if (getResource().getFileExtension().equalsIgnoreCase("xcas")) {
+    		format = DocumentFormat.XCAS;
+    	}
+    	else if (getResource().getFileExtension().equalsIgnoreCase("xmi")) {
+    		format = DocumentFormat.XMI;
+    	}
+    	else {
+    		throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID,
+    	              0, "Unkown file extension!", null));
+    	}
+    	
+    	document  = new DocumentUimaImpl(project, this, in, format);
 
     	mWorkingCopy = new SoftReference<DocumentUimaImpl>(document);
     }
