@@ -56,7 +56,7 @@
 			<artifactId>generated-xmltypes</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/lib/xmltypes.jar</systemPath>
+			<systemPath>${basedir}/lib/dict_annot_xml_types.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>local.xmlbeans.dependency</groupId>
@@ -129,7 +129,7 @@
 					<execution>
 						<phase>package</phase>
 						<configuration>
-						  <classpath>$main_root/lib/jsr173_1.0_api.jar;$main_root/lib/xmltypes.jar;$main_root/lib/xbean.jar</classpath>
+						  <classpath>$main_root/lib/jsr173_1.0_api.jar;$main_root/lib/dict_annot_xml_types.jar;$main_root/lib/xbean.jar</classpath>
 						  <mainComponentDesc>desc/DictionaryAnnotator.xml</mainComponentDesc>
 						  <componentId>DictionaryAnnotator</componentId>
 						  <datapath>$main_root/resources</datapath>
