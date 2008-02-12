@@ -36,7 +36,9 @@ import javax.swing.text.rtf.RTFEditorKit;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XCASSerializer;
+import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.caseditor.core.TaeError;
+import org.apache.uima.caseditor.core.model.DocumentFormat;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.util.CasCreationUtils;
@@ -87,23 +89,36 @@ final class DocumentImportStructureProvider implements IImportStructureProvider 
       }
   }
 
-  private InputStream getDocument(String text) {
+  private InputStream getDocument(String text, DocumentFormat format) {
 
     CAS cas = createEmtpyCAS();
     cas.setDocumentText(text);
 
     ByteArrayOutputStream out = new ByteArrayOutputStream(40000);
-
-    try {
-      XCASSerializer.serialize(cas, out);
-    } catch (SAXException e) {
-      // should not happen
-      throw new TaeError("Unexpected exception!", e);
-    } catch (IOException e) {
-      // will not happen, writing to memory
-      throw new TaeError("Unexpected exception!", e);
+    
+    if (DocumentFormat.XCAS.equals(format)) {
+	    try {
+	      XCASSerializer.serialize(cas, out);
+	    } catch (SAXException e) {
+	      // should not happen
+	      throw new TaeError("Unexpected exception!", e);
+	    } catch (IOException e) {
+	      // will not happen, writing to memory
+	      throw new TaeError("Unexpected exception!", e);
+	    }
     }
-
+    else if (DocumentFormat.XMI.equals(format)) {
+    	try {
+			XmiCasSerializer.serialize(cas, out);
+		} catch (SAXException e) {
+			// should not happen
+			throw new TaeError("Unexpected exception!", e);
+		}
+    }
+    else {
+    	throw new TaeError("Unkown document type!", null);
+    }
+    
     return new ByteArrayInputStream(out.toByteArray());
   }
 
@@ -119,7 +134,7 @@ final class DocumentImportStructureProvider implements IImportStructureProvider 
         in = new FileInputStream((File) element);
         String text = convert(in);
 
-        return getDocument(text);
+        return getDocument(text, DocumentFormat.XMI);
       } catch (FileNotFoundException e) {
         return null;
       } catch (IOException e) {
@@ -150,7 +165,7 @@ final class DocumentImportStructureProvider implements IImportStructureProvider 
           textStringBuffer.append(new String(readBuffer, 0, length)); //, "UTF-8"));
         }
 
-        return getDocument(textStringBuffer.toString());
+        return getDocument(textStringBuffer.toString(), DocumentFormat.XMI);
       } catch (FileNotFoundException e) {
         return null;
       } catch (IOException e) {
@@ -204,7 +219,7 @@ final class DocumentImportStructureProvider implements IImportStructureProvider 
       int nameWithouEndingLength = fileName.lastIndexOf(".");
       String nameWithouEnding = fileName.substring(0, nameWithouEndingLength);
 
-      return nameWithouEnding + ".xcas";
+      return nameWithouEnding + ".xmi";
     } else {
       return fileName;
     }
