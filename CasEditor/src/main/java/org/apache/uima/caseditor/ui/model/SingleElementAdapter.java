@@ -32,7 +32,7 @@ class SingleElementAdapter extends
 {
     /**
      * A <code>DocumentElement</code> has no children, just an emtpy array
-     * will be retrived.
+     * will be retrieved.
      */
     public Object[] getChildren(Object o)
     {
@@ -41,7 +41,7 @@ class SingleElementAdapter extends
     }
     
     /**
-     * Retrives the document element <code>ImageDescriptor</code>.
+     * Retrieves the document element <code>ImageDescriptor</code>.
      */
     public ImageDescriptor getImageDescriptor(Object object)
     {

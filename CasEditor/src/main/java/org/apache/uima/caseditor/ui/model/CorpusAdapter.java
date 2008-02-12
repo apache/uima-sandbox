@@ -33,7 +33,7 @@ class CorpusAdapter extends
         AbstractElementAdapter
 {
     /**
-     * Retrives all documents (children) of the current 
+     * Retrieves all documents (children) of the current 
      * CorpusElement instance.
      */
     public Object[] getChildren(Object o)
@@ -47,7 +47,7 @@ class CorpusAdapter extends
     }
     
     /**
-     * Retrives the imag {@link ImageDescriptor} for the CorpusElement.
+     * Retrieves the image {@link ImageDescriptor} for the CorpusElement.
      */
     public ImageDescriptor getImageDescriptor(Object object)
     {

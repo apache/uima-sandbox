@@ -7,7 +7,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 public class TypesystemAdapter extends SingleElementAdapter {
 	
     /**
-     * Retrives the document element <code>ImageDescriptor</code>.
+     * Retrieves the document element <code>ImageDescriptor</code>.
      */
     @Override
     public ImageDescriptor getImageDescriptor(Object object) {

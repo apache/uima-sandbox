@@ -42,7 +42,7 @@ public class SimpleProjectAdapter implements IWorkbenchAdapter {
     } catch (CoreException e) {
       // TODO: log it
       
-      // no childs available
+      // no children available
       return new Object[0]; 
     }
     

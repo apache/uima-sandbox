@@ -37,7 +37,7 @@ class ProjectAdapter extends
         AbstractElementAdapter
 {
     /**
-     * Retrives the children of the current <code>NLPProject</code>.
+     * Retrieves the children of the current <code>NLPProject</code>.
      */
     public Object[] getChildren(Object o)
     {
@@ -88,7 +88,7 @@ class ProjectAdapter extends
     }
     
     /**
-     * Retrives the <code>ImageDescriptor</code> for the
+     * Retrieves the <code>ImageDescriptor</code> for the
      * <code>NLPProject</code>.
      * 
      * @return the <code>ImageDescriptor</code>

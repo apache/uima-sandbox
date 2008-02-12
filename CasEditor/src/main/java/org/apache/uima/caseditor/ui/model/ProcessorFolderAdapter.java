@@ -36,7 +36,7 @@ class ProcessorFolderAdapter extends
         AbstractElementAdapter
 {
     /**
-     * Retrives the children of the current <code>UIMASourceFolder</code>.
+     * Retrieves the children of the current <code>UIMASourceFolder</code>.
      */
     public Object[] getChildren(Object o)
     {
@@ -54,15 +54,14 @@ class ProcessorFolderAdapter extends
         }
         catch (CoreException e)
         {
-            // TODO: handle it and log error
-            e.printStackTrace();
+        	// sorry this fails if the resource was already removed
         }
         
         return childs.toArray();
     }
     
     /**
-     * Retrives the <code>ImageDescriptor</code> for uima folder.
+     * Retrieves the <code>ImageDescriptor</code> for uima folder.
      */
     public ImageDescriptor getImageDescriptor(Object object)
     {

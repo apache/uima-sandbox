@@ -33,7 +33,7 @@ class ModelAdapter extends
         AbstractElementAdapter
 {
     /**
-     * Retrives the children of the current <code>NLPModel</code> instance.
+     * Retrieves the children of the current <code>NLPModel</code> instance.
      */
     public Object[] getChildren(Object o)
     {

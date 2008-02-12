@@ -460,7 +460,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
     for (CasProcessorFolder sourceFolder : mUimaSourceFolder) {
       if (sourceFolder.getResource().equals(resource)) {
-        mUimaSourceFolder.remove(resource);
+        mUimaSourceFolder.remove(sourceFolder);
         break;
       }
     }

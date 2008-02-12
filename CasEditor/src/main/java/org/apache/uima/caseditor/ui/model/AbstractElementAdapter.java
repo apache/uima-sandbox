@@ -30,7 +30,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 abstract class AbstractElementAdapter implements IWorkbenchAdapter
 {
     /**
-     * Retrives the name of the element.
+     * Retrieves the name of the element.
      */
     public String getLabel(Object o)
     {
@@ -40,7 +40,7 @@ abstract class AbstractElementAdapter implements IWorkbenchAdapter
     }
     
     /**
-     * Retrives the parent element;
+     * Retrieves the parent element;
      */
     public Object getParent(Object o)
     {
