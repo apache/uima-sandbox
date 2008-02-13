@@ -71,6 +71,7 @@
 		<configuration>
 			<descriptors>
 				<descriptor>annotator_package_bin.xml</descriptor>
+				<descriptor>annotator_package_src.xml</descriptor>
 			</descriptors>
 			<finalName>uimaj-annotator-addons-${pom.version}</finalName>
 	        <tarLongFileMode>gnu</tarLongFileMode>
