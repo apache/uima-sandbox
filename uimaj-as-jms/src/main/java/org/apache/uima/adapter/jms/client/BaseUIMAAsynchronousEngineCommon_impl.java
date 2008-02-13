@@ -49,6 +49,7 @@ import org.apache.uima.aae.UIDGenerator;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.error.InvalidMessageException;
+import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaEECollectionProcessCompleteTimeout;
 import org.apache.uima.aae.error.UimaEEMetaRequestTimeout;
 import org.apache.uima.aae.error.UimaEEProcessCasTimeout;
@@ -633,7 +634,7 @@ implements UimaAsynchronousEngine, MessageListener
 			ProcessTrace pt = new ProcessTrace_impl();
 			UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
 			Exception exception = retrieveExceptionFormMessage(message);
-
+			clientSideJmxStats.incrementMetaErrorCount();
 			status.addEventStatus("GetMeta", "Failed", exception);
 			notifyListeners(null, status, AsynchAEMessage.GetMeta);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleMetadataReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_exception_msg_INFO",
@@ -770,6 +771,10 @@ implements UimaAsynchronousEngine, MessageListener
 			if (AsynchAEMessage.Exception == payload)
 			{
 				handleException(message, doNotify);
+				if ( !isShutdownException(message))
+				{
+					clientSideJmxStats.incrementProcessErrorCount();
+				}
 				return;
 			}
 			completeProcessingReply( casReferenceId, payload, doNotify,  message, cachedRequest, pt);
@@ -797,6 +802,20 @@ implements UimaAsynchronousEngine, MessageListener
 				}
 			}
 		}
+	}
+	private boolean isShutdownException( Message message ) throws Exception
+	{
+		Exception exception = retrieveExceptionFormMessage(message);
+		if ( exception != null )
+		{
+			if ( exception instanceof ServiceShutdownException || 
+				 exception.getCause() != null && exception.getCause() 
+				 instanceof ServiceShutdownException )
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	private void handleException( Message message, boolean doNotify )
 	throws Exception
@@ -1035,6 +1054,10 @@ implements UimaAsynchronousEngine, MessageListener
 						payload = ((Integer) message.getIntProperty(AsynchAEMessage.Payload)).intValue();
 						if (AsynchAEMessage.Exception == payload)
 						{
+							if ( !isShutdownException(message))
+							{
+								clientSideJmxStats.incrementProcessErrorCount();
+							}
 							handleException(message, true);
 						}
 					}
@@ -1281,6 +1304,32 @@ implements UimaAsynchronousEngine, MessageListener
 		
 		private long deserializationTime;
 		
+		private long metaTimeoutErrorCount;
+		
+		private long processTimeoutErrorCount;
+		
+		private long processErrorCount;
+		
+		public long getMetaTimeoutErrorCount() {
+			return metaTimeoutErrorCount;
+		}
+		public void setMetaTimeoutErrorCount(long timeoutErrorCount) {
+			metaTimeoutErrorCount = timeoutErrorCount;
+		}
+
+		public long getProcessTimeoutErrorCount() {
+			return processTimeoutErrorCount;
+		}
+		public void setProcessTimeoutErrorCount(long timeoutErrorCount) {
+			processTimeoutErrorCount = timeoutErrorCount;
+		}
+		
+		public long getProcessErrorCount() {
+			return processErrorCount;
+		}
+		public void setProcessErrorCount(long processErrorCount) {
+			this.processErrorCount = processErrorCount;
+		}
 		public long getSerializationTime() {
 			return serializationTime;
 		}
@@ -1422,6 +1471,8 @@ implements UimaAsynchronousEngine, MessageListener
 						timeOutKind = MetadataTimeout;
 						initialized = false;
 						abort = true;
+						metaTimeoutErrorCount++;
+						clientSideJmxStats.incrementMetaTimeoutErrorCount();
 						synchronized( metadataReplyMonitor )
 						{
 							receivedMetaReply = true; // not really but simulate receving the meta so that we unblock the monitor
@@ -1440,6 +1491,8 @@ implements UimaAsynchronousEngine, MessageListener
 					else
 					{
 						timeOutKind = ProcessTimeout;
+						processTimeoutErrorCount++;
+						clientSideJmxStats.incrementProcessTimeoutErrorCount();
 					}
 					uimaEEEngine.notifyOnTimout(cas, endpoint, timeOutKind);
 					timer.cancel();
