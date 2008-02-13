@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.uima</groupId>
-	<artifactId>uimaj-ee-jms</artifactId>
+	<artifactId>uimaj-as-jms</artifactId>
 	<packaging>jar</packaging>
-	<version>${uimaj-ee-release-version}</version>
+	<version>${uimaj-as-release-version}</version>
 	<name>Apache UIMA Async Scaleout JMS</name>
 	<url>http://incubator.apache.org/uima</url>
 	<parent>
 		<groupId>org.apache.uima</groupId>
-		<artifactId>uimaj-ee</artifactId>
+		<artifactId>uimaj-as</artifactId>
 		<version>0.7.0-incubating-SNAPSHOT</version>
 	</parent>
 	<dependencies>	
@@ -35,8 +35,8 @@
 				
 		<dependency>
 		    <groupId>org.apache.uima</groupId>
-		    <artifactId>uimaj-ee-core</artifactId>
-			<version>${uimaj-ee-release-version}</version>
+		    <artifactId>uimaj-as-core</artifactId>
+			<version>${uimaj-as-release-version}</version>
 			<scope>compile</scope>
 		</dependency>
 
