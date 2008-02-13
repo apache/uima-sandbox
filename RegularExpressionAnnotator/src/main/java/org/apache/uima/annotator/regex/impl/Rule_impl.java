@@ -408,7 +408,7 @@ public class Rule_impl implements Rule {
          }
          String matchGroupName = this.regex.substring(varStart, varEnd);
          // add first match group content (match group name) to the variable list
-         this.matchGroupNames.put(matchGroupName.toLowerCase(), new Integer(
+         this.matchGroupNames.put(matchGroupName.toLowerCase(), Integer.valueOf(
                groupCounter));
          // store match group name with original case
          names.add(matchGroupName);

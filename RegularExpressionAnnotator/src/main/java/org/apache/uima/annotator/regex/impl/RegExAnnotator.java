@@ -86,8 +86,6 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
          throws ResourceInitializationException {
       super.initialize(aContext);
 
-      String[] conceptFileNames = new String[] {};
-
       // initialize annotator logger
       this.logger = getContext().getLogger();
 
@@ -96,7 +94,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
       // get configuration parameter settings
       // get parameter ConceptFiles, default is an empty array
-      conceptFileNames = safeGetConfigParameterStringArrayValue(getContext(),
+      String[] conceptFileNames = safeGetConfigParameterStringArrayValue(getContext(),
             REGEX_CONCEPTS_FILES, new String[] {});
 
       // get UIMA datapath and tokenize it into its elements
@@ -162,12 +160,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       }
 
       // initialize the regex concepts
-      if (this.regexConcepts != null) {
-         for (int i = 0; i < this.regexConcepts.length; i++) {
+     for (int i = 0; i < this.regexConcepts.length; i++) {
             ((Concept_impl) this.regexConcepts[i]).initialize(this.logger);
          }
-      }
-
    }
 
    /**
@@ -636,7 +631,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                throw new RegexAnnotatorProcessException(
                      "regex_annotator_error_validating_annotation",
                      new Object[] { annotations[a].getId(), matchText,
-                           new Integer(localStart), new Integer(localEnd) }, ex);
+                           Integer.valueOf(localStart), Integer.valueOf(localEnd) }, ex);
             }
          }
 
@@ -923,7 +918,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     * Helper class to bundle the XML Concept file name and the concept file
     * input stream to one object.
     */
-   private class ConceptFile {
+   private static class ConceptFile {
       // concept file path name
       private String filePath;
 

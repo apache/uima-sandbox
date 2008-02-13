@@ -45,7 +45,7 @@ public class CreditCardNumberValidator implements Validation {
       if (ruleID != null && ruleID.equals("unknown")) {
 
          // check AmericanExpress
-         if ((coveredText.startsWith("34") | coveredText.startsWith("37"))
+         if ((coveredText.startsWith("34") || coveredText.startsWith("37"))
                && coveredText.length() == 15) {
             // already detected by the AmericanExpress pattern
             return false;
