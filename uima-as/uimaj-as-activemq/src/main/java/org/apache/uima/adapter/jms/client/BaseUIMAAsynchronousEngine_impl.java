@@ -44,6 +44,8 @@ import org.apache.uima.aae.controller.ControllerCallbackListener;
 import org.apache.uima.aae.controller.ControllerLifecycle;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.UimaEEMetaRequestTimeout;
+import org.apache.uima.aae.jmx.JmxManager;
+import org.apache.uima.aae.jmx.UimaASClientInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.cas.CAS;
@@ -59,6 +61,7 @@ import org.apache.uima.aae.UIDGenerator;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Queue;
+import javax.management.ObjectName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQDestination;
@@ -87,7 +90,9 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	
 	private Queue consumerDestination = null;
 	private Session producerSession = null;
-
+	private JmxManager jmxManager = null;
+	private String applicationName = "UimaASClient";
+	
 	public BaseUIMAAsynchronousEngine_impl() {
         UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-EE version " + UimaVersion.getVersion());
 	}
@@ -197,6 +202,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	      consumer.close();
 	      connection.close();
 	      connection = null;
+			}
+			if ( jmxManager != null )
+			{
+				jmxManager.destroy();
 			}
 		}
 		catch (Exception e)
@@ -349,6 +358,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 
 			deployEmbeddedBroker();
 			deploySpringContainer(configFiles);
+			System.out.println("Registering Client with JMX Server");
+			jmxManager = new JmxManager("Uima AS Client");
+			ObjectName on = new ObjectName("ClientStats");
+			jmxManager.registerMBean(clientSideJmxStats, on);
 		}
 		catch (Exception e)
 		{
@@ -401,16 +414,19 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 
 		brokerURI = (String) anApplicationContext.get(UimaAsynchronousEngine.ServerUri);
 		String endpoint = (String) anApplicationContext.get(UimaAsynchronousEngine.Endpoint);
+		clientSideJmxStats.setEndpointName(endpoint);
 		int casPoolSize = 1;
 
 		if (anApplicationContext.containsKey(UimaAsynchronousEngine.ReplyWindow))
 		{
 			receiveWindow = ((Integer) anApplicationContext.get(UimaAsynchronousEngine.ReplyWindow)).intValue();
+			clientSideJmxStats.setReplyWindowSize(receiveWindow);
 		}
 
 		if (anApplicationContext.containsKey(UimaAsynchronousEngine.CasPoolSize))
 		{
 			casPoolSize = ((Integer) anApplicationContext.get(UimaAsynchronousEngine.CasPoolSize)).intValue();
+			clientSideJmxStats.setCasPoolSize(casPoolSize);
 		}
 
 		if (anApplicationContext.containsKey(UimaAsynchronousEngine.Timeout))
@@ -426,6 +442,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		if (anApplicationContext.containsKey(UimaAsynchronousEngine.CpcTimeout))
 		{
 			cpcTimeout = ((Integer) anApplicationContext.get(UimaAsynchronousEngine.CpcTimeout)).intValue();
+		}
+		if (anApplicationContext.containsKey(UimaAsynchronousEngine.ApplicationName))
+		{
+			applicationName = (String) anApplicationContext.get(UimaAsynchronousEngine.ApplicationName);
 		}
 
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_init_uimaee_client__CONFIG", new Object[] { brokerURI, receiveWindow, casPoolSize, processTimeout, metadataTimeout, cpcTimeout });
@@ -459,6 +479,11 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 					((UimaEEStatusCallbackListener) listeners.get(i)).initializationComplete(null);
 				}
 			}
+			jmxManager = new JmxManager("org.apache.uima");
+			clientSideJmxStats.setApplicationName(applicationName);
+			ObjectName on = new ObjectName("org.apache.uima:name="+applicationName);
+			jmxManager.registerMBean(clientSideJmxStats, on);
+
 		}
 		catch (ResourceInitializationException e)
 		{
@@ -740,5 +765,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
   public void notifyOnTermination(String message) {
     
   }
+
+
 
 }
