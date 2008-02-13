@@ -57,4 +57,18 @@ public interface UimaASClientInfoMBean {
     public String getMaxSerializationTime();
     public String getMaxDeserializationTime();
     public String getMaxIdleTime();
+
+    public long getMetaTimeoutErrorCount();
+    public void incrementMetaTimeoutErrorCount();
+    
+    public long getProcessTimeoutErrorCount();
+    public void incrementProcessTimeoutErrorCount();
+    
+    public long getProcessErrorCount();
+    public void incrementProcessErrorCount();
+    
+    public long getMetaErrorCount();
+    public void incrementMetaErrorCount();
+
+    public void reset();
 }

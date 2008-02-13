@@ -42,7 +42,64 @@ public class UimaASClientInfo implements
 	private String endpointName;
 	private int replyWindowSize;
 	private int casPoolSize;
+	private long _metaTimeoutErrorCount;
+	private long _processTimeoutErrorCount;
+	private long _processErrorCount;
+	private long _metaErrorCount;
 	
+	public void reset()
+	{
+		applicationName="";
+		idleTime = 0;
+		serializationTime=0;
+		deserializationTime=0;
+		totalCasesProcessed=0;
+		totalProcessTime=0;
+		maxSerializationTime=0;
+		maxDeserializationTime=0;
+		maxIdleTime=0;
+		maxProcessTime=0;
+		endpointName="";
+		replyWindowSize=0;
+		casPoolSize=0;
+		_metaTimeoutErrorCount=0;
+		_processTimeoutErrorCount=0;
+		_processErrorCount=0;
+		_metaErrorCount=0;
+	}
+    public long getMetaErrorCount()
+    {
+    	return _metaErrorCount;
+    }
+    public void incrementMetaErrorCount()
+    {
+    	_metaErrorCount++;
+    }
+
+	public long getMetaTimeoutErrorCount() {
+		return _metaTimeoutErrorCount;
+	}
+
+	public void incrementMetaTimeoutErrorCount() {
+		_metaTimeoutErrorCount++;
+	}
+
+	public long getProcessTimeoutErrorCount() {
+		return _processTimeoutErrorCount;
+	}
+
+	public void incrementProcessTimeoutErrorCount() {
+		_processTimeoutErrorCount++;
+	}
+
+	public long getProcessErrorCount() {
+		return _processErrorCount;
+	}
+
+	public void incrementProcessErrorCount() {
+		_processErrorCount++;
+	}
+
 	public String getEndpointName() {
 		return endpointName;
 	}
