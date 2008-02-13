@@ -14,77 +14,122 @@
    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
-   under the License.    
+   under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.uima</groupId>
-	<artifactId>uimaj-ep-runtime-deployeditor</artifactId>
-	<packaging>jar</packaging>
-	<version>${uimaj-ee-release-eclipse-version}</version>
-	<name>Apache UIMA Runtime Deployment Descriptor Editor Eclipse Plugin</name>
-	<url>http://incubator.apache.org/uima</url>
-	<parent>
-		<groupId>org.apache.uima</groupId>
-		<artifactId>uimaj-ee</artifactId>
-		<version>0.7.0-incubating-SNAPSHOT</version>
-	</parent>
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.uima</groupId>
-			<artifactId>uimaj-ep-runtime</artifactId>
-			<version>${uimaj-release-eclipse-version}</version>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.uima</groupId>
+  <artifactId>uimaj-ep-runtime-deployeditor</artifactId>
+  <packaging>bundle</packaging>
+  <version>${uimaj-as-release-eclipse-version}</version>
+  <name>Apache UIMA Runtime Fragment for the Deployment Descriptor Editor Eclipse Plugin</name>
+  <url>http://incubator.apache.org/uima</url>
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>uimaj-as</artifactId>
+    <version>0.7.0-incubating-SNAPSHOT</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-ep-runtime</artifactId>
+      <version>${uimaj-release-eclipse-version}</version>
       <!-- don't use provided scope here, because then
            eclipse:eclipse is set up to ref the uimaj-ep-runtime
-           project directly, and it has no content 
-           "compile" makes eclipse:eclipse ref the 
+           project directly, and it has no content
+           "compile" makes eclipse:eclipse ref the
            jar that maven built in the local repository -->
-			<scope>compile</scope>
-		</dependency>
+      <scope>compile</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.eclipse.core</groupId>
       <artifactId>variables</artifactId>
       <version>3.1.100-v20060605</version>
       <scope>provided</scope>
     </dependency>
-	</dependencies>
-	<build>
-		<finalName>uima-ep-runtime-deployeditor</finalName>	
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bin</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>
-									src/main/assembly/assemble-plugin.xml</descriptor>
-							</descriptors>
-							<finalName>
-								org.apache.uima.runtime-deployeditor_${uimaj-ee-release-eclipse-version}</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<manifest>.ignore</manifest>
-					<pde>true</pde>
-				</configuration>
-			</plugin>
-			
-		</plugins>
-	</build>
+
+  </dependencies>
+
+  <build>
+
+    <finalName>org.apache.uima.runtime-deployeditor_${uimaj-as-release-eclipse-version}</finalName>
+
+    <!-- needed to copy resources to the result -->
+    <resources>
+      <resource>   <!-- copy the license, notices, disclaimer -->
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>plugin.xml</include>
+          <include>icons/*.*</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <plugins>
+
+      <!--plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bin</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>
+                  src/main/assembly/assemble-plugin.xml</descriptor>
+              </descriptors>
+              <finalName>
+                org.apache.uima.runtime-deployeditor_${uimaj-as-release-eclipse-version}</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin-->
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <manifestLocation>META-INF</manifestLocation>
+          <instructions>
+            <Export-Package>
+              org.apache.uima.aae.deployment,
+              org.apache.uima.aae.deployment.impl,
+              org.apache.uima.application.metadata,
+              org.apache.uima.application.metadata.impl,
+              org.apache.uima.application.util,
+              org.apache.uima.cpe.model,
+              org.apache.uima.tools.debug.util
+            </Export-Package>
+
+            <Bundle-SymbolicName>org.apache.uima.runtime.fragments.tools;singleton:=true</Bundle-SymbolicName>
+
+            <Fragment-Host>org.apache.uima.runtime;bundle-version="2.1.0"</Fragment-Host>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <manifest>.ignore</manifest>
+          <pde>true</pde>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>
