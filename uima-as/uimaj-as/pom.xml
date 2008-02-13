@@ -22,7 +22,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.uima</groupId>
-  <artifactId>uimaj-ee</artifactId>
+  <artifactId>uimaj-as</artifactId>
   <packaging>pom</packaging>
   <parent>
     <groupId>org.apache.uima</groupId>
@@ -39,9 +39,9 @@
       <uimaj-release-version>${uimaj-version}-incubating</uimaj-release-version>
       <uimaj-release-eclipse-version>${uimaj-version}.incubating</uimaj-release-eclipse-version>
       <uimaj-base-version>${uimaj-version}</uimaj-base-version>
-      <uimaj-ee-version>0.7.0</uimaj-ee-version>
-      <uimaj-ee-release-version>${uimaj-ee-version}-incubating-SNAPSHOT</uimaj-ee-release-version>
-      <uimaj-ee-release-eclipse-version>${uimaj-ee-version}.incubating-SNAPSHOT</uimaj-ee-release-eclipse-version>
+      <uimaj-as-version>0.7.0</uimaj-as-version>
+      <uimaj-as-release-version>${uimaj-as-version}-incubating-SNAPSHOT</uimaj-as-release-version>
+      <uimaj-as-release-eclipse-version>${uimaj-as-version}.incubating-SNAPSHOT</uimaj-as-release-eclipse-version>
   </properties>
   <version>0.7.0-incubating-SNAPSHOT</version>
 
@@ -83,9 +83,9 @@
     </plugins>
   </reporting>
   <modules>
-    <module>../uimaj-ee-core</module>
-    <module>../uimaj-ee-activemq</module>
-    <module>../uimaj-ee-jms</module>
+    <module>../uimaj-as-core</module>
+    <module>../uimaj-as-activemq</module>
+    <module>../uimaj-as-jms</module>
     <module>../uimaj-ep-deployeditor</module>
     <module>../uimaj-ep-runtime-deployeditor</module>
   </modules>
