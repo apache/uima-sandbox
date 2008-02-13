@@ -128,7 +128,6 @@ public class TaggerEvaluation {
    */
   public static void main(String[] args) {
 
-    TaggerEvaluation test = new TaggerEvaluation();
     ModelGeneration my_model;
     CorpusReader reader;
     MappingInterface MAPPING;
@@ -180,10 +179,10 @@ public class TaggerEvaluation {
           my_model.suffix_tree_capitalized, my_model.transition_probs, my_model.word_probs,
           my_model.lambdas2, my_model.lambdas3, my_model.theta);
 
-      test.get_eval(my_model, wordList, posList, TagList);
+      TaggerEvaluation.get_eval(my_model, wordList, posList, TagList);
 
-    } catch (Exception e) {
-      System.err.println(e);
+    } catch (Throwable th) {
+      System.err.println(th);
     }
 
   }

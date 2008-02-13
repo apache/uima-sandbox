@@ -205,7 +205,7 @@ public class ModelGeneration implements java.io.Serializable{
 
     for (int i = 0; i < mapsize; i++)
     {
-      Map.Entry<String, Map<String, Double>> entry = (Map.Entry<String, Map<String, Double>>) keyValuePairs.next();
+      Map.Entry<String, Map<String, Double>> entry = keyValuePairs.next();
       Object key = entry.getKey();
     
     Map<String, Double> pos2= word_counts.get(key); // map of possible pos-s of the word
@@ -215,7 +215,7 @@ public class ModelGeneration implements java.io.Serializable{
 
       for (int u = 0; u < pos2.size(); u++)
       {
-       Map.Entry<String, Double> entry_pos = (Map.Entry<String, Double>) keyValuePairs_pos.next();
+       Map.Entry<String, Double> entry_pos = keyValuePairs_pos.next();
        Object key2 = entry_pos.getKey(); // pos of a word
         
        if (key2 != "count") {
@@ -256,7 +256,7 @@ public class ModelGeneration implements java.io.Serializable{
       
       for (int f= 0; f<st.edges.size();f++){
       
-          Map.Entry m = (Map.Entry) kv.next();
+          Map.Entry m = kv.next();
       //  Object keys = m.getKey();
         SuffixTree.Edge e = (SuffixTree.Edge) m.getValue();
         
@@ -274,7 +274,7 @@ public class ModelGeneration implements java.io.Serializable{
       } 
     
        // if this word is relevant for suffix tree
-     if (!local_suffixes.isEmpty() | !local_suffixes_capitalized.isEmpty()){
+     if (!local_suffixes.isEmpty() || !local_suffixes_capitalized.isEmpty()){
        Set endings;
        Map local_sm = new HashMap ( ); 
        if (local_suffixes.isEmpty()){
@@ -293,16 +293,15 @@ public class ModelGeneration implements java.io.Serializable{
         Map<String, Double> etwas = new HashMap<String, Double>();
 
         if(local_sm.containsKey(element)){
-            Map<String, Double> pos_suffix = new HashMap<String, Double>();
 
           // get map of possible pos-s of the suffix
-          pos_suffix= (Map<String, Double>) local_sm.get(element);
+          Map<String, Double> pos_suffix= (Map<String, Double>) local_sm.get(element);
           Iterator<Entry<String, Double>> pos_suf = pos_suffix.entrySet().iterator(); // iterate over words
   
 
             for (int k = 0; k < pos_suffix.size(); k++)
             {
-              Map.Entry<String, Double> entry3 = (Map.Entry<String, Double>) pos_suf.next();
+              Map.Entry<String, Double> entry3 = pos_suf.next();
           
               Object key_pos = entry3.getKey(); // pos of a suffix
               Object value_pos = entry3.getValue(); // its probability count
@@ -334,9 +333,9 @@ public class ModelGeneration implements java.io.Serializable{
           etwas.putAll(lokal);
       } 
         if (local_suffixes.isEmpty()){
-         sm2.put(element, etwas);;
+         sm2.put(element, etwas);
        } else {
-         sm.put(element, etwas);;
+         sm.put(element, etwas);
        }
         //local_sm.put(element, etwas);
        }  
@@ -366,7 +365,7 @@ public class ModelGeneration implements java.io.Serializable{
     
     for (int i = 0; i < probs.size(); i++)
     {
-      Map.Entry<String, Map<String, Double>> entry = (Map.Entry<String, Map<String, Double>>) keyValuePairs.next();
+      Map.Entry<String, Map<String, Double>> entry = keyValuePairs.next();
       Object key = entry.getKey();
       Map<String, Double> poss= probs.get(key); // map of possible pos-s of the word
       
@@ -457,7 +456,7 @@ public class ModelGeneration implements java.io.Serializable{
 
     //      Object freq2 = entry.getValue(); // get  a count of a bigram
           
-          double prob1 = (Double)freq1 / tokens_count_all_corpus; // Prob(key) = freq(tag)/freq(all_tags)?
+          double prob1 = freq1 / tokens_count_all_corpus; // Prob(key) = freq(tag)/freq(all_tags)?
           probs1.put((String)key, prob1); // save probability as a log2 : Math.log(prob1)
         
         }
@@ -531,9 +530,12 @@ public class ModelGeneration implements java.io.Serializable{
           double f1 = (freq1-1)/(tokens_count_all_corpus-1);
           
           double freq = get_max(f2, f1, 0);
-          if (freq == f2){lambda2+=freq2;count2+=freq2;}
+          if (freq == f2) {
+               lambda2 += freq2;
+               count2 += freq2;
+            }
           else {lambda1+=freq2;count2+=freq2;}
-          } lambdas2[0] = lambda1/count2; lambdas2[1]= lambda2/count2; 
+          } this.lambdas2[0] = lambda1/count2; this.lambdas2[1]= lambda2/count2; 
     }
     
     if (N == 3) {
@@ -557,10 +559,10 @@ public class ModelGeneration implements java.io.Serializable{
           if (freq == f3) {lambda3+= freq3; count3+=freq3;} // or just real frequency?
           else if (freq == f2){lambda2+=freq3; count3+=freq3;}
           else {lambda1+=freq3;count3+=freq3;}
-        }  lambdas3[0] = lambda1/count3; lambdas3[1]=lambda2/count3; lambdas3[2]=lambda3/count3;   
+        }  this.lambdas3[0] = lambda1/count3; this.lambdas3[1]=lambda2/count3; this.lambdas3[2]=lambda3/count3;   
     }
-   System.out.println("lambdas for 2-grams = "+lambdas2[0]+" "+lambdas2[1]+"\n"+"lambdas for 3-grams"+lambdas3[0]+" "+lambdas3[1]+" "+lambdas3[2]);
-      return ((N == 2) ? lambdas2 : lambdas3);
+   System.out.println("lambdas for 2-grams = "+this.lambdas2[0]+" "+this.lambdas2[1]+"\n"+"lambdas for 3-grams"+this.lambdas3[0]+" "+this.lambdas3[1]+" "+this.lambdas3[2]);
+      return ((N == 2) ? this.lambdas2 : this.lambdas3);
   }
   
   @SuppressWarnings("unchecked")

@@ -55,11 +55,6 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
   private static final String n_param = "NGRAM_SIZE";
 
   /**
-   * Model file name
-   */
-  String MODEL;
-
-  /**
    * for a bigram model: N = 2, for a trigram model N=3 N is defined in parameter file
    */
   public int N;
@@ -69,7 +64,6 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
   public ModelGeneration my_model;
   
   MappingInterface MAPPING;
-  boolean DO_MAPPING;
  
   /**
    * Initialize the Annotator.
@@ -83,7 +77,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
 
       this.N = ((Integer) aContext.getConfigParameterValue(n_param)).intValue();
           
-      my_model = get_model();
+      this.my_model = get_model();
 
     } catch (Exception e) {
       throw new ResourceInitializationException(e);
@@ -118,6 +112,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
       try {
         model.close();
       } catch (Exception e) {
+         //do nothing
       }
     }
     return oRead;
@@ -148,6 +143,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
       try {
         model.close();
       } catch (Exception e) {
+         //do nothing
       }
     }
     return oRead;
@@ -185,19 +181,21 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
         wordList.add(token.getCoveredText());
       }
 
-      List<String> wordTagList = Viterbi.process(N, wordList, ".",
-              my_model.suffix_tree, my_model.suffix_tree_capitalized, my_model.transition_probs,
-              my_model.word_probs, my_model.lambdas2, my_model.lambdas3, my_model.theta);
+      List<String> wordTagList = Viterbi.process(this.N, wordList, ".",
+              this.my_model.suffix_tree, this.my_model.suffix_tree_capitalized, this.my_model.transition_probs,
+              this.my_model.word_probs, this.my_model.lambdas2, this.my_model.lambdas3, this.my_model.theta);
 
       
-      if (MAPPING != null){
-        wordTagList = MAPPING.map_tags(wordTagList);
+      
+      if (this.MAPPING != null){
+        wordTagList = this.MAPPING.map_tags(wordTagList);
       }
+      
       
       try {
         for (int i = 0; i < tokenList.size(); i++) {
-          TokenAnnotation token = (TokenAnnotation) tokenList.get(i);
-          String posTag = (String) wordTagList.get(i);
+          TokenAnnotation token = tokenList.get(i);
+          String posTag = wordTagList.get(i);
           token.setPosTag(posTag);
         }
       } catch (IndexOutOfBoundsException e) {

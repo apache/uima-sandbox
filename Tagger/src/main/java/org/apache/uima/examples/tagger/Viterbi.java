@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.*;
 
 import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
 
@@ -36,7 +35,7 @@ import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
 public class Viterbi {
 
   @SuppressWarnings("unchecked")
-  public static Map<String, List> init_probs(String END_OF_SENT_TAG, Map<String, Double> pos_s) {
+  public static Map<String, List> init_probs(Map<String, Double> pos_s) {
     Map<String, List> init_probs = new HashMap<String, List>();
     double p_init = Math.log(1.0); // symbolic initial probability, at the
     // moment equal for all tags
@@ -119,8 +118,8 @@ public class Viterbi {
         //available_pos.put("CARD", 1.00);
       }
       else */
-      if (word_probs.containsKey(token)| word_probs.containsKey(non_cap)) {
-          if (ModelGeneration.capitalized(sentence.get(1)) & word_probs.containsKey(sentence.get(1))){
+      if (word_probs.containsKey(token)|| word_probs.containsKey(non_cap)) {
+          if (ModelGeneration.capitalized(sentence.get(1)) && word_probs.containsKey(sentence.get(1))){
             available_pos = word_probs.get(sentence.get(1)); // here we get available states of the
           } else{
               // if a lexicon contains a non-capitalized variant of a word
@@ -156,7 +155,7 @@ public class Viterbi {
                     while(posValuePairs.hasNext()){
                        Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs.next();
                          Object key = entry.getKey();
-                         Double value = (Double) entry.getValue();
+                         Double value = entry.getValue();
                          if (available_pos_zwischen.containsKey(key)) {
                            double zwischen_prob = (value + theta*(Double)available_pos_zwischen.get(key))/(1+theta);
                            available_pos_zwischen.put(key, zwischen_prob);
@@ -169,7 +168,7 @@ public class Viterbi {
                     while(posValuePairs2.hasNext()){
                        Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs2.next();
                          Object key = entry.getKey();
-                         Double value = (Double) entry.getValue();
+                         Double value = entry.getValue();
                          // smooth suffix probability P(suffix|tag)
                          double zwischen_prob = (0 + theta*value)/(1+theta);
                          pos.put(key, zwischen_prob);
@@ -188,7 +187,7 @@ public class Viterbi {
             }
           }
         }
-        all.putAll(init_probs(END_OF_SENT_TAG, available_pos));
+        all.putAll(init_probs(available_pos));
         continue; // go over to the next token
       }
 
@@ -247,7 +246,7 @@ public class Viterbi {
                     while(posValuePairs.hasNext()){
                        Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs.next();
                          Object key = entry.getKey();
-                         Double value = (Double) entry.getValue();
+                         Double value = entry.getValue();
                          if (available_pos_zwischen.containsKey(key)) {
                            // smooth suffix probability P(suffix|tag)
                            double zwischen_prob = (value + theta*(Double)available_pos_zwischen.get(key))/(1+theta);
@@ -261,7 +260,7 @@ public class Viterbi {
                     while(posValuePairs2.hasNext()){
                        Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs2.next();
                          Object key = entry.getKey();
-                         Double value = (Double) entry.getValue();
+                         Double value = entry.getValue();
                          // smooth suffix probability P(suffix|tag)
                          double zwischen_prob = (0 + theta*value)/(1+theta);
                          pos.put(key, zwischen_prob);

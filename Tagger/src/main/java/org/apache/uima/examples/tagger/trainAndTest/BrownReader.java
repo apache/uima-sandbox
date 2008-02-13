@@ -49,7 +49,7 @@ public class BrownReader implements CorpusReader{
 
   
 
-  public List<Token> read_corpus(String directory, MappingInterface Mapping) {
+  public List<Token> read_corpus(String directory, MappingInterface mapping) {
 
  
     // Reads file names from Directory and returns an array of file names in the directory
@@ -112,14 +112,15 @@ public class BrownReader implements CorpusReader{
               int last = tokens[x].lastIndexOf("/");
               if (first != last) {
                 String[] zw = tokens[x].split("/");
-                String t = "";
+                StringBuffer t = new StringBuffer();
                 for (int w = 0; w < zw.length - 1; w++) {
 
-                  t = t + zw[w];
+                  t.append(zw[w]);
                 }
 
-                t = t + "/" + zw[zw.length - 1];
-                tokens[x] = t;
+                t.append("/");
+                t.append(zw[zw.length - 1]);
+                tokens[x] = t.toString();
               }
 
               String[] t = tokens[x].split("/");
@@ -137,8 +138,8 @@ public class BrownReader implements CorpusReader{
       }
     }
     System.out.println(line_count + " sentences in the corpus");
-    if (Mapping != null) {
-      text = Mapping.map_tags(text); // in case we need to map
+    if (mapping != null) {
+      text = mapping.map_tags(text); // in case we need to map
     }
     return text;
   }
