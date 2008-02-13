@@ -20,12 +20,6 @@
 		<vendor>The Apache Software Foundation</vendor>
 		<configurationParameters>
             <configurationParameter>
-                <name>MODEL_FILE</name>
-                <type>String</type>
-                <multiValued>false</multiValued>
-                <mandatory>true</mandatory>
-            </configurationParameter>
-            <configurationParameter>
                 <name>NGRAM_SIZE</name>
                 <type>Integer</type>
                 <multiValued>false</multiValued>
@@ -33,12 +27,6 @@
             </configurationParameter>
 		</configurationParameters>
 		<configurationParameterSettings>
-            <nameValuePair>
-                <name>MODEL_FILE</name>
-                <value>
-                    <string>resources/english/BrownModel.dat</string>
-                </value>
-            </nameValuePair>
             <nameValuePair>
                 <name>NGRAM_SIZE</name>
                 <value>
