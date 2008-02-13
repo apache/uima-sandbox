@@ -31,6 +31,7 @@ import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 public interface UimaAsynchronousEngine
 {
 	public final String ApplicationContext = "ApplicationContext";
+	public final String ApplicationName = "ApplicationName";
 	public final String ServerUri = "ServerURI";
 	public final String Endpoint = "Endpoint";
 	public final String CasPoolSize = "CasPoolSize";
