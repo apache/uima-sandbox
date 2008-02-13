@@ -443,7 +443,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
     * Helper class to bundle the XML dictionary file name and the dictionary
     * file input stream to one object.
     */
-   private class DictionaryFile {
+   private static class DictionaryFile {
       // concept file path name
       private String filePath;
 

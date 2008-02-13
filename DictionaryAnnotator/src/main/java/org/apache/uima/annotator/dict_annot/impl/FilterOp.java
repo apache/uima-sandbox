@@ -53,7 +53,7 @@ public enum FilterOp {
          return "<=";
       }
       default: {
-         return null;
+         return "";
       }
       }
    }

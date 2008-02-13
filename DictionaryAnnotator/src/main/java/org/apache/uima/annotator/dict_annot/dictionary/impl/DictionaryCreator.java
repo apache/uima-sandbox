@@ -310,8 +310,8 @@ public class DictionaryCreator {
          System.out.println("The dictionary was sucessfully created at: "
                + outputFile);
 
-      } catch (Exception ex) {
-         ex.printStackTrace();
+      } catch (Throwable th) {
+         th.printStackTrace();
       }
    }
 }
