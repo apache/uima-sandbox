@@ -452,6 +452,11 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 
 		try
 		{
+			jmxManager = new JmxManager("org.apache.uima");
+			clientSideJmxStats.setApplicationName(applicationName);
+			ObjectName on = new ObjectName("org.apache.uima:name="+applicationName);
+			jmxManager.registerMBean(clientSideJmxStats, on);
+
 			initializeProducer(brokerURI, endpoint);
 			initializeConsumer(brokerURI);
 			running = true;
@@ -479,10 +484,6 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 					((UimaEEStatusCallbackListener) listeners.get(i)).initializationComplete(null);
 				}
 			}
-			jmxManager = new JmxManager("org.apache.uima");
-			clientSideJmxStats.setApplicationName(applicationName);
-			ObjectName on = new ObjectName("org.apache.uima:name="+applicationName);
-			jmxManager.registerMBean(clientSideJmxStats, on);
 
 		}
 		catch (ResourceInitializationException e)
