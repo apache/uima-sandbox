@@ -53,6 +53,8 @@ import org.apache.uima.aae.error.UimaEECollectionProcessCompleteTimeout;
 import org.apache.uima.aae.error.UimaEEMetaRequestTimeout;
 import org.apache.uima.aae.error.UimaEEProcessCasTimeout;
 import org.apache.uima.aae.error.UimaEEServiceException;
+import org.apache.uima.aae.jmx.UimaASClientInfoMBean;
+import org.apache.uima.aae.jmx.UimaASClientInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
@@ -158,6 +160,9 @@ implements UimaAsynchronousEngine, MessageListener
 	protected boolean receivedCpcReply;
 
 	protected MessageConsumer consumer = null;
+
+	protected UimaASClientInfoMBean clientSideJmxStats =
+		new UimaASClientInfo();
 	
 	protected List pendingMessageList = new ArrayList();
 	protected boolean producerInitialized;
@@ -524,7 +529,9 @@ implements UimaAsynchronousEngine, MessageListener
 			}
 
 			PendingMessage msg = new PendingMessage(AsynchAEMessage.Process);
+			long t1 = System.nanoTime();
 			String serializedCAS = serializeCAS(aCAS);
+			requestToCache.setSerializationTime(System.nanoTime()-t1);
 			msg.put( AsynchAEMessage.CAS, serializedCAS);
 			msg.put( AsynchAEMessage.CasReference, casReferenceId);
 			requestToCache.setIsRemote(remoteService);
@@ -827,16 +834,18 @@ implements UimaAsynchronousEngine, MessageListener
 			{
 				pt = new ProcessTrace_impl();
 			}
-			//	Log stats and populate ProcessTrace object
-			logTimingInfo(message, pt);
 			CAS cas=null;
 			try
 			{
 				// If the analysis service is remote deserialize the CAS
 				if (remoteService)
 				{
+					long t1 = System.nanoTime();
 					cas = deserializeCAS(((TextMessage) message).getText(), cachedRequest);
+					cachedRequest.setDeserializationTime(System.nanoTime() - t1);
 				}
+				//	Log stats and populate ProcessTrace object
+				logTimingInfo(message, pt, cachedRequest);
 				UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
 				if ( doNotify )
 				{
@@ -858,8 +867,10 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 
 	}
-	private void logTimingInfo(Message message, ProcessTrace pt ) throws Exception
+	private void logTimingInfo(Message message, ProcessTrace pt, ClientRequest cachedRequest ) throws Exception
 	{
+		clientSideJmxStats.incrementTotalNumberOfCasesProcessed();
+
 		if ( message.getStringProperty(AsynchAEMessage.CasReference) != null )
 		{
 			String casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
@@ -875,52 +886,61 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		if (message.propertyExists(AsynchAEMessage.TimeToSerializeCAS))
 		{
-			long timeToSerializeCAS = ((Long) message.getLongProperty(AsynchAEMessage.TimeToSerializeCAS)).longValue()/ 1000000;
+			long timeToSerializeCAS = message.getLongProperty(AsynchAEMessage.TimeToSerializeCAS);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Time To Serialize Cas", (float) timeToSerializeCAS / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Time To Serialize Cas", (int)timeToSerializeCAS, "");
+			pt.addEvent("UimaEE", "process", "Time To Serialize Cas", (int)timeToSerializeCAS/1000000, "");
+			//	Add the client serialization overhead to the value returned from a service
+			timeToSerializeCAS += cachedRequest.getSerializationTime();
+			clientSideJmxStats.incrementTotalSerializationTime(timeToSerializeCAS);
 		}
 		if (message.propertyExists(AsynchAEMessage.TimeToDeserializeCAS))
 		{
-			long timeToDeserializeCAS = ((Long) message.getLongProperty(AsynchAEMessage.TimeToDeserializeCAS)).longValue()/ 1000000;
+			long timeToDeserializeCAS = message.getLongProperty(AsynchAEMessage.TimeToDeserializeCAS);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Time To Deserialize Cas", (float) timeToDeserializeCAS / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Time To Deserialize Cas", (int)timeToDeserializeCAS, "");
+			pt.addEvent("UimaEE", "process", "Time To Deserialize Cas", (int)timeToDeserializeCAS/1000000, "");
+			//	Add the client deserialization overhead to the value returned from a service
+			timeToDeserializeCAS += cachedRequest.getDeserializationTime();
+			clientSideJmxStats.incrementTotalDeserializationTime(timeToDeserializeCAS);
 		}
 		if (message.propertyExists(AsynchAEMessage.TimeWaitingForCAS))
 		{
-			long timeWaitingForCAS = ((Long) message.getLongProperty(AsynchAEMessage.TimeWaitingForCAS)).longValue()/ 1000000;
+			long timeWaitingForCAS = message.getLongProperty(AsynchAEMessage.TimeWaitingForCAS);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Time to Wait for CAS", (float) timeWaitingForCAS / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Time to Wait for CAS", (int)timeWaitingForCAS, "");
+			pt.addEvent("UimaEE", "process", "Time to Wait for CAS", (int)timeWaitingForCAS/1000000, "");
 		}
 		if (message.propertyExists(AsynchAEMessage.TimeInService))
 		{
-			long ttimeInService = ((Long) message.getLongProperty(AsynchAEMessage.TimeInService)).longValue()/ 1000000;
+			long ttimeInService = message.getLongProperty(AsynchAEMessage.TimeInService);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Time In Service", (float) ttimeInService / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Time In Service", (int)ttimeInService, "");
+			pt.addEvent("UimaEE", "process", "Time In Service", (int)ttimeInService/1000000, "");
+
 		}
 		if (message.propertyExists(AsynchAEMessage.TotalTimeSpentInAnalytic))
 		{
-			long totaltimeInService = ((Long) message.getLongProperty(AsynchAEMessage.TotalTimeSpentInAnalytic)).longValue()/ 1000000;
+			long totaltimeInService = message.getLongProperty(AsynchAEMessage.TotalTimeSpentInAnalytic);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Total Time In Service", (float) totaltimeInService / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Total Time In Service", (int)totaltimeInService, "");
+			pt.addEvent("UimaEE", "process", "Total Time In Service", (int)totaltimeInService/1000000, "");
 		}
 		if (message.propertyExists(AsynchAEMessage.TimeInProcessCAS))
 		{
-			long totaltimeInProcessCAS = ((Long) message.getLongProperty(AsynchAEMessage.TimeInProcessCAS)).longValue()/ 1000000;
+			long totaltimeInProcessCAS = message.getLongProperty(AsynchAEMessage.TimeInProcessCAS);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Total Time In Process CAS", (float) totaltimeInProcessCAS / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Total Time In Process CAS", (int)totaltimeInProcessCAS, "");
+			pt.addEvent("UimaEE", "process", "Total Time In Process CAS", (int)totaltimeInProcessCAS/1000000, "");
+			clientSideJmxStats.incrementTotalTimeToProcess(totaltimeInProcessCAS);
 		}
 		if (message.propertyExists(AsynchAEMessage.IdleTime))
 		{
-			long totalIdletime = ((Long) message.getLongProperty(AsynchAEMessage.IdleTime)).longValue()/ 1000000;
+			long totalIdletime = message.getLongProperty(AsynchAEMessage.IdleTime);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Idle Time Waiting For CAS", (float) totalIdletime / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Idle Time Waiting For CAS", (int)totalIdletime, "");
+			pt.addEvent("UimaEE", "process", "Idle Time Waiting For CAS", (int)totalIdletime/1000000, "");
+			clientSideJmxStats.incrementTotalIdleTime(totalIdletime);
 		}
 		
 
@@ -1254,7 +1274,25 @@ implements UimaAsynchronousEngine, MessageListener
 		private boolean synchronousInvocation;  
 		
 		private long casDepartureTime;
+		
 		private long timeWaitingForReply;
+		
+		private long serializationTime;
+		
+		private long deserializationTime;
+		
+		public long getSerializationTime() {
+			return serializationTime;
+		}
+		public void setSerializationTime(long serializationTime) {
+			this.serializationTime = serializationTime;
+		}
+		public long getDeserializationTime() {
+			return deserializationTime;
+		}
+		public void setDeserializationTime(long deserializationTime) {
+			this.deserializationTime = deserializationTime;
+		}
 		public boolean isSynchronousInvocation()
 		{
 			return synchronousInvocation;
