@@ -170,6 +170,7 @@
 							</para>
 						</listitem>
 				  	</itemizedlist>
+				  	</para>
 				
 			</section>
 			<section id="sandbox.tagger.annotatorDescriptor.capabilities">
@@ -376,6 +377,7 @@ Very Good!]]></programlisting>
 		To train a new model, one should specify .... 
 		</para>
 	
+	<para>
 	An example of a parameter file for training is shown in the listing below:
 				
 				<programlisting><emphasis><![CDATA[## This is the default tagger.properties file
