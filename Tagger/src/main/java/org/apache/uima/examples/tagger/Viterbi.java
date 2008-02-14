@@ -68,7 +68,6 @@ public class Viterbi {
   /**
    * @param N
    * @param sentence
-   * @param END_OF_SENT_TAG
    * @param pos_s
    * @param transition_probs
    * @param word_probs
@@ -76,11 +75,12 @@ public class Viterbi {
    * @return
    */
   @SuppressWarnings("unchecked")
-  public static List process(int N, List<String> sentence, String END_OF_SENT_TAG,
+  public static List process(int N, List<String> sentence,
       Map<String, Map<String, Double>> suffix_tree,Map<String,Map<String, Double>> suffix_tree_cap, Map<String, Double> transition_probs,
       Map<String, Map<String, Double>> word_probs, double[] lambdas2, double[] lambdas3, double theta) {
 
-    sentence.add(0, END_OF_SENT_TAG);
+    // here we add something like an "end-of-sentence" tag at the beginning of the first sentence, to get probabilities for a certain tag to be at the beginning of the sentence.
+    sentence.add(0, ".");
 
     /** ******************************************************** */
 
@@ -108,16 +108,7 @@ public class Viterbi {
         // weight by relative frequencies of the corresponding forms and sum them
       token = sentence.get(1);
       String non_cap = token.toLowerCase();
-    /*  Matcher m = p.matcher(token);
-    boolean b = m.matches();
-    
-      if (b) {
-        System.out.println(token);
-        cardinals+=1;
-        available_pos = word_probs.get("@card");
-        //available_pos.put("CARD", 1.00);
-      }
-      else */
+  
       if (word_probs.containsKey(token)|| word_probs.containsKey(non_cap)) {
           if (ModelGeneration.capitalized(sentence.get(1)) && word_probs.containsKey(sentence.get(1))){
             available_pos = word_probs.get(sentence.get(1)); // here we get available states of the
@@ -182,7 +173,6 @@ public class Viterbi {
               }
             // 
             else if (j==unknown.length-1){
-            //  available_pos = word_probs.get("Clinton");
               available_pos = word_probs.get("(");
             }
           }

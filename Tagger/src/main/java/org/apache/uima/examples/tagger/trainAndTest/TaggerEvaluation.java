@@ -175,7 +175,7 @@ public class TaggerEvaluation {
         posList.add(corpus.get(x).pos);
         wordList.add(corpus.get(x).word);
       }
-      List TagList = Viterbi.process(my_model.N, wordList, ".", my_model.suffix_tree,
+      List TagList = Viterbi.process(my_model.N, wordList, my_model.suffix_tree,
           my_model.suffix_tree_capitalized, my_model.transition_probs, my_model.word_probs,
           my_model.lambdas2, my_model.lambdas3, my_model.theta);
 

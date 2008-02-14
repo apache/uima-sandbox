@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import org.apache.uima.examples.tagger.HMMTagger;
 import org.apache.uima.examples.tagger.Viterbi;
 
+//This test was run with JUnit3
 
 public class TaggerTest extends TestCase {
 
@@ -109,7 +110,7 @@ public class TaggerTest extends TestCase {
 
     String[] out = new String[] { "NE", "VVFIN", "NE", "$." };
     gold_standard.addAll(Arrays.asList(out));
-    tagger_output = Viterbi.process(hmm.N, sent, "$.", hmm.my_model.suffix_tree,
+    tagger_output = Viterbi.process(hmm.N, sent, hmm.my_model.suffix_tree,
             hmm.my_model.suffix_tree_capitalized, hmm.my_model.transition_probs,
             hmm.my_model.word_probs, hmm.my_model.lambdas2, hmm.my_model.lambdas3,
             hmm.my_model.theta);
@@ -179,7 +180,7 @@ public class TaggerTest extends TestCase {
 
     String[] out = new String[] { "np", "vbz", "np", "." };
     gold_standard.addAll(Arrays.asList(out));
-    tagger_output = Viterbi.process(hmm.N, sent, ".", hmm.my_model.suffix_tree,
+    tagger_output = Viterbi.process(hmm.N, sent, hmm.my_model.suffix_tree,
             hmm.my_model.suffix_tree_capitalized, hmm.my_model.transition_probs,
             hmm.my_model.word_probs, hmm.my_model.lambdas2, hmm.my_model.lambdas3,
             hmm.my_model.theta);

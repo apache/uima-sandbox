@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.uima.examples.tagger.*;
+import org.apache.uima.examples.tagger.trainAndTest.SuffixTree.EDGE_KEY;
+import org.apache.uima.examples.tagger.trainAndTest.SuffixTree.Edge;
 
 
 /**
@@ -252,7 +254,7 @@ public class ModelGeneration implements java.io.Serializable{
        
       SuffixTree st = new SuffixTree(word_end); 
        
-      Iterator<Entry> kv = st.edges.entrySet().iterator();
+      Iterator<Entry<EDGE_KEY, Edge>> kv = st.edges.entrySet().iterator();
       
       for (int f= 0; f<st.edges.size();f++){
       

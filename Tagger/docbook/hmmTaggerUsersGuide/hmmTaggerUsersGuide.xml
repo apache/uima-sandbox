@@ -138,68 +138,39 @@
 							relative path that is available in the UIMA
 							datapath or in the classpath.
 
-							<programlisting><emphasis><![CDATA[<configurationParameterSettings>
-  <nameValuePair>
-    <name>PARAM_FILE</name>
-      <value>
-        <string>tagger.properties</string>
-      </value>
-    </nameValuePair>
-</configurationParameterSettings>]]></emphasis></programlisting>
+							<programlisting><emphasis><![CDATA[    <configurationParameters>
+      <configurationParameter>
+        <name>NGRAM_SIZE</name>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>NGRAM_SIZE</name>
+        <value>
+          <integer>3</integer>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>]]></emphasis></programlisting>
+
+<programlisting><emphasis><![CDATA[   
+    <externalResources>
+      <externalResource>
+        <name>ModelFile</name>
+        <description>HMM Tagger model file</description>
+        <fileResourceSpecifier>
+          <fileUrl>file:german/TuebaModel.dat</fileUrl>
+        </fileResourceSpecifier>
+        <implementationName>org.apache.uima.examples.tagger.ModelResource</implementationName>
+      </externalResource>
+    </externalResources>]]></emphasis></programlisting>
 
 							</para>
 						</listitem>
 				  	</itemizedlist>
-				An example of a tagger parameter file is shown in the listing below:
 				
-				<programlisting><emphasis><![CDATA[## This is the default tagger.properties file
-
-## uncomment for English
-#MODEL = resources/english/BrownModel.dat
-
-## uncomment for German
-MODEL = resources/german/TuebaModel.dat
-
-
-## N =2 or N= 3 are supported, default N=3 
-
-N = 3
-
-## if mapping of tags is desired
-#DO_MAPPING = true
-
-## Basic mapping for the Brown corpus (nltk distribution) tagset: to get 93 tags out of ca. 460
-#MAPPING = org.apache.uima.examples.tagger.TagMapping
-
-
-## Basic mapping for STTS tagset: from 54 tags onto the basic ca. 15 classes plus punctuation
-#MAPPING = org.apache.uima.examples.tagger.GrobMapping]]></emphasis>
-				</programlisting>
-				
-				Thus, parameter file defines the following values:
-				<itemizedlist>
-					<listitem>
-						<para>
-							<code>MODEL</code>
-							- defines the relative path to the file containing the trained model
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<code>N</code>
-							- sets up whether we want to use a bi- (N=2) or a trigram (N=3) model for tagging (default is trigram)
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<code>MAPPING</code>
-							- this parameter is useful in two scenarios: either if mapping of tags is desired after tagging
-							is performed with a given model, or if one is willing to train and test a model (s. <xref linkend="sandbox.tagger.training"/>) 
-							for a modified tagset than the one used by a manually annotated corpus.   
-							</para>
-					</listitem>
-				</itemizedlist>
-				</para>
 			</section>
 			<section id="sandbox.tagger.annotatorDescriptor.capabilities">
 				<title>Capabilities</title>
@@ -404,6 +375,47 @@ Very Good!]]></programlisting>
 		<para>
 		To train a new model, one should specify .... 
 		</para>
+	
+	An example of a parameter file for training is shown in the listing below:
+				
+				<programlisting><emphasis><![CDATA[## This is the default tagger.properties file
+
+## if mapping of tags is desired
+#DO_MAPPING = true
+
+## Basic mapping for the Brown corpus (nltk distribution) tagset: to get 93 tags out of ca. 460
+#MAPPING = org.apache.uima.examples.tagger.TagMapping
+
+
+## Basic mapping for STTS tagset: from 54 tags onto the basic ca. 15 classes plus punctuation
+#MAPPING = org.apache.uima.examples.tagger.GrobMapping]]></emphasis>
+				</programlisting>
+				
+				Thus, parameter file defines the following values:
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>MODEL</code>
+							- defines the relative path to the file containing the trained model
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>N</code>
+							- sets up whether we want to use a bi- (N=2) or a trigram (N=3) model for tagging (default is trigram)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>MAPPING</code>
+							- this parameter is useful in two scenarios: either if mapping of tags is desired after tagging
+							is performed with a given model, or if one is willing to train and test a model (s. <xref linkend="sandbox.tagger.training"/>) 
+							for a modified tagset than the one used by a manually annotated corpus.   
+							</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+	
 	</chapter>
 	
 	<chapter id="sandbox.tagger.evaluation">
@@ -768,15 +780,16 @@ Very Good!]]></programlisting>
 					<surname>Schuetze</surname>
 				</author>
 			</authorgroup>
+			
+			<title>
+				Foundations of Statistical Natural Language Processing
+			</title>
 			<copyright>
 				<year>1999</year>
 			</copyright>
 			<publisher>
 				<publishername>MIT Press</publishername>
 			</publisher>
-			<title>
-				Foundations of Statistical Natural Language Processing
-			</title>
 		</biblioentry>
 	</bibliography>
 

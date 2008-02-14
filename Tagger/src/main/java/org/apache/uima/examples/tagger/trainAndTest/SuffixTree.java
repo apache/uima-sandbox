@@ -35,7 +35,7 @@ public class SuffixTree {
 
   public List<Node> nodes = new ArrayList<Node>();
 
-  public Map edges = new HashMap(); // Map to store the starting node of the edges and their corresponding
+  public Map<EDGE_KEY, Edge> edges = new HashMap<EDGE_KEY, Edge>(); // Map to store the starting node of the edges and their corresponding
 
   // first characters
 
@@ -64,9 +64,10 @@ public class SuffixTree {
 
   // 
   public void insert_edge(Edge edge) {
-    List keys = new ArrayList();
-    keys.add(edge.start_node);
-    keys.add(chars[edge.first_char_index]);
+    EDGE_KEY keys = new EDGE_KEY(edge.start_node, chars[edge.first_char_index]);
+  //  List keys = new ArrayList();
+  //  keys.add(edge.start_node);
+  //  keys.add(chars[edge.first_char_index]);
     edges.put(keys, edge);
   }
 
@@ -78,7 +79,6 @@ public class SuffixTree {
   class Suffix {
 
     int origin_node;
-
     int first_char_index;
 
     int last_char_index;
@@ -114,9 +114,10 @@ public class SuffixTree {
 
     void canonize() {
       if (!this.isExplicit()) {
-        List keys = new ArrayList();
-        keys.add(this.origin_node);
-        keys.add(chars[this.first_char_index]);
+        EDGE_KEY keys = new EDGE_KEY(this.origin_node, chars[this.first_char_index]); 
+      //  List keys = new ArrayList();
+      //  keys.add(this.origin_node);
+      //  keys.add(chars[this.first_char_index]);
         Edge edge = (Edge) edges.get(keys);
 
         int edge_span = edge.last_char_index - edge.first_char_index + 1;
@@ -133,6 +134,20 @@ public class SuffixTree {
     }
   }
 
+  /**
+   * Internal Class EDGE_KEY
+   */
+  
+  public class EDGE_KEY {
+    int suffix_begin;
+    char suffix;
+
+    public EDGE_KEY(int i, char s) {
+     suffix_begin = i;
+     suffix = s;
+    }
+  }
+  
   /**
    * Internal Class EDGE
    */
@@ -229,18 +244,23 @@ public class SuffixTree {
 
       Edge edge;
       if (active_point.isExplicit()) {
-        List keys = new ArrayList();
-        keys.add(active_point.origin_node);
-        keys.add(chars[last_char]);
+        EDGE_KEY keys = new EDGE_KEY(active_point.origin_node, chars[last_char]); 
+        
+      //  List keys = new ArrayList();
+     //   keys.add(active_point.origin_node);
+     //   keys.add(chars[last_char]);
         if (edges.containsKey(keys)) {
           edge = (Edge) edges.get(keys);
           break;
         }
       } else if (active_point.isImplicit()) { // if suffix is implicit, i.e. it does not end in a
         // leaf node $
-        List keys2 = new ArrayList();
-        keys2.add(active_point.origin_node);
-        keys2.add(chars[active_point.first_char_index]);
+        
+        EDGE_KEY keys2 = new EDGE_KEY(active_point.origin_node, chars[active_point.first_char_index]); 
+        
+      //  List keys2 = new ArrayList();
+      //  keys2.add(active_point.origin_node);
+      //  keys2.add(chars[active_point.first_char_index]);
         edge = (Edge) edges.get(keys2);
 
         int span = active_point.last_char_index - active_point.first_char_index;
