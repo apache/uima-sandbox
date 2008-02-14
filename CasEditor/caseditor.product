@@ -7,7 +7,7 @@
       <image path="/CasEditor/icons/window/uima_window_128.gif"/>
       <text>
          Cas Editor
-Apache UIMA Version 2.2.1-incubating
+Apache UIMA Version 2.2.2-incubating
 Copyright 2006, 2007 The Apache Software Foundation
       </text>
    </aboutInfo>
@@ -34,6 +34,7 @@ Copyright 2006, 2007 The Apache Software Foundation
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
       <linux type="ee">J2SE-1.5</linux>
