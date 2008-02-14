@@ -84,8 +84,9 @@
   </reporting>
   <modules>
     <module>../uimaj-as-core</module>
-    <module>../uimaj-as-activemq</module>
     <module>../uimaj-as-jms</module>
+    <!-- activemq depends on jms -->
+    <module>../uimaj-as-activemq</module>
     <module>../uimaj-ep-deployeditor</module>
     <module>../uimaj-ep-runtime-deployeditor</module>
   </modules>
