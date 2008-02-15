@@ -24,10 +24,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.uima.caseditor.core.model.AnnotatorElement;
+import org.apache.uima.caseditor.core.model.CasProcessorFolder;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
-import org.apache.uima.caseditor.core.model.CasProcessorFolder;
 import org.apache.uima.caseditor.core.uima.AnnotatorConfiguration;
 import org.apache.uima.caseditor.ui.action.AnnotatorActionRunnable;
 import org.apache.uima.caseditor.ui.action.RunnableAction;

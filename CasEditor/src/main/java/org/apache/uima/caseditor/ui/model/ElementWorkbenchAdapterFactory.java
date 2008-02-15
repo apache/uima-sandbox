@@ -19,11 +19,11 @@
 
 package org.apache.uima.caseditor.ui.model;
 
+import org.apache.uima.caseditor.core.model.CasProcessorFolder;
 import org.apache.uima.caseditor.core.model.CorpusElement;
 import org.apache.uima.caseditor.core.model.NlpModel;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.model.TypesystemElement;
-import org.apache.uima.caseditor.core.model.CasProcessorFolder;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;

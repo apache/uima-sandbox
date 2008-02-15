@@ -38,7 +38,6 @@ import org.apache.uima.caseditor.core.AbstractAnnotationDocumentListener;
 import org.apache.uima.caseditor.core.uima.StrictTypeConstraint;
 import org.apache.uima.caseditor.core.util.Primitives;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
-import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.FeatureValue;
 import org.apache.uima.caseditor.editor.ModelFeatureStructure;
 import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;

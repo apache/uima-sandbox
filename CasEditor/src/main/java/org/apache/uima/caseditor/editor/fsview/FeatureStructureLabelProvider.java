@@ -20,8 +20,8 @@
 package org.apache.uima.caseditor.editor.fsview;
 
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.cas.impl.FeatureStructureImpl;
+import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.util.Primitives;
 import org.apache.uima.caseditor.editor.FeatureValue;
 import org.eclipse.core.runtime.IAdaptable;
