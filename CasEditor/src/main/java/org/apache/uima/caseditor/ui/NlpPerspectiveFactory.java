@@ -31,13 +31,13 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
 /**
- * This <code>PerspectiveFactory</code> generates the intial layout
+ * This <code>PerspectiveFactory</code> generates the initial layout
  * for the NLP perspective.
  */
 public class NlpPerspectiveFactory implements IPerspectiveFactory
 {
     /**
-     * ID of the perpective factory. Use this ID for example in the plugin.xml
+     * ID of the perspective factory. Use this ID for example in the plugin.xml
      * file.
      */
     public static String ID = "Annotator.perspective.NLP";

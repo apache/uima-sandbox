@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 /**
- * Base class for actions which dependt on {@link IResource} selections.
+ * Base class for actions which dependent on {@link IResource} selections.
  */
 public abstract class ResourceAction extends BaseSelectionListenerAction {
 
@@ -37,7 +37,7 @@ public abstract class ResourceAction extends BaseSelectionListenerAction {
   }
 
   /**
-   * Retrives all selected itemes which are not {@link IResource}s.
+   * Retrieves all selected items which are not {@link IResource}s.
    * 
    * @return selected item which are not a {@link IResource}s
    */
@@ -66,7 +66,7 @@ public abstract class ResourceAction extends BaseSelectionListenerAction {
   }
   
   /**
-   * Retrives all selected {@link IResource} items.
+   * Retrieves all selected {@link IResource} items.
    * 
    * @return all selected {@link IResource} items
    */

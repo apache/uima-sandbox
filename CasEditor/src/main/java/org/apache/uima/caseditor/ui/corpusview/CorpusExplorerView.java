@@ -208,7 +208,7 @@ public final class CorpusExplorerView extends ViewPart
     }
     
     /**
-     * Retrives the <code>TreeViewer</code> of the current corupus explorer.
+     * Retrieves the <code>TreeViewer</code> of the current corupus explorer.
      * 
      * @return the <code>TreeViewer</code>.
      */

@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * TODO: 
- * should not be possible to crate an exisitng project
+ * should not be possible to crate an existing project
  * check if project name contains illegal chars
  */
 public class NewNlpProjectWizardPage extends WizardPage {

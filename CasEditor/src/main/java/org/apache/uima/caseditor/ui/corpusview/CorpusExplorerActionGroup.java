@@ -128,7 +128,7 @@ final class CorpusExplorerActionGroup extends ActionGroup implements ICorpusExpl
 
     menu.add(new Separator());
 
-    // 5. Other Plugin Additons
+    // 5. Other Plugin Additions
     workspaceGroup.fillContextMenu(menu);
     menu.add(new Separator());
 

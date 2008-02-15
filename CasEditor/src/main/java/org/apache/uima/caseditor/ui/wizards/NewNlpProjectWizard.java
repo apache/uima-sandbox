@@ -37,7 +37,7 @@ import org.eclipse.ui.IWorkbench;
 final public class NewNlpProjectWizard extends Wizard implements INewWizard
 {
     /**
-     * The ID of the new nlp porject wizard.
+     * The ID of the new nlp project wizard.
      */
     public static final String ID = "org.apache.uima.caseditor.wizards.NLPProjectWizard";
     

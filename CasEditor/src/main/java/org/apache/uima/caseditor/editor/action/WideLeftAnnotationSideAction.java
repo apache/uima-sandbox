@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 /**
- * Wides the left side of the currently selected annotation by one.
+ * Widens the left side of the currently selected annotation by one.
  */
 public final class WideLeftAnnotationSideAction extends BaseSelectionListenerAction {
   private IDocument mDocument;

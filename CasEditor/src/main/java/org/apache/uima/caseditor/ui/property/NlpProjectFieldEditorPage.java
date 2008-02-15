@@ -60,7 +60,7 @@ public abstract class NlpProjectFieldEditorPage extends FieldEditorPreferencePag
     }
     
     /**
-     * Retrives the project of the currently selected NLPElement.
+     * Retrieves the project of the currently selected NLPElement.
      * 
      * @return - project of selected NLPElement.
      */

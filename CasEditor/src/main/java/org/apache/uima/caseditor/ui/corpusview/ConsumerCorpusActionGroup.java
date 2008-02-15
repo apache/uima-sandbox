@@ -47,7 +47,7 @@ final class ConsumerCorpusActionGroup extends ActionGroup {
 
   /**
    * Adds for each uima cas consumer an appropriate configured <code>CasConsumerAction</code> to
-   * the given menu. The action apears only in the menu if a document or corpus is selected.
+   * the given menu. The action appears only in the menu if a document or corpus is selected.
    */
   @Override
   public void fillContextMenu(IMenuManager menu) {

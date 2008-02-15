@@ -60,7 +60,7 @@ final class CorpusSorter extends ViewerSorter
 		{
 			return CorpusSorter.CAT_FILE;
 		}
-		// if unkown, use default
+		// if unknown, use default
 		else
 		{
 			return super.category(element);

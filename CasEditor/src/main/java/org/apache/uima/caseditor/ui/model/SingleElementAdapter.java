@@ -31,7 +31,7 @@ class SingleElementAdapter extends
         AbstractElementAdapter
 {
     /**
-     * A <code>DocumentElement</code> has no children, just an emtpy array
+     * A <code>DocumentElement</code> has no children, just an empty array
      * will be retrieved.
      */
     public Object[] getChildren(Object o)

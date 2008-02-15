@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 /**
- * Merges two or more annoations.
+ * Merges two or more annotations.
  * 
  * TODO: also merge features - if one is null or primitive has default value take the the other one -
  * in conflict case do nothing
@@ -37,7 +37,7 @@ public class MergeAnnotationAction extends BaseSelectionListenerAction {
   private IDocument mDocument;
 
   /**
-   * Initalizes the current instance.
+   * Initializes the current instance.
    * 
    * @param document
    */

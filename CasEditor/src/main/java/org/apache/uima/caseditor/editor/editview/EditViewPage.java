@@ -734,7 +734,7 @@ final class EditViewPage extends Page implements ISelectionListener {
     createAction.setImageDescriptor(CasEditorPlugin.getTaeImageDescriptor(Images.ADD));
     getSite().getActionBars().getToolBarManager().add(createAction);
 
-    // TODO: setActionBars is deprecated, but registration of change listener
+    // TODO: setActionBars is depreciated, but registration of change listener
     // does not work in init method
     getSite().getSelectionProvider().addSelectionChangedListener(createAction);
 

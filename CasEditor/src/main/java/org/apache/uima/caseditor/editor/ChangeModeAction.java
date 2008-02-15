@@ -39,10 +39,8 @@ final class ChangeModeAction extends Action {
   /**
    * Initializes a new instance.
    * 
-   * @param newMode -
-   *          target mode
-   * @param name -
-   *          name of the action
+   * @param newMode -target mode
+   * @param name - name of the action
    * @param editor
    */
   ChangeModeAction(Type newMode, String name, AnnotationEditor editor) {
@@ -52,7 +50,7 @@ final class ChangeModeAction extends Action {
   }
 
   /**
-   * Retrives the document.
+   * Retrieves the document.
    * 
    * @return the document
    */

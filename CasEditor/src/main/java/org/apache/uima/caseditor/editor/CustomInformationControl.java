@@ -71,7 +71,7 @@ public class CustomInformationControl implements IInformationControl, IInformati
   }
 
   /**
-   * Retrives the parent.
+   * Retrieves the parent.
    * 
    * @return the parent
    */
@@ -154,7 +154,7 @@ public class CustomInformationControl implements IInformationControl, IInformati
   }
 
   /**
-   * Retrives the control
+   * Retrieves the control
    * 
    * @return the control
    */

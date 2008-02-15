@@ -60,9 +60,9 @@ final class PasteAction  extends ResourceAction
   }
 
   /**
-   * Locactes the new parent resource for the pasted ones.
+   * Locates the new parent resource for the pasted ones.
    * 
-   * If currenlty selected resource is a file, the parent of the file is returned.
+   * If currently selected resource is a file, the parent of the file is returned.
    * 
    * @return
    */

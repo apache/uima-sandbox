@@ -39,7 +39,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 final class RefactorGroup extends ActionGroup {
 
     /**
-     * The Clipboard for the copy/paste actions. Must be diposed!
+     * The Clipboard for the copy/paste actions. Must be disposed!
      */
     private Clipboard mClipboard;
 
@@ -166,7 +166,7 @@ final class RefactorGroup extends ActionGroup {
   }
 
     /**
-     * Update the selction of the actions.
+     * Update the selection of the actions.
      */
   @Override
   public void updateActionBars() {

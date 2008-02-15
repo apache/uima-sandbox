@@ -73,7 +73,7 @@ public class IDGenerator {
   }
 
   /**
-   * Retrives the only instance of the IDGenerator.
+   * Retrieves the only instance of the IDGenerator.
    * 
    * @return - the instance of the IDGenerator
    */

@@ -22,9 +22,9 @@ package org.apache.uima.caseditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
- * All images in the cas editor are referenced here.
+ * All images in the Cas Editor are referenced here.
  *
- * Call {@link CasEditorPlugin#getTaeImageDescriptor(Images)} to retrive
+ * Call {@link CasEditorPlugin#getTaeImageDescriptor(Images)} to retrieve
  * an actual {@link ImageDescriptor}.
  */
 public enum Images {

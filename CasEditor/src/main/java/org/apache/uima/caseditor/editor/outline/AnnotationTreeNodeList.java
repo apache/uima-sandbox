@@ -60,7 +60,7 @@ public class AnnotationTreeNodeList {
 
   void remove(AnnotationTreeNode node) {
     if (mElements.contains(node)) {
-      // insert childs in the list
+      // insert children in the list
       // remove the node from the list
       // AnnotationTreeNode nodeFromList = mElements.get(mElements.indexOf(node));
     } else {

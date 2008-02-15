@@ -35,15 +35,13 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
 {
     /**
-     * This is the config key, should only be used combindes with the
+     * This is the config key, should only be used combined with the
      * <code>DotCorpusPreferenceStore</code>
-     * 
-     * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
      */
     public enum Key
     {
         /**
-         * Name of the type sytem file
+         * Name of the type system file
          */
         TYPE_SYSTEM_FILE,
 
@@ -85,7 +83,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     }
     
     /**
-     * Writes the DotCorpus to the filesystem.
+     * Writes the DotCorpus to the file system.
      * 
      * @throws IOException -
      *             if writing fails
@@ -206,7 +204,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     }
     
     /**
-     * Retrvies the following parameters:
+     * Retrieves the following parameters:
      * + editor line length hint
      */
     public int getInt(String name)
@@ -358,7 +356,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     }
     
     /**
-     * Retrives the config value for the given name.
+     * Retrieves the config value for the given name.
      * 
      * @param name
      *            the config key

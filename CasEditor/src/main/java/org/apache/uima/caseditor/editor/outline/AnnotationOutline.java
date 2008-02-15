@@ -446,7 +446,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
   }
 
   /**
-   * Retrives the control.
+   * Retrieves the control.
    *
    * @return the control
    */
