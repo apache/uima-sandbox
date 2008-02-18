@@ -241,8 +241,8 @@ public class DictionaryCreator {
                new FileOutputStream(outputFile), "UTF-8"));
 
          // write dictionary XML lead in
-         writer
-               .write("<dictionary xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"dictionary.xsd\">\n");
+         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+         writer.write("<dictionary xmlns=\"http://incubator.apache.org/uima\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"dictionary.xsd\">\n");
          writer.write("<typeCollection>\n");
          writer
                .write("<dictionaryMetaData caseNormalization=\"true\" multiWordEntries=\"true\" multiWordSeparator=\"\t\"/>");
