@@ -270,7 +270,7 @@ public class WhitespaceTokenizer extends CasAnnotator_ImplBase {
 
          // whitespace characters
       case Character.SPACE_SEPARATOR:
-      case Character.CONNECTOR_PUNCTUATION:
+      //case Character.CONNECTOR_PUNCTUATION:
          return CH_WHITESPACE;
 
       case Character.DASH_PUNCTUATION:

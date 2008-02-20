@@ -202,11 +202,13 @@ TokenAnnotation(782,785): bar
 TokenAnnotation(785,786): .
 TokenAnnotation(786,789): com
 TokenAnnotation(791,794): foo
+TokenAnnotation(794,795): _
 TokenAnnotation(795,798): bar
 TokenAnnotation(798,799): @
 TokenAnnotation(799,802): foo
 TokenAnnotation(802,803): -
 TokenAnnotation(803,806): bar
+TokenAnnotation(806,807): _
 TokenAnnotation(807,809): de
 TokenAnnotation(809,810): .
 TokenAnnotation(810,813): com
