@@ -74,9 +74,12 @@ public class DictionaryCreator {
    // default separator character
    private static final String SEPARATOR_CHAR = " ";
 
+   // default output separator character
+   private static final String OUTPUT_SEPARATOR_CHAR = "|";
+
    /**
-    * creates the CommandLine parser used to parse the DictionaryCreator
-    * command line.
+    * creates the CommandLine parser used to parse the DictionaryCreator command
+    * line.
     * 
     * @return returns the CommandLineParser for the DictionaryCreator
     */
@@ -175,12 +178,30 @@ public class DictionaryCreator {
       String tokenTypeStr = clp.getParamArgument(TOKEN_TYPE_PARAM);
       String separatorChar = clp.getParamArgument(SEPARATOR_CHAR_PARAM);
 
+      // create dictionary
+      try {
+         DictionaryCreator.createDictionary(inputFile, encoding, outputFile,
+               language, tokenizerFile, tokenTypeStr, separatorChar);
+         
+         System.out.println("The dictionary was sucessfully created at: "
+               + outputFile);
+      } catch (Exception ex) {
+         ex.printStackTrace();
+      }
+
+   }
+
+   public static boolean createDictionary(String inputFile, String encoding,
+         String outputFile, String language, String tokenizerFile,
+         String tokenTypeStr, String separatorChar) throws Exception {
+
+      String outputSeparatorChar = OUTPUT_SEPARATOR_CHAR;
+
       // check input file command line argument
       File inFile = new File(inputFile);
       if (!inFile.canRead()) {
-         System.err.println("Error: Input file " + inputFile
+         throw new Exception("Error: Input file " + inputFile
                + " cannot be read!");
-         System.exit(-1);
       }
 
       // check tokenizer pear command line arguments
@@ -191,13 +212,11 @@ public class DictionaryCreator {
          // if a tokenizer is specified, check if the file can be read
          File pearFile = new File(tokenizerFile);
          if (!pearFile.canRead()) {
-            System.err.println("Error: Tokenizer file " + tokenizerFile
+            throw new Exception("Error: Tokenizer file " + tokenizerFile
                   + " cannot be read!");
-            System.exit(-1);
          }
          if (tokenTypeStr == null) {
-            System.err.println("Error: Tokenizer tokenType not specified");
-            System.exit(-1);
+            throw new Exception("Error: Tokenizer tokenType not specified");
          }
          try {
             // create temp directory to install PEAR
@@ -221,97 +240,100 @@ public class DictionaryCreator {
             tokenType = cas.getTypeSystem().getType(tokenTypeStr);
 
          } catch (Exception ex) {
-            System.err.println("Error creating tokenizer: " + ex.getMessage());
-            ex.printStackTrace();
-            System.exit(-1);
+            throw new Exception("Error creating tokenizer: " + ex.getMessage(), ex);
          }
       }
 
       // check separator char command line argument
-      if (separatorChar == null && ae == null) {
+      if (separatorChar == null) {
          // use default separator character
          separatorChar = SEPARATOR_CHAR;
+      } else {
+         // if set, use specified separator char also as output separator
+         outputSeparatorChar = separatorChar;
       }
 
-      try {
-         // initialize input and output files
-         BufferedReader reader = new BufferedReader(new InputStreamReader(
-               new FileInputStream(inputFile), encoding));
-         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-               new FileOutputStream(outputFile), "UTF-8"));
+      // initialize input and output files
+      BufferedReader reader = new BufferedReader(new InputStreamReader(
+            new FileInputStream(inputFile), encoding));
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+            new FileOutputStream(outputFile), "UTF-8"));
 
-         // write dictionary XML lead in
-         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-         writer.write("<dictionary xmlns=\"http://incubator.apache.org/uima\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"dictionary.xsd\">\n");
-         writer.write("<typeCollection>\n");
-         writer
-               .write("<dictionaryMetaData caseNormalization=\"true\" multiWordEntries=\"true\" multiWordSeparator=\"\t\"/>");
-         if (language != null) {
-            writer.write("<languageId>" + language + "</languageId>\n");
-         }
-         writer.write("<typeDescription>\n");
-         writer
-               .write("<typeName> ADD DICTIONARY OUTPUT TYPE HERE</typeName>\n");
-         writer.write("</typeDescription>\n");
-         writer.write("<entries>\n");
+      // write dictionary XML lead in
+      writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+      writer
+            .write("<dictionary xmlns=\"http://incubator.apache.org/uima\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"dictionary.xsd\">\n");
+      writer.write("<typeCollection>\n");
+      writer
+            .write("<dictionaryMetaData caseNormalization=\"true\" multiWordEntries=\"true\" multiWordSeparator=\""
+                  + outputSeparatorChar + "\"/>\n");
+      if (language != null) {
+         writer.write("<languageId>" + language + "</languageId>\n");
+      }
+      writer.write("<typeDescription>\n");
+      writer.write("<typeName> ADD DICTIONARY OUTPUT TYPE HERE</typeName>\n");
+      writer.write("</typeDescription>\n");
+      writer.write("<entries>\n");
 
-         // start adding dictionary entries
-         String line = reader.readLine();
-         while (line != null) {
+      // start adding dictionary entries
+      String line = reader.readLine();
+      while (line != null) {
 
-            // multi workd string buffer - contains the tokens for each entry
-            StringBuffer multiWordString = new StringBuffer();
+         // multi workd string buffer - contains the tokens for each entry
+         StringBuffer multiWordString = new StringBuffer();
 
-            // tokenize entry line
-            if (ae != null) { // use tokenizer
-               cas.setDocumentText(line);
-               if (language != null) {
-                  cas.setDocumentLanguage(language);
-               }
-               // tokenize line
-               ae.process(cas);
-
-               // read results
-               FSIterator it = cas.getAnnotationIndex(tokenType).iterator();
-               while (it.hasNext()) {
-                  multiWordString.append(((AnnotationFS) it.next())
-                        .getCoveredText());
-                  multiWordString.append("\t");
-               }
-               cas.reset();
-
-            } else { // use separator char
-
-               StringTokenizer tokenizer = new StringTokenizer(line,
-                     separatorChar);
-               while (tokenizer.hasMoreTokens()) {
-                  multiWordString.append(tokenizer.nextToken());
-                  multiWordString.append("\t");
-               }
+         // tokenize entry line
+         if (ae != null) { // use tokenizer
+            cas.setDocumentText(line);
+            if (language != null) {
+               cas.setDocumentLanguage(language);
             }
+            // tokenize line
+            ae.process(cas);
 
-            // write dictionary entry to XML
-            writer.write("<entry>\n");
-            writer.write("<key>" + multiWordString.toString().trim()
-                  + "</key>\n");
-            writer.write("</entry>\n");
+            // read results
+            FSIterator it = cas.getAnnotationIndex(tokenType).iterator();
+            while (it.hasNext()) {
+               multiWordString.append(((AnnotationFS) it.next())
+                     .getCoveredText());
+               multiWordString.append(outputSeparatorChar);
+            }
+            cas.reset();
 
-            // get next line
-            line = reader.readLine();
-         } // all dictionary lines are processed
-         reader.close();
+         } else { // use separator char
 
-         // write dictionary XML lead out
-         writer.write("</entries>\n");
-         writer.write("</typeCollection>\n");
-         writer.write("</dictionary>\n");
-         writer.close();
+            StringTokenizer tokenizer = new StringTokenizer(line, separatorChar);
+            while (tokenizer.hasMoreTokens()) {
+               multiWordString.append(tokenizer.nextToken());
+               multiWordString.append(outputSeparatorChar);
+            }
+         }
 
-         System.out.println("The dictionary was sucessfully created at: "
-               + outputFile);
+         // trim string and remove separator char at the end
+         String multiWordTokenString = multiWordString.toString().trim();
+         if (multiWordTokenString.endsWith(outputSeparatorChar)) {
+            int separatorLength = outputSeparatorChar.length();
+            int length = multiWordTokenString.length();
+            multiWordTokenString = multiWordTokenString.substring(0, length
+                  - separatorLength);
+         }
 
-      } catch (Throwable th) {
-         th.printStackTrace();
-      }
+         // write dictionary entry to XML
+         writer.write("<entry>\n");
+         writer.write("<key>" + multiWordTokenString + "</key>\n");
+         writer.write("</entry>\n");
+
+         // get next line
+         line = reader.readLine();
+      } // all dictionary lines are processed
+      reader.close();
+
+      // write dictionary XML lead out
+      writer.write("</entries>\n");
+      writer.write("</typeCollection>\n");
+      writer.write("</dictionary>\n");
+      writer.close();
+
+      return true;
    }
 }

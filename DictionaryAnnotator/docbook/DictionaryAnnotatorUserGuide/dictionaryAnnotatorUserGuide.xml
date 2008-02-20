@@ -126,7 +126,7 @@
       <dictionaryMetaData 
          caseNormalization="true" 
          multiWordEntries="true" 
-         multiWordSeparator="	"/>
+         multiWordSeparator=" "/>
       <typeDescription>
          <typeName> ADD DICTIONARY OUTPUT TYPE HERE</typeName>
       </typeDescription>
@@ -207,7 +207,7 @@
       <dictionaryMetaData 
          caseNormalization="true" 
          multiWordEntries="true" 
-         multiWordSeparator="	"/>
+         multiWordSeparator=" "/>
       <languageId>en</languageId>
       <typeDescription>
          <typeName>org.apache.uima.DictionaryEntry</typeName>
@@ -239,7 +239,7 @@
 			           <code>multiWordSeparator</code> - 
 						Specifies the multi word separator character that is used in the XML document 
 						for multi words. If the DictionaryCreator creates the dictionary files this is by default
-						the tab character.  
+						the "|" character.  
 					</para>
 				 </listitem>
 			     <listitem>
@@ -248,7 +248,7 @@
 						If this parameter is <code>true</code> the dictionary is treated as 
 						multi word dictionary. This means that dictionary entries that are separated by
 						the <code>multiWordSpearator</code> are treated as multi word entries. So for example 
-						"Apache   UIMA" is treated as multi word entry and the document text must
+						"Apache|UIMA" is treated as multi word entry and the document text must
 						have after the tokenization two tokens "Apache" and "UIMA" to match the dictionary 
 						entry. 
 					</para>
