@@ -157,6 +157,8 @@ public interface AnalysisEngineController extends ControllerLifecycle
 
 	public JmxManagement getManagementInterface();
 	
-  public void notifyListenersWithInitializationStatus(Exception e);
+    public void notifyListenersWithInitializationStatus(Exception e);
+  
+	public ServicePerformance getCasStatistics( String aCasReferenceId );
 
 }

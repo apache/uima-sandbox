@@ -32,6 +32,10 @@ public class ServicePerformance implements ServicePerformanceMBean
 	private long numberOfCASesProcessed=0;
 	private long casDeserializationTime=0;
 	private long casSerializationTime=0;
+	private long analysisTime=0;
+	private long maxSerializationTime=0;
+	private long maxDeserializationTime=0;
+	private long maxAnalysisTime=0;
 	
 	private Object sem = new Object();
 
@@ -46,6 +50,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 		numberOfCASesProcessed=0;
 		casDeserializationTime=0;
 		casSerializationTime=0;
+		analysisTime=0;
 	}
 	public double getIdleTime()
 	{
@@ -58,12 +63,38 @@ public class ServicePerformance implements ServicePerformanceMBean
 			return 0;
 	}
 
+	public long getRawIdleTime()
+	{
+		return accumulatedIdleTime;
+	}
 	public void incrementIdleTime(long anIdleTime)
 	{
 		synchronized( sem )
 		{
 			accumulatedIdleTime += anIdleTime;
 		}
+	}
+
+	public void incrementAnalysisTime( long anAnalysisTime )
+	{
+		synchronized(sem)
+		{
+			if ( maxAnalysisTime < anAnalysisTime )
+			{
+				maxAnalysisTime = anAnalysisTime;
+			}
+			analysisTime += anAnalysisTime;
+		}
+	}
+	
+	public double getAnalysisTime()
+	{
+		return (double)analysisTime/(double)1000000;
+	}
+	
+	public long getRawAnalysisTime()
+	{
+		return analysisTime;
 	}
 
 	public long getNumberOfCASesProcessed()
@@ -84,19 +115,46 @@ public class ServicePerformance implements ServicePerformanceMBean
 		}
 		return 0.0;
 	}
-
+	public synchronized long getRawCasDeserializationTime()
+	{
+		return casDeserializationTime;
+	}
 	public synchronized void incrementCasDeserializationTime(long aCasDeserializationTime)
 	{
+		if ( maxDeserializationTime < aCasDeserializationTime )
+		{
+			maxDeserializationTime = aCasDeserializationTime;
+		}
 		casDeserializationTime += aCasDeserializationTime;
 	}
 	public double getCasSerializationTime()
 	{
+		return ((double)casSerializationTime/(double) 1000000);
+	}
+	public long getRawCasSerializationTime()
+	{
 		return casSerializationTime;
 	}
-
 	public synchronized void incrementCasSerializationTime(long casSerializationTime)
 	{
+		if ( maxSerializationTime < casSerializationTime )
+		{
+			maxSerializationTime = casSerializationTime;
+		}
 		this.casSerializationTime += casSerializationTime;
 	}
 	
+	public double getMaxSerializationTime()
+	{
+		return (double)maxSerializationTime/(double)1000000;
+	}
+	public double getMaxDeserializationTime()
+	{
+		return (double)maxDeserializationTime/(double)1000000;
+	}
+	
+	public double getMaxAnalysisTime()
+	{
+		return (double)maxAnalysisTime / (double)1000000;
+	}
 }
