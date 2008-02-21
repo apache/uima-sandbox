@@ -130,7 +130,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	private int remoteIndex = 1;
 
 	private boolean requestForMetaSentToRemotes = false;
-	
+
+
 	private ConcurrentHashMap<String, Object[]> delegateStatMap = 
 		new ConcurrentHashMap();
 	/**
@@ -353,12 +354,13 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	 */
 	public void processCollectionCompleteReplyFromDelegate(String aDelegateKey, boolean sendReply) throws AsynchAEException
 	{
+		
 		try
 		{
 			Endpoint endpoint = (Endpoint) destinationMap.get(aDelegateKey);
+			String key = lookUpDelegateKey( aDelegateKey);
 			if ( endpoint == null )
 			{
-				String key = lookUpDelegateKey( aDelegateKey);
 				
 				endpoint = (Endpoint) destinationMap.get(key);
 				if ( endpoint == null )
@@ -370,7 +372,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			endpoint.setCompletedProcessingCollection(true);
 
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "processCollectionCompleteReplyFromDelegate", 
-					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_recvd_cpc_reply__FINE", new Object[] { endpoint.getEndpoint() });
+					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_recvd_cpc_reply__FINE", new Object[] { key });
 			
 			
 			if (sendReply && allDelegatesCompletedCollection() && getClientEndpoint() != null)
@@ -396,30 +398,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			{
 				endpoint.setCompletedProcessingCollection(false);  // reset for the next run
 			}
+			logStats( key,getDelegateServicePerformance(key) );
 			
 		}
-		
-		
-		
-		
-		
-		Iterator it = delegateStats.keySet().iterator();
-
-		
-		
-		while( it.hasNext())
-		{
-			String delegateKey = (String)it.next();
-			
-			//	log delegate stats
-			logStats( delegateKey, (HashMap)delegateStats.get(delegateKey));
-		}
-
-		if ( isTopLevelComponent() )
-		{
-			//	Log this controller's stats
-			logStats();
-		}
+		//	Log this controller's stats
+		logStats(getComponentName(),servicePerformance);
 		getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, getClientEndpoint());
 		clientEndpoint = null;
 		clearStats();
@@ -1241,9 +1224,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	}
 
 
-	public boolean isDelegateKeyValid(String anEndpointName)
+	public boolean isDelegateKeyValid(String aDelegateKey)
 	{
-		if (destinationMap.containsKey(anEndpointName))
+		if (destinationMap.containsKey(aDelegateKey))
 		{
 			return true;
 		}
@@ -1293,6 +1276,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     	{
         	return (ServicePerformance)delegateStats[SERVICE_PERF_INDX];
     	}
+    	
     	return null;
     }
     public ServiceErrors getDelegateServiceErrors( String aDelegateKey )
@@ -1558,6 +1542,39 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		anEndpoint.startMetadataRequestTimer();
 		anEndpoint.setController(this);
+		
+		String key = lookUpDelegateKey(anEndpoint.getEndpoint());
+		if ( !delegateStatMap.containsKey(key))
+		{
+			if ( key != null && anEndpoint != null)
+			{
+				ServiceInfo serviceInfo = anEndpoint.getServiceInfo();
+				PrimitiveServiceInfo pServiceInfo = new PrimitiveServiceInfo();
+				pServiceInfo.setBrokerURL(serviceInfo.getBrokerURL());
+				pServiceInfo.setInputQueueName(serviceInfo.getInputQueueName());
+				pServiceInfo.setState(serviceInfo.getState());
+				pServiceInfo.setAnalysisEngineInstanceCount(1);
+				
+				registerWithAgent(pServiceInfo, super.getManagementInterface().getJmxDomain()
+						+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
+
+				ServicePerformance servicePerformance = new ServicePerformance();
+				
+				registerWithAgent(servicePerformance, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
+
+				ServiceErrors serviceErrors = new ServiceErrors();
+				
+				registerWithAgent(serviceErrors, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceErrors.getLabel());
+				remoteIndex++;
+
+				serviceErrorMap.put(key, serviceErrors);
+				Object[] delegateStatsArray = 
+					new Object[] { pServiceInfo, servicePerformance, serviceErrors }; 
+
+				delegateStatMap.put( key, delegateStatsArray);					
+
+			}
+		}
 		getOutputChannel().sendRequest(AsynchAEMessage.GetMeta, anEndpoint);
 	}
 
@@ -1699,35 +1716,21 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		return serviceInfo;
 	}
-	
-    public void incrementCasProcessedByDelegate(String aDelegateKey)
+	public ServicePerformance getServicePerformance(String aDelegateKey )
+	{
+		return getDelegateServicePerformance(aDelegateKey);
+	}
+    /**
+     * Accumulate analysis time for the aggregate
+     * 
+     * @param anAnalysisTime
+     */
+    public synchronized void incrementAnalysisTime( long anAnalysisTime )
     {
-		ServicePerformance delegatePerformanceStats =
-			getDelegateServicePerformance(aDelegateKey);
-		delegatePerformanceStats.incrementNumberOfCASesProcessed();
-    }
-    
-    public void incrementDelegateIdleTime(String aDelegateKey, long anIdleTime)
-    {
-		ServicePerformance delegatePerformanceStats =
-			getDelegateServicePerformance(aDelegateKey);
-		delegatePerformanceStats.incrementIdleTime(anIdleTime);
+		servicePerformance.incrementAnalysisTime(anAnalysisTime);
     }
 
-    public void incrementCasSerializationTime( String aDelegateKey,long aSerializationTime )
-    {
-		ServicePerformance delegatePerformanceStats =
-			getDelegateServicePerformance(aDelegateKey);
-		delegatePerformanceStats.incrementCasSerializationTime(aSerializationTime);
-    }
-    
-    public synchronized void incrementCasDeserializationTime( String aDelegateKey, long aDeserializationTime )
-    {
-		ServicePerformance delegatePerformanceStats =
-			getDelegateServicePerformance(aDelegateKey);
-		delegatePerformanceStats.incrementCasDeserializationTime(aDeserializationTime);
-    }
-	public void stopTimers()
+    public void stopTimers()
 	{
 		Set set = destinationMap.entrySet();
 		for( Iterator it = set.iterator(); it.hasNext();)
@@ -1799,4 +1802,22 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		super.stop();
 		cleanUp();
 	}
+/*	
+	public ServicePerformance getCasStatistics( String aCasReferenceId )
+	{
+		ServicePerformance casStats = null;
+		if ( perCasStatistics.containsKey(aCasReferenceId) )
+		{
+			casStats = (ServicePerformance)perCasStatistics.get(aCasReferenceId);
+		}
+		else
+		{
+			casStats = new ServicePerformance();
+			perCasStatistics.put( aCasReferenceId, casStats);
+			System.out.println("########## AggregateController.getCasStatistics()-Controller:"+getComponentName()+" Creating New ServicePerformance Object for Cas:"+aCasReferenceId+" Map HashCode:"+perCasStatistics.hashCode()+" Map Size:"+perCasStatistics.size());
+		}
+		return casStats;
+	}
+*/
+
 }

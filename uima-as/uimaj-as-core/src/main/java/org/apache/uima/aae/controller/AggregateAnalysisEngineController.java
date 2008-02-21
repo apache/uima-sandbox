@@ -93,7 +93,7 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
     public PrimitiveServiceInfo getDelegateServiceInfo( String aDelegateKey );
 
     public ServiceErrors getDelegateServiceErrors( String aDelegateKey );
-
+/*
     public void incrementCasProcessedByDelegate(String aDelegateKey);
     
     public void incrementCasSerializationTime( String aDelegateKey,long aSerializationTime );
@@ -102,7 +102,11 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
     
     public void incrementDelegateIdleTime(String aDelegateKey, long anIdleTime);
 
-	public void stopTimers();
+    public void incrementAnalysisTime(String aDelegateKey, long anAnalysisTime);
+
+    public void incrementAnalysisTime( long anAnalysisTime );
+*/
+    public void stopTimers();
 
 	
 	public boolean requestForMetaSentToRemotes();
@@ -110,5 +114,8 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	public void setRequestForMetaSentToRemotes();
 	
 	public Map getDestinations();
+
+	public ServicePerformance getServicePerformance(String aDelegateKey );
+
 
 }

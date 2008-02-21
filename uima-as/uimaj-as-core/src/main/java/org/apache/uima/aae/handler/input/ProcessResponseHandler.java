@@ -21,6 +21,7 @@ package org.apache.uima.aae.handler.input;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
@@ -60,43 +61,110 @@ public class ProcessResponseHandler extends HandlerBase
 
 	private void aggregateDelegateStats(MessageContext aMessageContext, String aCasReferenceId) throws AsynchAEException
 	{
+		String delegateKey = "";
 		try
 		{
+			
+			delegateKey = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
 			CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 			if ( entry == null )
 			{
 				throw new AsynchAEException("CasReferenceId:"+aCasReferenceId+" Not Found in the Cache.");
 			}
+			CacheEntry inputCasEntry = null;
 			String inputCasReferenceId = entry.getInputCasReferenceId();
+			ServicePerformance casStats = 
+				((AggregateAnalysisEngineController)getController()).getCasStatistics(aCasReferenceId);
 			if ( inputCasReferenceId != null && 
 				 getController().getInProcessCache().entryExists(inputCasReferenceId) )
 			{
-				//	Get entry for the input CAS
-				entry = getController().
-							getInProcessCache().
-								getCacheEntryForCAS(inputCasReferenceId);
+				String casProducerKey = entry.getCasProducerKey();
+				if ( casProducerKey != null &&
+					((AggregateAnalysisEngineController)getController()).
+						isDelegateKeyValid(casProducerKey) )
+				{
+					//	Get entry for the input CAS
+					inputCasEntry = getController().
+								getInProcessCache().
+									getCacheEntryForCAS(inputCasReferenceId);
+				}
+				
 			}
+			ServicePerformance delegateServicePerformance =
+				((AggregateAnalysisEngineController)getController()).getServicePerformance(delegateKey);
+
 			if (aMessageContext.propertyExists(AsynchAEMessage.TimeToSerializeCAS))
 			{
 				long timeToSerializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToSerializeCAS)).longValue();
-				entry.incrementTimeToSerializeCAS(timeToSerializeCAS);
+				if ( timeToSerializeCAS > 0)
+				{
+					casStats.incrementCasSerializationTime(timeToSerializeCAS);
+					if ( delegateServicePerformance != null )
+					{
+						delegateServicePerformance.
+						incrementCasSerializationTime(timeToSerializeCAS);
+					}
+					getController().getServicePerformance().
+						incrementCasSerializationTime(timeToSerializeCAS);
+				}
 			}
 			if (aMessageContext.propertyExists(AsynchAEMessage.TimeToDeserializeCAS))
 			{
 				long timeToDeserializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToDeserializeCAS)).longValue();
-				entry.incrementTimeToDeserializeCAS(timeToDeserializeCAS);
+				if ( timeToDeserializeCAS > 0 )
+				{
+					casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
+
+					if ( delegateServicePerformance != null )
+					{
+						delegateServicePerformance.
+							incrementCasDeserializationTime(timeToDeserializeCAS);
+					}
+					getController().getServicePerformance().
+						incrementCasDeserializationTime(timeToDeserializeCAS);
+				}
 			}
+
+			if (aMessageContext.propertyExists(AsynchAEMessage.IdleTime))
+			{
+				long idleTime = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.IdleTime)).longValue();
+				if ( idleTime > 0 )
+				{
+					casStats.incrementIdleTime(idleTime);
+					if ( delegateServicePerformance != null )
+					{
+						delegateServicePerformance.
+							incrementIdleTime(idleTime);
+					}
+				}
+			}
+			
 			if (aMessageContext.propertyExists(AsynchAEMessage.TimeWaitingForCAS))
 			{
 				long timeWaitingForCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeWaitingForCAS)).longValue();
-				entry.incrementTimeWaitingForCAS(timeWaitingForCAS);
+				if ( aMessageContext.getEndpoint().isRemote())
+				{
+					entry.incrementTimeWaitingForCAS(timeWaitingForCAS);
+					if ( inputCasEntry != null )
+					{
+						inputCasEntry.incrementTimeWaitingForCAS(timeWaitingForCAS);
+					}
+				}
 			}
 			if (aMessageContext.propertyExists(AsynchAEMessage.TimeInProcessCAS))
 			{
 				long timeInProcessCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeInProcessCAS)).longValue();
-				entry.incrementTimeToProcessCAS(timeInProcessCAS);
+				casStats.incrementAnalysisTime(timeInProcessCAS);
+				if ( delegateServicePerformance != null )
+				{
+					delegateServicePerformance.
+						incrementAnalysisTime(timeInProcessCAS);
+				}
+				//	Aggregate delegates processing times for this aggregate
+				getController().getServicePerformance().
+					incrementAnalysisTime(timeInProcessCAS);
+
 			}
-			
 		}
 		catch( AsynchAEException e)
 		{
@@ -135,37 +203,6 @@ public class ProcessResponseHandler extends HandlerBase
 			{
 				aggregateDelegateStats( aMessageContext, aCasReferenceId );
 			}			
-			
-			if ( aMessageContext.propertyExists(AsynchAEMessage.DelegateStats) )
-			{	
-				if ( getController() instanceof AggregateAnalysisEngineController )
-				{
-					CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-					DelegateStats stats;
-					if ( (stats = entry.getStat()) != null )
-					{
-						//DelegateStats delegateStats = (DelegateStats) 
-						Object delegateStats = aMessageContext.getMessageObjectProperty(AsynchAEMessage.DelegateStats);
-
-						if ( delegateStats instanceof TimerStats )
-						{
-							//delegateStats.get(AsynchAEMessage.TimeToSerializeCAS);
-							/*
-							timerStats.put(AsynchAEMessage.TimeToSerializeCAS, entry.getTimeToSerializeCAS());
-							timerStats.put(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
-							timerStats.put(AsynchAEMessage.TimeToDeserializeCAS, entry.getTimeToDeserializeCAS());
-							timerStats.put(AsynchAEMessage.TimeInService, timeInService);
-*/							
-							//TimerStats timerStats = (TimerStats)delegateStats;
-							
-						}
-						if (!stats.containsKey( aMessageContext.getEndpoint().getEndpoint()))
-						{
-							stats.put(aMessageContext.getEndpoint().getEndpoint(), delegateStats);
-						}
-					}
-				}
-			}
 	}
 
 	private Endpoint lookupEndpoint(String anEndpointName, String aCasReferenceId)
@@ -290,8 +327,13 @@ public class ProcessResponseHandler extends HandlerBase
 			//	Increment number of CASes processed by this delegate
 			if ( aDelegateKey != null)
 			{
-				((AggregateAnalysisEngineController)getController()).
-					incrementCasProcessedByDelegate(aDelegateKey);
+				ServicePerformance delegateServicePerformance =
+					((AggregateAnalysisEngineController)getController()).
+						getServicePerformance(aDelegateKey);
+				if ( delegateServicePerformance != null )
+				{
+					delegateServicePerformance.incrementNumberOfCASesProcessed();
+				}
 			}
 			
 			String xmi = aMessageContext.getStringMessage();
@@ -358,35 +400,13 @@ public class ProcessResponseHandler extends HandlerBase
 		
 			long timeToDeserializeCAS = System.nanoTime() - t1;
 
-			//	Increment Total Deserialization Time for the remote delegate
-//((AggregateAnalysisEngineController)getController()).
-//incrementCasDeserializationTime(aDelegateKey, timeToDeserializeCAS);
-
-			if ( aMessageContext.propertyExists(AsynchAEMessage.TimeToDeserializeCAS))
-			{
-				long remoteDelegateTimeToDeserialize =
-					aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToDeserializeCAS);
-				((AggregateAnalysisEngineController)getController()).
-					incrementCasDeserializationTime(aDelegateKey, remoteDelegateTimeToDeserialize);
-				
-			}
-
-			if ( aMessageContext.propertyExists(AsynchAEMessage.TimeToSerializeCAS))
-			{
-				long remoteDelegateTimeToSerialize =
-					aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToSerializeCAS);
-				((AggregateAnalysisEngineController)getController()).
-					incrementCasDeserializationTime(aDelegateKey, remoteDelegateTimeToSerialize);
-
-			}			
-
             getController().
             	getServicePerformance().
             		incrementCasDeserializationTime(timeToDeserializeCAS);
 
-
-
-
+            ServicePerformance casStats =
+            	getController().getCasStatistics(casReferenceId);
+			casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
 			LongNumericStatistic statistic;
 			if ( (statistic = getController().getMonitor().getLongNumericStatistic("",Monitor.TotalDeserializeTime)) != null )
 			{
@@ -424,36 +444,6 @@ public class ProcessResponseHandler extends HandlerBase
 		}
 
 	}
-/*	
-	private boolean deserialize(String xmi, String casReferenceId, CAS cas, Endpoint endpoint, XmiSerializationSharedData deserSharedData, boolean dflag, int highWaterMark )
-	{
-		try
-		{
-			UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, dflag, -1);
-		}
-		catch( Exception e)
-		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-            "deserialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialize_error__WARNING",
-            new Object[] { getController().getName(), casReferenceId, endpoint.getEndpoint() });
-			try
-			{
-				getController().getOutputChannel().sendReply(e, casReferenceId, endpoint );
-			}
-			catch( Exception ee )
-			{
-				//	Exception while sending reply to client. Handle this silently for now.
-			}
-			if ( cas != null )
-			{
-				getController().dropCAS(cas);
-			}
-			return false; 
-		}
-		return true;
-
-	}
-*/	
 	private void handleProcessResponseWithCASReference(MessageContext aMessageContext )
 	{
 		String casReferenceId = null;
@@ -464,6 +454,16 @@ public class ProcessResponseHandler extends HandlerBase
 			casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
 			cacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
 			CAS cas = cacheEntry.getCas();
+			String endpointName = aMessageContext.getEndpoint().getEndpoint();
+			String delegateKey = ((AggregateAnalysisEngineController)getController()).
+									lookUpDelegateKey(endpointName);
+			ServicePerformance delegateServicePerformance = 
+				((AggregateAnalysisEngineController)getController()).
+					getServicePerformance(delegateKey);
+			if ( delegateServicePerformance != null )
+			{
+				delegateServicePerformance.incrementNumberOfCASesProcessed();
+			}
 
 			//CAS cas = getController().getInProcessCache().getCasByReference(casReferenceId);
 			if (cas != null)
@@ -638,23 +638,6 @@ public class ProcessResponseHandler extends HandlerBase
 			String delegateKey = ((Endpoint)aMessageContext.getEndpoint()).getEndpoint();
 			if ( getController() instanceof AggregateAnalysisEngineController )
 			{
-				Object o;
-				if ( (o = aMessageContext.getMessageObjectProperty("Stats")) !=  null && o instanceof HashMap)
-				{
-					((AggregateAnalysisEngineController) getController()).
-						saveStatsFromService(delegateKey, (HashMap)o );
-//					saveStatsFromService(delegateKey, (HashMap)((HashMap)o).get(mapkey) );
-/*					
-					Iterator it = ((HashMap)o).keySet().iterator();
-					while( it.hasNext() )
-					{
-						String mapkey = (String)it.next();
-						System.out.println("Controller:"+getController().getComponentName()+" HashMap Delegate Key:"+mapkey);
-						((AggregateAnalysisEngineController) getController()).
-							saveStatsFromService(delegateKey, (HashMap)((HashMap)o).get(mapkey) );
-					}
-*/					
-				}
 				((AggregateAnalysisEngineController) getController())
 					.processCollectionCompleteReplyFromDelegate(delegateKey, true);
 			}

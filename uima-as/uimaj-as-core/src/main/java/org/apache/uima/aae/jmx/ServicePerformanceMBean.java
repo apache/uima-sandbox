@@ -31,5 +31,6 @@ public interface ServicePerformanceMBean extends Serializable
 	public long getNumberOfCASesProcessed();
 	public double getCasDeserializationTime();
 	public double getCasSerializationTime();
+	public double getAnalysisTime();
 	
 }

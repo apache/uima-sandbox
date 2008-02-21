@@ -146,6 +146,8 @@ implements AnalysisEngineController, EventSubscriber
 	
 	protected boolean serviceInitialized = false;
 	
+	protected ConcurrentHashMap perCasStatistics = new ConcurrentHashMap();
+
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -991,7 +993,9 @@ implements AnalysisEngineController, EventSubscriber
 			idleTimeMap.remove(aKey);
 		}
 	}	
-	
+	/**
+	 * Removes statistics from the global Map
+	 */
 	public void dropStats( String aCasReferenceId, String anEndpointName )
 	{
 		String key = aCasReferenceId+anEndpointName;
@@ -1002,11 +1006,76 @@ implements AnalysisEngineController, EventSubscriber
 				statsMap.remove(key);
 			}
 		}
+		dropCasStatistics(aCasReferenceId);
 	}
 	protected void logStats()
 	{
-		Map controllerStats = getStats();
-		logStats(getComponentName(),controllerStats);
+		if ( this instanceof AggregateAnalysisEngineController )
+		{
+			Map delegates = ((AggregateAnalysisEngineController)this).getDestinations();
+			Set set = delegates.entrySet();
+			for( Iterator it = set.iterator(); it.hasNext();)
+			{
+				Map.Entry entry = (Map.Entry)it.next();
+				Endpoint endpoint = (Endpoint)entry.getValue();
+				if ( endpoint != null )
+				{
+					//	Fetch stats for the delegate
+					ServicePerformance delegatePerformanceStats =
+						((AggregateAnalysisEngineController)this).
+							getDelegateServicePerformance((String)entry.getKey());
+					//	Log this delegate's statistics
+					logStats((String)entry.getKey(), delegatePerformanceStats);
+				}
+			}
+		}
+		//	log stats for this service
+		logStats(getComponentName(),servicePerformance);
+	}
+	
+	/**
+	 * Returns stats associated with a given CAS. A service uses a global
+	 * map to store CAS level statistics. A key to the map is the CAS id.
+	 * This method creates a new instance of ServicePerformance object
+	 * if one doesnt exist in the map for a given CAS id.
+	 *  
+	 */
+	public ServicePerformance getCasStatistics( String aCasReferenceId )
+	{
+		ServicePerformance casStats = null;
+		if ( perCasStatistics.containsKey(aCasReferenceId) )
+		{
+			casStats = (ServicePerformance)perCasStatistics.get(aCasReferenceId);
+		}
+		else
+		{
+			casStats = new ServicePerformance();
+			perCasStatistics.put( aCasReferenceId, casStats);
+		}
+		return casStats;
+	}
+
+	/**
+	 * Logs statistics  
+	 * 
+	 * @param aDelegateKey
+	 * @param aDelegateServicePerformance
+	 */
+	protected void logStats( String aDelegateKey, ServicePerformance aServicePerformance )
+	{
+		if ( aServicePerformance != null )
+		{
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "logStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_primitive_stats__INFO", 
+						new Object[] {getComponentName(), aDelegateKey, 
+									   aServicePerformance.getNumberOfCASesProcessed(), 
+									   aServicePerformance.getCasDeserializationTime(), 
+									   aServicePerformance.getCasSerializationTime(), 
+									   aServicePerformance.getAnalysisTime(),
+				   	   				   aServicePerformance.getMaxSerializationTime(), 
+				   	   				   aServicePerformance.getMaxDeserializationTime(), 
+				   	   				   aServicePerformance.getMaxAnalysisTime(),
+									   aServicePerformance.getIdleTime() });
+		}
 	}
 	
 	/**
@@ -1071,22 +1140,6 @@ implements AnalysisEngineController, EventSubscriber
 				((LongNumericStatistic)entry.getValue()).reset();
 			}
 		}
-/*		
-		Iterator it = stats.keySet().iterator();
-		while( it.hasNext())
-		{
-			Object o = it.next();
-			if ( o instanceof String )
-			{
-				String key = (String)o;
-				Object statObject = stats.get(key);
-				if ( statObject instanceof LongNumericStatistic )
-				{
-					((LongNumericStatistic)statObject).reset();
-				}
-			}
-		}
-*/		
 	}
 	/**
 	 * Returns a copy of the controller statistics.
@@ -1644,5 +1697,13 @@ implements AnalysisEngineController, EventSubscriber
               notifyOnInitializationSuccess();
         }
       }
+	  }
+	  
+	  protected void dropCasStatistics( String aCasReferenceId )
+	  {
+		if ( isTopLevelComponent() && perCasStatistics.containsKey(aCasReferenceId))
+		{
+				perCasStatistics.remove(aCasReferenceId);
+		}
 	  }
 }

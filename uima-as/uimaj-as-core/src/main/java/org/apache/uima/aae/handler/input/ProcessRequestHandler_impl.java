@@ -30,6 +30,7 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.InvalidMessageException;
 import org.apache.uima.aae.handler.HandlerBase;
+import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
 import org.apache.uima.aae.monitor.Monitor;
@@ -218,6 +219,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialize_cas_time_FINE",
                 new Object[] { timeToDeserializeCAS / 1000 });
+        		ServicePerformance casStats = null;
         
         
 				if (casReferenceId == null)
@@ -234,10 +236,18 @@ public class ProcessRequestHandler_impl extends HandlerBase
 							inputCasReferenceId = casReferenceId;
 						}
 					}
+					casStats = getController().getCasStatistics(inputCasReferenceId);
+
 				}
 				else
 				{
 					getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
+					casStats = getController().getCasStatistics(casReferenceId);
+				}
+				casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
+				if ( getController().isTopLevelComponent() )
+				{
+					getController().getServicePerformance().incrementCasDeserializationTime(timeToDeserializeCAS);
 				}
 				//	Set a local flag to indicate that the CAS has been added to the cache. This will be usefull when handling an exception
 				//	If an exception happens before the CAS is added to the cache, the CAS needs to be dropped immediately.
@@ -497,6 +507,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			if ( aMessageContext.propertyExists(AsynchAEMessage.CasSequence) )
 			{
 				isNewCAS = true;
+				
+
 				if ( replyToEndpoint == null )
 				{
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
@@ -510,6 +522,9 @@ public class ProcessRequestHandler_impl extends HandlerBase
 					newCASProducedBy = 
 						((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(replyToEndpoint.getEndpoint());
 					replyToEndpoint.setIsCasMultiplier(true);
+					((AggregateAnalysisEngineController)getController()).
+						getServicePerformance(newCASProducedBy).
+							incrementNumberOfCASesProcessed();
 				}
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_new_cas__FINE",
