@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,6 +78,10 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
    private AnnotationFS lastRuleExceptionAnnotation = null;
 
+   private NumberFormat floatNumberFormat = null;
+
+   private NumberFormat integerNumberFormat = null;
+
    /**
     * Performs any startup tasks required by this annotator. This implementation
     * reads the configuration parameters and compiles the regular expressions.
@@ -89,13 +95,17 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       // initialize annotator logger
       this.logger = getContext().getLogger();
 
+      // default initialization for number format
+      this.floatNumberFormat = NumberFormat.getNumberInstance();
+      this.integerNumberFormat = NumberFormat.getIntegerInstance();
+
       // create a concept file parser object
       ConceptFileParser parser = new ConceptFileParser_impl();
 
       // get configuration parameter settings
       // get parameter ConceptFiles, default is an empty array
-      String[] conceptFileNames = safeGetConfigParameterStringArrayValue(getContext(),
-            REGEX_CONCEPTS_FILES, new String[] {});
+      String[] conceptFileNames = safeGetConfigParameterStringArrayValue(
+            getContext(), REGEX_CONCEPTS_FILES, new String[] {});
 
       // get UIMA datapath and tokenize it into its elements
       StringTokenizer tokenizer = new StringTokenizer(getContext()
@@ -160,9 +170,9 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
       }
 
       // initialize the regex concepts
-     for (int i = 0; i < this.regexConcepts.length; i++) {
-            ((Concept_impl) this.regexConcepts[i]).initialize(this.logger);
-         }
+      for (int i = 0; i < this.regexConcepts.length; i++) {
+         ((Concept_impl) this.regexConcepts[i]).initialize(this.logger);
+      }
    }
 
    /**
@@ -631,7 +641,8 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                throw new RegexAnnotatorProcessException(
                      "regex_annotator_error_validating_annotation",
                      new Object[] { annotations[a].getId(), matchText,
-                           Integer.valueOf(localStart), Integer.valueOf(localEnd) }, ex);
+                           Integer.valueOf(localStart),
+                           Integer.valueOf(localEnd) }, ex);
             }
          }
 
@@ -686,11 +697,42 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   // set feature value at the annotation in dependence of the
                   // feature type
                   if (type == Feature.FLOAT_FEATURE) {
-                     fs.setFloatValue(features[f].getFeature(), Float
-                           .parseFloat(featureValue));
+                     try {
+                        Number number = this.floatNumberFormat
+                              .parse(featureValue);
+                        fs.setFloatValue(features[f].getFeature(), number
+                              .floatValue());
+                     } catch (ParseException ex) {
+                        this.logger
+                              .logrb(
+                                    Level.WARNING,
+                                    "RegExAnnotator",
+                                    "processConceptInstructions",
+                                    MESSAGE_DIGEST,
+                                    "regex_annotator_warning_number_format_conversion",
+                                    new Object[] { featureValue,
+                                          features[f].getFeature().getName(),
+                                          "float" });
+                     }
+
                   } else if (type == Feature.INTEGER_FEATURE) {
-                     fs.setIntValue(features[f].getFeature(), Integer
-                           .parseInt(featureValue));
+                     try {
+                        Number number = this.integerNumberFormat
+                              .parse(featureValue);
+                        fs.setIntValue(features[f].getFeature(), number
+                              .intValue());
+                     } catch (ParseException ex) {
+                        this.logger
+                              .logrb(
+                                    Level.WARNING,
+                                    "RegExAnnotator",
+                                    "processConceptInstructions",
+                                    MESSAGE_DIGEST,
+                                    "regex_annotator_warning_number_format_conversion",
+                                    new Object[] { featureValue,
+                                          features[f].getFeature().getName(),
+                                          "integer" });
+                     }
                   } else if (type == Feature.STRING_FEATURE) {
                      fs.setStringValue(features[f].getFeature(), featureValue);
                   }
@@ -836,7 +878,7 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
     * @return returns the replaced match group value content
     */
    private String replaceMatchGroupValues(String featureValue, Matcher matcher,
-         Rule rule) throws RegexAnnotatorProcessException{
+         Rule rule) throws RegexAnnotatorProcessException {
       StringBuffer replaced = new StringBuffer();
       int pos = 0;
       int end = featureValue.length();

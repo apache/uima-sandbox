@@ -992,6 +992,15 @@ public class SampleValidator implements
 				</itemizedlist>
 				</para>
 
+				<note>
+					<para>
+					Float and Integer based feature values are converted using the Java NumberFormat for the
+					current Java default locale. If the feature value cannot be converted the feature value is not
+					set and a warning is written to the log. To prevent these warnings it may be useful 
+					to do a custom normalization of the numbers before they are added to the feature.
+					</para>
+				</note>
+
 				</section>
 				<section id="sandbox.regexAnnotator.conceptsFile.annotationCreation.featureNormalization">
 					<title>Features Value Normalization</title>
