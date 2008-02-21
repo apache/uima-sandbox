@@ -52,6 +52,7 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaEEServiceException;
+import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.aae.monitor.Monitor;
@@ -61,6 +62,8 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
+
+import com.sun.org.apache.xml.internal.security.encryption.AgreementMethod;
 
 public class JmsOutputChannel implements OutputChannel
 {
@@ -495,6 +498,7 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				long t1 = System.nanoTime();
 				String serializedCAS = getSerializedCasAndReleaseIt(false, aCasReferenceId,anEndpoint, anEndpoint.isRetryEnabled());
+/*				
 				if ( analysisEngineController instanceof AggregateAnalysisEngineController )
 				{
 					String delegateKey
@@ -503,15 +507,15 @@ public class JmsOutputChannel implements OutputChannel
 					if ( delegateKey != null)
 					{
 						long timeToSerialize = System.nanoTime() - t1;
-						((AggregateAnalysisEngineController)analysisEngineController).
-							incrementCasSerializationTime(delegateKey, timeToSerialize);
+//						((AggregateAnalysisEngineController)analysisEngineController).
+//							incrementCasSerializationTime(delegateKey, timeToSerialize);
 						
 						analysisEngineController.
 							getServicePerformance().
 								incrementCasSerializationTime(timeToSerialize);
 					}
 				}
-
+*/
 				if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 				{
 		            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
@@ -658,16 +662,7 @@ public class JmsOutputChannel implements OutputChannel
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 			populateHeaderWithResponseContext(tm, anEndpoint, aCommand);
 			
-			if ( aCommand == AsynchAEMessage.CollectionProcessComplete)
-			{
-				Map controllerStats = getAnalysisEngineController().getStats();
-				if ( controllerStats != null)
-				{
-					tm.setObjectProperty("Stats", controllerStats);
-				}
-			
-			}
-			endpointConnection.send(tm, true); //false);
+			endpointConnection.send(tm, true); 
 			addIdleTime(tm);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cpc_reply_sent__FINE",
@@ -916,7 +911,7 @@ public class JmsOutputChannel implements OutputChannel
 			String serializedCAS = null;
 			//	Using Cas reference Id retrieve CAS from the shared Cash
 			cas = getAnalysisEngineController().getInProcessCache().getCasByReference(aCasReferenceId);
-
+			ServicePerformance casStats = getAnalysisEngineController().getCasStatistics(aCasReferenceId);
 			if ( cas == null )
 			{
 				serializedCAS = getAnalysisEngineController().getInProcessCache().getSerializedCAS( aCasReferenceId );
@@ -932,7 +927,11 @@ public class JmsOutputChannel implements OutputChannel
 					serializer = "xmi";
 				}
 				serializedCAS = serializeCAS(isReply, cas, aCasReferenceId, serializer);
-				entry.incrementTimeToSerializeCAS(System.nanoTime()-t1);
+				long timeToSerializeCas = System.nanoTime()-t1;
+				entry.incrementTimeToSerializeCAS(timeToSerializeCas);
+				casStats.incrementCasSerializationTime(timeToSerializeCas);
+				getAnalysisEngineController().getServicePerformance().
+					incrementCasSerializationTime(timeToSerializeCas);
 				if ( cacheSerializedCas )
 				{
 					getAnalysisEngineController().getInProcessCache().saveSerializedCAS(aCasReferenceId, serializedCAS);
@@ -1027,11 +1026,14 @@ public class JmsOutputChannel implements OutputChannel
 			}
 			else 
 			{
-				CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-				aTextMessage.setLongProperty(AsynchAEMessage.TimeToSerializeCAS, entry.getTimeToSerializeCAS());
-				aTextMessage.setLongProperty(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
-				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, entry.getTimeToDeserializeCAS());
-				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, entry.getTimeToProcessCAS() );
+			
+				ServicePerformance casStats =
+					getAnalysisEngineController().getCasStatistics(aCasReferenceId);
+				
+				aTextMessage.setLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
+//					aTextMessage.setLongProperty(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
+				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
+				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
 				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, anEndpoint.getIdleTime() );
 				
 				String lookupKey = getAnalysisEngineController().getName();//getInProcessCache().getMessageAccessorByReference(aCasReferenceId).getEndpointName();
@@ -1040,36 +1042,6 @@ public class JmsOutputChannel implements OutputChannel
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "populateStats", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timein_service__FINEST",
 	                    new Object[] { serviceInputEndpoint, (double)timeInService/(double)1000000 });
-//				aTextMessage.setLongProperty(AsynchAEMessage.TimeInService, timeInService );
-/*				
-				TimerStats timerStats = new TimerStats();
-				timerStats.put(AsynchAEMessage.TimeToSerializeCAS, entry.getTimeToSerializeCAS());
-				timerStats.put(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
-				timerStats.put(AsynchAEMessage.TimeToDeserializeCAS, entry.getTimeToDeserializeCAS());
-				timerStats.put(AsynchAEMessage.TimeInService, timeInService);
-				if ( getAnalysisEngineController() instanceof PrimitiveAnalysisEngineController )
-				{
-					aTextMessage.setObjectProperty(AsynchAEMessage.DelegateStats, timerStats);
-				}
-				else
-				{
-					
-					DelegateStats delegateStats = entry.getStat();
-					if ( delegateStats != null )
-					{
-						Iterator it = delegateStats.keySet().iterator();
-						while( it.hasNext())
-						{
-							String key = (String) it.next();
-//							System.out.println("DelegateStats KEY:::::::::::::::::::::::::::::"+key+ " Value Object::"+ delegateStats.get(key).getClass().getName());
-						}
-					}
-					else
-					{
-				//		System.out.println(">>>>>>>>>>>>>>>>>>Delegate Stats Not in Cache");
-					}
-				}
-*/				
 			}
 		}	
 	}
@@ -1433,6 +1405,8 @@ public class JmsOutputChannel implements OutputChannel
 				tm.setStringProperty(AsynchAEMessage.InputCasReference, anInputCasReferenceId);
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
 				//	Override MessageType set in the populateHeaderWithContext above.
+				//	Add stats
+				populateStats(tm, anEndpoint, aNewCasReferenceId, AsynchAEMessage.Process, isRequest);
 				
 				//	Make the reply message look like a request. This message will contain a new CAS 
 				//	produced by the CAS Multiplier. The client will treat this CAS

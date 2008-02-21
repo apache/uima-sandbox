@@ -460,6 +460,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		{
 			if ( isProcessRequest(aMessage) )
 			{
+				//	Compute the time between waiting for this request and update
+				//	this service performance stats.
 				idleTime = computeIdleTime();
 			}
 
