@@ -950,7 +950,8 @@ implements UimaAsynchronousEngine, MessageListener
 			long totaltimeInProcessCAS = message.getLongProperty(AsynchAEMessage.TimeInProcessCAS);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 					new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Total Time In Process CAS", (float) totaltimeInProcessCAS / (float) 1000000 });
-			pt.addEvent("UimaEE", "process", "Total Time In Process CAS", (int)totaltimeInProcessCAS/1000000, "");
+			float timeInMillis = (float)totaltimeInProcessCAS/(float)1000000;
+			pt.addEvent("UimaEE", "process", "Total Time In Process CAS", (int)timeInMillis, "");
 			clientSideJmxStats.incrementTotalTimeToProcess(totaltimeInProcessCAS);
 		}
 		if (message.propertyExists(AsynchAEMessage.IdleTime))
