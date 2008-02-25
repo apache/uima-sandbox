@@ -60,7 +60,7 @@
 			<directory>../RegularExpressionAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/RegularExpressionAnnotator/lib</outputDirectory>
 			<includes>
-				<include>uimaj-an-regex.jar</include>
+				<include>uima-an-regex.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -103,7 +103,7 @@
 			<directory>../DictionaryAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/DictionaryAnnotator/lib</outputDirectory>
 			<includes>
-				<include>uimaj-an-dictionary.jar</include>
+				<include>uima-an-dictionary.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -139,7 +139,7 @@
 			<directory>../WhitespaceTokenizer/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/WhitespaceTokenizer/lib</outputDirectory>
 			<includes>
-				<include>uimaj-an-wst.jar</include>
+				<include>uima-an-wst.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -171,7 +171,7 @@
 			<directory>../Tagger/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/Tagger/lib</outputDirectory>
 			<includes>
-				<include>uimaj-tagger.jar</include>
+				<include>uima-an-tagger.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
