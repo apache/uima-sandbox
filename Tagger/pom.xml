@@ -61,7 +61,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>uimaj-tagger</finalName>
+		<finalName>uima-an-tagger</finalName>
 		<resources>
 			<resource>
 				<directory>desc</directory>
