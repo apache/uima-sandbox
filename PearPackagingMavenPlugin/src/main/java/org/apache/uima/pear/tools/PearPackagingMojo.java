@@ -185,7 +185,11 @@ public class PearPackagingMojo extends AbstractMojo {
          buffer.append(this.project.getBuild().getFinalName());
          buffer.append(".jar");
          String classpathExtension = buffer.toString();
-         this.classpath = this.classpath + classpathExtension;
+         if(this.classpath != null) {
+            this.classpath = this.classpath + classpathExtension;
+         } else {
+            this.classpath = classpathExtension.substring(1,classpathExtension.length());
+         }
 
          // create the PEAR package
          createPear();
