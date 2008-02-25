@@ -39,7 +39,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>uimaj-pear-task</finalName>
+		<finalName>uima-pear-ant-task</finalName>
 		
 		<plugins>
 		   <plugin>
