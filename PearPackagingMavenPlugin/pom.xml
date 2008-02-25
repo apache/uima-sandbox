@@ -61,6 +61,7 @@
 	</dependencies>
 	
 	<build>
+		<finalName>uima-pear-maven-plugin</finalName>
 		<plugins>
 		   <plugin>
 	          <groupId>org.apache.maven.plugins</groupId>
