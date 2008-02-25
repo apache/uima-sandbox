@@ -46,6 +46,8 @@ import org.apache.uima.simpleserver.output.ResultConverter;
 public class SimpleServerServlet extends HttpServlet {
 
   public static final String utf8 = "utf-8";
+  
+  public static final String MODE_PARAMETER = "mode";
 
   public static final String DEFAULT_CODE_PAGE = utf8;
 
@@ -91,10 +93,10 @@ public class SimpleServerServlet extends HttpServlet {
   // creates the mappings for standard parameter description
   // this method can be overridden for non-standard parameter sets
   protected void declareServletParameters() {
-    this.servletGETParameters.put("mode", "This parameter should define, what"
+    this.servletGETParameters.put(MODE_PARAMETER, "This parameter should define, what"
         + " the servlet should return. Some options are available.");
     Map<String, String> options = new HashMap<String, String>();
-    this.servletGETParamOptions.put("mode", options);
+    this.servletGETParamOptions.put(MODE_PARAMETER, options);
     options.put("description", "will return a description of a service "
         + "in  HTML (human-readable) format. This description is"
         + " partially automatically generated, and partially created "
@@ -107,7 +109,7 @@ public class SimpleServerServlet extends HttpServlet {
     this.servletPOSTParameters.put("text", "the value of this parameter is the "
         + "text to analyze. Expected encoding is UTF-8. This " + "parameter must always be set.");
 
-    this.servletPOSTParameters.put("mode", "This parameter should define, what"
+    this.servletPOSTParameters.put(MODE_PARAMETER, "This parameter should define, what"
         + " view of the analyss result the servlet should return. "
         + "If this parameter is not set, XML output will be produced.");
     options = new HashMap<String, String>();
@@ -116,7 +118,7 @@ public class SimpleServerServlet extends HttpServlet {
     options.put("inline", "returns inline-xml containing the analyzed "
         + "text in which all found entities are represented by tags");
     options.put("csv", "returns the found entities in a comma-separated list");
-    this.servletPOSTParamOptions.put("mode", options);
+    this.servletPOSTParamOptions.put(MODE_PARAMETER, options);
 
     this.servletPOSTParameters.put("lang", "This parameter sets the language "
         + "of the text. If this parameter is not set, the value" + "&quot;en&quot; will be used");
@@ -137,7 +139,12 @@ public class SimpleServerServlet extends HttpServlet {
     response.setCharacterEncoding(DEFAULT_CODE_PAGE);
     request.setCharacterEncoding(DEFAULT_CODE_PAGE);
     PrintWriter writer = response.getWriter();
-    String mode = request.getParameter("mode");
+    if (request.getParameterMap().isEmpty()) {
+      writer.print(this.constructHtmlDescription(request.getRequestURL().toString()));
+      writer.close();
+      return;
+    }
+    String mode = request.getParameter(MODE_PARAMETER);
     try {
       if ("xsd".equals(mode)) {
         // just give out the XSD definition provided by the server
@@ -185,11 +192,11 @@ public class SimpleServerServlet extends HttpServlet {
     String text = request.getParameter("text");
     String lang = request.getParameter("lang");
     System.out.println("Given text: " + text.substring(0, Math.min(50, text.length())));
-    String mode = request.getParameter("mode");
+    String mode = request.getParameter(MODE_PARAMETER);
     if ((lang == null) || lang.equals("")) {
       lang = "en";
     }
-    System.out.println("mode: " + mode);
+    System.out.println(MODE_PARAMETER + ": " + mode);
     System.out.println("lang: " + lang);
     // process the text
     Result result = this.server.process(text, lang);
