@@ -75,7 +75,7 @@
 		
 	</dependencies>
 	<build>
-		<finalName>uimaj-an-dictionary</finalName>
+		<finalName>uima-an-dictionary</finalName>
 		<resources>
 			<resource>
 				<directory>desc</directory>
