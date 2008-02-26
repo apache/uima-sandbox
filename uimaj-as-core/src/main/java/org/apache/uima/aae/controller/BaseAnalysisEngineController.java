@@ -857,7 +857,13 @@ implements AnalysisEngineController, EventSubscriber
 				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removed_cache_entry__FINE",
 				                new Object[] {aCasReferenceId, getComponentName() });
 					}
+					inProcessCache.dumpContents();
 				}	
+			}
+			//	Remove stats from the map maintaining CAS specific stats
+			if ( perCasStatistics.containsKey(aCasReferenceId))
+			{
+				perCasStatistics.remove(aCasReferenceId);
 			}
 	}
 
@@ -884,7 +890,6 @@ implements AnalysisEngineController, EventSubscriber
 			
 			synchronized(statsMap)
 			{
-				
 				statsMap.remove(key);
 			}
 			return time;
@@ -993,18 +998,37 @@ implements AnalysisEngineController, EventSubscriber
 			idleTimeMap.remove(aKey);
 		}
 	}	
+	
+	private void dropStats( String aKey )
+	{
+		if ( aKey != null && statsMap.containsKey(aKey ))
+		{
+			synchronized( statsMap)
+			{
+				statsMap.remove(aKey);
+			}
+		}
+	}
 	/**
 	 * Removes statistics from the global Map
 	 */
 	public void dropStats( String aCasReferenceId, String anEndpointName )
 	{
 		String key = aCasReferenceId+anEndpointName;
-		if ( key != null && statsMap.containsKey(key ))
+		//	Remove stats associated with this service
+		dropStats(key);
+		
+		if ( this instanceof AggregateAnalysisEngineController )
 		{
-			synchronized( statsMap)
+			//	remove stats for delegates
+			Set set = ((AggregateAnalysisEngineController)this).getDestinations().entrySet();
+			for( Iterator it = set.iterator(); it.hasNext();)
 			{
-				statsMap.remove(key);
+				Map.Entry entry = (Map.Entry)it.next();
+				key = aCasReferenceId + ((Endpoint)entry.getValue()).getEndpoint();
+				dropStats(key);
 			}
+
 		}
 		dropCasStatistics(aCasReferenceId);
 	}
@@ -1084,6 +1108,7 @@ implements AnalysisEngineController, EventSubscriber
 	 * @param aComponentName 
 	 * @param aStatsMap
 	 */
+/*	
 	protected void logStats(String aComponentName, Map aStatsMap)
 	{
 		float totalIdleTime = 0;
@@ -1123,6 +1148,7 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		
 	}
+*/	
 	/**
 	 * Clears controller statistics.
 	 * 
@@ -1140,6 +1166,8 @@ implements AnalysisEngineController, EventSubscriber
 				((LongNumericStatistic)entry.getValue()).reset();
 			}
 		}
+		//	Clear CAS statistics
+		perCasStatistics.clear();
 	}
 	/**
 	 * Returns a copy of the controller statistics.

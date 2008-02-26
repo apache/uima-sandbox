@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.uima.UimaContext;
+import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.jmx.AggregateServiceInfo;
 import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
@@ -93,21 +94,8 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
     public PrimitiveServiceInfo getDelegateServiceInfo( String aDelegateKey );
 
     public ServiceErrors getDelegateServiceErrors( String aDelegateKey );
-/*
-    public void incrementCasProcessedByDelegate(String aDelegateKey);
-    
-    public void incrementCasSerializationTime( String aDelegateKey,long aSerializationTime );
-    
-    public void incrementCasDeserializationTime( String aDelegateKey, long aDeserializationTime );
-    
-    public void incrementDelegateIdleTime(String aDelegateKey, long anIdleTime);
 
-    public void incrementAnalysisTime(String aDelegateKey, long anAnalysisTime);
-
-    public void incrementAnalysisTime( long anAnalysisTime );
-*/
     public void stopTimers();
-
 	
 	public boolean requestForMetaSentToRemotes();
 	
@@ -117,5 +105,5 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 
 	public ServicePerformance getServicePerformance(String aDelegateKey );
 
-
+	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry );
 }

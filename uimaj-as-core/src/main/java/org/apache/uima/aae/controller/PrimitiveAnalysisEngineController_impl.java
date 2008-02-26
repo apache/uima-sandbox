@@ -372,8 +372,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				MessageContext mContext = getInProcessCache().getMessageAccessorByReference(aCasReferenceId);
 				sequence++;
 				newCasReferenceId = getInProcessCache().register( casProduced, mContext, otsd);
-				CacheEntry entry = getInProcessCache().getCacheEntryForCAS(newCasReferenceId);
-				entry.setInputCasReferenceId(aCasReferenceId);
+				CacheEntry newEntry = getInProcessCache().getCacheEntryForCAS(newCasReferenceId);
+				newEntry.setInputCasReferenceId(aCasReferenceId);
 				//	Add to the cache how long it took to process the generated (subordinate) CAS
 				getCasStatistics(newCasReferenceId).incrementAnalysisTime(timeToProcessCAS);
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_produced_new_cas__FINE", new Object[] { Thread.currentThread().getName(),getComponentName(),newCasReferenceId, aCasReferenceId });
@@ -408,7 +408,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 
 			}
 			getMonitor().resetCountingStatistic("", Monitor.ProcessErrorCount);
-			CacheEntry entry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
 			//	Aggregate total time spent processing the input CAS
 			getServicePerformance().incrementAnalysisTime(totalProcessTime);
