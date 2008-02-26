@@ -160,10 +160,20 @@ public class ProcessResponseHandler extends HandlerBase
 					delegateServicePerformance.
 						incrementAnalysisTime(timeInProcessCAS);
 				}
-				//	Aggregate delegates processing times for this aggregate
+				//	Accumulate processing time
 				getController().getServicePerformance().
 					incrementAnalysisTime(timeInProcessCAS);
-
+				if ( inputCasReferenceId != null )
+				{
+					ServicePerformance inputCasStats = 
+						((AggregateAnalysisEngineController)getController()).
+							getCasStatistics(inputCasReferenceId);
+					// Update processing time for this CAS
+					if ( inputCasStats != null )
+					{
+						inputCasStats.incrementAnalysisTime(timeInProcessCAS);
+					}
+				}
 			}
 		}
 		catch( AsynchAEException e)
@@ -340,6 +350,7 @@ public class ProcessResponseHandler extends HandlerBase
 
 			//	Fetch entry from the cache for a given Cas Id. The entry contains a CAS that will be used during deserialization 
 			CacheEntry cacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
+			cacheEntry.setReplyReceived();
 			cas = cacheEntry.getCas();  
 			int totalNumberOfParallelDelegatesProcessingCas = cacheEntry.getNumberOfParallelDelegates();
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
@@ -453,6 +464,7 @@ public class ProcessResponseHandler extends HandlerBase
 		{
 			casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
 			cacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
+			cacheEntry.setReplyReceived();
 			CAS cas = cacheEntry.getCas();
 			String endpointName = aMessageContext.getEndpoint().getEndpoint();
 			String delegateKey = ((AggregateAnalysisEngineController)getController()).

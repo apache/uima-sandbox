@@ -932,41 +932,71 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	private void finalStep(FinalStep aStep, String aCasReferenceId)// throws AsynchAEException
 	{
 		Endpoint endpoint=null;
-    CacheEntry inputCASCacheEntry = null;
-    boolean replyWithInputCAS = false;
-    
+		boolean subordinateCasInPlayCountDecremented=false;
     
 		try
 		{
 			CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-/*
-			System.out.println("Aggregate.finalStep() - Cache Size:::"+getInProcessCache().getSize()+"-Input CAS RefId::::::::::::::::::::::"+cacheEntry.getInputCasReferenceId());
-			
-			
-			if ( cacheEntry.getInputCasReferenceId() == null )  // This is an input CAS  
+			if ( cacheEntry == null )
 			{
-			  // Check the cache to see if there are any subordinate CASes (those produced from the input CAS) still in-play
-			  if ( getInProcessCache().producedCASesStillInPlay(aCasReferenceId, null))
-			  {
-		      System.out.println("Aggregate.finalStep() - Input CAS In Final Step - There are still subordinate CASes in-play");
-			    cacheEntry.setPendingReply(true);
-			    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			    // Leave input CAS in pending state. It will be returned to the client
-			    // *only* if the last subordinate CAS is fully processed.
-          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			    return;
-			  }
+				return;
 			}
-			else 
-      {
-			  inputCASCacheEntry =
-			    getInProcessCache().getCacheEntryForCAS(cacheEntry.getInputCasReferenceId());      
-			  if ( !getInProcessCache().producedCASesStillInPlay(cacheEntry.getInputCasReferenceId(), aCasReferenceId) )
-			  {
-			    replyWithInputCAS = true;
-			  }
-      }
-*/
+			CacheEntry parentCASCacheEntry = null;
+	        boolean replyWithInputCAS = false;
+			//	Check if the CAS has subordinates, meaning is this CAS an input CAS from which
+			//	other CASes (subordinates) were produced. If so, make sure that all subordinate
+			//	CASes have been fully processed. Only when all subordinates are accounted for
+			//	return the input CAS back to the client. While subordinates are in-play keep
+			//	the input CAS in the cache.
+				
+			//	Check if this CAS is an input CAS
+			if (!cacheEntry.isSubordinate() )
+			{
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
+						"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas__FINEST", new Object[] { getComponentName(),aCasReferenceId});
+				synchronized( cacheEntry )
+				{
+					if ( cacheEntry.getSubordinateCasInPlayCount() > 0 )
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
+								"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_child_count__FINEST", new Object[] { getComponentName(),aCasReferenceId,cacheEntry.getSubordinateCasInPlayCount()});
+
+						// Leave input CAS in pending state. It will be returned to the client
+			    		// *only* if the last subordinate CAS is fully processed.
+			    		cacheEntry.setPendingReply(true);
+						//	Done here. There are subordinate CASes still being processed.
+						return;
+					}
+					else
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
+								"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_no_children__FINEST", new Object[] { getComponentName(),aCasReferenceId});
+
+						//	All subordinates have been fully processed. Set the flag so that
+						//	the input is returned back to the client.
+						replyWithInputCAS = true;
+					}
+				}
+			}
+			else
+			{
+				//	 This is a subordinate CAS. First get cache entry for the input (parent) CAS
+				parentCASCacheEntry = 
+					getInProcessCache().getCacheEntryForCAS(cacheEntry.getInputCasReferenceId());
+
+				replyWithInputCAS = decrementCasSubordinateCount( parentCASCacheEntry);
+				if ( parentCASCacheEntry != null )
+				{
+					//	Set the flag to indicate that the cache entry for the parent CAS has been updated
+					//	In case an exception happens below, the error handler will be instructed to skip
+					//	decrementing subordinate count (since it's been done already)
+					subordinateCasInPlayCountDecremented = true;
+				}
+				else
+				{
+					//	Input CAS doesnt exist
+				}
+			}
 			
 			// Cas Processing has been completed. Check if the CAS should be sent to
 			// the client.
@@ -986,93 +1016,20 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
 				dropCAS(aCasReferenceId, true);
 			}
-			else
+			if ( replyWithInputCAS )
 			{
-				// Get the endpoint that represents a client that send the request
-				// to this analytic. If the first arg to getEndpoint() is null, the method
-				// should return the origin.
-				if (isTopLevelComponent())
+				if ( parentCASCacheEntry != null ) 
 				{
-					endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
+					//	Reply with the input CAS
+					replyToClient( parentCASCacheEntry.getCasReferenceId() );
 				}
 				else
 				{
-					endpoint = getMessageOrigin(aCasReferenceId);
+					replyToClient( aCasReferenceId );
 				}
-				if ( endpoint != null )
-				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
-							"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step__FINEST", new Object[] { aCasReferenceId, (double) (System.nanoTime() - endpoint.getEntryTime()) / (double) 1000000 });
-				}
-	/*
-				System.out.println(Thread.currentThread().getName() + "::" + getClass().getName() + "=========== Completed Flow For Cas with Reference Id::" + aCasReferenceId);
-				System.out.println(Thread.currentThread().getName() + "::" + getClass().getName() + "=========== Origin Server::" + endpoint.getServerURI());
-				System.out.println(Thread.currentThread().getName() + "::" + getClass().getName() + "=========== Origin Endpoint::" + endpoint.getEndpoint());
-				System.out.println(Thread.currentThread().getName() + "::" + getClass().getName() + "=========== Entry Time::" + endpoint.getEntryTime());
-				System.out.println(Thread.currentThread().getName() + "::" + getClass().getName() + "=========== Time Spent in Anotator::" + (double) (System.nanoTime() - endpoint.getEntryTime()) / (double) 1000000);
-	*/
-				if ( !isTopLevelComponent() )
-				{
-					dropFlow(aCasReferenceId, false);
-				}
-
-				if (endpoint != null && endpoint.getEndpoint() == null)
-				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_reply_destination__INFO", new Object[] { aCasReferenceId });
-					HashMap map = new HashMap();
-					map.put(AsynchAEMessage.Command, AsynchAEMessage.Process);
-					map.put(AsynchAEMessage.CasReference, aCasReferenceId);
-					handleError(map, new UnknownDestinationException());
-
-				}
-				else if ( endpoint != null && !endpoint.isCasMultiplier() )
-				{
-					endpoint.setFinal(true);
-					
-					if ( !isStopped() )
-					{
-						// Send response to the given endpoint
-						getOutputChannel().sendReply(aCasReferenceId, endpoint);
-					}
-					
-				}
-				// If the destination for the reply is in the same jvm dont remove
-				// the entry from the cache. The client may need to retrive CAS by reference
-				// to do some post-processing. The client will remove the entry when done
-				// post-processing CAS.
-				if (endpoint != null && !endpoint.getServerURI().startsWith("vm:"))
-				{
-
-					// Message was fully processed, remove state info related to the
-					// previous CAS from the cache
-					InProcessCache cache = getInProcessCache();
-					
-					synchronized (cache)
-					{
-						dropCAS(aCasReferenceId, true);
-					}
-				}
-				
 			}
-/*
-			if ( replyWithInputCAS )
-			{
-        if (isTopLevelComponent())
-        {
-          endpoint = getInProcessCache().getEndpoint(null, cacheEntry.getInputCasReferenceId());
-        }
-        else
-        {
-          endpoint = getMessageOrigin(cacheEntry.getInputCasReferenceId());
-        }
-        // Send response to the given endpoint
-        getOutputChannel().sendReply(cacheEntry.getInputCasReferenceId(), endpoint);
-        synchronized (getInProcessCache())
-        {
-          dropCAS(inputCASCacheEntry.getCasReferenceId(), true);
-        }
-			}
-*/
+			
+			
 			String casMultiplierKey = cacheEntry.getCasMultiplierKey();
 			if ( isNewCas  && casMultiplierKey != null ) //&& cacheEntry.shouldSendRequestToFreeCas())
 			{
@@ -1084,12 +1041,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				endpoint = null;
 			}
-			
-
-
-			
-			
-			
 			removeMessageOrigin(aCasReferenceId);
 			dropStats(aCasReferenceId, super.getName());
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
@@ -1101,6 +1052,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			HashMap map = new HashMap();
 			map.put(AsynchAEMessage.Command, AsynchAEMessage.Process);
 			map.put(AsynchAEMessage.CasReference, aCasReferenceId);
+			//	If the subordinate count has been decremented, let the error handler know
+			//	so that it doesn't decrement the count again. The default action in the
+			//	error handler is to decrement number of subordinates responding. An exception
+			//	that is no subject to retry will be counted as a response.
+			if (subordinateCasInPlayCountDecremented)
+			{
+				map.put(AsynchAEMessage.SkipSubordinateCountUpdate, true);
+			}
 			if ( endpoint != null )
 			{
 				map.put(AsynchAEMessage.Endpoint, endpoint);
@@ -1116,7 +1075,84 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			getServicePerformance().incrementNumberOfCASesProcessed();
 		}
 	}
+	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry )
+	{
+		if ( aParentCasCacheEntry != null )
+		{
+			synchronized( aParentCasCacheEntry )
+			{
+				//	Decrement number of subordinate CASes still in play and fetch the
+				//	current count of subordinate CASes in play
+				aParentCasCacheEntry.decrementSubordinateCasInPlayCount();
+				if ( aParentCasCacheEntry.isReplyReceived() && aParentCasCacheEntry.getSubordinateCasInPlayCount() == 0 )
+				{
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
+							"decrementCasSubordinateCount", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_no_children__FINEST", new Object[] { getComponentName(),aParentCasCacheEntry.getCasReferenceId()});
+					//	All subordinates have been fully processed. Set the flag so that
+					//	the input is returned back to the client.
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	private void replyToClient(String aCasReferenceId ) throws Exception
+	{
+		Endpoint endpoint;
+		
+		// Get the endpoint that represents a client that send the request
+		// to this service. If the first arg to getEndpoint() is null, the method
+		// should return the origin.
+		if (isTopLevelComponent())
+		{
+			endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
+		}
+		else
+		{
+			endpoint = getMessageOrigin(aCasReferenceId);
+			dropFlow(aCasReferenceId, false);
+		}
+		if ( endpoint != null )
+		{
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
+					"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step__FINEST", new Object[] { aCasReferenceId, (double) (System.nanoTime() - endpoint.getEntryTime()) / (double) 1000000 });
 
+			if (endpoint.getEndpoint() == null)
+			{
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_reply_destination__INFO", new Object[] { aCasReferenceId });
+				HashMap map = new HashMap();
+				map.put(AsynchAEMessage.Command, AsynchAEMessage.Process);
+				map.put(AsynchAEMessage.CasReference, aCasReferenceId);
+				handleError(map, new UnknownDestinationException());
+
+			}
+			else if ( !endpoint.isCasMultiplier() )
+			{
+				endpoint.setFinal(true);
+				
+				if ( !isStopped() )
+				{
+					// Send response to the given endpoint
+					getOutputChannel().sendReply(aCasReferenceId, endpoint);
+				}
+			}
+			// If the destination for the reply is in the same jvm dont remove
+			// the entry from the cache. The client may need to retrive CAS by reference
+			// to do some post-processing. The client will remove the entry when done
+			// post-processing CAS.
+			if ( !endpoint.getServerURI().startsWith("vm:"))
+			{
+				// Message was fully processed, remove state info related to the
+				// previous CAS from the cache
+				InProcessCache cache = getInProcessCache();
+				
+				synchronized (cache)
+				{
+					dropCAS(aCasReferenceId, true);
+				}
+			}
+		}
+	}
 	private void executeFlowStep(FlowContainer aFlow, String aCasReferenceId, boolean newCAS) throws AsynchAEException
 	{
 		Step step = null;
@@ -1794,6 +1830,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     {
       flowControllerContainer.destroy();
     }
+    	perCasStatistics.clear();
 	}
 	
 	

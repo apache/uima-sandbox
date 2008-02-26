@@ -49,7 +49,8 @@ public interface AsynchAEMessage
 	public static final String TimeInProcessCAS  = "TimeInProcessCAS";
 	public static final String IdleTime  = "IdleTime";
 	public static final String CAS  = "CAS";
-
+	public static final String SkipSubordinateCountUpdate = "SkipSubordinateCountUpdate";
+	
 	
 	public static final String Payload = "Payload";
 	public static final int XMIPayload = 1000;

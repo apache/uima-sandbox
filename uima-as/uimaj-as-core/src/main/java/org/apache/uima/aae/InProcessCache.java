@@ -561,7 +561,7 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private int highWaterMark;
     
-    private XmiSerializationSharedData deserSharedData;
+		private XmiSerializationSharedData deserSharedData;
 		
 		private String aggregateProducingTheCas;
 		
@@ -583,6 +583,12 @@ public class InProcessCache implements InProcessCacheMBean
 
 		private boolean pendingReply = false;
 		
+		private boolean subordinateCAS = false;
+
+		private int subordinateCasInPlayCount = 0;
+		
+		private boolean replyReceived = false;
+		
 		protected CacheEntry(CAS aCas, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
 		{
 			cas = aCas;
@@ -591,9 +597,6 @@ public class InProcessCache implements InProcessCacheMBean
 			if ( aMessageAccessor != null )
 			{
 				messageOrigin = aMessageAccessor.getEndpoint();
-				
-				//originStack.push(aMessageAccessor.getEndpoint());
-				
 			}
 		}
 		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, XmiSerializationSharedData sdata)
@@ -625,6 +628,7 @@ public class InProcessCache implements InProcessCacheMBean
 		public void setInputCasReferenceId(String anInputCasReferenceId)
 		{
 			inputCasReferenceId = anInputCasReferenceId;
+			subordinateCAS = true;
 		}
 		
 		public void setStat( DelegateStats aStat)
@@ -844,13 +848,43 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			return totalTimeToProcessCAS;
 		}
-    public boolean isPendingReply() {
-      return pendingReply;
-    }
-    public void setPendingReply(boolean pendingReply) {
-      this.pendingReply = pendingReply;
-    }
-
+		public boolean isPendingReply() {
+			return pendingReply;
+		}
+		public void setPendingReply(boolean pendingReply) {
+			this.pendingReply = pendingReply;
+		}
+		public boolean isSubordinate()
+		{
+			return subordinateCAS;
+		}
+		
+		public int getSubordinateCasInPlayCount()
+		{
+			return subordinateCasInPlayCount;
+		}
+		
+		public void incrementSubordinateCasInPlayCount()
+		{
+			subordinateCasInPlayCount++;
+		}
+		public int decrementSubordinateCasInPlayCount()
+		{
+			if ( subordinateCasInPlayCount > 0)
+			{
+				subordinateCasInPlayCount--;
+			}
+			return subordinateCasInPlayCount;
+		}
+		public void setReplyReceived()
+		{
+			replyReceived = true;
+		}
+		public boolean isReplyReceived()
+		{
+			return replyReceived;
+		}
+		
 	}	
 
 
