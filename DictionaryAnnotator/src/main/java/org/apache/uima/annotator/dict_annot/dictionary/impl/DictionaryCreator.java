@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.uima.UIMAFramework;
@@ -37,6 +38,7 @@ import org.apache.uima.internal.util.CommandLineParser;
 import org.apache.uima.pear.tools.PackageBrowser;
 import org.apache.uima.pear.tools.PackageInstaller;
 import org.apache.uima.resource.ResourceSpecifier;
+import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.XMLInputSource;
 
 /**
@@ -208,6 +210,8 @@ public class DictionaryCreator {
       AnalysisEngine ae = null;
       Type tokenType = null;
       CAS cas = null;
+      File tempDir = null;
+      
       if (tokenizerFile != null) {
          // if a tokenizer is specified, check if the file can be read
          File pearFile = new File(tokenizerFile);
@@ -220,7 +224,7 @@ public class DictionaryCreator {
          }
          try {
             // create temp directory to install PEAR
-            File tempDir = new File(".", "~tokenizer_temp_install");
+            tempDir = new File(".", "~tokenizer_temp_install");
             tempDir.deleteOnExit();
             tempDir.mkdir();
 
@@ -334,6 +338,17 @@ public class DictionaryCreator {
       writer.write("</dictionary>\n");
       writer.close();
 
+      //try to delete PEAR temp dir
+      if(tempDir != null) {
+         FileUtils.deleteRecursive(tempDir);
+         if(tempDir != null) {
+            List files = FileUtils.getFiles(tempDir, true);
+            for(int i = 0; i < files.size(); i++) {
+               ((File)files.get(i)).deleteOnExit();
+            }
+         }
+      }
+      
       return true;
    }
 }

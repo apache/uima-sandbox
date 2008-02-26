@@ -32,7 +32,6 @@ import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.analysis_engine.annotator.AnnotatorContextException;
 import org.apache.uima.annotator.dict_annot.dictionary.Dictionary;
-import org.apache.uima.annotator.dict_annot.dictionary.DictionaryBuilder;
 import org.apache.uima.annotator.dict_annot.dictionary.DictionaryFileParser;
 import org.apache.uima.annotator.dict_annot.dictionary.DictionaryMatch;
 import org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryFileParserImpl;
@@ -278,9 +277,6 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
                new Object[] { buffer.toString() });
       }
 
-      // create dictionary builder
-      DictionaryBuilder dictBuilder = new HashMapDictionaryBuilder();
-
       // create dictionary file parser
       DictionaryFileParser fileParser = new DictionaryFileParserImpl();
 
@@ -314,7 +310,7 @@ public class DictionaryAnnotator extends CasAnnotator_ImplBase {
 
             // parse dictionary file
             Dictionary dict = fileParser.parseDictionaryFile(
-                  file.getFilePath(), file.getStream(), dictBuilder);
+                  file.getFilePath(), file.getStream(), new HashMapDictionaryBuilder());
             // add dictionary to the dictionary list
             dicts.add(dict);
          }
