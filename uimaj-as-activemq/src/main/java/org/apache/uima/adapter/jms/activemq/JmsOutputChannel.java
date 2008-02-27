@@ -63,8 +63,6 @@ import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
 
-import com.sun.org.apache.xml.internal.security.encryption.AgreementMethod;
-
 public class JmsOutputChannel implements OutputChannel
 {
 	
