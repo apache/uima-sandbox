@@ -586,7 +586,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				catch( Exception ex)
 				{
-					ex.printStackTrace();
+					//ex.printStackTrace();
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "disableDelegates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { ex });
 					handleAction(ErrorHandler.TERMINATE, null, null);
 					return;
