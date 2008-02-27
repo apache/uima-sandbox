@@ -212,6 +212,7 @@ public class TestUimaEE extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
 		Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue" );
+		super.setExpectingServiceShutdown();
 		initialize(eeUimaEngine, appCtx);
 		waitUntilInitialized();
 		try
@@ -249,6 +250,7 @@ public class TestUimaEE extends BaseTestSupport
 	    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 	    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
 	    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFlowControllerExceptionOnDisable.xml");
+		super.setExpectingServiceShutdown();
 	    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH); //PC_LATCH);
 	  }
   
@@ -424,6 +426,7 @@ public class TestUimaEE extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_ComplexAggregate.xml");
+		super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
 	}
 
@@ -453,6 +456,7 @@ public class TestUimaEE extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplier.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithExceptionOn5thCAS.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMultiplier.xml");
+		super.setExpectingServiceShutdown();
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
 	}
 
@@ -474,6 +478,7 @@ public class TestUimaEE extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith1MillionDocs.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMultiplier.xml");
+		super.setExpectingServiceShutdown();
 		//	Spin a thread to cancel Process after 20 seconds
 		spinShutdownThread( eeUimaEngine, 20000 );
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,EXCEPTION_LATCH);
@@ -494,6 +499,7 @@ public class TestUimaEE extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		//	Deploy remote service
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
+		super.setExpectingServiceShutdown();
 		//	Deploy Uima EE Primitive Service 
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"NoOpAnnotatorQueue", 1, EXCEPTION_LATCH);
@@ -512,6 +518,7 @@ public class TestUimaEE extends BaseTestSupport
 		//	Deploy top level aggregate service
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlowTerminateOnDelegateFailure.xml");
 		
+		super.setExpectingServiceShutdown();
 		
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH); //PC_LATCH);
@@ -538,6 +545,7 @@ public class TestUimaEE extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		//	Deploy top level aggregate service
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
+		super.setExpectingServiceShutdown();
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, CPC_LATCH );
 	}
@@ -551,6 +559,7 @@ public class TestUimaEE extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		//	Deploy remote service
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		super.setExpectingServiceShutdown();
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,httpURI,"NoOpAnnotatorQueue", 1, CPC_LATCH );
 	}
@@ -566,6 +575,7 @@ public class TestUimaEE extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		//	Deploy top level aggregate that communicates with the remote via Http Tunnelling
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithHttpDelegate.xml");
+		super.setExpectingServiceShutdown();
 		
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine, String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue", 10, CPC_LATCH );
@@ -627,6 +637,7 @@ public class TestUimaEE extends BaseTestSupport
     initialize(eeUimaEngine, appCtx);
     //  Wait until the top level service returns its metadata
     waitUntilInitialized();
+    super.setExpectingServiceShutdown();
 
     CAS cas = eeUimaEngine.getCAS();
     System.out.println(" Sending CAS to kick off aggregate w/colocated CasMultiplier");
@@ -721,6 +732,7 @@ public class TestUimaEE extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		//	Deploy top level aggregate that communicates with the remote via Http Tunnelling
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithHttpDelegateNoRetries.xml");
+		super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine, String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue", 10, EXCEPTION_LATCH );
 		fail("Expected ResourceInitializationException. Instead, the Aggregate Reports Successfull Initialization");
 	}

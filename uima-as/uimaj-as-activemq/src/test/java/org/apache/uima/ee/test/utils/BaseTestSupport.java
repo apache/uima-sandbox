@@ -572,7 +572,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}

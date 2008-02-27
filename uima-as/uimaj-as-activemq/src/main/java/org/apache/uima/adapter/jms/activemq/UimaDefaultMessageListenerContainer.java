@@ -114,7 +114,6 @@ implements ExceptionListener
 
 	protected void handleListenerException( Throwable t )
 	{
-		  t.printStackTrace();
       String endpointName = 
         (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
       

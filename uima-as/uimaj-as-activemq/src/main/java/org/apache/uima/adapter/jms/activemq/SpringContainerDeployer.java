@@ -188,7 +188,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			ApplicationContext ctx = new FileSystemXmlApplicationContext(springContextFile);
 			return initializeContainer(ctx);
 		} catch (ResourceInitializationException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
