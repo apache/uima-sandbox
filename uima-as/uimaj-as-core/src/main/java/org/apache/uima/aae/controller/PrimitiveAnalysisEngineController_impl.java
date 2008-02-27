@@ -240,6 +240,18 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		finally
 		{
 			clearStats();
+			if ( ae != null )
+			{
+				try
+				{
+					aeInstancePool.checkin(ae);
+				}
+				catch( Exception ex) 
+				{
+					ex.printStackTrace();
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_unable_to_check_ae_back_to_pool__WARNING", new Object[] { getComponentName(), ex});
+				}
+			}
 		}
 	}
 
