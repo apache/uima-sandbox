@@ -685,8 +685,10 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                      // try to set the normalized feature value, if no
                      // normalization was specified for the feature, the
                      // original feature value is set
-                     featureValue = features[f].normalize(featureValue, concept
-                           .getRules()[ruleIndex].getId());
+                     if (featureValue != null) {
+                        featureValue = features[f].normalize(featureValue,
+                              concept.getRules()[ruleIndex].getId());
+                     }
                   } catch (Exception ex) {
                      throw new RegexAnnotatorProcessException(
                            "regex_annotator_error_normalizing_feature_value",
@@ -698,10 +700,12 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                   // feature type
                   if (type == Feature.FLOAT_FEATURE) {
                      try {
-                        Number number = this.floatNumberFormat
-                              .parse(featureValue);
-                        fs.setFloatValue(features[f].getFeature(), number
-                              .floatValue());
+                        if (featureValue != null) {
+                           Number number = this.floatNumberFormat
+                                 .parse(featureValue);
+                           fs.setFloatValue(features[f].getFeature(), number
+                                 .floatValue());
+                        }
                      } catch (ParseException ex) {
                         this.logger
                               .logrb(
@@ -717,10 +721,12 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
 
                   } else if (type == Feature.INTEGER_FEATURE) {
                      try {
-                        Number number = this.integerNumberFormat
-                              .parse(featureValue);
-                        fs.setIntValue(features[f].getFeature(), number
-                              .intValue());
+                        if (featureValue != null) {
+                           Number number = this.integerNumberFormat
+                                 .parse(featureValue);
+                           fs.setIntValue(features[f].getFeature(), number
+                                 .intValue());
+                        }
                      } catch (ParseException ex) {
                         this.logger
                               .logrb(
