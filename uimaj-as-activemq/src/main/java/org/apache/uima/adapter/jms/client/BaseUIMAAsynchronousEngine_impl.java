@@ -200,7 +200,11 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			{
 	      consumerSession.close();
 	      consumer.close();
-	      connection.close();
+	      try
+	      {
+		      connection.close();
+	      }
+	      catch(Exception ex) {}
 	      connection = null;
 			}
 			if ( jmxManager != null )
