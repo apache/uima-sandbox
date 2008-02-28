@@ -23,7 +23,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.uima</groupId>
-	<artifactId>uimaj-adapter-activemq</artifactId>
+	<artifactId>uimaj-as-activemq</artifactId>
 	<packaging>jar</packaging>
 	<version>${uimaj-as-release-version}</version>
 	<name>Apache UIMA Async Scaleout using ActiveMQ</name>
