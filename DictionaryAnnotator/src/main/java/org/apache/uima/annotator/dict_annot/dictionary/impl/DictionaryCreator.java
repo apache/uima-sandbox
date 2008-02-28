@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -78,6 +79,17 @@ public class DictionaryCreator {
 
    // default output separator character
    private static final String OUTPUT_SEPARATOR_CHAR = "|";
+
+   private static HashMap<Character, String> entities;
+
+   static {
+      entities = new HashMap<Character, String>(5);
+      entities.put('<', "&lt;");
+      entities.put('>', "&gt;");
+      entities.put('&', "&amp;");
+      entities.put('\"', "&quot;");
+      entities.put('\'', "&apos;");
+   }
 
    /**
     * creates the CommandLine parser used to parse the DictionaryCreator command
@@ -184,7 +196,7 @@ public class DictionaryCreator {
       try {
          DictionaryCreator.createDictionary(inputFile, encoding, outputFile,
                language, tokenizerFile, tokenTypeStr, separatorChar);
-         
+
          System.out.println("The dictionary was sucessfully created at: "
                + outputFile);
       } catch (Exception ex) {
@@ -211,7 +223,7 @@ public class DictionaryCreator {
       Type tokenType = null;
       CAS cas = null;
       File tempDir = null;
-      
+
       if (tokenizerFile != null) {
          // if a tokenizer is specified, check if the file can be read
          File pearFile = new File(tokenizerFile);
@@ -244,7 +256,8 @@ public class DictionaryCreator {
             tokenType = cas.getTypeSystem().getType(tokenTypeStr);
 
          } catch (Exception ex) {
-            throw new Exception("Error creating tokenizer: " + ex.getMessage(), ex);
+            throw new Exception("Error creating tokenizer: " + ex.getMessage(),
+                  ex);
          }
       }
 
@@ -322,6 +335,9 @@ public class DictionaryCreator {
                   - separatorLength);
          }
 
+         // replace XML entities
+         multiWordTokenString = replaceXMLEntities(multiWordTokenString);
+
          // write dictionary entry to XML
          writer.write("<entry>\n");
          writer.write("<key>" + multiWordTokenString + "</key>\n");
@@ -338,17 +354,38 @@ public class DictionaryCreator {
       writer.write("</dictionary>\n");
       writer.close();
 
-      //try to delete PEAR temp dir
-      if(tempDir != null) {
+      // try to delete PEAR temp dir
+      if (tempDir != null) {
          FileUtils.deleteRecursive(tempDir);
-         if(tempDir != null) {
+         if (tempDir != null) {
             List files = FileUtils.getFiles(tempDir, true);
-            for(int i = 0; i < files.size(); i++) {
-               ((File)files.get(i)).deleteOnExit();
+            for (int i = 0; i < files.size(); i++) {
+               ((File) files.get(i)).deleteOnExit();
             }
          }
       }
-      
+
       return true;
+   }
+
+   /**
+    * returns text with replaced XML entities
+    * 
+    * @param text
+    *           input text
+    * 
+    * @return XML valid text
+    */
+   private static String replaceXMLEntities(String text) {
+      StringBuffer buffer = new StringBuffer();
+      for (int i = 0; i < text.length(); i++) {
+         char character = text.charAt(i);
+         if (DictionaryCreator.entities.containsKey(character)) {
+            buffer.append(DictionaryCreator.entities.get(character));
+         } else {
+            buffer.append(character);
+         }
+      }
+      return buffer.toString();
    }
 }

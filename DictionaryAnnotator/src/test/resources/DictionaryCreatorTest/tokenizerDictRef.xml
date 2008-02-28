@@ -25,6 +25,15 @@
 <entry>
 <key>web2|.|0</key>
 </entry>
+<entry>
+<key>&amp;|Test</key>
+</entry>
+<entry>
+<key>&lt;|Test</key>
+</entry>
+<entry>
+<key>&lt;|&amp;|&gt;|&apos;|&quot;</key>
+</entry>
 </entries>
 </typeCollection>
 </dictionary>

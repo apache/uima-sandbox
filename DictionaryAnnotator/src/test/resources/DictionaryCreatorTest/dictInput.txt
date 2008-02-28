@@ -4,3 +4,6 @@ new orleans
 foo-bar
 foo_bar
 web2.0
+&Test
+<Test
+<&>'"
