@@ -32,25 +32,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.uima.examples.tagger.MappingInterface;
-
+/**
+ * TreeTagger Format Reader, i.e. "word-per-line with tags separated with tabs"
+ *
+ */
 
 public class TT_FormatReader implements CorpusReader{
-
-  /*
-  List<Token> corpus;
-
-  public TT_FormatReader(String InputFile, MappingInterface Mapping) {
-    corpus = read_corpus(InputFile);
-    if (Mapping == null) {
-      this.corpus = read_corpus(InputFile);
-    } else {
-      this.corpus = Mapping.map_tags(read_corpus(InputFile)); // in case we need to map
-    }
-  }
-*/
  
-
   public List<Token> read_corpus(String file, MappingInterface Mapping) {
 
     // Text is already tokenized

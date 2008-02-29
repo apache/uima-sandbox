@@ -34,6 +34,9 @@ import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
  */
 public class Viterbi {
 
+  static NGram ngram;
+  static NGram ngram2;
+
   @SuppressWarnings("unchecked")
   public static Map<String, List> init_probs(Map<String, Double> pos_s) {
     Map<String, List> init_probs = new HashMap<String, List>();
@@ -76,7 +79,7 @@ public class Viterbi {
    */
   @SuppressWarnings("unchecked")
   public static List process(int N, List<String> sentence,
-      Map<String, Map<String, Double>> suffix_tree,Map<String,Map<String, Double>> suffix_tree_cap, Map<String, Double> transition_probs,
+      Map<String, Map<String, Double>> suffix_tree,Map<String,Map<String, Double>> suffix_tree_cap, Map<NGram, Double> transition_probs,
       Map<String, Map<String, Double>> word_probs, double[] lambdas2, double[] lambdas3, double theta) {
 
     // here we add something like an "end-of-sentence" tag at the beginning of the first sentence, to get probabilities for a certain tag to be at the beginning of the sentence.
@@ -191,13 +194,17 @@ public class Viterbi {
       /** ********************************************************* */
       /* At INDUCTION step the algorithm looks at the total and local possibilities of the next
        * state(=tag), given a current observation (=token) If a token is known, we limit the coming
-       * tags by only possible ones for this token
+       * tags by only possible ones for this token from the dictionary;
+       * otherwise: we use suffix analysis to find possible POS tags for the unknown words 
        */
 
       Map<String, Double> possible_pos_next = new HashMap<String, Double>(); // possible pos of the
       // next token
       
-   /*   Matcher m2 = p.matcher(token);
+   // Here we tell the tagger that every identified number can only be a cardinal. 
+    //  It didn't improve the accuracy, even v.v. That is why it is uncommented.
+    /*
+    Matcher m2 = p.matcher(token);
     boolean b = m2.matches();
     
       if (b) {
@@ -209,7 +216,7 @@ public class Viterbi {
       if (word_probs.containsKey(sentence.get(i + 1))) { // if the next token is known
         possible_pos_next = word_probs.get(sentence.get(i + 1)); // get possible POS of the next
      
-      } else   
+      } else   // if the token is unknown, then get possible tags from the suffix analysis
       {
           Map<String, Map<String, Double>> suffix_tree_local;
           // if a word is capitalized ... 
@@ -226,7 +233,7 @@ public class Viterbi {
             if(suffix_tree_local.containsKey(suffix)){ 
               // get available POS with corresponding counts for the longest suffix
                 Map available_pos_zwischen =suffix_tree_local.get(suffix); 
-                // 
+                // smooth suffix probabilities
               for(int suf=j+1; suf<unknown.length;suf++){
                 String subsuffix = sentence.get(i+1).substring(suf, unknown.length);
                 Map pos = new HashMap();
@@ -241,9 +248,7 @@ public class Viterbi {
                            // smooth suffix probability P(suffix|tag)
                            double zwischen_prob = (value + theta*(Double)available_pos_zwischen.get(key))/(1+theta);
                            available_pos_zwischen.put(key, zwischen_prob);
-                         }/* else {
-                           available_pos_zwischen.put(key, value);
-                         }*/
+                         }
                     }
                 } else {
                   Iterator posValuePairs2 = available_pos_zwischen.entrySet().iterator(); // iterate over words
@@ -261,7 +266,7 @@ public class Viterbi {
               }
               possible_pos_next = available_pos_zwischen;
               break;
-              }
+              } // for unexpected cases which are neither in the dictionary nor in the suffix analysis 
             else if (j==unknown.length-1){
               possible_pos_next = word_probs.get("(");
           }
@@ -298,36 +303,36 @@ public class Viterbi {
 
           // Double prob_local = (Double) probs.get(0); // total_probability for
           // forward algorihtm
-          List path_local = (List) probs.get(1); // path to that token
+          List<String> path_local = (List) probs.get(1); // path to that token
 
           Double vprob_local = (Double) probs.get(2); // get viterbi probability for this token
 
-          String ngram = null;
-          String ngram2 = null; // for smoothing of transition probs, at the moment for unknown grams only
-          
           /*
            * The following 4 lines can be modified to get any other number of N-grams
            */
 
           /* -- from here -- */
-       // um den ersten trigramm abzufangen
+          // um den ersten trigramm abzufangen
           if (N == 3 && i == 1) {
-            ngram = path_local.get(path_local.size() - 1) + "_" + key_next;
-       
+            // ngram = path_local.get(path_local.size() - 1) + "_" + key_next;
+             ngram = new NGram(path_local.get(path_local.size() - 1), key_next);       
+            
           }  else if (N == 2) {
             
-            ngram = path_local.get(path_local.size() - 1) + "_" + key_next;
-            
+            //ngram = path_local.get(path_local.size() - 1) + "_" + key_next;
+              ngram = new NGram(path_local.get(path_local.size() - 1), key_next);
           } else if (N == 3 && i != 1) {
-            ngram = path_local.get(path_local.size() - 2) + "_"
-                + path_local.get(path_local.size() - 1) + "_" + key_next;
-            ngram2 = path_local.get(path_local.size() - 1) + "_" + key_next;
-            
+        //    ngram = path_local.get(path_local.size() - 2) + "_"
+        //        + path_local.get(path_local.size() - 1) + "_" + key_next;
+        //    ngram2 = path_local.get(path_local.size() - 1) + "_" + key_next;
+              ngram = new NGram(path_local.get(path_local.size() - 2),path_local.get(path_local.size() - 1), key_next);  
+              ngram2 = new NGram(path_local.get(path_local.size() - 1), key_next);
           } else {
             System.err.println("at the moment only bi-and trigramms are supported");
           }
 
           /* -- till here -- */
+
 
           double pp = 0;
           
@@ -346,7 +351,7 @@ public class Viterbi {
              double lambda1 = lambdas2[0];
                  double lambda2 = lambdas2[1];
                
-                 ppp = (transition_probs.containsKey(ngram)) ? ((lambda2*transition_probs.get(ngram))+(lambda1*transition_probs.get(key_next))) : (lambda1*transition_probs.get(key_next));
+                 ppp = (transition_probs.containsKey(ngram)) ? ((lambda2*transition_probs.get(ngram))+(lambda1*transition_probs.get(new NGram(key_next)))) : (lambda1*transition_probs.get(new NGram(key_next)));
                  pp = Math.log(value_next) + Math.log(ppp); // P(t|w) * P(t1,t2,t3)
            }
            else if (N==3){
@@ -357,17 +362,17 @@ public class Viterbi {
               if(transition_probs.containsKey(ngram)){
               
                 
-                ppp = (lambda3*transition_probs.get(ngram))+(lambda2*transition_probs.get(ngram2))+(lambda1*transition_probs.get(key_next));
+                ppp = (lambda3*transition_probs.get(ngram))+(lambda2*transition_probs.get(ngram2))+(lambda1*transition_probs.get(new NGram(key_next)));
               } else {
               //  System.out.println(ngram2);
-                 ppp = (transition_probs.containsKey(ngram2)) ? ((lambda2*transition_probs.get(ngram2))+(lambda1*transition_probs.get(key_next))) : (lambda1*transition_probs.get(key_next));
+                 ppp = (transition_probs.containsKey(ngram2)) ? ((lambda2*transition_probs.get(ngram2))+(lambda1*transition_probs.get(new NGram(key_next)))) : (lambda1*transition_probs.get(new NGram(key_next)));
               }pp = Math.log(value_next) + Math.log(ppp);
             }
            if (N ==2){
              double lambda1 = lambdas2[0];
                  double lambda2 = lambdas2[1];
                
-                 ppp = (transition_probs.containsKey(ngram)) ? ((lambda2*transition_probs.get(ngram))+(lambda1*transition_probs.get(key_next))) : (lambda1*transition_probs.get(key_next));
+                 ppp = (transition_probs.containsKey(ngram)) ? ((lambda2*transition_probs.get(ngram))+(lambda1*transition_probs.get(new NGram(key_next)))) : (lambda1*transition_probs.get(new NGram(key_next)));
                  pp = Math.log(value_next) + Math.log(ppp);
            }
    
@@ -396,7 +401,6 @@ public class Viterbi {
       }
       all = m;
     }
-  //  System.out.println("cardinals found: "+cardinals);
     /** ****************************************************** */
     /***********************************************************************************************
      * Best sequence identification / Termination / Backtracking /

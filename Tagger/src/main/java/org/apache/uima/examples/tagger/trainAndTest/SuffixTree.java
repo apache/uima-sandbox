@@ -139,13 +139,37 @@ public class SuffixTree {
    */
   
   public class EDGE_KEY {
-    int suffix_begin;
-    char suffix;
+    private int suffix_begin;
+    private char suffix;
 
     public EDGE_KEY(int i, char s) {
      suffix_begin = i;
      suffix = s;
     }
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof EDGE_KEY) {
+        EDGE_KEY ek = (EDGE_KEY) o;
+        if ((this.suffix_begin == ek.suffix_begin) && (this.suffix == ek.suffix)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    public int hashCode(){
+      int hash = 0;
+      hash <<= 1;
+      if ( hash < 0 )
+      {
+        hash |= 1;
+      }
+      hash ^= suffix_begin;
+      hash ^= suffix;
+        
+      return hash;
+    }
+    
   }
   
   /**
@@ -187,6 +211,8 @@ public class SuffixTree {
     // the new leaves I create.
     // Each time I create a new edge, I also create a suffix pointer
     // from the parent node of the last leaf edge I created to the current parent edge.
+    // (Mark Nelson. Fast String Searching With Suffix Trees.
+    // http://marknelson.us/1996/08/01/suffix-trees/)
 
     public int split_edge(Suffix suffix) {
 
@@ -256,17 +282,17 @@ public class SuffixTree {
       } else if (active_point.isImplicit()) { // if suffix is implicit, i.e. it does not end in a
         // leaf node $
         
-        EDGE_KEY keys2 = new EDGE_KEY(active_point.origin_node, chars[active_point.first_char_index]); 
+          EDGE_KEY keys2 = new EDGE_KEY(active_point.origin_node, chars[active_point.first_char_index]); 
         
       //  List keys2 = new ArrayList();
       //  keys2.add(active_point.origin_node);
       //  keys2.add(chars[active_point.first_char_index]);
-        edge = (Edge) edges.get(keys2);
+          edge = (Edge) edges.get(keys2);
 
-        int span = active_point.last_char_index - active_point.first_char_index;
+          int span = active_point.last_char_index - active_point.first_char_index;
         // if the given prefix is already in the tree, do nothing
-        if (chars[edge.first_char_index + span + 1] == chars[last_char]) {
-          break;
+          if (chars[edge.first_char_index + span + 1] == chars[last_char]) {
+            break;
         } else {
           parent_node = edge.split_edge(active_point);
         }

@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.uima.examples.tagger.MappingInterface;
-
 /**
  * Reader for Brown Corpus from NLTK Distribution (nltk.sourceforge.net)
  */
@@ -40,10 +38,6 @@ public class BrownReader implements CorpusReader{
    * Reads Brown Corpus from NLTK Distribution Format. Iterates over all files in the directory,
    * which are in a sentence per line format, and returns all tokens in the collection in a List of
    * {@link Token}s}
-   * 
-   * @param directory
-   *          an array of file names
-   * @return a list of tokens from all files
    * 
    */
 

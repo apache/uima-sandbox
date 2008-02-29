@@ -29,12 +29,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.uima.examples.tagger.HMMTagger;
-import org.apache.uima.examples.tagger.MappingInterface;
 import org.apache.uima.examples.tagger.Viterbi;
 
+
 /**
- * Evaluation of Tagger NB. As it is implemented at hte moment, to be used just for small tests with
- * small files .. (very naive and takes quite a long time with big files..)
+ * Evaluation of Tagger 
+ * NB. As it is implemented at the moment, to be used just for small tests with
+ * small files. Takes quite a long time with big files. If one needs to test big files,
+ * it is better to implement iteration over sentences and not over the complete list of {@code Tokens}.
  */
 public class TaggerEvaluation {
 
@@ -45,7 +47,7 @@ public class TaggerEvaluation {
     int wrong_tag = 0;
     int right_tags = 0;
     List unknown_list = new ArrayList<String>();
-    int unknown_count = 0; // counter for erroronously tagged unknown words
+    int unknown_count = 0; // counter for erroneously tagged unknown words
     int unknown_all = 0; // counter for all unknown words
     List wrong_tags = new ArrayList<String>();
     Map wrong_tag_counts = new HashMap();
@@ -54,8 +56,6 @@ public class TaggerEvaluation {
     for (int u = 0; u < posList.size(); u++) {
 
       if (!posList.get(u).equalsIgnoreCase((String) TagList.get(u))) {
-        String test = TagList.get(u).toString().toLowerCase();
-
         wrong_tags.add(posList.get(u));
 
         Integer freq = (Integer) wrong_tag_counts.get(posList.get(u));
@@ -126,6 +126,7 @@ public class TaggerEvaluation {
   /**
    * @param args
    */
+  @SuppressWarnings("unchecked")
   public static void main(String[] args) {
 
     ModelGeneration my_model;
@@ -143,8 +144,9 @@ public class TaggerEvaluation {
       defaultProps.load(in);
       in.close();
 
-      String MODEL = defaultProps.getProperty("MODEL");
       String n = defaultProps.getProperty("N");
+      String MODEL = defaultProps.getProperty("MODEL_FILE");
+      
 
       my_model = HMMTagger.get_model(MODEL);
       String t = defaultProps.getProperty("DO_MAPPING");
@@ -163,11 +165,9 @@ public class TaggerEvaluation {
       String r = defaultProps.getProperty("CORPUS_READER");
       reader = (CorpusReader) (Class.forName(r)).newInstance();
       file = defaultProps.getProperty("GOLD_STANDARD");
-
       List<Token> corpus = reader.read_corpus(file, MAPPING);
       List<String> wordList = new ArrayList<String>();
-      // List<String> posSent = new ArrayList<String>(); // for pos-s on the level of sentence
-
+     
       List<String> posList = new ArrayList<String>();
 
       for (int x = 0; x < corpus.size(); x++) { // iterate over tokens with their corresponding POS

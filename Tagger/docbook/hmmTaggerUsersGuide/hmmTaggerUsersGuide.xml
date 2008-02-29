@@ -27,7 +27,7 @@
 <book lang="en">
 
 	<title>Tagger Annotator Documentation</title>
-    <subtitle>.. work in progress..</subtitle>
+	
 
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
 		href="../../../SandboxDocs/src/docbook/book_info.xml" />
@@ -121,23 +121,18 @@
 		<section id="sandbox.tagger.annotatorDescriptor.configParam">
 			<title>Configuration Parameters</title>
 			<para>
-				The HMM tagger annotator requires the following
-				configuration parameter:
+				The HMM tagger annotator (
+				<code>HmmTagger.xml</code>
+				) requires the following configuration parameters:
 			</para>
 			<para>
 				<itemizedlist>
 					<listitem>
 						<para>
-							<code>PARAM_FILE</code>
-							- This parameter is a String defining the
-							name of a tagger's parameter file (default
-							is
-							<code>tagger.properties</code>
-							), which is in Java properties file format.
-							The parameter file must be specified using a
-							relative path that is available in the UIMA
-							datapath or in the classpath.
-
+							<code>NGRAM_SIZE</code>
+							- this parameter is an Integer, defining
+							whether a bi- or trigram model should be
+							used for tagging (default is N=3).
 							<programlisting><emphasis><![CDATA[    <configurationParameters>
       <configurationParameter>
         <name>NGRAM_SIZE</name>
@@ -154,7 +149,14 @@
         </value>
       </nameValuePair>
     </configurationParameterSettings>]]></emphasis></programlisting>
-
+	</para>
+						</listitem>
+				  	
+				  	
+	<listitem>
+						<para>
+							<code>ModelFile</code>
+							- binary file containing the statistical model which should be used for tagging is defined as an external resource
 <programlisting><emphasis><![CDATA[   
     <externalResources>
       <externalResource>
@@ -167,6 +169,11 @@
       </externalResource>
     </externalResources>]]></emphasis></programlisting>
 
+Thus, one can easily use a different model by changing the <code>fileUrl</code> line: 
+<code>file:german/TuebaModel.dat</code>. 
+(NB. <emphasis>New models must be located in the <code>resources</code> folder</emphasis>.)
+After these two parameters have been set, the tagger is ready to use.  
+	
 							</para>
 						</listitem>
 				  	</itemizedlist>
@@ -206,7 +213,7 @@
 	<chapter id="sandbox.tagger.unittest">
 		<title>Functionality Test</title>
 		<para>
-			The <code>TaggerTest</code> is a JUnit test file (available in the folder <code>unittests</code>), 
+			The <code>TaggerTest</code> is a JUnit test file (available in the <code>test</code> folder), 
 			which provides an opportunity to test provided models for English and German, 
 			as well as the basic functionality of the tagger. In order to check whether 
 			the tagger's configuration is correct, just run this file as JUnit Test and you should get the following output:
@@ -237,7 +244,7 @@ Very Good!]]></programlisting>
 	</chapter>
 	
 	<chapter id="sandbox.tagger.tagger">
-		<title>Overview of the Tagger Package</title>
+		<title>Overview of the Tagger package</title>
 		<para>
 			The package <code>org.apache.uima.examples.tagger</code> contains:
 			<itemizedlist>
@@ -247,21 +254,14 @@ Very Good!]]></programlisting>
 							<orderedlist>
 								<listitem>
 									<para>
-									 <code>MappingInterface</code>
-									 - defines mapping for a tagset. For example, one may wish to map a more detailed tagset 
-									 to a less distinctive one (i.e. tell a program to tag all verbs as just <code>VERB</code>
-									 instead of differentiating between <code>verb infinitive</code>, <code>verb imperative</code>, etc.
-									
-									Two sample implementations for <code>MappingInterface</code> are included, 
-									namely <code>TagMapping</code> (mapping reducing Brown corpus tagset from more than 400 tags to ca. 93) and 
-									<code>GrobMapping</code>(mapping German STTS tagset from 54 tags to basic 
-									11 categories plus special symbols and punctuation)
- 									</para>
+									<code>IModelResource</code>
+									- model resource interface
+									 </para>
 								</listitem>
 								<listitem>
 									<para>
 									 <code>Tagger</code>
-									 - general tagger interface in case one would want to integrate further tagger types. 
+									 - general tagger interface, in case one would want to integrate further tagger types. 
 									</para>
 								</listitem>
 							</orderedlist>
@@ -269,7 +269,7 @@ Very Good!]]></programlisting>
 							</para>
 					</listitem>
 					<listitem>
-						<para> two basic classes:
+						<para> three classes:
 						<orderedlist>
 								<listitem>
 									<para>
@@ -285,13 +285,18 @@ Very Good!]]></programlisting>
 									 - implementation of the Viterbi Algorithm. This class makes up the core of the tagger.
 									</para>
 								</listitem>
-
+								<listitem>
+									<para>
+									 <code>ModelResource.java</code>
+									 - implementation of the <code>IModelResource</code>
+									</para>
+								</listitem>
 							</orderedlist>
 						
 						</para>
 					</listitem>
-			</itemizedlist>  
-		</para>
+			</itemizedlist>
+				</para>
 	</chapter>
 	
 	
@@ -305,15 +310,29 @@ Very Good!]]></programlisting>
 		
 			 
 			<itemizedlist>
-			
-			
+				<listitem>
+						<para>
+							<code>MappingInterface</code>
+									 - defines mapping for a tagset. For example, one may wish to map a more detailed tagset 
+									 to a less distinctive one (i.e. tell a program to tag all verbs as just <code>VERB</code>
+									 instead of differentiating between <code>verb infinitive</code>, <code>verb imperative</code>, etc.
+									
+									Two sample implementations for <code>MappingInterface</code> are included, 
+									namely <code>TagMappingBrown</code> (mapping reducing Brown corpus tagset from more than 400 tags to 93) and 
+									<code>GrobMappingTueba</code>(mapping German STTS tagset from 54 tags to basic 11 categories plus special symbols and punctuation)
+ 						</para>
+					</listitem>
+					
 					<listitem>
 						<para>
 							<code>ModelGeneration</code>
-							- trains an N-gram model for the tagger, iterating over the files from some predefined 
-							training directory. Writes the resulting model to a binary file. At the moment,
+							- trains an N-gram model for the tagger, iterating over a List of <code>Token</code>s. 
+							Writes the resulting model to a binary file. At the moment,
 							only bi-and trigram models are supported. Further N-grams can be easily integrated.
-							
+							<code>ModelGeneration</code> is not concerned with the fact, 
+							whether the training corpus is given as a single file or as a directory containing a number of files,
+							as this is a <code>CORPUS_READER</code> implementation issue. Two supplied readers include both a reader 
+							for a corpus as a single file (<code>TT_FormatReader</code>code>) or as a directory (<code>BrownReader</code>code>)
 							</para>
 					</listitem>
 					<listitem>
@@ -338,7 +357,7 @@ Very Good!]]></programlisting>
 									<para>
 									 <code>TT_FormatReader</code>
 									-  for the corpora in TreeTagger format, i.e. one word per line 
-									with tags separated from the words by tab. 
+									with tags separated from the words by tabs. 
 									</para>
 							</listitem>
 							
@@ -347,75 +366,67 @@ Very Good!]]></programlisting>
 							
 							</para>
 					</listitem>
-		
-					
-					<listitem>
-						<para>
-							<code>SuffixTree</code>
-							- Java implementation of the Ukkonen's suffix tree, used to gain suffix statistics for unknown words.
-						</para>
-					</listitem>
-					
-					<listitem>
-						<para>
-							 <code>Token</code>
-							 - is used as a kind of an interface between 
-							 the text and the annotator. Every tokenized unit of text should be defined as a <code>Token</code>
-							 .
-						</para>
-					</listitem>
-					
-						<listitem>
-						<para>
-							<code>TaggerEvaluation</code>
-							- can be used to evaluate the tagger and/or new models on a small manually annotated corpus. </para>
-					</listitem>
 					
 				</itemizedlist>
 				</para>
 		<para>
-		To train a new model, one should specify .... 
-		</para>
-	
-	<para>
-	An example of a parameter file for training is shown in the listing below:
-				
-				<programlisting><emphasis><![CDATA[## This is the default tagger.properties file
+		To train a new model, one should  adjust a number of parameters in the <code>"tagger.properties"</code> file, 
+		which is in Java properties file format (see <xref linkend="properties.file"/>). After the parameters are set, you just need to run 
+		<code>ModelGeneration.java</code>
+				<programlisting id="properties.file" xreflabel="tagger.properties file"><emphasis><![CDATA[######## This is the default tagger.properties file
+######## This file is used for training and testing only,
+######## The configuration for tagging is directly tuned in the descriptor "HmmTagger.xml"
 
-## if mapping of tags is desired
+
+##########################  BOTH FOR TRAINING AND EVALUATION  ################################
+
+######## THESE ARE THE DEFAULT MODEL FILES FOR GERMAN AND ENGLISH
+######## You can either uncomment one of them, if you want to replace given models with your own one,
+
+#MODEL_FILE = resources/german/TuebaModel.dat
+#MODEL_FILE = resources/english/BrownModel.dat
+
+######## or specify a completely different name
+MODEL_FILE = 
+
+######## If mapping of tags is desired, uncomment the following
 #DO_MAPPING = true
 
-## Basic mapping for the Brown corpus (nltk distribution) tagset: to get 93 tags out of ca. 460
-#MAPPING = org.apache.uima.examples.tagger.TagMapping
 
+#######	EXAMPLES OF MAPPING CLASSES 
 
+## Basic mapping for the Brown corpus (nltk distribution) tagset: to get 93 tags out of 473
+#MAPPING = org.apache.uima.examples.tagger.TagMappingBrown
 ## Basic mapping for STTS tagset: from 54 tags onto the basic ca. 15 classes plus punctuation
-#MAPPING = org.apache.uima.examples.tagger.GrobMapping]]></emphasis>
+#MAPPING = org.apache.uima.examples.tagger.GrobMappingTueba
+
+## If you implement your own mapping, you should specify here in the same manner as above a java-path to the class  
+MAPPING = 
+
+####### FILE CONTAINING TRAINING CORPUS:
+####### can be in specified either as an absolute or as a relative path
+####### e.g. FILE = ../../tueba_tigerFormat.txt or FILE = C:/Data/tueba.txt
+FILE = 
+
+######## If corpus is in a different format and cannot be read with the provided READERS,
+######## you should specify here a java-path to the class (s. examples below) 
+
+#CORPUS_READER = org.apache.uima.examples.tagger.trainAndTest.TT_FormatReader
+#CORPUS_READER = org.apache.uima.examples.tagger.trainAndTest.BrownReader
+CORPUS_READER = 
+
+#################      ONLY FOR EVALUATION   ###############################
+
+######### GOLD STANDARD CORPUS FILE: 
+######### can be specified as an absolute or as a relative path 
+## e.g. GOLD_STANDARD = ../../tueba_tigerFormat.txt or GOLD_STANDARD = C:/Data/tueba.txt
+GOLD_STANDARD = 
+
+######### Here we specify whether one intends to test a bi- or a trigram model (default is a trigram model)  
+N=3
+]]></emphasis>
 				</programlisting>
-				
-				Thus, parameter file defines the following values:
-				<itemizedlist>
-					<listitem>
-						<para>
-							<code>MODEL</code>
-							- defines the relative path to the file containing the trained model
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<code>N</code>
-							- sets up whether we want to use a bi- (N=2) or a trigram (N=3) model for tagging (default is trigram)
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<code>MAPPING</code>
-							- this parameter is useful in two scenarios: either if mapping of tags is desired after tagging
-							is performed with a given model, or if one is willing to train and test a model (s. <xref linkend="sandbox.tagger.training"/>) 
-							for a modified tagset than the one used by a manually annotated corpus.   
-							</para>
-					</listitem>
-				</itemizedlist>
+			
 				</para>
 	
 	</chapter>
@@ -423,8 +434,23 @@ Very Good!]]></programlisting>
 	<chapter id="sandbox.tagger.evaluation">
 		<title>Evaluation</title>
 		<para>
-			To evaluate performance if a "gold standard" corpus is given, ....
-		
+		To evaluate performance if a "gold standard" corpus is available, one can use the following provided file:
+		<itemizedlist>
+			<listitem>
+				<para>
+					<code>TaggerEvaluation.java</code>
+						- can be used to evaluate the tagger and/or new models on a manually annotated corpus. 
+				</para>
+			</listitem>
+		</itemizedlist>
+		</para>
+		<para>
+		<code>HMMTagger</code> was evaluated for English and German. For English, it was trained on 80% of the Brown corpus 
+		(180,000 tokens) and tested on the rest unseen 20%. The achieved accuracy was about 96%, test corpus contained 4.5% of unknown tokens.
+		</para>
+		<para>
+		For German, it achieves between 95% and 96% accuracy when trained and tested on the same type of corpus, i.e. with 80% of corpus used for training and 20% for testing.
+		The accuracy goes a bit down when tagging is performed for different types of corpora than the training one, mostly due to the growing number of unknown words.  
 		</para>
 	</chapter>
 

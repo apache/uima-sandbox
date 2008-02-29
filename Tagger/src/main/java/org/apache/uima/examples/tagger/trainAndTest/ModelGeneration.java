@@ -67,7 +67,7 @@ public class ModelGeneration implements java.io.Serializable{
    * Map containing N-gram probabilities 
    */
   
-  public Map<String, Double> transition_probs = new HashMap<String, Double>() ;
+  public Map<NGram, Double> transition_probs = new HashMap<NGram, Double>() ;
   
   
   static List<String> posList = new ArrayList<String>(); 
@@ -78,16 +78,11 @@ public class ModelGeneration implements java.io.Serializable{
   public double [] lambdas3 = new double[3];
   public double theta; // for suffix probabiliites smoothing
   
- // transient String InputDir;
+ 
   transient String OutputFile;
   transient List corpus; 
   
-  /**
-   * @param N N=1, 2 or 3
-   * @param InputDir input directory name
-   * @param OutputFile output file name
-   *    MapBrownToPenn TagMapping
-   */
+
   @SuppressWarnings("unchecked")
    public ModelGeneration(List<Token> corpus, String OutputFile) {
     this.OutputFile = OutputFile;
@@ -102,21 +97,7 @@ public class ModelGeneration implements java.io.Serializable{
     this.word_probs = (Map) l.get(0);
     this.suffix_tree = (Map) l.get(1);
     this.suffix_tree_capitalized = (Map) l.get(2);
-     /*  Map test2 = get_ngrams(2);
-     Map test3 = get_ngrams(3);
-     Map test1 = get_ngrams(1);
-       Iterator<Entry<String, Map>> it = test2.entrySet().iterator(); // iterate over words
-       
-     for (int g = 0; g<test2.size(); g++){
-       
-       Map.Entry entry = (Map.Entry) it.next();
-          ArrayList  key = (ArrayList ) entry.getKey();
-        Object value = entry.getValue();
-       System.out.println(key.toString());
-       System.out.println(value);
-     }
-     System.out.println("Number of ngrams: "+(test2.size()+test1.size()+test3.size()));
-   */  
+  
      System.out.println("Number of different words "+word_probs.size());
      System.out.println("Number of non-capitalized suffixes: "+suffix_tree.size());
      System.out.println("Number of capitalized suffixes: "+suffix_tree_capitalized.size());
@@ -203,8 +184,8 @@ public class ModelGeneration implements java.io.Serializable{
     int mapsize = word_counts.size();
     
     Iterator<Entry<String, Map<String, Double>>> keyValuePairs = word_counts.entrySet().iterator(); // iterate over words
-    Map<String, Double> pos_counts = get_ngrams(1);
-
+    Map<NGram, Double> pos_counts = get_ngrams(1);
+    
     for (int i = 0; i < mapsize; i++)
     {
       Map.Entry<String, Map<String, Double>> entry = keyValuePairs.next();
@@ -218,12 +199,13 @@ public class ModelGeneration implements java.io.Serializable{
       for (int u = 0; u < pos2.size(); u++)
       {
        Map.Entry<String, Double> entry_pos = keyValuePairs_pos.next();
-       Object key2 = entry_pos.getKey(); // pos of a word
-        
+       String key2 = entry_pos.getKey(); // pos of a word
+       System.out.println(pos_counts.size()); 
        if (key2 != "count") {
       
         Object value2 = entry_pos.getValue(); // its count
-          double freq_pos=pos_counts.get(key2);
+          NGram ng = new NGram(key2);
+          double freq_pos=pos_counts.get(ng);
           Double val2 = (Double)value2 / freq_pos; // Prob(w|t) = freq(w,t)/freq(t)
           lokal.put((String)key2, val2); // save probability as a log2
          } else {
@@ -397,31 +379,31 @@ public class ModelGeneration implements java.io.Serializable{
    * @return Map<String, Double> N-grams of parts-of-speech, where {@code N = 1, 2 or 3} 
    * @throws IllegalArgumentException
    */
-  static Map<String, Double> get_ngrams(int N) throws IllegalArgumentException{
+  static Map<NGram, Double> get_ngrams(int N) throws IllegalArgumentException{
    
-    Map<String, Double> ngrams1= new HashMap<String,Double>();
-    Map<String, Double> ngrams2= new HashMap<String,Double>();
-    Map<String, Double> ngrams3= new HashMap<String,Double>();
+    Map<NGram, Double> ngrams1= new HashMap<NGram,Double>();
+    Map<NGram, Double> ngrams2= new HashMap<NGram,Double>();
+    Map<NGram, Double> ngrams3= new HashMap<NGram,Double>();
     
     if (N==1){
       for (int y=0; y<posList.size(); y++){
-        Double freq=ngrams1.get(posList.get(y));
-        // if a given POS is already in the Map, then add its corresponding count, otherwise add a POS value with a count of 1 
-        ngrams1.put(posList.get(y), (freq == null) ? 1 : freq + 1);
-      }
+        NGram onegram = new NGram(posList.get(y));
+        Double freq = ngrams1.get(onegram);
+        ngrams1.put(onegram, (freq == null) ? 1 : freq + 1);
+        }
     }
     else if (N==2){
       for (int y=0; y<(posList.size()-1); y++){
-       String s2 = posList.get(y)+"_"+posList.get(y+1);
-       Double freq=ngrams2.get(s2);
-       ngrams2.put(s2, (freq == null) ? 1 : freq + 1);
+       NGram bigram = new NGram(posList.get(y),posList.get(y+1));
+       Double freq=ngrams2.get(bigram);
+       ngrams2.put(bigram, (freq == null) ? 1 : freq + 1);
       }
     }
     else if (N==3){
       for (int y=0; y<(posList.size()-2); y++){
-       String s3 = posList.get(y)+"_"+posList.get(y+1)+"_"+posList.get(y+2);
-       Double freq=ngrams3.get(s3);
-       ngrams3.put(s3, (freq == null) ? 1 : freq + 1);
+       NGram trigram = new NGram(posList.get(y),posList.get(y+1),posList.get(y+2));
+       Double freq=ngrams3.get(trigram);
+       ngrams3.put(trigram, (freq == null) ? 1 : freq + 1);
       }
     } else{ 
         throw new IllegalArgumentException ("N=1, N=2 or N=3, no further N-grams are supported at the moment");
@@ -434,15 +416,15 @@ public class ModelGeneration implements java.io.Serializable{
   * Computes {@code transition_probs} using {@link #get_ngrams(int)} frequency counts for N-grams..  
   */
    
-  static Map<String, Double> unigrams;
-  static Map<String, Double> bigrams;
-  static Map<String, Double> trigrams;
+  static Map<NGram, Double> unigrams;
+  static Map<NGram, Double> bigrams;
+  static Map<NGram, Double> trigrams;
 
   @SuppressWarnings("unchecked")
-  static Map<String, Double> get_transition_probs(int N) throws IllegalArgumentException{
-  Map<String, Double> probs1= new HashMap<String, Double>();
-    Map<String, Double> probs2= new HashMap<String, Double>();
-    Map<String, Double> probs3= new HashMap<String, Double>();
+  static Map<NGram, Double> get_transition_probs(int N) throws IllegalArgumentException{
+    Map<NGram, Double> probs1= new HashMap<NGram, Double>();
+    Map<NGram, Double> probs2= new HashMap<NGram, Double>();
+    Map<NGram, Double> probs3= new HashMap<NGram, Double>();
     unigrams = get_ngrams(1);
     bigrams = get_ngrams(2);
     trigrams = get_ngrams(3);
@@ -452,14 +434,10 @@ public class ModelGeneration implements java.io.Serializable{
         for (int i = 0; i < unigrams.size(); i++) // for all bigrams
         {
           Map.Entry entry = (Map.Entry) keyValuePairs.next();
-          Object key = entry.getKey(); // get a bigram
-       //   String [] t = ((String)key).split("_");
-          double freq1 =  unigrams.get(key); // get a count of a  unigram
-
-    //      Object freq2 = entry.getValue(); // get  a count of a bigram
-          
+          Object key = entry.getKey(); // get an unigram
+          double freq1 =  unigrams.get(key); // get a count of a  unigram 
           double prob1 = freq1 / tokens_count_all_corpus; // Prob(key) = freq(tag)/freq(all_tags)?
-          probs1.put((String)key, prob1); // save probability as a log2 : Math.log(prob1)
+          probs1.put((NGram)key, prob1); // save probability as a log2 : Math.log(prob1)
         
         }
     }
@@ -470,14 +448,17 @@ public class ModelGeneration implements java.io.Serializable{
       for (int i = 0; i < bigrams.size(); i++) // for all bigrams
       {
         Map.Entry entry = (Map.Entry) keyValuePairs.next();
-        Object key = entry.getKey(); // get a bigram
-        String [] t = ((String)key).split("_");
-        double freq1 =  unigrams.get(t[0]); // get a count of a preceding unigram
+        NGram key = (NGram) entry.getKey(); // get a bigram
+        double freq1 =  unigrams.get(new NGram(key.tag1)); // get a count of a preceding unigram
+
+        
+        //  String [] t = ((String)key).split("_");
+        // double freq1 =  unigrams.get(t[0]); // get a count of a preceding unigram
 
         Object freq2 = entry.getValue(); // get  a count of a bigram
         
         double prob2 = (Double)freq2 / freq1; // Prob(t2|t1) = freq(t1,t2)/freq(t1)
-        probs2.put((String)key, prob2); // save probability as a log2: Math.log(prob2)
+        probs2.put((NGram)key, prob2); 
       } 
     } else if (N==3){ // for trigram models
       
@@ -485,16 +466,19 @@ public class ModelGeneration implements java.io.Serializable{
       for (int i = 0; i < trigrams.size(); i++) // for all trigrams
       {
         Map.Entry entry = (Map.Entry) keyValuePairs.next();
-        Object key = entry.getKey(); // get a trigram
-        String [] t = ((String)key).split("_");
-        String tt = t[0]+"_"+t[1];
+        NGram key = (NGram) entry.getKey(); // get a trigram
+        double freq1 =  bigrams.get(new NGram(key.tag1,key.tag2)); // get a count of a preceding bigram
 
-        Double freq1 =  bigrams.get(tt); // get a count of a preceding bigram
+        
+        //String [] t = ((String)key).split("_");
+        //String tt = t[0]+"_"+t[1];
+
+        // Double freq1 =  bigrams.get(tt); // get a count of a preceding bigram
 
         Object freq2 = entry.getValue(); // get  a count of a trigram
         
         double prob3 = (Double)freq2/freq1; // Prob(t3|(t1_t2)) = freq(t1_t2_t3)/freq(t1_t2)
-        probs3.put((String)key, prob3); // save probability as a log2: Math.log(prob3)
+        probs3.put((NGram)key, prob3); // save probability as a log2: Math.log(prob3)
      }
     } else{ 
       throw new IllegalArgumentException ("only uni-, bi-, and trigramms are supported at the moment");
@@ -502,7 +486,7 @@ public class ModelGeneration implements java.io.Serializable{
     return ((N == 2) ? probs2 : (N==3)? probs3 : probs1);
   }
   
-  // TODO: ADD SMOOTHING, both for ngrams and evtl unknown suffixes (?)
+
   /**
    * Computes alphas for linear interpolation smoothing of unknown n-grams
    * @param N N-gram
@@ -523,9 +507,9 @@ public class ModelGeneration implements java.io.Serializable{
         for (int i = 0; i < bigrams.size(); i++) // for all bigrams
         {
           Map.Entry entry = (Map.Entry) keyValuePairs.next();
-          Object key = entry.getKey(); // get a bigram
-          String [] t = ((String)key).split("_");
-          double freq1 =  unigrams.get(t[0]); // get a count of a preceding unigram
+          NGram key = (NGram)entry.getKey(); // get a bigram
+        
+          double freq1 =  unigrams.get(new NGram(key.tag1)); // get a count of a preceding unigram
           Double freq2 = (Double) entry.getValue(); // get  a count of a bigram
           
           double f2 = (freq2-1)/(freq1-1);
@@ -546,13 +530,13 @@ public class ModelGeneration implements java.io.Serializable{
         for (int i = 0; i < trigrams.size(); i++) // for all trigrams
         {
           Map.Entry entry = (Map.Entry) keyValuePairs.next();
-          Object key = entry.getKey(); // get a trigram
-          String [] t = ((String)key).split("_");
-          String tt = t[0]+"_"+t[1];
-
-          Double freq2 = bigrams.containsKey(tt) ?  bigrams.get(tt) : 0.0; // get a count of a preceding bigram
+          NGram key = (NGram) entry.getKey(); // get a trigram
+      //    String [] t = ((String)key).split("_");
+       //   String tt = t[0]+"_"+t[1];
+          NGram preceding_bigram = new NGram(key.tag1, key.tag2);
+          Double freq2 = bigrams.containsKey(preceding_bigram) ?  bigrams.get(preceding_bigram) : 0.0; // get a count of a preceding bigram
           Double freq3 = (Double) entry.getValue(); // get  a count of a trigram
-          Double freq1 = unigrams.containsKey(t[0]) ? unigrams.get(t[0]) : 0.0;
+          Double freq1 = unigrams.containsKey(new NGram(key.tag1)) ? unigrams.get(new NGram(key.tag1)) : 0.0;
         
           double f3 = (freq3-1)/(freq2-1);
           double f2 = (freq2-1)/(freq1-1);
@@ -563,7 +547,7 @@ public class ModelGeneration implements java.io.Serializable{
           else {lambda1+=freq3;count3+=freq3;}
         }  this.lambdas3[0] = lambda1/count3; this.lambdas3[1]=lambda2/count3; this.lambdas3[2]=lambda3/count3;   
     }
-   System.out.println("lambdas for 2-grams = "+this.lambdas2[0]+" "+this.lambdas2[1]+"\n"+"lambdas for 3-grams"+this.lambdas3[0]+" "+this.lambdas3[1]+" "+this.lambdas3[2]);
+   System.out.println("lambdas: "+this.lambdas3[0]+" "+this.lambdas3[1]+" "+this.lambdas3[2]);
       return ((N == 2) ? this.lambdas2 : this.lambdas3);
   }
   
@@ -647,17 +631,14 @@ public class ModelGeneration implements java.io.Serializable{
       in.close();
 
       file = defaultProps.getProperty("FILE");
-      fileOutput = defaultProps.getProperty("FILE_OUTPUT");
+      fileOutput = defaultProps.getProperty("MODEL_FILE");
 
       boolean DO_MAPPING;
       String b =  defaultProps.getProperty("DO_MAPPING");
       DO_MAPPING = Boolean.valueOf(b);
-      System.out.println("HALLO");
       if (DO_MAPPING){
         String m = defaultProps.getProperty("MAPPING");
          MAPPING = (MappingInterface)(Class.forName(m)).newInstance();
-         System.out.println("HALLO2");
-
       } else {
         MAPPING = null;
       }
@@ -666,9 +647,8 @@ public class ModelGeneration implements java.io.Serializable{
       String r = defaultProps.getProperty("CORPUS_READER");
       reader = (CorpusReader)(Class.forName(r)).newInstance();
     
-  //  md = new ModelGeneration(new BrownReader().read_corpus("../brown",m),fileOutput);
-
-     System.out.println(fileOutput);
+      System.out.println("Input file: "+file);
+      System.out.println("Output model file: "+fileOutput);
       md = new ModelGeneration(reader.read_corpus(file, MAPPING),fileOutput);
       md.init();
     } catch (Exception e) {

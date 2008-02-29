@@ -34,6 +34,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.analysis_engine.annotator.AnnotatorConfigurationException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.text.AnnotationIndex;
+import org.apache.uima.examples.tagger.trainAndTest.MappingInterface;
 import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -184,13 +185,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
       List<String> wordTagList = Viterbi.process(this.N, wordList, this.my_model.suffix_tree, this.my_model.suffix_tree_capitalized, this.my_model.transition_probs,
               this.my_model.word_probs, this.my_model.lambdas2, this.my_model.lambdas3, this.my_model.theta);
 
-      
-      /*
-      if (this.MAPPING != null){
-        wordTagList = this.MAPPING.map_tags(wordTagList);
-      }
-      */
-      
+     
       try {
         for (int i = 0; i < tokenList.size(); i++) {
           TokenAnnotation token = tokenList.get(i);

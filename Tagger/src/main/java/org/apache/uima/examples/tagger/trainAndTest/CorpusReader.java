@@ -21,17 +21,14 @@ package org.apache.uima.examples.tagger.trainAndTest;
 
 
 import java.util.List;
-import org.apache.uima.examples.tagger.MappingInterface;
 
 
 /**
- * Reads (annotated) text file(s) and transforms every word into a {@code Token}-object 
+ * Reads (annotated) text file or directory and transforms every word into a {@code Token}-object 
  *
  */
 public interface CorpusReader {
 
- // public List<Token> corpus = new ArrayList<Token>();
- // public List<Token> read_corpus(String file);
   public List<Token> read_corpus(String file, MappingInterface mapping);
 }
 
