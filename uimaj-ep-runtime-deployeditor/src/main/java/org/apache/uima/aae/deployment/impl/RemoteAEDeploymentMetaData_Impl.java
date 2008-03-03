@@ -53,6 +53,8 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
   private static final long serialVersionUID = -6028698292841920067L;
 
   protected int           casMultiplierPoolSize = DEFAULT_CAS_MULTIPLIER_POOL_SIZE;
+  protected int initialFsHeapSize = DEFAULT_CAS_INITIAL_HEAP_SIZE;
+
   protected InputQueue    inputQueue = new InputQueue_Impl();
   protected String        replyQueueLocation = DEFAULT_REPLY_QUEUE_LOCATION; // NOT defined
   protected String        serializerMethod = "xmi"; // NOT defined
@@ -141,6 +143,18 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
           }
           setCasMultiplierPoolSize(n);
 
+          // Check for Optional "initialFsHeapSize"
+          val = DDParserUtil.checkAndGetAttributeValue(TAG_CAS_MULTIPLIER, TAG_ATTR_INIT_SIZE_OF_CAS_HEAP, elem, false);
+          if (val != null && val.trim().length() > 0) {
+            try {
+              initialFsHeapSize = Integer.parseInt(val);
+            } catch (NumberFormatException e) {
+              e.printStackTrace();
+              throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                      new Object[] { TAG_ATTR_INIT_SIZE_OF_CAS_HEAP }, e);
+            }
+          }
+          
         } else if (TAG_REPLY_QUEUE.equalsIgnoreCase(elem.getTagName())) {
           // setReplyQueueLocation(elem.getAttribute(TAG_ATTR_LOCATION));
           setReplyQueueLocation(DDParserUtil.checkAndGetAttributeValue(TAG_REPLY_QUEUE, TAG_ATTR_LOCATION, elem, true));
@@ -235,6 +249,9 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
       if (getCasMultiplierPoolSize() != UNDEFINED_INT) {
         attrs.addAttribute("", TAG_ATTR_POOL_SIZE, TAG_ATTR_POOL_SIZE,
                 null, "" + getCasMultiplierPoolSize());
+        attrs.addAttribute("", TAG_ATTR_INIT_SIZE_OF_CAS_HEAP, TAG_ATTR_INIT_SIZE_OF_CAS_HEAP,
+                null, ""+initialFsHeapSize);
+
         aContentHandler.startElement("", TAG_CAS_MULTIPLIER, TAG_CAS_MULTIPLIER, attrs);
         aContentHandler.endElement("", "", TAG_CAS_MULTIPLIER);
         attrs.clear();        
@@ -371,6 +388,20 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
    */
   public void setImportedAE(Import importedAE) {
     this.importedAE = importedAE;
+  }
+
+  /**
+   * @return the initialFsHeapSize
+   */
+  public int getInitialFsHeapSize() {
+      return initialFsHeapSize;
+  }
+
+  /**
+   * @param initialFsHeapSize the initialFsHeapSize to set
+   */
+  public void setInitialFsHeapSize(int initialFsHeapSize) {
+      this.initialFsHeapSize = initialFsHeapSize;
   }
 
 
