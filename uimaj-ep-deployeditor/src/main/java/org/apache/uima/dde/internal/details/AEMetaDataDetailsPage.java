@@ -112,6 +112,14 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
   private Spinner casMultiplier;
 
+  private Label initialFsHeapSizeLabel;
+
+  private Spinner initialFsHeapSize;
+
+  private Label initialFsHeapSizeLabelRemote;
+
+  private Spinner initialFsHeapSizeRemote;
+  
   private ErrorConfigDetailsPage errorConfigDetails;
 
   private Button deploymentCoLocated;
@@ -187,6 +195,12 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
       } else if (e.getSource() == casMultiplierRemote) {
         updateCasMultiplierPoolSize(casMultiplierRemote.getSelection());
+        
+      } else if (e.getSource() == initialFsHeapSize) {
+          updateInitialFsHeapSize(initialFsHeapSize.getSelection());
+
+      } else if (e.getSource() == initialFsHeapSizeRemote) {
+          updateInitialFsHeapSize(initialFsHeapSizeRemote.getSelection());
 
       } else if (e.getSource() == remoteQueueLocation) {
         String location;
@@ -282,7 +296,6 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     while (!(c instanceof ScrolledPageBook)) {
       c = c.getParent();
     }
-//    myScrolledPageBook = (ScrolledPageBook) c;
 
     // Set Layout for "parent"
     TableWrapLayout layout = new TableWrapLayout();
@@ -388,6 +401,19 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
             casMultiplierLabel, SWT.BORDER, 0, Integer.MAX_VALUE, false);
     casMultiplier.setSelection(0);
     casMultiplier.addSelectionListener(asynAggregateListener);
+    
+    // initialFsHeapSize (default size is 2M)
+    initialFsHeapSizeLabel = toolkit.createLabel(compositeCoLocatedSetting,
+            "Initial size of CAS heap (in bytes):");
+    initialFsHeapSize = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
+            initialFsHeapSizeLabel, SWT.BORDER, 1, 
+            Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
+    gd = (GridData) initialFsHeapSize.getLayoutData();
+    gd.minimumWidth = 80;
+    gd.widthHint = 80;
+    initialFsHeapSize.setLayoutData(gd);
+    initialFsHeapSize.setSelection(0);
+    initialFsHeapSize.addSelectionListener(asynAggregateListener);
 
     // /////////////////////////////////////////////////////////////////////
 
@@ -413,11 +439,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
       FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
     decorationEndPoint.setDescription("The name of the queue cannot be empty");
     endPointDecoField.addFieldDecoration(decorationEndPoint, SWT.LEFT | SWT.TOP, false);    
-
-    // Create pop-up context menu
-//    createContextMenu(brokerUrl);
-//    createContextMenu(endPoint);
-    
+   
     remoteQueueLocation = FormSection.createLabelAndCCombo(toolkit, compositeRemoteSetting,
             "Service client is inside firewall:", SWT.BORDER | SWT.FLAT | SWT.READ_ONLY);
     remoteQueueLocation.add("no");  // local
@@ -433,6 +455,19 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     casMultiplierRemote.setSelection(0);
     casMultiplierRemote.addSelectionListener(asynAggregateListener);
 
+    // initialFsHeapSize (default size is 2M)
+    initialFsHeapSizeLabelRemote = toolkit.createLabel(compositeRemoteSetting,
+            "Initial size of CAS heap (in bytes):");
+    initialFsHeapSizeRemote = FormSection2.createLabelAndSpinner(toolkit, compositeRemoteSetting,
+            initialFsHeapSizeLabelRemote, SWT.BORDER, 1, 
+            Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
+    gd = (GridData) initialFsHeapSizeRemote.getLayoutData();
+    gd.minimumWidth = 80;
+    gd.widthHint = 80;
+    initialFsHeapSizeRemote.setLayoutData(gd);
+    initialFsHeapSizeRemote.setSelection(0);
+    initialFsHeapSizeRemote.addSelectionListener(asynAggregateListener);
+    
     stackLayout.topControl = compositeCoLocatedSetting;
 
     return sectionAEMetaDataDetails;
@@ -483,9 +518,14 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
           casMultiplierLabel.setVisible(true);
           casMultiplier.setVisible(true);
           casMultiplier.setSelection(obj.getCasMultiplierPoolSize());
+          initialFsHeapSizeLabel.setVisible(true);
+          initialFsHeapSize.setVisible(true);
+          initialFsHeapSize.setSelection(obj.getInitialFsHeapSize());
         } else {
           casMultiplierLabel.setVisible(false);
           casMultiplier.setVisible(false);
+          initialFsHeapSizeLabel.setVisible(false);
+          initialFsHeapSize.setVisible(false);
         }
         // Is Primitive ?
         if (aed.isPrimitive()) {
@@ -499,6 +539,8 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
         // CAS Consumer, ...
         casMultiplierLabel.setVisible(false);
         casMultiplier.setVisible(false);
+        initialFsHeapSizeLabel.setVisible(false);
+        initialFsHeapSize.setVisible(false);
         asMode.setEnabled(false);
         asMode.setSelection(false);
       }
@@ -582,9 +624,14 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
           casMultiplierLabelRemote.setVisible(true);
           casMultiplierRemote.setVisible(true);
           casMultiplierRemote.setSelection(obj.getCasMultiplierPoolSize());
+          initialFsHeapSizeLabelRemote.setVisible(true);
+          initialFsHeapSizeRemote.setVisible(true);
+          initialFsHeapSizeRemote.setSelection(obj.getInitialFsHeapSize());
         } else {
           casMultiplierLabelRemote.setVisible(false);
           casMultiplierRemote.setVisible(false);
+          initialFsHeapSizeLabelRemote.setVisible(false);
+          initialFsHeapSizeRemote.setVisible(false);
         }
       }
     }
@@ -702,6 +749,17 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     } else if (currentMetaDataObject instanceof RemoteAEDeploymentMetaData) {
       ((RemoteAEDeploymentMetaData) currentMetaDataObject).setCasMultiplierPoolSize(value);
+
+    }
+    multiPageEditor.setFileDirty();
+  }
+
+  private void updateInitialFsHeapSize(int value) {
+    if (currentMetaDataObject instanceof AEDeploymentMetaData) {
+      ((AEDeploymentMetaData) currentMetaDataObject).setInitialFsHeapSize(value);
+
+    } else if (currentMetaDataObject instanceof RemoteAEDeploymentMetaData) {
+      ((RemoteAEDeploymentMetaData) currentMetaDataObject).setInitialFsHeapSize(value);
 
     }
     multiPageEditor.setFileDirty();
