@@ -38,7 +38,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>uima-ee-core</finalName>			
+		<finalName>uima-as-core</finalName>			
 	</build>
   <!-- temp until we get top level uimaj-as pom -->
   <repositories>
