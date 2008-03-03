@@ -53,6 +53,6 @@
 
 	</dependencies>
 	<build>
-		<finalName>uima-ee-jms</finalName>
+		<finalName>uima-as-jms</finalName>
 	</build>	
 </project>
