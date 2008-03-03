@@ -118,4 +118,14 @@ public interface RemoteAEDeploymentMetaData {
      */
     public void setSerializerMethod(String serializerMethod);
 
+    /**
+     * @return the initialFsHeapSize
+     */
+    public int getInitialFsHeapSize();
+
+    /**
+     * @param initialFsHeapSize the initialFsHeapSize to set
+     */
+    public void setInitialFsHeapSize(int initialFsHeapSize);
+    
 }

@@ -97,6 +97,8 @@ AEDeploymentConstants, AEDeploymentMetaData {
 
   protected int casMultiplierPoolSize = 0; // required - DEFAULT_CAS_MULTIPLIER_POOL_SIZE;
 
+  protected int initialFsHeapSize = DEFAULT_CAS_INITIAL_HEAP_SIZE;
+
   protected AEDelegates_Impl delegates;
 
   protected AsyncAEErrorConfiguration asyncAEErrorConfiguration;
@@ -351,7 +353,19 @@ AEDeploymentConstants, AEDeploymentMetaData {
           }
         }
         setCasMultiplierPoolSize(n);
-
+        
+        // Check for Optional "initialFsHeapSize"
+        val = DDParserUtil.checkAndGetAttributeValue(TAG_CAS_MULTIPLIER, TAG_ATTR_INIT_SIZE_OF_CAS_HEAP, elem, false);
+        if (val != null && val.trim().length() > 0) {
+          try {
+            initialFsHeapSize = Integer.parseInt(val);
+          } catch (NumberFormatException e) {
+            e.printStackTrace();
+            throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                    new Object[] { TAG_ATTR_INIT_SIZE_OF_CAS_HEAP }, e);
+          }
+        }
+        
       } else if (AEDeploymentConstants.TAG_DELEGATES.equalsIgnoreCase(elem.getTagName())) {
         delegates = new AEDelegates_Impl(this);
         NodeList nodes = elem.getChildNodes();
@@ -494,11 +508,14 @@ AEDeploymentConstants, AEDeploymentMetaData {
       attrs.clear();
     }
 
-    // <casMultiplier poolSize="5"/> <!-- req | omit-->
+    // <casMultiplier poolSize="5" initialFsHeapSize="200000" /> <!-- req | omit-->
     if (AEDeploymentDescription_Impl.isCASMultiplier(getResourceSpecifier())) {
       if (getCasMultiplierPoolSize() != UNDEFINED_INT) {
         attrs.addAttribute("", AEDeploymentConstants.TAG_ATTR_POOL_SIZE,
                 AEDeploymentConstants.TAG_ATTR_POOL_SIZE, null, "" + getCasMultiplierPoolSize());
+        attrs.addAttribute("", TAG_ATTR_INIT_SIZE_OF_CAS_HEAP, TAG_ATTR_INIT_SIZE_OF_CAS_HEAP,
+                null, ""+initialFsHeapSize);
+
         aContentHandler.startElement("", AEDeploymentConstants.TAG_CAS_MULTIPLIER,
                 AEDeploymentConstants.TAG_CAS_MULTIPLIER, attrs);
         aContentHandler.endElement("", "", AEDeploymentConstants.TAG_CAS_MULTIPLIER);
@@ -678,6 +695,14 @@ AEDeploymentConstants, AEDeploymentMetaData {
 
   public void setCasMultiplier(boolean casMultiplier) {
     this.casMultiplier = casMultiplier;
+  }
+
+  public int getInitialFsHeapSize() {
+      return initialFsHeapSize;
+  }
+
+  public void setInitialFsHeapSize(int initialFsHeapSize) {
+      this.initialFsHeapSize = initialFsHeapSize;
   }
 
   /** ********************************************************************** */

@@ -133,4 +133,9 @@ public interface AEDeploymentMetaData
      * @param topAnalysisEngine the topAnalysisEngine to set
      */
     public void setTopAnalysisEngine(boolean topAnalysisEngine);
+    
+    public int getInitialFsHeapSize();
+
+    public void setInitialFsHeapSize(int initialFsHeapSize);
+
 }
