@@ -28,7 +28,7 @@ import javax.management.ObjectName;
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
-import org.apache.activemq.memory.UsageListener;
+//import org.apache.activemq.memory.UsageListener;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.util.Level;
@@ -48,7 +48,7 @@ public class BrokerDeployer implements ApplicationListener
 	private String brokerURI;
 	private TransportConnector  tcpConnector = null;
 	private TransportConnector  httpConnector = null;
-	private UsageListener usageListener = null;
+//	private UsageListener usageListener = null;
 
 	public BrokerDeployer(long maxMemoryinBytes) throws Exception
 	{
@@ -84,11 +84,11 @@ public class BrokerDeployer implements ApplicationListener
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
                     "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_broker_memory__CONFIG",
                     new Object[] {maxBrokerMemory});
-			service.getMemoryManager().setLimit(maxBrokerMemory);
+//			service.getMemoryManager().setLimit(maxBrokerMemory);
 		}
-		usageListener = new UimaEEBrokerMemoryUsageListener();
+//		usageListener = new UimaEEBrokerMemoryUsageListener();
 
-		service.getMemoryManager().addUsageListener( usageListener ); //new UimaEEBrokerMemoryUsageListener());
+//		service.getMemoryManager().addUsageListener( usageListener ); //new UimaEEBrokerMemoryUsageListener());
 		
 		String[] connectors = service.getNetworkConnectorURIs();
 		if ( connectors != null  )
@@ -302,10 +302,10 @@ public class BrokerDeployer implements ApplicationListener
 		{
 			try
 			{
-				if ( usageListener != null )
-				{
-					service.getMemoryManager().removeUsageListener(usageListener);		
-				}
+//				if ( usageListener != null )
+//				{
+//					service.getMemoryManager().removeUsageListener(usageListener);		
+//				}
 				if ( tcpConnector != null )
 				{
 					tcpConnector.stop();
