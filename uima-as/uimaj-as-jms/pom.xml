@@ -53,6 +53,6 @@
 
 	</dependencies>
 	<build>
-		<finalName>uima-as-jms</finalName>
+		<finalName>${artifactId}</finalName>
 	</build>	
 </project>
