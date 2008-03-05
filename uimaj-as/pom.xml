@@ -35,9 +35,9 @@
   <properties>
       <!-- next entry needed until we get past 2.2.1 -->
       <!-- because properties weren't used before -->
-      <uimaj-version>2.2.1</uimaj-version>
-      <uimaj-release-version>${uimaj-version}-incubating</uimaj-release-version>
-      <uimaj-release-eclipse-version>${uimaj-version}.incubating</uimaj-release-eclipse-version>
+      <uimaj-version>2.2.2</uimaj-version>
+      <uimaj-release-version>${uimaj-version}-incubating-SNAPSHOT</uimaj-release-version>
+      <uimaj-release-eclipse-version>${uimaj-version}.incubating-SNAPSHOT</uimaj-release-eclipse-version>
       <uimaj-base-version>${uimaj-version}</uimaj-base-version>
       <uimaj-as-version>0.7.0</uimaj-as-version>
       <uimaj-as-release-version>${uimaj-as-version}-incubating-SNAPSHOT</uimaj-as-release-version>
