@@ -36,7 +36,7 @@
  * under the License.
  */
 
-package org.apache.uima.examples.ee;
+package org.apache.uima.examples.as;
 
 import java.io.File;
 import java.io.FileOutputStream;
