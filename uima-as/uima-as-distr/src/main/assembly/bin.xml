@@ -152,13 +152,26 @@ under the License.
         <include>xstream:xstream</include>
         <include>org.springframework:spring</include>
         <include>commons-pool:commons-pool</include>
+        <include>commons-logging:commons-logging</include>
         <include>org.apache.activemq:apache-activemq</include>
-        <include>net.sf.saxon:saxon</include>
+        <include>org.apache.activemq:activemq-optional</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>lib</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <outputFileNameMapping>${artifact.artifactId}.jar</outputFileNameMapping>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
+        <include>net.sf.saxon:saxon</include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <!-- we name this version of the saxon jar to indicate it 
+           supports xslt 2.0 -->
+      <outputFileNameMapping>saxon_xslt_2.0.jar</outputFileNameMapping>
     </dependencySet>
    
     <!-- Copy each eclipse plugin into the /eclipsePlugins dir of the distribution -->
@@ -205,7 +218,7 @@ under the License.
       <fileMode>755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>src/main/properties</directory>
+      <directory>src/main/config</directory>
       <outputDirectory>config</outputDirectory>
     </fileSet>
     <fileSet>
@@ -252,6 +265,13 @@ under the License.
         <include>uima_async_scaleout.pdf</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>../uima-as-docbooks/src</directory>
+      <outputDirectory>docs</outputDirectory>
+      <includes>
+        <include>index.html</include>
+      </includes>
+    </fileSet>    
     <fileSet>
       <directory>../uimaj-examples/src/main/java</directory>
       <outputDirectory>examples/src</outputDirectory>

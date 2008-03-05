@@ -17,6 +17,12 @@
 #   specific language governing permissions and limitations
 #   under the License.
 
+if [ "$UIMA_HOME" == "" ]
+then
+  echo UIMA_HOME environment variable is not set
+  exit 1
+fi
+
 # ActiveMQ needs a writeable directory for the log files and derbydb.
 if [ -z "$ACTIVEMQ_BASE" ] ; then
   export ACTIVEMQ_BASE=amq
@@ -31,7 +37,7 @@ fi
 # If the config file isn't there, copy it
 if [ ! -f $ACTIVEMQ_BASE/conf/activemq-nojournal.xml ] ; then
   cp $UIMA_HOME/config/activemq-nojournal.xml $ACTIVEMQ_BASE/conf/
-  cp $UIMA_HOME/apache-activemq-4.1.1/conf/log4j.properties $ACTIVEMQ_BASE/conf/
+  cp $UIMA_HOME/config/log4j.properties $ACTIVEMQ_BASE/conf/
 fi
 
-$UIMA_HOME/apache-activemq-4.1.1/bin/activemq xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml
+. $UIMA_HOME/bin/activemq.sh xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml

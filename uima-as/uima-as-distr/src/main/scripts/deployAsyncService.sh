@@ -16,6 +16,12 @@
 #   specific language governing permissions and limitations
 #   under the License.
 
+if [ "$UIMA_HOME" == "" ]
+then
+  echo UIMA_HOME environment variable is not set
+  exit 1
+fi
+
 if [ $# -lt 1 ]
   then echo "You must specify one or more deployment descriptors.  Usage: deployAsyncService.sh file-path-of-deployment-descriptor [another-dd ...]"
        exit;

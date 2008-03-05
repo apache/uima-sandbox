@@ -17,6 +17,15 @@
 
 @if .%1 == . goto usage
 @if NOT exist %1 goto usage
+
+if not defined UIMA_HOME goto USAGE_UIMA
+goto RUN
+
+:USAGE_UIMA
+echo UIMA_HOME environment variable is not set 
+goto end
+
+:RUN
 @setlocal
 @call "%UIMA_HOME%\bin\setUimaClassPath"
 
