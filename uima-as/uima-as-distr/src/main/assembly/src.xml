@@ -27,12 +27,13 @@ under the License.
     <format>zip</format>
   </formats>
   
+  <baseDirectory>apache-uima-as</baseDirectory>
   <includeBaseDirectory>true</includeBaseDirectory>
   
   <fileSets>
     <fileSet>
-      <directory>.</directory>
-      <outputDirectory>/uimaj-distr</outputDirectory>
+      <directory>/apache.uima-as</directory>
+      <outputDirectory>uimaj-distr</outputDirectory>
       <includes>
         <include>src/**</include>
         <include>pom.xml</include>
@@ -40,32 +41,29 @@ under the License.
     </fileSet>
     <fileSet>
       <directory>src/main/readme</directory>
-      <outputDirectory>/</outputDirectory>
+      <!-- to get things into the base dir, use this form
+           If you use <outputDirectory>.</outputDirectory> - 
+           it also puts into the base dir, but creates an
+           extra (empty) version of the base dir - probably 
+           a bug. -->
+      <outputDirectory></outputDirectory>
       <excludes>
-		  <exclude>README</exclude>
+  		  <exclude>README</exclude>
       </excludes>
     </fileSet>
     <fileSet>
-      <directory>src/main/readme_src</directory>
-      <outputDirectory>/</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>../uima-docbooks</directory>
-      <outputDirectory>/uima-docbooks</outputDirectory>
+      <directory>../uima-as-docbooks</directory>
+      <outputDirectory>uima-as-docbooks</outputDirectory>
       <excludes>
         <exclude>target/**</exclude>
-        <!-- Directories does not exist -->
-        <!-- <exclude>docbook/**</exclude>  -->
-        <!-- <exclude>lib/**</exclude> -->
-        <!-- <exclude>Source_UIMA_SDK_Guide_Ref/**</exclude> -->
         <exclude>.*</exclude>   
-        <exclude>LICENSE.txt</exclude>
-        <exclude>src/styles/titlepage/*.xsl</exclude>     
+        <exclude>src/styles/titlepage/*.xsl</exclude>
+        <exclude>src/olink/**/*.db</exclude>     
       </excludes>
     </fileSet>   
     <fileSet>
       <directory>../uima-docbook-tool</directory>
-      <outputDirectory>/uima-docbook-tool</outputDirectory>
+      <outputDirectory>uima-docbook-tool</outputDirectory>
       <includes>
         <include>build/**</include>
         <include>catalog/**</include>
@@ -79,160 +77,62 @@ under the License.
     </fileSet>
     <fileSet>
       <directory>../uimaj-eclipse-update-site</directory>
-      <outputDirectory>/uimaj-eclipse-update-site</outputDirectory>
+      <outputDirectory>uimaj-eclipse-update-site</outputDirectory>
       <includes>
         <include>features/**</include>
-        <include>plugins/**</include>
+        <!--include>plugins/**</include-->
         <include>web/**</include>
         <include>build.xml</include>
         <include>index.html</include>
         <include>site.xml</include>
       </includes>
-    </fileSet>    
-    <fileSet>
-      <directory>../uimaj-eclipse-feature-runtime</directory>
-      <outputDirectory>/uimaj-eclipse-feature-runtime</outputDirectory>
-      <includes>
-        <include>build.properties</include>
-        <include>feature.properties</include>
-        <include>feature.xml</include>
-      </includes>
-    </fileSet>    
-    <fileSet>
-      <directory>../uimaj-eclipse-feature-tools</directory>
-      <outputDirectory>/uimaj-eclipse-feature-tools</outputDirectory>
-      <includes>
-        <include>build.properties</include>
-        <include>feature.properties</include>
-        <include>feature.xml</include>
-      </includes>
-    </fileSet>    
-    <fileSet>
-      <directory>../uimaj</directory>
-      <outputDirectory>/uimaj</outputDirectory>
-      <includes>
-        <include>pom.xml</include>
-      </includes>
     </fileSet>
     <fileSet>
-      <directory>../jVinci</directory>
-      <outputDirectory>/jVinci</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>../uimaj-adapter-soap</directory>
-      <outputDirectory>/uimaj-adapter-soap</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>../uimaj-adapter-vinci</directory>
-      <outputDirectory>/uimaj-adapter-vinci</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>    
-    <fileSet>
-      <directory>../uimaj-component-test-util</directory>
-      <outputDirectory>/uimaj-component-test-util</outputDirectory>
+      <directory>../uimaj-ep-deployeditor</directory>
+      <outputDirectory>uimaj-ep-deployeditor</outputDirectory>
       <includes>
         <include>src/**</include>
         <include>pom.xml</include>
       </includes>
     </fileSet>  
     <fileSet>
-      <directory>../uimaj-core</directory>
-      <outputDirectory>/uimaj-core</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>  
-    <fileSet>
-      <directory>../uimaj-cpe</directory>
-      <outputDirectory>/uimaj-cpe</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>      
-    <fileSet>
-      <directory>../uimaj-document-annotation</directory>
-      <outputDirectory>/uimaj-document-annotation</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>   
-    <fileSet>
-      <directory>../uimaj-ep-configurator</directory>
-      <outputDirectory>/uimaj-ep-configurator</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>      
-    <fileSet>
-      <directory>../uimaj-ep-debug</directory>
-      <outputDirectory>/uimaj-ep-debug</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>       
-    <fileSet>
-      <directory>../uimaj-ep-jcasgen</directory>
-      <outputDirectory>/uimaj-ep-jcasgen</outputDirectory>
-      <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet> 
-    <fileSet>
-      <directory>../uimaj-ep-pear-packager</directory>
-      <outputDirectory>/uimaj-ep-pear-packager</outputDirectory>
+      <directory>../uimaj-ep-runtime-deployeditor</directory>
+      <outputDirectory>uimaj-ep-runtime-deployeditor</outputDirectory>
       <includes>
         <include>src/**</include>
         <include>pom.xml</include>
       </includes>
     </fileSet>     
     <fileSet>
-      <directory>../uimaj-ep-runtime</directory>
-      <outputDirectory>/uimaj-ep-runtime</outputDirectory>
+      <directory>../uimaj-as</directory>
+      <outputDirectory>uimaj-as</outputDirectory>
       <includes>
-        <include>src/**</include>
         <include>pom.xml</include>
       </includes>
-    </fileSet>      
+    </fileSet>
     <fileSet>
-      <directory>../uimaj-examples</directory>
-      <outputDirectory>/uimaj-examples</outputDirectory>
+      <directory>../uimaj-as-activemq</directory>
+      <outputDirectory>uimaj-as-activemq</outputDirectory>
       <includes>
         <include>src/**</include>
         <include>pom.xml</include>
       </includes>
-    </fileSet>      
+    </fileSet>
     <fileSet>
-      <directory>../uimaj-test-util</directory>
-      <outputDirectory>/uimaj-test-util</outputDirectory>
+      <directory>../uimaj-as-core</directory>
+      <outputDirectory>uimaj-as-core</outputDirectory>
       <includes>
         <include>src/**</include>
         <include>pom.xml</include>
       </includes>
-    </fileSet>     
+    </fileSet>
     <fileSet>
-      <directory>../uimaj-tools</directory>
-      <outputDirectory>/uimaj-tools</outputDirectory>
+      <directory>../uimaj-as-jms</directory>
+      <outputDirectory>uimaj-as-jms</outputDirectory>
       <includes>
         <include>src/**</include>
         <include>pom.xml</include>
       </includes>
-    </fileSet>       
+    </fileSet>    
   </fileSets>  
 </assembly>
