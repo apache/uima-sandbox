@@ -848,7 +848,7 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 		if (AsynchAEMessage.XMIPayload == payload || AsynchAEMessage.CASRefID == payload)
 		{
-			cancelTimer(casReferenceId);
+			//cancelTimer(casReferenceId);
 			if ( pt == null )
 			{
 				pt = new ProcessTrace_impl();
@@ -1065,6 +1065,13 @@ implements UimaAsynchronousEngine, MessageListener
 	
 					return;
 				}
+				
+				try
+				{
+					cancelTimer(casReferenceId);
+				}
+				catch( Exception e) {}
+
 				ClientRequest cachedRequest =
 					(ClientRequest)clientCache.get(casReferenceId);
 
