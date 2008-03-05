@@ -17,6 +17,12 @@
 #   specific language governing permissions and limitations
 #   under the License.
 
+if [ "$UIMA_HOME" == "" ]
+then
+  echo UIMA_HOME environment variable is not set
+  exit 1
+fi
+
 . "$UIMA_HOME/bin/setUimaClassPath.sh"
 if [ "$JAVA_HOME" = "" ]
 then
@@ -24,4 +30,4 @@ then
 else
   UIMA_JAVA_CALL="$JAVA_HOME/bin/java"
 fi
-"$UIMA_JAVA_CALL" -cp "$UIMA_CLASSPATH" -Djava.util.logging.config.file=$UIMA_LOGGER_CONFIG_FILE $UIMA_JVM_OPTS org.apache.uima.examples.ee.RunRemoteAsyncAE $*
+"$UIMA_JAVA_CALL" -cp "$UIMA_CLASSPATH" -Djava.util.logging.config.file=$UIMA_LOGGER_CONFIG_FILE $UIMA_JVM_OPTS org.apache.uima.examples.as.RunRemoteAsyncAE $*

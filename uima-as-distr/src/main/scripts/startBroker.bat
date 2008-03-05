@@ -17,6 +17,15 @@ REM   KIND, either express or implied.  See the License for the
 REM   specific language governing permissions and limitations
 REM   under the License.
 
+@if not defined UIMA_HOME goto USAGE_UIMA
+@goto RUN
+
+:USAGE_UIMA
+@echo UIMA_HOME environment variable is not set 
+@goto EXIT
+
+:RUN
+
 @echo on
 
 REM  ActiveMQ needs a writable directory for the log files and derbydb
@@ -34,8 +43,9 @@ REM  WARNING - it appears that ACTIVEMQ_BASE cannot contain backslashes!
 
 @REM If config file not there, copy it
 @if not exist "%ACTIVEMQ_BASE%"\conf\activemq-nojournal.xml (
-  copy "%UIMA_HOME%"\apache-activemq-4.1.1\conf\log4j.properties %ACTIVEMQ_BASE%\conf
+  copy "%UIMA_HOME%"\config\log4j.properties %ACTIVEMQ_BASE%\conf
   copy "%UIMA_HOME%"\config\activemq-nojournal.xml %ACTIVEMQ_BASE%\conf
 )
 
-@call "%UIMA_HOME%"\apache-activemq-4.1.1\bin\activemq xbean:file:%ACTIVEMQ_BASE%/conf/activemq-nojournal.xml
+@call "%UIMA_HOME%"\bin\activemq.bat xbean:file:%ACTIVEMQ_BASE%/conf/activemq-nojournal.xml
+:EXIT
