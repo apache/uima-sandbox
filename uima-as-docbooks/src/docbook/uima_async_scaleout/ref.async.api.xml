@@ -74,8 +74,8 @@ under the License.
       UimaAsynchronousEngine Interface. For each service an application wants to use, it
       must instantiate a client object:
 
-      <programlisting> UimaAsynchronousEngine uimaEEEngine = new BaseUIMAAsynchronousEngine_impl();
-      </programlisting>
+      <programlisting>UimaAsynchronousEngine uimaAsEngine = 
+        new BaseUIMAAsynchronousEngine_impl();</programlisting>
 
       The following is a short introduction to some important methods on this class.
       
@@ -235,7 +235,7 @@ under the License.
       <title>Status Callback Listener</title>
       <para>Asynchronous events are delivered to applications via methods in classes registered
           to the API object with addStatusCallbackListener(). These classes must implement the
-          interface org.apache.uima.aae.client.UimaEEStatusCallbackListener.
+          interface org.apache.uima.aae.client.UimaAsStatusCallbackListener.
 
       <itemizedlist>
         <listitem>
@@ -293,8 +293,8 @@ under the License.
       A client API object must be instantiated for each remote service an application will 
       directly connect with, and a listener class registered in order to process asynchronous events:
         <programlisting>//create Asynchronous Client API
-uimaEEEngine = new BaseUIMAAsynchronousEngine_impl();
-uimaEEEngine.addStatusCallbackListener(new MyStatusCallbackListener());
+uimaAsEngine = new BaseUIMAAsynchronousEngine_impl();
+uimaAsEngine.addStatusCallbackListener(new MyStatusCallbackListener());
     </programlisting>
     </para>
   </section>
@@ -313,18 +313,18 @@ appCtx.put(UimaAsynchronousEngine.Endpoint, "RoomNumberAnnotatorQueue");
 appCtx.put(UimaAsynchronousEngine.CasPoolSize, 2);
 
 //initialize
-uimaEEEngine.initialize(appCtx);
+uimaAsEngine.initialize(appCtx);
     </programlisting>
     </para>
 
     <para>
       Prepare a Cas and send it to the service:
     <programlisting>//get an empty CAS from the Cas pool
-CAS cas = uimaEEEngine.getCAS();
+CAS cas = uimaAsEngine.getCAS();
 // Initialize it with input data
 cas.setDocumentText("Some text to pass to this service.");
 // Send Cas to service for processing
-uimaEEEngine.sendCAS(cas);
+uimaAsEngine.sendCAS(cas);
     </programlisting>
     </para>
   </section>
@@ -344,7 +344,7 @@ public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
     for (int i = 0; i &lt; exceptions.size(); i++) {
       ((Throwable) exceptions.get(i)).printStackTrace();
       }
-    uimaEEEngine.stop();
+    uimaAsEngine.stop();
     return;
     }
 
@@ -366,9 +366,11 @@ public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
       then remove the service when the application is done using it.
         <programlisting>// create Map to hold required parameters
 Map&lt;String,Object&gt; appCtx = new HashMap&lt;String,Object&gt;();
-appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, System.getenv("UIMA_HOME") + "/bin/dd2spring.xsl");
-appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + "/lib/saxon8.jar");
-uimaEEEngine.deploy(service, appCtx);
+appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, 
+           System.getenv("UIMA_HOME") + "/bin/dd2spring.xsl");
+appCtx.put(UimaAsynchronousEngine.SaxonClasspath, 
+           "file:" + System.getenv("UIMA_HOME") + "/lib/saxon8.jar");
+uimaAsEngine.deploy(service, appCtx);
     </programlisting>
     </para>
   </section>

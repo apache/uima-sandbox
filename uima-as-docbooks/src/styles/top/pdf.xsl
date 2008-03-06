@@ -34,6 +34,10 @@
   <!-- this needs to be here because the common xsl scripts can't ref using params -->
   <xsl:include href="../titlepage/titlepage-pdf.xsl"/>
   
+    <!-- width specifications: inside, center, outside -->
+    <!-- OVERRIDE:  inside is large to accommodate large version strings without overflowing -->
+    <xsl:param name="footer.column.widths">6 8 1</xsl:param>
+
   <!-- review formatting -->
   <xsl:template match="emphasis[@role='review']">
    <fo:inline font-weight="bold" color="red">
