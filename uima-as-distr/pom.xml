@@ -300,12 +300,13 @@
 									<packages>*</packages>
 								</group>
 							</groups>
+              <!--verbose>true</verbose-->
 							<sourcepath>
                 ../uimaj-as-core/src/main/java
               </sourcepath>
-              <!-- *.aae makes javadoc fail -->
+              <subpackages>org.apache.uima.aae</subpackages>
 							<excludePackageNames>
-                org.apache.uima.aae:
+                *.uima.aae:
                 *.aae.controller:
                 *.aae.deploymentDescriptor:
                 *.aae.error:
@@ -322,6 +323,8 @@
                 ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/client/UimaAsynchronousEngine.java
                 ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/client/UimaEEStatusCallbackListener.java
                 ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/error/ErrorResult.java
+                ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/error/ErrorResultComponentPath.java
+                ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/error/ErrorResultTDs.java
               </additionalparam>
 							<doctitle>Apache UIMA Async Scaleout Java SDK ${pom.version} User-Level API Documentation</doctitle>
 							<windowtitle>Apache UIMA-AS Java SDK ${pom.version} User-Level API Documentation</windowtitle>
@@ -371,14 +374,14 @@
                 <ant dir="../uima-as-docbooks" inheritAll="false"/>
                 <!-- build eclipse update site -->
                   
-                <!--ant dir="../uimaj-eclipse-update-site"-->
+                <ant dir="../uimaj-eclipse-update-site">
                   <!-- property values from maven must be passed in 
                        using what looks like a redundant <property> statement.
                        See http://cwiki.apache.org/UIMA/maven-tips.html 
                          section on passing parameters to ant scripts -->
-                  <!--property name="uima-maven-build-eclipse-home" value="${uima-maven-build-eclipse-home}"/>                 
+                  <property name="uima-maven-build-eclipse-home" value="${uima-maven-build-eclipse-home}"/>                 
                   <property name="project.version" value="${uimaj-release-eclipse-version}"/>
-                </ant-->            
+                </ant>            
               </tasks>
             </configuration>
             <goals>
