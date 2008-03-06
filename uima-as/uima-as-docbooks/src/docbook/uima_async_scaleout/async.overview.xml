@@ -954,7 +954,7 @@ under the License.
     public interface UIMAAsynchronousEngine
 {
 	/**
-	 * Initializes and instantiates UIMAEE Aggregate component from
+	 * Initializes and instantiates UIMA-AS Aggregate component from
 	 * provided spring xml context configuration file(s). This call
 	 * blocks until the Aggregate is fully initialized and ready to
 	 * process CASes.
@@ -973,7 +973,7 @@ under the License.
 	public void addStatusCallbackListener(StatusCallbackListener aListener);
 
 	/**
-	 * Removes named application listener from the UIMAEE Aggregate. 
+	 * Removes named application listener from the UIMA-AS Aggregate. 
 	 * 
 	 * @param aListener - application listener to remove
 	 */
@@ -989,7 +989,7 @@ under the License.
 	public void sendCAS( CAS aCAS ) throws ResourceProcessException;
 	
 	/**
-	 * Request for a new CAS instance. The UIMAEE Aggregate returns 
+	 * Request for a new CAS instance. The UIMA-AS Aggregate returns 
 	 * an available CAS instance from its pool of CASes. 
 	 * 
 	 * @return - new CAS instance
