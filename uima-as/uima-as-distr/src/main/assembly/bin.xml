@@ -123,22 +123,7 @@ under the License.
       <outputDirectory>lib</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
-    <!--dependencySet>
-      <includes>
-        <include>org.apache.uima:uimaj-as-core</include>
-      </includes>      
-      <outputFileNameMapping>uimaj-as-core.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
-    </dependencySet>
-    <dependencySet>
-      <includes>
-        <include>org.apache.uima:uimaj-as-jms</include>
-      </includes>      
-      <outputFileNameMapping>uimaj-as-jms.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
-    </dependencySet-->
+
     
     <!-- UIMA-AS included other projects -->
 
@@ -198,6 +183,9 @@ under the License.
     <!-- base UIMA -->
     <fileSet>
       <directory>../uimaj-distr/src/main/scripts</directory>
+      <excludes>
+        <exclude>setUimaClassPath.*</exclude>
+      </excludes>
       <outputDirectory>bin</outputDirectory>
       <fileMode>755</fileMode>
     </fileSet>
@@ -303,30 +291,37 @@ under the License.
       <directory>../uimaj-examples/src/main/run_configuration</directory>
       <outputDirectory>examples/run_configuration</outputDirectory>
     </fileSet>
+    
+    <!-- uima-as additions -->
+    <fileSet>
+      <directory>src/main/examples</directory>
+      <outputDirectory>examples</outputDirectory>
+    </fileSet>   
   </fileSets>
+  
   <files>
     <file>
       <source>../uimaj-examples/src/main/eclipseProject/project</source>
       <outputDirectory>examples</outputDirectory>
       <destName>.project</destName>
-      <fileMode>644</fileMode> <!-- workaround for bug MASSEMBLY-173 -->
+      <fileMode>644</fileMode> 
     </file>
     <file>
       <source>../uimaj-examples/src/main/eclipseProject/classpath</source>
       <outputDirectory>examples</outputDirectory>
       <destName>.classpath</destName>
-      <fileMode>644</fileMode> <!-- workaround for bug MASSEMBLY-173 -->
+      <fileMode>644</fileMode> 
     </file>
     <file>
       <source> ../uimaj-examples/src/main/eclipseProject/ecore_src_readme.txt</source>
       <outputDirectory>examples/ecore_src</outputDirectory>
       <destName>readme.txt</destName>
-      <fileMode>644</fileMode> <!-- workaround for bug MASSEMBLY-173 -->
+      <fileMode>644</fileMode> 
     </file>
     <file>
       <source>../uimaj-examples/src/main/java/org/apache/uima/examples/xmi/XmiEcoreCasConsumer.java</source>
       <outputDirectory>examples/ecore_src/org/apache/uima/examples/xmi</outputDirectory>
-      <fileMode>644</fileMode> <!-- workaround for bug MASSEMBLY-173 -->
+      <fileMode>644</fileMode> 
     </file>
   </files>
 </assembly>
