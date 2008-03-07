@@ -22,9 +22,9 @@
   
   <broker xmlns="http://activemq.org/config/1.0">
   
-    <memoryManager>  
+    <!--memoryManager>  
       <usageManager id="memory-manager" limit="150 MB"/>
-    </memoryManager>
+    </memoryManager-->
 
     <!-- In ActiveMQ 4, you can setup destination policies -->  
     <destinationPolicy>

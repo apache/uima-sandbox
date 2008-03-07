@@ -142,11 +142,20 @@ under the License.
         <include>org.apache.activemq:activemq-core</include>
         <include>org.apache.activemq:activemq-optional</include>       
         <include>org.apache.geronimo.specs:geronimo-jms_1.1_spec</include>
+        <include>org.apache.geronimo.specs:geronimo-j2ee-management_1.0_spec</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>apache-activemq-5.0.0/lib</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
-      <outputFileNameMapping>${artifact.artifactId}.jar</outputFileNameMapping>
+    </dependencySet>
+    
+    <dependencySet>
+      <includes>
+        <include>org.apache.derby:derby</include>
+      </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <outputDirectory>apache-activemq-5.0.0/lib/optional</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
     <dependencySet>
