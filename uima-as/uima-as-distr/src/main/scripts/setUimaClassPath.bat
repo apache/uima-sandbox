@@ -48,6 +48,9 @@ REM   under the License.
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-core.jar;%UIMA_HOME%\lib\uima-as-activemq.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-jms.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\config;%_REALLYNOQUOTES%
+
+@set ACTIVEMQ_HOME=%UIMA_HOME%\apache-activemq-5.0
+
 @rem set path to support running C++ annotators
 set PATH=%UIMA_HOME%\uimacpp\bin;%UIMA_HOME%\uimacpp\examples\tutorial\src;%PATH%
 @rem Also set VNS_HOST and VNS_PORT to default values if they are not specified

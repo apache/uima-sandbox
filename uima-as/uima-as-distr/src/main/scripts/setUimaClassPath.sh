@@ -43,6 +43,9 @@ UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/commons-pool.jar:$UIMA_HOME/lib/sp
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/uimaj-as-core.jar:$UIMA_HOME/lib/uimaj-as-activemq.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/uimaj-as-jms.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/config:$CLASSPATH
+
+ACTIVEMQ_HOME=$UIMA_HOME/apache-activemq-5.0
+
 #set LD_LIBRARY_PATH to support running C++ annotators
 LD_LIBRARY_PATH=$UIMA_HOME/uimacpp/lib:$UIMA_HOME/uimacpp/examples/tutorial/src:$LD_LIBRARY_PATH
 #also set DYLD_LIBRARY_PATH, used by Mac OSX

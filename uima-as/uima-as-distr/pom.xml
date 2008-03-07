@@ -167,29 +167,41 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring</artifactId>
       <version>2.5.1</version>
-    </dependency> 
+    </dependency>
+     
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>apache-activemq</artifactId>
+      <artifactId>activemq-console</artifactId>
       <version>5.0.0</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.activemq</groupId>
-          <artifactId>activemq-console</artifactId>
+          <artifactId>activeio-core</artifactId>
         </exclusion>
+        <!-- this next exclusion is because
+             the org.apache.xbean:xbean-spring 
+             artifact is only available at the time
+             this was done, as a -SNAPSHOT
+          Instead of getting it from here, we'll 
+          copy a fixed version of this into
+          our SVN and add it from there
+          -->
         <exclusion>
-          <groupId>org.apache.activemq</groupId>
-          <artifactId>activemq-core</artifactId>
+          <groupId>org.apache.xbean</groupId>
+          <artifactId>xbean-spring</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.apache.activemq</groupId>
-          <artifactId>activemq-web</artifactId>
-        </exclusion>
+      </exclusions>      
+    </dependency> 
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-core</artifactId>
+      <version>5.0.0</version>
+      <exclusions>
         <exclusion>
           <groupId>org.apache.activemq</groupId>
           <artifactId>activeio-core</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions>      
     </dependency> 
     <dependency>
       <groupId>org.apache.activemq</groupId>
@@ -205,6 +217,11 @@
           <artifactId>activeio-core</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jms_1.1_spec</artifactId>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -249,6 +266,7 @@
     </dependency>
 	</dependencies>
 	<build>
+    <finalName>${artifactId}-empty-jar</finalName>
 		<pluginManagement>
 			<plugins>
 				<!-- For some reason v2.1 doesn't seem to work with the "sourcepath"

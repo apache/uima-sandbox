@@ -130,19 +130,21 @@ under the License.
     <dependencySet>
       <includes>
         <include>commons-httpclient:commons-httpclient</include>
-        <include>org.mortbay.jetty:jetty</include>
-        <include>org.mortbay.jetty:jetty-util</include>
+        <include>org.mortbay.jetty:jetty</include> 
+        <include>org.mortbay.jetty:jetty-util</include> 
         <include>org.mortbay.jetty:servlet-api-2.5</include>
-        <include>xmlpull:xmlpull</include>
-        <include>xstream:xstream</include>
-        <include>org.springframework:spring</include>
+        <!--include>xmlpull:xmlpull</include--> <!-- in activemq-optional -->
+        <!--include>xstream:xstream</include--> <!-- in activemq-optional -->
+        <include>org.springframework:spring</include>  
         <include>commons-pool:commons-pool</include>
         <include>commons-logging:commons-logging</include>
-        <include>org.apache.activemq:apache-activemq</include>
-        <include>org.apache.activemq:activemq-optional</include>
+        <include>org.apache.activemq:activemq-console</include>
+        <include>org.apache.activemq:activemq-core</include>
+        <include>org.apache.activemq:activemq-optional</include>       
+        <include>org.apache.geronimo.specs:geronimo-jms_1.1_spec</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>apache-activemq-5.0.0/lib</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <outputFileNameMapping>${artifact.artifactId}.jar</outputFileNameMapping>
     </dependencySet>
@@ -296,7 +298,13 @@ under the License.
     <fileSet>
       <directory>src/main/examples</directory>
       <outputDirectory>examples</outputDirectory>
-    </fileSet>   
+    </fileSet> 
+    
+    <!-- activemq -->
+    <fileSet>
+      <directory>src/main/apache-activemq-5.0.0</directory>
+      <outputDirectory>apache-activemq-5.0.0</outputDirectory>
+    </fileSet>  
   </fileSets>
   
   <files>
