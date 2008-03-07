@@ -30,7 +30,7 @@
 	<fileSets>
 	<!-- copy license and notice files -->
 		<fileSet>
-			<directory>../uimaj-distr/src/main/readme/</directory>
+			<directory>../../uimaj-distr/src/main/readme/</directory>
 			<outputDirectory>/apache-uima/addons/annotator/</outputDirectory>
 			<includes>
 				<include>DISCLAIMER</include>
@@ -41,7 +41,7 @@
 	
 	<!-- Add files for the RegularExpressionAnnotator -->
 		<fileSet>
-			<directory>../RegularExpressionAnnotator/target</directory>
+			<directory>../../RegularExpressionAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/RegularExpressionAnnotator/docs/html</outputDirectory>
 			<includes>
 				<include>images/**</include>
@@ -50,21 +50,21 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../RegularExpressionAnnotator/target/RegexAnnotatorUserGuide</directory>
+			<directory>../../RegularExpressionAnnotator/target/RegexAnnotatorUserGuide</directory>
 			<outputDirectory>/apache-uima/addons/annotator/RegularExpressionAnnotator/docs/pdf</outputDirectory>
 			<includes>
 				<include>RegexAnnotatorUserGuide.pdf</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../RegularExpressionAnnotator/target</directory>
+			<directory>../../RegularExpressionAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/RegularExpressionAnnotator/lib</outputDirectory>
 			<includes>
 				<include>uima-an-regex.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../RegularExpressionAnnotator/</directory>
+			<directory>../../RegularExpressionAnnotator/</directory>
 			<outputDirectory>/apache-uima/addons/annotator/RegularExpressionAnnotator/</outputDirectory>
 			<includes>
 				<include>lib/**</include>
@@ -75,7 +75,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../RegularExpressionAnnotator/target</directory>
+			<directory>../../RegularExpressionAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/RegularExpressionAnnotator/</outputDirectory>
 			<includes>
 				<include>RegExAnnotator.pear</include>
@@ -84,7 +84,7 @@
 		
 		<!-- Add files for the DictionaryAnnotator -->
 		<fileSet>
-			<directory>../DictionaryAnnotator/target</directory>
+			<directory>../../DictionaryAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/DictionaryAnnotator/docs/html</outputDirectory>
 			<includes>
 				<include>images/**</include>
@@ -93,21 +93,21 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../DictionaryAnnotator/target/DictionaryAnnotatorUserGuide</directory>
+			<directory>../../DictionaryAnnotator/target/DictionaryAnnotatorUserGuide</directory>
 			<outputDirectory>/apache-uima/addons/annotator/DictionaryAnnotator/docs/pdf</outputDirectory>
 			<includes>
 				<include>DictionaryAnnotatorUserGuide.pdf</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../DictionaryAnnotator/target</directory>
+			<directory>../../DictionaryAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/DictionaryAnnotator/lib</outputDirectory>
 			<includes>
 				<include>uima-an-dictionary.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../DictionaryAnnotator</directory>
+			<directory>../../DictionaryAnnotator</directory>
 			<outputDirectory>/apache-uima/addons/annotator/DictionaryAnnotator/</outputDirectory>
 			<includes>
 				<include>lib/**</include>
@@ -118,7 +118,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../DictionaryAnnotator/target</directory>
+			<directory>../../DictionaryAnnotator/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/DictionaryAnnotator/</outputDirectory>
 			<includes>
 				<include>DictionaryAnnotator.pear</include>
@@ -127,7 +127,7 @@
 		
 		<!-- Add files for the WhitespaceTokenizer -->
 		<fileSet>
-			<directory>../WhitespaceTokenizer/</directory>
+			<directory>../../WhitespaceTokenizer/</directory>
 			<outputDirectory>/apache-uima/addons/annotator/WhitespaceTokenizer/</outputDirectory>
 			<includes>
 				<include>desc/**</include>
@@ -136,14 +136,14 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../WhitespaceTokenizer/target</directory>
+			<directory>../../WhitespaceTokenizer/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/WhitespaceTokenizer/lib</outputDirectory>
 			<includes>
 				<include>uima-an-wst.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../WhitespaceTokenizer/target</directory>
+			<directory>../../WhitespaceTokenizer/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/WhitespaceTokenizer/</outputDirectory>
 			<includes>
 				<include>WhitespaceTokenizer.pear</include>
@@ -152,7 +152,7 @@
 
 		<!-- Add files for the Tagger annotator -->
 		<fileSet>
-			<directory>../Tagger/target</directory>
+			<directory>../../Tagger/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/Tagger/docs/html</outputDirectory>
 			<includes>
 				<include>images/**</include>
@@ -161,21 +161,21 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../Tagger/target/hmmTaggerUsersGuide</directory>
+			<directory>../../Tagger/target/hmmTaggerUsersGuide</directory>
 			<outputDirectory>/apache-uima/addons/annotator/Tagger/docs/pdf</outputDirectory>
 			<includes>
 				<include>hmmTaggerUsersGuide.pdf</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../Tagger/target</directory>
+			<directory>../../Tagger/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/Tagger/lib</outputDirectory>
 			<includes>
 				<include>uima-an-tagger.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../Tagger</directory>
+			<directory>../../Tagger</directory>
 			<outputDirectory>/apache-uima/addons/annotator/Tagger/</outputDirectory>
 			<includes>
 				<include>desc/**</include>
@@ -185,7 +185,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../Tagger/target</directory>
+			<directory>../../Tagger/target</directory>
 			<outputDirectory>/apache-uima/addons/annotator/Tagger/</outputDirectory>
 			<includes>
 				<include>HmmPosTagger.pear</include>

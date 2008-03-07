@@ -30,7 +30,7 @@
 	<fileSets>
 	<!-- Add files for the SandboxDistr -->
 		<fileSet>
-      		<directory>../SandboxDistr</directory>
+      		<directory>../../SandboxDistr</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/SandboxDistr</outputDirectory>
       		<includes>
         		<include>annotator_package_bin.xml</include>
@@ -41,7 +41,7 @@
 
 	<!-- Add files for the SandboxDocs -->
 		<fileSet>
-      		<directory>../SandboxDocs</directory>
+      		<directory>../../SandboxDocs</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/SandboxDocs</outputDirectory>
       		<includes>
         		<include>src/**</include>
@@ -51,7 +51,7 @@
 
 	<!-- Add files for the uima-docbook-tool -->
 		<fileSet>
-      		<directory>../uima-docbook-tool</directory>
+      		<directory>../../uima-docbook-tool</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/uima-docbook-tool</outputDirectory>
       		<includes>
         		<include>build/**</include>
@@ -66,7 +66,7 @@
 	
 	<!-- Add files for the PearPackagingMavenPlugin -->
 		<fileSet>
-      		<directory>../PearPackagingMavenPlugin</directory>
+      		<directory>../../PearPackagingMavenPlugin</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/PearPackagingMavenPlugin</outputDirectory>
       		<includes>
         		<include>src/**</include>
@@ -80,7 +80,7 @@
 
 	<!-- Add files for the PearPackagingAntTask -->
 		<fileSet>
-      		<directory>../PearPackagingAntTask</directory>
+      		<directory>../../PearPackagingAntTask</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/PearPackagingAntTask</outputDirectory>
       		<includes>
         		<include>src/**</include>
@@ -94,7 +94,7 @@
 	
 	<!-- copy license and notice files -->
 		<fileSet>
-			<directory>../uimaj-distr/src/main/readme/</directory>
+			<directory>../../uimaj-distr/src/main/readme/</directory>
 			<outputDirectory>/apache-uima/addons/annotator_src/</outputDirectory>
 			<includes>
 				<include>DISCLAIMER</include>
@@ -105,7 +105,7 @@
 	
 	<!-- Add files for the RegularExpressionAnnotator -->
 		<fileSet>
-      		<directory>../RegularExpressionAnnotator</directory>
+      		<directory>../../RegularExpressionAnnotator</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/RegularExpressionAnnotator</outputDirectory>
       		<includes>
         		<include>src/**</include>
@@ -122,7 +122,7 @@
 
 	<!-- Add files for the DictionaryAnnotator -->
 		<fileSet>
-      		<directory>../DictionaryAnnotator</directory>
+      		<directory>../../DictionaryAnnotator</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/DictionaryAnnotator</outputDirectory>
       		<includes>
         		<include>src/**</include>
@@ -139,7 +139,7 @@
 
 	<!-- Add files for the WhitespaceTokenizer -->
 		<fileSet>
-      		<directory>../WhitespaceTokenizer</directory>
+      		<directory>../../WhitespaceTokenizer</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/WhitespaceTokenizer</outputDirectory>
       		<includes>
         		<include>src/**</include>
@@ -152,7 +152,7 @@
 
 	<!-- Add files for the Tagger -->
 		<fileSet>
-      		<directory>../Tagger</directory>
+      		<directory>../../Tagger</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/Tagger</outputDirectory>
       		<includes>
         		<include>src/**</include>
