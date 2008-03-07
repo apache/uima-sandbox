@@ -28,8 +28,8 @@ REM   under the License.
 
 @echo on
 
-REM  ActiveMQ needs a writable directory for the log files and derbydb
-REM  WARNING - it appears that ACTIVEMQ_BASE cannot contain backslashes!
+@REM  ActiveMQ needs a writable directory for the log files and derbydb
+@REM  WARNING - it appears that ACTIVEMQ_BASE cannot contain backslashes!
 @setlocal
 @if "%ACTIVEMQ_BASE%" == "" (
   set ACTIVEMQ_BASE=amq
@@ -47,5 +47,5 @@ REM  WARNING - it appears that ACTIVEMQ_BASE cannot contain backslashes!
   copy "%UIMA_HOME%"\config\activemq-nojournal.xml %ACTIVEMQ_BASE%\conf
 )
 
-@call "%UIMA_HOME%"\bin\activemq.bat xbean:file:%ACTIVEMQ_BASE%/conf/activemq-nojournal.xml
+call "%UIMA_HOME%\bin\activemq.bat" xbean:file:%ACTIVEMQ_BASE%/conf/activemq-nojournal.xml
 :EXIT

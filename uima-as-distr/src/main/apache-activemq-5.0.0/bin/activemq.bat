@@ -22,7 +22,7 @@ if exist "%HOME%\activemqrc_pre.bat" call "%HOME%\activemqrc_pre.bat"
 if "%OS%"=="Windows_NT" @setlocal
 
 rem %~dp0 is expanded pathname of the current script under NT
-set DEFAULT_ACTIVEMQ_HOME=%~dp0..\apache-activemq-5.0.0
+set DEFAULT_ACTIVEMQ_HOME=%~dp0..
 
 if "%ACTIVEMQ_HOME%"=="" set ACTIVEMQ_HOME=%DEFAULT_ACTIVEMQ_HOME%
 set DEFAULT_ACTIVEMQ_HOME=
