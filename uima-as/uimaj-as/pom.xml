@@ -94,6 +94,9 @@
     <repository>
       <id>uima</id>
       <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
     </repository>
   </repositories>
 </project>
