@@ -204,11 +204,6 @@ under the License.
       <directory>../uimaj-distr/src/main/properties</directory>
       <outputDirectory>config</outputDirectory>
     </fileSet>
-    <!-- there is one readme-file -->
-    <!--fileSet>
-      <directory>../uimaj-distr/src/main/readme</directory>
-      <outputDirectory>/apache-uima</outputDirectory>
-    </fileSet-->
     
     <!-- uima-as -->
     <fileSet>
@@ -222,10 +217,6 @@ under the License.
     </fileSet>
     <fileSet>
       <directory>src/main/readme</directory>
-      <excludes>
-        <!-- top level README being replaced by one from readme_src -->
-        <exclude>README</exclude>
-      </excludes>
       <!-- to get things into the base dir, use this form
            If you use <outputDirectory>.</outputDirectory> - 
            it also puts into the base dir, but creates an
