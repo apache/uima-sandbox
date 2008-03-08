@@ -6,10 +6,12 @@
 *****************************************************************************
 
 0. 
-    Changes in the 0.7.0 release
+    Changes in the 2.2.2 release
   - Development has been moved to Apache, in the Apache UIMA incubator project
   - Package names are changed to org.apache.uima...
   - Name has been changed to Apache UIMA Asynchronous Scaleout (Apache UIMA-AS)
+  - Versioning aligned with Apache UIMA
+  - Build process changed to use Maven
     
     Changes in the 0.6.5 release
   - Added Component Descriptor Editor (CDE) support for UIMA deployment descriptors
@@ -73,7 +75,7 @@ in the file LICENSE.
 UIMA-AS components include:
 
   bin/startBroker.sh/bat: starts the ActiveMQ broker, which must be running before
-      UIMA EE services can be deployed.
+      UIMA AS services can be deployed.
   bin/deployAsyncService.sh/bat: deploys an AnalysisEngine as a UIMA-AS
       service.  Takes one or more UIMA-AS Deployment Descriptors as arguments.
   bin/runRemoteAsyncAE.sh/bat: Calls a UIMA-AS service. Takes arguments specifying the
@@ -83,7 +85,7 @@ UIMA-AS components include:
   docs/pdf/uima_async_scaleout.pdf: UIMA-AS documentation, including the specification
       for the deployment descriptor file syntax.
 
-  examples/deploy/ee/...  (Sample Deployment Descriptors)
+  examples/deploy/as/...  (Sample Deployment Descriptors)
     Deploy_RoomNumberAnnotator.xml: Deploys Room Number Annotator Primitive AE
     Deploy_MeetingDetectorTAE.xml: Deploys Meeting Detector Aggregate AE with all
         delegates in the same JVM.
@@ -97,35 +99,31 @@ UIMA-AS components include:
         Meeting Detector as a Synchronous Aggregate (meaning the delegate AEs do not each
         get their own input queue).
 
-  descriptors/ee/...  (Other Sample Descriptors for use with UIMA EE)
-    MeetingDetectorAsyncAE.xml:  Specifier that can be used to call a UIMA EE
+  descriptors/as/...  (Other Sample Descriptors for use with UIMA AS)
+    MeetingDetectorAsyncAE.xml:  Specifier that can be used to call a UIMA AS
         Service from an existing UIMA application (see Section 2.5 below).
 
-  src/org/apache/uima/examples/ee/RunRemoteAsyncAE.java:  Sample client code showing how
+  src/org/apache/uima/examples/as/RunRemoteAsyncAE.java:  Sample client code showing how
        to call an Asynchronous UIMA Service.
 
 2. Installation and Setup
 
 2.1 Supported Platforms
 
-UIMA EE Requires Java 5 or later.  It has been tested with Sun Java 5 on Windows XP and Linux.
+UIMA AS Requires Java 5 or later.  It has been tested with Sun Java 5 on Windows XP and Linux.
 Other platforms and Java (5+) implementations should work, but have not been significantly tested.
 
 2.2. Environment Variables
-After you have unpacked the UIMA EE UIMA distribution, you must perform the following
+After you have unpacked the UIMA AS UIMA distribution, you must perform the following
 environment variable settings (the same as for normal Apache UIMA setup):
 
     * Set JAVA_HOME to the directory of your JRE installation you would like to use for UIMA.
-    * Set UIMA_HOME to the uima-ee directory of your unpacked Apache UIMA distribution
+    * Set UIMA_HOME to the apache-uima-as directory of your unpacked Apache UIMA distribution
     * Append UIMA_HOME/bin to your PATH
 
 2.3 Running the Setup Script
-Also, you must run the script UIMA_HOME/bin/setupUimaEE.bat (or .sh).  This does two things:
-    1) It downloads several open-source packages required by UIMA EE.  During this process
-       you will be informed about the license for each package and asked to confirm that
-       you want to proceed to download the software.
-    2) It runs the standard UIMA adjustExamplePaths script to update
-        paths in the examples based on the actual UIMA_HOME directory path.
+   You must run the script UIMA_HOME/bin/adjustExamplePaths.bat (or .sh).  This updates
+   paths in the examples based on the actual UIMA_HOME directory path.
 
     Note: The Mac OS X operating system has special procedures for setting up global environment
     variables; see http://developer.apple.com/qa/qa2001/qa1067.html for how to do this.
@@ -134,17 +132,18 @@ Also, you must run the script UIMA_HOME/bin/setupUimaEE.bat (or .sh).  This does
 Eclipse users should install the UIMA Eclipse Plugins and UIMA Examples Project using the "manual"
 install procedure described in Chapter 3 of the Apache UIMA Overview and Setup guide 
 (docs/pdf/overview_and_setup.pdf). The manual procedure is required to pick up capability to
-work with UIMA EE deployment descriptors.
+work with UIMA AS deployment descriptors.
 
-However, since UIMA EE requires Java 5, you must be sure to set up your uimaj-examples Eclipse
-project to use a version 5 JRE, and you must set your compiler compliance level to 5.0.  To do
-this go to Window->Preferences and navigate to the Java->Compiler page.
+However, since UIMA AS requires Java 5, you must be sure to set up your uimaj-examples Eclipse
+project to use a version 5 (or later) JRE, and you must set your compiler compliance level to 5.0.  To do
+this go to Window->Preferences and navigate to the Java->Compiler page.  Remember to 
+run the base Eclipse using Java 5 (or later), as well.
 
 
 3. Getting Started
 
 3.1 Starting the ActiveMQ Broker
-UIMA EE services require an ActiveMQ broker to be available with which to create/register 
+UIMA AS services require an ActiveMQ broker to be available with which to create/register 
 the service request queue. If no broker is available, start a new broker on the same machine 
 the services will run on or another machine; this is done by first setting an env parameter
 ACTIVEMQ_BASE pointing at a writable directory, or simply by cd'ing to a writable directory,
@@ -169,10 +168,10 @@ To connect to brokers running behind a firewall, see section 3.6 below for instr
 on using HTTP tunneling.
 
 
-3.2 Deploying an Analysis Engine as a UIMA EE Asynchronous Service
+3.2 Deploying an Analysis Engine as a UIMA AS Asynchronous Service
 
 a. Create a Deployment Descriptor.
-  Examples can be found in the examples/deploy/ee directory,
+  Examples can be found in the examples/deploy/as directory,
   and the syntax is documented in docs/pdf/uima_async_scaleout.pdf.
   One of the things that the deployment descriptor contains is the URL of the broker,
   which must match the URL of the broker you started in step 3.1 (note that if running
@@ -185,16 +184,16 @@ b. Run the command:
 
   The argument to the command is the deployment descriptor you created in step (a).
 
-  Note: If you use import by name in your deployment descriptor, UIMA EE searches the CLASSPATH
+  Note: If you use import by name in your deployment descriptor, UIMA AS searches the CLASSPATH
   as well as directories on UIMA_DATAPATH to resolve the import.
 
   Note: This command will generate an intermediate file in the working directory,
   with a filename derived from your deployment descriptor name (e.g., testDD_spring.xml).
-  This file is used internally by UIMA EE and is automatically regenerated each time
+  This file is used internally by UIMA AS and is automatically regenerated each time
   you run.
 
 
-3.3 Calling a UIMA EE Asynchronous Service
+3.3 Calling a UIMA AS Asynchronous Service
 To test a remote UIMA service you can use the script:
   runRemoteAsyncAE.sh/cmd brokerUrl endpoint [-c CollectionReaderDescriptorFile] \
     [-d DeploymentDescriptorFile]+ [-w ReplyWindow] [-o OutputDir] [-t Timeout] [-i]
@@ -229,7 +228,7 @@ To test a remote UIMA service you can use the script:
 
 The source code for this client is provided in
 
-  examples/src/org/apache/uima/examples/ee/RunRemoteAsyncAE.java
+  examples/src/org/apache/uima/examples/as/RunRemoteAsyncAE.java
 
 and you can also run this class from the uimaj-examples Eclipse project.
 
@@ -244,26 +243,26 @@ Start two terminal windows, each with an environments setup as described in sect
 
   * In the second terminal window, launch a service from the deployment descriptor
     Deploy_MeetingDetectorTAE.xml and run the test driver:
-      cd $UIMA_HOME/examples/deploy/ee
+      cd $UIMA_HOME/examples/deploy/as
       runRemoteAsyncAE.sh/cmd tcp://localhost:61616 MeetingDetectorTaeQueue \
          -d Deploy_MeetingDetectorTAE.xml \
          -c $UIMA_HOME/examples/descriptors/collection_reader/FileSystemCollectionReader.xml
 
     If you get an UnsupportedClassVersionError, Java 5 is probably not being used.
-    If the driver fails to find the input data, setupUimaEE was probably not run.
+    If the driver fails to find the input data, adjustExamplePaths was probably not run.
 
 
-3.5 Calling a UIMA EE Asynchronous Service from an Existing UIMA Application
+3.5 Calling a UIMA AS Asynchronous Service from an Existing UIMA Application
 
-You can also call a UIMA EE Service from the DocumentAnalyzer or any other UIMA
+You can also call a UIMA AS Service from the DocumentAnalyzer or any other UIMA
 application using a new JMS client. However, note that this is a synchronous interface,
 that is, it will process only one CAS at a time, so it will not take advantage of the
-scalability that UIMA EE provides.  To process more than one CAS at a
-time, you must use the Asynchronous UIMA EE Client as described in section 3.3.
+scalability that UIMA AS provides.  To process more than one CAS at a
+time, you must use the Asynchronous UIMA AS Client as described in section 3.3.
 
 An example JMS client service descriptor is provided in
 
-  examples/descriptors/ee/MeetingDetectorAsyncAE.xml
+  examples/descriptors/as/MeetingDetectorAsyncAE.xml
 
 The JMS service makes use of the customResourceSpecifier capability in Apache UIMA.
 For more information on the customResourceSpecifier see the "Custom Resource Specifiers"
@@ -291,7 +290,7 @@ These "remote" reply queues are now JMS temporary queues, which means that they 
 deleted when the requestor aggregate or client API terminates.
 
 A more complicated approach is for the client to use an HTTP connector. In this case
-UIMA EE always creates reply queues on the service's broker.
+UIMA AS always creates reply queues on the service's broker.
 
 Note: There are bugs in the ActiveMQ HTTP connector. A fix is available if you want to
       build ActiveMQ manually. See http://issues.apache.org/activemq/browse/AMQ-1308
