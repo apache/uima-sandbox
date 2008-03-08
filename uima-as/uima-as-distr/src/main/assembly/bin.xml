@@ -133,8 +133,8 @@ under the License.
         <include>org.mortbay.jetty:jetty</include> 
         <include>org.mortbay.jetty:jetty-util</include> 
         <include>org.mortbay.jetty:servlet-api-2.5</include>
-        <!--include>xmlpull:xmlpull</include--> <!-- in activemq-optional -->
-        <!--include>xstream:xstream</include--> <!-- in activemq-optional -->
+        <include>xmlpull:xmlpull</include> <!-- need for uima-as -->
+        <include>xstream:xstream</include> <!-- need for uima-as -->
         <include>org.springframework:spring</include>  
         <include>commons-pool:commons-pool</include>
         <include>commons-logging:commons-logging</include>
