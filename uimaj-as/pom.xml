@@ -29,21 +29,18 @@
     <artifactId>uimaj</artifactId>
     
     <!-- the version of base UIMA this version goes with -->
-    <version>2.2.1-incubating</version>
+    <version>2.2.2-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
     
   </parent>
   <properties>
       <!-- next entry needed until we get past 2.2.1 -->
       <!-- because properties weren't used before -->
-      <uimaj-version>2.2.2</uimaj-version>
-      <uimaj-release-version>${uimaj-version}-incubating-SNAPSHOT</uimaj-release-version>
-      <uimaj-release-eclipse-version>${uimaj-version}.incubating-SNAPSHOT</uimaj-release-eclipse-version>
-      <uimaj-base-version>${uimaj-version}</uimaj-base-version>
-      <uimaj-as-version>0.7.0</uimaj-as-version>
-      <uimaj-as-release-version>${uimaj-as-version}-incubating-SNAPSHOT</uimaj-as-release-version>
-      <uimaj-as-release-eclipse-version>${uimaj-as-version}.incubating-SNAPSHOT</uimaj-as-release-eclipse-version>
+      <uimaj-release-version>2.2.2-incubating-SNAPSHOT</uimaj-release-version>
+      <uimaj-release-eclipse-version>2.2.2.incubating-SNAPSHOT</uimaj-release-eclipse-version>
+      <uimaj-as-release-version>2.2.2-incubating-SNAPSHOT</uimaj-as-release-version>
+      <uimaj-as-release-eclipse-version>2.2.2.incubating-SNAPSHOT</uimaj-as-release-eclipse-version>
   </properties>
-  <version>0.7.0-incubating-SNAPSHOT</version>
+  <version>2.2.2-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
 
   <name>Apache UIMA Asynch Scaleout framework</name>
   <url>http://incubator.apache.org/uima</url>
@@ -87,8 +84,7 @@
     <module>../uimaj-as-jms</module>
     <!-- activemq depends on jms -->
     <module>../uimaj-as-activemq</module>
-    <module>../uimaj-ep-deployeditor</module>
-    <module>../uimaj-ep-runtime-deployeditor</module>
+    <module>eclipse-plugin-superPom</module>
   </modules>
   <repositories>
     <repository>
