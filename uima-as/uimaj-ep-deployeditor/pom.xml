@@ -29,8 +29,8 @@
   <url>http://incubator.apache.org/uima</url>
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>uimaj-as</artifactId>
-    <version>0.7.0-incubating-SNAPSHOT</version>
+    <artifactId>uimaj-as-eclipse-plugins</artifactId>
+    <version>2.2.2-incubating-SNAPSHOT</version>
   </parent>
 
   <dependencies>
