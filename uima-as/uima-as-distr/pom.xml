@@ -47,7 +47,7 @@
 	<parent>
 		<groupId>org.apache.uima</groupId>
 		<artifactId>uimaj-as</artifactId>
-		<version>0.7.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+		<version>2.2.2-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
 	</parent>
   
   <!-- dependencies used during assembly -->
@@ -166,7 +166,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring</artifactId>
-      <version>2.5.1</version>
+      <version>2.0.6</version>
     </dependency>
      
     <dependency>
