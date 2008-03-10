@@ -400,23 +400,24 @@
               <tasks>
                 <!-- Build documentation -->
                 <ant dir="../uima-as-docbooks" inheritAll="false"/>
-                <!-- build eclipse update site -->
+                <!-- build eclipse update site 
+                     Deleted from here, moved to a "deploy" step -->
                   
-                <ant dir="../uimaj-eclipse-update-site">
+                <!--ant dir="../uimaj-eclipse-update-site"-->
                   <!-- property values from maven must be passed in 
                        using what looks like a redundant <property> statement.
                        See http://cwiki.apache.org/UIMA/maven-tips.html 
                          section on passing parameters to ant scripts -->
-                  <property name="uima-maven-build-eclipse-home" value="${uima-maven-build-eclipse-home}"/>                 
+                  <!--property name="uima-maven-build-eclipse-home" value="${uima-maven-build-eclipse-home}"/>                 
                   <property name="project.version" value="${uimaj-release-eclipse-version}"/>
-                </ant>            
+                </ant-->            
               </tasks>
             </configuration>
             <goals>
               <goal>run</goal>
             </goals>
           </execution>
-          <execution>
+          <!--execution>
             <id>checksum</id>
             <phase>package</phase>
             <configuration>
@@ -424,8 +425,7 @@
                 <checksum algorithm="sha1">
                   <fileset dir="target" includes="*.gz *.bz2 *.zip" />
                   <fileset dir="../uimaj-eclipse-update-site/target/eclipse-update-site/features"
-                           includes="*.jar"/> <!-- the features are tiny, and not packed, so 
-                                                   no need for *.pack.gz -->
+                           includes="*.jar"/> 
                   <fileset dir="../uimaj-eclipse-update-site/target/eclipse-update-site/plugins"
                            includes="*.jar *.pack.gz"/>
                 </checksum>
@@ -441,7 +441,7 @@
             <goals>
               <goal>run</goal>
             </goals>
-          </execution>
+          </execution-->
         </executions>
       </plugin>
 		</plugins>
