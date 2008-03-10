@@ -29,5 +29,5 @@ goto EXIT
 @call "%UIMA_HOME%\bin\setUimaClassPath"
 
 @if "%JAVA_HOME%"=="" (set UIMA_JAVA_CALL=java) else (set UIMA_JAVA_CALL=%JAVA_HOME%\bin\java)
-@"%UIMA_JAVA_CALL%" -cp "%UIMA_CLASSPATH%;%UIMA_HOME%\lib\saxon8.jar" "-Duima.datapath=%UIMA_DATAPATH%" -Xmx256M net.sf.saxon.Transform -l -s %1 -o %2 "%UIMA_HOME%\bin\dd2spring.xsl" %3 %4 %5 %6 %7 %8 %9
+@"%UIMA_JAVA_CALL%" -cp "%UIMA_CLASSPATH%;%UIMA_HOME%\saxon\saxon8.jar" "-Duima.datapath=%UIMA_DATAPATH%" -Xmx256M net.sf.saxon.Transform -l -s %1 -o %2 "%UIMA_HOME%\bin\dd2spring.xsl" %3 %4 %5 %6 %7 %8 %9
 :EXIT

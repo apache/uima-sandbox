@@ -36,7 +36,7 @@ goto end
 @rem call dd2spring %1 %spring_file%
 
 @if "%JAVA_HOME%"=="" (set UIMA_JAVA_CALL=java) else (set UIMA_JAVA_CALL=%JAVA_HOME%\bin\java)
-@"%UIMA_JAVA_CALL%" -cp "%UIMA_CLASSPATH%" "-Duima.datapath=%UIMA_DATAPATH%" "-Djava.util.logging.config.file=%UIMA_LOGGER_CONFIG_FILE%" %UIMA_JVM_OPTS%  org.apache.uima.adapter.jms.service.UIMA_Service -saxonURL "file:%UIMA_HOME%\lib\saxon8.jar" -xslt "%UIMA_HOME%\bin\dd2spring.xsl" -dd %*
+@"%UIMA_JAVA_CALL%" -cp "%UIMA_CLASSPATH%" "-Duima.datapath=%UIMA_DATAPATH%" "-Djava.util.logging.config.file=%UIMA_LOGGER_CONFIG_FILE%" %UIMA_JVM_OPTS%  org.apache.uima.adapter.jms.service.UIMA_Service -saxonURL "file:%UIMA_HOME%\saxon\saxon8.jar" -xslt "%UIMA_HOME%\bin\dd2spring.xsl" -dd %*
 @goto end
 :usage
  @echo Deployment descriptor %1 not found

@@ -36,11 +36,12 @@
     <mkdir dir="${tmp.dir}"/>
     
     <property name="lib.dir" location="${tmp.start}/uima_ee_test/lib"/>
+    <property name="saxon.dir" location="${tmp.start}/uima_ee_test/saxon"/>
     <property name="activemq.dir" location="${tmp.start}/uima_ee_test/activemq"/>
   </target>
 
   <target name="check">
-    <available file="${lib.dir}/saxon8.jar"                               property="saxon.available"/>
+    <available file="${saxon.dir}/saxon8.jar"                               property="saxon.available"/>
     <available file="${lib.dir}/spring.jar"                               property="spring.available"/>
     <available file="${activemq.dir}/apache-activemq-4.1.1/lib/activemq-core-4.1.1.jar" property="activemq.available"/>
     <condition property="already.alerted">
@@ -88,7 +89,7 @@ You may obtain a copy of the License at http://www.mozilla.org/MPL/&#xA;&#xA;Ok 
     <get src="http://downloads.sourceforge.net/saxon/saxonb8-9-0-3j.zip"
              dest="${tmp.dir}/saxon.zip"/>
     <unzip src="${tmp.dir}/saxon.zip" dest="${tmp.dir}/saxon"/>
-    <copy file="${tmp.dir}/saxon/saxon8.jar" tofile="${lib.dir}/saxon8.jar"/>
+    <copy file="${tmp.dir}/saxon/saxon8.jar" tofile="${saxon.dir}/saxon8.jar"/>
   </target>
 
   <!-- ======================================================================== -->
