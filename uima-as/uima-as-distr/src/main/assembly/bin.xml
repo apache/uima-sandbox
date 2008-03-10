@@ -309,7 +309,7 @@ under the License.
     <!-- saxon -->    
     <fileSet>
       <directory>src/main/saxon</directory>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>saxon</outputDirectory>
     </fileSet>
   </fileSets>
   
