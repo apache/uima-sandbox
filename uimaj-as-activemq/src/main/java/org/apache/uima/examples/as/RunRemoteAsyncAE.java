@@ -59,7 +59,6 @@ import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.collection.EntityProcessStatus;
-import org.apache.uima.collection.StatusCallbackListener;
 import org.apache.uima.util.XMLInputSource;
 
 /**
@@ -131,7 +130,7 @@ public class RunRemoteAsyncAE {
     
     Map<String,Object> appCtx = new HashMap<String,Object>();
     appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, System.getenv("UIMA_HOME") + "/bin/dd2spring.xsl");
-    appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + "/lib/saxon8.jar");
+    appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + "/saxon/saxon8.jar");
   
     // parse command line
     for (int i = 0; i < args.length; i++) {
