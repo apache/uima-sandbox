@@ -35,7 +35,7 @@ REM   under the License.
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%CATALINA_HOME%\webapps\axis\WEB-INF\lib\mail.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%CATALINA_HOME%\webapps\axis\WEB-INF\lib\saaj.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\jVinci.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\activemq_core-5.0.0.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\activemq-core-5.0.0.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\activemq-optional-5.0.0.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\commons-httpclient-3.1.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\xstream-1.1.2.jar
@@ -47,6 +47,7 @@ REM   under the License.
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\commons-pool-20030825.18394.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\spring-2.5.1.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\geronimo-jms_1.1_spec-1.0.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\geronimo-j2ee-management_1.0_spec-1.0.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-core.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-activemq.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-jms.jar
