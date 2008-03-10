@@ -158,17 +158,17 @@ under the License.
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
-    <dependencySet>
+    <!--dependencySet>
       <includes>
         <include>net.sf.saxon:saxon</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>lib</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
+      <useProjectArtifact>false</useProjectArtifact-->
       <!-- we name this version of the saxon jar to indicate it 
            supports xslt 2.0 -->
-      <outputFileNameMapping>saxon_xslt_2.0.jar</outputFileNameMapping>
-    </dependencySet>
+      <!--outputFileNameMapping>saxon_xslt_2.0.jar</outputFileNameMapping>
+    </dependencySet-->
    
     <!-- Copy each eclipse plugin into the /eclipsePlugins dir of the distribution -->
     <dependencySet>
@@ -305,6 +305,12 @@ under the License.
       <directory>src/main/apache-activemq-5.0.0</directory>
       <outputDirectory>apache-activemq-5.0.0</outputDirectory>
     </fileSet>  
+    
+    <!-- saxon -->    
+    <fileSet>
+      <directory>src/main/saxon</directory>
+      <outputDirectory>lib</outputDirectory>
+    </fileSet>
   </fileSets>
   
   <files>
