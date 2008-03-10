@@ -41,6 +41,7 @@ UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/apache-activemq-5.0.0/lib/servlet-api-
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/apache-activemq-5.0.0/lib/commons-logging-1.1.1.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/apache-activemq-5.0.0/lib/commons-pool-20030825.18394.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/apache-activemq-5.0.0/lib/spring-2.5.1.jar
+UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/apache-activemq-5.0.0/lib/geronimo-jms_1.1_spec-1.0.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/uimaj-as-core.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/uimaj-as-activemq.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/uimaj-as-jms.jar
