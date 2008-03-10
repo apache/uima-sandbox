@@ -129,8 +129,6 @@ under the License.
 
     <dependencySet>
       <includes>
-        <include>org.springframework:spring</include>  
-        <include>commons-pool:commons-pool</include>
         <include>commons-logging:commons-logging</include>
         <include>org.apache.activemq:activemq-console</include>
         <include>org.apache.activemq:activemq-core</include>
@@ -144,6 +142,8 @@ under the License.
     
     <dependencySet>
       <includes>
+        <include>commons-pool:commons-pool</include>
+        <include>org.springframework:spring</include>  
         <include>commons-httpclient:commons-httpclient</include>
         <include>org.apache.activemq:activemq-optional</include>               
         <include>org.mortbay.jetty:jetty</include> 
