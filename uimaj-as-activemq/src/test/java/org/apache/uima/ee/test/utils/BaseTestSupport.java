@@ -46,6 +46,7 @@ import org.apache.uima.util.impl.ProcessTrace_impl;
 
 public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEEStatusCallbackListener
 {
+  private static final char FS = System.getProperty("file.separator").charAt(0);
 	protected String text = "IBM today elevated five employees to the title of IBM Fellow\n -- its most prestigious technical honor.\n The company also presented more than $2.8 million in cash awards to employees whose technical innovation have yielded exceptional value to the company and its customers.\nIBM conferred the accolades and awards at its 2003 Corporate Technical Recognition Event (CTRE) in Scottsdale, Ariz. CTRE is a 40-year tradition at IBM, established to recognize exceptional technical employees and reward them for extraordinary achievements and contributions to the company's technology leadership.\n Our technical employees are among the best and brightest innovators in the world.\n They share a passion for excellence that defines their work and permeates the products and services IBM delivers to its customers, said Nick Donofrio, senior vice president, technology and manufacturing for IBM.\n CTRE provides the means for us to honor those who have distinguished themselves as exceptional leaders among their peers.\nAmong the special honorees at the 2003 CTRE are five employees who earned the coveted distinction of IBM Fellow:- David Ferrucci aka Dave, Grady Booch, chief scientist of Rational Software, IBM Software Group.\n Recognized internationally for his innovative work on software architecture, modeling, and software engineering process. \nMr. Booch is one of the original authors of the Unified Modeling Language (UML), the industry-standard language of blueprints for software-intensive systems.- Dr. Donald Chamberlin, researcher, IBM Almaden Research Center. An expert in relational database languages, Dr. Chamberlin is co- inventor of SQL, the language that energized the relational database market. He has also";
 	protected boolean unexpectedException = false;
 	private static final boolean SEND_CAS_ASYNCHRONOUSLY = true;
@@ -67,8 +68,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
 	{
 		Map<String, Object> appCtx = new HashMap();
-		appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, System.getenv("UIMA_HOME") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "dd2spring.xsl"); // C:/uima-ee-rc8/bin/dd2spring.xsl");
-		appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + System.getProperty("file.separator") + "saxon" +System.getProperty("file.separator")+"saxon8.jar");
+		appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, "../uima-as-distr/src/main/scripts/dd2spring.xsl".replace('/', FS));
+		appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:../uima-as-distr/src/main/saxon/saxon8.jar".replace('/', FS)); 
 //		appCtx.put(UimaAsynchronousEngine.UimaEeDebug, UimaAsynchronousEngine.UimaEeDebug);
 		String containerId = eeUimaEngine.deploy(aDeploymentDescriptorPath, appCtx);
 		return containerId;
@@ -95,6 +96,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
   	  	URL url = this.getClass().getClassLoader().getResource(aFilename);
   	  	return (url == null ? null : url.getPath());
 	}
+	
 	protected Map buildContext( String aTopLevelServiceBrokerURI, String aTopLevelServiceQueueName ) throws Exception
 	{
 		return buildContext(aTopLevelServiceBrokerURI, aTopLevelServiceQueueName, 0);
