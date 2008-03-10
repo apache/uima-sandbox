@@ -20,7 +20,7 @@
 <feature
       id="org.apache.uima.as.deployeditor"
       label="UIMA-AS Deployment Descriptor Editor"
-      version="2.2.2.incubating-SNAPSHOT"
+      version="2.2.2.incubating"
       provider-name="Apache Software Foundation">
 
    <description url="http://incubator.apache.org/uima">
@@ -65,14 +65,14 @@ under the License.
          id="org.apache.uima.editors.dde"
          download-size="0"
          install-size="0"
-         version="2.2.2.incubating-SNAPSHOT"
+         version="2.2.2.incubating"
          unpack="false"/>
 
    <plugin
          id="org.apache.uima.runtime.fragments.tools"
          download-size="0"
          install-size="0"
-         version="2.2.2.incubating-SNAPSHOT"
+         version="2.2.2.incubating"
          fragment="true"
          unpack="false"/>
 
