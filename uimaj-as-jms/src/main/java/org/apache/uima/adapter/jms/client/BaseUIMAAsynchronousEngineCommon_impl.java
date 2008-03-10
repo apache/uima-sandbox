@@ -144,7 +144,7 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected static final String uniqueIdentifier = String.valueOf(System.nanoTime());
 
-	protected boolean error;
+//	protected boolean error;
 
 	protected Exception exc;
 
@@ -539,6 +539,7 @@ implements UimaAsynchronousEngine, MessageListener
 			requestToCache.setEndpoint(getEndPointName());
 			requestToCache.setProcessTimeout(processTimeout);
 			requestToCache.setThreadId(Thread.currentThread().getId());
+      requestToCache.clearTimeoutException();
 
 			if (remoteService)
 			{
@@ -1170,7 +1171,7 @@ implements UimaAsynchronousEngine, MessageListener
 			synchronized (threadMonitor.getMonitor())
 			{
 				//	Block sending thread until a reply is received
-				while (!threadMonitor.wasSignaled && running && !error)
+				while (!threadMonitor.wasSignaled && running)
 				{
 					try
 					{
@@ -1183,6 +1184,10 @@ implements UimaAsynchronousEngine, MessageListener
 			}
 			try
 			{
+        // check if timeout exception
+        if (cachedRequest.isTimeoutException()) {
+          throw new ResourceProcessException(new UimaEEProcessCasTimeout());
+        }
 				//	Process reply in the sending thread
 				Message message = cachedRequest.getMessage();
 				handleProcessReply(message, false, pt);
@@ -1198,7 +1203,6 @@ implements UimaAsynchronousEngine, MessageListener
 			finally
 			{
 				threadMonitor.reset();
-				error = false;
 			}
 	}
 	public void sendAndReceiveCAS(CAS aCAS) throws ResourceProcessException
@@ -1206,7 +1210,7 @@ implements UimaAsynchronousEngine, MessageListener
 		sendAndReceiveCAS( aCAS, null );
 	}
 
-	protected void notifyOnTimout(CAS aCAS, String anEndpoint, int aTimeoutKind)
+	protected void notifyOnTimout(CAS aCAS, String anEndpoint, int aTimeoutKind, String casReferenceId)
 	{
 
 		ProcessTrace pt = new ProcessTrace_impl();
@@ -1238,33 +1242,67 @@ implements UimaAsynchronousEngine, MessageListener
 
 		case (ProcessTimeout):
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "notifyOnTimout", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_process_timeout_INFO", new Object[] { anEndpoint });
-			exc = new UimaEEProcessCasTimeout();
-			status.addEventStatus("Process", "Failed", exc);
-			notifyListeners(aCAS, status, AsynchAEMessage.Process);
+		  ClientRequest cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
 
-			if (sendAndReceiveCAS != null)
-			{
-				synchronized (sendAndReceiveCasMonitor)
-				{
-					error = true;
-					sendAndReceiveCasMonitor.notifyAll();
-				}
-				sendAndReceiveCAS = aCAS;
-			}
-			else
-			{
-				synchronized (gater)
-				{
-					if (howManyBeforeReplySeen > 0)
-					{
-						howManyBeforeReplySeen--;
-					}
-					gater.notifyAll();
-				}
-			}
-			howManyRecvd++; // increment global counter to enable CPC request to be sent when howManySent = howManyRecvd
+		  if ( cachedRequest == null )
+		  {
+		    // if missing for any reason ...
+		    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_expired_msg_INFO",
+		            new Object[] { anEndpoint, casReferenceId });
+		    return;
+		  }
+		  //  Store the total latency for this CAS. The departure time is set right before the CAS
+		  //  is sent to a service.
+      //TODO set to process timeout value in nanos
+		  cachedRequest.setTimeWaitingForReply(System.nanoTime() - cachedRequest.getCASDepartureTime());
+
+      // mark timeout exception
+      cachedRequest.setTimeoutException();
+
+      if ( cachedRequest.isSynchronousInvocation() )
+      {
+        //  Signal a thread that we received a reply, if in the map
+        if ( threadMonitorMap.containsKey(cachedRequest.getThreadId()))
+        {
+          ThreadMonitor threadMonitor = (ThreadMonitor) threadMonitorMap.get(cachedRequest.getThreadId());
+          //  Unblock the sending thread so that it can complete processing with an error
+          synchronized( threadMonitor.getMonitor() )
+          {
+            threadMonitor.setWasSignaled();
+            cachedRequest.setReceivedProcessCasReply(); // should not be needed
+            threadMonitor.getMonitor().notifyAll();
+          }
+        }
+      }
+      else {
+        // notify the application listener with the error
+        exc = new UimaEEProcessCasTimeout();
+        status.addEventStatus("Process", "Failed", exc);
+        notifyListeners(aCAS, status, AsynchAEMessage.Process);
+      }
+      cachedRequest.removeEntry(casReferenceId);
+
+//			if (sendAndReceiveCAS != null)
+//			{
+//				synchronized (sendAndReceiveCasMonitor)
+//				{
+//					error = true;
+//					sendAndReceiveCasMonitor.notifyAll();
+//				}
+//				sendAndReceiveCAS = aCAS;
+//			}
+
+      synchronized (gater) {
+        if (howManyBeforeReplySeen > 0) {
+          howManyBeforeReplySeen--;
+        }
+        //TODO what is being notified???
+        gater.notifyAll();
+      }
+      howManyRecvd++; // increment global counter to enable CPC request to be sent when howManySent = howManyRecvd
 			break;
 		}
+    
 
 	}
 
@@ -1304,6 +1342,8 @@ implements UimaAsynchronousEngine, MessageListener
 		
 		private boolean synchronousInvocation;  
 		
+    private boolean timeoutException;  
+    
 		private long casDepartureTime;
 		
 		private long timeWaitingForReply;
@@ -1358,6 +1398,18 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			synchronousInvocation = true;
 		}
+    public boolean isTimeoutException()
+    {
+      return timeoutException;
+    }
+    public void setTimeoutException()
+    {
+      timeoutException = true;
+    }
+    public void clearTimeoutException()
+    {
+      timeoutException = false;
+    }
 		public Message getMessage() 
 		{
 			return message;
@@ -1472,7 +1524,10 @@ implements UimaAsynchronousEngine, MessageListener
 							e.printStackTrace();
 						}
 					}
-					removeEntry(casReferenceId);
+				
+          //  TODO: This needs to be done elsewhere
+          //removeEntry(casReferenceId);
+          
 					int timeOutKind;
 					if (isMetaRequest())
 					{
@@ -1502,7 +1557,7 @@ implements UimaAsynchronousEngine, MessageListener
 						processTimeoutErrorCount++;
 						clientSideJmxStats.incrementProcessTimeoutErrorCount();
 					}
-					uimaEEEngine.notifyOnTimout(cas, endpoint, timeOutKind);
+					uimaEEEngine.notifyOnTimout(cas, endpoint, timeOutKind, getCasReferenceId());
 					timer.cancel();
 					if (cas != null)
 					{
