@@ -48,7 +48,8 @@
   <property name="wksp" location="../../../../"/>
   
   <target name="all" depends=
-   "uimaj-as, 
+   "uimaj-as,
+    uima-as-distr, 
     normal-modules,
     eclipse-plugins, 
     eclipse-features, 
@@ -80,6 +81,13 @@
                      value="&lt;version&gt;${uima.eclipse.version}&lt;/version&gt; &lt;!-- this comment is a flag for changeVersion - eclipse -->"/>
      
     </replace>
+  </target>
+  
+  <target name="uima-as-distr">
+    <replace file="${wksp}/uima-as-distr/pom.xml" summary="yes">
+       <replacefilter token="&lt;version&gt;${uima.as.prev.version}&lt;/version&gt; &lt;!-- this comment is a flag for changeVersion -->"
+                     value="&lt;version&gt;${uima.as.version}&lt;/version&gt; &lt;!-- this comment is a flag for changeVersion -->"/>
+    </replace>  
   </target>
   
   <target name="normal-modules">
