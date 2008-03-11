@@ -42,11 +42,7 @@
 			schema="./src/main/resources/SimpleServerConfig.xsd">
 		</xmlbean>
 
-		<!-- Delete previously generated Java source code -->
-		<delete dir="./src/main/java/org/apache/uima/simpleserver/config/xml" />
-
-		<!-- Delete previously generated .xsb files -->
-		<delete dir="./src/main/resources/schemaorg_apache_xmlbeans" />
+		<!-- Don't delete anything, else the .svn info is lost and svn barfs -->
 
 		<!-- Copy generated java source into project source tree -->
 		<copy todir="./src/main/java/org">
