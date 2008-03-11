@@ -20,8 +20,8 @@
 
 <xsd:schema elementFormDefault="qualified"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:uima="http://incubator.apache.org/uima/simpleserver/config/xml"
-	targetNamespace="http://incubator.apache.org/uima/simpleserver/config/xml">
+	xmlns:uima="http://uima.apache.org/simpleserver/config/xml"
+	targetNamespace="http://uima.apache.org/simpleserver/config/xml">
 	<!-- Top level element -->
 	<xsd:element name="uimaSimpleServerSpec">
 		<xsd:complexType>
@@ -36,6 +36,8 @@
 					maxOccurs="unbounded" minOccurs="1">
 				</xsd:element>
 			</xsd:sequence>
+			<xsd:attribute name="outputAll" type="xsd:boolean"
+				default="false" use="optional" />
 		</xsd:complexType>
 	</xsd:element>
 
@@ -75,6 +77,8 @@
 			use="required" />
 		<xsd:attribute name="outputCoveredText" type="xsd:boolean"
 			use="optional" />
+		<xsd:attribute name="outputAll" type="xsd:boolean"
+			default="false" use="optional" />
 	</xsd:complexType>
 
 	<xsd:complexType name="filterType" abstract="true">

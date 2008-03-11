@@ -124,7 +124,8 @@ public class ConfigTest {
       exc.get(0).printStackTrace();
       assertTrue(false);
     }
-    Result result = ResultExtractor.getResult(cas.getCas(), serverSpec);
+    ResultExtractor ex = new ResultExtractor();
+    Result result = ex.getResult(cas.getCas(), serverSpec);
     final int resultSize = result.getResultEntries().size();
     assertTrue("Expected number of results was " + expectedResultNumber + ", actual number is "
         + resultSize, (resultSize == expectedResultNumber));
