@@ -50,7 +50,7 @@
 
 		<!-- Copy generated java source into project source tree -->
 		<copy todir="./src/main/java/org">
-			<fileset dir="${src.gen.dir}" />
+			<fileset dir="${src.gen.dir}/org" />
 		</copy>
 
 		<!-- Copy generated .xsb files into project resource dir -->
