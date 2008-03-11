@@ -50,19 +50,21 @@
     	</fileSet>
 
 	<!-- Add files for the uima-docbook-tool -->
-		<fileSet>
-      		<directory>../../uima-docbook-tool</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/uima-docbook-tool</outputDirectory>
-      		<includes>
-        		<include>build/**</include>
-        		<include>catalog/**</include>
-        		<include>properties/**</include>
-        		<include>samples/**</include>
-        		<include>styles/**</include>
-        		<include>tools/**</include>
-        		<include>xinclude.mod</include>
-      		</includes>
-    	</fileSet>
+    <fileSet>
+      <directory>../uima-docbook-tool</directory>
+      <outputDirectory>/uima-docbook-tool</outputDirectory>
+      <includes>
+        <include>build/**</include>
+        <include>catalog/**</include>
+        <include>properties/**</include>
+        <include>styles/**</include>
+        <include>tools/common-lib/**</include>
+        <include>tools/fop-versions/**</include>
+        <include>xinclude.mod</include> 
+        <include>README</include>
+        <include>README.FIRST</include>
+      </includes>
+    </fileSet>
 	
 	<!-- Add files for the PearPackagingMavenPlugin -->
 		<fileSet>
