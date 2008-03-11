@@ -116,6 +116,15 @@
 				<include>KEYS</include>
 			</includes>
 		</fileSet>
+		<fileSet>
+			<directory>./readme/</directory>
+			<outputDirectory>/apache-uima/addons/annotator_src/</outputDirectory>
+			<includes>
+				<include>RELEASE_NOTES</include>
+				<include>RELEASE_NOTES.html</include>
+			</includes>
+		</fileSet>
+		
 		
 	
 	<!-- Add files for the RegularExpressionAnnotator -->
