@@ -33,8 +33,10 @@
       		<directory>../../SandboxDistr</directory>
       		<outputDirectory>/apache-uima/addons/annotator_src/SandboxDistr</outputDirectory>
       		<includes>
-        		<include>annotator_package_bin.xml</include>
-        		<include>annotator_package_src.xml</include>
+        		<include>annotator-package/assembly/**</include>
+        		<include>annotator-package/build/**</include>
+        		<include>annotator-package/readme/**</include>
+        		<include>annotator-package/readme_src/**</include>
         		<include>pom.xml</include>
       		</includes>
     	</fileSet>
@@ -96,14 +98,25 @@
 	
 	<!-- copy license and notice files -->
 		<fileSet>
+			<directory>./readme_src/</directory>
+			<outputDirectory>/apache-uima/addons/annotator_src/</outputDirectory>
+			<includes>
+				<include>LICENSE</include>
+				<include>NOTICE</include>
+				<include>README</include>
+				<include>addSourceToJars.bat</include>
+				<include>addSourceToJars.sh</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>../../uimaj-distr/src/main/readme/</directory>
 			<outputDirectory>/apache-uima/addons/annotator_src/</outputDirectory>
 			<includes>
 				<include>DISCLAIMER</include>
-				<include>LICENSE</include>
-				<include>NOTICE</include>
+				<include>KEYS</include>
 			</includes>
 		</fileSet>
+		
 	
 	<!-- Add files for the RegularExpressionAnnotator -->
 		<fileSet>

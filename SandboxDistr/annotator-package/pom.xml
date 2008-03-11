@@ -24,7 +24,7 @@
   <groupId>org.apache.uima</groupId>
   <artifactId>SandboxAnnotatorPackage</artifactId>
   <packaging>pom</packaging>
-  <version>2.2.2S-incubating-SNAPSHOT</version>
+  <version>2.2.2-incubating</version>
   <name>Apache UIMA Java SDK Add-Ons</name>
   <url>http://incubator.apache.org/uima</url>
   <description>Components and tooling for the UIMA SDK</description>
@@ -70,8 +70,8 @@
 		<artifactId>maven-assembly-plugin</artifactId>
 		<configuration>
 			<descriptors>
-				<descriptor>bin.xml</descriptor>
-				<descriptor>src.xml</descriptor>
+				<descriptor>assembly/bin.xml</descriptor>
+				<descriptor>assembly/src.xml</descriptor>
 			</descriptors>
 			<finalName>uimaj-annotator-addons-${pom.version}</finalName>
 	        <tarLongFileMode>gnu</tarLongFileMode>

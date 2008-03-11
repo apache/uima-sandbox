@@ -34,8 +34,18 @@
 			<outputDirectory>/apache-uima/addons/annotator/</outputDirectory>
 			<includes>
 				<include>DISCLAIMER</include>
+				<include>KEYS</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>./readme/</directory>
+			<outputDirectory>/apache-uima/addons/annotator/</outputDirectory>
+			<includes>
 				<include>LICENSE</include>
 				<include>NOTICE</include>
+				<include>README</include>
+				<include>RELEASE_NOTES</include>
+				<include>RELEASE_NOTES.html</include>
 			</includes>
 		</fileSet>
 	
