@@ -185,6 +185,7 @@ under the License.
         
       </includes>
       <outputDirectory>eclipsePlugins</outputDirectory>
+      <outputFileNameMapping>${artifact.build.finalName}.jar</outputFileNameMapping>
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
   </dependencySets>

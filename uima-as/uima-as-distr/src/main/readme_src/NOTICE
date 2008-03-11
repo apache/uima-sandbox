@@ -1,8 +1,3 @@
-=========================================================================
-==  NOTICE file corresponding to section 4(d) of the Apache License,   ==
-==  Version 2.0, in this case for the Apache UIMA AS distribution.     ==
-=========================================================================
-
 Apache UIMA-AS
 Copyright 2008 The Apache Software Foundation
 
@@ -13,27 +8,34 @@ Portions of UIMA were originally developed by
 International Business Machines Corporation and are
 licensed to the Apache Software Foundation under the
 "Software Grant License Agreement", informally known as the 
-"IBM UIMA-AS License Agreement".
+"IBM UIMA-EE License Agreement".
 
-The following copyright notice(s) were affixed to portions of the code
-with which this file is now or was at one time distributed
-and are placed here unaltered.
+This product includes software, Apache ActiveMQ, developed
+at the Apache Software Foundation (http://www.apache.org/).
 
-Copyright (c) 2007 IBM Corporation.  All rights reserved.
-
-=========================================================================
-==  xbean-spring Notice                                                ==
-=========================================================================
-
-XBean :: Spring
-Copyright 2005-2007 The Apache Software Foundation
-
-This product includes software developed at
+This product includes software, XBean::Spring, developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 This product includes software, QDox, developed by
 ThoughtWorks, Inc (http://www.thoughtworks.com/).
+
 This product includes software, Spring Framework: Core, developed by
 Spring Framework (http://www.springframework.org/).
+
 This product includes software, Spring Framework: Web, developed by
 Spring Framework (http://www.springframework.org/).
+
+This product includes software known as 
+"The Saxon XSLT and XQuery Processor from Saxonica Limited", whose
+home page URL is http://www.saxonica.com/ 
+
+Saxon includes the org.apache.xerces.util.XMLChar module from the Apache 
+Xerces product, renamed as net.sf.saxon.om.XMLChar but otherwise unchanged. 
+See the copyright statements included in the source code of that module for
+conditions of use.
+
+Saxon includes code for performing Unicode normalization that is derived 
+from the sample code published for this purpose by the Unicode consortium. 
+For the terms of use of this code, see http://www.unicode.org/terms_of_use.html, 
+which should be regarded as forming part of these conditions of use, and part 
+of the Saxon documentation. 
