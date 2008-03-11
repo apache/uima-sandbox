@@ -42,10 +42,13 @@ public final class ConfigFactory {
    *                Short description of service.
    * @param longDescription
    *                Verbose description of service.
+   * @param doOutputAll
+   *                Output all types, regardless of individual type maps.
    * @return A new service config object.
    */
-  public static ServerSpec newServerSpec(String shortDescription, String longDescription) {
-    return new ServerSpecImpl(shortDescription, longDescription);
+  public static ServerSpec newServerSpec(String shortDescription, String longDescription,
+      boolean doOutputAll) {
+    return new ServerSpecImpl(shortDescription, longDescription, doOutputAll);
   }
 
   /**
@@ -61,7 +64,7 @@ public final class ConfigFactory {
    */
   public static TypeMap newTypeMap(String typeName, Filter filter, String outputTag,
       boolean coveredText) {
-    return new TypeMapImpl(typeName, filter, outputTag, coveredText, null, null);
+    return new TypeMapImpl(typeName, filter, outputTag, coveredText, false, null, null);
   }
 
   /**
@@ -80,22 +83,22 @@ public final class ConfigFactory {
    * @return A new type map object. Can be added to a server spec.
    */
   public static TypeMap newTypeMap(String typeName, Filter filter, String outputTag,
-      boolean coveredText, String shortDescription, String longDescription) {
-    return new TypeMapImpl(typeName, filter, outputTag, coveredText, shortDescription,
+      boolean coveredText, boolean outputAll, String shortDescription, String longDescription) {
+    return new TypeMapImpl(typeName, filter, outputTag, coveredText, outputAll, shortDescription,
         longDescription);
   }
-  
+
   /**
    * Create a new output mapping.
    * 
    * @param path
-   *          Feature path whose value will be output.
+   *                Feature path whose value will be output.
    * @param attribute
-   *          XML attribute that will contain the output.
+   *                XML attribute that will contain the output.
    * @param shortDescription
-   *          A short description of the output mapping.
+   *                A short description of the output mapping.
    * @param longDescription
-   *          A verbose description of the output mapping.
+   *                A verbose description of the output mapping.
    * @return A new output mapping. Can be added to a type map.
    */
   public static Output newOutput(List<String> path, String attribute, String shortDescription,
@@ -107,9 +110,9 @@ public final class ConfigFactory {
    * Create a new Filter.
    * 
    * @param featurePath
-   *          Feature path whose value the filter operates on. Must not be null.
+   *                Feature path whose value the filter operates on. Must not be null.
    * @param condition
-   *          The condition the path's value must satisfy.
+   *                The condition the path's value must satisfy.
    * @return A new Filter.
    */
   public static SimpleFilter newSimpleFilter(List<String> featurePath, Condition condition) {
@@ -118,20 +121,22 @@ public final class ConfigFactory {
 
   /**
    * Create a new filter conjunction.
+   * 
    * @return A new filter conjunction.
    */
   public static AndFilter newAndFilter() {
     return new AndFilterImpl();
   }
-  
+
   /**
    * Create a new filter disjunction.
+   * 
    * @return A new filter disjunction.
    */
   public static OrFilter newOrFilter() {
     return new OrFilterImpl();
   }
-  
+
   /**
    * Create new Condition.
    * 

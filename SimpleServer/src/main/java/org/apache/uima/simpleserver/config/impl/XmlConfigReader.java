@@ -28,17 +28,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.incubator.uima.simpleserver.config.xml.And;
-import org.apache.incubator.uima.simpleserver.config.xml.FilterOperator;
-import org.apache.incubator.uima.simpleserver.config.xml.FilterType;
-import org.apache.incubator.uima.simpleserver.config.xml.Or;
-import org.apache.incubator.uima.simpleserver.config.xml.OutputType;
-import org.apache.incubator.uima.simpleserver.config.xml.SimpleFilterType;
-import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType;
-import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument;
-import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType.Filters;
-import org.apache.incubator.uima.simpleserver.config.xml.TypeElementType.Outputs;
-import org.apache.incubator.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument.UimaSimpleServerSpec;
 import org.apache.uima.cas.impl.TypeSystemUtils;
 import org.apache.uima.simpleserver.SimpleServerException;
 import org.apache.uima.simpleserver.config.AndFilter;
@@ -51,6 +40,17 @@ import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.ServerSpec;
 import org.apache.uima.simpleserver.config.SimpleFilter;
 import org.apache.uima.simpleserver.config.TypeMap;
+import org.apache.uima.simpleserver.config.xml.And;
+import org.apache.uima.simpleserver.config.xml.FilterOperator;
+import org.apache.uima.simpleserver.config.xml.FilterType;
+import org.apache.uima.simpleserver.config.xml.Or;
+import org.apache.uima.simpleserver.config.xml.OutputType;
+import org.apache.uima.simpleserver.config.xml.SimpleFilterType;
+import org.apache.uima.simpleserver.config.xml.TypeElementType;
+import org.apache.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument;
+import org.apache.uima.simpleserver.config.xml.TypeElementType.Filters;
+import org.apache.uima.simpleserver.config.xml.TypeElementType.Outputs;
+import org.apache.uima.simpleserver.config.xml.UimaSimpleServerSpecDocument.UimaSimpleServerSpec;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
@@ -123,9 +123,15 @@ public final class XmlConfigReader {
       }
     }
 
+    // TODO: recompile XML beans code from XSD. While doing this: check if the number of jars for
+    // xml parsing (3) can be reduced. This is all Apache code, so legally this should be ok.
+    // Also create ant build script for this.
+    // TEMPORARY:
+    final boolean doOutputAll = false;
+
     // Create new server spec from XML beans.
     ServerSpec spec = ConfigFactory.newServerSpec(specBean.getShortDescription(), specBean
-        .getLongDescription());
+        .getLongDescription(), doOutputAll);
     TypeElementType[] typeMaps = specBean.getTypeArray();
     for (int i = 0; i < typeMaps.length; i++) {
       spec.addTypeMap(readTypeMap(typeMaps[i]));
@@ -148,10 +154,11 @@ public final class XmlConfigReader {
         filter = readFilter(filterBean.getFilter());
       }
     }
-    
-    //create a type map with the given information
+
+    // create a type map with the given information
     TypeMap typeMap = ConfigFactory.newTypeMap(typeBean.getName(), filter, typeBean.getOutputTag(),
-          coveredText, typeBean.getShortDescription(), typeBean.getLongDescription());
+        coveredText, typeBean.getOutputAll(), typeBean.getShortDescription(), typeBean
+            .getLongDescription());
 
     // check if for the current type output features are mapped
     if (typeBean.getOutputs() != null) {
@@ -269,8 +276,7 @@ public final class XmlConfigReader {
   private static final void valueMustNotBeNull(FilterOp op, String value)
       throws SimpleServerException {
     if (value == null) {
-      throw new SimpleServerException(SimpleServerException.value_must_be_set, new Object[] {
-          op});
+      throw new SimpleServerException(SimpleServerException.value_must_be_set, new Object[] { op });
     }
   }
 

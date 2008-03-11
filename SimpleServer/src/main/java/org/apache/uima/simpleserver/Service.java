@@ -72,6 +72,8 @@ public class Service {
   private CAS cas = null;
 
   private ServerSpec serviceSpec = null;
+  
+  private ResultExtractor resultExtractor = null;
 
   private volatile boolean initialized = false;
 
@@ -80,6 +82,7 @@ public class Service {
    */
   public Service() {
     super();
+    this.resultExtractor = new ResultExtractor();
   }
 
   public static Logger getLogger() {
@@ -150,6 +153,7 @@ public class Service {
   }
 
   private final void logInitializationError() {
+    //TODO: log which service could not be initialized!!!!!!!!!!!!!!!!!
     SimpleServerException e = new SimpleServerException(
         SimpleServerException.service_state_exception, new Object[] {});
     getLogger().log(Level.SEVERE, "", e);
@@ -248,7 +252,7 @@ public class Service {
       getLogger().log(Level.SEVERE, "", e);
       return null;
     }
-    return ResultExtractor.getResult(this.cas, this.serviceSpec);
+    return this.resultExtractor.getResult(this.cas, this.serviceSpec);
   }
 
   public Result process(String text) {

@@ -28,9 +28,8 @@ import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.TypeMap;
 
 /*
- * Implementation of the TypeSpecification interface. 
- * Just a simple bean-like class without any logic,
- * exept for constructor method.
+ * Implementation of the TypeSpecification interface. Just a simple bean-like class without any
+ * logic, exept for constructor method.
  */
 public class TypeMapImpl implements TypeMap {
 
@@ -39,6 +38,8 @@ public class TypeMapImpl implements TypeMap {
   private final String outputTag;
 
   private boolean outputCoveredText;
+
+  private boolean outputAll;
 
   private final Filter filter;
 
@@ -49,12 +50,13 @@ public class TypeMapImpl implements TypeMap {
   private final String longDescription;
 
   public TypeMapImpl(String typeName, Filter filter, String outputTag, boolean outputCoveredText,
-      String shortDescription, String longDescription) {
+      boolean outputAll, String shortDescription, String longDescription) {
     super();
     this.typeName = typeName;
     this.filter = filter;
     this.outputTag = outputTag;
     this.outputCoveredText = outputCoveredText;
+    this.outputAll = outputAll;
     this.shortDescription = shortDescription;
     this.longDescription = longDescription;
   }
@@ -89,6 +91,10 @@ public class TypeMapImpl implements TypeMap {
 
   public void addOutput(Output output) {
     this.outputs.add(output);
+  }
+
+  public boolean getOutputAll() {
+    return this.outputAll;
   }
 
 }

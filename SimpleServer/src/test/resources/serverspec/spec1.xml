@@ -19,7 +19,7 @@
 -->
 
 <uimaSimpleServerSpec
-	xmlns="http://incubator.apache.org/uima/simpleserver/config/xml"
+	xmlns="http://uima.apache.org/simpleserver/config/xml"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="file:///SimpleServerConfig.xsd">
 	<shortDescription>Recognize stuff</shortDescription>

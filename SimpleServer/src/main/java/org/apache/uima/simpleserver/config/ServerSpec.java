@@ -35,6 +35,13 @@ public interface ServerSpec {
   public static final char PATH_SEPARATOR = '/';
 
   /**
+   * Check setting to output all types.  If this returns true, individual type maps are ignored.
+   * Defaults to <code>false</code>.
+   * @return <code>true</code> iff output of all types is enabled.  
+   */
+  public boolean getOutputAll();
+  
+  /**
    * @return A list of type specifications. Each type specification represents output specifications
    *         for a single CAS type.
    */

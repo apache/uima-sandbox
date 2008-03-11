@@ -44,13 +44,21 @@ public class ServerSpecImpl implements ServerSpec {
   private final String shortDescription;
 
   private final String longDescription;
+  
+  private final boolean doOutputAll;
 
   private final List<TypeMap> typeMaps = new ArrayList<TypeMap>();
 
-  public ServerSpecImpl(String shortDesc, String longDesc) {
+  public ServerSpecImpl(String shortDesc, String longDesc, boolean doOutputAll) {
     super();
     this.shortDescription = shortDesc;
     this.longDescription = longDesc;
+    this.doOutputAll = doOutputAll;
+  }
+
+  public ServerSpecImpl(String shortDesc, String longDesc) {
+    // Default doOutputAll to false;
+    this(shortDesc, longDesc, false);
   }
 
   public void addTypeMap(TypeMap typeMap) {
@@ -138,5 +146,9 @@ public class ServerSpecImpl implements ServerSpec {
     for (Filter filter : filters) {
       checkFilter(filter, type, exc);
     }
+  }
+
+  public boolean getOutputAll() {
+    return this.doOutputAll;
   }
 }

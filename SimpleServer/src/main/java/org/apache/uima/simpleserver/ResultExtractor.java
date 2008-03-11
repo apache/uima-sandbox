@@ -20,7 +20,10 @@
 package org.apache.uima.simpleserver;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
@@ -31,6 +34,7 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.LowLevelCAS;
 import org.apache.uima.cas.impl.TypeSystemUtils;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.simpleserver.config.ConfigFactory;
 import org.apache.uima.simpleserver.config.Filter;
 import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.ServerSpec;
@@ -46,6 +50,48 @@ import org.apache.uima.simpleserver.output.impl.ResultImpl;
  */
 public class ResultExtractor {
 
+  private static class DefaultTypeMap {
+
+    private final Map<Type, TypeMap> typeMap = new HashMap<Type, TypeMap>();
+
+    @SuppressWarnings("unchecked")
+    private void initialize(TypeSystem ts) {
+      Type annotationType = ts.getType(CAS.TYPE_NAME_ANNOTATION);
+      List annotationTypes = ts.getProperlySubsumedTypes(annotationType);
+      annotationTypes.add(annotationType);
+      Iterator it = annotationTypes.iterator();
+      while (it.hasNext()) {
+        Type type = (Type) it.next();
+        createMapForType(type);
+      }
+    }
+
+    private void createMapForType(Type type) {
+      TypeMap tm = ConfigFactory.newTypeMap(type.getName(), null, type.getShortName(), true);
+      Iterator<?> featureIt = type.getFeatures().iterator();
+      while (featureIt.hasNext()) {
+        Feature feat = (Feature) featureIt.next();
+        if (feat.getRange().isPrimitive()) {
+          ArrayList<String> path = new ArrayList<String>(1);
+          path.add(feat.getShortName());
+          Output out = ConfigFactory.newOutput(path, feat.getShortName(),
+              "No description provided", "No description provided");
+          tm.addOutput(out);
+        }
+      }
+      this.typeMap.put(type, tm);
+    }
+
+    private TypeMap get(Type type) {
+      return this.typeMap.get(type);
+    }
+
+  }
+
+  private TypeSystem ts = null;
+
+  private DefaultTypeMap defaultTypeMap = null;
+
   /**
    * Extract a set of results from a CAS and a result specification.
    * 
@@ -54,13 +100,17 @@ public class ResultExtractor {
    * @param resultSpec
    *                The result specification.
    */
-  public static Result getResult(CAS cas, ServerSpec resultSpec) {
+  public Result getResult(CAS cas, ServerSpec resultSpec) {
     List<ResultEntry> resultEntries = new ArrayList<ResultEntry>();
     processTypes(cas, resultSpec, resultEntries);
     return new ResultImpl(resultEntries, cas.getDocumentText());
   }
 
-  private static void processTypes(CAS cas, ServerSpec rspec, List<ResultEntry> resultEntries) {
+  private void processTypes(CAS cas, ServerSpec rspec, List<ResultEntry> resultEntries) {
+    if (rspec.getOutputAll()) {
+      outputAll(cas, resultEntries);
+      return;
+    }
     Type annotationType = cas.getTypeSystem().getType(CAS.TYPE_NAME_ANNOTATION);
     for (TypeMap tspec : rspec.getTypeSpecs()) {
       TypeSystem typeSystem = cas.getTypeSystem();
@@ -87,6 +137,38 @@ public class ResultExtractor {
       }
     }
 
+  }
+
+  // TODO: create test case for this
+  private void outputAll(CAS cas, List<ResultEntry> resultEntries) {
+    checkCreateDefaultMap(cas.getTypeSystem());
+    // Output everything except the document annotation.
+    Type docAnnotationType = cas.getTypeSystem().getType(CAS.TYPE_NAME_DOCUMENT_ANNOTATION);
+    FSIterator it = cas.getAnnotationIndex().iterator();
+    for (it.moveToFirst(); it.isValid(); it.moveToNext()) {
+      AnnotationFS annot = (AnnotationFS) it.get();
+      if (annot.getType().equals(docAnnotationType)) {
+        // Skip the document annotation
+        continue;
+      }
+      TypeMap typeMap = this.defaultTypeMap.get(annot.getType());
+      // Create a new result entry, fill with attributes and add result set.
+      ResultEntryImpl resultEntry = new ResultEntryImpl(typeMap.getOutputTag(), annot.getBegin(),
+          annot.getEnd());
+      makeOutputs(resultEntry, annot, typeMap);
+      resultEntries.add(resultEntry);
+    }
+  }
+
+  private final void checkCreateDefaultMap(TypeSystem typeSystem) {
+    assert(typeSystem != null);
+    if (typeSystem == this.ts) {
+      return;
+    }
+    this.ts = typeSystem;
+    DefaultTypeMap dtm = new DefaultTypeMap();
+    dtm.initialize(typeSystem);
+    this.defaultTypeMap = dtm;
   }
 
   public static void makeOutputs(ResultEntryImpl resultEntry, AnnotationFS annotation, TypeMap tspec) {
