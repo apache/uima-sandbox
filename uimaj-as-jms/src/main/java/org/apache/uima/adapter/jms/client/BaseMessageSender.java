@@ -200,11 +200,31 @@ public abstract class BaseMessageSender implements Runnable,
 						JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
 						"UIMAJMS_sending_msg_to_endpoint__FINEST",
 						new Object[] { destination });
-				if ( pm.getMessageType() == AsynchAEMessage.Process )
+				
+				if ( pm.containsKey(AsynchAEMessage.CasReference) )
 				{
 					ClientRequest cacheEntry = (ClientRequest)
-						engine.getCache().get(pm.get(AsynchAEMessage.CasReference));
-					cacheEntry.setCASDepartureTime(System.nanoTime());
+					engine.getCache().get(pm.get(AsynchAEMessage.CasReference));
+					if ( cacheEntry != null )
+					{
+						//	Use Process Timeout value for the time-to-live property in the 
+						//	outgoing JMS message. When this time is exceeded
+						//	while the message sits in a queue, the JMS Server will remove it from
+						//	the queue. What happens with the expired message depends on the 
+						//	configuration. Most JMS Providers create a special dead-letter queue
+						//	where all expired messages are placed.
+						long timeoutValue = cacheEntry.getProcessTimeout();
+						if ( timeoutValue > 0 )
+						{
+							message.setJMSExpiration(timeoutValue);
+						}
+						if (  pm.getMessageType() == AsynchAEMessage.Process )
+						{
+							//					ClientRequest cacheEntry = (ClientRequest)
+							//						engine.getCache().get(pm.get(AsynchAEMessage.CasReference));
+							cacheEntry.setCASDepartureTime(System.nanoTime());
+						}
+					}
 				}
 				producer.send(message);
 			} catch (Exception e) {

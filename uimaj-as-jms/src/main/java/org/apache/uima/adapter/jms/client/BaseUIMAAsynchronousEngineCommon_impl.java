@@ -539,7 +539,7 @@ implements UimaAsynchronousEngine, MessageListener
 			requestToCache.setEndpoint(getEndPointName());
 			requestToCache.setProcessTimeout(processTimeout);
 			requestToCache.setThreadId(Thread.currentThread().getId());
-      requestToCache.clearTimeoutException();
+            requestToCache.clearTimeoutException();
 
 			if (remoteService)
 			{
@@ -1450,7 +1450,10 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			processTimeout = aTimeout;
 		}
-		
+		public long getProcessTimeout()
+		{
+			return processTimeout;
+		}
 		public void setCpcTimeout( int aTimeout )
 		{
 			cpcTimeout = aTimeout;
