@@ -19,7 +19,13 @@
 
 package org.apache.uima.ee.test;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -582,6 +588,45 @@ public class TestUimaASExtended extends BaseTestSupport
 		super.setExpectingServiceShutdown();
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,httpURI,"NoOpAnnotatorQueue", 1, CPC_LATCH );
+	}
+	public void testClientHttpTunnellingWithDoubleByteText() throws Exception
+	{
+    System.out.println("-------------- testClientHttpTunnellingWithDoubleByteText -------------");
+		try
+		{
+			File file = new File(relativeDataPath+"/DoubleByteText.txt");
+			System.out.println("Checking for existence of File:"+file.getAbsolutePath());
+			//	Process only if the file exists
+			if ( file.exists())
+			{
+				System.out.println("File Exists");
+
+				
+				// Add HTTP Connector to the broker. The connector will use port 8888. If this port is not available the test fails 
+				String httpURI = addHttpConnector(DEFAULT_HTTP_PORT);
+				//	Create Uima EE Client
+				BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+				//	Deploy remote service
+				deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+				
+				
+				
+				InputStream fis = new FileInputStream(file);
+				Reader rd = new InputStreamReader(fis, "UTF-8");
+				BufferedReader in = new BufferedReader(rd);
+				char buffer[] = new char[(int)file.length()];
+				in.read(buffer);
+				//	Set the double-byte text. This is what will be sent to the service
+				super.setDoubleByteText(String.valueOf(buffer));
+				super.setExpectingServiceShutdown();
+				//	Initialize and run the Test. Wait for a completion and cleanup resources.
+				runTest(null,eeUimaEngine,httpURI,"NoOpAnnotatorQueue", 1, CPC_LATCH );
+			}
+		}
+		catch( Exception e)
+		{
+			//	Double-Byte Text file not present. Continue on with the next test
+		}
 	}
 	
 	public void testAggregateHttpTunnelling() throws Exception
