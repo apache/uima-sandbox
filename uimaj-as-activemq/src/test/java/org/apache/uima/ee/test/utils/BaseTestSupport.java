@@ -32,8 +32,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.jms.Message;
 
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.client.UimaEEProcessStatusImpl;
-import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
+import org.apache.uima.aae.client.UimaASProcessStatusImpl;
+import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
@@ -44,7 +44,7 @@ import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.ProcessTraceEvent;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 
-public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEEStatusCallbackListener
+public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASStatusCallbackListener
 {
   private static final char FS = System.getProperty("file.separator").charAt(0);
 	protected String text = "IBM today elevated five employees to the title of IBM Fellow\n -- its most prestigious technical honor.\n The company also presented more than $2.8 million in cash awards to employees whose technical innovation have yielded exceptional value to the company and its customers.\nIBM conferred the accolades and awards at its 2003 Corporate Technical Recognition Event (CTRE) in Scottsdale, Ariz. CTRE is a 40-year tradition at IBM, established to recognize exceptional technical employees and reward them for extraordinary achievements and contributions to the company's technology leadership.\n Our technical employees are among the best and brightest innovators in the world.\n They share a passion for excellence that defines their work and permeates the products and services IBM delivers to its customers, said Nick Donofrio, senior vice president, technology and manufacturing for IBM.\n CTRE provides the means for us to honor those who have distinguished themselves as exceptional leaders among their peers.\nAmong the special honorees at the 2003 CTRE are five employees who earned the coveted distinction of IBM Fellow:- David Ferrucci aka Dave, Grady Booch, chief scientist of Rational Software, IBM Software Group.\n Recognized internationally for his innovative work on software architecture, modeling, and software engineering process. \nMr. Booch is one of the original authors of the Unified Modeling Language (UML), the industry-standard language of blueprints for software-intensive systems.- Dr. Donald Chamberlin, researcher, IBM Almaden Research Center. An expert in relational database languages, Dr. Chamberlin is co- inventor of SQL, the language that energized the relational database market. He has also";
@@ -553,7 +553,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaEES
 					CAS cas = uimaClient.getCAS();
 					cas.setDocumentText(text);
 					ProcessTrace pt = new ProcessTrace_impl();
-					UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
+					UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 
 					try
 					{
