@@ -38,6 +38,10 @@ import org.apache.activemq.broker.BrokerFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.Connector;
 import org.apache.activemq.broker.TransportConnector;
+import org.apache.activemq.broker.region.policy.IndividualDeadLetterStrategy;
+import org.apache.activemq.broker.region.policy.PolicyEntry;
+import org.apache.activemq.broker.region.policy.PolicyMap;
+import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.uima.UIMAFramework;
@@ -146,6 +150,7 @@ public class ActiveMQSupport extends TestCase
 	protected BrokerService createBroker() throws Exception
 	{
 		ServerSocket ssocket = null;
+		System.out.println("Creating Broker <<<<<<<<<<<<<<<<");
 		try
 		{
 			ssocket = new ServerSocket();
@@ -153,6 +158,17 @@ public class ActiveMQSupport extends TestCase
 			uri = "tcp://" + hostName + ":8118";
 			BrokerService broker = BrokerFactory.createBroker(new URI("broker:()/" + hostName + "?persistent=false"));
 			tcpConnector = broker.addConnector(uri);
+			
+			
+			PolicyEntry policy = new PolicyEntry();
+	        policy.setDeadLetterStrategy(new SharedDeadLetterStrategy());
+
+	        PolicyMap pMap = new PolicyMap();
+	        pMap.setDefaultEntry(policy);
+
+	        broker.setDestinationPolicy(pMap);
+
+			
 			return broker;
 		}
 		finally
