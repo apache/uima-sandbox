@@ -523,6 +523,26 @@ public class TestUimaASExtended extends BaseTestSupport
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH); //PC_LATCH);
 	}
+  
+  /** Tests that the thresholdAction is taken when thresholdCount errors occur in the last thresholdWindow CASes. 
+   * Aggregate has two annotators, first fails with increasing frequency (on CASes 10 19 27 34 40 45 49 52 54) 
+   * and is disabled after 3 errors in a window of 7 (49,52,54)
+   * Second annotator counts the CASes that reach it and verifies that it sees all but the 9 failures.
+   * It throws an exception if the first is disabled after too many or too few errors. 
+   * 
+   * @throws Exception
+   */
+  public void testErrorThresholdWindow() throws Exception
+  {
+    System.out.println("-------------- testErrorThresholdWindow -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    UIMAFramework.getLogger().setLevel(Level.FINE);
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithThresholdWindow.xml");
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+    // Set an explicit CPC timeout as exceptions thrown in the 2nd annotator's CPC don't reach the client.
+    appCtx.put(UimaAsynchronousEngine.CpcTimeout, 20000 );
+    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
+  }
 
   public void testProcessParallelFlowWithDelegateDisable() throws Exception
   {

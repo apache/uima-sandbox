@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>false</primitive>
+  <delegateAnalysisEngineSpecifiers>
+    <delegateAnalysisEngine key="NoOpAnnotatorWithCpcCheck">
+      <import location="NoOpAnnotatorWithCpcCheck.xml"/>
+    </delegateAnalysisEngine>
+    <delegateAnalysisEngine key="NoOp">
+      <import location="NoOpAnnotator.xml"/>
+    </delegateAnalysisEngine>
+    <delegateAnalysisEngine key="SimpleCasGenerator">
+      <import location="../multiplier/SimpleCasGenerator.xml"/>
+    </delegateAnalysisEngine>
+  </delegateAnalysisEngineSpecifiers>
+  <analysisEngineMetaData>
+    <name>Test Aggregate TAE</name>
+    <description>Detects Nothing</description>
+    <configurationParameters searchStrategy="language_fallback">
+      <configurationParameter>
+        <name>ErrorFrequency</name>
+        <description>Frequency of Generated Errors</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+        <overrides>
+          <parameter>NoOp/ErrorFrequency</parameter>
+        </overrides>
+      </configurationParameter>
+      <configurationParameter>
+        <name>NumberToGenerate</name>
+        <description>Approximate number of CASes to create.</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+        <overrides>
+          <parameter>SimpleCasGenerator/NumberToGenerate</parameter>
+        </overrides>
+      </configurationParameter>
+      <configurationParameter>
+        <name>FinalCount</name>
+        <description>Total number of CASes that should be processed before CPC</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+        <overrides>
+          <parameter>NoOpAnnotatorWithCpcCheck/FinalCount</parameter>
+        </overrides>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>ErrorFrequency</name>
+        <value>
+          <integer>10</integer>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>NumberToGenerate</name>
+        <value>
+          <integer>100</integer>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>FinalCount</name>
+        <value>
+          <integer>91</integer>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+    <flowConstraints>
+      <fixedFlow>
+        <node>SimpleCasGenerator</node>
+        <node>NoOp</node>
+        <node>NoOpAnnotatorWithCpcCheck</node>
+      </fixedFlow>
+    </flowConstraints>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs/>
+        <languagesSupported>
+          <language>en</language>
+        </languagesSupported>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </analysisEngineMetaData>
+</analysisEngineDescription>
