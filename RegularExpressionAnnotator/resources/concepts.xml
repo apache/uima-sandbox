@@ -98,10 +98,11 @@
 	<concept name="MoneyAmountDetection" processAllRules="true">
 	<!-- \p{Sc} -> currentySymbol -->
 	<!-- (?i) -> case insensitive match -->
+	<!-- \s -> whitespace character -->
 		<rules>
-  			<rule regEx="\m{currency}(\p{Sc}\s?|(?i)USD\s?|(?i)Dollars\s?|(?i)Dollar\s?|(?i)CNY\s?|(?i)CAD\s?|(?i)GBP\s?|(?i)Pounds\s?|(?i)Pound\s?|(?i)EUR\s?|(?i)Euro\s?|(?i)Yen\s?)\m{amount}(\d+(,\d\d\d)*(\.\d\d?)?)\m{amountText}(\s?(?i)million|\s?(?i)billion)?"
+  			<rule regEx="\m{currency}(\p{Sc}\s?|(?i)USD\s?|(?i)Dollars\s?|(?i)Dollar\s?|(?i)CNY\s?|(?i)CAD\s?|(?i)GBP\s?|(?i)Pounds\s?|(?i)Pound\s?|(?i)Euros\s?|(?i)Euro\s?|(?i)Yen\s?|(?i)EUR\s?)\m{amount}(\d+(,\d\d\d)*(\.\d\d?)?)\m{amountText}(\s?(?i)million|\s?(?i)billion)?"
       			  matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/> 
-            <rule regEx="\m{amount}(\d+(,\d\d\d)*(\.\d\d?\d?)?)\m{amountText}(\s?(?i)million|\s?(?i)billion)?\m{currency}(\s?\p{Sc}|\s?(?i)USD|\s?(?i)Dollars|\s?(?i)Dollar|\s?(?i)CNY|\s?(?i)CAD|\s?(?i)GBP|\s?(?i)Pounds|\s?(?i)Pound|\s?(?i)EUR|\s?(?i)Euro|\s?(?i)Yen)"
+            <rule regEx="\m{amount}(\d+(,\d\d\d)*(\.\d\d?\d?)?)\m{amountText}(\s?(?i)million|\s?(?i)billion)?\m{currency}(\s?\p{Sc}|\s?(?i)USD|\s?(?i)Dollars|\s?(?i)Dollar|\s?(?i)CNY|\s?(?i)CAD|\s?(?i)GBP|\s?(?i)Pounds|\s?(?i)Pound|\s?(?i)Euros|\s?(?i)Euro|\s?(?i)Yen|\s?(?i)EUR)"
                   matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
 		</rules>
 		<createAnnotations>
