@@ -50,9 +50,9 @@ import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.error.InvalidMessageException;
 import org.apache.uima.aae.error.ServiceShutdownException;
-import org.apache.uima.aae.error.UimaEECollectionProcessCompleteTimeout;
-import org.apache.uima.aae.error.UimaEEMetaRequestTimeout;
-import org.apache.uima.aae.error.UimaEEProcessCasTimeout;
+import org.apache.uima.aae.error.UimaASCollectionProcessCompleteTimeout;
+import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
+import org.apache.uima.aae.error.UimaASProcessCasTimeout;
 import org.apache.uima.aae.error.UimaEEServiceException;
 import org.apache.uima.aae.jmx.UimaASClientInfoMBean;
 import org.apache.uima.aae.jmx.UimaASClientInfo;
@@ -73,8 +73,8 @@ import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.client.UimaEEProcessStatusImpl;
-import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
+import org.apache.uima.aae.client.UimaASProcessStatusImpl;
+import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.message.PendingMessage;
 import org.apache.uima.aae.controller.Endpoint;
@@ -181,7 +181,7 @@ implements UimaAsynchronousEngine, MessageListener
 	abstract protected String deploySpringContainer(String[] springContextFiles) throws ResourceInitializationException;
 //	abstract protected MessageProducer lookupProducerForEndpoint( Endpoint anEndpoint ) throws Exception;
   
-	public void addStatusCallbackListener(UimaEEStatusCallbackListener aListener)
+	public void addStatusCallbackListener(UimaASStatusCallbackListener aListener)
 	{
 	    listeners.add(aListener);
 	}
@@ -202,7 +202,7 @@ implements UimaAsynchronousEngine, MessageListener
 
 	}
 
-	public void removeStatusCallbackListener(UimaEEStatusCallbackListener aListener)
+	public void removeStatusCallbackListener(UimaASStatusCallbackListener aListener)
 	{
 		listeners.remove(aListener);
 	}
@@ -271,7 +271,7 @@ implements UimaAsynchronousEngine, MessageListener
 			{
 				for (int i = 0; listeners != null && i < listeners.size(); i++)
 				{
-					((UimaEEStatusCallbackListener) listeners.get(i)).collectionProcessComplete(null);
+					((UimaASStatusCallbackListener) listeners.get(i)).collectionProcessComplete(null);
 				}
 			}
 			
@@ -595,7 +595,7 @@ implements UimaAsynchronousEngine, MessageListener
 		if (AsynchAEMessage.Exception == payload)
 		{
 			ProcessTrace pt = new ProcessTrace_impl();
-			UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
+			UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 			Exception exception = retrieveExceptionFormMessage(message);
 
 //			Exception exception = (Exception) ((ObjectMessage) message).getObject();
@@ -633,7 +633,7 @@ implements UimaAsynchronousEngine, MessageListener
 		if (AsynchAEMessage.Exception == payload)
 		{
 			ProcessTrace pt = new ProcessTrace_impl();
-			UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
+			UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 			Exception exception = retrieveExceptionFormMessage(message);
 			clientSideJmxStats.incrementMetaErrorCount();
 			status.addEventStatus("GetMeta", "Failed", exception);
@@ -671,7 +671,7 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 		for (int i = 0; listeners != null && i < listeners.size(); i++)
 		{
-			UimaEEStatusCallbackListener statCL = (UimaEEStatusCallbackListener) listeners.get(i);
+			UimaASStatusCallbackListener statCL = (UimaASStatusCallbackListener) listeners.get(i);
 			switch( aCommand )
 			{
 			case AsynchAEMessage.GetMeta:
@@ -822,7 +822,7 @@ implements UimaAsynchronousEngine, MessageListener
 	throws Exception
 	{
 		ProcessTrace pt = new ProcessTrace_impl();
-		UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
+		UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 		Exception exception = retrieveExceptionFormMessage(message);
 		status.addEventStatus("Process", "Failed", exception);
 		receivedCpcReply = true; // change state as if the CPC reply came in. This is done to prevent a hang on CPC request 
@@ -866,7 +866,7 @@ implements UimaAsynchronousEngine, MessageListener
 				}
 				//	Log stats and populate ProcessTrace object
 				logTimingInfo(message, pt, cachedRequest);
-				UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
+				UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 				if ( doNotify )
 				{
 					notifyListeners(cas, status, AsynchAEMessage.Process);
@@ -1186,7 +1186,7 @@ implements UimaAsynchronousEngine, MessageListener
 			{
         // check if timeout exception
         if (cachedRequest.isTimeoutException()) {
-          throw new ResourceProcessException(new UimaEEProcessCasTimeout());
+          throw new ResourceProcessException(new UimaASProcessCasTimeout());
         }
 				//	Process reply in the sending thread
 				Message message = cachedRequest.getMessage();
@@ -1214,14 +1214,14 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 
 		ProcessTrace pt = new ProcessTrace_impl();
-		UimaEEProcessStatusImpl status = new UimaEEProcessStatusImpl(pt);
+		UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 
 		switch (aTimeoutKind)
 		{
 		case (MetadataTimeout):
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "notifyOnTimout", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_meta_timeout_INFO", new Object[] { anEndpoint });
 
-			status.addEventStatus("GetMeta", "Failed", new UimaEEMetaRequestTimeout());
+			status.addEventStatus("GetMeta", "Failed", new UimaASMetaRequestTimeout());
 			notifyListeners(null, status, AsynchAEMessage.GetMeta);
 			synchronized (metadataReplyMonitor)
 			{
@@ -1231,7 +1231,7 @@ implements UimaAsynchronousEngine, MessageListener
 			break;
 		case (CpCTimeout):
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "notifyOnTimout", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cpc_timeout_INFO", new Object[] { anEndpoint });
-			status.addEventStatus("CpC", "Failed", new UimaEECollectionProcessCompleteTimeout());
+			status.addEventStatus("CpC", "Failed", new UimaASCollectionProcessCompleteTimeout());
 			notifyListeners(null, status, AsynchAEMessage.CollectionProcessComplete);
 			receivedCpcReply = true;
 			synchronized(endOfCollectionMonitor)
@@ -1276,7 +1276,7 @@ implements UimaAsynchronousEngine, MessageListener
       }
       else {
         // notify the application listener with the error
-        exc = new UimaEEProcessCasTimeout();
+        exc = new UimaASProcessCasTimeout();
         status.addEventStatus("Process", "Failed", exc);
         notifyListeners(aCAS, status, AsynchAEMessage.Process);
       }
