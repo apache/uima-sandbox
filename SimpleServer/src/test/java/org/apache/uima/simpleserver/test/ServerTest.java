@@ -75,7 +75,7 @@ public class ServerTest {
       assertTrue(false);
     }
     JettyUtils.addServletWithMapping(server, uimaServlet, "/uima");
-
+    
     // Start the server
     try {
       server.start();
@@ -119,7 +119,6 @@ public class ServerTest {
   public static void tearDown() {
     try {
       server.stop();
-      server.join();
     } catch (Exception e) {
       e.printStackTrace();
       assertTrue("Exception shutting down Jetty", false);
