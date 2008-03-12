@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.uima.util.ProcessTrace;
 
-public class UimaEEProcessStatusImpl implements org.apache.uima.collection.EntityProcessStatus 
+public class UimaASProcessStatusImpl implements org.apache.uima.collection.EntityProcessStatus 
 {
 
 	  private static final long serialVersionUID = -5101356145458558249L;
@@ -46,11 +46,11 @@ public class UimaEEProcessStatusImpl implements org.apache.uima.collection.Entit
 
 	  public boolean isProcessed = true;
 
-	  public UimaEEProcessStatusImpl(ProcessTrace p) {
+	  public UimaASProcessStatusImpl(ProcessTrace p) {
 	    prT = p;
 	  }
 
-	  public UimaEEProcessStatusImpl(ProcessTrace p, boolean aSkip) {
+	  public UimaASProcessStatusImpl(ProcessTrace p, boolean aSkip) {
 	    prT = p;
 	    isSkipped = aSkip;
 	  }

@@ -28,7 +28,7 @@ import org.apache.uima.collection.EntityProcessStatus;
  * various events occur. 
  * 
  */
-public interface UimaEEStatusCallbackListener
+public interface UimaASStatusCallbackListener
 {
 	 /**
 	   * The callback used to inform the application that the initialization request has completed. 
