@@ -1072,7 +1072,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			{
 				originMap.remove(aCasReferenceId);
 			}
-			getServicePerformance().incrementNumberOfCASesProcessed();
 		}
 	}
 	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry )

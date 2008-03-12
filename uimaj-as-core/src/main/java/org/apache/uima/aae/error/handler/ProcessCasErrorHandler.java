@@ -269,7 +269,13 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 							}
 						}
 					}
+
+					/***
 					if (threshold != null && threshold.getThreshold() > 0 && super.exceedsThresholdWithinWindow(aController.getMonitor(), Monitor.ProcessErrorCount, key, threshold) )
+					*/
+
+					long procCount = aController.getMonitor().getLongNumericStatistic(key, Monitor.ProcessCount).getValue();
+					if (threshold != null && threshold.exceededWindow(procCount))
 					{
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", 
 								UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_process_cas_exceeded_threshold__INFO", new Object[] { aController.getComponentName(), key, casReferenceId, threshold.getThreshold(), threshold.getAction() });

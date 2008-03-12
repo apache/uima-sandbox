@@ -424,9 +424,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			//	Aggregate total time spent processing the input CAS
 			getServicePerformance().incrementAnalysisTime(totalProcessTime);
 			getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
-
-			//	Add the input CAS to the number of CASes processed by this service
-			getServicePerformance().incrementNumberOfCASesProcessed();
 		}
 		catch ( Throwable e)
 		{

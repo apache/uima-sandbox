@@ -584,9 +584,19 @@ public class ProcessResponseHandler extends HandlerBase
 
 		boolean isCpCError = false;
 		String casReferenceId = null;
-		try
+
+
+    try
 		{
-			Object object = aMessageContext.getObjectMessage();
+      //  If a Process Request, increment number of docs processed
+      if ( aMessageContext.getMessageIntProperty(AsynchAEMessage.MessageType) == AsynchAEMessage.Response &&
+         aMessageContext.getMessageIntProperty(AsynchAEMessage.Command)== AsynchAEMessage.Process )
+      {
+        //  Increment number of CASes processed by a delegate
+        incrementDelegateProcessCount(aMessageContext);
+      }
+
+      Object object = aMessageContext.getObjectMessage();
 			if ( object == null )
 			{
 				//	 Could be a C++ exception. In this case the exception is just a String in the message cargo

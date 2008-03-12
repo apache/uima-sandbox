@@ -686,11 +686,17 @@ System.out.println(getController().getName()+" ::::::: Processing Release CAS Re
 	 			 isHandlerForMessage(messageContext, AsynchAEMessage.Request, AsynchAEMessage.Stop ) 
 				)
 			{
-				int payload = ((MessageContext) anObjectToHandle).getMessageIntProperty(AsynchAEMessage.Payload);
+				int payload = messageContext.getMessageIntProperty(AsynchAEMessage.Payload);
 				int command = messageContext.getMessageIntProperty(AsynchAEMessage.Command);
 
 				getController().getControllerLatch().waitUntilInitialized();
-				
+
+        // If a Process Request, increment number of docs processed
+        if (messageContext.getMessageIntProperty(AsynchAEMessage.MessageType) == AsynchAEMessage.Request
+                && command == AsynchAEMessage.Process) {
+          // Increment number of CASes processed by this service
+          getController().getServicePerformance().incrementNumberOfCASesProcessed();
+        }
 				
 				if (AsynchAEMessage.CASRefID == payload)
 				{
