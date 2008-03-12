@@ -83,14 +83,14 @@ public interface UimaAsynchronousEngine
 	 * 
 	 * @param aListener - application listener object to add
 	 */
-	public void addStatusCallbackListener(UimaEEStatusCallbackListener aListener);
+	public void addStatusCallbackListener(UimaASStatusCallbackListener aListener);
 	
 	/**
 	 * Removes named application listener. 
 	 * 
 	 * @param aListener - application listener to remove
 	 */
-	public void removeStatusCallbackListener(UimaEEStatusCallbackListener aListener);
+	public void removeStatusCallbackListener(UimaASStatusCallbackListener aListener);
 	
 	/**
 	 * Stops the asynchronous client. Cleans up resources, drops connection to UIMA EE

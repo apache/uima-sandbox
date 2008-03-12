@@ -19,23 +19,23 @@
 
 package org.apache.uima.aae.error;
 
-public class UimaEEMetaRequestTimeout extends Exception
+public class UimaASMetaRequestTimeout extends Exception
 {
-	public UimaEEMetaRequestTimeout()
+	public UimaASMetaRequestTimeout()
 	{
 	}
 
-	public UimaEEMetaRequestTimeout(String message)
+	public UimaASMetaRequestTimeout(String message)
 	{
 		super(message);
 	}
 
-	public UimaEEMetaRequestTimeout(Throwable cause)
+	public UimaASMetaRequestTimeout(Throwable cause)
 	{
 		super(cause);
 	}
 
-	public UimaEEMetaRequestTimeout(String message, Throwable cause)
+	public UimaASMetaRequestTimeout(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
