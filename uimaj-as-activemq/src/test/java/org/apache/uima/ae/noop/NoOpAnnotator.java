@@ -30,11 +30,13 @@ import org.apache.uima.util.Logger;
 
 public class NoOpAnnotator extends CasAnnotator_ImplBase
 {
-	private long counter = 1;
+	private long counter = 0;
+  private long countDown = 0;
 	int errorFrequency = 0;
 	int cpcDelay = 1;
 	int processDelay = 0;
-	
+  int finalCount = 0;
+  
 	public void initialize(UimaContext aContext) throws ResourceInitializationException
 	{
 		super.initialize(aContext);
@@ -42,6 +44,7 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 		if ( getContext().getConfigParameterValue("ErrorFrequency") != null )
 		{
 			errorFrequency = ((Integer)getContext().getConfigParameterValue("ErrorFrequency")).intValue();
+      countDown = errorFrequency;
 		}
 		if ( getContext().getConfigParameterValue("CpCDelay") != null )
 		{
@@ -54,6 +57,10 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 			System.out.println("NoOpAnnotator.initialize() Initializing With Process Delay of " +processDelay +" millis");
 
 		}
+    if (getContext().getConfigParameterValue("FinalCount") != null) {
+      finalCount = ((Integer) getContext().getConfigParameterValue("FinalCount")).intValue();
+    }
+
 		// write log messages
 		Logger logger = getContext().getLogger();
 		logger.log(Level.CONFIG, "NAnnotator initialized");
@@ -61,35 +68,27 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 
 	public void typeSystemInit(TypeSystem aTypeSystem) throws AnalysisEngineProcessException
 	{
-
 	}
+  
 	public void collectionProcessComplete() throws AnalysisEngineProcessException
 	{
 		System.out.println("NoOpAnnotator.collectionProcessComplete() Called -------------------------------------");
-/*
-		synchronized( this )
-		{
-			try
-			{
-				wait(cpcDelay);
-			}
-			catch( InterruptedException e) {}
-		}
-*/		
-	//	System.out.println("NoOpAnnotator.collectionProcessComplete()Throwing Exception  -------------------------------------");
-	//	throw new AnalysisEngineProcessException(new NullPointerException());
+    if (finalCount > 0 && finalCount != counter) {
+      String msg = "NoOpAnnotator expected " + finalCount + " CASes but was given " + counter;
+      System.out.println(msg);
+      throw new AnalysisEngineProcessException(new Exception(msg));
+    }
 	}
+  
 	public void process(CAS aCAS) throws AnalysisEngineProcessException
 	{
+    ++counter;
 		try
 		{
-			//UimaClassFactory.someMethod();
       if ( processDelay == 0 ) {
 			System.out.println("NoOpAnnotator.process() called for the " + counter + "th time.");
       }
-			//System.out.println("NoOpAnnotator Received Cas with Text::"+aCAS.getDocumentText());
-//			throw new IndexOutOfBoundsException();
-      else {
+     else {
 				System.out.println("NoOpAnnotator.process() called for the " + counter + "th time, delaying Response For:" +processDelay +" millis");
 				synchronized( this )
 				{
@@ -101,11 +100,16 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 				}
 			}
 
+      // If creating exceptions, reduce interval between them each time.
 			if ( errorFrequency > 0 )
 			{
-				if ( counter > 0 && counter % errorFrequency == 0)
+				if ( --countDown == 0)
 				{
-					System.out.println("Generating OutOfBoundsException");
+					System.out.println("Generating OutOfBoundsException on " + counter + "th call.");
+          if (errorFrequency > 1) {
+            --errorFrequency;
+          }
+          countDown = errorFrequency;
 					throw new IndexOutOfBoundsException();
 				}
 			}
@@ -113,10 +117,6 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 		catch ( Exception e)
 		{
 			throw new AnalysisEngineProcessException(e);
-		}
-		finally
-		{
-			counter++;
 		}
 	}
 
