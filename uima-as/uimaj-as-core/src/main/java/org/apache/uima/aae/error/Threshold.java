@@ -19,104 +19,114 @@
 
 package org.apache.uima.aae.error;
 
-public class Threshold
-{
-	private long threshold;
+import java.util.Arrays;
 
-	private String action;
+public class Threshold {
+  private int threshold;
 
-	private long window;
+  private String action;
 
-	private int maxRetries;
+  private long window;
 
-	private boolean continueOnRetryFailure;
+  private int maxRetries;
 
-	public Threshold() {}
-	
-	public Threshold(long aThreshold, long aWindow, String anAction)
-	{
-		this.threshold = aThreshold;
-		this.window = aWindow;
-		action = anAction;
-	}
+  private boolean continueOnRetryFailure;
 
-	public Threshold(long aThreshold, String anAction)
-	{
-		this.threshold = aThreshold;
-		this.window = 100;
-		action = anAction;
-	}
+  private long errorCount;
 
-	public long getWindow()
-	{
-		return window;
-	}
+  private long errorSequences[];
 
-	public void setWindow(long aWindow)
-	{
-		window = aWindow;
-	}
+  public Threshold() {
+  }
 
-	public long getThreshold()
-	{
-		return threshold;
-	}
+  public long getWindow() {
+    return window;
+  }
 
-	public long getThresholdCount()
-	{
-		return threshold;
-	}
-	
-//	public void setThresholdCount( long aCount )
-	public void setThreshold( long aCount )
-	{
-		threshold = aCount;
-	}
-	public String getAction()
-	{
-		return action;
-	}
-
-	public boolean exceeded(long value)
-	{
-		if (threshold == 0) {
-		  return false;  
+  public void setWindow(long aWindow) {
+    window = aWindow;
+    // Need to save errors if can tolerate more than 1 error in a larger window
+    // Initialize array with values outside the window
+    if (aWindow > threshold && threshold > 1) {
+      errorSequences = new long[threshold - 1];
+      Arrays.fill(errorSequences, -window);
+    } else {
+      errorSequences = null;
     }
-    return (value >= threshold-1);
-	}
-	public boolean maxRetriesExceeded( long value )
-	{
-		return (value >= maxRetries);
-	}
+  }
 
-	public long getMax()
-	{
-		return threshold;
-	}
+  public long getThreshold() {
+    return threshold;
+  }
 
-	public int getMaxRetries()
-	{
-		return maxRetries;
-	}
+  public void setThreshold(long aCount) {
+    threshold = (int) aCount;
+    // Need to save errors if can tolerate more than 1 error in a larger window
+    // Initialize array with values outside the window
+    if (window > threshold && threshold > 1) {
+      errorSequences = new long[threshold - 1];
+      Arrays.fill(errorSequences, -window);
+    } else {
+      errorSequences = null;
+    }
+  }
 
-	public void setMaxRetries(int maxRetries)
-	{
-		this.maxRetries = maxRetries;
-	}
+  public boolean exceeded(long value) {
+    if (threshold == 0) {
+      return false;
+    }
+    return (value >= threshold - 1);
+  }
 
-	public boolean getContinueOnRetryFailure()
-	{
-		return continueOnRetryFailure;
-	}
+  public boolean exceededWindow(long casCount) {
+    if (threshold == 0) {
+      return false;
+    }
+    ++errorCount;
+    // casCount += errorCount; // HACK! Currently count doesn't include errors
 
-	public void setContinueOnRetryFailure(boolean continueOnRetryFailure)
-	{
-		this.continueOnRetryFailure = continueOnRetryFailure;
-	}
+    // If no window check if total errors have REACHED the threshold
+    if (errorSequences == null) {
+      return (errorCount >= threshold);
+    }
+    // Insert in array by replacing one that is outside the window.
+    int i = threshold - 1;
+    while (--i >= 0) {
+      if (errorSequences[i] <= casCount - window) {
+        errorSequences[i] = casCount;
+        return false;
+      }
+    }
+    // If insert fails then have reached threshold.
+    // (Should not be called again after returning true!)
+    return true;
+  }
 
+  public boolean maxRetriesExceeded(long value) {
+    return (value >= maxRetries);
+  }
 
-	public void setAction(String action)
-	{
-		this.action = action;
-	}
+  public int getMaxRetries() {
+    return maxRetries;
+  }
+
+  public void setMaxRetries(int maxRetries) {
+    this.maxRetries = maxRetries;
+  }
+
+  public boolean getContinueOnRetryFailure() {
+    return continueOnRetryFailure;
+  }
+
+  public void setContinueOnRetryFailure(boolean continueOnRetryFailure) {
+    this.continueOnRetryFailure = continueOnRetryFailure;
+  }
+
+  public String getAction() {
+    return action;
+  }
+
+  public void setAction(String action) {
+    this.action = action;
+  }
 }
