@@ -1043,6 +1043,17 @@ public class JmsOutputChannel implements OutputChannel
 			}
 		}	
 	}
+	private long getCommandTimeoutValue( Endpoint anEndpoint, int aCommand )
+	{
+		switch( aCommand )
+		{
+		case AsynchAEMessage.GetMeta:
+			return anEndpoint.getMetadataRequestTimeout();
+		case AsynchAEMessage.Process:
+			return anEndpoint.getProcessRequestTimeout();
+		}
+		return 0; // no match for the command
+	}
 	/**
 	 * Adds Request specific properties to the JMS Header.
 	 * @param aMessage
@@ -1054,7 +1065,11 @@ public class JmsOutputChannel implements OutputChannel
 	{
 		aMessage.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
 		aMessage.setIntProperty(AsynchAEMessage.Command, aCommand); 
-
+		long timeout = getCommandTimeoutValue(anEndpoint, aCommand);
+		if ( timeout > 0 )
+		{
+			aMessage.setJMSExpiration(timeout);
+		}
 		if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController )
 		{
 			aMessage.setStringProperty(AsynchAEMessage.MessageFrom, controllerInputEndpoint);
