@@ -95,14 +95,13 @@ public class Viterbi {
     /** ********************************************************* */
    
     
-    for (int i = 0; i < sentence.size() - 1; i++) { // for every token (observation) in a sentence
+    for (int i = 0; i < sentence.size()-1; i++) { // for every token (observation) in a sentence
 
       /*
        * Get initial probabilities for the first token in a sentence, at the moment we just make
        * them all equal 1.0 through the init_probs() function
        */
       Map<String, Double> available_pos = new HashMap<String, Double>();
-   //   Pattern p = Pattern.compile("[0-9]*");
       String token;
       
       if (i == 0) {
@@ -113,14 +112,12 @@ public class Viterbi {
       String non_cap = token.toLowerCase();
   
       if (word_probs.containsKey(token)|| word_probs.containsKey(non_cap)) {
-          if (ModelGeneration.capitalized(sentence.get(1)) && word_probs.containsKey(sentence.get(1))){
-            available_pos = word_probs.get(sentence.get(1)); // here we get available states of the
-          } else{
-              // if a lexicon contains a non-capitalized variant of a word
-                if (word_probs.containsKey(non_cap)) {
-                available_pos = word_probs.get(non_cap); 
-                }}
-        
+    	  if (word_probs.containsKey(non_cap)){
+    		 available_pos = word_probs.get(non_cap); 
+    	 } else{
+    		 available_pos = word_probs.get(token); 
+          }
+          
         } else  
           // 2. smoothed suffix- the strategy described in (Brants, 2000)
         {
@@ -133,6 +130,7 @@ public class Viterbi {
           }
           
           char [] unknown = sentence.get(1).toCharArray();
+         
           for (int j=0;j<unknown.length; j++){
             // get the longest suffix distribution from the suffix tree
             String suffix = sentence.get(1).substring(j, unknown.length);
@@ -201,21 +199,9 @@ public class Viterbi {
       Map<String, Double> possible_pos_next = new HashMap<String, Double>(); // possible pos of the
       // next token
       
-   // Here we tell the tagger that every identified number can only be a cardinal. 
-    //  It didn't improve the accuracy, even v.v. That is why it is uncommented.
-    /*
-    Matcher m2 = p.matcher(token);
-    boolean b = m2.matches();
-    
-      if (b) {
-      cardinals+=1;
-       possible_pos_next = word_probs.get("@card");
-      // possible_pos_next.put("CARD", 1.00);
-      }
-      else */
+  
       if (word_probs.containsKey(sentence.get(i + 1))) { // if the next token is known
         possible_pos_next = word_probs.get(sentence.get(i + 1)); // get possible POS of the next
-     
       } else   // if the token is unknown, then get possible tags from the suffix analysis
       {
           Map<String, Map<String, Double>> suffix_tree_local;
