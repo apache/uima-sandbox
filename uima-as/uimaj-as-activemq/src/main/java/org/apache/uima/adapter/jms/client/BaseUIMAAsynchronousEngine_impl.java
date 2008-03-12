@@ -37,13 +37,13 @@ import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.AsynchAECasManager_impl;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
+import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.ControllerCallbackListener;
 import org.apache.uima.aae.controller.ControllerLifecycle;
 import org.apache.uima.aae.controller.Endpoint;
-import org.apache.uima.aae.error.UimaEEMetaRequestTimeout;
+import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
 import org.apache.uima.aae.jmx.JmxManager;
 import org.apache.uima.aae.jmx.UimaASClientInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
@@ -469,7 +469,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			if (abort || !running)
 			{
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_aborting_as_WARNING", new Object[] { "Metadata Timeout" });
-				throw new ResourceInitializationException(new UimaEEMetaRequestTimeout());
+				throw new ResourceInitializationException(new UimaASMetaRequestTimeout());
 			}
 			else
 			{
@@ -485,7 +485,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 
 				for (int i = 0; listeners != null && i < listeners.size(); i++)
 				{
-					((UimaEEStatusCallbackListener) listeners.get(i)).initializationComplete(null);
+					((UimaASStatusCallbackListener) listeners.get(i)).initializationComplete(null);
 				}
 			}
 

@@ -48,7 +48,7 @@ import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.client.UimaEEStatusCallbackListener;
+import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
@@ -308,7 +308,7 @@ public class RunRemoteAsyncAE {
    * 
    * 
    */
-  class StatusCallbackListenerImpl implements UimaEEStatusCallbackListener {
+  class StatusCallbackListenerImpl implements UimaASStatusCallbackListener {
     int entityCount = 0;
 
     long size = 0;
