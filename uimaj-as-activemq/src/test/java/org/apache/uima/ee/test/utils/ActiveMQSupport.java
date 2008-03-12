@@ -58,6 +58,11 @@ public class ActiveMQSupport extends TestCase
 		"test"+System.getProperty("file.separator")+
 		"resources"+System.getProperty("file.separator")+
 		"deployment";
+	protected static final String relativeDataPath = 
+		"src"+System.getProperty("file.separator")+
+		"test"+System.getProperty("file.separator")+
+		"resources"+System.getProperty("file.separator")+
+		"data";
 
 	protected void setUp() throws Exception
 	{
