@@ -4,11 +4,12 @@ Copyright 2008 The Apache Software Foundation
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
-Portions of UIMA were originally developed by
+Portions of UIMA-AS were originally developed by
 International Business Machines Corporation and are
 licensed to the Apache Software Foundation under the
 "Software Grant License Agreement", informally known as the 
 "IBM UIMA-EE License Agreement".
+Copyright (c) 2007, 2008 IBM Corporation
 
 This product includes software, Apache ActiveMQ, developed
 at the Apache Software Foundation (http://www.apache.org/).
