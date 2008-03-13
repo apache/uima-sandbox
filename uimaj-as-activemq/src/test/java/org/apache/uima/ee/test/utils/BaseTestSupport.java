@@ -460,10 +460,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 			if ( doubleByteText != null )
 			{
 				String returnedText = aCAS.getDocumentText();
-				if ( !doubleByteText.equalsIgnoreCase(returnedText))
+				if ( !doubleByteText.equals(returnedText))
 				{
 					  System.out.println("!!!!!!!!!!!!! Expected Same Double-Byte Text in Reply. Received Reply With Invalid Document");
 					  unexpectedException = true;
+            processCountLatch.countDown();
 					  return;
 				}
 			}
