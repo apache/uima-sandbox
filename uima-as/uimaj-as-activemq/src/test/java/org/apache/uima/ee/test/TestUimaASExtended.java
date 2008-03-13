@@ -52,6 +52,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.ee.test.utils.BaseTestSupport;
+import org.apache.uima.internal.util.XMLUtils;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
@@ -614,10 +615,13 @@ public class TestUimaASExtended extends BaseTestSupport
 				InputStream fis = new FileInputStream(file);
 				Reader rd = new InputStreamReader(fis, "UTF-8");
 				BufferedReader in = new BufferedReader(rd);
-				char buffer[] = new char[(int)file.length()];
-				in.read(buffer);
 				//	Set the double-byte text. This is what will be sent to the service
-				super.setDoubleByteText(String.valueOf(buffer));
+        String line = in.readLine();
+				super.setDoubleByteText(line);
+        int err = XMLUtils.checkForNonXmlCharacters(line);
+        if (err >= 0) {
+          fail("Illegal XML char at offset " + err);
+        }
 				super.setExpectingServiceShutdown();
 				//	Initialize and run the Test. Wait for a completion and cleanup resources.
 				runTest(null,eeUimaEngine,httpURI,"NoOpAnnotatorQueue", 1, CPC_LATCH );
@@ -626,6 +630,8 @@ public class TestUimaASExtended extends BaseTestSupport
 		catch( Exception e)
 		{
 			//	Double-Byte Text file not present. Continue on with the next test
+      e.printStackTrace();
+      fail("Could not complete test");
 		}
 	}
 	
