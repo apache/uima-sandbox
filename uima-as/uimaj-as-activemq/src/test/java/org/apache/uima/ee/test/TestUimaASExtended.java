@@ -600,8 +600,9 @@ public class TestUimaASExtended extends BaseTestSupport
 			//	Process only if the file exists
 			if ( file.exists())
 			{
-				System.out.println("File Exists");
-
+				System.out.println(" *** DoubleByteText.txt exists and will be sent through http connector.");
+        System.out.println(" *** If the vanilla activemq-optional-5.0.0.jar from AMQ 5.0 release is being used,");
+        System.out.println(" *** and DoubleByteText.txt is bigger than 60KB or so, this test case will hang.");
 				
 				// Add HTTP Connector to the broker. The connector will use port 8888. If this port is not available the test fails 
 				String httpURI = addHttpConnector(DEFAULT_HTTP_PORT);
