@@ -349,7 +349,7 @@
 							<!-- add a few classes in impl packages that are directly used by user code -->
               <additionalparam>
                 ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/client/UimaAsynchronousEngine.java
-                ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/client/UimaEEStatusCallbackListener.java
+                ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/client/UimaASStatusCallbackListener.java
                 ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/error/ErrorResult.java
                 ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/error/ErrorResultComponentPath.java
                 ${basedir}/../uimaj-as-core/src/main/java/org/apache/uima/aae/error/ErrorResultTDs.java
