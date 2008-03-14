@@ -154,7 +154,7 @@ under the License.
         <include>org.apache.derby:derby</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
-`      <outputDirectory>apache-activemq-5.0.0/lib/</outputDirectory>
+      <outputDirectory>apache-activemq-5.0.0/lib/optional</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
