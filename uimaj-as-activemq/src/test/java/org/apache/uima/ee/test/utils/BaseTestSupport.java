@@ -462,7 +462,10 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 				String returnedText = aCAS.getDocumentText();
 				if ( !doubleByteText.equals(returnedText))
 				{
-					  System.out.println("!!!!!!!!!!!!! Expected Same Double-Byte Text in Reply. Received Reply With Invalid Document");
+					  System.out.println("!!! DocumentText in CAS reply different from that in CAS sent !!!");
+            System.out.println("This is expected using http connector with vanilla AMQ 5.0 release,");
+            System.out.println("and the test file DoubleByteText.txt contains double byte chars.");
+            System.out.println("To fix, use uima-as-distr/src/main/lib/optional/activemq-optional-5.0.0.jar");
 					  unexpectedException = true;
             processCountLatch.countDown();
 					  return;
