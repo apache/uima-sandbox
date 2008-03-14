@@ -1,0 +1,266 @@
+	                    Apache UIMA Sandbox v2.2.2
+                               Release Notes
+   -----------------------------------------------------------------------
+
+CONTENTS
+1. What is the UIMA?
+2. What is the Apache UIMA annotator package?
+3. Major Changes in this Release
+4. How to Get Involved
+5. How to Report Issues
+6. List of JIRA Issues Fixed in this Release   
+   
+   
+1. What is UIMA?
+
+Unstructured Information Management applications are software systems that 
+analyze large volumes of unstructured information in order to discover knowledge
+that is relevant to an end user. UIMA is a framework and SDK for developing such
+applications. An example UIM application might ingest plain text and identify 
+entities, such as persons, places, organizations; or relations, such as 
+works-for or located-at. UIMA enables such an application to be decomposed into 
+components, for example "language identification" -> 
+"language specific segmentation" -> "sentence boundary detection" -> 
+"entity detection (person/place names etc.)". Each component must implement 
+interfaces defined by the framework and must provide self-describing metadata 
+via XML descriptor files. The framework manages these components and the data 
+flow between them. Components are written in Java or C++; the data that 
+flows between components is designed for efficient mapping between these 
+languages. UIMA additionally provides capabilities to wrap components as 
+network services, and can scale to very large volumes by replicating processing 
+pipelines over a cluster of networked nodes.
+
+Apache UIMA is an Apache-licensed open source implementation of the UIMA 
+specification (that specification is, in turn, being developed concurrently by 
+a technical committee within OASIS , a standards organization). We invite and 
+encourage you to participate in both the implementation and specification 
+efforts.
+
+UIMA is a component framework for analysing unstructured content such as text, 
+audio and video. It comprises an SDK and tooling for composing and running 
+analytic components written in Java and C++, with some support for Perl, 
+Python and TCL.
+
+2. What is the Apache UIMA annotator package?
+
+The Apache UIMA annotator package is an add-on package for the base UIMA release.
+The add-on package contains annotator components developed for Apache UIMA. The 
+add-on package fits the Apache UIMA directory structure and adds a directory 
+called "addons/annotator" that contains the following annotator components:
+ - DictionaryAnnotator
+ - RegularExpressionAnnotator
+ - Tagger
+ - WhitespaceTokenizer
+
+
+3. Major Changes in this Release
+
+The Apache UIMA annotator package release version 2.2.2 is the first release 
+of this package. The package contains four new components. These are:
+ - DictionaryAnnotator
+ - RegularExpressionAnnotator
+ - Tagger
+ - WhitespaceTokenizer
+For a list of all JIRA issues fixed with the current Sandbox release, 
+please refer to chapter 6. "List of JIRA Issues Fixed in this Release". 
+
+
+4. How to Get Involved
+
+The Apache UIMA project really needs and appreciates any contributions, 
+including documentation help, source code and feedback.  If you are interested
+in contributing, please visit http://incubator.apache.org/uima/get-involved.html.
+
+
+5. How to Report Issues
+
+The Apache UIMA project uses JIRA for issue tracking.  Please report any 
+issues you find at http://issues.apache.org/jira/browse/uima.
+
+
+6. List of JIRA Issues Fixed in this Release
+
+Release Notes - UIMA Sandbox - Version 2.2.2
+
+** Bug
+    * [UIMA-430] - CAS Editor test case fails 
+    * [UIMA-431] - Cas Editor: Select all button in the outline view does not work
+    * [UIMA-432] - CAS Editor annotation style property page show not all annotations
+    * [UIMA-433] - CAS Editor changing documents does not always sets dirty flag
+    * [UIMA-434] - CAS Editor add icons
+    * [UIMA-444] - Sandbox projects build only when in same directory as uimaj projects
+    * [UIMA-450] - Cas Editor: Renaming typesystem does not work
+    * [UIMA-451] - Cas Editor: AnnotionEditor.dispose() throws NPE
+    * [UIMA-452] - Cas Editor: Actions to modify annotations spans do not check bounds
+    * [UIMA-453] - Cas Editor: FS View delete button does not work
+    * [UIMA-454] - Cas Editor : AnnotationEditor highlights annotations which do not belong to the current annotation mode
+    * [UIMA-455] - Unused import com.sun.org.apache.bcel.internal.generic.ISTORE in CasEditor causes build break with IBM JVM
+    * [UIMA-457] - Can't build CAS Editor from SVN checkout in Eclipse
+    * [UIMA-482] - Cas Editor: Show Annotations menu does not remember selction across editors
+    * [UIMA-493] - Cas Editor: Adding a typesystem throws NPE
+    * [UIMA-505] - Cas Editor: Hide unwanted org.eclipse.ui.ide extensions
+    * [UIMA-512] - Cas Editor: plugin.xml contains unused extensions which depend on eclipse 3.3
+    * [UIMA-530] - Cas Editor: The Annotation Editor throws sometimes exceptions if used as FS drag source
+    * [UIMA-531] - Cas Editor: Delete button of the FSView does not work correctly
+    * [UIMA-532] - Cas Editor: Select all action does not work in FSView
+    * [UIMA-535] - Cas Editor: After running an AE there is no call to collectionProcessComplete
+    * [UIMA-537] - Cas Editor: Imports do not work in descriptor files
+    * [UIMA-542] - Cas Editor cannot be exported via product export wizard
+    * [UIMA-558] - Cas Editor: Annotator Runner sets editor dirty but also writes the file to disc
+    * [UIMA-561] - Cas Editor: Junit Plugin tests cannot be run
+    * [UIMA-588] - fix RegularExpressionAnnotator tests - add type priorities to get the same results for all JVMs
+    * [UIMA-593] - Cas Editor: The show menu in the annotation editor can not hide annotations 
+    * [UIMA-612] - add License and Notice files
+    * [UIMA-613] - remove compiler warnings after moving to Java 1.5
+    * [UIMA-614] - remove compiler warnings after moving to Java 1.5
+    * [UIMA-617] - change POM to work with Java 1.5
+    * [UIMA-620] - switch concept file parsing from File to InputStream
+    * [UIMA-621] - change the way to add the compiled sources to the PEAR package
+    * [UIMA-625] - update DictionaryAnnotator message catalog
+    * [UIMA-646] - remove classpath as required argument for the PEAR packaging plugin
+    * [UIMA-653] - allow feature normalization also on non-String based features
+    * [UIMA-658] - Cas Editor: Change version to 2.2.1
+    * [UIMA-693] - Fix poms so uima-as compiles with maven
+    * [UIMA-713] - Opening a document should show an error message if something goes wrong
+    * [UIMA-714] - F2 key short cut for renaming a resource does not work in the Corpus Explorer
+    * [UIMA-715] - F5 key short cut for refreshing does not work in Corpus Explorer
+    * [UIMA-716] - Deletion of processor folder does not removes the folder in the Corpus Explorer
+    * [UIMA-725] - case sensitive dictionaries do not work correctly
+    * [UIMA-757] - Tagger throws ClassCastException
+    * [UIMA-760] - add regex annotator performance test
+    * [UIMA-762] - rename xmltypes.jar 
+    * [UIMA-765] - fix email address regex - escape "-" in regular expression
+    * [UIMA-768] - rename xmltypes.jar 
+    * [UIMA-773] - Some files missing license headers
+    * [UIMA-775] - fix Findbugs issues
+    * [UIMA-776] - fix Findbugs issues
+    * [UIMA-778] - fix Findbugs issues
+    * [UIMA-795] - dictionaries created by DictionaryCreator cannot be used
+    * [UIMA-803] - change whitespace character definition 
+    * [UIMA-804] - change default multi token separator from \t to |
+    * [UIMA-808] - SimpleServerServlet throws NullPointerExcpetion if no parameter was specified in doGet or doPost
+    * [UIMA-809] - Silence exceptions occuring in ActiveMQ/Spring when stopping listeners
+    * [UIMA-812] - Dictionary annotator does not work with several dictionaries in a single descriptor
+    * [UIMA-819] - rename all shipment jars start with uima-
+    * [UIMA-820] - fix classpath entry "null;"  if no classpath was specified
+    * [UIMA-827] - fix NPE for interger based feature values that are null
+    * [UIMA-831] - UIMA-AS code fails to compile
+    * [UIMA-833] - Cannot create Eclipse project uimaj-as-activemq
+    * [UIMA-834] - replace special characters with XML entities when generating dictionaries
+    * [UIMA-843] - Modify UIMA-AS client to throw exception from initialize() when GetMeta times out
+    * [UIMA-851] - dd2spring uses incorrect default value for casPoolSize
+    * [UIMA-859] - changeVersion scripts not handling transition from SNAPSHOT to non-SNAPSHOT properly
+    * [UIMA-862] - UIMA-AS: saxon jar name wrong, and saxon version issue
+    * [UIMA-864] - update version from 2.2.2-incubating-SNAPSHOT to 2.2.2-incubating
+    * [UIMA-865] - UIMA core distribution build only works if the UIMA AS plugins are available
+    * [UIMA-868] - put Saxon in a place unlikely to be put in the class path; update test and script codes to reference
+    * [UIMA-869] - uima-as test case refers to UIMA_HOME to get saxon and dd2spring xslt - doesn't work before install & assembly:assembly
+    * [UIMA-870] - uima-as fix active-mq jar lib layout - wrong jetty version, move right things to "optional" directory
+    * [UIMA-872] - uima-as has spring version 2.5.1 , but is using activemq-5.0.0 which in turn has spring version 2.0.6, causing intermittant test failures?
+    * [UIMA-873] - uima-as NOTICE file needs to remove horizontal lines
+    * [UIMA-875] - Problem handing errors in sendAndReceiveCAS
+    * [UIMA-876] - UIMA service requests should expire if timeout value is set
+
+** Improvement
+    * [UIMA-350] - add performance test for WhitespaceTokenizer
+    * [UIMA-460] - Change CAS Editor Docs project to be a general sandbox docs project
+    * [UIMA-470] - CAS Editor: Cas Processor error reporting does not show a problem message
+    * [UIMA-471] - CAS Editor: Non xcas files are only viewable but not editable
+    * [UIMA-481] - Cas Editor: Error reporting for cas processor
+    * [UIMA-485] - Cas Editor: Add cas text color annotation drawing strategy
+    * [UIMA-495] - Cas Editor: FS View should show address of FS objects
+    * [UIMA-497] - Cas Editor: Add token annotation drawing strategy
+    * [UIMA-501] - Cas Editor: Finish the about dialog
+    * [UIMA-502] - Cas Editor: Add a splash screen
+    * [UIMA-503] - Cas Editor: Add support for XMI files
+    * [UIMA-504] - Cas Editor: Cas Processors should synchronize with editors
+    * [UIMA-511] - Cas Editor: Should show all annotaions by default
+    * [UIMA-526] - Cas Editor: Add a new Edit View for editing of FS
+    * [UIMA-536] - Build Cas Editor as rcp application with maven
+    * [UIMA-538] - Cas Editor: Add an icon for the merge action in the outline view
+    * [UIMA-540] - Cas Editor: Add launcher icons
+    * [UIMA-541] - Cas Editor: Add windows icons
+    * [UIMA-550] - Sandbox components: use UIMA artifacts from the repository 
+    * [UIMA-559] - Cas Editor: Add a facility to choose the type of a new annotation in the AnnotationEditor
+    * [UIMA-562] - Cas Editor: Add an import wizard for txt files
+    * [UIMA-565] - Cas Editor: Improve startup process
+    * [UIMA-566] - Cas Editor: Add a dialog to choose the workspace
+    * [UIMA-571] - Cas Editor: Add drawing layer support for annotation painting
+    * [UIMA-577] - split up the Sandbox documentation build
+    * [UIMA-584] - Add eclipse project files to the Cas Editor project
+    * [UIMA-587] - Cas Editor: After a cas processor was run the cas processor folder should be refreshed
+    * [UIMA-590] - change the way the RegularExpressionAnnotator load the configuration files
+    * [UIMA-592] - add feature value normalization for RegEx Annotator
+    * [UIMA-594] - update RegexAnnotator with custom anntoation validator
+    * [UIMA-596] - Cas Editor: Do not show DocumentAnnotation by default
+    * [UIMA-602] - add PEAR packaging task for RegexAnnotaor
+    * [UIMA-609] - Cas Editor: Add automated ui tests
+    * [UIMA-610] - minor documentation updates - added some real world examples
+    * [UIMA-615] - update DictionaryBuilder tests to work with XML dictionary formats
+    * [UIMA-618] - add documentation infrastructure for the DictionaryAnnotator
+    * [UIMA-631] - Switch dictionary file parsing from File input to InputStream
+    * [UIMA-634] - improve DictionaryAnnotator exception handling
+    * [UIMA-635] - add documentation for the PearPackagingMavenPlugin
+    * [UIMA-637] - add multi-word separator configuration for the DictionaryAnnotator
+    * [UIMA-644] - update RegexAnnotator tests after test coverage analysis
+    * [UIMA-647] - add DictionaryAnnotator tests
+    * [UIMA-666] - update feature normalization interface - add additional information
+    * [UIMA-678] - Update notice file
+    * [UIMA-691] - add DictionaryCreator command line
+    * [UIMA-696] - build documentation automatically during the component build
+    * [UIMA-717] - minor performance improvements
+    * [UIMA-719] - Current Version of the HMM Tagger
+    * [UIMA-728] - add money amount detection for regex annotator - use match group names
+    * [UIMA-752] - rename uima-ee to uima-as in SVN
+    * [UIMA-753] - Some improvements in the algorithm, structural changes as well as docbook update
+    * [UIMA-758] - Make the tagger runtime read its properties from the descriptor, not a properties file
+    * [UIMA-763] - Automatically build PEAR file for Tagger
+    * [UIMA-779] - Some modifications in the tagger code (esp. in the implementation of the SuffixTree.EDGE class)
+    * [UIMA-787] - Migrate code to the latest version of ActiveMQ (5.0.0)
+    * [UIMA-788] - Migrate code to the latest version of Spring (v.2.5.1)
+    * [UIMA-791] - Patch containing some improvements
+    * [UIMA-793] - CasEditor - updates to docbook doc
+    * [UIMA-806] - use Java NumberFormat to convert string numbers to float or integer
+    * [UIMA-846] - Modify UIMA-AS to remove EE from class names
+    * [UIMA-856] - cleanup uima-as docbook
+    * [UIMA-861] - Add eclipse-plugin-superPom for uima-as, copying the structure used in uima
+    * [UIMA-871] - Split test suite into basic test and an extended test suite
+    * [UIMA-877] - Reverse multiple copyright statements in docbooks, per request at previous release vote
+
+** New Feature
+    * [UIMA-95] - add sandbox infrastructure
+    * [UIMA-151] - Add project for uima whitespace tokenizer implementation
+    * [UIMA-155] - add cas editor (tae) project
+    * [UIMA-384] - create a pear packaging ant task
+    * [UIMA-515] - enable CASEditor to work with resource specifiers as cas processors
+    * [UIMA-539] - implement UIMA RegularExpressionAnnotator
+    * [UIMA-555] - add documentation for the RegularExpressionAnnotator
+    * [UIMA-595] - add Rule to the RegexAnnotator to detect credit card numbers
+    * [UIMA-600] - add new DictionaryAnnotator implementation
+    * [UIMA-601] - initial import of the PEAR packaging maven plugin
+    * [UIMA-603] - update Sandbox documentation build
+    * [UIMA-604] - Create HMM POS project in the sandbox
+    * [UIMA-605] - UIMA Sandbox tagger initial code drop
+    * [UIMA-642] - allow RegularExpressionAnnotator to match on featurePath values
+    * [UIMA-645] - minor code updates for WhitespaceTokenizer
+    * [UIMA-651] - add regex variables to the concept file syntax
+    * [UIMA-669] - update WhitespaceTokenizer to be sofa aware
+    * [UIMA-692] - allow DictionaryAnnotator to match on featurePath values
+    * [UIMA-695] - allow DictionaryAnnotator to filter the inputMatch annotations
+    * [UIMA-697] - add DictionaryAnnotator documentation
+    * [UIMA-724] - allow match group names for regular expressions
+    * [UIMA-770] - add PEAR build to WhitespaceTokenizer POM
+    * [UIMA-771] - call documentation build from POM
+    * [UIMA-772] - add new Sandbox-dist project that contains the Sandbox build
+    * [UIMA-849] - Add sample deployment descriptors
+
+** Task
+    * [UIMA-357] - Write documentation for the Cas Editor
+    * [UIMA-573] - Cas Editor: Update documentation
+    * [UIMA-581] - Cas Editor: Create a test plan
+    * [UIMA-682] - update Sandbox components to work on the new uimaj-2.2.1-incubating release
+    * [UIMA-783] - Update Cas Editor version to 2.2.2
+
+** Wish
+    * [UIMA-448] - Add a sample annotation project
+

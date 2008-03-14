@@ -1,0 +1,101 @@
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.    
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.uima</groupId>
+  <artifactId>SandboxAnnotatorPackage</artifactId>
+  <packaging>pom</packaging>
+  <version>2.2.2-incubating</version>
+  <name>Apache UIMA Java SDK Add-Ons</name>
+  <url>http://incubator.apache.org/uima</url>
+  <description>Components and tooling for the UIMA SDK</description>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>http://svn.apache.org/viewvc/incubator/uima</url>
+  </scm>
+  <organization>
+    <name>The Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+  </organization>
+
+  <dependencies>
+  </dependencies>
+ 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Require v2.1 of assembly plugin because v2.2 doesn't seem to correctly unpack zip files.
+        It creates an extra top-level directory with the same name as the zip file. -->
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+     </plugin>
+  	 <plugin>
+		<artifactId>maven-assembly-plugin</artifactId>
+		<configuration>
+			<descriptors>
+				<descriptor>assembly/bin.xml</descriptor>
+				<descriptor>assembly/src.xml</descriptor>
+			</descriptors>
+			<finalName>uimaj-annotator-addons-${pom.version}</finalName>
+	        <tarLongFileMode>gnu</tarLongFileMode>
+		</configuration>
+	 </plugin>
+    </plugins>
+  </build>
+  
+  <reporting>
+  </reporting>
+  
+  <modules>
+    <module>../../PearPackagingMavenPlugin</module>
+    <module>../../PearPackagingAntTask</module>
+    <module>../../RegularExpressionAnnotator</module>
+    <module>../../DictionaryAnnotator</module>
+    <module>../../WhitespaceTokenizer</module>
+    <module>../../Tagger</module>
+  </modules>
+   
+  <repositories>
+    <repository>
+      <id>eclipsePlugins</id>
+      <url>http://repo1.maven.org/eclipse</url>
+    </repository>
+  </repositories>
+</project>

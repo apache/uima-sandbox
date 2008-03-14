@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDeploymentDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>Top Level TAE</name>
+  <description/>
+  <version/>
+  <vendor/>
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="1" initialFsHeapSize="2000000"/>
+    <service>
+      <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
+      <topDescriptor>
+        <import location="../descriptors/analysis_engine/SimpleTestAggregateWith100DocCM.xml"/>
+      </topDescriptor>
+      <analysisEngine async="true">
+        <scaleout numberOfInstances="1"/>
+        <delegates>
+          <analysisEngine key="SimpleCasGenerator" async="false">
+            <scaleout numberOfInstances="1"/>
+            <casMultiplier poolSize="1" initialFsHeapSize="2000000"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="0" errorAction="terminate"/>
+              <processCasErrors maxRetries="0" timeout="0" continueOnRetryFailure="false" thresholdCount="0" thresholdWindow="0" thresholdAction="terminate"/>
+              <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+          </analysisEngine>
+          <analysisEngine key="NoOp" async="false">
+            <scaleout numberOfInstances="1"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="5000" errorAction="continue"/>
+              <processCasErrors maxRetries="0" timeout="5000" continueOnRetryFailure="false" thresholdCount="3" thresholdWindow="7" thresholdAction="disable"/>
+              <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+          </analysisEngine>
+          <analysisEngine key="NoOpAnnotatorWithCpcCheck" async="false">
+            <scaleout numberOfInstances="1"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="0" errorAction="terminate"/>
+              <processCasErrors maxRetries="0" timeout="0" continueOnRetryFailure="false" thresholdCount="0" thresholdWindow="0" thresholdAction="terminate"/>
+              <collectionProcessCompleteErrors timeout="20000" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+          </analysisEngine>
+        </delegates>
+        <asyncPrimitiveErrorConfiguration>
+          <processCasErrors thresholdCount="1" thresholdWindow="100" thresholdAction="terminate"/>
+          <collectionProcessCompleteErrors timeout="20000" additionalErrorAction="terminate"/>
+        </asyncPrimitiveErrorConfiguration>
+      </analysisEngine>
+    </service>
+  </deployment>
+</analysisEngineDeploymentDescription>
