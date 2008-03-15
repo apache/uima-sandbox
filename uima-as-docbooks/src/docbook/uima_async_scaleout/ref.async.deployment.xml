@@ -674,55 +674,47 @@ under the License.
         
         
         <para>The continueOnRetryFailure attribute, if set to 'true' causes the framework to ask the 
-          aggregate's flow controller to attempt to continue, by skipping this failing delegate in its flow.
-          The flow controller can indicate it cannot continue, in which case, an error result is returned.
+          aggregate's flow controller if the processing for the CAS can continue.
+          If this attribute is 'false' or if the flow controller indicates it cannot continue,
+          further processing on the CAS is stopped and an error returned from the aggregate.
           </para>
         
         <warning><para>
-        If maxRetries > 0 or the continueOnRetryFailure option is specified, the CAS will be saved 
+        If maxRetries > 0 or the continueOnRetryFailure attribute is 'true', the CAS will be saved 
         before sending it to remote delegates, to enable the these actions.  
-        For co-located delegates, the CAS is <emphasis>not</emphasis> copied, therefor the retry 
+        For co-located delegates, the CAS is <emphasis>not</emphasis> copied, therefore the retry 
         and continue options are not allowed.
       </para></warning>
         
       <para>
         The timeout attribute specifies the timeout values used when sending the 
-        commands to the delegates.</para>
+        commands to the delegates.  The units are milliseconds and a value of 0
+        has the special meaning of no timeout.</para>
         
       <para>
-        The thresholdCount and thresholdWindow attributes specify a threshold,
-        where xxx is the number of errors permitted in a window of size yyy.
-        If the threshold is exceeded, the framework take the specified
+        The thresholdCount and thresholdWindow attributes specify the threshold 
+        at which the thresholdAction is taken.
+        If xxx errors occur within a window of size yyy, the framework takes the specified
         action of either disabling this delegate, or terminating the containing AS Aggregate
-        (or if not an AS Aggregate, terminated the AS Primitive).
-        Disabling removes the delegate from the flow,
-        so the containing aggregate will no longer send it commands; the 
-        error result object returned indicates the disable action
-        was taken.  When disabling, the framework asks the flow controller to remove the
-        delegate from the flow; the flow controller respond to the framework that it cannot 
-        reasonably operate without this component, in which case
-        the framework will convert the "disable" into a "terminate".  
+        (or if not an AS Aggregate, terminating the AS Primitive).
+        A thresholdCount of 0 (the default) has the special meaning of no threshold, i.e. errors ignored,
+        and a thresholdWindow of 0 (the default) means no window, i.e. all errors counted.
       </para>
- 
+
       <para>
-        The termination action disconnects the containing AS Aggregate or this AS Primitive
-        from its input queue so it will no longer handle messages delivered to it.  It
-        cleans up the containing AS Aggregate or this AS Primitive, and, for AS Aggregates, 
-        cascades this cleanup down to any co-located
-        delegates that are not shared by other clients.
+        An action of 'disable' applied to the specified delegate, removing it from the flow
+        so the containing aggregate will no longer send it commands.
+        The 'terminate' action applies to the entire service containing this component,
+        disconnecting it from its input queue and shutting it down.
+        Note that when disabling, the framework asks the flow controller to remove the delegate from the flow;
+        the flow controller may respond to the framework that it cannot reasonably operate without this component,
+        in which case the framework will convert "disable" into "terminate".
       </para>
         
-        <para>
-          If, as a result of termination, there are no more enabled consumers attached to a particular queue, the
-          framework will set a flag and immediately return error results for both in-progress and future 
-          commands addressed to this queue.  If, at some later point, one or more consumers become enabled on this
-          queue, the framework will resume sending commands.
-        </para>
-        
       <para>
-        Note that the only action for an <emphasis>AS Primitive</emphasis> on getMetadata failure is to terminate, and this is 
-        always the case, so it is not listed as an configuration option.  This is also the default and only action 
-        allowed if thresholds are used.
+        Note that the only action for an AS Primitive on getMetadata failure is to terminate, and this is 
+        always the case, so it is not listed as an configuration option.  This is also the default
+        action for an AS Aggregate getMetadata failure.
       </para>
         
         </section>
@@ -734,12 +726,16 @@ under the License.
          If the &lt;errorConfiguration> element is omitted, or if some sub elements of this
          are omitted, the following defaults are used:
          <itemizedlist>
-           <listitem><para>Timeout defaults are set to 0, meaning no timeout, except for the
-             getMetadata command on remote delegates; here the default is 1 minute.</para></listitem>
-           <listitem><para>No disable or terminate action will be done, except for the getMetadata command
-             where the default is to terminate.</para></listitem>
-           <listitem><para>The "continueOnRetryFailure" action is set to "false".</para></listitem>
            <listitem><para>The maxRetries parameter is set to 0. </para></listitem>
+           <listitem><para>Timeout defaults are set to 0, meaning no timeout, except for the
+             getMetadata command for remote delegates; here the default is 60000 (1 minute)</para></listitem>
+           <listitem><para>The continueOnRetryFailure action is set to "false".</para></listitem>
+           <listitem><para>The thresholdCount value is set to 0, meaning no
+                           threshold, errors are ignored.</para></listitem>
+           <listitem><para>The thresholdWindow value is set to 0, meaning no
+                           window, all errors are counted.</para></listitem>
+           <listitem><para>No disable or terminate action will be done (i.e. errors ignored), except for the getMetadata command
+             where the default is to terminate.</para></listitem>
          </itemizedlist>       </para>
         </section>
 
