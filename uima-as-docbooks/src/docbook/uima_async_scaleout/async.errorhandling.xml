@@ -162,11 +162,16 @@ under the License.
   
   <section id="ugr.async.eh.error_results">
     <title>Error results</title>
-    <para>When an error occurs and is not recovered, an error result is returned to the caller.
+    <note><para>The ErrorResult object is not implemented yet.  
+      Instead, when an error occurs and is not recovered, 
+      the caller is notified via the standard callback mechanism for the client 
+      (<xref linkend="ugr.ref.async.error.status"/>).</para></note>
+      
+    <para>When an error occurs and is not recovered, an ErrorResult is returned to the caller.
       This is an object with the following methods: </para>
     
     <table frame="all" rowsep="1" colsep="1" id="ugr.async.eh.table.error_result">
-      <title>Error Result</title>
+      <title>ErrorResult class</title>
       <tgroup cols="2">
         <colspec colnum="1" colname="col1" colwidth="1*"/>
         <colspec colnum="2" colname="col2" colwidth="2*"/>
