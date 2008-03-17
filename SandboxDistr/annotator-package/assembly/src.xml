@@ -174,22 +174,38 @@
       		</includes>
     	</fileSet>
 
-	<!-- Add files for the Tagger -->
-		<fileSet>
-      		<directory>../../Tagger</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/Tagger</outputDirectory>
-      		<includes>
-        		<include>src/**</include>
-        		<include>desc/**</include>
-        		<include>resources/**</include>
-        		<include>docbook/**</include>
-        		<include>lib/**</include>
-        		<include>pom.xml</include>
-        		<include>build_documentation.xml</include>
-        		<include>NOTICE.txt</include>
-        		<include>LICENSE.txt</include>
-      		</includes>
-    	</fileSet>
+    <!-- Add files for the Tagger -->
+        <fileSet>
+            <directory>../../Tagger</directory>
+            <outputDirectory>/apache-uima/addons/annotator_src/Tagger</outputDirectory>
+            <includes>
+                <include>src/**</include>
+                <include>desc/**</include>
+                <include>resources/**</include>
+                <include>docbook/**</include>
+                <include>lib/**</include>
+                <include>pom.xml</include>
+                <include>build_documentation.xml</include>
+                <include>NOTICE.txt</include>
+                <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
+    <!-- SimpleServer -->
+        <fileSet>
+            <directory>../../SimpleServer</directory>
+            <outputDirectory>/apache-uima/addons/SimpleServer</outputDirectory>
+            <includes>
+                <include>src/**</include>
+                <include>desc/**</include>
+                <include>resources/**</include>
+                <include>docbook/**</include>
+                <include>lib/**</include>
+                <include>pom.xml</include>
+                <include>build_documentation.xml</include>
+                <include>NOTICE.txt</include>
+                <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
 
 		
 	</fileSets>

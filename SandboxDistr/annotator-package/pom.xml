@@ -42,7 +42,7 @@
     <name>The Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
   </organization>
-
+  
   <dependencies>
   </dependencies>
  
@@ -90,6 +90,7 @@
     <module>../../DictionaryAnnotator</module>
     <module>../../WhitespaceTokenizer</module>
     <module>../../Tagger</module>
+    <module>../../SimpleServer</module>
   </modules>
    
   <repositories>
