@@ -24,24 +24,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.aae.UIDGenerator;
-import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
-import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.ControllerCallbackListener;
-import org.apache.uima.aae.controller.ControllerLifecycle;
-import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.adapter.jms.JmsConstants;
-import org.apache.uima.adapter.jms.activemq.BrokerDeployer;
 import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
-import org.apache.uima.adapter.jms.activemq.UimaEEAdminSpringContext;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.UimaVersion;
@@ -338,7 +327,7 @@ public class UIMA_Service implements ControllerCallbackListener
 	}
 
 	/**
-	 * The main routine for starting the deployment of a UIMA-EE instance. The
+	 * The main routine for starting the deployment of a UIMA-AS instance. The
 	 * args are either: 1 or more "paths" to Spring XML descriptors representing
 	 * the information needed or some number of parameters, preceeded by a "-"
 	 * sign. If the first arg doesn't start with a "-" it is presumed to be the
@@ -356,7 +345,7 @@ public class UIMA_Service implements ControllerCallbackListener
 	 */
 	public static void main(String[] args)
 	{
-		UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-EE version " + UimaVersion.getVersion());
+		UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-AS version " + UimaVersion.getVersion());
 
 		String[] springConfigFileArray =
 		{};

@@ -19,35 +19,40 @@
 
 package org.apache.uima.adapter.jms.client;
 import java.io.File;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.management.ObjectName;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQDestination;
+import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalArgumentException;
 import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.AsynchAECasManager_impl;
-import org.apache.uima.aae.UIMAEE_Constants;
-import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
-import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
+import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.ControllerCallbackListener;
 import org.apache.uima.aae.controller.ControllerLifecycle;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
 import org.apache.uima.aae.jmx.JmxManager;
-import org.apache.uima.aae.jmx.UimaASClientInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
+import org.apache.uima.adapter.jms.JmsConstants;
+import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
+import org.apache.uima.adapter.jms.activemq.UimaEEAdminSpringContext;
+import org.apache.uima.adapter.jms.service.Dd2spring;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceConfigurationException;
@@ -56,20 +61,6 @@ import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.UimaVersion;
-import org.apache.uima.adapter.jms.service.Dd2spring;
-import org.apache.uima.aae.UIDGenerator;
-
-import javax.jms.DeliveryMode;
-import javax.jms.Queue;
-import javax.management.ObjectName;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQDestination;
-import org.apache.activemq.command.ActiveMQTextMessage;
-import org.apache.uima.adapter.jms.JmsConstants;
-import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
-import org.apache.uima.adapter.jms.activemq.UimaEEAdminSpringContext;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -94,7 +85,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	private String applicationName = "UimaASClient";
 	
 	public BaseUIMAAsynchronousEngine_impl() {
-        UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-EE version " + UimaVersion.getVersion());
+        UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-AS version " + UimaVersion.getVersion());
 	}
 
 
