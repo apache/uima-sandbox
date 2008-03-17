@@ -40,7 +40,7 @@ public class Dd2spring {
 	private ClassLoader saxonClassLoader;
 	
 	/**
-	 * Test driver  arg = path_to_source,  path_to_xslt, path_to_saxon_jar, uima-ee-debug flag
+	 * Test driver  arg = path_to_source,  path_to_xslt, path_to_saxon_jar, uima-as-debug flag
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -126,7 +126,7 @@ public class Dd2spring {
     argsForSaxon.add(dd2SpringXsltFilePath); // xslt transform to apply
     
     
-    if (null != System.getProperty("uima-ee.dd2spring.noTempQueues")) {
+    if (null != System.getProperty("uima-as.dd2spring.noTempQueues")) {
       argsForSaxon.add("noTempQueues=true");  // disable generate of temp queues (for testing)
     }
 
