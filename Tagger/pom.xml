@@ -63,11 +63,8 @@
 	<build>
 		<finalName>uima-an-tagger</finalName>
 		<resources>
-			<resource>
-				<directory>desc</directory>
-			</resource>
             <resource>
-                <directory>resources</directory>
+                <directory>desc</directory>
             </resource>
 		</resources>
 
@@ -114,7 +111,7 @@
                     <execution>
                         <phase>package</phase>
                         <configuration>
-                          <classpath>$main_root/target/uimaj-tagger.jar;$main_root/desc</classpath>
+                          <classpath>$main_root/resources;$main_root/desc</classpath>
                           <mainComponentDesc>desc/HmmTagger.xml</mainComponentDesc>
                           <componentId>HmmPosTagger</componentId>
                         </configuration>
