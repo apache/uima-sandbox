@@ -676,7 +676,9 @@ under the License.
         <para>The continueOnRetryFailure attribute, if set to 'true' causes the framework to ask the 
           aggregate's flow controller if the processing for the CAS can continue.
           If this attribute is 'false' or if the flow controller indicates it cannot continue,
-          further processing on the CAS is stopped and an error returned from the aggregate.
+          further processing on the CAS is stopped and an error is returned from the aggregate. 
+          Warning: there are some conditions in the current implmentation where
+          this is not yet being done; this is a known issue.
           </para>
         
         <warning><para>
@@ -702,13 +704,14 @@ under the License.
       </para>
 
       <para>
-        An action of 'disable' applied to the specified delegate, removing it from the flow
+        An action of 'disable' applies to the specified delegate, removing it from the flow
         so the containing aggregate will no longer send it commands.
         The 'terminate' action applies to the entire service containing this component,
         disconnecting it from its input queue and shutting it down.
-        Note that when disabling, the framework asks the flow controller to remove the delegate from the flow;
-        the flow controller may respond to the framework that it cannot reasonably operate without this component,
-        in which case the framework will convert "disable" into "terminate".
+        Note that when disabling, the framework asks the flow controller to remove the delegate from the flow,
+        but if the flow controller cannot reasonably operate without this component
+        it can convert the action to 'terminate' by throwing an 
+        AnalysisEngineProcessException exception.
       </para>
         
       <para>
