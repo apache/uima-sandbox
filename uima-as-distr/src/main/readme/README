@@ -12,58 +12,11 @@
   - Name has been changed to Apache UIMA Asynchronous Scaleout (Apache UIMA-AS)
   - Versioning aligned with Apache UIMA
   - Build process changed to use Maven
-    
-    Changes in the 0.6.5 release
-  - Added Component Descriptor Editor (CDE) support for UIMA deployment descriptors
-  - Use temp queues for remote delegates connected by http or with the optional element: <replyQueue location="remote"/>
-  - Fixed hang with action=terminate for aggregate services with remote CAS multipliers or delegates having no timeout
-
-   Changes in the 0.6.4 release
-  - Fix hangs in services with action=terminate (except as noted in Section 4).
-  - Support asynchronous stop/undeployment of colocated services.
-  - Document the UIMA EE Asynchronous API.
-
-   Changes in the 0.6.3 release
-  - Real fix for merging CASes on a parallel step (XMI deserialization bug)
-  - Fixed bugs to allow multiple/sucessive runs through uima ee client
-  - Fix for NullPointer when handling reply exceptions that occur in the final step.
-  - Stop listener thread when delegate is disabled
-  - Changes to error handling to properly handle JMS Connection problems.
-  - Increased Spring recovery interval from 5secs to 1 minute.
-  - Fixed uima ee client to set the MsgFrom property to the name of the temp queue instead of currentTimeMillis()
-  - Fixed javax.management.MalformedObjectNameException: Invalid character ':' in value part of property
-  - Fixed a race condition in the uima ee client when handling getMeta replies
-  - Extend deployAsyncService to deploy multiple deployment descriptors in the same JVM
-
-   Changes in the 0.6.2 release
-  - Fix to XMI deserialization bug associated with using JCas.
-  - Fix for merging CASes on a parallel step
-
-   Changes in the 0.6.1 release
-  - Added new default ActiveMQ configuration script.
-  - Several fixes to error handling have been implemented.
-  - Fixed API-deployment problems on Linux.
-
-   Changes in the 0.6 release
-  - Removed the limitation on concurrently the same service from the same directory.
-  - The client API can deploy colocated services. This feature has been added
-    to the runRemoteAsyncAE driver.
-
-   Changes in the 0.5 release
-  - Error handling has been implemented as per the documentation.
-  - Support for remote Cas Multipliers has been added.
-  - Added option to specify remote deployment of a delegate's reply queue.
-  - Default deployment for aggregates changed to async="false".
-  - Prefetch="0" supported by Java service wrapper.
-  - Primitive Cas Consumers as well as Vinci & SOAP service proxies supported.
-  - "startBroker" scripts modified to support UIMA-EE installation on shared filesystems.
-  - Each instance of a primitive analysis engine is called with a pinned thread ID.
-  - Several memory leaks fixed.
 
 
 1. Contents of Apache UIMA-AS binary distribution
 The Apache UIMA-AS binary distribution includes 
-  - Apache UIMA (base) 
+  - Apache UIMA (base minus documentation) 
   - Apache UIMA Asynchronous Scaleout extensions
   - Apache ANT
   - Apache ActiveMQ
@@ -98,13 +51,13 @@ UIMA-AS components include:
     Deploy_MeetingDetectorTAE_Sync_3Instances.xml: Deploys 3 instances of the
         Meeting Detector as a Synchronous Aggregate (meaning the delegate AEs do not each
         get their own input queue).
+    Deploy_MeetingAnnotator.xml: Deploys C++ Meeting Annotator. Note: requires
+        installation of uimacpp SDK into $UIMA_HOME.
 
   descriptors/as/...  (Other Sample Descriptors for use with UIMA AS)
     MeetingDetectorAsyncAE.xml:  Specifier that can be used to call a UIMA AS
         Service from an existing UIMA application (see Section 2.5 below).
 
-  src/org/apache/uima/examples/as/RunRemoteAsyncAE.java:  Sample client code showing how
-       to call an Asynchronous UIMA Service.
 
 2. Installation and Setup
 
@@ -121,12 +74,12 @@ environment variable settings (the same as for normal Apache UIMA setup):
     * Set UIMA_HOME to the apache-uima-as directory of your unpacked Apache UIMA distribution
     * Append UIMA_HOME/bin to your PATH
 
+    Note: The Mac OS X operating system has special procedures for setting up global environment
+    variables; see http://developer.apple.com/qa/qa2001/qa1067.html for how to do this.
+
 2.3 Running the Setup Script
    You must run the script UIMA_HOME/bin/adjustExamplePaths.bat (or .sh).  This updates
    paths in the examples based on the actual UIMA_HOME directory path.
-
-    Note: The Mac OS X operating system has special procedures for setting up global environment
-    variables; see http://developer.apple.com/qa/qa2001/qa1067.html for how to do this.
 
 2.4 Setting up Eclipse
 Eclipse users should install the UIMA Eclipse Plugins and UIMA Examples Project using the "manual"
@@ -151,7 +104,7 @@ and running:
 
    startBroker.sh/bat
 
-Before the broker is started, if necessary, $ACTIVEMQ_BASE (or "./amq") will be created 
+The first time run this script will create a new directory $ACTIVEMQ_BASE/amq (or ./amq)
 and default configuration files will be copied there. The configuration files can then be 
 customized to modify broker behavior for subsequent startups.
 
@@ -159,13 +112,12 @@ Note: only one broker can be started at a time on the same machine with the same
       configuration file, or on different machines from the same writable directory.
 
 When the broker starts it will print a message such as:
-  INFO TransportServerThreadSupport - Listening for connections at: tcp://yourHost:61616
+  INFO: Listening for connections at: tcp://yourHostname:61616
 
 Note this URL since you will need it to run services and clients.
 
-The tcp protocol is used to connect to brokers that are listening on an exposed port.
-To connect to brokers running behind a firewall, see section 3.6 below for instructions
-on using HTTP tunneling.
+The tcp listening port must be exposed to any clients or services using the broker.
+To connect to a broker running behind a firewall using HTTP tunneling, see section 3.6 below.
 
 
 3.2 Deploying an Analysis Engine as a UIMA AS Asynchronous Service
@@ -187,22 +139,16 @@ b. Run the command:
   Note: If you use import by name in your deployment descriptor, UIMA AS searches the CLASSPATH
   as well as directories on UIMA_DATAPATH to resolve the import.
 
-  Note: This command will generate an intermediate file in the working directory,
-  with a filename derived from your deployment descriptor name (e.g., testDD_spring.xml).
-  This file is used internally by UIMA AS and is automatically regenerated each time
-  you run.
-
 
 3.3 Calling a UIMA AS Asynchronous Service
 To test a remote UIMA service you can use the script:
-  runRemoteAsyncAE.sh/cmd brokerUrl endpoint [-c CollectionReaderDescriptorFile] \
-    [-d DeploymentDescriptorFile]+ [-w ReplyWindow] [-o OutputDir] [-t Timeout] [-i]
+  runRemoteAsyncAE.sh/cmd brokerUrl endpoint
 
   This connects to a remote AE at specified brokerUrl and endpoint (which must match
   the inputQueue endpoint in the remote AE service's deployment descriptor).
 
-  The following optional arguments are accepted:
-    -c  Specifies a CollectionReader descriptor.  The client will read CASes from the
+  A subset of the optional arguments to runRemoteAsyncAE are:
+    -c  Specifies a CollectionReader descriptor.  The client will obtain CASes from the
         CollectionReader and send them to the service for processing.  If this option
         is omitted, one empty CAS will be sent to the service (useful for services
         containing a CAS Multiplier acting as a collection reader).
@@ -211,26 +157,9 @@ To test a remote UIMA service you can use the script:
         begins, and the service will be undeployed after processing completes. 
         Multiple -d entries can be given.
 
-    -w  Specifies a "ReplyWindow", which is the maximum number of outstanding requests
-        that the client will send. This is only meaningful if the -c option is also used.
-        If not specified, the default window size is 5.
-
     -o  Specifies an Output Directory.  All CASes received by the client's
         CallbackListener will be serialized to XMI in the specified OutputDir.
         If omitted, no XMI files will be output.
-
-    -t  Specifies a timeout period in seconds.  If a CAS does not return within this time
-        period it is considered an error. By default there is no timeout, so the client will
-        wait forever.
-
-    -i  Causes the client to ignore errors returned from the service.  If not specified, the
-        client terminates on the first error.
-
-The source code for this client is provided in
-
-  examples/src/org/apache/uima/examples/as/RunRemoteAsyncAE.java
-
-and you can also run this class from the uimaj-examples Eclipse project.
 
 
 3.4 Quick Test of an async service
@@ -238,11 +167,11 @@ and you can also run this class from the uimaj-examples Eclipse project.
 Start two terminal windows, each with an environments setup as described in section 2.2.
 
   * In the first terminal window start the broker (as described in section 3.1),
-    by running the command:
+    by running the commands:
+      cd $UIMA_HOME
       startBroker.sh/bat
 
-  * In the second terminal window, launch a service from the deployment descriptor
-    Deploy_MeetingDetectorTAE.xml and run the test driver:
+  * In the second terminal window, deploy a sample service and send it some CASes:
       cd $UIMA_HOME/examples/deploy/as
       runRemoteAsyncAE.sh/cmd tcp://localhost:61616 MeetingDetectorTaeQueue \
          -d Deploy_MeetingDetectorTAE.xml \
@@ -271,9 +200,9 @@ section in the Apache UIMA Reference manual.
 
 3.6 Firewalls between clients and services
 
-A service accessed behind a firewall can be accessed as long as its input queue
-is on a broker that is accessable. For example, the service can register with an
-accessable broker running outside the firewall.
+A service running behind a firewall can be accessed as long as its input queue
+is on a broker that is accessable. For example, the service can register with a
+public broker running outside the firewall.
 
 By default, the reply queue used by an aggregate when calling a remote delegate is located
 on the host where the aggregate is running. This will not work if there is a firewall blocking
@@ -286,14 +215,15 @@ should be created on the service's broker. This is done by adding
 to the remoteAnalysisEngine definition for the remote delegate.
 
 The client API used by runRemoteAsyncAE always creates a reply queue on the service's broker.
-These "remote" reply queues are now JMS temporary queues, which means that they will be
-deleted when the requestor aggregate or client API terminates.
+These "remote" reply queues are JMS temporary queues, which means that they will be
+deleted when the client aggregate or application terminates.
 
 A more complicated approach is for the client to use an HTTP connector. In this case
 UIMA AS always creates reply queues on the service's broker.
 
-Note: There are bugs in the ActiveMQ HTTP connector. A fix is available if you want to
-      build ActiveMQ manually. See http://issues.apache.org/activemq/browse/AMQ-1308
+Note: There are bugs in the ActiveMQ HTTP connector associated with CASes larger than 64KB
+      and with doublebyte characters. However, the ActiveMQ jars distributed with UIMA AS
+      include the bug fixes described in http://issues.apache.org/activemq/browse/AMQ-1308
       
 
 3.7 Monitoring a broker and its queues
@@ -307,10 +237,10 @@ If your console is not on the same machine as the broker replace localhost by
 the name of the broker's machine.  For more details see http://activemq.apache.org/jmx.html
 
 
-4. Known problems with Release 0.6.5
+4. Known problems/limitations with Release 2.2.2
 
   1. Only one remote CAS multiplier per aggregate is supported.
-  2. The thresholdWindow feature is not working and should not be specified.
+  2. Jira issues UIMA-844, UIMA-845, UIMA-874, UIMA-914
 
 Disclaimer
 -----------
