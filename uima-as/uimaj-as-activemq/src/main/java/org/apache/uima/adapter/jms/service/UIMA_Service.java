@@ -395,7 +395,7 @@ public class UIMA_Service implements ControllerCallbackListener
 				{
 					return;
 				}
-				springConfigFileArray[dd] = "file:" + springConfigFile.getAbsolutePath();
+				springConfigFileArray[dd] = springConfigFile.getAbsolutePath();
 
 				// get the descriptor to register with the engine controller
 				String deployDescriptor = "";
