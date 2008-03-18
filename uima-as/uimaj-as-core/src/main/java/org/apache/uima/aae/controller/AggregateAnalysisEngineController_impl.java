@@ -71,7 +71,6 @@ public class AggregateAnalysisEngineController_impl
 extends BaseAnalysisEngineController 
 implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_implMBean
 {
-	private static final long serialVersionUID = 2214140414061082168L;
 
 	private static final Class CLASS_NAME = AggregateAnalysisEngineController_impl.class;
 
@@ -273,7 +272,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		FlowContainer flow = lookupFlow(aCasReferenceId);
 			if ( flow != null )
 			{
-				flow.aborted();
+				//flow.aborted();
 				synchronized( flowMap )
 				{
 					flowMap.remove(aCasReferenceId);
