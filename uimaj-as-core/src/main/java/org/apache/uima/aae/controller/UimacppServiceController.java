@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -97,6 +96,10 @@ public class UimacppServiceController implements ControllerLifecycle {
   private int initialFsHeapSize;
   
   private ArrayList<ControllerCallbackListener> listeners = new ArrayList<ControllerCallbackListener>();
+  
+  private Boolean InitializedState = false;
+  
+  private Exception InitializedStatus = null;
   
   /**
    * Configure and start a Uima C++ service that connects to an ActiveMG
@@ -167,22 +170,44 @@ public class UimacppServiceController implements ControllerLifecycle {
         // start threads to accept two connections from the service
 
         /* start the service */
+      this.uimaLogger.log(Level.INFO, "Starting C++ service: " + commandArgs.toString());
+      this.uimaLogger.log(Level.INFO, " env params: " + envVarMap.toString());
         startService();
 
         /** register with JMX - for now register with the platform MBean server */
         mbean = new UimacppServiceManagement("org.apache.uima:type=ee.jms.services,",commandConnection, aeDesc,
             numInstances, brokerURL, queueName);
         JmxMBeanAgent.registerMBean(mbean, null);
+        
+        // Initialization looks good
+        notifyInitializationStatus(null);
 
-     // } catch (IOException e1) {
-      //  e1.printStackTrace();
-      //}
     } catch (IOException e) {
-      //e.printStackTrace();
+      notifyInitializationStatus(e);
       throw new ResourceInitializationException(e);
     } catch (UIMAException e) {
-      //e.printStackTrace();
+      notifyInitializationStatus(e);
       throw new ResourceInitializationException(e);
+    }
+  }
+  
+  private void notifyInitializationStatus(Exception e) {
+    if ( this.listeners.isEmpty())
+    {
+      this.InitializedStatus = e;
+      this.InitializedState = true;
+      return;
+    }
+    for( int i=0; i < this.listeners.size(); i++ )
+    {
+      //  If there is an exception, notify listener with failure
+      if ( e != null ) {
+        (this.listeners.get(i)).notifyOnInitializationFailure(e);
+      }
+      // else, Success!
+      else {
+        (this.listeners.get(i)).notifyOnInitializationSuccess();
+      }
     }
   }
   
@@ -278,6 +303,8 @@ public class UimacppServiceController implements ControllerLifecycle {
       // System.out.println(builder.command().toString());
 
       /* start the service */
+      this.uimaLogger.log(Level.INFO, "Starting C++ service: " + commandArgs.toString());
+      this.uimaLogger.log(Level.INFO, " env params: " + envVarMap.toString());
       startService();  
       
       mbean = new UimacppServiceManagement(null, commandConnection, aeDesc,
@@ -339,10 +366,16 @@ public class UimacppServiceController implements ControllerLifecycle {
 
     // arguments
     // UIMA AE descriptor
+    if (this.aeDesc.startsWith("file:") || this.aeDesc.startsWith("File:")) {
+      this.aeDesc = this.aeDesc.substring(5);
+    }
+    if (this.aeDesc.startsWith("/C:") || this.aeDesc.startsWith("/c:")) {
+      this.aeDesc = this.aeDesc.substring(1);
+    }
     commandArgs.add(aeDesc);
     if (!(new File(aeDesc)).exists()) {
       throw new ResourceInitializationException(new IOException(
-          "Invalid location of AE descriptor " + aeDesc));
+              "Invalid location of AE descriptor " + aeDesc));
     }
 
     // input queue name
@@ -711,12 +744,21 @@ public class UimacppServiceController implements ControllerLifecycle {
   }
 
   public void addControllerCallbackListener(ControllerCallbackListener aListener) {
-    listeners.add(aListener);
+    this.listeners.add(aListener);
+    // if already initialized, notify now
+    if (this.InitializedState) {
+      if (this.InitializedStatus == null) {
+        aListener.notifyOnInitializationSuccess();
+      }
+      else {
+        aListener.notifyOnInitializationFailure(this.InitializedStatus);
+      }
+    }
   } 
   
   public void removeControllerCallbackListener(ControllerCallbackListener aListener)
   {
-    listeners.remove(aListener);
+    this.listeners.remove(aListener);
   }
 
 }
