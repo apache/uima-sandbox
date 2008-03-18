@@ -31,6 +31,7 @@ import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.ControllerCallbackListener;
 import org.apache.uima.aae.controller.ControllerLifecycle;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.controller.UimacppServiceController;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
@@ -124,6 +125,14 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 				initializeTopLevelController( cntlr, ctx);
 			}
 		}
+
+    String[] cppcontrollers = ctx.getBeanNamesForType(org.apache.uima.aae.controller.UimacppServiceController.class);
+    for (int i = 0; cppcontrollers != null && i < cppcontrollers.length; i++) {
+      UimacppServiceController cntlr = (UimacppServiceController) ctx.getBean(cppcontrollers[i]);
+      // register listener
+      cntlr.addControllerCallbackListener(this);
+    }
+    
 		// blocks until the top level controller sends a notification.
 		// Notification is send
 		// when either the controller successfully initialized or it failed
