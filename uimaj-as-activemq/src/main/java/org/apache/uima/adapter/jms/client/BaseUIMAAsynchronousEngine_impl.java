@@ -332,41 +332,6 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		consumer = consumerSession.createConsumer(consumerDestination);
 		consumer.setMessageListener(this);
 	}
-
-	public void initialize(String[] configFiles, Map anApplicationContext) throws ResourceInitializationException
-	{
-		if ( running )
-		{
-			throw new ResourceInitializationException(new UIMA_IllegalStateException());
-		}
-		reset();
-
-		if (anApplicationContext != null)
-		{
-			Properties p = new Properties();
-			p.put(UimaAsynchronousEngine.ApplicationContext, anApplicationContext);
-			System.setProperties(p);
-		}
-
-		try
-		{
-
-			deployEmbeddedBroker();
-			deploySpringContainer(configFiles);
-			System.out.println("Registering Client with JMX Server");
-			jmxManager = new JmxManager("Uima AS Client");
-			ObjectName on = new ObjectName("ClientStats");
-			jmxManager.registerMBean(clientSideJmxStats, on);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			throw new ResourceInitializationException(e);
-		}
-		running = true;
-		initialized = true;
-	}
-
 	/**
 	 * Initialize the uima ee client. Takes initialization parameters from the
 	 * <code>anApplicationContext</code> map.
