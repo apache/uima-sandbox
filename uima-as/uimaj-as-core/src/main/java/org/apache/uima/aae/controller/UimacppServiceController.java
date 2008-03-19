@@ -192,21 +192,22 @@ public class UimacppServiceController implements ControllerLifecycle {
   }
   
   private void notifyInitializationStatus(Exception e) {
-    if ( this.listeners.isEmpty())
-    {
-      this.InitializedStatus = e;
-      this.InitializedState = true;
-      return;
-    }
-    for( int i=0; i < this.listeners.size(); i++ )
-    {
-      //  If there is an exception, notify listener with failure
-      if ( e != null ) {
-        (this.listeners.get(i)).notifyOnInitializationFailure(e);
+    synchronized (this.InitializedState) {
+      if (!this.InitializedState) {
+        this.InitializedStatus = e;
+        this.InitializedState = true;
       }
-      // else, Success!
-      else {
-        (this.listeners.get(i)).notifyOnInitializationSuccess();
+  
+      for( int i=0; i < this.listeners.size(); i++ )
+      {
+        //  If there is an exception, notify listener with failure
+        if ( e != null ) {
+          (this.listeners.get(i)).notifyOnInitializationFailure(e);
+        }
+        // else, Success!
+        else {
+          (this.listeners.get(i)).notifyOnInitializationSuccess();
+        }
       }
     }
   }
@@ -744,14 +745,16 @@ public class UimacppServiceController implements ControllerLifecycle {
   }
 
   public void addControllerCallbackListener(ControllerCallbackListener aListener) {
-    this.listeners.add(aListener);
-    // if already initialized, notify now
-    if (this.InitializedState) {
-      if (this.InitializedStatus == null) {
-        aListener.notifyOnInitializationSuccess();
-      }
-      else {
-        aListener.notifyOnInitializationFailure(this.InitializedStatus);
+    synchronized (this.InitializedState) {
+      this.listeners.add(aListener);
+      // if already initialized, notify now
+      if (this.InitializedState) {
+        if (this.InitializedStatus == null) {
+          aListener.notifyOnInitializationSuccess();
+        }
+        else {
+          aListener.notifyOnInitializationFailure(this.InitializedStatus);
+        }
       }
     }
   } 
