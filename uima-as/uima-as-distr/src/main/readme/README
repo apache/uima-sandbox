@@ -17,14 +17,11 @@
 1. Contents of Apache UIMA-AS binary distribution
 
 The Apache UIMA-AS binary distribution includes 
-  - Apache UIMA (base minus documentation) 
+  - Apache UIMA (exluding documentation) 
   - Apache UIMA Asynchronous Scaleout extensions
-  - Apache ANT
+  - Saxon
   - Apache ActiveMQ
   - Spring Framework
-
-All of these components are licensed under the Apache 2.0 license, included here
-in the file LICENSE.
 
 UIMA-AS components include:
 
