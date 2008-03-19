@@ -15,6 +15,7 @@
 
 
 1. Contents of Apache UIMA-AS binary distribution
+
 The Apache UIMA-AS binary distribution includes 
   - Apache UIMA (base minus documentation) 
   - Apache UIMA Asynchronous Scaleout extensions
@@ -54,9 +55,14 @@ UIMA-AS components include:
     Deploy_MeetingAnnotator.xml: Deploys C++ Meeting Annotator. Note: requires
         installation of uimacpp SDK into $UIMA_HOME.
 
+    MeetingFinderAggregate.xml: Aggregate descriptor that use the same components as the
+        CPE examples MeetingFinderCPE* in base UIMA.
+    Deploy_MeetingFinder.xml: Deploys MeetingFinderAggregate illustrating scalability and
+        error handling similar to the CPM examples; see Section 4 on migration below.
+
   descriptors/as/...  (Other Sample Descriptors for use with UIMA AS)
     MeetingDetectorAsyncAE.xml:  Specifier that can be used to call a UIMA AS
-        Service from an existing UIMA application (see Section 2.5 below).
+        Service from an existing UIMA application; see Section 2.5 below.
 
 
 2. Installation and Setup
@@ -67,6 +73,7 @@ UIMA AS Requires Java 5 or later.  It has been tested with Sun Java 5 on Windows
 Other platforms and Java (5+) implementations should work, but have not been significantly tested.
 
 2.2. Environment Variables
+
 After you have unpacked the UIMA AS UIMA distribution, you must perform the following
 environment variable settings (the same as for normal Apache UIMA setup):
 
@@ -78,10 +85,12 @@ environment variable settings (the same as for normal Apache UIMA setup):
     variables; see http://developer.apple.com/qa/qa2001/qa1067.html for how to do this.
 
 2.3 Running the Setup Script
-   You must run the script UIMA_HOME/bin/adjustExamplePaths.bat (or .sh).  This updates
-   paths in the examples based on the actual UIMA_HOME directory path.
+
+You must run the script UIMA_HOME/bin/adjustExamplePaths.bat (or .sh).  This updates
+paths in the examples based on the actual UIMA_HOME directory path.
 
 2.4 Setting up Eclipse
+
 Eclipse users should install the UIMA Eclipse Plugins and UIMA Examples Project using the "manual"
 install procedure described in Chapter 3 of the Apache UIMA Overview and Setup guide 
 (docs/pdf/overview_and_setup.pdf). The manual procedure is required to pick up capability to
@@ -96,6 +105,7 @@ run the base Eclipse using Java 5 (or later), as well.
 3. Getting Started
 
 3.1 Starting the ActiveMQ Broker
+
 UIMA AS services require an ActiveMQ broker to be available with which to create/register 
 the service request queue. If no broker is available, start a new broker on the same machine 
 the services will run on or another machine; this is done by first setting an env parameter
@@ -119,7 +129,6 @@ Note this URL since you will need it to run services and clients.
 The tcp listening port must be exposed to any clients or services using the broker.
 To connect to a broker running behind a firewall using HTTP tunneling, see section 3.6 below.
 
-
 3.2 Deploying an Analysis Engine as a UIMA AS Asynchronous Service
 
 a. Create a Deployment Descriptor.
@@ -139,8 +148,8 @@ b. Run the command:
   Note: If you use import by name in your deployment descriptor, UIMA AS searches the CLASSPATH
   as well as directories on UIMA_DATAPATH to resolve the import.
 
-
 3.3 Calling a UIMA AS Asynchronous Service
+
 To test a remote UIMA service you can use the script:
   runRemoteAsyncAE.sh/cmd brokerUrl endpoint
 
@@ -180,7 +189,6 @@ Start two terminal windows, each with an environments setup as described in sect
     If you get an UnsupportedClassVersionError, Java 5 is probably not being used.
     If the driver fails to find the input data, adjustExamplePaths was probably not run.
 
-
 3.5 Calling a UIMA AS Asynchronous Service from an Existing UIMA Application
 
 You can also call a UIMA AS Service from the DocumentAnalyzer or any other UIMA
@@ -196,7 +204,6 @@ An example JMS client service descriptor is provided in
 The JMS service makes use of the customResourceSpecifier capability in Apache UIMA.
 For more information on the customResourceSpecifier see the "Custom Resource Specifiers"
 section in the Apache UIMA Reference manual.
-
 
 3.6 Firewalls between clients and services
 
@@ -225,7 +232,6 @@ Note: There are bugs in the ActiveMQ HTTP connector associated with CASes larger
       and with doublebyte characters. However, the ActiveMQ jars distributed with UIMA AS
       include the bug fixes described in http://issues.apache.org/activemq/browse/AMQ-1308
       
-
 3.7 Monitoring a broker and its queues
 
 When the broker starts it will print a message such as:
@@ -237,7 +243,30 @@ If your console is not on the same machine as the broker replace localhost by
 the name of the broker's machine.  For more details see http://activemq.apache.org/jmx.html
 
 
-4. Known problems/limitations with Release 2.2.2
+4. Migration from CPM to UIMA-AS
+
+Migrating a collection processing engine from the CPM to UIMA-AS is straightforward.
+
+First, create a UIMA aggreate that includes all the components specified in the CPE descriptor. 
+Transfer any parameter overrides in the CPE descriptor to the aggregate descriptor.
+Note that the aggreate descriptor must set <multipleDeploymentAllowed> to false 
+to be consistent with collection reader and CAS consumer delegates.
+
+Second, test the aggregate descriptor by instantiating the aggregate and sending it a single CAS.
+The contents of the CAS are not important; it's purpose is to start the collection reader delegate
+which will then create the actual CASes to be processed by the other aggregate components.
+The CAS Visual Debugger, CVD, is a useful tool for doing this test.
+
+Next, create a UIMA-AS deployment descriptor that specifies desired scaleout and error handling.
+Vinci services are still supported, although it is recommended to replace them with UIMA-AS
+services to enable more efficient load balancing and greater scaleout capability.
+
+An example of CPM migration is embodied by the sample descriptors:
+  $UIMA_HOME/examples/deploy/as/MeetingFinderAggregate.xml
+  $UIMA_HOME/examples/deploy/as/Deploy_MeetingFinder.xml
+
+
+5. Known problems/limitations with Release 2.2.2
 
   1. Only one remote CAS multiplier per aggregate is supported.
   2. Jira issues UIMA-844, UIMA-845, UIMA-874, UIMA-914
