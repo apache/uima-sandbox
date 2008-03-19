@@ -173,13 +173,10 @@ implements UimaAsynchronousEngine, MessageListener
 	abstract protected void setCASMessage(String casReferenceId, CAS aCAS, TextMessage msg) throws Exception;
 	abstract protected void setCASMessage(String casReferenceId, String aSerializedCAS, TextMessage msg) throws Exception;
 	abstract public void setCPCMessage(TextMessage msg) throws Exception;
-//	abstract public void setReleaseCASMessage( TextMessage msg, String casReferenceId ) throws Exception;
 	abstract public void initialize(Map anApplicationContext) throws ResourceInitializationException;
-	abstract public void initialize(String[] configFiles, Map anApplicationContext) throws ResourceInitializationException;
 	abstract protected void cleanup() throws Exception;
 	abstract public String deploy(String[] aDeploymentDescriptorList, Map anApplicationContext) throws Exception;
 	abstract protected String deploySpringContainer(String[] springContextFiles) throws ResourceInitializationException;
-//	abstract protected MessageProducer lookupProducerForEndpoint( Endpoint anEndpoint ) throws Exception;
   
 	public void addStatusCallbackListener(UimaASStatusCallbackListener aListener)
 	{
