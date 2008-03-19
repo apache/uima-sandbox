@@ -43,17 +43,6 @@ public interface UimaAsynchronousEngine
 	public static final String SaxonClasspath = "SaxonClasspath";
 	public static final String UimaEeDebug = "-uimaEeDebug";
 	/**
-	 * Initializes and instantiates UIMA EE Client component from
-	 * provided spring xml context configuration file(s). 
-	 * 
-	 * @param configFiles - spring xml context files
-	 * @param anApplicationContext
-	 * 
-	 * @throws ResourceInitializationException
-	 */
-	public void initialize( String[] configFiles, Map anApplicationContext ) throws ResourceInitializationException;
-
-	/**
 	 * Initializes asynchronous client using configuration parameters provided in a Map object. It creates a
 	 * connection to a service queue managed by a Broker as specified in the parameters. A temporary reply 
 	 * queue is also created here with a jms listener attached to it. Once the connections are made and the
