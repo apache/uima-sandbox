@@ -43,10 +43,6 @@
     </destinationPolicy>
   
   
-    <persistenceAdapter>
-        <jdbcPersistenceAdapter dataDirectory="${activemq.base}/activemq-data"/>
-    </persistenceAdapter>
-  
     <transportConnectors>
        <transportConnector name="default" uri="tcp://localhost:61616"/>
     </transportConnectors>
