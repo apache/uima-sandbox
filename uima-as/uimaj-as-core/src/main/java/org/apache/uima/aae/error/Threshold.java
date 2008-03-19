@@ -45,9 +45,9 @@ public class Threshold {
 
   public void setWindow(long aWindow) {
     window = aWindow;
-    // Need to save errors if can tolerate more than 1 error in a larger window
+    // Need to save error sequences if watching for more than 1 error in a window
     // Initialize array with values outside the window
-    if (aWindow > threshold && threshold > 1) {
+    if (aWindow >= threshold && threshold > 1) {
       errorSequences = new long[threshold - 1];
       Arrays.fill(errorSequences, -window);
     } else {
@@ -61,9 +61,9 @@ public class Threshold {
 
   public void setThreshold(long aCount) {
     threshold = (int) aCount;
-    // Need to save errors if can tolerate more than 1 error in a larger window
+    // Need to save error sequences if watching for more than 1 error in a window
     // Initialize array with values outside the window
-    if (window > threshold && threshold > 1) {
+    if (window >= threshold && threshold > 1) {
       errorSequences = new long[threshold - 1];
       Arrays.fill(errorSequences, -window);
     } else {
