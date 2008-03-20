@@ -194,6 +194,9 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			// synchronous ( one bean at a time), some beans run in a separate
 			// threads. The completion of container deployment doesnt
 			// necessarily mean that all beans have initialized completely.
+		    if (!springContextFile.startsWith("file:")) {
+		      springContextFile = "file:" + springContextFile;
+		    }
 			ApplicationContext ctx = new FileSystemXmlApplicationContext(springContextFile);
 			return initializeContainer(ctx);
 		} catch (ResourceInitializationException e) {
@@ -213,8 +216,10 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 		}
 		//	Log context files
 		for (int i = 0; i < springContextFiles.length; i++) {
-			springContextFiles[i] = "file:" + springContextFiles[i];
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "deploySpringContainer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_deploy_container__CONFIG", new Object[] { springContextFiles[i] });
+          if (!springContextFiles[i].startsWith("file:")) {
+            springContextFiles[i] = "file:" + springContextFiles[i];
+          }
+		  UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "deploySpringContainer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_deploy_container__CONFIG", new Object[] { springContextFiles[i] });
 		}
 		try {
 			// Deploy beans in the Spring container. Although the deployment is
