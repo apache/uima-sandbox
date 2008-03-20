@@ -151,7 +151,14 @@
       <version>${uimaj-as-release-eclipse-version}</version>
       <scope>compile</scope>
     </dependency>
-
+    
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-test-util</artifactId>
+      <version>${uimaj-release-version}</version>
+      <scope>test</scope>
+    </dependency>
+    
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
@@ -269,11 +276,11 @@
       <version>1.1.2</version>
     </dependency>
         
-    <dependency>
+    <!--dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>saxon</artifactId>
       <version>8.7</version>
-    </dependency>
+    </dependency-->
 	</dependencies>
 	<build>
     <finalName>${artifactId}-empty-jar</finalName>

@@ -1328,9 +1328,24 @@
   <xsl:template mode="addDefaults" match="u:deployment[@protocol='jms' and @provider='activemq']" >
     <!--xsl:sequence select="f:validate(.)"/-->
     <u:deployment protocol="jms" provider="activemq">
-      <xsl:if test="not(u:casPool)">
-        <u:casPool numberOfCASes="1" initialFsHeapSize="defaultFsHeapSize"/>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="not(u:casPool)">
+          <xsl:choose>
+            <xsl:when test="u:service/u:analysisEngine[(not(@async)) or (@async = ('no', 'false'))]/u:scaleout/@numberOfInstances">
+              <u:casPool numberOfCASes="{u:service/u:analysisEngine[(not(@async)) or (@async = ('no', 'false'))]/u:scaleout/@numberOfInstances}"
+                 initialFsHeapSize="defaultFsHeapSize"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <u:casPool numberOfCASes="1" initialFsHeapSize="defaultFsHeapSize"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+          
+        <xsl:otherwise>
+          <!-- casPool argument provided.  verify that the number of instances is >= scaleout if scaleout is present -->
+          <!-- TO BE DONE LATER - also handle case where not all parameters were specified -->
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:apply-templates mode="addDefaults"/>
     </u:deployment>
   </xsl:template>
