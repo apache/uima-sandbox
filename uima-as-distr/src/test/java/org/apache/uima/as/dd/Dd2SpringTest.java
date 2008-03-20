@@ -43,7 +43,7 @@ public class Dd2SpringTest extends TestCase{
       "^\\s*<!-- (" +       // match start-of-line, spaces, "<!-- 
       "(file\\:)|" +             // match file:  or
                                  // dd September, 2007, 7:03:00 etc
-      "(\\d{1,2} \\w*, \\d{4}, \\d{1,2}\\:\\d{1,2}\\:\\d{1,2} )" +
+      "(\\d{1,2} \\w*, \\d{4}, \\d{1,2}\\:\\d{1,2}\\:\\d{1,2} ))" +
       "[^\\n]*?-->[ \\t]*$";  // followed by some other non-newline chars, and then --> at end of line 
 
   // get rid of uniqifiers that are generated
@@ -63,7 +63,7 @@ public class Dd2SpringTest extends TestCase{
    * file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex2/RoomNumberAnnotator.xml
    */
   
-  private static String specificPaths = "file:[\\w/:\\-\\.]*?src/test/resources/";
+  private static String specificPaths = "\\\"file:[\\w/:\\-\\.]*?src/test/resources/";
 
   private static Pattern compareFilter = Pattern.compile(
       // turn on multiline mode (?m) so ^ and $ match for each line
@@ -71,7 +71,7 @@ public class Dd2SpringTest extends TestCase{
       sourceFileCommentPattern + 
       ")|(" + 
       uniquifiersPattern +
-      "))|(" +
+      ")|(" +
       sourceFileCommentBorder +
       ")|(" + 
       specificPaths +
