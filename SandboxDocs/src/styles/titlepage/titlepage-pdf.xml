@@ -64,7 +64,7 @@
       <copyright space-before="0.5em"/>
       <legalnotice text-align="start" margin-left="0.5in" margin-right="0.5in"
         font-family="{$body.fontset}"/>
-      <pubdate space-before="3.5em"/>
+<!--      <pubdate space-before="3.5em"/> -->
     </t:titlepage-content>
 
     

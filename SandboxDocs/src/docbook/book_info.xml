@@ -24,7 +24,7 @@ under the License.
 -->
 <bookinfo>
 
-    <releaseinfo>Version 2.3</releaseinfo>
+    <releaseinfo>Version 2.2.2</releaseinfo>
 
     <productname>Apache UIMA Sandbox</productname>
 
@@ -90,5 +90,5 @@ under the License.
       <year>2008</year>
       <holder>The Apache Software Foundation</holder>
     </copyright>
-    <pubdate>February, 2008</pubdate>
+    <pubdate>2008</pubdate>
   </bookinfo>
