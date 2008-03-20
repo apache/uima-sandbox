@@ -109,7 +109,6 @@ public class Service {
   public void configureAnalysisEngine(File descriptorFile, File resultSpecXMLFile)
       throws SimpleServerException, IOException, XmlException {
     assert (descriptorFile != null);
-    assert (resultSpecXMLFile != null);
     try {
       loadDescriptor(descriptorFile);
     } catch (InternationalizedException e) {
