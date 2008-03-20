@@ -36,30 +36,27 @@
 
 	<target name="all">
 
+	    <!-- Historical note: I had this all set up to check in the generated xbeans code so there
+	         would be only one simple server jar.  However, xbeans creates a .class file as part
+	         of its output, and I was unable to figure out how to get Eclipse to deal with this.
+	         Checking in a .class file in a source folder works fine for maven, but not for
+	         Eclipse.  And maybe it's not such a good idea after all.  So, back to a separate jar
+	         for the xbean stuff.  -->
+		
 		<!-- Bean generation into target dir -->
 		<xmlbean classpath="${class.path}" failonerror="true" javasource="1.5" 
 			srcgendir="${src.gen.dir}" classgendir="${bin.gen.dir}" 
-			schema="./src/main/resources/SimpleServerConfig.xsd">
+			schema="./src/main/resources/SimpleServerConfig.xsd" destfile="./lib/uima-simple-server-xbean.jar">
 		</xmlbean>
 
-		<!-- Don't delete anything, else the .svn info is lost and svn barfs -->
+        <!-- Delete temporary bin dir -->
+        <delete dir="${bin.gen.dir}" />
 
-		<!-- Copy generated java source into project source tree -->
-		<copy todir="./src/main/java/org">
-			<fileset dir="${src.gen.dir}/org" />
-		</copy>
+        <!-- Delete temporary src dir -->
+        <delete dir="${src.gen.dir}" />
 
-		<!-- Copy generated .xsb files into project resource dir -->
-		<copy todir="./src/main/resources/schemaorg_apache_xmlbeans">
-			<fileset dir="${bin.gen.dir}/schemaorg_apache_xmlbeans" />
-		</copy>
 
-		<!-- Delete temporary bin dir -->
-		<delete dir="${bin.gen.dir}" />
-
-		<!-- Delete temporary src dir -->
-		<delete dir="${src.gen.dir}" />
-
+		
 	</target>
 
 </project>

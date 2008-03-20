@@ -66,6 +66,13 @@
             <systemPath>${basedir}/lib/jsr173_1.0_api.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>org.apache.uima.xmlbeans</groupId>
+            <artifactId>uima-simple-server-xbean</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/uima-simple-server-xbean.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.0</version>
