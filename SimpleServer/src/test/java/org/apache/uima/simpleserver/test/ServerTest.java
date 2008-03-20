@@ -76,6 +76,16 @@ public class ServerTest {
     }
     JettyUtils.addServletWithMapping(server, uimaServlet, "/uima");
     
+    // Set up config-less UIMA servlet
+    SimpleServerServlet uimaNoConfigServlet = new SimpleServerServlet(true);
+    try {
+      uimaNoConfigServlet.init(descriptorFile, null);
+    } catch (ServletException e1) {
+      e1.printStackTrace();
+      assertTrue(false);
+    }
+    JettyUtils.addServletWithMapping(server, uimaNoConfigServlet, "/uima-no-config");
+
     // Start the server
     try {
       server.start();
@@ -107,6 +117,19 @@ public class ServerTest {
     try {
       HttpResponse response = HttpClientUtils.callGet(JettyUtils.getHost(server), JettyUtils
           .getPort(server), "/uima?text=foo%20bar");
+      assertTrue(response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK);
+      System.out.println(HttpClientUtils.getResponseContent(response));
+    } catch (Exception e) {
+      e.printStackTrace();
+      assertTrue(false);
+    }
+  }
+
+  @Test
+  public void test2() {
+    try {
+      HttpResponse response = HttpClientUtils.callGet(JettyUtils.getHost(server), JettyUtils
+          .getPort(server), "/uima-no-config?text=foo%20bar");
       assertTrue(response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK);
       System.out.println(HttpClientUtils.getResponseContent(response));
     } catch (Exception e) {

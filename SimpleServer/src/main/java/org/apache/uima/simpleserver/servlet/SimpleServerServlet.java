@@ -46,7 +46,7 @@ import org.apache.uima.simpleserver.output.ResultConverter;
 public class SimpleServerServlet extends HttpServlet {
 
   public static final String utf8 = "utf-8";
-  
+
   public static final String MODE_PARAMETER = "mode";
 
   public static final String DEFAULT_CODE_PAGE = utf8;
@@ -239,8 +239,11 @@ public class SimpleServerServlet extends HttpServlet {
   }
 
   protected boolean initServer() {
-    File resultSpec = new File(this.baseWebappDirectory.getAbsoluteFile(),
-        getInitParameter("ResultSpecFile"));
+    File resultSpec = null;
+    String resultSpecParamValue = getInitParameter("ResultSpecFile");
+    if (resultSpecParamValue != null) {
+      resultSpec = new File(this.baseWebappDirectory.getAbsoluteFile(), resultSpecParamValue);
+    }
     String pearPath = getInitParameter("PearPath");
     String descriptorPath = getInitParameter("DescriptorPath");
 

@@ -44,6 +44,7 @@ import org.apache.uima.pear.tools.PackageInstaller;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceSpecifier;
+import org.apache.uima.simpleserver.config.ConfigFactory;
 import org.apache.uima.simpleserver.config.Output;
 import org.apache.uima.simpleserver.config.ServerSpec;
 import org.apache.uima.simpleserver.config.TypeMap;
@@ -65,6 +66,8 @@ import org.w3c.dom.Element;
  */
 public class Service {
 
+  private static final String noDescriptionProvided = "No description provided";
+
   private static final Logger logger = UIMAFramework.getLogger(Service.class);
 
   private AnalysisEngine ae = null;
@@ -72,7 +75,7 @@ public class Service {
   private CAS cas = null;
 
   private ServerSpec serviceSpec = null;
-  
+
   private ResultExtractor resultExtractor = null;
 
   private volatile boolean initialized = false;
@@ -147,13 +150,18 @@ public class Service {
 
   private void configure(File serviceSpecFile) throws IOException, SimpleServerException,
       XmlException {
-    this.serviceSpec = XmlConfigReader.readServerSpec(serviceSpecFile);
-    validateResultSpec();
+    if (serviceSpecFile == null) {
+      this.serviceSpec = ConfigFactory.newServerSpec(noDescriptionProvided, noDescriptionProvided,
+          true);
+    } else {
+      this.serviceSpec = XmlConfigReader.readServerSpec(serviceSpecFile);
+      validateResultSpec();
+    }
     this.initialized = true;
   }
 
   private final void logInitializationError() {
-    //TODO: log which service could not be initialized!!!!!!!!!!!!!!!!!
+    // TODO: log which service could not be initialized!!!!!!!!!!!!!!!!!
     SimpleServerException e = new SimpleServerException(
         SimpleServerException.service_state_exception, new Object[] {});
     getLogger().log(Level.SEVERE, "", e);
@@ -258,7 +266,7 @@ public class Service {
   public Result process(String text) {
     return process(text, null);
   }
-  
+
   public ServerSpec getServiceSpec() {
     return this.serviceSpec;
   }
