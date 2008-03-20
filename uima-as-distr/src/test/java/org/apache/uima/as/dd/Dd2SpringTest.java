@@ -90,7 +90,7 @@ public class Dd2SpringTest extends TestCase{
   }
   
   public void testDd2Spring_dfltPrimMultiInstance() throws Exception {
-    checkDd2Spring("defaultingPrimAeMultInstance.xml");  
+    checkDd2Spring("defaultingPrimAEMultInstance.xml");  
   }
   
   public void testDd2Spring_tempQ() throws Exception {
