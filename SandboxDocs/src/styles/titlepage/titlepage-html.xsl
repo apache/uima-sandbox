@@ -38,6 +38,8 @@
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/mediaobject"/>
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/othercredit"/>
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/othercredit"/>
+  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/productname"/>
+  <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/productname"/>
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/releaseinfo"/>
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="info/releaseinfo"/>
   <xsl:apply-templates mode="book.titlepage.recto.auto.mode" select="bookinfo/copyright"/>
@@ -149,6 +151,12 @@
 </xsl:template>
 
 <xsl:template match="othercredit" mode="book.titlepage.recto.auto.mode">
+<div xsl:use-attribute-sets="book.titlepage.recto.style">
+<xsl:apply-templates select="." mode="book.titlepage.recto.mode"/>
+</div>
+</xsl:template>
+
+<xsl:template match="productname" mode="book.titlepage.recto.auto.mode">
 <div xsl:use-attribute-sets="book.titlepage.recto.style">
 <xsl:apply-templates select="." mode="book.titlepage.recto.mode"/>
 </div>
