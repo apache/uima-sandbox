@@ -35,7 +35,7 @@ public class Annotator extends JTextAnnotator_ImplBase {
 
   public void process(JCas jcas, ResultSpecification _rs) {
     final String text = jcas.getDocumentText();
-    for (int i = 0; i < text.length() - 1; i++) {
+    for (int i = 0; i < text.length(); i++) {
       CharacterAnnotation ca = new CharacterAnnotation(jcas, i, i+1);
       ca.setBooleanFeature((i % 10) == 0);
       ca.setByteFeature((byte) (i % Byte.MAX_VALUE));

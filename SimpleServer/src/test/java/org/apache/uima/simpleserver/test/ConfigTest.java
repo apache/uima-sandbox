@@ -76,7 +76,7 @@ public class ConfigTest {
 
   @Test
   public void testResultGeneration1() {
-    test("serverspec/spec1.xml", 289);    
+    test("serverspec/spec1.xml", 290);    
   }
   
   @Test
