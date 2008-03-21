@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taeDescription xmlns="http://uima.apache.org/resourceSpecifier">
+<frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+<primitive>false</primitive>
+<delegateAnalysisEngineSpecifiers>
+<delegateAnalysisEngine key="BeanshellNicknameAnnotator">
+<import location="BSFAnnotator.xml"/>
+</delegateAnalysisEngine>
+<delegateAnalysisEngine key="RhinoAnnotator">
+<import location="BSFAnnotator.xml"/>
+</delegateAnalysisEngine>
+</delegateAnalysisEngineSpecifiers>
+<analysisEngineMetaData>
+<name>Aggregated BSF AE</name>
+<description>Example of an aggregated AE calling several BSF annotators.</description>
+<version>1.0</version>
+<vendor>TEMIS</vendor>
+<configurationParameters searchStrategy="language_fallback">
+<configurationParameter>
+<name>BshSourceFile</name>
+<description>BSF script to be loaded</description>
+<type>String</type>
+<multiValued>false</multiValued>
+<mandatory>true</mandatory>
+<overrides>
+<parameter>BeanshellNicknameAnnotator/SourceFile</parameter>
+</overrides>
+</configurationParameter>
+<configurationParameter>
+<name>RhinoSourceFile</name>
+<description>BSF script to be loaded</description>
+<type>String</type>
+<multiValued>false</multiValued>
+<mandatory>true</mandatory>
+<overrides>
+<parameter>RhinoAnnotator/SourceFile</parameter>
+</overrides>
+</configurationParameter>
+<configurationParameter>
+<name>RhinoRegexp</name>
+<description>Regular expression</description>
+<type>String</type>
+<multiValued>false</multiValued>
+<mandatory>true</mandatory>
+<overrides>
+<parameter>RhinoAnnotator/Regexp</parameter>
+</overrides>
+</configurationParameter>
+</configurationParameters>
+<configurationParameterSettings>
+<nameValuePair>
+<name>BshSourceFile</name>
+<value>
+<string>NICKNAMES.bsh</string>
+</value>
+</nameValuePair>
+<nameValuePair>
+<name>RhinoSourceFile</name>
+<value>
+<string>TEST.js</string>
+</value>
+</nameValuePair>
+<nameValuePair>
+<name>RhinoRegexp</name>
+<value>
+<string>\b\w+\b</string>
+</value>
+</nameValuePair>
+</configurationParameterSettings>
+<flowConstraints>
+<fixedFlow>
+<node>RhinoAnnotator</node>
+<node>BeanshellNicknameAnnotator</node>
+</fixedFlow>
+</flowConstraints>
+<typePriorities/>
+<fsIndexCollection/>
+<capabilities>
+<capability>
+<inputs/>
+<outputs/>
+<languagesSupported/>
+</capability>
+</capabilities>
+<operationalProperties>
+<modifiesCas>true</modifiesCas>
+<multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+<outputsNewCASes>false</outputsNewCASes>
+</operationalProperties>
+</analysisEngineMetaData>
+<resourceManagerConfiguration/>
+</taeDescription>

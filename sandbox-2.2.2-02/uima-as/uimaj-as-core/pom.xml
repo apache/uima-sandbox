@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.uima</groupId>
+	<artifactId>uimaj-as-core</artifactId>
+	<packaging>jar</packaging>
+	<version>${uimaj-as-release-version}</version>
+	<name>Apache UIMA Async Scaleout core</name>
+	<url>http://incubator.apache.org/uima</url>
+	<parent>
+		<groupId>org.apache.uima</groupId>
+		<artifactId>uimaj-as</artifactId>
+		<version>2.2.2-incubating</version> <!-- this comment is a flag for changeVersion -->
+	</parent>
+	<dependencies>
+
+				
+		<dependency>
+			<groupId>commons-pool</groupId>
+			<artifactId>commons-pool</artifactId>
+			<version>1.2</version>
+			<scope>compile</scope>
+		</dependency> 
+
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>uimaj-core</artifactId>
+			<version>2.2.2-incubating</version> <!-- this comment is a flag for changeVersion -->
+			<scope>compile</scope>
+		</dependency>
+
+    <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring</artifactId>
+			<version>2.0.6</version>
+		</dependency> 
+
+	</dependencies>
+	<build>
+		<finalName>${artifactId}</finalName>			
+	</build>
+  <!-- temp until we get top level uimaj-as pom -->
+  <repositories>
+    <repository>
+      <id>incubating repository</id>
+      <url>http://people.apache.org/repo/m2-incubating-repository</url>
+    </repository> 
+  </repositories>	
+</project>

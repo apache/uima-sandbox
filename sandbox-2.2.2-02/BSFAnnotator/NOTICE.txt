@@ -1,0 +1,24 @@
+Apache UIMA BSFAnnotator software component
+Copyright 2007 The Apache Software Foundation
+
+This Apache UIMA software component includes code that was developed at
+the Apache Software Foundation (http://www.apache.org/).
+
+This software includes other Apache code, also licensed under the Apache License 2.0:
+
+    - the Apache Bean Scripting Software (BSF) 
+    - the Apache Commons Logging Software 
+    - the Apache Log4j Software 
+
+This software also includes:
+
+    - Beanshell, lightweight Scripting for Java, from http://www.beanshell.org/,
+      licensed under the Sun Public License/LGPL.  Distributed here under the
+      SPL, see LICENSE.txt.
+
+    - Rhino, the open-source implementation of JavaScript written entirely in Java, from 
+      http://www.mozilla.org/rhino/, available under MPL 1.1/GPL 2.0 license.  Distributed here
+      under the MPL 1.1, see LICENSE.txt.
+      
+
+       
