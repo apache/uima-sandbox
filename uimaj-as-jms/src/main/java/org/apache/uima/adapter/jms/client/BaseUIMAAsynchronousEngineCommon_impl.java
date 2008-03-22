@@ -240,18 +240,19 @@ implements UimaAsynchronousEngine, MessageListener
 			requestToCache.setIsRemote(remoteService);
 			requestToCache.setCPCRequest(true);
 			requestToCache.setCpcTimeout(cpcTimeout);
-			
 			requestToCache.setEndpoint(getEndPointName());
 			
 			clientCache.put(uniqueIdentifier, requestToCache);
 
+			PendingMessage msg = new PendingMessage(AsynchAEMessage.CollectionProcessComplete);
 			if (cpcTimeout > 0)
 			{
+				
 				requestToCache.startTimer();
+				msg.put(UimaAsynchronousEngine.CpcTimeout, String.valueOf(cpcTimeout));
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_started_cpc_request_timer_FINEST", new Object[] {});
 
-			PendingMessage msg = new PendingMessage(AsynchAEMessage.CollectionProcessComplete);
 			synchronized( pendingMessageList )
 			{
 				pendingMessageList.add(msg);
@@ -392,6 +393,7 @@ implements UimaAsynchronousEngine, MessageListener
 		if (metadataTimeout > 0)
 		{
 			requestToCache.startTimer();
+			msg.put(UimaAsynchronousEngine.GetMetaTimeout, String.valueOf(metadataTimeout));
 		}
 		synchronized( pendingMessageList )
 		{
