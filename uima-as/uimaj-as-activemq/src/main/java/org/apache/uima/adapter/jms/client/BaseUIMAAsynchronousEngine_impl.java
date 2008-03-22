@@ -33,6 +33,7 @@ import javax.jms.TextMessage;
 import javax.management.ObjectName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.uima.UIMAFramework;
@@ -250,6 +251,14 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		if (connection == null)
 		{
 			ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(aBrokerURI);
+			System.out.println(">>>>>>>>>>>>> BaseUIMAAsynchronousEngine_impl.validateConnection() Adding policy");
+	        RedeliveryPolicy policy = new RedeliveryPolicy();
+	        policy.setMaximumRedeliveries(1);
+	        policy.setBackOffMultiplier((short) 1);
+	        policy.setInitialRedeliveryDelay(10);
+	        policy.setUseExponentialBackOff(false);
+	        factory.setRedeliveryPolicy(policy);
+
 			connection = factory.createConnection();
 			connection.start();
 		}
