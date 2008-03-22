@@ -27,6 +27,7 @@ import javax.jms.MessageProducer;
 import javax.jms.TextMessage;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngineCommon_impl.ClientRequest;
@@ -77,6 +78,8 @@ public abstract class BaseMessageSender implements Runnable,
 	// Returns the name of the destination
 	protected abstract String getDestinationEndpoint() throws Exception;
 
+	private MessageProducer producer = null;
+	
 	public BaseMessageSender(List aPendingMessageList,
 			BaseUIMAAsynchronousEngineCommon_impl anEngine) {
 		pendingMessageList = aPendingMessageList;
@@ -164,7 +167,9 @@ public abstract class BaseMessageSender implements Runnable,
 		engine.onProducerInitialized();
 		signal();
 
-		MessageProducer producer = getMessageProducer();
+		producer = getMessageProducer();
+		int counter=0;
+///		MessageProducer producer = getMessageProducer();
 
 		// Wait for messages from application threads. The uima ee client engine
 		// will call
@@ -212,11 +217,15 @@ public abstract class BaseMessageSender implements Runnable,
 						//	while the message sits in a queue, the JMS Server will remove it from
 						//	the queue. What happens with the expired message depends on the 
 						//	configuration. Most JMS Providers create a special dead-letter queue
-						//	where all expired messages are placed.
+						//	where all expired messages are placed. NOTE: In ActiveMQ expired msgs in the DLQ 
+						//	are not auto evicted yet and accumulate taking up memory.
+						
 						long timeoutValue = cacheEntry.getProcessTimeout();
+
 						if ( timeoutValue > 0 )
 						{
-							message.setJMSExpiration(timeoutValue);
+							// Set msg expiration time
+							producer.setTimeToLive(timeoutValue);
 						}
 						if (  pm.getMessageType() == AsynchAEMessage.Process )
 						{
@@ -238,7 +247,19 @@ public abstract class BaseMessageSender implements Runnable,
 			handleException(e, destination);
 		}
 	}
-
+	private void setMsgExpiration( PendingMessage aPm, String aCommandTimeoutKey)
+	{
+		if ( producer != null && aPm.containsKey(aCommandTimeoutKey))
+		{
+			long timeToLive = Long.parseLong((String)aPm.get(aCommandTimeoutKey));
+			try
+			{
+				producer.setTimeToLive(timeToLive);
+			}
+			catch( Exception e){}
+		}
+		
+	}
 	private void initializeMessage( PendingMessage aPm, TextMessage anOutgoingMessage)
 	throws Exception
 	{
@@ -247,6 +268,7 @@ public abstract class BaseMessageSender implements Runnable,
 		{
 		case AsynchAEMessage.GetMeta:
 			engine.setMetaRequestMessage(anOutgoingMessage);
+			setMsgExpiration(aPm, UimaAsynchronousEngine.GetMetaTimeout);
 			break;
 			
 		case AsynchAEMessage.Process:
@@ -255,10 +277,13 @@ public abstract class BaseMessageSender implements Runnable,
 			String serializedCAS = 
 				(String) aPm.get(AsynchAEMessage.CAS);
 			engine.setCASMessage(casReferenceId, serializedCAS, anOutgoingMessage);
+			//	Message Expiration for Process is added in the main run() loop
+			//	right before the message is dispatched to the AS Service
 			break;
 			
 		case AsynchAEMessage.CollectionProcessComplete:
 			engine.setCPCMessage(anOutgoingMessage);
+			setMsgExpiration(aPm, UimaAsynchronousEngine.CpcTimeout);
 			break;
 		}
 	}
