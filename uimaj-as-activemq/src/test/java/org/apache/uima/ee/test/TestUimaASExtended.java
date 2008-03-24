@@ -40,6 +40,8 @@ import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.UimaClassFactory;
+import org.apache.uima.aae.client.UimaASProcessStatus;
+import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.ServiceShutdownException;
@@ -51,6 +53,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.collection.CollectionReaderDescription;
+import org.apache.uima.collection.EntityProcessStatus;
 import org.apache.uima.ee.test.utils.BaseTestSupport;
 import org.apache.uima.internal.util.XMLUtils;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -723,6 +726,55 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println(" stop() returned!");
   }
 
+  
+  public void testCallbackListenerOnFailure() throws Exception
+  {
+    System.out.println("-------------- testCallbackListenerOnFailure -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
+    
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "NoOpAnnotatorQueue" );
+    initialize(eeUimaEngine, appCtx);
+    //  Wait until the top level service returns its metadata
+    waitUntilInitialized();
+    super.setExpectingServiceShutdown();
+    CAS cas = eeUimaEngine.getCAS();
+    //	Register special callback listener. This listener will receive
+    //	an exception with the Cas Reference id.
+    TestListener listener = new TestListener(this);
+    eeUimaEngine.addStatusCallbackListener(listener);
+    
+    //	Send request out and save Cas Reference id
+    String casReferenceId = eeUimaEngine.sendCAS(cas);
+    //	Spin a callback listener thread
+    Thread t = new Thread(listener);
+    t.start();
+    //	Wait for reply CAS. This method blocks
+    String cRefId = listener.getCasReferenceId();
+
+    try
+    {
+    	//	Test if received Cas Reference Id matches the id of the CAS sent out
+        if ( !cRefId.equals(casReferenceId))
+        {
+        	fail( "Received Invalid Cas Reference Id. Expected:"+casReferenceId+" Received: "+cRefId);
+        }
+        else
+        {
+        	System.out.println("Received Expected Cas Identifier:"+casReferenceId);
+        }
+    }
+    finally
+    {
+    	//	Stop callback listener thread
+    	listener.doStop();
+        eeUimaEngine.stop();
+    }
+  }
+  
+  
+  
+  
   public void testTerminateOnInitializationFailure() throws Exception
   {
     System.out.println("-------------- testTerminateOnInitializationFailure -------------");
@@ -955,4 +1007,71 @@ public class TestUimaASExtended extends BaseTestSupport
 		// Now have an empty directory or simple file
 		return directory.delete();
 	}
+
+    private class TestListener implements UimaASStatusCallbackListener, Runnable
+    {
+    	private String casReferenceId = null;
+    	private TestUimaASExtended tester;
+    	private boolean running = false;
+    	private Object monitor = new Object();
+    	
+    	public TestListener(TestUimaASExtended aTester)
+    	{
+    		tester = aTester;
+    	}
+    	
+
+    	public void collectionProcessComplete(EntityProcessStatus arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus) {
+			if (aProcessStatus.isException())
+			{
+				if ( aProcessStatus instanceof UimaASProcessStatus )
+				{
+					casReferenceId = 
+						((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
+					if ( casReferenceId != null )
+					{
+						synchronized(monitor)
+						{
+							monitor.notifyAll();
+						}
+					}
+				}
+			}
+		}
+
+		public void initializationComplete(EntityProcessStatus arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		public String getCasReferenceId()
+		{
+			while( casReferenceId == null )
+			{
+				synchronized( monitor)
+				{
+					try
+					{
+						monitor.wait();
+					}catch( InterruptedException e) {}
+				}
+			}
+			return casReferenceId;
+		}
+		public void doStop()
+		{
+			running = false;
+		}
+    	public void run()
+    	{
+    		while( running )
+    		{
+    		}
+    		System.out.println("Stopping Callback Listener Thread");
+    	}
+    }
 }

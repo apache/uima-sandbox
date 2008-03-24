@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Message;
 
+import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
@@ -414,10 +415,18 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	 */
 	public void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
 	{
+		String casReferenceId="";
 		if (aProcessStatus.isException())
 		{
 			if ( !expectingServiceShutdownException )
-				System.out.println(" Process Received Reply Containing Exception");
+				System.out.println(" Process Received Reply Containing Exception.");
+			
+			if ( aProcessStatus instanceof UimaASProcessStatus )
+			{
+				casReferenceId = 
+					((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
+			}
+
 			List list = aProcessStatus.getExceptions();
 			for( int i=0; i < list.size(); i++)
 			{
