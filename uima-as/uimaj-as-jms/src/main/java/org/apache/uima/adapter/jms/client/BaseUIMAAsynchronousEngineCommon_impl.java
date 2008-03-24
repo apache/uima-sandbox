@@ -72,6 +72,7 @@ import org.apache.uima.util.Level;
 import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.impl.ProcessTrace_impl;
+import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
@@ -820,10 +821,7 @@ implements UimaAsynchronousEngine, MessageListener
 	private void handleException( Message message, boolean doNotify )
 	throws Exception
 	{
-		ProcessTrace pt = new ProcessTrace_impl();
-		UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 		Exception exception = retrieveExceptionFormMessage(message);
-		status.addEventStatus("Process", "Failed", exception);
 		receivedCpcReply = true; // change state as if the CPC reply came in. This is done to prevent a hang on CPC request 
 		synchronized(endOfCollectionMonitor)
 		{
@@ -833,6 +831,19 @@ implements UimaAsynchronousEngine, MessageListener
 				new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference), exception });
 		if ( doNotify )
 		{
+			ProcessTrace pt = new ProcessTrace_impl();
+			UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
+			String casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
+			if ( casReferenceId != null && casReferenceId.trim().length() > 0)
+			{
+				//	Add Cas reference Id to enable matching replies with requests
+				status = new UimaASProcessStatusImpl(pt, casReferenceId);
+			}
+			else
+			{
+				status = new UimaASProcessStatusImpl(pt);
+			}
+			status.addEventStatus("Process", "Failed", exception);
 			notifyListeners(null, status, AsynchAEMessage.Process);
 			//	 Done here
 			return;
@@ -865,9 +876,10 @@ implements UimaAsynchronousEngine, MessageListener
 				}
 				//	Log stats and populate ProcessTrace object
 				logTimingInfo(message, pt, cachedRequest);
-				UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 				if ( doNotify )
 				{
+					//	Add CAS identifier to enable matching replies with requests
+					UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt, casReferenceId);
 					notifyListeners(cas, status, AsynchAEMessage.Process);
 				}
 			}
@@ -1213,13 +1225,12 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 
 		ProcessTrace pt = new ProcessTrace_impl();
-		UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
+		UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt,casReferenceId);
 
 		switch (aTimeoutKind)
 		{
 		case (MetadataTimeout):
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "notifyOnTimout", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_meta_timeout_INFO", new Object[] { anEndpoint });
-
 			status.addEventStatus("GetMeta", "Failed", new UimaASMetaRequestTimeout());
 			notifyListeners(null, status, AsynchAEMessage.GetMeta);
 			synchronized (metadataReplyMonitor)
