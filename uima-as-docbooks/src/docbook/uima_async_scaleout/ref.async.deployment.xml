@@ -711,7 +711,7 @@ under the License.
         Note that when disabling, the framework asks the flow controller to remove the delegate from the flow,
         but if the flow controller cannot reasonably operate without this component
         it can convert the action to 'terminate' by throwing an 
-        AnalysisEngineProcessException exception.
+        AnalysisEngineProcessException.FLOW_CANNOT_CONTINUE_AFTER_REMOVE exception.
       </para>
         
       <para>
