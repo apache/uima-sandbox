@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.uima.util.ProcessTrace;
 
-public class UimaASProcessStatusImpl implements org.apache.uima.collection.EntityProcessStatus 
+public class UimaASProcessStatusImpl implements UimaASProcessStatus 
 {
 
 	  private static final long serialVersionUID = -5101356145458558249L;
@@ -46,9 +46,15 @@ public class UimaASProcessStatusImpl implements org.apache.uima.collection.Entit
 
 	  public boolean isProcessed = true;
 
-	  public UimaASProcessStatusImpl(ProcessTrace p) {
-	    prT = p;
+	  private String casReferenceId;
+	  
+	  public UimaASProcessStatusImpl(ProcessTrace p){
+	      this(p,null);
 	  }
+	  public UimaASProcessStatusImpl(ProcessTrace p, String aCasReferenceId) {
+		    prT = p;
+		    casReferenceId = aCasReferenceId;
+		  }
 
 	  public UimaASProcessStatusImpl(ProcessTrace p, boolean aSkip) {
 	    prT = p;
@@ -133,4 +139,8 @@ public class UimaASProcessStatusImpl implements org.apache.uima.collection.Entit
 	  public boolean isEntitySkipped() {
 	    return isSkipped;
 	  }
+
+	public String getCasReferenceId() {
+		return casReferenceId;
+	}
 	}
