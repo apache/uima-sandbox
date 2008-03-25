@@ -1,0 +1,43 @@
+For instructions on building Apache UIMA-AS please refer to:
+http://incubator.apache.org/uima/svn.html#building.with.maven
+
+Those instructions will enable building the uima core, which is
+needed by this project.
+
+To build this project, first build the UIMA core, and then
+do the following steps:
+
+1) check out of SVN the following projects into the same 
+"workspace" directory that you checked out the base UIMA:
+   - uima-as-distr
+   - uimaj-as
+   - uimaj-as-activemq
+   - uimaj-as-core
+   - uimaj-as-jms
+   - uimaj-ep-deployeditor
+   - uimaj-ep-runtime-deployeditor
+   
+2) cd to the uimaj-as project, and do mvn install
+3) To work with eclipse, following step 2), do mvn eclipse:eclipse
+4) To build the distribution, follow the setup instructions on
+http://incubator.apache.org/uima/svn.html#build.distribution and 
+then cd to uima-as-distr and do mvn assembly:assembly
+
+-------------------------
+
+If you have installed both the Apache UIMA-AS binary distribution and the
+Apache UIMA-AS source distribution, you can run the addSourceJars.bat 
+(or .sh) script to add the source code to the jar files in the 
+UIMA_HOME/lib directory.  This may make it more convenient to access
+the UIMA Source Code (and JavaDocs) from an IDE such as Eclipse.
+
+See the NOTICE file for licensing information.
+
+Apache UIMA is an effort undergoing incubation at The Apache Software
+Foundation (ASF). Incubation is required of all newly accepted projects
+until a further review indicates that the infrastructure, communications,
+and decision making process have stabilized in a manner consistent with
+other successful ASF projects. While incubation status is not necessarily
+a reflection of the completeness or stability of the code, it does
+indicate that the project has yet to be fully endorsed by the ASF.
+
