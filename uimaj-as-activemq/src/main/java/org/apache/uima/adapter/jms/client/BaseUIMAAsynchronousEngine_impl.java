@@ -61,7 +61,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.Level;
-import org.apache.uima.util.UimaVersion;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -86,7 +85,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	private String applicationName = "UimaASClient";
 	
 	public BaseUIMAAsynchronousEngine_impl() {
-        UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-AS version " + UimaVersion.getVersion());
+        UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-AS version " + UIMAFramework.getVersionString());
 	}
 
 

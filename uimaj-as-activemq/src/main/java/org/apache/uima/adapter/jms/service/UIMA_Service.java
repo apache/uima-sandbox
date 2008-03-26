@@ -33,7 +33,6 @@ import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
-import org.apache.uima.util.UimaVersion;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -345,7 +344,7 @@ public class UIMA_Service implements ControllerCallbackListener
 	 */
 	public static void main(String[] args)
 	{
-		UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-AS version " + UimaVersion.getVersion());
+		UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-AS version " + UIMAFramework.getVersionString());
 
 		String[] springConfigFileArray =
 		{};
