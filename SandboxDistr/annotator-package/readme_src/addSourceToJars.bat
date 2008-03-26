@@ -37,4 +37,7 @@ jar -uvf %UIMA_HOME%\addons\annotator\WhitespaceTokenizer\lib\uima-an-wst.jar *
 cd ..\..\..\..\Tagger\src\main\java
 jar -uvf %UIMA_HOME%\addons\annotator\Tagger\lib\uima-an-tagger.jar *
 
+cd ..\..\..\..\SimpleServer\src\main\java
+jar -uvf %UIMA_HOME%\addons\SimpleServer\lib\uima-simple-server.jar *
+
 cd ..\..\..\..
