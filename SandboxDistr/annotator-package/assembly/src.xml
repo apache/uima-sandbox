@@ -25,7 +25,7 @@
 		<format>zip</format>
 	</formats>
 
-	<includeBaseDirectory>false</includeBaseDirectory>
+	<includeBaseDirectory>true</includeBaseDirectory>
 
 	<fileSets>
 	<!-- Add files for the SandboxDistr -->
@@ -33,6 +33,7 @@
       		<directory>../../SandboxDistr</directory>
       		<outputDirectory>/SandboxDistr</outputDirectory>
       		<includes>
+        		<include>annotator-package/pom.xml</include>
         		<include>annotator-package/assembly/**</include>
         		<include>annotator-package/build/**</include>
         		<include>annotator-package/readme/**</include>
@@ -53,7 +54,7 @@
 
 	<!-- Add files for the uima-docbook-tool -->
     <fileSet>
-      <directory>../uima-docbook-tool</directory>
+      <directory>../../uima-docbook-tool</directory>
       <outputDirectory>/uima-docbook-tool</outputDirectory>
       <includes>
         <include>build/**</include>
