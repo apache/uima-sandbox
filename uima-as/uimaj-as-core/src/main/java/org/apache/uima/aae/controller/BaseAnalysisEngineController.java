@@ -1631,7 +1631,7 @@ implements AnalysisEngineController, EventSubscriber
 		return null;
 	}
 
-	private InputChannel getInputChannel( String anEndpointName )
+	public InputChannel getInputChannel( String anEndpointName )
 	{
 		
 		for( int i=0; inputChannelList != null && i < inputChannelList.size(); i++ )

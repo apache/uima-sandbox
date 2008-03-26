@@ -56,6 +56,8 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	public void takeAction( String anAction, String anEndpointName, ErrorContext anErrorContext);  
 
 	public InputChannel getInputChannel();
+
+	public InputChannel getInputChannel(String aQueueName );
 	
 	public long getIdleTime( String aKey );
 	
