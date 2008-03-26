@@ -30,17 +30,10 @@
 	<fileSets>
 	<!-- copy license and notice files -->
 		<fileSet>
-			<directory>../../uimaj-distr/src/main/readme/</directory>
-			<outputDirectory>/apache-uima/addons/annotator/</outputDirectory>
-			<includes>
-				<include>DISCLAIMER</include>
-				<include>KEYS</include>
-			</includes>
-		</fileSet>
-		<fileSet>
 			<directory>./readme/</directory>
 			<outputDirectory>/apache-uima/addons/annotator/</outputDirectory>
 			<includes>
+				<include>DISCLAIMER</include>
 				<include>LICENSE</include>
 				<include>NOTICE</include>
 				<include>README</include>

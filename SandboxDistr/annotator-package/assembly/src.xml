@@ -31,7 +31,7 @@
 	<!-- Add files for the SandboxDistr -->
 		<fileSet>
       		<directory>../../SandboxDistr</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/SandboxDistr</outputDirectory>
+      		<outputDirectory>/SandboxDistr</outputDirectory>
       		<includes>
         		<include>annotator-package/assembly/**</include>
         		<include>annotator-package/build/**</include>
@@ -44,7 +44,7 @@
 	<!-- Add files for the SandboxDocs -->
 		<fileSet>
       		<directory>../../SandboxDocs</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/SandboxDocs</outputDirectory>
+      		<outputDirectory>/SandboxDocs</outputDirectory>
       		<includes>
         		<include>src/**</include>
         		<include>sandbox_build.xml</include>
@@ -71,7 +71,7 @@
 	<!-- Add files for the PearPackagingMavenPlugin -->
 		<fileSet>
       		<directory>../../PearPackagingMavenPlugin</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/PearPackagingMavenPlugin</outputDirectory>
+      		<outputDirectory>/PearPackagingMavenPlugin</outputDirectory>
       		<includes>
         		<include>src/**</include>
         		<include>docbook/**</include>
@@ -85,7 +85,7 @@
 	<!-- Add files for the PearPackagingAntTask -->
 		<fileSet>
       		<directory>../../PearPackagingAntTask</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/PearPackagingAntTask</outputDirectory>
+      		<outputDirectory>/PearPackagingAntTask</outputDirectory>
       		<includes>
         		<include>src/**</include>
         		<include>docbook/**</include>
@@ -99,26 +99,19 @@
 	<!-- copy license and notice files -->
 		<fileSet>
 			<directory>./readme_src/</directory>
-			<outputDirectory>/apache-uima/addons/annotator_src/</outputDirectory>
+			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>LICENSE</include>
 				<include>NOTICE</include>
 				<include>README</include>
+				<include>DISCLAIMER</include>
 				<include>addSourceToJars.bat</include>
 				<include>addSourceToJars.sh</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../uimaj-distr/src/main/readme/</directory>
-			<outputDirectory>/apache-uima/addons/annotator_src/</outputDirectory>
-			<includes>
-				<include>DISCLAIMER</include>
-				<include>KEYS</include>
-			</includes>
-		</fileSet>
-		<fileSet>
 			<directory>./readme/</directory>
-			<outputDirectory>/apache-uima/addons/annotator_src/</outputDirectory>
+			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>RELEASE_NOTES</include>
 				<include>RELEASE_NOTES.html</include>
@@ -130,7 +123,7 @@
 	<!-- Add files for the RegularExpressionAnnotator -->
 		<fileSet>
       		<directory>../../RegularExpressionAnnotator</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/RegularExpressionAnnotator</outputDirectory>
+      		<outputDirectory>/RegularExpressionAnnotator</outputDirectory>
       		<includes>
         		<include>src/**</include>
         		<include>desc/**</include>
@@ -147,7 +140,7 @@
 	<!-- Add files for the DictionaryAnnotator -->
 		<fileSet>
       		<directory>../../DictionaryAnnotator</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/DictionaryAnnotator</outputDirectory>
+      		<outputDirectory>/DictionaryAnnotator</outputDirectory>
       		<includes>
         		<include>src/**</include>
         		<include>desc/**</include>
@@ -164,7 +157,7 @@
 	<!-- Add files for the WhitespaceTokenizer -->
 		<fileSet>
       		<directory>../../WhitespaceTokenizer</directory>
-      		<outputDirectory>/apache-uima/addons/annotator_src/WhitespaceTokenizer</outputDirectory>
+      		<outputDirectory>/WhitespaceTokenizer</outputDirectory>
       		<includes>
         		<include>src/**</include>
         		<include>desc/**</include>
@@ -177,7 +170,7 @@
     <!-- Add files for the Tagger -->
         <fileSet>
             <directory>../../Tagger</directory>
-            <outputDirectory>/apache-uima/addons/annotator_src/Tagger</outputDirectory>
+            <outputDirectory>/Tagger</outputDirectory>
             <includes>
                 <include>src/**</include>
                 <include>desc/**</include>
@@ -193,7 +186,7 @@
     <!-- SimpleServer -->
         <fileSet>
             <directory>../../SimpleServer</directory>
-            <outputDirectory>/apache-uima/addons/SimpleServer</outputDirectory>
+            <outputDirectory>/SimpleServer</outputDirectory>
             <includes>
                 <include>src/**</include>
                 <include>desc/**</include>
@@ -205,8 +198,6 @@
                 <include>NOTICE.txt</include>
                 <include>LICENSE.txt</include>
             </includes>
-        </fileSet>
-
-		
+        </fileSet>	
 	</fileSets>
 </assembly>
