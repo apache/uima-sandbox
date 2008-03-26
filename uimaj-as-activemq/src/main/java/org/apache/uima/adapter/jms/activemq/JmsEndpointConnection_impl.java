@@ -155,11 +155,15 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			
 			
 			
-			
 			//	If replying to http request, reply to a queue managed by this service broker using tcp protocol
 			if ( isReplyEndpoint && brokerUri.startsWith("http") && controller != null && controller.getInputChannel() != null )
 			{
-				brokerUri = controller.getInputChannel().getServerUri();
+				org.apache.uima.aae.InputChannel iC = controller.getInputChannel(controller.getName());
+				if ( iC != null )
+				{
+					brokerUri = iC.getServiceInfo().getBrokerURL();
+				}
+				
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "open", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_override_connection_to_endpoint__FINE", new Object[] { controller.getComponentName(), getEndpoint(), controller.getInputChannel().getServerUri() });
 			}
 
@@ -465,6 +469,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 					//	Send a reply to a queue provided by the client
 					if ( isReplyEndpoint && delegateEndpoint.getDestination() != null  )
 					{
+						
 						destinationName = ((ActiveMQDestination)delegateEndpoint.getDestination()).getPhysicalName();
 						producer.send((Destination)delegateEndpoint.getDestination(), aMessage);
 					}

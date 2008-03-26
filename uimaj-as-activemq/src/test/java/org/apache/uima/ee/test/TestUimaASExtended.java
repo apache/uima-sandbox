@@ -593,6 +593,20 @@ public class TestUimaASExtended extends BaseTestSupport
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,httpURI,"NoOpAnnotatorQueue", 1, CPC_LATCH );
 	}
+	public void testClientHttpTunnellingToAggregate() throws Exception
+	{
+    System.out.println("-------------- testClientHttpTunnellingToAggregate -------------");
+		// Add HTTP Connector to the broker. The connector will use port 8888. If this port is not available the test fails 
+		String httpURI = addHttpConnector(DEFAULT_HTTP_PORT);
+		//	Create Uima EE Client
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		//	Deploy remote service
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
+		super.setExpectingServiceShutdown();
+		//	Initialize and run the Test. Wait for a completion and cleanup resources.
+		runTest(null,eeUimaEngine,httpURI,"TopLevelTaeQueue", 1, CPC_LATCH );
+	}
 	public void testClientHttpTunnellingWithDoubleByteText() throws Exception
 	{
     System.out.println("-------------- testClientHttpTunnellingWithDoubleByteText -------------");
