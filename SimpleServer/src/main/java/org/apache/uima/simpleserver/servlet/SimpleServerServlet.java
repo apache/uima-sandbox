@@ -209,6 +209,7 @@ public class SimpleServerServlet extends HttpServlet {
   // (baseWebappDirectory)
   @Override
   public void init() throws ServletException {
+    System.out.println("Starting UIMA servlet initialization");
     if (this.localInit) {
       return;
     }
@@ -298,7 +299,7 @@ public class SimpleServerServlet extends HttpServlet {
         + "</h2>"
         + rspec.getLongDescription()
         + "<h3>Usage</h3>"
-        + "In odrer to use this service, a POST- or GET-request should be sent to the server with the following URL:"
+        + "In order to use this service, a POST- or GET-request should be sent to the server with the following URL:"
         + "<pre>"
         + servletURL
         + "</pre>"

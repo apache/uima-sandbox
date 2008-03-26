@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY imgroot "./images/" >
+<!ENTITY imgroot "../images/simpleServerUserGuide/" >
 <!ENTITY % xinclude SYSTEM "../../../uima-docbook-tool/xinclude.mod">
   %xinclude;
 ]>
@@ -40,26 +40,26 @@ under the License.
   The Simple Server is implemented as a Java Servlet, and can be deployed into any Servlet container
   (such as Apache Tomcat or Jetty).</para>
   
-  <para>Once you have installed the Simple Server into a Servlet container of your choice, you can
+  <para>You can
   make your UIMA analysis available as follows:
   </para>
   
   <itemizedlist>
   <listitem>
-  <para>Package you analysis as a UIMA PEAR file</para>
+  <para>Package you analysis as a UIMA PEAR file.</para>
   </listitem>
   <listitem>
-  <para>Create a mapping file that tells the server what analysis results to show in which format</para>
+  <para>Create a mapping file that tells the server what analysis results to show in which format.</para>
   </listitem>
   <listitem>
-  <para>Deploy the PEAR file and the mapping file into the server.</para>
+  <para>Create a WAR file for deployment into the servle container with appropriate WEB.xml.</para>
+  </listitem>
+  <listitem>
+  <para>Deploy the WAR file into the server.</para>
   </listitem>
   </itemizedlist>
   
-  <para>In the following, we will explain how to perform each of these steps.  We will also show
-  you how to accomplish all of this in a concrete Servlet container, namely Apache Tomcat.  Finally,
-  we will describe how to use another Servlet container, Jetty, to test your application 
-  <emphasis>without</emphasis> deployment.</para>
+  <para>In the following, we will explain how to perform each of these steps.  </para>
   
   <section>
   <title>Quick start for the impatient</title>
@@ -70,33 +70,103 @@ under the License.
   <itemizedlist>
   <listitem>
   <para>Tomcat or some other servlet container installed.  Installing Tomcat is a breeze, see 
-  <ulink url="http://tomcat.apache.org/"></ulink>. </para>
+  <ulink url="http://tomcat.apache.org/"></ulink>.  For the purposes of this documentation, we have
+  used Apache Tomcat 6.0.16, but other versions should work just as well if they're not too old.</para>
   </listitem>
   <listitem>
-  <para>The UIMA development environment set up (with Maven and all the other good stuff).  For
-  information on how to do that, see <ulink url="http://incubator.apache.org/uima/svn.html"></ulink>.
+  <para>The latest Apache UIMA release, plus the Apache UIMA sandbox add-ons.  See
+  <ulink url="http://incubator.apache.org/uima/downloads.cgi">the Apache UIMA download site</ulink>.
    </para>
   </listitem>
   <listitem>
-  <para>Doing all this from Eclipse is convenient, but not required.  If you work with Eclipse, the
-  Sysdeo Tomcat plugin is useful: <ulink url="http://www.eclipsetotale.com/tomcatPlugin.html"></ulink>.
-  It lets you start and stop Tomcat from Eclipse, and allows you to debug your web apps in the
-  Eclipse debugger.</para>
+  <para>Doing all this from Eclipse is convenient, but not required.  If you work with Eclipse, it is
+  useful to use the Web Tools Platform.  Alternatively, just install the J2EE development
+  version of Eclipse.  The screenshots for this documentation were done with the J2EE development
+  version of Eclipse 3.3.1.1.</para>
   </listitem>
   </itemizedlist>
   
   <section>
-  <title>Install the SimpleServer code</title>
-  
-  <para>If you haven't done so already, start by extracting the SimpleServer sandbox project from
-  Subversion, and build it with "mvn install".  Copy the following files to the <code>shared/lib</code>
-  directory of your servlet container (i.e., Tomcat most likely; if the directory doesn't exist,
-  you can create it):
+  <title>Build a sample WAR file</title>
+
+  <para>
+  	Create a Web ARchive project in your favorite development
+  	environment. We'll show you how to do this in Eclipse, but if you
+  	don't use Eclipse, you'll figure out how to do this without.
   </para>
+
+  <para>
+  	Create a new "dynamic web project" called "simple-server-test" (or
+  	whatever you like). Below is a series of screenshots that show how
+  	to create such a project.
+  </para>
+
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;new-web-project1.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>New project dialog: select "dynamic web project"</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+  
+  <para>
+  Below is the next step in the dialog, where you can set the project name and the intended
+  runtime.  If you haven't done so yet, point Eclipse to your Tomcat installation.
+  </para>
+
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;new-web-project2.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>New project dialog: note server runtime</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+
+  <para>
+  	Finally, you can select other project facets for your project. The
+  	default should be fine.
+  </para>
+
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;new-web-project3.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>New project dialog: no other facets are necessary</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+
+  <para>
+  We'll now describe what jar files you need to package in your WAR file for the application
+  to run.  Note that these are jars that you will need for each and every UIMA service you
+  deploy.  So if deploy several different services into the same servlet container, you can
+  also copy those jars to the shared lib directory of your servlet container: you then don't
+  have to deploy them with each UIMA service.  However, for the purposes of this example, we
+  <emphasis>will</emphasis> deploy the common jars with the WAR file.
+  </para>
+
+<para>
+Below is list of the required files from the SimpleServer project.
+</para>
 
   <itemizedlist>
   <listitem>
-  <para><code>SimpleServer/lib/config-xml.jar</code>
+  <para><code>SimpleServer/lib/uima-simple-server.jar</code>
+  </para>
+  </listitem>
+  <listitem>
+  <para><code>SimpleServer/lib/uima-simple-server-xbean.jar</code>
   </para>
   </listitem>
   <listitem>
@@ -107,69 +177,183 @@ under the License.
   <para><code>SimpleServer/lib/xbean.jar</code>
   </para>
   </listitem>
-  <listitem>
-  <para><code>SimpleServer/target/uimaj-simple-server.jar</code>
-  </para>
-  </listitem>
   </itemizedlist>
   
   <para>
-  One more file you need to copy there is <code>uima-core.jar</code>.  You can either build it from
-  source, or grab it from the <code>lib</code> directory of an Apache UIMA distribution.  Note: the
-  SimpleServer requires at least version 2.2.1 of UIMA.
+  In addition, you also need
   </para>
   
+  <itemizedlist>
+  <listitem>
+  <para><code>${UIMA_HOME}/lib/uima-core.jar</code>
+  </para>
+  </listitem>
+</itemizedlist>
+  
+  <para>
+  from your UIMA distribution.  Make sure you have the UIMA core version that has the same version
+  number as the sandbox distribution.  An older version may not work.
+  </para>
+  
+  <para>
+  Copy all those jar files into the <code>WebContent/WEB-INF/lib</code> directory
+  of your sample project.  Note how Eclipse automatically adds the jars to the Java build path under
+  "Web App Libraries".
+  </para>
+
+  <para>
+  We now need to add some actual analysis to run in our services.  For simplicity, we'll use
+  the simple tokenizer that comes with the sandbox distribution.  In your sample project, create
+  a new directory <code>WebContent/WEB-INF/resources</code>, and copy 
+  <code>WhitespaceTokenizer/WhitespaceTokenizer.pear</code> there.  Your project layout should now
+  look like this:
+  </para>
+
+
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;sample-project-layout.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>Sample web project layout</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+
+  <para>
+  Finally, you need to update your <code>web.xml</code> descriptor.
+  Edit the <code>WebContent/WEB-INF/web.xml</code> file in your sample
+  project.  Minimally, it should look like this:
+  </para>
+  
+  <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+      http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    id="WebApp_ID" version="2.5">
+    <display-name>simple-server-test</display-name>
+    <!-- Declare simple server test servlet -->
+    <servlet>
+        <servlet-name>simple-server-test</servlet-name>
+        <servlet-class>
+            org.apache.uima.simpleserver.servlet.SimpleServerServlet
+        </servlet-class>
+        <!-- Define the path to the tokenizer pear file -->
+        <init-param>
+            <param-name>PearPath</param-name>
+            <param-value>
+                resources/WhitespaceTokenizer.pear
+            </param-value>
+        </init-param>
+    </servlet>
+    <!-- Declare the URL of the servlet -->
+    <servlet-mapping>
+        <servlet-name>simple-server-test</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>]]>
+  </programlisting>
+  
+  <para>
+  If you're doing all of this in Eclipse, and you have Tomcat configured as a server, you
+  can now right-click your project and select "Run on server...".  This will start Tomcat
+  and deploy web app.
+  </para>
+  
+  <para>
+  Alternatively, you can build a WAR file out of your project.  In Eclipse, right-click
+  your project, and select "Export/Web/WAR file".  Save the WAR file to some location
+  and deploy it in Tomcat (for example, using the admin web app that comes with Tomcat).
+  </para>
+
   </section>
   
-  <section>
-  <title>Build the WhitespaceTokenizer</title>
-  
-  <para>Extract the WhitespaceTokenizer sandbox project from Subversion and build it with "mvn install".
-  Note that the WhitespaceTokenizer depends on the PearPackagingMavenPlugin sandbox project, so you
-  will need to extract and build that one as well.
-  </para>
-  
-  <para>When you have successfully built the WhitespaceTokenizer, you'll end up with a pear file in
-  <code>WhitespaceTokenizer/target/WhitespaceTokenizer.pear</code>.  You'll need this file in the
-  next step.
-  </para>
-  
-  </section>
-  
-  <section>
-  <title>Create a UIMA webapp</title>
-  
-  <para>Create a subdirectory <code>webapps/uima</code> in your Tomcat directory.  This is where all
-  your simple services will live.  Now create further subdirectories <code>webapps/uima/resources</code>
-  and <code>webapps/uima/WEB-INF</code> (webapp metadata) and <code>webapps/uima/resources</code>
-  (UIMA analysis).
-  </para>
-  
-  <para>Copy the whitespace tokenizer pear file from your workspace
-  (<code>WhitespaceTokenizer/target/WhitespaceTokenizer.pear</code>) to <code>webapps/uima/resources</code>
-  in your Tomcat directory.  Copy a corresponding SimpleServer output mapping file 
-  <code>SimpleServer/src/main/resources/samples/WhitespaceTokenizer.xml</code> also to 
-  <code>webapps/uima/resources</code>.
-  </para>
-  
-  <para>Finally, copy <code>SimpleServer/src/main/resources/samples/web.xml</code> to
-  <code>webapps/uima/WEB-INF</code>.
-  </para>
-  
-  </section>
   
   <section>
   <title>Trying it out</title>
   
-  <para>This is it, your first simple service should be ready to run.  Start (or restart) Tomcat and
-  direct your browser to the following URL: <ulink url="http://127.0.0.1:8080/uima/ws-tokenizer?mode=form"></ulink>.
-  Type in some text, check the "inline XML" radio button, and hit "Submit Query".  You should see
-  your text split up into sentences and tokens.
+  <para>This is it, your first simple service should be ready to run.  Make sure
+  Tomcat is running and direct your browser to the following URL: 
+  <ulink url="http://localhost:8080/simple-server-test"></ulink>.
+  You should see something like this:
+  </para>
+  
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;sample-app-info-page.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>Info page of sample project</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+  
+  <para>
+  This page basically explains what kind of requests this service can handle.
+  To actually try some analysis, the service provides a simple html form
+  you can use to test the service: 
+  <ulink url="http://localhost:8080/simple-server-test?mode=form"></ulink>.
+  </para>
+
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;sample-app-form-top.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>Sample app html form</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+  
+  Now enter some text like "This is some sample text.", and at the bottom of the form,
+  check the "XML document" button.  Hit the "Submit Query" button.
+  
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;sample-app-form-bottom.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>Sample app html form</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+  
+  You should see output like this:
+  
+  <screenshot>
+    <mediaobject>
+        <imageobject>
+            <imagedata scale="100" format="JPG"
+                fileref="&imgroot;sample-app-form-result.jpg" />
+        </imageobject>
+        <textobject>
+            <phrase>Sample app html form result</phrase>
+        </textobject>
+    </mediaobject>
+  </screenshot>
+  
+  <para>
+  Use your browser's back button to go back to the form and experiment some more.
+  Programmatic access to the service is described on the info page.  You can also
+  look at the unit tests in the source code for how to use Apache's HttpClient
+  to call UIMA simple services.  
+  </para>
+  
+  <para>
+  TODO: describe service spec (output filtering and mapping), detailed reference... 
   </para>
   
   </section>
-
-	To be continued...
 
   </section>
   
