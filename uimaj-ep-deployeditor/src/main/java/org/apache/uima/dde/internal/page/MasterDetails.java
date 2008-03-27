@@ -220,8 +220,8 @@ public class MasterDetails extends MasterDetailsBlock { // implements Listener {
     Composite sectionClient = toolkit.createComposite(section);
     section.setClient(sectionClient);
     GridLayout layout = new GridLayout(1, false);
-    layout.marginHeight = 0;
-    layout.marginWidth = 0;
+    layout.marginHeight = 2;
+    layout.marginWidth = 2;
     sectionClient.setLayout(layout);
     GridData gd = new GridData(GridData.FILL_BOTH);
     sectionClient.setLayoutData(gd);

@@ -187,13 +187,14 @@ public class ErrorConfigDetailsPage implements IDetailsPage {
     Composite sectionClient = toolkit.createComposite(sectionErrorConfigDetails);
     TableWrapLayout tl = new TableWrapLayout();
     tl.numColumns = 1;
-    tl.leftMargin = 0;
-    tl.rightMargin = 0;
+    tl.leftMargin = 2;
+    tl.rightMargin = 2;
     tl.topMargin = 2;
     tl.bottomMargin = 6;    // cannot be < 6 (otherwise, lost bottom-border of table)
     sectionClient.setLayout(tl);
     sectionErrorConfigDetails.setClient(sectionClient);
-
+    toolkit.paintBordersFor(sectionClient);
+    
     // /////////////////////////////////////////////////////////////////////
 
     // GetMetadataError
@@ -255,8 +256,6 @@ public class ErrorConfigDetailsPage implements IDetailsPage {
     gd.grabHorizontal = true;
     gd.valign = TableWrapData.FILL;
     gd.heightHint = table.getHeaderHeight() + (table.getItemHeight() * (totalItems + 1)); // +1
-    // Trace.err("table.getHeaderHeight(): " + table.getHeaderHeight());
-    // Trace.err("table.getItemHeight(): " + table.getItemHeight());
     table.setLayoutData(gd);
 
     return table;
