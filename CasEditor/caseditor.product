@@ -35,7 +35,6 @@ Copyright 2006, 2007 The Apache Software Foundation
       </win>
    </launcher>
 
-
    <vm>
       <linux type="ee">J2SE-1.5</linux>
       <macos type="ee">J2SE-1.5</macos>
@@ -67,6 +66,9 @@ Copyright 2006, 2007 The Apache Software Foundation
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
+      <plugin id="org.eclipse.emf.common"/>
+      <plugin id="org.eclipse.emf.ecore"/>
+      <plugin id="org.eclipse.emf.ecore.xmi"/>
       <plugin id="org.eclipse.equinox.app"/>
       <plugin id="org.eclipse.equinox.common"/>
       <plugin id="org.eclipse.equinox.preferences"/>
