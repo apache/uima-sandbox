@@ -23,6 +23,11 @@ then
   exit 1
 fi
 
+# ActiveMQ needs a HOME
+if [ -z "$ACTIVEMQ_HOME" ] ; then
+  export ACTIVEMQ_HOME=$UIMA_HOME/apache-activemq-5.0.0
+fi
+
 # ActiveMQ needs a writeable directory for the log files and derbydb.
 if [ -z "$ACTIVEMQ_BASE" ] ; then
   export ACTIVEMQ_BASE=amq
@@ -40,4 +45,4 @@ if [ ! -f $ACTIVEMQ_BASE/conf/activemq-nojournal.xml ] ; then
   cp $UIMA_HOME/config/log4j.properties $ACTIVEMQ_BASE/conf/
 fi
 
-. $UIMA_HOME/bin/activemq.sh xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml
+. $ACTIVEMQ_HOME/bin/activemq xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml
