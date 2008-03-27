@@ -274,7 +274,7 @@ public class PearPackagingMojo extends AbstractMojo {
       for (int i = 0; i < subdirs.size(); i++) {
          File current = subdirs.get(i);
          if (current.getName().startsWith(".")) {
-            FileUtils.deleteDirectory(current);
+            org.apache.uima.util.FileUtils.deleteRecursive(current);
          } else {
             removeDotDirectories(current);
          }
