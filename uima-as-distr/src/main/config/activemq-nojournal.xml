@@ -15,34 +15,14 @@
     limitations under the License.
 -->
 
+
 <beans>
 
   <!-- Allows us to use system properties as variables in this configuration file -->
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
-  <broker xmlns="http://activemq.org/config/1.0">
-  
-    <!--memoryManager>  
-      <usageManager id="memory-manager" limit="150 MB"/>
-    </memoryManager-->
-
-    <!-- In ActiveMQ 4, you can setup destination policies -->  
-    <destinationPolicy>
-      <policyMap><policyEntries>
-        
-          <policyEntry topic="FOO.>">
-            <dispatchPolicy>
-              <strictOrderDispatchPolicy />
-            </dispatchPolicy>
-            <subscriptionRecoveryPolicy>
-              <lastImageSubscriptionRecoveryPolicy />
-            </subscriptionRecoveryPolicy>
-          </policyEntry>
-
-      </policyEntries></policyMap>
-    </destinationPolicy>
-  
-  
+  <broker xmlns="http://activemq.org/config/1.0" brokerName="localhost" persistent="false" useShutdownHook="false" dataDirectory="${activemq.base}/data">
+    
     <transportConnectors>
        <transportConnector name="default" uri="tcp://localhost:61616"/>
     </transportConnectors>
@@ -53,4 +33,3 @@
   </broker>
 
 </beans>
-
