@@ -246,7 +246,7 @@ Below is list of the required files from the SimpleServer project.
         <init-param>
             <param-name>PearPath</param-name>
             <param-value>
-                resources/WhitespaceTokenizer.pear
+                WEB-INF/resources/WhitespaceTokenizer.pear
             </param-value>
         </init-param>
     </servlet>
