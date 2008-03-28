@@ -241,7 +241,35 @@
               org.apache.uima.tools.internal.uima.util
             </Export-Package>
 
-            <Import-Package>*,
+            <!-- handle split packages in Eclipse.
+               There are 4 packages in org.eclipse.jface.* that are "split" between bundles 
+                  org.eclipse.jface.text and org.eclipse.text.
+               org.eclipse.ui.texteditor is split between 
+                 org.eclipse.ui.editors and org.eclipse.ui.workbench.texteditor.
+               There are 5 packages in org.eclipse.ui.*  that are split between 
+                 org.eclipse.ui.ide and org.eclipse.ui.workbench.  
+                 The Notes say not to require org.eclipse.ui.workbench, but instead just require
+                    org.eclipse.ui (which imports and reexports org.eclipse.ui.workbench packages).
+               org.eclipse.core.runtime has combined apis (that were split in later 
+                 point releases of 3.x)
+            -->
+            <Require-Bundle>
+              org.eclipse.jface.text,
+              org.eclipse.text,
+              org.eclipse.ui.editors,
+              org.eclipse.ui.workbench.texteditor,
+              org.eclipse.ui.ide,
+              org.eclipse.ui,
+              org.eclipse.core.runtime,
+              org.apache.uima.runtime,
+              org.apache.uima.desceditor
+            </Require-Bundle>
+            
+            <Import-Package>
+              *, 
+              org.eclipse.jdt.launching
+            </Import-Package>
+            <!--Import-Package>*,
               org.eclipse.core.runtime,
               org.eclipse.core.runtime.jobs,
               org.eclipse.core.commands.common,
@@ -249,7 +277,7 @@
               org.eclipse.jface.window,
               org.eclipse.jdt.launching,
               org.apache.uima.taeconfigurator.editors.ui.dialogs
-            </Import-Package>
+            </Import-Package-->
 
             <Bundle-Activator>org.apache.uima.editors.dde.internal.Activator</Bundle-Activator>
             <Bundle-SymbolicName>org.apache.uima.editors.dde;singleton:=true</Bundle-SymbolicName>
