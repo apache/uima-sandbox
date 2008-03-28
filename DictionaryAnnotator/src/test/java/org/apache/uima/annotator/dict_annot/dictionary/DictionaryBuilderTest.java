@@ -401,6 +401,6 @@ public class DictionaryBuilderTest extends TestCase {
       
       //compare dictionary content with reference content 
       FileCompare.compare(outputFile, JUnitExtension
-            .getFile("DictionaryBuilderTests/dictionaryPrintingRef.txt"));
+            .getFile("DictionaryBuilderTests/DictionaryPrintingRef.txt"));
    }
 }
