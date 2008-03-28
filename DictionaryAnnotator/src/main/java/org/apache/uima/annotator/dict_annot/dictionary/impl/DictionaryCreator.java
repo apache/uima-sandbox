@@ -359,8 +359,10 @@ public class DictionaryCreator {
          FileUtils.deleteRecursive(tempDir);
          if (tempDir != null) {
             List files = FileUtils.getFiles(tempDir, true);
-            for (int i = 0; i < files.size(); i++) {
-               ((File) files.get(i)).deleteOnExit();
+            if (files != null) {
+               for (int i = 0; i < files.size(); i++) {
+                  ((File) files.get(i)).deleteOnExit();
+               }
             }
          }
       }
