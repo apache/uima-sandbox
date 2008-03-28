@@ -40,7 +40,7 @@ public class RegexAnnotatorPerfTest extends TestCase {
    */
   public void testPerformanceSet1() throws Exception {
     // get descriptor
-    File descFile = JUnitExtension.getFile("performanceTest/RegexAnnotPerf.xml");
+    File descFile = JUnitExtension.getFile("performanceTest/RegExAnnotPerf.xml");
     File testFileDir = JUnitExtension.getFile("performanceTest/fileSet1");
     // run performance test
     PerformanceTestResult result = AnnotatorPerformanceTester.runPerformanceTest(true, 10000, descFile, testFileDir,
