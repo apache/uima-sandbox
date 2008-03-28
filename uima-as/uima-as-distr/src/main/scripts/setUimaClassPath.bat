@@ -46,6 +46,8 @@ REM   under the License.
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\commons-logging-1.1.1.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\commons-pool-1.2.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\spring-2.0.6.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\xbean-spring-3.2-SNAPSHOT.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\commons-collections-3.1.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\geronimo-jms_1.1_spec-1.0.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\geronimo-j2ee-management_1.0_spec-1.0.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-core.jar
