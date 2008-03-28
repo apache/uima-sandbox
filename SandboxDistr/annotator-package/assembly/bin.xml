@@ -31,7 +31,7 @@
 	<!-- copy license and notice files -->
 		<fileSet>
 			<directory>./readme/</directory>
-			<outputDirectory>/apache-uima/addons/annotator/</outputDirectory>
+			<outputDirectory>/apache-uima/addons/</outputDirectory>
 			<includes>
 				<include>DISCLAIMER</include>
 				<include>LICENSE</include>
