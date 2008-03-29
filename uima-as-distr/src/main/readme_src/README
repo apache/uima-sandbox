@@ -7,7 +7,7 @@ needed by this project.
 To build this project, first build the UIMA core, and then
 do the following steps:
 
-1) check out of SVN the following projects into the same 
+1) either check out of SVN the following projects into the same 
 "workspace" directory that you checked out the base UIMA:
    - uima-as-distr
    - uimaj-as
@@ -16,6 +16,8 @@ do the following steps:
    - uimaj-as-jms
    - uimaj-ep-deployeditor
    - uimaj-ep-runtime-deployeditor
+   
+   or, unzip the source distribution into the same workspace.
    
 2) cd to the uimaj-as project, and do mvn install
 3) To work with eclipse, following step 2), do mvn eclipse:eclipse
