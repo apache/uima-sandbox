@@ -143,6 +143,7 @@ under the License.
     <dependencySet>
       <includes>
         <include>commons-pool:commons-pool</include>
+        <include>commons-collections:commons-collections</include>
         <include>org.springframework:spring</include>  
         <include>commons-httpclient:commons-httpclient</include>
         <!--include>org.apache.activemq:activemq-</include>  patched!  -->               
