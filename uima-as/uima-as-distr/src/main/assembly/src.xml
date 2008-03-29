@@ -32,8 +32,8 @@ under the License.
   
   <fileSets>
     <fileSet>
-      <directory>/apache.uima-as</directory>
-      <outputDirectory>uimaj-distr</outputDirectory>
+      <directory>.</directory>
+      <outputDirectory>uima-as-distr</outputDirectory>
       <includes>
         <include>src/**</include>
         <include>pom.xml</include>
@@ -87,18 +87,20 @@ under the License.
         <include>README.FIRST</include>
       </includes>
     </fileSet>
-    <fileSet>
+    <!-- update site not part of the source distribution.  This is 
+         something built after the release vote, as part of deployment -->
+    <!--fileSet>
       <directory>../uimaj-eclipse-update-site</directory>
       <outputDirectory>uimaj-eclipse-update-site</outputDirectory>
       <includes>
-        <include>features/**</include>
+        <include>features/**</include-->
         <!--include>plugins/**</include-->
-        <include>web/**</include>
+        <!--include>web/**</include>
         <include>build.xml</include>
         <include>index.html</include>
         <include>site.xml</include>
       </includes>
-    </fileSet>
+    </fileSet-->
     <fileSet>
       <directory>../uimaj-ep-deployeditor</directory>
       <outputDirectory>uimaj-ep-deployeditor</outputDirectory>
@@ -145,6 +147,30 @@ under the License.
         <include>src/**</include>
         <include>pom.xml</include>
       </includes>
-    </fileSet>    
+    </fileSet>
+    <fileSet>
+      <directory>../uimaj</directory>
+      <outputDirectory>uimaj</outputDirectory>
+      <includes>
+        <include>eclipse-plugin-superPom/*</include>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>../uimaj-distr</directory>
+      <outputDirectory>uimaj-distr</outputDirectory>
+      <includes>
+        <include>src/**</include>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>../uimaj-examples</directory>
+      <outputDirectory>uimaj-examples</outputDirectory>
+      <includes>
+        <include>src/**</include>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>  
   </fileSets>  
 </assembly>
