@@ -932,14 +932,19 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		Endpoint endpoint=null;
 		boolean subordinateCasInPlayCountDecremented=false;
-    
+		CacheEntry cacheEntry = null;
 		try
 		{
-			CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-			if ( cacheEntry == null )
-			{
+			cacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+		}
+		catch(Exception e)
+		{
 				return;
-			}
+		}
+		
+		try
+		{
+//			System.out.println(")))))))))))) FINAL STEP-CAS:"+aCasReferenceId+" PARENT:"+cacheEntry.getInputCasReferenceId());						
 			CacheEntry parentCASCacheEntry = null;
 	        boolean replyWithInputCAS = false;
 			//	Check if the CAS has subordinates, meaning is this CAS an input CAS from which
@@ -949,8 +954,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			//	the input CAS in the cache.
 				
 			//	Check if this CAS is an input CAS
-			if (!cacheEntry.isSubordinate() )
+			if (!cacheEntry.isSubordinate() || cacheEntry.getSubordinateCasInPlayCount() > 0 )
 			{
+//				System.out.println("########### Handling Input CAS::"+aCasReferenceId);						
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 						"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas__FINEST", new Object[] { getComponentName(),aCasReferenceId});
 				synchronized( cacheEntry )
@@ -970,6 +976,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					{
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 								"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_no_children__FINEST", new Object[] { getComponentName(),aCasReferenceId});
+//						System.out.println("########### Releasing CAS::"+aCasReferenceId+" No Subordinates Found");						
 
 						//	All subordinates have been fully processed. Set the flag so that
 						//	the input is returned back to the client.
@@ -982,6 +989,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				//	 This is a subordinate CAS. First get cache entry for the input (parent) CAS
 				parentCASCacheEntry = 
 					getInProcessCache().getCacheEntryForCAS(cacheEntry.getInputCasReferenceId());
+//				System.out.println("------------- Decrementing Delegate Count For Input Cas::"+cacheEntry.getInputCasReferenceId());						
 
 				replyWithInputCAS = decrementCasSubordinateCount( parentCASCacheEntry);
 				if ( parentCASCacheEntry != null )
@@ -1013,17 +1021,31 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			if (aStep.getForceCasToBeDropped() || (isNewCas && aggregateMetadata.getOperationalProperties().getOutputsNewCASes() == false))
 			{
 				endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
-				dropCAS(aCasReferenceId, true);
+				if ( cacheEntry.isReplyReceived())
+				{
+//					System.out.println(":::::::::::::::::::::: DROPPING CAS:"+aCasReferenceId);
+					dropCAS(aCasReferenceId, true);
+				}
+				
+				if ( parentCASCacheEntry != null && parentCASCacheEntry.isSubordinate() 
+					    && parentCASCacheEntry.isReplyReceived()
+						&& parentCASCacheEntry.getSubordinateCasInPlayCount() == 0)
+				{
+//					System.out.println("************ RECURSING WITH PARENT:"+parentCASCacheEntry.getCasReferenceId());
+					finalStep(aStep, parentCASCacheEntry.getCasReferenceId());
+				}
 			}
 			if ( replyWithInputCAS )
 			{
 				if ( parentCASCacheEntry != null ) 
 				{
+//					System.out.println("===================>----REPLYING TO CLIENT-INPUT CAS ID:"+parentCASCacheEntry.getCasReferenceId());
 					//	Reply with the input CAS
 					replyToClient( parentCASCacheEntry.getCasReferenceId() );
 				}
 				else
 				{
+//					System.out.println("===================>++++REPLYING TO CLIENT-INPUT CAS ID:"+aCasReferenceId);
 					replyToClient( aCasReferenceId );
 				}
 			}
@@ -1082,7 +1104,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				//	Decrement number of subordinate CASes still in play and fetch the
 				//	current count of subordinate CASes in play
 				aParentCasCacheEntry.decrementSubordinateCasInPlayCount();
-				if ( aParentCasCacheEntry.isReplyReceived() && aParentCasCacheEntry.getSubordinateCasInPlayCount() == 0 )
+				if ( !aParentCasCacheEntry.isSubordinate() && aParentCasCacheEntry.isReplyReceived() && aParentCasCacheEntry.getSubordinateCasInPlayCount() == 0 )
 				{
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 							"decrementCasSubordinateCount", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_no_children__FINEST", new Object[] { getComponentName(),aParentCasCacheEntry.getCasReferenceId()});

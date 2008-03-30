@@ -115,6 +115,9 @@ public class ProcessRequestHandler_impl extends HandlerBase
 					//	it back to the client
 					synchronized( inputCasCacheEntry )
 					{
+						
+						
+//System.out.println(">>>>>>> Incrementing Delegate:"+casReferenceId+" Count For Input Cas::"+inputCasReferenceId);						
 						inputCasCacheEntry.incrementSubordinateCasInPlayCount();
 					}
 					//newCASProducedBy = key;
@@ -551,6 +554,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 					{
 						synchronized( inputCasCacheEntry )
 						{
+//							System.out.println("++++++++ Incrementing Delegate:"+casReferenceId+" Count For Input Cas::"+subordinateCasCacheEntry.getInputCasReferenceId());						
 							inputCasCacheEntry.incrementSubordinateCasInPlayCount();
 						}
 					}
