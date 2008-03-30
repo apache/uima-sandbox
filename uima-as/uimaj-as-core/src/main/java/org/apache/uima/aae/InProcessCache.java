@@ -458,7 +458,7 @@ public class InProcessCache implements InProcessCacheMBean
 	public synchronized void register(CAS aCAS, MessageContext aMessageContext, OutOfTypeSystemData otsd, String aCasReferenceId)
 	throws AsynchAEException
 	{
-		cache.put(aCasReferenceId, new CacheEntry(aCAS, aMessageContext, otsd));
+		cache.put(aCasReferenceId, new CacheEntry(aCAS, aCasReferenceId, aMessageContext, otsd));
 	}
 	
 	
@@ -589,28 +589,44 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private boolean replyReceived = false;
 		
-		protected CacheEntry(CAS aCas, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
+		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
 		{
-			cas = aCas;
+			this(aCas, aCasReferenceId, aMessageAccessor);
 			messageAccessor = aMessageAccessor;
+/*
+			cas = aCas;
 			otsd = aotsd;
 			if ( aMessageAccessor != null )
 			{
 				messageOrigin = aMessageAccessor.getEndpoint();
 			}
+			casReferenceId = aCasReferenceId;
+*/			
 		}
 		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, XmiSerializationSharedData sdata)
 		{
+			this(aCas, aCasReferenceId, aMessageAccessor);
+			deserSharedData = sdata;
+/*
 			cas = aCas;
 			messageAccessor = aMessageAccessor;
-			deserSharedData = sdata;
+			if ( aMessageAccessor != null )
+			{
+				messageOrigin = aMessageAccessor.getEndpoint();
+			}
+			casReferenceId = aCasReferenceId;
+*/			
+		}
+		private CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor )
+		{
+			cas = aCas;
+			messageAccessor = aMessageAccessor;
 			if ( aMessageAccessor != null )
 			{
 				messageOrigin = aMessageAccessor.getEndpoint();
 			}
 			casReferenceId = aCasReferenceId;
 		}
-		
 		public String getCasReferenceId()
 		{
 			return casReferenceId;
