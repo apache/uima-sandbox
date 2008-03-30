@@ -459,6 +459,15 @@ public class TestUimaASExtended extends BaseTestSupport
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
+	public void testProcessWithAggregateUsing2CollocatedMultipliers() throws Exception
+	{
+    System.out.println("-------------- testProcessWithAggregateUsing2CollocatedMultipliers -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWith2Multipliers.xml");
+		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	}
+
 	public void testStopAggregateWithRemoteMultiplier() throws Exception
 	{
     System.out.println("-------------- testStopAggregateWithRemoteMultiplier -------------");
