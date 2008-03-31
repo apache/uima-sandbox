@@ -52,7 +52,7 @@
 
     <concept name="Variables3">
     	<rules>
-			<rule regEx="\v{escaping} Feb\." matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+			<rule regEx="\v{escaping}" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
 	    </rules>
 	    <createAnnotations>	
 			<annotation id="testannot1" type="org.apache.uima.TestAnnot">
