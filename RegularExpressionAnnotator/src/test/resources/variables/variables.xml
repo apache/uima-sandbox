@@ -23,6 +23,7 @@
 		<variable name="days" value="(Monday|Tuesday)"/>
 		<variable name="month1" value="January"/>
 		<variable name="Last_Day" value="Sunday"/>
+		<variable name="escaping" value="Jan\."/>
 	</variables>
 	
     <concept name="Variables1">
@@ -40,6 +41,18 @@
     <concept name="Variables2">
     	<rules>
 			<rule regEx="\v{days} \v{month1} \v{Last_Day} test \{days\}" matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
+	    </rules>
+	    <createAnnotations>	
+			<annotation id="testannot1" type="org.apache.uima.TestAnnot">
+				<begin group="0"/>
+				<end group="0"/>
+		 	</annotation>
+	 	</createAnnotations>
+    </concept>
+
+    <concept name="Variables3">
+    	<rules>
+			<rule regEx="\v{escaping} Feb\." matchStrategy="matchAll" matchType="uima.tcas.DocumentAnnotation"/>
 	    </rules>
 	    <createAnnotations>	
 			<annotation id="testannot1" type="org.apache.uima.TestAnnot">

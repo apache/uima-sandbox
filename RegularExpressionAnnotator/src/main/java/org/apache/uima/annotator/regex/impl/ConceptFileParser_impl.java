@@ -100,8 +100,8 @@ public class ConceptFileParser_impl implements ConceptFileParser {
          if (varArray.length > 0) {
             variables = new RegexVariables_impl();
             for (int i = 0; i < varArray.length; i++) {
-               variables.addVariable(varArray[i].getName(), varArray[i]
-                     .getValue());
+               String value = varArray[i].getValue().replaceAll("\\\\", "\\\\\\\\");
+               variables.addVariable(varArray[i].getName(), value);
             }
          }
       }

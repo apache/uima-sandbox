@@ -83,6 +83,29 @@ public class TestVariables extends TestCase {
    }
 
    /**
+    * Test regex variable replacement for variable concept 3
+    * 
+    * @throws Exception
+    */
+   public void testVariablesConept3() throws Exception {
+
+      // create annotation tester with the regex annotator specifier
+      AnnotatorTester annotTester = new AnnotatorTester(JUnitExtension
+            .getFile("variables/RegExAnnotVariables.xml"));
+
+      CAS cas = annotTester.performTest("Match: Jan. Don't macht Jana", "en");
+
+      // define result interested in
+      String[] tofs = { "org.apache.uima.TestAnnot" };
+
+      // compare results
+      File outputFile = new File(JUnitExtension.getFile("variables"),
+            "variablesConcept3_testoutput.txt");
+      AnnotatorTester.checkResult(cas, tofs, JUnitExtension
+            .getFile("variables/variablesConcept3Ref.txt"), outputFile);
+   }
+
+   /**
     * Test regex variable replacement for variable concept 2
     * 
     * @throws Exception
