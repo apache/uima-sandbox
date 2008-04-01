@@ -295,7 +295,11 @@
               !org.eclipse.ui.dialogs,
               !org.eclipse.ui.model,
               !org.eclipse.ui.part, 
-              *
+              *,
+              org.apache.uima.taeconfigurator.editors.ui.dialogs,
+              org.apache.uima.taeconfigurator.files,
+              org.apache.uima.application.util,
+              org.eclipse.jdt.launching
             </Import-Package>
 
             <!--Import-Package>*,
@@ -322,6 +326,7 @@
         <configuration>
           <manifest>.ignore</manifest>
           <pde>true</pde>
+          <useProjectReferences>false</useProjectReferences>
         </configuration>
       </plugin>
 
