@@ -298,8 +298,7 @@
               *,
               org.apache.uima.taeconfigurator.editors.ui.dialogs,
               org.apache.uima.taeconfigurator.files,
-              org.apache.uima.application.util,
-              org.eclipse.jdt.launching
+              org.apache.uima.application.util
             </Import-Package>
 
             <!--Import-Package>*,
