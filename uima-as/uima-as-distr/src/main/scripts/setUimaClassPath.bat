@@ -35,27 +35,24 @@ REM   under the License.
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%CATALINA_HOME%\webapps\axis\WEB-INF\lib\mail.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%CATALINA_HOME%\webapps\axis\WEB-INF\lib\saaj.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\jVinci.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\activemq-core-5.0.0.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\activemq-optional-5.0.0.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\commons-httpclient-2.0.1.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\xstream-1.1.2.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\xmlpull-1.1.3.4d_b4_min.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\jetty-6.1.4.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\jetty-util-6.1.4.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\servlet-api-2.5-6.1.4.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\commons-logging-1.1.1.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\commons-pool-1.2.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\spring-2.0.6.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\xbean-spring-3.2-SNAPSHOT.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\optional\commons-collections-3.1.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\geronimo-jms_1.1_spec-1.0.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-5.0.0\lib\geronimo-j2ee-management_1.0_spec-1.0.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\apache-activemq-4.1.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\activemq-optional-4.1.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\commons-httpclient-2.0.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\xstream-1.1.2.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\xmlpull-1.1.3.4d_b4_min.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\jetty-6.0.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\jetty-util-6.0.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\servlet-api-2.5-6.0.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\commons-logging-1.1.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\commons-pool-1.2.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\spring-2.0.6.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\commons-collections-3.1.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\geronimo-jms_1.1_spec-1.0.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\geronimo-j2ee-management_1.0_spec-1.0.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-core.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-activemq.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\lib\uimaj-as-jms.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\config;%_REALLYNOQUOTES%
-
-@set ACTIVEMQ_HOME=%UIMA_HOME%\apache-activemq-5.0
 
 @rem set path to support running C++ annotators
 set PATH=%UIMA_HOME%\uimacpp\bin;%UIMA_HOME%\uimacpp\examples\tutorial\src;%PATH%

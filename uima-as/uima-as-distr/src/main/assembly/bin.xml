@@ -131,32 +131,28 @@ under the License.
       <includes>
         <include>commons-logging:commons-logging</include>
         <include>org.apache.activemq:activemq-console</include>
-        <include>org.apache.activemq:activemq-core</include>
         <include>org.apache.geronimo.specs:geronimo-jms_1.1_spec</include>
         <include>org.apache.geronimo.specs:geronimo-j2ee-management_1.0_spec</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>apache-activemq-5.0.0/lib</outputDirectory>
+      <outputDirectory>apache-activemq-4.1.1/lib</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
     
     <dependencySet>
       <includes>
-        <include>commons-pool:commons-pool</include>
-        <include>commons-collections:commons-collections</include>
         <include>org.springframework:spring</include>  
         <include>commons-httpclient:commons-httpclient</include>
-        <!--include>org.apache.activemq:activemq-</include>  patched!  -->               
         <include>org.mortbay.jetty:jetty</include> 
         <include>org.mortbay.jetty:jetty-util</include> 
         <include>org.mortbay.jetty:servlet-api-2.5</include>
         <include>xmlpull:xmlpull</include> <!-- need for uima-as -->
         <include>xstream:xstream</include> <!-- need for uima-as -->
         <include>org.apache.derby:derby</include>
-        <include>log4j:log4j</include>
+        <include>org.apache.xbean:xbean-spring</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>apache-activemq-5.0.0/lib/optional</outputDirectory>
+      <outputDirectory>apache-activemq-4.1.1/lib/optional</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
 
@@ -305,8 +301,8 @@ under the License.
     
     <!-- activemq -->
     <fileSet>
-      <directory>src/main/apache-activemq-5.0.0</directory>
-      <outputDirectory>apache-activemq-5.0.0</outputDirectory>
+      <directory>src/main/apache-activemq-4.1.1</directory>
+      <outputDirectory>apache-activemq-4.1.1</outputDirectory>
     </fileSet>  
     
     <!-- saxon -->    
