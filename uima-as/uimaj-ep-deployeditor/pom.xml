@@ -223,10 +223,14 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <!-- version 1.4.0 to support _nouses instruction -->
+        <version>1.4.0</version>
         <extensions>true</extensions>
         <configuration>
           <manifestLocation>META-INF</manifestLocation>
           <instructions>
+            <!-- turn off "uses" generation because Eclipse 3.2.x doesn't work with them -->
+            <_nouses>true</_nouses>
             <Export-Package>
               org.apache.uima.dde.internal,
               org.apache.uima.dde.internal.details,
@@ -242,14 +246,30 @@
             </Export-Package>
 
             <!-- handle split packages in Eclipse.
+              We do this by using Require-Bundle, and excluding from the Import-Package those
+                split packages covered by those bundles - this is required by OSGi.
+                               
                There are 4 packages in org.eclipse.jface.* that are "split" between bundles 
                   org.eclipse.jface.text and org.eclipse.text.
+                 Packages:
+                  org.eclipse.jface.text
+                  org.eclipse.jface.text.link
+                  org.eclipse.jface.text.source
+                  org.eclipse.jface.text.templates 
                org.eclipse.ui.texteditor is split between 
                  org.eclipse.ui.editors and org.eclipse.ui.workbench.texteditor.
+                 Packages: 
+                  org.eclipse.ui.texteditor
                There are 5 packages in org.eclipse.ui.*  that are split between 
                  org.eclipse.ui.ide and org.eclipse.ui.workbench.  
                  The Notes say not to require org.eclipse.ui.workbench, but instead just require
                     org.eclipse.ui (which imports and reexports org.eclipse.ui.workbench packages).
+                 Packages:
+                  org.eclipse.ui
+                  org.eclipse.ui.actions
+                  org.eclipse.ui.dialogs
+                  org.eclipse.ui.model
+                  org.eclipse.ui.part
                org.eclipse.core.runtime has combined apis (that were split in later 
                  point releases of 3.x)
             -->
@@ -260,18 +280,24 @@
               org.eclipse.ui.workbench.texteditor,
               org.eclipse.ui.ide,
               org.eclipse.ui,
-              org.eclipse.core.runtime,
-              org.apache.uima.runtime,
-              org.eclipse.core.resources,
-              org.eclipse.ui.forms,
-              org.eclipse.jdt.core,
-              org.apache.uima.desceditor
+              org.eclipse.ui.workbench,
+              org.eclipse.core.runtime
             </Require-Bundle>
-            
             <Import-Package>
-              *, 
-              org.eclipse.jdt.launching
+              !org.eclipse.jface.text,
+              !org.eclipse.jface.text,
+              !org.eclipse.jface.text.link,
+              !org.eclipse.jface.text.source,
+              !org.eclipse.jface.text.templates,
+              !org.eclipse.ui.texteditor,
+              !org.eclipse.ui,
+              !org.eclipse.ui.actions,
+              !org.eclipse.ui.dialogs,
+              !org.eclipse.ui.model,
+              !org.eclipse.ui.part, 
+              *
             </Import-Package>
+
             <!--Import-Package>*,
               org.eclipse.core.runtime,
               org.eclipse.core.runtime.jobs,
