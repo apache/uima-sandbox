@@ -20,32 +20,7 @@
   <!-- Allows us to use system properties as variables in this configuration file -->
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
-  <broker xmlns="http://activemq.org/config/1.0">
-  
-    <memoryManager>  
-      <usageManager id="memory-manager" limit="150 MB"/>
-    </memoryManager>
-
-    <!-- In ActiveMQ 4, you can setup destination policies -->  
-    <destinationPolicy>
-      <policyMap><policyEntries>
-        
-          <policyEntry topic="FOO.>">
-            <dispatchPolicy>
-              <strictOrderDispatchPolicy />
-            </dispatchPolicy>
-            <subscriptionRecoveryPolicy>
-              <lastImageSubscriptionRecoveryPolicy />
-            </subscriptionRecoveryPolicy>
-          </policyEntry>
-
-      </policyEntries></policyMap>
-    </destinationPolicy>
-  
-  
-    <persistenceAdapter>
-        <jdbcPersistenceAdapter dataDirectory="${activemq.base}/activemq-data"/>
-    </persistenceAdapter>
+  <broker xmlns="http://activemq.org/config/1.0" persistent="false" useShutdownHook="false">
   
     <transportConnectors>
        <transportConnector name="default" uri="tcp://localhost:61616"/>

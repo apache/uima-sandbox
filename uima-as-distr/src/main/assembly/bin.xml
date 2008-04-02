@@ -131,7 +131,11 @@ under the License.
       <includes>
         <include>commons-logging:commons-logging</include>
         <include>org.apache.activemq:activemq-console</include>
+        <include>org.apache.activemq:activeio-core</include>
         <include>backport-util-concurrent:backport-util-concurrent</include>
+        <include>org.apache.activemq:activemq-jaas</include>
+        <include>org.apache.activemq:activemq-web</include>
+        <include>mx4j:mx4j</include>
         <include>org.apache.geronimo.specs:geronimo-jms_1.1_spec</include>
         <include>org.apache.geronimo.specs:geronimo-j2ee-management_1.0_spec</include>
       </includes>
@@ -151,6 +155,16 @@ under the License.
         <include>xstream:xstream</include> <!-- need for uima-as -->
         <include>org.apache.derby:derby</include>
         <include>org.apache.xbean:xbean-spring</include>
+        <include>commons-beanutils:commons-beanutils</include>
+		<include>commons-collections:commons-collections</include>
+		<include>commons-dbcp:commons-dbcp</include>
+		<include>commons-pool:commons-pool</include>
+		<include>org.apache.geronimo.specs:geronimo-j2ee-connector_1.5_spec</include>
+		<include>org.apache.geronimo.specs:geronimo-j2ee-jacc_1.0_spec</include>
+		<include>activemq:jmdns</include>
+		<include>log4j:log4j</include>
+		<include>mx4j:mx4j-remote</include>
+		<include>mx4j:mx4j-tools</include>
       </includes>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>apache-activemq-4.1.1/lib/optional</outputDirectory>
