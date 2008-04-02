@@ -107,6 +107,12 @@
 
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
+			<artifactId>activeio-core</artifactId>
+			<version>3.0.0-incubator</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-console</artifactId>
 			<version>4.1.1</version>
 		</dependency>
@@ -116,6 +122,87 @@
 			<artifactId>backport-util-concurrent</artifactId>
 			<version>2.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-jaas</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-web</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mx4j</groupId>
+			<artifactId>mx4j</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+
+   <!-- lib/optional -->
+
+	<dependency>
+		<groupId>commons-beanutils</groupId>
+		<artifactId>commons-beanutils</artifactId>
+		<version>1.6.1</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>commons-collections</groupId>
+		<artifactId>commons-collections</artifactId>
+		<version>2.1</version>
+	</dependency>
+
+	<dependency>
+		<groupId>commons-dbcp</groupId>
+		<artifactId>commons-dbcp</artifactId>
+		<version>1.2</version>
+	</dependency>
+
+	<dependency>
+		<groupId>commons-pool</groupId>
+		<artifactId>commons-pool</artifactId>
+		<version>1.2</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.apache.geronimo.specs</groupId>
+		<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+		<version>1.0</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.apache.geronimo.specs</groupId>
+		<artifactId>geronimo-j2ee-jacc_1.0_spec</artifactId>
+		<version>1.0</version>
+	</dependency>
+
+	<dependency>
+		<groupId>activemq</groupId>
+		<artifactId>jmdns</artifactId>
+		<version>1.0-RC2</version>
+	</dependency>
+
+	<dependency>
+		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+		<version>1.2.12</version>
+	</dependency>
+
+	<dependency>
+		<groupId>mx4j</groupId>
+		<artifactId>mx4j-remote</artifactId>
+		<version>2.1.1</version>
+	</dependency>
+
+	<dependency>
+		<groupId>mx4j</groupId>
+		<artifactId>mx4j-tools</artifactId>
+		<version>2.1.1</version>
+	</dependency>
+
 
 		<dependency>
 		    <groupId>org.apache.uima</groupId>
