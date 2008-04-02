@@ -16,7 +16,7 @@ UIMA Asynchronous Scaleout (AS) is an add-on to Apache UIMA that provides a set 
 for achieving flexible scaleout.  It is a second generation design, replacing the
 CPM and Vinci Services. The CPM and Vinci are still available and are not being deprecated, 
 but new designs are encouraged to use UIMA-AS for scalability, and current designs 
-reaching limitations want to move to UIMA-AS.
+reaching limitations may want to move to UIMA-AS.
   
 UIMA-AS is integrated with the new flow controller architecture, and can be applied to
 both primitive and aggregate analysis engines.
@@ -40,4 +40,98 @@ issues you find at http://issues.apache.org/jira/browse/uima.
 
 
 5. List of JIRA Issues Fixed in this Release
+
+Release Notes - UIMA - Version 2.2.2AS
+
+** Bug
+    * [UIMA-693] - Fix poms so uima-as compiles with maven
+    * [UIMA-748] - Multiple notfications sent to registered listeners.
+    * [UIMA-754] - Add missing folder and file to uimaj-as-jms
+    * [UIMA-784] - uima-as build order wrong
+    * [UIMA-785] - CPC stats returned from aggregates are invalid 
+    * [UIMA-786] - Input CAS is returned back to the client while subordinate CASes are still in play in the aggregate
+    * [UIMA-809] - Silence exceptions occuring in ActiveMQ/Spring when stopping listeners
+    * [UIMA-829] - When processing CPC the PrimitiveController doesnt release AE instance back to the pool
+    * [UIMA-831] - UIMA-AS code fails to compile
+    * [UIMA-833] - Cannot create Eclipse project uimaj-as-activemq
+    * [UIMA-838] - Incorrect support for process CAS error threshold count and threshold window 
+    * [UIMA-843] - Modify UIMA-AS client to throw exception from initialize() when GetMeta times out
+    * [UIMA-850] - Cancel timer as soon as process reply is received
+    * [UIMA-851] - dd2spring uses incorrect default value for casPoolSize
+    * [UIMA-859] - changeVersion scripts not handling transition from SNAPSHOT to non-SNAPSHOT properly
+    * [UIMA-862] - UIMA-AS: saxon jar name wrong, and saxon version issue
+    * [UIMA-864] - update version from 2.2.2-incubating-SNAPSHOT to 2.2.2-incubating
+    * [UIMA-865] - UIMA core distribution build only works if the UIMA AS plugins are available
+    * [UIMA-866] - Modify UIMA-AS documentation to state that the Error Results are not implemented
+    * [UIMA-867] - runRemoteAyncAE scripts do not support UIMA_DATAPATH
+    * [UIMA-868] - put Saxon in a place unlikely to be put in the class path; update test and script codes to reference
+    * [UIMA-869] - uima-as test case refers to UIMA_HOME to get saxon and dd2spring xslt - doesn't work before install & assembly:assembly
+    * [UIMA-870] - uima-as fix active-mq jar lib layout - wrong jetty version, move right things to "optional" directory
+    * [UIMA-872] - uima-as has spring version 2.5.1 , but is using activemq-5.0.0 which in turn has spring version 2.0.6, causing intermittant test failures?
+    * [UIMA-873] - uima-as NOTICE file needs to remove horizontal lines
+    * [UIMA-875] - Problem handing errors in sendAndReceiveCAS
+    * [UIMA-876] - UIMA service requests should expire if timeout value is set
+    * [UIMA-879] - Eclipse plugin jar files do not have the right names
+    * [UIMA-895] - apply http patch to activemq jars
+    * [UIMA-901] - [UIMA-AS] Fix RAT reported missing license headers
+    * [UIMA-902] - [uima-as] src distr build not properly excluding duplicate readme/license/notice files
+    * [UIMA-903] - [uima-as] src distr build including too much of uima-docbook-tool
+    * [UIMA-908] - The Flow's aborted method is called when every CAS reaches the end of its flow ... should be just the failing ones
+    * [UIMA-912] - UIMA C++ service not deployed correctly
+    * [UIMA-914] - If the Error Configuration thresholdWindow value is invalid it is quietly ignored
+    * [UIMA-915] - Clean up README for UIMA AS SDK
+    * [UIMA-919] - UIMA AS client hangs when the last CAS sent in the process() method times out
+    * [UIMA-921] - Fix wrong uima version numbers in uima-as
+    * [UIMA-922] - pass absolute file path args to Spring's FileSystemXmlApplicationContext class with prepended "file:"
+    * [UIMA-925] - How does a UIMA-AS client using sendCAS associate a returned error with the CAS that caused it?
+    * [UIMA-930] - uima-as release notes are incorrect
+    * [UIMA-932] - UIMA-AS version printing as "unknown"
+    * [UIMA-934] - Some Linux scripts cannot execute as are in DOS format
+    * [UIMA-937] - UIMA AS service fetches a wrong Broker URL from the controller on replies
+    * [UIMA-938] - startBroker doesn't on Linux
+    * [UIMA-946] - Missing jars from distr and setUimaClassPath
+    * [UIMA-949] - Get exceptions when have 2 CAS multipliers
+    * [UIMA-950] - Connection times out waiting for long running remote service and temp reply queues are lost ... cannot recover
+    * [UIMA-951] - Eclipse split packages not handled well - causing plugin ClassNotFound failures
+    * [UIMA-952] - source distribution build for uima-as not building the uima-as-distr project correctly
+    * [UIMA-954] - Switch back to AMQ 4.1.1 for now
+
+** Improvement
+    * [UIMA-706] - put in Apache license headers
+    * [UIMA-720] - have dd2spring generate an additional property when using a remote temp Q
+    * [UIMA-742] - Cumulative fixes to synch apache svn with the latest changes
+    * [UIMA-743] - Add new testcases to test new features
+    * [UIMA-744] - Improved the XML parsing of the Deployment Descriptor
+    * [UIMA-745] - Improved the UI when editing GetMetadataError and ProcessCasError, added support for edting "initialFsHeapSize"
+    * [UIMA-752] - rename uima-ee to uima-as in SVN
+    * [UIMA-755] - Expose per CAS statistics to the application from uima-as client
+    * [UIMA-787] - Migrate code to the latest version of ActiveMQ (5.0.0)
+    * [UIMA-788] - Migrate code to the latest version of Spring (v.2.5.1)
+    * [UIMA-801] - Support specification of "initialFsHeapSize" for Cas Multiplier delegate
+    * [UIMA-839] - Fixup uima-as-distr to create src and bin distr for uima-as
+    * [UIMA-846] - Modify UIMA-AS to remove EE from class names
+    * [UIMA-856] - cleanup uima-as docbook
+    * [UIMA-861] - Add eclipse-plugin-superPom for uima-as, copying the structure used in uima
+    * [UIMA-871] - Split test suite into basic test and an extended test suite
+    * [UIMA-877] - Reverse multiple copyright statements in docbooks, per request at previous release vote
+    * [UIMA-916] - Remove unused initialize(String, Map) method from the UIMA AS client API
+    * [UIMA-927] - Provide a way to drain Dead Letter Queue 
+    * [UIMA-928] - [DDE] For Linux platform, Deployment Descriptor Editor's table border is not visible
+    * [UIMA-931] - uima-as signing script missing md5 and sha1 generation, also trying to sign bz files which are not generated for uima-as
+
+** New Feature
+    * [UIMA-759] - Expose uima as client side stats via JMX
+    * [UIMA-789] - Generate JavaDocs for the UIMA-AS Client API
+    * [UIMA-849] - Add sample deployment descriptors
+
+
+
+** Task
+    * [UIMA-701] - Bring up to date with the code changes since the code was packaged for apache grant
+
+
+** Test
+    * [UIMA-896] - Add testcase to test processing of double-byte documents through HTTP tunneling
+
+
 
