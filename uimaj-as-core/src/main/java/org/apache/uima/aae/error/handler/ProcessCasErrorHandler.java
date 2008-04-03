@@ -178,14 +178,31 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		{
     		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", 
     				UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_ignore_error__INFO", new Object[] { aController.getComponentName(), t.getClass().getName()});
-		
-//			Endpoint endpoint = (Endpoint) anErrorContext.get(AsynchAEMessage.Endpoint);
-//			if ( endpoint != null && endpoint.getReplyToEndpoint() != null &&
-//				 t.getCause() != null && t.getCause() instanceof ConnectException ) 	
-//			{
-//	    		//	Special case: disable a listener on queue that no longer exists
-//				aController.getUimaEEAdminContext().stopListener(endpoint.getReplyToEndpoint());
-//			}
+    		if ( casReferenceId !=  null)
+    		{
+    			//	Cleanup resources associated with a CAS and then release the CAS
+    			try
+    			{
+        			if ( aController instanceof AggregateAnalysisEngineController )
+        			{
+            			((AggregateAnalysisEngineController)aController).dropFlow(casReferenceId, true);
+            			((AggregateAnalysisEngineController)aController).removeMessageOrigin(casReferenceId);
+        			}
+        			aController.dropStats(casReferenceId, aController.getName());
+    			}
+    			catch( Exception e)
+    			{
+    				//	Throwing this CAS away, ignore exception
+    			}
+    			finally
+    			{
+        			if ( aController.isTopLevelComponent())
+        			{
+            			aController.dropCAS(casReferenceId, true);	
+        			}
+    			}
+    		}
+
     		return true;   // handled here. This message will not processed
 		}
 
