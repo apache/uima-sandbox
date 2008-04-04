@@ -627,8 +627,11 @@ public class TestUimaASExtended extends BaseTestSupport
 			if ( file.exists())
 			{
 				System.out.println(" *** DoubleByteText.txt exists and will be sent through http connector.");
-        System.out.println(" *** If the vanilla activemq-optional-5.0.0.jar from AMQ 5.0 release is being used,");
-        System.out.println(" *** and DoubleByteText.txt is bigger than 60KB or so, this test case will hang.");
+        System.out.println(" ***   If the vanilla activemq release is being used,");
+        System.out.println(" ***   and DoubleByteText.txt is bigger than 64KB or so, this test case will hang.");
+        System.out.println(" *** To fix, override the classpath with the jar files in and under the");
+        System.out.println(" ***   apache-uima-as/uima-as-distr/src/main/apache-activemq-X.y.z directory");
+        System.out.println(" ***   in the apache-uima-as source distribution.");
 				
 				// Add HTTP Connector to the broker. The connector will use port 8888. If this port is not available the test fails 
 				String httpURI = addHttpConnector(DEFAULT_HTTP_PORT);
