@@ -76,7 +76,7 @@
 			<jvmarg value="-Dbase=${base}"/>
 			<jvmarg value="-DbaseLocation=${eclipseLocation}"/>
 			<classpath>
-				<pathelement location="${equinox}" />
+				<pathelement path="${equinox}" />
 			</classpath>
 		</java>
 	</target>
