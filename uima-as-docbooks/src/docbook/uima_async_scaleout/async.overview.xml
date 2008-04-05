@@ -1199,12 +1199,12 @@ The alternative to using a wrapper would be to hard-code this into the AE framew
     <!-- ======================================================= -->
   <section id="ugr.async.ov.concepts.jms_descriptor">
       <title>JMS Service Descriptor</title>
-      <para>To call a UIMA AS Service from Document Analyzer or any other UIMA "SE" application, 
+      <para>To call a UIMA AS Service from Document Analyzer or any other base UIMA application, 
       use a descriptor such as the following:
       </para>
       <programlisting><![CDATA[<customResourceSpecifier xmlns="http://uima.apache.org/resourceSpecifier">
    <resourceClassName>
-      com.ibm.uima.aae.jms_adapter.JmsAnalysisEngineServiceAdapter
+      org.apache.uima.aae.jms_adapter.JmsAnalysisEngineServiceAdapter
    </resourceClassName>
    <parameters>
      <parameter name="brokerURL" 
