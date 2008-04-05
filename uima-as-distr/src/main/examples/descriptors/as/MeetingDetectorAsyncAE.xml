@@ -17,7 +17,7 @@
  * under the License.
  -->
 <customResourceSpecifier xmlns="http://uima.apache.org/resourceSpecifier">
-   <resourceClassName>com.ibm.uima.aae.jms_adapter.JmsAnalysisEngineServiceAdapter</resourceClassName>
+   <resourceClassName>org.apache.uima.aae.jms_adapter.JmsAnalysisEngineServiceAdapter</resourceClassName>
    <parameters>
      <parameter name="brokerURL" value="tcp://localhost:61616"/>
      <parameter name="endpoint" value="MeetingDetectorTaeQueue"/>
