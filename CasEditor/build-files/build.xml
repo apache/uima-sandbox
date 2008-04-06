@@ -22,6 +22,8 @@
 <project name="org.apache.uima.caseditor" default="build" basedir=".">
 
 	<property file="build_local.properties" />
+	<property file="build.properties" />
+	
 	
 	<fail message="The eclipseLocation property must be set in the build_local.properties file." 
 		unless="eclipseLocation" />
@@ -58,8 +60,6 @@
 
 		<copy todir="${buildDirectory}/plugins/org.apache.uima.caseditor">
 			<fileset dir="../">
-				<exclude name="${buildDirectory}/**" />				
-				<exclude name="build.xml" />
 			</fileset>
 		</copy>
 	</target>
@@ -79,5 +79,71 @@
 				<pathelement path="${equinox}" />
 			</classpath>
 		</java>
+		
+	<!-- Create directory for source build -->
+	<mkdir dir="${outputLocation}/${buildLabel}/${buildId}-src" />
+		
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/CasEditor">
+		<fileset dir="../">
+		</fileset>
+	</copy>
+	
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src">
+		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+		</fileset>
+	</copy>
+		
+	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-src.zip"
+		       basedir="${outputLocation}/${buildLabel}/${buildId}-src"/>
+		
+	<delete dir="${outputLocation}/${buildLabel}/${buildId}-src"/>
+		
+	<!-- mkdir src --> 
+	<!-- copy over source stuff -->
+		
+	<!-- build docs -->
+	<!-- call build_documentation.xml-->
+	<!-- does not work currently, because the imports fials -->
+	
+	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into win32 build -->
+	<unzip src="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip" 
+			dest="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
+	
+	<delete file="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip"/>
+	
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor">
+		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+		</fileset>
+	</copy>
+	
+		
+	<!-- copy over docs -->
+	<!-- to doc/html and doc/pdf like michael did it -->
+	
+	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip"
+		       basedir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
+
+	<delete dir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
+	
+	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into linux build -->
+	<unzip src="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip" 
+			dest="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
+	
+	<delete file="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip"/>
+	
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor">
+		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+		</fileset>
+	</copy>
+	
+	<!-- copy over docs -->
+	<!-- to doc/html and doc/pdf like michael did it -->
+	
+	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip"
+		       basedir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
+		
+	<delete dir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
+		
 	</target>
+	
 </project>
