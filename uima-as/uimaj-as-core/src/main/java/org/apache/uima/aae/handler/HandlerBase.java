@@ -70,7 +70,7 @@ public abstract class HandlerBase implements Handler
 				
 				if ( aMessageCtx.propertyExists(AsynchAEMessage.CasReference))
 				{
-					errorContext.add( AsynchAEMessage.CasReference, aMessageCtx.getMessageIntProperty(AsynchAEMessage.CasReference));
+					errorContext.add( AsynchAEMessage.CasReference, aMessageCtx.getMessageStringProperty(AsynchAEMessage.CasReference));
 				}
 				errorContext.add(UIMAMessage.RawMsg, aMessageCtx.getRawMessage());
 			}
