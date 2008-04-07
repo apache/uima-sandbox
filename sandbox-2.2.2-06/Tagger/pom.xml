@@ -1,0 +1,135 @@
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.    
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.uima</groupId>
+	<artifactId>Tagger</artifactId>
+	<packaging>jar</packaging>
+	<version>2.2.2-incubating</version>
+	<name>Apache UIMA Sandbox -- HMM Tagger</name>
+	<url>http://incubator.apache.org/uima</url>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>uimaj-core</artifactId>
+			<version>2.2.2-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>uimaj-test-util</artifactId>
+			<version>2.2.2-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>uimaj-component-test-util</artifactId>
+			<version>2.2.2-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>WhitespaceTokenizer</artifactId>
+			<version>2.2.2-incubating</version>
+			<scope>compile</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.uima</groupId>
+            <artifactId>PearPackagingMavenPlugin</artifactId>
+            <version>2.2.2-incubating</version>
+            <scope>package</scope>
+        </dependency>
+
+	</dependencies>
+	<build>
+		<finalName>uima-an-tagger</finalName>
+		<resources>
+            <resource>
+                <directory>desc</directory>
+            </resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>-Xmx500M</argLine>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<!-- Build documentation -->
+								<ant antfile="build_documentation.xml" target="copyDocs"/>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+            <plugin>
+                <groupId>org.apache.uima</groupId>
+                <artifactId>PearPackagingMavenPlugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                          <classpath>$main_root/resources;$main_root/desc</classpath>
+                          <mainComponentDesc>desc/HmmTagger.xml</mainComponentDesc>
+                          <componentId>HmmPosTagger</componentId>
+                        </configuration>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>    
+                </executions>
+            </plugin>
+		</plugins>
+	</build>
+	<repositories>
+		<repository>
+			<id>ApacheIncubatorRepository</id>
+			<url>
+				http://people.apache.org/repo/m2-incubating-repository/
+			</url>
+		</repository>
+	</repositories>
+</project>
+
