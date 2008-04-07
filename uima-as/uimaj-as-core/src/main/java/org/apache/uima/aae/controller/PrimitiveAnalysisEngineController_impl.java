@@ -366,17 +366,29 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	If the service is stopped or aborted, stop generating new CASes and just return the input CAS
 				if ( stopped || abortGeneratingCASes(aCasReferenceId))
 				{
-					if ( getInProcessCache() != null )
+					if ( getInProcessCache() != null && getInProcessCache().getSize() > 0 && getInProcessCache().entryExists(aCasReferenceId))
 					{
-						//	Set a flag on the input CAS to indicate that the processing was aborted
-						getInProcessCache().getCacheEntryForCAS(aCasReferenceId).setAborted(true);
-						
-						//	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-						//	We are terminating the iterator here, release the internal CAS lock
-						//	so that we can release the CAS. This approach may need to be changed
-						//	as there may potentially be a problem with a Class Loader.
-						//	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-						((CASImpl)aCAS).enableReset(true);
+						try
+						{
+							//	Set a flag on the input CAS to indicate that the processing was aborted
+							getInProcessCache().getCacheEntryForCAS(aCasReferenceId).setAborted(true);
+						}
+						catch( Exception e )
+						{
+							//	An exception be be thrown here if the service is being stopped.
+							//	The top level controller may have already cleaned up the cache
+							//	and the getCacheEntryForCAS() will throw an exception. Ignore it
+							//	here, we are shutting down.
+						}
+						finally
+						{
+							//	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							//	We are terminating the iterator here, release the internal CAS lock
+							//	so that we can release the CAS. This approach may need to be changed
+							//	as there may potentially be a problem with a Class Loader.
+							//	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							((CASImpl)aCAS).enableReset(true);
+						}
 					}
 					return;
 				}
