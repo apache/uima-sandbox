@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+		Licensed to the Apache Software Foundation (ASF) under one
+		or more contributor license agreements.  See the NOTICE file
+		distributed with this work for additional information
+		regarding copyright ownership.  The ASF licenses this file
+		to you under the Apache License, Version 2.0 (the
+		"License"); you may not use this file except in compliance
+		with the License.  You may obtain a copy of the License at
+		
+		http://www.apache.org/licenses/LICENSE-2.0
+		
+		Unless required by applicable law or agreed to in writing,
+		software distributed under the License is distributed on an
+		"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+		KIND, either express or implied.  See the License for the
+		specific language governing permissions and limitations
+		under the License.    
+	-->
+
+<project name="org.apache.uima.caseditor" default="build" basedir=".">
+
+	<property file="build_local.properties" />
+	<property file="build.properties" />
+	
+	
+	<fail message="The eclipseLocation property must be set in the build_local.properties file." 
+		unless="eclipseLocation" />
+	
+	<fail message="The outputLocation property must be set in the build_local.properties file." 
+		unless="outputLocation" />
+	
+	<property name="buildDirectory" location="${outputLocation}" />
+	<property name="base" location="${outputLocation}/base" />
+	
+	<fileset dir="${eclipseLocation}/plugins" includes="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml" id="pde.plugin.path" />
+	<pathconvert property="buildfile" refid="pde.plugin.path" />
+	<fail message="Unable to find productBuild.xml." unless="buildfile" />
+
+	<fileset dir="${eclipseLocation}/plugins" 
+		includes="org.eclipse.equinox.launcher_*.jar" 
+		id="equinox.plugin.path" />
+	<pathconvert property="equinox" refid="equinox.plugin.path" />
+	<fail message="Unable to find equinox." 
+		unless="equinox" />
+	
+	<fileset dir="../../uimaj-ep-runtime/" includes="target/org.apache.uima.runtime_*.zip" id="uima.plugin.path" />
+	<pathconvert property="uimaj-ep-runtime" refid="uima.plugin.path" />
+	<fail message="Unable to find org.apache.uima_runtime*.zip" 
+		unless="uimaj-ep-runtime" />
+
+	<target name="prepareBuildDirectory">
+
+		<mkdir dir="${buildDirectory}/plugins" />
+		<mkdir dir="${buildDirectory}/features" />
+		
+		<copy file="../../uimaj-ep-runtime/target/org.apache.uima.runtime_2.2.2.incubating.jar"  
+				todir="${buildDirectory}/plugins/"/>
+
+		<copy todir="${buildDirectory}/plugins/org.apache.uima.caseditor">
+			<fileset dir="../">
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="build" depends="prepareBuildDirectory">
+		<property name="buildResultsDirectory" value="${buildDirectory}/build-results" />
+		<property name="builder" location="./build-files" />
+		<java classname="org.eclipse.core.launcher.Main" fork="true" failonerror="true">
+			<arg value="-application" />
+			<arg value="org.eclipse.ant.core.antRunner" />
+			<arg value="-buildfile" />
+			<arg value="${buildfile}" />
+			<jvmarg value="-DbuildDirectory=${buildDirectory}"/>
+			<jvmarg value="-Dbase=${base}"/>
+			<jvmarg value="-DbaseLocation=${eclipseLocation}"/>
+			<classpath>
+				<pathelement path="${equinox}" />
+			</classpath>
+		</java>
+		
+	<!-- Create directory for source build -->
+	<mkdir dir="${outputLocation}/${buildLabel}/${buildId}-src" />
+		
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/CasEditor">
+		<fileset dir="../">
+		</fileset>
+	</copy>
+	
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src">
+		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+		</fileset>
+	</copy>
+		
+	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-src.zip"
+		       basedir="${outputLocation}/${buildLabel}/${buildId}-src"/>
+		
+	<delete dir="${outputLocation}/${buildLabel}/${buildId}-src"/>
+		
+	<!-- mkdir src --> 
+	<!-- copy over source stuff -->
+		
+	<!-- build docs -->
+	<!-- call build_documentation.xml-->
+	<!-- does not work currently, because the imports fials -->
+	
+	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into win32 build -->
+	<unzip src="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip" 
+			dest="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
+	
+	<delete file="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip"/>
+	
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor">
+		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+		</fileset>
+	</copy>
+	
+		
+	<!-- copy over docs -->
+	<!-- to doc/html and doc/pdf like michael did it -->
+	
+	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip"
+		       basedir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
+
+	<delete dir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
+	
+	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into linux build -->
+	<unzip src="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip" 
+			dest="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
+	
+	<delete file="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip"/>
+	
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor">
+		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+		</fileset>
+	</copy>
+	
+	<!-- copy over docs -->
+	<!-- to doc/html and doc/pdf like michael did it -->
+	
+	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip"
+		       basedir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
+		
+	<delete dir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
+		
+	</target>
+	
+</project>

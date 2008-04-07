@@ -1,0 +1,25 @@
+            
+            Apache UIMA Annotator Package Version 2.2.2 README
+     ----------------------------------------------------------------
+
+The Apache UIMA annotator package is an add-on package for the base UIMA release.
+The add-on package contains annotator components developed for Apache UIMA. The 
+add-on package fits the Apache UIMA directory structure and adds a directory 
+called "addons/annotator" that contains the following annotator components:
+ - DictionaryAnnotator
+ - RegularExpressionAnnotator
+ - Tagger
+ - WhitespaceTokenizer
+
+Each component has a separate documentation with some usage information.
+
+Disclaimer
+-----------
+
+Apache UIMA is an effort undergoing incubation at The Apache Software
+Foundation (ASF). Incubation is required of all newly accepted projects
+until a further review indicates that the infrastructure, communications,
+and decision making process have stabilized in a manner consistent with
+other successful ASF projects. While incubation status is not necessarily
+a reflection of the completeness or stability of the code, it does
+indicate that the project has yet to be fully endorsed by the ASF.
