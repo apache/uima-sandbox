@@ -172,7 +172,7 @@ public class UimacppServiceController implements ControllerLifecycle {
         /* start the service */
       this.uimaLogger.log(Level.INFO, "Starting C++ service: " + commandArgs.toString());
       this.uimaLogger.log(Level.INFO, " env params: " + envVarMap.toString());
-        startService();
+      startService();
 
         /** register with JMX - for now register with the platform MBean server */
         mbean = new UimacppServiceManagement("org.apache.uima:type=ee.jms.services,",commandConnection, aeDesc,
@@ -579,12 +579,32 @@ public class UimacppServiceController implements ControllerLifecycle {
       Runtime.getRuntime().addShutdownHook(shutdownHook);
       
       if (uimacppProcess != null) {
-        System.out.println("Uima C++ service at " + queueName
-            + " Ready to process...");
-        WaitThread wt = new WaitThread(uimacppProcess, uimaLogger,listeners);
-        Thread wThread = new Thread(wt);
-        wThread.start();
-        // System.out.println("UIMA C++ service terminated rc=" + rc);
+        //wait for C++ process to report initialization status.	  
+    	System.out.println("Waiting for Uima C++ service to report init status...");
+    	BufferedReader in = new BufferedReader(new InputStreamReader(commandConnection
+    	          .getInputStream()));
+
+    	StringBuffer sb = new StringBuffer();
+    	int c = in.read();
+    	while (c >= 0) {
+    	   sb.append((char) c);
+    	   c = in.read();
+    	   if (c == '\n') {
+    	          break;
+    	   }
+    	}  
+    	if (sb.toString().equalsIgnoreCase("0")) {
+    		System.out.println("Uima C++ service at " + queueName
+    				+ " Ready to process...");
+    		WaitThread wt = new WaitThread(uimacppProcess, uimaLogger,listeners);
+    		Thread wThread = new Thread(wt);
+    		wThread.start();
+    	} else {
+    		System.out.println("UIMA C++ service at " + queueName + " failed to initialize.");
+    		System.out.println(sb.toString());
+    		uimacppProcess.destroy();
+    		throw new IOException(sb.toString());
+    	}
       } else {
         throw new ResourceInitializationException(new IOException(
             "Could not start the C++ service."));
