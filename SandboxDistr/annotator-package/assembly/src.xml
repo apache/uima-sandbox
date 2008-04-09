@@ -80,6 +80,7 @@
         		<include>build_documentation.xml</include>
         		<include>NOTICE.txt</include>
         		<include>LICENSE.txt</include>
+        		<include>DISCLAIMER</include>
       		</includes>
     	</fileSet>
 
@@ -94,6 +95,7 @@
         		<include>build_documentation.xml</include>
         		<include>NOTICE.txt</include>
         		<include>LICENSE.txt</include>
+        		<include>DISCLAIMER</include>
       		</includes>
     	</fileSet>
 	
@@ -135,6 +137,7 @@
         		<include>build_documentation.xml</include>
         		<include>NOTICE.txt</include>
         		<include>LICENSE.txt</include>
+        		<include>DISCLAIMER</include>
       		</includes>
     	</fileSet>
 
@@ -152,6 +155,7 @@
         		<include>build_documentation.xml</include>
         		<include>NOTICE.txt</include>
         		<include>LICENSE.txt</include>
+        		<include>DISCLAIMER</include>
       		</includes>
     	</fileSet>
 
@@ -165,6 +169,7 @@
         		<include>pom.xml</include>
         		<include>NOTICE.txt</include>
         		<include>LICENSE.txt</include>
+        		<include>DISCLAIMER</include>
       		</includes>
     	</fileSet>
 
@@ -182,6 +187,7 @@
                 <include>build_documentation.xml</include>
                 <include>NOTICE.txt</include>
                 <include>LICENSE.txt</include>
+                <include>DISCLAIMER</include>
             </includes>
         </fileSet>
     <!-- SimpleServer -->
@@ -198,6 +204,7 @@
                 <include>build_documentation.xml</include>
                 <include>NOTICE.txt</include>
                 <include>LICENSE.txt</include>
+                <include>DISCLAIMER</include>
             </includes>
         </fileSet>	
 	</fileSets>
