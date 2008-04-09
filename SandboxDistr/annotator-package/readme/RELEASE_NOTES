@@ -132,6 +132,7 @@ Release Notes - UIMA - Version 2.2.2
     * [UIMA-953] - "\" in regex variables are not escaped
     * [UIMA-970] - update annotator package release files
     * [UIMA-971] - minor documentation updates for PearPackagingMavenPlugin
+    * [UIMA-972] - fix jar file name in pear ant task documentation
 
 ** Improvement
     * [UIMA-350] - add performance test for WhitespaceTokenizer
