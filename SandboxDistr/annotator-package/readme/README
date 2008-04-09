@@ -10,6 +10,12 @@ called "addons/annotator" that contains the following annotator components:
  - RegularExpressionAnnotator
  - Tagger
  - WhitespaceTokenizer
+ 
+Additionally the package contains some components to package annotators 
+and to accessing annotators as simple REST service. These are:
+ - PearPackagingAntTask
+ - PearPackagingMavenPlugin
+ - SimpleServer
 
 Each component has a separate documentation with some usage information.
 

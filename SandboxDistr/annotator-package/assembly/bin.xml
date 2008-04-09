@@ -236,5 +236,71 @@
             </includes>
         </fileSet>
 		
+		<!-- Add files for PearPackagingAntTask -->
+		<fileSet>
+			<directory>../../PearPackagingAntTask/</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingAntTask/</outputDirectory>
+			<includes>
+				<include>LICENSE.txt</include>
+				<include>NOTICE.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../PearPackagingAntTask/target</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingAntTask/lib</outputDirectory>
+			<includes>
+				<include>uima-pear-ant-task.jar</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../PearPackagingAntTask/target</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingAntTask/docs/html</outputDirectory>
+			<includes>
+				<include>images/**</include>
+				<include>PearPackagingAntTaskUserGuide/PearPackagingAntTaskUserGuide.html</include>
+				<include>PearPackagingAntTaskUserGuide/css/**</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../PearPackagingAntTask/target/PearPackagingAntTaskUserGuide</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingAntTask/docs/pdf</outputDirectory>
+			<includes>
+				<include>PearPackagingAntTaskUserGuide.pdf</include>
+			</includes>
+		</fileSet>
+
+		<!-- Add files for PearPackagingMavenPlugin -->
+		<fileSet>
+			<directory>../../PearPackagingMavenPlugin/</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingMavenPlugin/</outputDirectory>
+			<includes>
+				<include>LICENSE.txt</include>
+				<include>NOTICE.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../PearPackagingMavenPlugin/target</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingMavenPlugin/lib</outputDirectory>
+			<includes>
+				<include>uima-pear-maven-plugin.jar</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../PearPackagingMavenPlugin/target</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingMavenPlugin/docs/html</outputDirectory>
+			<includes>
+				<include>images/**</include>
+				<include>PearPackagingMavenPluginUserGuide/PearPackagingMavenPluginUserGuide.html</include>
+				<include>PearPackagingMavenPluginUserGuide/css/**</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../PearPackagingMavenPlugin/target/PearPackagingMavenPluginUserGuide</directory>
+			<outputDirectory>/apache-uima/addons/PearPackagingMavenPlugin/docs/pdf</outputDirectory>
+			<includes>
+				<include>PearPackagingMavenPluginUserGuide.pdf</include>
+			</includes>
+		</fileSet>
+		
 	</fileSets>
 </assembly>

@@ -56,11 +56,14 @@ called "addons/annotator" that contains the following annotator components:
 3. Major Changes in this Release
 
 The Apache UIMA annotator package release version 2.2.2 is the first release 
-of this package. The package contains four new components. These are:
+of this package. The package contains the following components:
  - DictionaryAnnotator
  - RegularExpressionAnnotator
  - Tagger
  - WhitespaceTokenizer
+ - SimpleServer
+ - PearPackagingAntTask
+ - PearPackagingMavenPlugin
 For a list of all JIRA issues fixed with the current Sandbox release, 
 please refer to chapter 6. "List of JIRA Issues Fixed in this Release". 
 
@@ -127,6 +130,8 @@ Release Notes - UIMA - Version 2.2.2
     * [UIMA-945] - move LICENSE and NOTICE files to toplevel dir for annotator package
     * [UIMA-947] - Documentation: resources path in web.xml incorrect
     * [UIMA-953] - "\" in regex variables are not escaped
+    * [UIMA-970] - update annotator package release files
+    * [UIMA-971] - minor documentation updates for PearPackagingMavenPlugin
 
 ** Improvement
     * [UIMA-350] - add performance test for WhitespaceTokenizer
@@ -190,4 +195,7 @@ Release Notes - UIMA - Version 2.2.2
 
 ** Task
     * [UIMA-682] - update Sandbox components to work on the new uimaj-2.2.1-incubating release
+
+
+
 
