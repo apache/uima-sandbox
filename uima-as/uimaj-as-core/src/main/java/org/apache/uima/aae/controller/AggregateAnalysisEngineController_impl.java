@@ -1166,10 +1166,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				// previous CAS from the cache
 				InProcessCache cache = getInProcessCache();
 				
-				synchronized (cache)
-				{
-					dropCAS(aCasReferenceId, true);
-				}
+				dropCAS(aCasReferenceId, true);
 			}
 		}
 	}
