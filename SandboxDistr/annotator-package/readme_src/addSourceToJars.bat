@@ -20,10 +20,10 @@ REM   under the License.
 @echo on
 
 cd PearPackagingMavenPlugin\src\main\java
-jar -uvf %UIMA_HOME%\addons\annotator\PearPackagingMavenPlugin\lib\uima-pear-maven-plugin.jar *
+jar -uvf %UIMA_HOME%\addons\PearPackagingMavenPlugin\lib\uima-pear-maven-plugin.jar *
 
 cd ..\..\..\..\PearPackagingAntTask\src\main\java
-jar -uvf %UIMA_HOME%\addons\annotator\PearPackagingMavenPlugin\lib\uima-pear-ant-task.jar *
+jar -uvf %UIMA_HOME%\addons\PearPackagingAntTask\lib\uima-pear-ant-task.jar *
 
 cd ..\..\..\..\RegularExpressionAnnotator\src\main\java
 jar -uvf %UIMA_HOME%\addons\annotator\RegularExpressionAnnotator\lib\uima-an-regex.jar *
