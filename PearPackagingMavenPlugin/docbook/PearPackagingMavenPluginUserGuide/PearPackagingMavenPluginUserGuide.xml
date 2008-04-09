@@ -46,8 +46,8 @@
 		</para>
 	</preface>
 	
-	<chapter id="pear.packaging.maven.plugin.install">
-		<title>Installing The PEAR Packaging Plugin</title>
+	<chapter id="pear.packaging.maven.plugin.install.src">
+		<title>Installing The PEAR Packaging Plugin From Source</title>
 		<para>
 		  The PEAR packaging Maven plugin is modeled as custom plugin for the Maven build system.
 		  To use it, the plugin must be available in the local Maven repository. So far the plugin is
@@ -70,16 +70,16 @@
 		  in other Maven artifact builds from now. To integrate the plugin into other builds it is necessary to 
 		  know the PEAR Packaging plugin version number as it is available in the Maven repository. The plugin version number
 		  is displayed at the end of the Maven build as shown in the example below. For this example, the plugin 
-		  version number is: <code>2.2.0-incubating-SNAPSHOT</code> 
+		  version number is: <code>2.2.2-incubating</code> 
 		</para>
 		<para>
 		<programlisting><![CDATA[[INFO] Installing 
 /code/apache/PearPackagingMavenPlugin/target/
-PearPackagingMavenPlugin-2.2.0.-incubating-SNAPSHOT.jar 
+PearPackagingMavenPlugin-2.2.2.-incubating.jar 
 to 
 /maven-repository/repository/org/apache/uima/PearPackagingMavenPlugin/
-2.2.0-incubating-SNAPSHOT/
-PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
+2.2.2-incubating/
+PearPackagingMavenPlugin-2.2.2-incubating.jar
 [INFO] [plugin:updateRegistry]
 [INFO] --------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
@@ -89,12 +89,7 @@ PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
 [INFO] Final Memory: 10M/24M
 [INFO] --------------------------------------------------------------]]></programlisting>
 		</para>
-	</chapter>
-
-	<chapter id="pear.packaging.maven.plugin.usage">
-		<title>Using the PEAR Packaging Plugin</title>
-		<section id="pear.packaging.maven.plugin.usage.dependency">
-			<title>Adding The Plugin Dependency To The POM</title>
+		
 		<para>
 		  To use the PEAR packaging plugin in a Maven build, it is necessary to add it as dependency to the
 		  POM. Important while adding the dependency is the version number of the plugin. With that the correct
@@ -115,7 +110,31 @@ PearPackagingMavenPlugin-2.2.0-incubating-SNAPSHOT.jar
 </dependencies>
 ]]></programlisting>
 		</para>
-		</section>
+		
+	</chapter>
+
+	<chapter id="pear.packaging.maven.plugin.install">
+		<title>Installing The PEAR Packaging Plugin Using The Binary</title>
+		<para>
+		  It is also possible to use the binary version of the plugin. In that case the 
+		  <code>uima-pear-maven-plugin.jar</code> file must be added to the dependency set of your 
+		  POM like for example: 
+		</para>
+		<para>
+		<programlisting><![CDATA[<dependencies>
+   ...
+   <dependency>
+     <groupId>org.apache.uima</groupId>
+     <artifactId>PearPackagingMavenPlugin</artifactId>
+     <version>2.2.2-incubating</version>
+     <scope>system</scope>
+     <systemPath>${basedir}/lib/uima-pear-maven-plugin.jar</systemPath>
+   </dependency>]]></programlisting>
+		</para>
+	</chapter>
+
+	<chapter id="pear.packaging.maven.plugin.usage">
+		<title>Using the PEAR Packaging Plugin</title>
 		<section id="pear.packaging.maven.plugin.usage.configure">
 			<title>Calling The PEAR Packaging Plugin</title>
 		<para>
