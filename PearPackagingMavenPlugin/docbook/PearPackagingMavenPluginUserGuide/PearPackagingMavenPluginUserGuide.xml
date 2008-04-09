@@ -129,7 +129,9 @@ PearPackagingMavenPlugin-2.2.2-incubating.jar
      <version>2.2.2-incubating</version>
      <scope>system</scope>
      <systemPath>${basedir}/lib/uima-pear-maven-plugin.jar</systemPath>
-   </dependency>]]></programlisting>
+   </dependency>
+   ....
+</dependencies>]]></programlisting>
 		</para>
 	</chapter>
 
