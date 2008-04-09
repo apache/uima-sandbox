@@ -1,0 +1,5 @@
+Apache UIMA sandbox -- SimpleServer component
+Copyright 2008 The Apache Software Foundation
+
+This Apache UIMA software component includes code that was developed at
+The Apache Software Foundation (http://www.apache.org/).

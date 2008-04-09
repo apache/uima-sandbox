@@ -1,0 +1,32 @@
+For general instructions about building the Apache UIMA annotator package 
+please refer to:
+http://incubator.apache.org/uima/svn.html#building.with.maven
+
+For details about how to build the current source package refer the 
+steps below:
+
+1) cd to the SandboxDistr/annotator-package project, and do mvn install
+2) To work with eclipse additionally do mvn eclipse:eclipse
+3) To build the distribution, follow the setup instructions on
+http://incubator.apache.org/uima/svn.html#build.distribution and 
+then cd to SandboxDistr/annotator-package and do mvn assembly:assembly
+
+-------------------------
+
+If you have installed both the Apache UIMA annotator package binary 
+distribution and the Apache UIMA annotator package source distribution, 
+you can run the addSourceJars.bat (or .sh) script to add the 
+source code to the jar files in the UIMA_HOME/lib directory.  
+This may make it more convenient to access
+the UIMA Source Code (and JavaDocs) from an IDE such as Eclipse.
+
+See the NOTICE file for licensing information.
+
+Apache UIMA is an effort undergoing incubation at The Apache Software
+Foundation (ASF). Incubation is required of all newly accepted projects
+until a further review indicates that the infrastructure, communications,
+and decision making process have stabilized in a manner consistent with
+other successful ASF projects. While incubation status is not necessarily
+a reflection of the completeness or stability of the code, it does
+indicate that the project has yet to be fully endorsed by the ASF.
+
