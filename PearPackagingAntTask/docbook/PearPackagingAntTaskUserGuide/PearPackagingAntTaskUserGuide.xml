@@ -50,12 +50,12 @@
 		<para>
 		  To use the PEAR packaging Ant task it is necessary to define an additional classpath setting for the ant build.
 		  The two necessary jars for this setting are the <code>uima-core.jar</code> that contains the PEAR packaging code and the  
-		  <code>uimaj-pear-task.jar</code> that contains the code for the PEAR packaging Ant task. 
+		  <code>uima-pear-ant-task.jar</code> that contains the code for the PEAR packaging Ant task. 
 		  The additional classpath setting can look like:
 		</para>
 		<para>  
 		  <programlisting><![CDATA[<path id="pearTask.classpath">
-  <fileset dir="/home/apache-uima/lib/" includes="uimaj-pear-task.jar"/>
+  <fileset dir="/home/apache-uima/lib/" includes="uima-pear-ant-task.jar"/>
   <fileset dir="/home/apache-uima/lib/" includes="uima-core.jar"/>
 </path>]]></programlisting>
 		  </para>
