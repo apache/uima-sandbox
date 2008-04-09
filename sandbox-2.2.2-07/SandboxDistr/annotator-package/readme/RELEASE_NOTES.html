@@ -1,0 +1,342 @@
+<html>
+<head>
+  <title>Apache UIMA Sandbox v2.2.2 Release Notes</title>
+</head>
+<body>
+<h1>Apache UIMA Sandbox v2.2.2 Release Notes</h1>
+
+<h2>Contents</h2>
+<p>
+<a href="#what.is.uima">1. What is UIMA?</a><br/>
+<a href="#what.is.annot.package">2. What is the Apache UIMA annotator package?</a><br>
+<a href="#major.changes">3. Major Changes in this Release</a><br/>
+<a href="#get.involved">4. How to Get Involved</a><br/>
+<a href="#report.issues">5. How to Report Issues</a><br/>
+<a href="#list.issues">6. List of JIRA Issues Fixed in this Release</a>
+</p>  
+   
+<h2><a name="what.is.uima">1. What is UIMA?</a></h2>
+
+     <p>
+  			Unstructured Information Management applications are
+				software systems that analyze large volumes of
+				unstructured information in order to discover knowledge
+				that is relevant to an end user. UIMA is a framework and
+				SDK for developing such applications. An example UIM
+				application might ingest plain text and identify
+				entities, such as persons, places, organizations; or
+				relations, such as works-for or located-at. UIMA enables
+				such an application to be decomposed into components,
+				for example "language identification" -&gt; "language
+				specific segmentation" -&gt; "sentence boundary
+				detection" -&gt; "entity detection (person/place names
+				etc.)". Each component must implement interfaces defined
+				by the framework and must provide self-describing
+				metadata via XML descriptor files. The framework manages
+				these components and the data flow between them.
+				Components are written in Java or C++; the data that
+				flows between components is designed for efficient
+				mapping between these languages. UIMA additionally
+				provides capabilities to wrap components as network
+				services, and can scale to very large volumes by
+				replicating processing pipelines over a cluster of
+				networked nodes.
+			</p>
+                                                <p>
+				Apache UIMA is an Apache-licensed open source
+				implementation of the UIMA specification (that
+				specification is, in turn, being developed concurrently
+				by a technical committee within
+				<a href="http://www.oasis-open.org">OASIS</a>
+				, a standards organization). We invite and encourage you
+				to participate in both the implementation and
+				specification efforts.
+			</p>
+                                                <p>
+				UIMA is a component framework for analysing unstructured
+				content such as text, audio and video. It comprises an
+				SDK and tooling for composing and running analytic
+				components written in Java and C++, with some support
+				for Perl, Python and TCL.
+			</p>
+
+<h2><a name="what.is.annot.package">2. What is the Apache UIMA annotator package?</a></h2>
+<p>
+The Apache UIMA annotator package is an add-on package for the base UIMA release.
+The add-on package contains annotator components developed for Apache UIMA. The 
+add-on package fits the Apache UIMA directory structure and adds a directory 
+called "addons/annotator" that contains the following annotator components: <br>
+ - DictionaryAnnotator <br>
+ - RegularExpressionAnnotator <br>
+ - Tagger<br>
+ - WhitespaceTokenizer<br>
+</p> 
+
+<h2><a name="major.changes">3. Major Changes in this Release</a></h2>
+<p>
+The Apache UIMA annotator package release version 2.2.2 is the first release 
+of this package. The package contains the following components: <br>
+ - DictionaryAnnotator <br>
+ - RegularExpressionAnnotator <br>
+ - Tagger <br>
+ - WhitespaceTokenizer <br>
+ - SimpleServer <br>
+ - PearPackagingAntTask <br>
+ - PearPackagingMavenPlugin <br>
+For a list of all JIRA issues fixed with the current Sandbox release, 
+please refer to chapter <a href="#list.issues">6. List of JIRA Issues Fixed in this Release</a>. 
+</p> 
+  
+  
+<h2><a name="get.involved">4. How to Get Involved</a></h2>
+<p>
+The Apache UIMA project really needs and appreciates any contributions, 
+including documentation help, source code and feedback.  If you are interested
+in contributing, please visit 
+<a href="http://incubator.apache.org/uima/get-involved.html">
+  http://incubator.apache.org/uima/get-involved.html</a>.
+</p>
+  
+<h2><a name="report.issues">5. How to Report Issues</a></h2>
+<p>
+The Apache UIMA project uses JIRA for issue tracking.  Please report any 
+issues you find at 
+<a href="http://issues.apache.org/jira/browse/uima">http://issues.apache.org/jira/browse/uima</a>
+</p>
+  
+<h2><a name="list.issues">6. List of JIRA Issues Fixed in this Release</a></h2>
+    
+
+       Release Notes - UIMA - Version 2.2.2
+        
+<h2>        Bug
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-444'>UIMA-444</a>] -         Sandbox projects build only when in same directory as uimaj projects
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-588'>UIMA-588</a>] -         fix RegularExpressionAnnotator tests - add type priorities to get the same results for all JVMs
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-612'>UIMA-612</a>] -         add License and Notice files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-613'>UIMA-613</a>] -         remove compiler warnings after moving to Java 1.5
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-614'>UIMA-614</a>] -         remove compiler warnings after moving to Java 1.5
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-617'>UIMA-617</a>] -         change POM to work with Java 1.5
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-620'>UIMA-620</a>] -         switch concept file parsing from File to InputStream
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-621'>UIMA-621</a>] -         change the way to add the compiled sources to the PEAR package
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-625'>UIMA-625</a>] -         update DictionaryAnnotator message catalog
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-646'>UIMA-646</a>] -         remove classpath as required argument for the PEAR packaging plugin
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-653'>UIMA-653</a>] -         allow feature normalization also on non-String based features
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-725'>UIMA-725</a>] -         case sensitive dictionaries do not work correctly
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-757'>UIMA-757</a>] -         Tagger throws ClassCastException
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-760'>UIMA-760</a>] -         add regex annotator performance test
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-762'>UIMA-762</a>] -         rename xmltypes.jar 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-765'>UIMA-765</a>] -         fix email address regex - escape &quot;-&quot; in regular expression
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-768'>UIMA-768</a>] -         rename xmltypes.jar 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-773'>UIMA-773</a>] -         Some files missing license headers
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-775'>UIMA-775</a>] -         fix Findbugs issues
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-776'>UIMA-776</a>] -         fix Findbugs issues
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-778'>UIMA-778</a>] -         fix Findbugs issues
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-795'>UIMA-795</a>] -         dictionaries created by DictionaryCreator cannot be used
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-803'>UIMA-803</a>] -         change whitespace character definition 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-804'>UIMA-804</a>] -         change default multi token separator from \t to |
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-808'>UIMA-808</a>] -         SimpleServerServlet throws NullPointerExcpetion if no parameter was specified in doGet or doPost
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-812'>UIMA-812</a>] -         Dictionary annotator does not work with several dictionaries in a single descriptor
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-819'>UIMA-819</a>] -         rename all shipment jars start with uima-
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-820'>UIMA-820</a>] -         fix classpath entry &quot;null;&quot;  if no classpath was specified
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-827'>UIMA-827</a>] -         fix NPE for interger based feature values that are null
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-834'>UIMA-834</a>] -         replace special characters with XML entities when generating dictionaries
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-855'>UIMA-855</a>] -         java.lang.ArrayIndexOutOfBoundsException in Tagger
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-864'>UIMA-864</a>] -         update version from 2.2.2-incubating-SNAPSHOT to 2.2.2-incubating
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-882'>UIMA-882</a>] -         rename Tagger XML descriptor and add license header
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-883'>UIMA-883</a>] -         Missing license headers in JCas files and some XML files of simple server
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-887'>UIMA-887</a>] -         minor update for money detection regular expression
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-909'>UIMA-909</a>] -         Model files are contained twice in pear file
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-917'>UIMA-917</a>] -         Simple Server test annotator misses last character in text
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-940'>UIMA-940</a>] -         change way of deleting files in the PearPackagingMavenPlugin
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-942'>UIMA-942</a>] -         Regex performance test doesn't run on Linux
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-943'>UIMA-943</a>] -         DictionaryAnnotator tests doesn't run on Linux
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-944'>UIMA-944</a>] -         simple server notice file contains redundant uima reference
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-945'>UIMA-945</a>] -         move LICENSE and NOTICE files to toplevel dir for annotator package
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-947'>UIMA-947</a>] -         Documentation: resources path in web.xml incorrect
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-953'>UIMA-953</a>] -         &quot;\&quot; in regex variables are not escaped
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-970'>UIMA-970</a>] -         update annotator package release files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-971'>UIMA-971</a>] -         minor documentation updates for PearPackagingMavenPlugin
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-972'>UIMA-972</a>] -         fix jar file name in pear ant task documentation
+</li>
+</ul>
+    
+<h2>        Improvement
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-350'>UIMA-350</a>] -         add performance test for WhitespaceTokenizer
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-550'>UIMA-550</a>] -         Sandbox components: use UIMA artifacts from the repository 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-577'>UIMA-577</a>] -         split up the Sandbox documentation build
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-590'>UIMA-590</a>] -         change the way the RegularExpressionAnnotator load the configuration files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-592'>UIMA-592</a>] -         add feature value normalization for RegEx Annotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-594'>UIMA-594</a>] -         update RegexAnnotator with custom anntoation validator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-602'>UIMA-602</a>] -         add PEAR packaging task for RegexAnnotaor
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-610'>UIMA-610</a>] -         minor documentation updates - added some real world examples
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-615'>UIMA-615</a>] -         update DictionaryBuilder tests to work with XML dictionary formats
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-618'>UIMA-618</a>] -         add documentation infrastructure for the DictionaryAnnotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-631'>UIMA-631</a>] -         Switch dictionary file parsing from File input to InputStream
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-634'>UIMA-634</a>] -         improve DictionaryAnnotator exception handling
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-635'>UIMA-635</a>] -         add documentation for the PearPackagingMavenPlugin
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-637'>UIMA-637</a>] -         add multi-word separator configuration for the DictionaryAnnotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-644'>UIMA-644</a>] -         update RegexAnnotator tests after test coverage analysis
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-647'>UIMA-647</a>] -         add DictionaryAnnotator tests
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-666'>UIMA-666</a>] -         update feature normalization interface - add additional information
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-691'>UIMA-691</a>] -         add DictionaryCreator command line
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-696'>UIMA-696</a>] -         build documentation automatically during the component build
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-717'>UIMA-717</a>] -         minor performance improvements
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-719'>UIMA-719</a>] -         Current Version of the HMM Tagger
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-728'>UIMA-728</a>] -         add money amount detection for regex annotator - use match group names
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-753'>UIMA-753</a>] -         Some improvements in the algorithm, structural changes as well as docbook update
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-758'>UIMA-758</a>] -         Make the tagger runtime read its properties from the descriptor, not a properties file
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-763'>UIMA-763</a>] -         Automatically build PEAR file for Tagger
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-779'>UIMA-779</a>] -         Some modifications in the tagger code (esp. in the implementation of the SuffixTree.EDGE class)
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-791'>UIMA-791</a>] -         Patch containing some improvements
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-806'>UIMA-806</a>] -         use Java NumberFormat to convert string numbers to float or integer
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-840'>UIMA-840</a>] -         change uima-as version to 2.2.2-incubating-SNAPSHOT (match uimaj version), add script to update version
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-877'>UIMA-877</a>] -         Reverse multiple copyright statements in docbooks, per request at previous release vote
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-918'>UIMA-918</a>] -         Fix version number in sandbox docs
+</li>
+</ul>
+    
+<h2>        New Feature
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-95'>UIMA-95</a>] -         add sandbox infrastructure
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-151'>UIMA-151</a>] -         Add project for uima whitespace tokenizer implementation
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-384'>UIMA-384</a>] -         create a pear packaging ant task
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-539'>UIMA-539</a>] -         implement UIMA RegularExpressionAnnotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-555'>UIMA-555</a>] -         add documentation for the RegularExpressionAnnotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-595'>UIMA-595</a>] -         add Rule to the RegexAnnotator to detect credit card numbers
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-600'>UIMA-600</a>] -         add new DictionaryAnnotator implementation
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-601'>UIMA-601</a>] -         initial import of the PEAR packaging maven plugin
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-603'>UIMA-603</a>] -         update Sandbox documentation build
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-604'>UIMA-604</a>] -         Create HMM POS project in the sandbox
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-605'>UIMA-605</a>] -         UIMA Sandbox tagger initial code drop
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-642'>UIMA-642</a>] -         allow RegularExpressionAnnotator to match on featurePath values
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-645'>UIMA-645</a>] -         minor code updates for WhitespaceTokenizer
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-651'>UIMA-651</a>] -         add regex variables to the concept file syntax
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-669'>UIMA-669</a>] -         update WhitespaceTokenizer to be sofa aware
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-685'>UIMA-685</a>] -         Create documentation for SimpleServer
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-692'>UIMA-692</a>] -         allow DictionaryAnnotator to match on featurePath values
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-695'>UIMA-695</a>] -         allow DictionaryAnnotator to filter the inputMatch annotations
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-697'>UIMA-697</a>] -         add DictionaryAnnotator documentation
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-724'>UIMA-724</a>] -         allow match group names for regular expressions
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-770'>UIMA-770</a>] -         add PEAR build to WhitespaceTokenizer POM
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-771'>UIMA-771</a>] -         call documentation build from POM
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-772'>UIMA-772</a>] -         add new Sandbox-dist project that contains the Sandbox build
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-884'>UIMA-884</a>] -         Add default output abilities to simple server
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-907'>UIMA-907</a>] -         Add SimpleServer to sandbox distribution
+</li>
+</ul>
+            
+<h2>        Task
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-682'>UIMA-682</a>] -         update Sandbox components to work on the new uimaj-2.2.1-incubating release
+</li>
+</ul>
+     
+                        
+</body>
+</html>
