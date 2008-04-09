@@ -479,10 +479,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				}
 				else
 				{
-					synchronized (getInProcessCache())
-					{
-						dropCAS(aCasReferenceId, true);
-					}
+					dropCAS(aCasReferenceId, true);
 				}
 			}
 		}
