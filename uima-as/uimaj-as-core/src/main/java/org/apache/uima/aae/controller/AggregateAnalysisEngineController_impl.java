@@ -1609,13 +1609,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				pServiceInfo.setAnalysisEngineInstanceCount(1);
 
 				ServicePerformance servicePerformance = new ServicePerformance();
-				
-				registerWithAgent(servicePerformance, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
 
 				ServiceErrors serviceErrors = new ServiceErrors();
-				
-				registerWithAgent(serviceErrors, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceErrors.getLabel());
-				remoteIndex++;
 
 				serviceErrorMap.put(key, serviceErrors);
 				Object[] delegateStatsArray = 
