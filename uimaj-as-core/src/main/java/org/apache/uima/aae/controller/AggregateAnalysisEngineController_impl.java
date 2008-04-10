@@ -1607,9 +1607,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				pServiceInfo.setInputQueueName(serviceInfo.getInputQueueName());
 				pServiceInfo.setState(serviceInfo.getState());
 				pServiceInfo.setAnalysisEngineInstanceCount(1);
-				
-				registerWithAgent(pServiceInfo, super.getManagementInterface().getJmxDomain()
-						+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
 
 				ServicePerformance servicePerformance = new ServicePerformance();
 				
