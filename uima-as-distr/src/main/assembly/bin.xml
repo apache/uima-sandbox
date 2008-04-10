@@ -335,7 +335,7 @@ under the License.
       <fileMode>644</fileMode> 
     </file>
     <file>
-      <source>../uimaj-examples/src/main/eclipseProject/classpath</source>
+      <source>src/main/eclipseProject/classpath</source>
       <outputDirectory>examples</outputDirectory>
       <destName>.classpath</destName>
       <fileMode>644</fileMode> 
