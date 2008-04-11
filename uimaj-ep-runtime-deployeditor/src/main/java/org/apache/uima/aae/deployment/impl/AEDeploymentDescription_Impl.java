@@ -57,6 +57,7 @@ import org.apache.uima.aae.deployment.AEDeploymentDescription;
 import org.apache.uima.aae.deployment.AEService;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
+import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.internal.util.XMLUtils;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.OperationalProperties;
@@ -362,11 +363,14 @@ implements AEDeploymentDescription, AEDeploymentConstants
 
   static public boolean isCASMultiplier (ResourceSpecifier rs)
   {
-    if (rs != null && (rs instanceof AnalysisEngineDescription)) {
-      return isCASMultiplier((AnalysisEngineDescription) rs);
-    } else {
-      return false;
-    }
+    if (rs != null) {
+      if (rs instanceof AnalysisEngineDescription) {    
+        return isCASMultiplier((AnalysisEngineDescription) rs);
+      } else if (rs instanceof CollectionReaderDescription) {
+        return true;
+      }
+    } 
+    return false;
   }
 
   static public boolean isCASMultiplier (AnalysisEngineDescription ae)
