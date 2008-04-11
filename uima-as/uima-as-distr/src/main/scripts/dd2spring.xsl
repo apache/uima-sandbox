@@ -1586,7 +1586,12 @@
         ('deployment descriptor for analysisEngine:', $key,
          'specifies false for the async attribute, but contains a delegates element, which is not allowed in this case.'), .)"/>
     </xsl:if>
-        
+     
+    <!--xsl:sequence select="f:msgWithLineNumber('INFO', 
+        ('deployment descriptor for AE:', $key,
+         'has delegate?', if (u:delegates) then 'true' else 'false',
+         'async is:', $async), .)"/-->
+         
     <u:analysisEngine key="{$key}" async="{$async}">
       
       <i:local_ae_descriptor file_path="{$local_ae_descriptor_file_path[1]}">
@@ -1740,10 +1745,16 @@
             <xsl:when test="$ddDelegates[string(@key) = string(current()/@key)]">             
               <xsl:sequence select="$ddDelegates[string(@key) eq string(current()/@key)]"/>
             </xsl:when>
-            <xsl:otherwise>          
-              <u:analysisEngine key="{@key}" async="{if (f:isAggr($delegateAE)) then 'true' else 'false'}"/>
-             </xsl:otherwise> 
-           </xsl:choose>              
+            <xsl:otherwise>
+              <!-- next line commented out - 
+                   Wrong logic
+                   If a deployment descriptor doesn't have a analysisEngine or remoteAnalysisEngine
+                     for a delegate, make the default for this always be asynch = false
+                -->          
+              <!-- u:analysisEngine key="{@key}" async="{if (f:isAggr($delegateAE)) then 'true' else 'false'}"/-->
+              <u:analysisEngine key="{@key}" async="false"/>
+            </xsl:otherwise> 
+          </xsl:choose>              
         </xsl:variable> 
         
         <!--xsl:message select="concat(

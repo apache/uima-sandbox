@@ -88,6 +88,10 @@ public class Dd2SpringTest extends TestCase{
   protected void tearDown() {
     
   }
+
+  public void testDd2Spring_multiLevelAsyncDefaulting() throws Exception {
+    checkDd2Spring("Deploy_MeetingFinder.xml");
+  }
   
   public void testDd2Spring_dfltPrimMultiInstance() throws Exception {
     checkDd2Spring("defaultingPrimAEMultInstance.xml");  
