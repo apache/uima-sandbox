@@ -27,6 +27,7 @@ import org.apache.uima.aae.deployment.impl.AEDeploymentDescription_Impl;
 import org.apache.uima.aae.deployment.impl.DeploymentMetaData_Impl;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.application.metadata.impl.UimaApplication_Impl;
+import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.dde.internal.DeploymentDescriptorEditor;
 import org.apache.uima.dde.internal.Messages;
 import org.apache.uima.dde.internal.page.MasterDetails;
@@ -535,6 +536,17 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
           asMode.setEnabled(true);
           asMode.setSelection(obj.isAsync());
         }
+      } else if (rs instanceof CollectionReaderDescription) {
+        // Handle as CAS Multiplier
+        casMultiplierLabel.setVisible(true);
+        casMultiplier.setVisible(true);
+        casMultiplier.setSelection(obj.getCasMultiplierPoolSize());
+        initialFsHeapSizeLabel.setVisible(true);
+        initialFsHeapSize.setVisible(true);
+        initialFsHeapSize.setSelection(obj.getInitialFsHeapSize());
+        
+        asMode.setEnabled(false);
+        asMode.setSelection(false);
       } else {
         // CAS Consumer, ...
         casMultiplierLabel.setVisible(false);
