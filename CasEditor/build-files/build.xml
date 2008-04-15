@@ -35,29 +35,32 @@
 	<property name="base" location="${outputLocation}/base" />
 	
 	<fileset dir="${eclipseLocation}/plugins" includes="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml" id="pde.plugin.path" />
-	<pathconvert property="buildfile" refid="pde.plugin.path" />
+	<pathconvert property="buildfile" refid="pde.plugin.path" setonempty="false"/>
 	<fail message="Unable to find productBuild.xml." unless="buildfile" />
 
 	<fileset dir="${eclipseLocation}/plugins" 
 		includes="org.eclipse.equinox.launcher_*.jar" 
 		id="equinox.plugin.path" />
-	<pathconvert property="equinox" refid="equinox.plugin.path" />
+	<pathconvert property="equinox" refid="equinox.plugin.path" setonempty="false"/>
 	<fail message="Unable to find equinox." 
 		unless="equinox" />
 	
-	<fileset dir="../../uimaj-ep-runtime/" includes="target/org.apache.uima.runtime_*.zip" id="uima.plugin.path" />
-	<pathconvert property="uimaj-ep-runtime" refid="uima.plugin.path" />
-	<fail message="Unable to find org.apache.uima_runtime*.zip" 
-		unless="uimaj-ep-runtime" />
-
+	<fileset dir="../../uimaj-ep-runtime/" includes="target/org.apache.uima.runtime_2.3.2.incubating.jar" id="uima.plugin.path" />
+	<pathconvert property="uimaj-ep-runtime" refid="uima.plugin.path" setonempty="false" />
+	
+	<target name="copyRuntimePlugin" if="uimaj-ep-runtime">
+		<copy file="${uimaj-ep-runtime}"  
+				todir="${buildDirectory}/plugins/"/>
+	</target>
+	
 	<target name="prepareBuildDirectory">
 
 		<mkdir dir="${buildDirectory}/plugins" />
 		<mkdir dir="${buildDirectory}/features" />
 		
-		<copy file="../../uimaj-ep-runtime/target/org.apache.uima.runtime_2.2.2.incubating.jar"  
-				todir="${buildDirectory}/plugins/"/>
-
+		<antcall target="copyRuntimePlugin">
+		 </antcall>
+		
 		<copy todir="${buildDirectory}/plugins/org.apache.uima.caseditor">
 			<fileset dir="../">
 				<exclude name="**/target/**"/>
@@ -87,9 +90,18 @@
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/CasEditor">
 		<fileset dir="../">
 			<exclude name="**/target/**"/>
+			<exclude name="**/build_local.properties"/>
 		</fileset>
 	</copy>
 	
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/uima-docbook-tool">
+		<fileset dir="../../uima-docbook-tool"/>
+	</copy>	
+		
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/SandboxDocs">
+		<fileset dir="../../SandboxDocs"/>
+	</copy>
+		
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src">
 		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
 		</fileset>
