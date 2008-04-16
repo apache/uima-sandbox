@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -367,12 +369,17 @@ public class UimacppServiceController implements ControllerLifecycle {
 
     // arguments
     // UIMA AE descriptor
-    if (this.aeDesc.startsWith("file:") || this.aeDesc.startsWith("File:")) {
+    // eclipse likes URL formats starting with file:, but C++ doesn't
+    if (this.aeDesc.regionMatches(true, 0, "file:", 0, 5)) {
       this.aeDesc = this.aeDesc.substring(5);
     }
-    if (this.aeDesc.startsWith("/C:") || this.aeDesc.startsWith("/c:")) {
+    Pattern mSlashDosDrive = Pattern.compile("/[a-zA-Z]:");
+    Matcher matcher = mSlashDosDrive.matcher(this.aeDesc);
+    if (matcher.find(0)) {
+      // "/c:" doesn't work either
       this.aeDesc = this.aeDesc.substring(1);
     }
+
     commandArgs.add(aeDesc);
     if (!(new File(aeDesc)).exists()) {
       throw new ResourceInitializationException(new IOException(
