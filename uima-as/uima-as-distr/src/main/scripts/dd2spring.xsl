@@ -1446,7 +1446,6 @@
       <!--xsl:message select="'top descriptor/import'"/>
       <xsl:message select="u:topDescriptor/u:import"/-->
       <xsl:variable name="aePath" select="f:fixupPath(u:topDescriptor/u:import, '.')"/>
-
       <xsl:apply-templates mode="addDefaults" select="$topLevelAe">
         <xsl:with-param name="defaultErrorConfig"  tunnel="yes" select="'topAe'"/>
         <xsl:with-param name="local_ae_descriptor" tunnel="yes" select="$ae_descriptor"/>
@@ -2048,11 +2047,17 @@
     <xsl:param name="relBase"/>
     <!--xsl:message select="'*** fixup path'"/>
     <xsl:message select="$node"/>
-    <xsl:message select="$relBase"/-->
-    
+    <xsl:message select="$relBase"/-->    
+
     <xsl:choose>
       <xsl:when test="$node/@location">
-        <xsl:variable name="relOrAbsPath" select="$node/@location"/>
+        <!-- some paths start with file: 
+             strip that out if found, so the subsequent logic for
+             detecting "absolute" paths works -->
+        <xsl:variable name="relOrAbsPath" select=
+          "if (starts-with($node/@location, 'file:')) then
+             substring($node/@location, 6) else $node/@location"/>
+        <!--xsl:variable name="relOrAbsPath" select="$node/@location"/-->
         <xsl:variable name="fwdSlashes" select="replace(string($relOrAbsPath), '\\', '/')"/>
         <xsl:variable name="isAbsPath"  select="matches($fwdSlashes, '^/|^.:')"/>
         <!--xsl:message select="concat('relOrAbsPath = ',string($relOrAbsPath))"/-->
