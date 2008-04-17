@@ -218,6 +218,15 @@ under the License.
       <directory>../uimaj-distr/src/main/properties</directory>
       <outputDirectory>config</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>../uima-docbooks/target</directory>
+      <outputDirectory>docs/html</outputDirectory>
+      <includes>
+        <include>tools/tools.html</include>
+        <include>tools/css/**</include>
+        <include>images/tools/**</include>
+      </includes>
+    </fileSet>
     
     <!-- uima-as -->
     <fileSet>
