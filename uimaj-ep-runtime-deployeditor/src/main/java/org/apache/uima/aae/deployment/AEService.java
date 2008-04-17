@@ -21,6 +21,7 @@ package org.apache.uima.aae.deployment;
 
 import java.util.List;
 
+import org.apache.uima.aae.deployment.impl.NameValue;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceSpecifier;
@@ -80,26 +81,38 @@ public interface AEService extends MetaDataObject {
     public void setPrefetch(int prefetch);
 
     public Import getImportDescriptor();
+    
     public void setImportDescriptor(Import importDescriptor);
     
-//    /**
-//     * @return the importByLocation
-//     */
-//    public String getImportByLocation();
+    /**
+     * @return the cPlusPlusTopAE
+     */
+    public boolean isCPlusPlusTopAE();
 
-//    /**
-//     * @param importByLocation the importByLocation to set
-//     */
-//    public void setImportByLocation(String importByLocation);
+    /**
+     * @param plusPlusTopAE the cPlusPlusTopAE to set
+     */
+    public void setCPlusPlusTopAE(boolean plusPlusTopAE);
 
-//    /**
-//     * @return the topDescriptor
-//     */
-//    public String getTopDescriptor();
-//
-//    /**
-//     * @param topDescriptor the topDescriptor to set
-//     */
-//    public void setTopDescriptor(String topDescriptor);
+    /**
+     * @return the environmentVariables
+     */
+    public List<NameValue> getEnvironmentVariables();
+
+    /**
+     * @param environmentVariables the environmentVariables to set
+     */
+    public void setEnvironmentVariables(List<NameValue> environmentVariables);
+    
+    /**
+     * @return the customValue
+     */
+    public String getCustomValue();
+
+    /**
+     * @param customValue the customValue to set
+     */
+    public void setCustomValue(String customValue);
+
 
 }

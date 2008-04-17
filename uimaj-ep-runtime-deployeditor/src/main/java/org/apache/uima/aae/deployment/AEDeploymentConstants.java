@@ -31,6 +31,7 @@ public interface AEDeploymentConstants
     final static int        DEFAULT_CAS_MULTIPLIER_POOL_SIZE  = 1;
     final static boolean    DEFAULT_ASYNC               = false;
     final static int        DEFAULT_GETMETADATA_TIMEOUT = 60000;
+    final static int        DEFAULT_GETMETADATA_NO_TIMEOUT = 0;
     final static int        DEFAULT_PROCESSCASERROR_TIMEOUT  = 0;
     final static int        DEFAULT_COLLPROCESSCOMPLETEERROR_TIMEOUT  = 0;
     final static int        DEFAULT_MAX_RETRIES         = 0;
@@ -128,5 +129,11 @@ public interface AEDeploymentConstants
     final static public String TAG_ATTR_NUMBER_OF_INSTANCES = "numberOfInstances";
     final static public String TAG_ATTR_POOL_SIZE          = "poolSize";
 
+    // C++ Support
+    // Environment Variables (name/value pair)
+    final static public String TAG_CUSTOM           = "custom";
+    final static public String TAG_CUSTOM_ATTR_NAME = "run_top_level_CPP_service_as_separate_process";
+    final static public String TAG_ENV_VAR          = "environmentVariable";
+    final static public String TAG_ENV_VARS         = "environmentVariables";
 
 }

@@ -17,39 +17,15 @@
  * under the License.
  */
 
-/**
- * 
- * Project UIMA Tooling
- * 
- * 
- * creation date: Apr 3, 2007, 9:16:18 PM
- * source:  AEService_Impl.java
- */
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.apache.uima.aae.deployment.impl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.uima.Constants;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.deployment.AEDeploymentConstants;
 import org.apache.uima.aae.deployment.AEDeploymentMetaData;
@@ -57,6 +33,7 @@ import org.apache.uima.aae.deployment.AEService;
 import org.apache.uima.aae.deployment.AsyncAggregateErrorConfiguration;
 import org.apache.uima.aae.deployment.AsyncPrimitiveErrorConfiguration;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.resource.ResourceCreationSpecifier;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.Import;
@@ -95,6 +72,12 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
   protected boolean importResolved = false;
 
   protected ResourceSpecifier topAnalysisEngineDescription;
+  
+  protected boolean cPlusPlusTopAE = false;
+  
+  protected String customValue;  // <custom name=....>
+  
+  protected List<NameValue> environmentVariables = new ArrayList<NameValue>();
 
   /** ********************************************************************** */
 
@@ -173,6 +156,59 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
           analysisEngineDeploymentMetaData = (AEDeploymentMetaData) aParser.buildObject(elem,
                   aOptions);
           analysisEngineDeploymentMetaData.setTopAnalysisEngine(true);
+          
+        } else if (TAG_CUSTOM.equalsIgnoreCase(elem.getTagName())) {
+          // Check for "name"
+          NamedNodeMap map = elem.getAttributes();
+          if (map != null) {
+            for (int k=0; k<map.getLength(); ++k) {
+              Node item = map.item(k);
+              String name = item.getNodeName();
+              String val = item.getNodeValue();
+              if (val == null) {
+                val = "";
+              } else {
+                val = val.trim();
+              }
+              if (TAG_ATTR_NAME.equalsIgnoreCase(name)) {
+                // set "name = ..." attribute
+                customValue = val;
+              } else {
+                throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                        new Object[]{name});
+              }
+            }
+          }
+          
+        } else if (TAG_ENV_VARS.equalsIgnoreCase(elem.getTagName())) {
+          // delegates = new AEDelegates_Impl(this);
+          NodeList nodes = elem.getChildNodes();
+          if (nodes.getLength() > 0) {
+            // Look for "environmentVariable"
+            for (int k = 0; k < nodes.getLength(); ++k) {
+              Node n = nodes.item(k);
+              if (!(n instanceof Element)) {
+                continue;
+              }
+
+              Element e = (Element) n;
+              if (TAG_ENV_VAR.equalsIgnoreCase(e.getTagName())) {
+                String envName = getValueOfNameAttribute(e);
+                if (envName == null) {
+                  throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                          new Object[]{e.getTagName()});
+                }
+                if (environmentVariables == null) {
+                  environmentVariables = new ArrayList<NameValue>();
+                }
+                environmentVariables.add(new NameValue(envName, e.getTextContent()));
+              } else {     
+                throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                        new Object[]{e.getTagName()});
+              }
+            }
+          }
+          
         } else {
             throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
                     new Object[]{elem.getTagName()});
@@ -194,6 +230,31 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
       }
       analysisEngineDeploymentMetaData.setAsyncAEErrorConfiguration((AsyncPrimitiveErrorConfiguration) obj);
     }
+  }
+  
+  protected String getValueOfNameAttribute (Element elem) throws InvalidXMLException {
+    // Check for "name"
+    NamedNodeMap map = elem.getAttributes();
+    if (map != null) {
+      for (int k=0; k<map.getLength(); ++k) {
+        Node item = map.item(k);
+        String name = item.getNodeName();
+        String val = item.getNodeValue();
+        if (val == null) {
+          val = "";
+        } else {
+          val = val.trim();
+        }
+        if (TAG_ATTR_NAME.equalsIgnoreCase(name)) {
+          // get "name = ..." attribute
+          return val;
+        } else {
+          throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                  new Object[]{name});
+        }
+      }
+    }
+    return null;
   }
   
   /**
@@ -265,6 +326,26 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
     aContentHandler.startElement("", TAG_INPUT_QUEUE, TAG_INPUT_QUEUE, attrs);
     aContentHandler.endElement("", "", TAG_INPUT_QUEUE);
     attrs.clear();
+    
+    if (isCPlusPlusTopAE()) {
+      if (customValue != null) {
+        attrs.addAttribute("", TAG_ATTR_NAME, TAG_ATTR_NAME, null, getCustomValue());
+        aContentHandler.startElement("", TAG_CUSTOM, TAG_CUSTOM, attrs);
+        aContentHandler.endElement("", "", TAG_CUSTOM);
+        attrs.clear();
+        if (environmentVariables != null && environmentVariables.size() > 0) {
+          aContentHandler.startElement("", TAG_ENV_VARS, TAG_ENV_VARS, attrs);
+          for (NameValue nv: environmentVariables) {
+            attrs.addAttribute("", TAG_ATTR_NAME, TAG_ATTR_NAME, null, nv.getName());
+            aContentHandler.startElement("", TAG_ENV_VAR, TAG_ENV_VAR, attrs);
+            aContentHandler.characters(nv.getValue().toCharArray(), 0, nv.getValue().length());
+            aContentHandler.endElement("", "", TAG_ENV_VAR);
+            attrs.clear();
+          }
+          aContentHandler.endElement("", "", TAG_ENV_VARS);
+        }
+      }
+    } 
 
     // <TAG_TOP_DESCRIPTOR>
     aContentHandler.startElement("", TAG_TOP_DESCRIPTOR, TAG_TOP_DESCRIPTOR, attrs);
@@ -475,13 +556,24 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
 //      return topAnalysisEngineDescription;
 //    }
     
-    // Trace.err(10, "1");
     topAnalysisEngineDescription = resolveImport(aResourceManager);
 
+    // If C++ descriptor, active C++ settings
+    if (topAnalysisEngineDescription != null) {
+      if (((ResourceCreationSpecifier)topAnalysisEngineDescription).getFrameworkImplementation().equalsIgnoreCase(Constants.CPP_FRAMEWORK_NAME)) {
+        cPlusPlusTopAE = true;
+      } else {
+        // Check that there are NO for C++ Settings
+        if (customValue != null) {
+          throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                  new Object[]{TAG_CUSTOM});
+        }
+      }
+    }
+    
     if (topAnalysisEngineDescription != null && analysisEngineDeploymentMetaData != null) {
       analysisEngineDeploymentMetaData.setResourceSpecifier(topAnalysisEngineDescription,
               aResourceManager, recursive);
-      // Trace.err("setResourceSpecifier for TOP");
     }
     importResolved = true;
     return topAnalysisEngineDescription;
@@ -530,6 +622,48 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
    */
   public void setPrefetch(int prefetch) {
     this.prefetch = prefetch;
+  }
+
+  /**
+   * @return the environmentVariables
+   */
+  public List<NameValue> getEnvironmentVariables() {
+    return environmentVariables;
+  }
+
+  /**
+   * @param environmentVariables the environmentVariables to set
+   */
+  public void setEnvironmentVariables(List<NameValue> environmentVariables) {
+    this.environmentVariables = environmentVariables;
+  }
+
+  /**
+   * @return the customValue
+   */
+  public String getCustomValue() {
+    return customValue;
+  }
+
+  /**
+   * @param customValue the customValue to set
+   */
+  public void setCustomValue(String customValue) {
+    this.customValue = customValue;
+  }
+
+  /**
+   * @return the cPlusPlusTopAE
+   */
+  public boolean isCPlusPlusTopAE() {
+    return cPlusPlusTopAE;
+  }
+
+  /**
+   * @param plusPlusTopAE the cPlusPlusTopAE to set
+   */
+  public void setCPlusPlusTopAE(boolean plusPlusTopAE) {
+    cPlusPlusTopAE = plusPlusTopAE;
   }
 
 }
