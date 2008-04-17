@@ -21,6 +21,7 @@ package org.apache.uima.tools.internal.uima.util;
 
 import org.apache.uima.ResourceSpecifierFactory;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.deployment.AEDeploymentConstants;
 import org.apache.uima.aae.deployment.AEDeploymentMetaData;
 import org.apache.uima.aae.deployment.AsyncAEErrorConfiguration;
 import org.apache.uima.aae.deployment.RemoteAEDeploymentMetaData;
@@ -30,10 +31,8 @@ import org.apache.uima.aae.deployment.impl.DeploymentMetaData_Impl;
 import org.apache.uima.aae.deployment.impl.GetMetadataErrors_Impl;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
-import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.Import;
 import org.apache.uima.resource.metadata.OperationalProperties;
-import org.apache.uima.tools.debug.util.Trace;
 import org.apache.uima.util.InvalidXMLException;
 
 
@@ -50,6 +49,13 @@ public class AETreeBuilder {
     return imp;
   }
 
+  /**
+   * Create AEDeploymentMetaData from RemoteAEDeploymentMetaData
+   * 
+   * @param remoteMetaData
+   * @return
+   * @return AEDeploymentMetaData
+   */
   static public AEDeploymentMetaData createAEDeploymentMetaData(
           RemoteAEDeploymentMetaData remoteMetaData) {
     ResourceSpecifierFactory factory = UIMAFramework.getResourceSpecifierFactory();
@@ -66,32 +72,22 @@ public class AETreeBuilder {
     // Need to call AFTER metaData.setResourceSpecifier
     metaData.setCasMultiplierPoolSize(remoteMetaData.getCasMultiplierPoolSize());
 
-    // Clone OR Create a new AsyncPrimitiveErrorConfiguration
-//    ResourceSpecifier rs = remoteMetaData.getResourceSpecifier();
-    boolean isPrimitive = false;
-//    if (rs instanceof AnalysisEngineDescription) {
-//      isPrimitive = ((AnalysisEngineDescription) rs).isPrimitive();
-//    } else {
-//      // Exception ???
-//    }
-    if (isPrimitive) {
-      // Create a new AsyncPrimitiveErrorConfiguration
-      AsyncAEErrorConfiguration remoteErrorConfig = remoteMetaData.getAsyncAEErrorConfiguration();
-      AsyncAEErrorConfiguration primitiveErrorConfig = new AsyncPrimitiveErrorConfiguration_Impl();
-      primitiveErrorConfig.setProcessCasErrors(remoteErrorConfig.getProcessCasErrors().clone(
-              primitiveErrorConfig));
-      primitiveErrorConfig.setCollectionProcessCompleteErrors(remoteErrorConfig
-              .getCollectionProcessCompleteErrors().clone(primitiveErrorConfig));
-      metaData.setAsyncAEErrorConfiguration(primitiveErrorConfig);
-    } else {
-      // Clone
+      // Clone AsyncAggregateErrorConfiguration
       metaData.setAsyncAEErrorConfiguration((AsyncAEErrorConfiguration) remoteMetaData
               .getAsyncAEErrorConfiguration().clone());
-    }
+      // Set TimeOut for Delegate
+      metaData.getAsyncAEErrorConfiguration().getGetMetadataErrors().setTimeout(AEDeploymentConstants.DEFAULT_GETMETADATA_NO_TIMEOUT);
 
     return metaData;
   }
 
+  /**
+   * Create RemoteAEDeploymentMetaData from AEDeploymentMetaData
+   * 
+   * @param metaData
+   * @return
+   * @return RemoteAEDeploymentMetaData
+   */
   static public RemoteAEDeploymentMetaData createRemoteAEDeploymentMetaData(
           AEDeploymentMetaData metaData) {
     ResourceSpecifierFactory factory = UIMAFramework.getResourceSpecifierFactory();
@@ -115,8 +111,6 @@ public class AETreeBuilder {
       aggErrorConfig = errorConfig.clone();
     } else {
       // Create a new AsyncAggregateErrorConfiguration
-      Trace.err("errorConfig: " + errorConfig.getClass().getName());
-      Trace.err("Create a new AsyncAggregateErrorConfiguration");
       aggErrorConfig = new AsyncAggregateErrorConfiguration_Impl();
       aggErrorConfig.setGetMetadataErrors(new GetMetadataErrors_Impl(errorConfig));
       aggErrorConfig.setProcessCasErrors(errorConfig.getProcessCasErrors().clone(aggErrorConfig));
@@ -125,7 +119,8 @@ public class AETreeBuilder {
     }
     remoteMetaData.setErrorConfiguration(aggErrorConfig);
     errorConfig.sParentObject((DeploymentMetaData_Impl)remoteMetaData);
-    
+    // Set TimeOut for Remote
+    aggErrorConfig.getGetMetadataErrors().setTimeout(AEDeploymentConstants.DEFAULT_GETMETADATA_TIMEOUT);
     return remoteMetaData;
   }
 
