@@ -97,8 +97,6 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
   private IManagedForm mform;
 
-//  private ScrolledPageBook myScrolledPageBook = null; // used to support Section
-  
   private Section sectionAEMetaDataDetails;
 
   private Button asMode;
@@ -507,7 +505,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     }
     
     ResourceSpecifier rs = obj.getResourceSpecifier();
-    showStatus(null, IMessageProvider.ERROR);
+    showStatus(null, IMessageProvider.NONE);
     if (rs != null) {
       // Is AnalysisEngineDescription ?
       if (rs instanceof AnalysisEngineDescription) {
@@ -708,7 +706,6 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
    * @see org.eclipse.ui.forms.IDetailsPage#refresh()
    */
   public void refresh() {
-    update();
     super.refresh();
   }
 
@@ -775,12 +772,6 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     }
     multiPageEditor.setFileDirty();
-  }
-
-  private void update() {
-    // id.setValue(input!=null?input.getId():null, true);
-    // name.setValue(input!=null?input.getName():null, true);
-    // point.setValue(input!=null?input.getPoint():null, true);
   }
 
   protected void changeToAsyncAggregate(boolean toAsyncAggreagte) {
@@ -871,15 +862,5 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     private IWorkspaceRoot getWorkspaceRoot() {
         return ResourcesPlugin.getWorkspace().getRoot();
     }
-
-  /** ********************************************************************** */
-
-//  public void modelChanged(IModelChangedEvent event) {
-//    if (event.getChangeType() == IModelChangedEvent.CHANGE) {
-//      Object obj = event.getChangedObjects()[0];
-//      if (obj.equals(selectedObject))
-//        refresh();
-//    }
-//  }
 
 }

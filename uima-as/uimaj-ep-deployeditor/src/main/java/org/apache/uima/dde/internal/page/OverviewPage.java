@@ -20,23 +20,27 @@
 package org.apache.uima.dde.internal.page;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.deployment.AEDeploymentConstants;
 import org.apache.uima.aae.deployment.AEDeploymentDescription;
 import org.apache.uima.aae.deployment.AEService;
 import org.apache.uima.aae.deployment.AsyncAEErrorConfiguration;
 import org.apache.uima.aae.deployment.AsyncAggregateErrorConfiguration;
 import org.apache.uima.aae.deployment.impl.AEDelegates_Impl;
 import org.apache.uima.aae.deployment.impl.AEDeploymentMetaData_Impl;
+import org.apache.uima.aae.deployment.impl.NameValue;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.dde.internal.DeploymentDescriptorEditor;
 import org.apache.uima.dde.internal.Messages;
+import org.apache.uima.dde.internal.wizards.EditParamWizard;
 import org.apache.uima.resource.ResourceSpecifier;
-import org.apache.uima.resource.URISpecifier;
 import org.apache.uima.resource.metadata.Import;
+import org.apache.uima.resource.metadata.impl.Import_impl;
 import org.apache.uima.taeconfigurator.editors.ui.FileAndShortName;
 import org.apache.uima.taeconfigurator.editors.ui.Utility;
 import org.apache.uima.taeconfigurator.files.MultiResourceSelectionDialog;
@@ -45,13 +49,10 @@ import org.apache.uima.tools.internal.cde.uima.util.UimaDescriptionUtils;
 import org.apache.uima.tools.internal.ui.forms.FormSection;
 import org.apache.uima.tools.internal.ui.forms.FormSection2;
 import org.apache.uima.util.InvalidXMLException;
-import org.apache.uima.util.XMLInputSource;
-import org.apache.uima.util.XMLizable;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -60,9 +61,23 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.DecoratedField;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.viewers.ColumnLayoutData;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.PopupList;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.ModifyEvent;
@@ -73,19 +88,19 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.forms.FormColors;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
@@ -103,13 +118,13 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
  */
 public class OverviewPage extends AbstractHeaderPage {
 
-  static public final String PAGE_TITLE = "Overview";
+  static private final int  SERVICE_PANE_INDENT = 8; // indent for elements of service section_
 
-//  static protected OverviewPage instance = null;
+  static private final Object[] EMPTY_ARRAY = new Object[0];
 
+  private IManagedForm mForm;
+  
   private ScrolledForm form;
-
-//  private FormToolkit toolkit;
   
   private DecoratedField brokerUrlDecoField;
   
@@ -135,10 +150,6 @@ public class OverviewPage extends AbstractHeaderPage {
 
   private Label importByNameOrLocation;
   
-//  private Button importByLocation;
-
-//  private Button importByName;
-  
   private boolean isImportByLocation = true; // default
 
   private DeploymentDescriptorEditor multiPageEditor;
@@ -146,13 +157,95 @@ public class OverviewPage extends AbstractHeaderPage {
   private AEDeploymentDescription aeDeploymentDescription;
 
   private AEService aeService;
-    
-  private Text name;
+  
+  private Button customButton; // Customization for C++
+  
+  private Composite customComposite;
+  
+  private Composite serviceSectionClient;
+
+  private Text nameText;
   private Text description;
   private Text version;
   private Text vendor;
   private boolean ignoreUpdate = false; // Used to update Text without setting dirty flag
-  private Action openAction;
+  private Action openAction;    // Open top-level Xml with CDE
+  private Action notInWSAction; // Pop-up "File is not in workspace" when try to open 
+  
+  private TableViewer envTableViewer;
+  private Table envTable;
+  private Map<String,NameValue> envName2NameValueMap = new TreeMap<String,NameValue>();
+  private Button addButton;
+  private Button editButton;
+  private Button removeButton;
+
+  private ColumnLayoutData[] envTableColumnLayouts = {
+    new ColumnWeightData(200),
+    new ColumnWeightData(300)
+  };
+
+  /**
+   * Content provider for the environment var table
+   */
+  protected class EnvVariableContentProvider implements IStructuredContentProvider {
+    
+    public Object[] getElements(Object inputElement) {
+      Map<String,NameValue> m = (Map<String,NameValue>) inputElement;
+      if (!m.isEmpty()) {
+        return m.values().toArray();
+      }
+      return EMPTY_ARRAY;
+    }
+    public void dispose() {
+    }
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      if (newInput == null || !(newInput instanceof Map)){
+        return;
+      }
+      if (viewer instanceof TableViewer){
+        TableViewer tableViewer= (TableViewer) viewer;
+        if (tableViewer.getTable().isDisposed()) {
+          return;
+        }
+        tableViewer.setSorter(new ViewerSorter() {
+          public int compare(Viewer iviewer, Object e1, Object e2) {
+            if (e1 == null) {
+              return -1;
+            } else if (e2 == null) {
+              return 1;
+            } else {
+              return ((NameValue)e1).getName().compareToIgnoreCase(((NameValue)e2).getName());
+            }
+          }
+        });
+      }
+    }
+  }
+  
+  /**
+   * Label provider for the environment var table
+   */
+  public class EnvVariableLabelProvider extends LabelProvider implements ITableLabelProvider {
+    public String getColumnText(Object element, int columnIndex)  {
+      String result = null;
+      if (element != null) {
+        NameValue var = (NameValue) element;
+        switch (columnIndex) {
+          case 0: // variable
+            result = var.getName();
+            break;
+          case 1: // value
+            result = var.getValue();
+            break;
+        }
+      }
+      return result;
+    }
+    
+    public Image getColumnImage(Object element, int columnIndex) {
+      return null;
+    }
+  }
   
   /** ********************************************************************** */
 
@@ -169,8 +262,8 @@ public class OverviewPage extends AbstractHeaderPage {
 
       } else if (source == topDescriptorField) {
 
-      } else if (source == name) {
-        aeDeploymentDescription.setName(name.getText().trim());
+      } else if (source == nameText) {
+        aeDeploymentDescription.setName(nameText.getText().trim());
         
       } else if (source == description) {
         aeDeploymentDescription.setDescription(description.getText().trim());
@@ -189,26 +282,9 @@ public class OverviewPage extends AbstractHeaderPage {
     }
   };
   
-  static public String fromAbsoluteUrl2Location (IFile parentIFile, String fileFullPath) {
-    // Import by Location
-    try {
-      int index= fileFullPath.indexOf("file:/");
-      if (index != -1) {
-        fileFullPath = fileFullPath.substring(6);
-        // Trace.err("fileFullPath0: " + fileFullPath);
-      }
-      // Trace.err("fileFullPath: " + fileFullPath);
-      Import importDescriptor = UimaDescriptionUtils.createByLocationImport(parentIFile,
-            fileFullPath);
-      return importDescriptor.getLocation();
-    } catch (MalformedURLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return null;
-  }
-
-  protected SelectionListener asynAggregateListener = new SelectionAdapter() {
+  
+    
+  protected SelectionListener selectionListener = new SelectionAdapter() {
 
     public void widgetSelected(SelectionEvent event) {
       if (event.getSource() == casPoolSize) {
@@ -217,9 +293,26 @@ public class OverviewPage extends AbstractHeaderPage {
       } else if (event.getSource() == initialFsHeapSize) {
         aeDeploymentDescription.setInitialFsHeapSize(initialFsHeapSize.getSelection());
         multiPageEditor.setFileDirty();
+      } else if (event.getSource() == customButton) {
+        // Customization of C++
+        if (customComposite == null) {
+          aeService.setCustomValue(AEDeploymentConstants.TAG_CUSTOM_ATTR_NAME);
+          customComposite = createCustomizationSection(serviceSectionClient);
+          updateEnvironmentVariables();
+        } else {
+          aeService.setCustomValue(null);
+          if (aeService.getEnvironmentVariables() != null) {
+            aeService.getEnvironmentVariables().clear();
+          }
+          customComposite.dispose();
+          customComposite = null;
+        }
+        serviceSectionClient.layout(true, true);
+        mForm.reflow(true);
       }
     }
   };
+  
 
   /** ********************************************************************** */
 
@@ -235,18 +328,15 @@ public class OverviewPage extends AbstractHeaderPage {
     aeService = aeDeploymentDescription.getAeService();
   }
 
-//  static public OverviewPage getInstance() {
-//    return instance;
-//  }
-  
   /**
    * Called by the framework to fill in the contents
    */
   protected void createFormContent(IManagedForm managedForm) {
     super.createFormContent(managedForm);
+    mForm = managedForm;
     form = managedForm.getForm();
     FormToolkit toolkit = managedForm.getToolkit();
-    form.setText(PAGE_TITLE);
+    form.setText(Messages.DDE_OverviewPage_Title);
 
     ScrolledForm form = managedForm.getForm();
     FormColors colors = toolkit.getColors();
@@ -254,7 +344,6 @@ public class OverviewPage extends AbstractHeaderPage {
     Color gbg = colors.getColor(FormColors.TB_GBG);
     Color bg = colors.getBackground();
     form.getForm().setTextBackground(new Color[] { bg, gbg }, new int[] { 100 }, true);
-    // form.getForm().setSeparatorVisible(true);
 
     fillBody(managedForm, toolkit);
   }
@@ -273,43 +362,37 @@ public class OverviewPage extends AbstractHeaderPage {
     ((GridData) compTop.getLayoutData()).widthHint = c.getSize().x;
     ((GridData) compTop.getLayoutData()).heightHint = c.getSize().y;
 
-    SashForm sashFormOverview = new SashForm(compTop, SWT.VERTICAL);
-    // toolkit.adapt(sashForm, true, true); // makes the bar invisible (white)
-    sashFormOverview.setLayoutData(new GridData(GridData.FILL_BOTH)); // needed
+    compTop.setLayoutData(new GridData(GridData.FILL_BOTH)); // needed
 
-    createToolBarActions(managedForm, sashFormOverview, false);
-
-    ScrolledComposite leftScrolled = new ScrolledComposite(sashFormOverview, SWT.H_SCROLL | SWT.V_SCROLL); // toolkit.createComposite(sashFormOverview);
+    ScrolledComposite leftScrolled = new ScrolledComposite(compTop, SWT.H_SCROLL | SWT.V_SCROLL); // toolkit.createComposite(sashFormOverview);
     leftScrolled.setExpandHorizontal(true);
     leftScrolled.setExpandVertical(true);
     leftScrolled.setLayoutData(new GridData(GridData.FILL_BOTH));
     leftScrolled.setLayout(new GridLayout(1, false));
-    Composite leftPane = toolkit.createComposite(leftScrolled);
+    Composite servicePane = toolkit.createComposite(leftScrolled);
     TableWrapLayout layout = new TableWrapLayout();
-    layout.verticalSpacing = 20;
-    leftPane.setLayout(layout);
-    leftPane.setLayoutData(new GridData(GridData.FILL_BOTH));
-    leftScrolled.setContent(leftPane);
+    servicePane.setLayout(layout);
+    servicePane.setLayoutData(new GridData(GridData.FILL_BOTH));
+    leftScrolled.setContent(servicePane);
 
-    ScrolledComposite rightScrolled = new ScrolledComposite(sashFormOverview, SWT.H_SCROLL | SWT.V_SCROLL); // toolkit.createComposite(sashFormOverview);
+    ScrolledComposite rightScrolled = new ScrolledComposite(compTop, SWT.H_SCROLL | SWT.V_SCROLL); // toolkit.createComposite(sashFormOverview);
     rightScrolled.setExpandHorizontal(true);
     rightScrolled.setExpandVertical(true);
     rightScrolled.setLayoutData(new GridData(GridData.FILL_BOTH));
     rightScrolled.setLayout(new GridLayout(1, false));
     Composite rightPane = toolkit.createComposite(rightScrolled);
     layout = new TableWrapLayout();
-    layout.verticalSpacing = 20;
     rightPane.setLayout(layout);
     rightPane.setLayoutData(new GridData(GridData.FILL_BOTH));
     rightScrolled.setContent(rightPane);
     
     createIdentitySection(rightPane, toolkit);
-    createServiceSection(leftPane, toolkit);
-    leftScrolled.setMinSize(leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    createServiceSection(servicePane, toolkit);
+    
+    leftScrolled.setMinSize(servicePane.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     rightScrolled.setMinSize(rightPane.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
   }
-
+  
   /** ********************************************************************** */
 
   private Section createIdentitySection(Composite parent, FormToolkit toolkit) {
@@ -331,12 +414,11 @@ public class OverviewPage extends AbstractHeaderPage {
     section.setClient(sectionClient);
     TableWrapLayout tl = new TableWrapLayout();
     tl.numColumns = 2;
-    // gl.makeColumnsEqualWidth = true;
-    tl.bottomMargin = 10;
+    tl.bottomMargin = 6;
     sectionClient.setLayout(tl);
 
     // Name
-    name = FormSection.createLabelAndText(toolkit, sectionClient, "Name:",
+    nameText = FormSection.createLabelAndText(toolkit, sectionClient, "Name:",
             aeDeploymentDescription.getName(), SWT.WRAP, 10, 0);
 
     // Description
@@ -349,7 +431,7 @@ public class OverviewPage extends AbstractHeaderPage {
     vendor = FormSection.createLabelAndText(toolkit, sectionClient, "Vendor:",
             aeDeploymentDescription.getVendor(), SWT.WRAP, 10, 0);
     
-    name.addModifyListener(fModifyListener);
+    nameText.addModifyListener(fModifyListener);
     description.addModifyListener(fModifyListener);
     version.addModifyListener(fModifyListener);
     vendor.addModifyListener(fModifyListener);
@@ -361,36 +443,181 @@ public class OverviewPage extends AbstractHeaderPage {
     return section;
   } // createIdentitySection
 
+  private Composite createCustomizationSection(Composite parent) {
+    FormToolkit toolkit = mForm.getToolkit();
+    Composite customComposite = toolkit.createComposite(parent);
+    TableWrapLayout tl = new TableWrapLayout();
+    tl.numColumns = 1;
+    tl.numColumns = 1;
+    tl.leftMargin = 0;
+    tl.rightMargin = 0;
+    tl.topMargin = 0;
+    tl.bottomMargin = 0;
+    customComposite.setLayout(tl);
+    GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+    gd.horizontalIndent = SERVICE_PANE_INDENT;
+    gd.grabExcessHorizontalSpace = true;
+    customComposite.setLayoutData(gd);
+    
+    envTable = createCustomizationTable(customComposite, toolkit);
+
+    envTableViewer = new TableViewer(envTable);
+    envTableViewer.setContentProvider(new EnvVariableContentProvider());
+    envTableViewer.setLabelProvider(new EnvVariableLabelProvider());
+    envTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        // handleTableSelectionChanged(event);
+        int size = ((IStructuredSelection)event.getSelection()).size();
+        editButton.setEnabled(size == 1);
+        removeButton.setEnabled(size > 0);
+      }
+    });
+    envTableViewer.addDoubleClickListener(new IDoubleClickListener() {
+      public void doubleClick(DoubleClickEvent event) {
+        if (!envTableViewer.getSelection().isEmpty()) {
+          handleEditButton();
+        }
+      }
+    });
+    envTableViewer.setInput(envName2NameValueMap);
+        
+    toolkit.paintBordersFor(customComposite);
+
+    return customComposite;
+  } // createCustomizationSection
+
+  private Table createCustomizationTable(Composite parent, FormToolkit toolkit) {
+    Composite tableComposite = toolkit.createComposite(parent, SWT.NONE);
+    TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB);
+    td.grabHorizontal = true;
+    td.valign = TableWrapData.FILL;
+    tableComposite.setLayoutData(td);
+    
+    GridLayout glayout = new GridLayout();
+    glayout.marginTop = 0;
+    glayout.marginLeft = 0;
+    glayout.numColumns = 3;
+    tableComposite.setLayout(glayout);
+    
+    final Table table = toolkit.createTable(tableComposite, SWT.HIDE_SELECTION | SWT.FULL_SELECTION
+            | SWT.H_SCROLL | SWT.V_SCROLL);
+    table.setLinesVisible(true);
+    table.setHeaderVisible(true);
+    String headers[] = { Messages.DDE_EnvVariable_Table_NAME, Messages.DDE_EnvVariable_Table_VALUE };
+    
+    TableLayout tableLayout = new TableLayout();
+    table.setLayout(tableLayout);
+
+    for (int i = 0; i < headers.length; i++) {
+      tableLayout.addColumnData(envTableColumnLayouts[i]);
+      TableColumn tc = new TableColumn(table, SWT.NONE, i);
+      tc.setResizable(true);
+      tc.setText(headers[i]);
+    }
+
+    GridData gd = new GridData(GridData.FILL_BOTH|GridData.VERTICAL_ALIGN_BEGINNING);
+    gd.horizontalSpan = 2;
+    gd.heightHint = table.getHeaderHeight() + (table.getItemHeight() * 4); // +1
+    table.setLayoutData(gd);
+    
+    createTableButtons(tableComposite, toolkit);
+
+    return table;
+  }
+  
+  protected void createTableButtons(Composite parent, FormToolkit toolkit) {
+    // Create button composite
+    Composite buttonComposite = toolkit.createComposite(parent, SWT.NONE);
+    GridLayout glayout = new GridLayout();
+    glayout.marginHeight = 0;
+    glayout.marginWidth = 0;
+    glayout.numColumns = 1;
+    GridData gdata = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.HORIZONTAL_ALIGN_END);
+    buttonComposite.setLayout(glayout);
+    buttonComposite.setLayoutData(gdata);
+    buttonComposite.setFont(parent.getFont());
+
+    createVerticalSpacer(buttonComposite, 1);
+    /**************************************/
+    /*            Create buttons          */
+    /**************************************/
+    addButton = createPushButton(buttonComposite, "Add...", null, toolkit); 
+    addButton.addSelectionListener(new SelectionAdapter()
+    {
+        public void widgetSelected(SelectionEvent event) {
+          handleAddButton();
+        }            
+    });
+
+    editButton = createPushButton(buttonComposite, "Edit...", null, toolkit); 
+    editButton.addSelectionListener(new SelectionAdapter()
+    {
+        public void widgetSelected(SelectionEvent event) {
+          handleEditButton();
+        }
+    });
+    
+    removeButton = createPushButton(buttonComposite, "Remove", null, toolkit); 
+    removeButton.addSelectionListener(new SelectionAdapter()
+    {
+        public void widgetSelected(SelectionEvent event) {
+          handleDeleteButton();
+        }
+    });
+    
+  } // createTableButtons
+
+  public Button createPushButton(Composite parent, String label, Image image, FormToolkit toolkit) {
+    Button button = toolkit.createButton(parent, label, SWT.PUSH);
+    GridData gd = new GridData(GridData.CENTER|GridData.FILL_HORIZONTAL);
+    button.setLayoutData(gd); 
+    button.setEnabled(true);
+
+    return button;
+  }
+  
+  /**
+   * Create some empty space.
+   */
+  protected void createVerticalSpacer(Composite comp, int colSpan) {
+    Label label = new Label(comp, SWT.NONE);
+    GridData gd = new GridData();
+    gd.horizontalSpan = colSpan;
+    label.setLayoutData(gd);
+    label.setFont(comp.getFont());
+  } 
+  
   private Section createServiceSection(Composite parent, final FormToolkit toolkit) {
 
     Section section = FormSection.createTableWrapDataSection(toolkit, parent, Section.TREE_NODE
             | Section.DESCRIPTION, Messages.DDE_OverviewPage_Service_Section_Title,
             Messages.DDE_OverviewPage_Service_Section_Description, 10, 3, TableWrapData.FILL_GRAB,
             TableWrapData.FILL_GRAB, 1, 1);
-
-    // final SectionPart spart = new SectionPart(section);
-    // mform.addPart(spart);
-    // spart.initialize (mform); // Need this code. Otherwise, exception in SectionPart !!!
-
     section.setExpanded(true);
     section.addExpansionListener(new ExpansionAdapter() {
       public void expansionStateChanged(ExpansionEvent e) {
         form.reflow(true);
       }
     });
-
-    // //////////////////
-
     Composite sectionClient = toolkit.createComposite(section);
+    serviceSectionClient = sectionClient;
+    GridLayout gl = new GridLayout(1, false);
+    gl.marginWidth = 0;
+    sectionClient.setLayout(gl);
     section.setClient(sectionClient);
+    
+    // Top part
+    Composite topComposite = toolkit.createComposite(sectionClient);
     TableWrapLayout tl = new TableWrapLayout();
     tl.numColumns = 2;
-    // gl.makeColumnsEqualWidth = true;
     tl.bottomMargin = 10;
-    sectionClient.setLayout(tl);
+    topComposite.setLayout(tl);
+    GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+    gd.grabExcessHorizontalSpace = true;
+    topComposite.setLayoutData(gd); 
 
     // <deployment protocol="jms" provider="activemq">
-    brokerUrlDecoField = FormSection2.createLabelAndDecoratedText(toolkit, sectionClient, 
+    brokerUrlDecoField = FormSection2.createLabelAndDecoratedText(toolkit, topComposite, 
             "Broker URL for input queue:", 
             aeService.getBrokerURL(), SWT.WRAP, 10, 0);
     
@@ -403,7 +630,7 @@ public class OverviewPage extends AbstractHeaderPage {
     brokerUrl.setToolTipText("Enter the URL for the input queue");
     brokerUrl.addModifyListener(fModifyListener);    
 
-    endPointDecoField = FormSection2.createLabelAndDecoratedText(toolkit, sectionClient, 
+    endPointDecoField = FormSection2.createLabelAndDecoratedText(toolkit, topComposite, 
             "Name for input queue:", aeService.getEndPoint(), SWT.WRAP, 10, 0);
     endPoint = (Text) endPointDecoField.getControl();
     endPoint.setToolTipText("Enter the name for the input queue");
@@ -421,24 +648,24 @@ public class OverviewPage extends AbstractHeaderPage {
 //    prefetch.addSelectionListener(asynAggregateListener);
 
     // <casPool numberOfCASes="3"/> <!-- optional -->
-    casPoolSize = FormSection2.createLabelAndSpinner(toolkit, sectionClient,
+    casPoolSize = FormSection2.createLabelAndSpinner(toolkit, topComposite,
             "Number of CASes in CAS pool:", SWT.BORDER, 1, 
             Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
     casPoolSize.setSelection(aeDeploymentDescription.getCasPoolSize());
-    casPoolSize.addSelectionListener(asynAggregateListener);
+    casPoolSize.addSelectionListener(selectionListener);
 
     // initialFsHeapSize (default size is 2M)
-    initialFsHeapSize = FormSection2.createLabelAndSpinner(toolkit, sectionClient,
+    initialFsHeapSize = FormSection2.createLabelAndSpinner(toolkit, topComposite,
             "Initial size of CAS heap (in bytes):", SWT.BORDER, 1, 
             Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
     initialFsHeapSize.setSelection(aeDeploymentDescription.getInitialFsHeapSize());
-    initialFsHeapSize.addSelectionListener(asynAggregateListener);
+    initialFsHeapSize.addSelectionListener(selectionListener);
     
     // ////////////////////////////////////////
 
     // Top descriptor
     topDescriptorDecoField = FormSection2.createLabelAndGridLayoutDecoratedContainer(toolkit, 
-            sectionClient, "Top analysis engine descriptor", 2, 0, 0);
+            topComposite, "Top analysis engine descriptor", 2, 0, 0);
     Composite browsingGroup = (Composite) topDescriptorDecoField.getControl();
     decorationTopDescriptor = FormSection2.registerFieldDecoration("topDescriptorField",
         "Top descriptor cannot be empty");
@@ -459,12 +686,12 @@ public class OverviewPage extends AbstractHeaderPage {
       } else {
         isImportByLocation = true;
       }
-      topDescriptor = descr;
+      topDescriptor = descr;      
     }
     topDescriptorField.setText(topDescriptor != null ? topDescriptor : "");
     topDescriptorField.addModifyListener(fModifyListener);
 
-    // browse button
+    // Button for browsing AE Xml descriptor
     Button browseDirectoriesButton = toolkit.createButton(browsingGroup, "B&rowse...", SWT.PUSH);
     browseDirectoriesButton.setLayoutData(new GridData());
     browseDirectoriesButton.addSelectionListener(new SelectionAdapter() {
@@ -481,8 +708,6 @@ public class OverviewPage extends AbstractHeaderPage {
         if (files != null && files.length > 0) {
           for (int i = 0; i < files.length; i++) {
             FileAndShortName fsn = new FileAndShortName(files[i]);
-            // produceKeyAddDelegate(fsn.shortName, fsn.fileName, dialog.getAutoAddToFlow(),
-            //         dialog.isImportByName);
             updateTopDescriptor(fsn.fileName, !dialog.isImportByName);
           }
         }
@@ -507,17 +732,16 @@ public class OverviewPage extends AbstractHeaderPage {
     
     createContextMenu();
 
-    // Name or Location
-    toolkit.createLabel(sectionClient, "", SWT.NONE);
-    Composite nameOrLocation = toolkit.createComposite(sectionClient, SWT.NONE);
+    // Import by Name or by Location
+    toolkit.createLabel(topComposite, "", SWT.NONE);
+    Composite nameOrLocation = toolkit.createComposite(topComposite, SWT.NONE);
     nameOrLocation.setLayout(new GridLayout(2, false));
     TableWrapData td = new TableWrapData();
     td.colspan = 1;
     td.grabHorizontal = true;
     td.indent = 0;
     nameOrLocation.setLayoutData(td);
-    toolkit.paintBordersFor(nameOrLocation);
-    
+    toolkit.paintBordersFor(nameOrLocation);    
     importByNameOrLocation = FormSection.createLabelAndLabel(toolkit, nameOrLocation, "Import by:",
             "(Name or Location)", 200, 20);
     if (imp != null) {
@@ -527,20 +751,48 @@ public class OverviewPage extends AbstractHeaderPage {
         importByNameOrLocation.setText("Name");
       }
     }
-    toolkit.paintBordersFor(sectionClient);
+    
+    // Run C++ component in a separate process
+    customButton = toolkit.createButton(sectionClient, "Run top level C++ component in a separate process", SWT.CHECK);
+    gd = new GridData(GridData.FILL_HORIZONTAL);
+    gd.horizontalIndent = SERVICE_PANE_INDENT;
+    gd.grabExcessHorizontalSpace = true;
+    customButton.setLayoutData(gd);
+    customButton.addSelectionListener(selectionListener);
+    if (imp != null) {
+      // Check if C++ AE
+      customButton.setEnabled(aeService.isCPlusPlusTopAE());
+      if (aeService.getCustomValue() != null) {
+        customButton.setSelection(true);
+        if (aeService.getEnvironmentVariables() != null) {
+          for (NameValue nv: aeService.getEnvironmentVariables()) {
+            envName2NameValueMap.put(nv.getName(), nv);
+          }
+          customComposite = createCustomizationSection(serviceSectionClient);
+        }
+      }
+    } else {
+      customButton.setEnabled(false);
+    }
+
+    toolkit.paintBordersFor(topComposite);
 
     return section;
   } // createServiceSection
-
+  
   private void createContextMenu() {
     // Create Open Action
-    openAction = new Action("Open in new window") {
+    openAction = new Action(Messages.DDE_POPUP_ACTION_OPEN_IN_NEW_WINDOW) {
       public void run() {
-        String xml = topDescriptorField.getText().trim();
-        // Trace.err("Xml: " + xml);
         multiPageEditor.openTopLevelXmlDescriptor(aeService.getImportDescriptor());
       }
     };
+    // Action when trying to open a file outside workspace
+    notInWSAction = new Action(Messages.DDE_POPUP_ACTION_NOT_IN_WORKSPACE) {
+      public void run() {
+      }
+    };
+    notInWSAction.setEnabled(false);
     
     //  Create menu manager.
     MenuManager menuMgr = new MenuManager();
@@ -561,9 +813,17 @@ public class OverviewPage extends AbstractHeaderPage {
   private void fillContextMenu(IMenuManager mgr) {
     String xml = topDescriptorField.getText().trim();
     if (xml.length() > 0) {
+      
+      String path = multiPageEditor.cde.getAbsolutePathFromImport(aeService.getImportDescriptor());
+      IPath iPath = new Path(path);
+      IFile[] files = multiPageEditor.cde.getProject().getWorkspace().getRoot().findFilesForLocation(iPath);
+      if (null == files || files.length != 1) {
+        mgr.add(notInWSAction);
+        return;
+      }
+
       mgr.add(openAction);
     }
-    // mgr.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
   }
   
   /** ********************************************************************** */
@@ -574,8 +834,7 @@ public class OverviewPage extends AbstractHeaderPage {
     try {
       if (byLocation) {
         // Import by Location
-        importDescriptor = UimaDescriptionUtils.createByLocationImport(multiPageEditor.getFile(),
-              fileFullPath);
+        importDescriptor = createLocationImport(fileFullPath);
       } else {
         // Import by Name
         importDescriptor = UimaDescriptionUtils.createByNameImport(fileFullPath,
@@ -618,6 +877,9 @@ public class OverviewPage extends AbstractHeaderPage {
   
           aeService.getAnalysisEngineDeploymentMetaData(multiPageEditor
                   .cde.createResourceManager()).setDelegates(delegates);
+          
+          // If C++ descriptor, activate C++ settings
+          updateCPlusPlusSettings ();
         }
       } else {
         Trace.err("Cannot resolve: " + relativeFile);
@@ -625,7 +887,6 @@ public class OverviewPage extends AbstractHeaderPage {
     } catch (InvalidXMLException e) {
       // e.printStackTrace();
       Utility.popMessage(Messages.getString("InvalidXMLException"), //$NON-NLS-1$
-      // Utility.popMessage("InvalidXMLException", //$NON-NLS-1$
               multiPageEditor.cde.getMessagesToRootCause(e), MessageDialog.ERROR);
       multiPageEditor.switchToBadSource(true);
       return;
@@ -643,20 +904,44 @@ public class OverviewPage extends AbstractHeaderPage {
     multiPageEditor.setFileDirty();
   }
 
+  /**
+   * @param location
+   * @return
+   * @throws MalformedURLException
+   */
+  public Import createLocationImport(String location) throws MalformedURLException {
+
+    String sDescriptorRelativePath = multiPageEditor.cde.getDescriptorRelativePath(location);
+    // If relative path is not "relative", on Windows might get back
+    // an absolute path starting with C: or something like it.
+    // If a path starts with "C:", it must be preceeded by
+    // file:/ so the C: is not interpreted as a "scheme".
+    if (sDescriptorRelativePath.indexOf("file:/") == -1 //$NON-NLS-1$
+            && sDescriptorRelativePath.indexOf(":/") > -1) { //$NON-NLS-1$
+      sDescriptorRelativePath = "file:/" + sDescriptorRelativePath; //$NON-NLS-1$
+    }
+
+    Import imp = new Import_impl();
+    // fails on unix? URL url = new URL("file:/" + getDescriptorDirectory());
+    // Set relative Path Base
+    // a version that might work on all platforms
+    URL url = new File(multiPageEditor.cde.getDescriptorDirectory()).toURL();
+    ((Import_impl) imp).setSourceUrl(url);
+
+    imp.setLocation(sDescriptorRelativePath);
+    return imp;
+  }
+  
   /** ********************************************************************** */
 
   public void setActive(boolean active) {
     if (active) {
       super.setActive(active);
-      // Trace.err("Activate Overview");
       isValid();
-    } else {
-      // Trace.err("De-Activate Overview");
     }
   }
 
   protected void isValid() {
-    // if (true) return;
     if (brokerUrl.getText().trim().length() == 0) {
       showStatus("The queue Broker Url is not specified", IMessageProvider.ERROR);
       brokerUrlDecoField.showDecoration(decorationBrokerUrl);
@@ -679,17 +964,6 @@ public class OverviewPage extends AbstractHeaderPage {
       // return;
     } else {
       topDescriptorDecoField.hideDecoration(decorationTopDescriptor);
-      // int err = validateFilePath(topDescriptorField.getText().trim());
-      // if (err != 0) {
-      // Trace.err("validateFilePath");
-      // if (err == STATUS_FILE_NOT_SPECIFIED) {
-      // // setErrorMessage("Analysis Engine's xml descriptor is not specified");
-      // } else {
-      // // setErrorMessage("Analysis Engine's xml descriptor does not exist");
-      // showStatus("The specified descriptor \"" + topDescriptorField.getText().trim()
-      // + "\" does not exist.", IMessageProvider.ERROR);
-      // }
-      // }
     }
     // showStatus(null, IMessageProvider.ERROR);
   }
@@ -718,7 +992,7 @@ public class OverviewPage extends AbstractHeaderPage {
     aeDeploymentDescription = aeDD;
     aeService = aeDeploymentDescription.getAeService();
     
-    name.setText(aeDeploymentDescription.getName());
+    nameText.setText(aeDeploymentDescription.getName());
     description.setText(aeDeploymentDescription.getDescription());
     version.setText(aeDeploymentDescription.getVersion());
     vendor.setText(aeDeploymentDescription.getVendor());
@@ -744,6 +1018,9 @@ public class OverviewPage extends AbstractHeaderPage {
       } else {
         importByNameOrLocation.setText("Name");
       }
+      
+      // Check if C++ AE
+      updateCPlusPlusSettings ();
     } else {
       // Import is NOT defined
       importByNameOrLocation.setText("(Name or Location)");
@@ -752,5 +1029,137 @@ public class OverviewPage extends AbstractHeaderPage {
 
     topDescriptorField.setText(topDescriptor != null ? topDescriptor : "");
     ignoreUpdate = false;
+  }
+    
+  /***************************************************************************/
+  
+  /**
+   * Creates an editor for the value of the selected environment variable.
+   */
+  private void handleEditButton() {
+    IStructuredSelection sel= (IStructuredSelection) envTableViewer.getSelection();
+    NameValue var= (NameValue) sel.getFirstElement();
+    if (var == null) {
+      return;
+    }
+    String oldName  = var.getName();
+    EditParamWizard wizard = new EditParamWizard(Messages.DDE_EnvVariable_Wizard_EDIT_Title, 
+            Messages.DDE_EnvVariable_Wizard_EDIT_Description, var.getName(), var.getValue());
+    WizardDialog dialog = new WizardDialog(form.getShell(), wizard);
+    
+    if (dialog.open() != Window.OK) {
+      return;
+    }
+    String name  = wizard.getName();
+    String value = wizard.getValue();
+    
+    // Delete OLD name/value from Map
+    envName2NameValueMap.remove(oldName);
+    
+    if (name.length() == 0) {
+      // Delete OLD name/value from Table
+      envTableViewer.remove(var);
+      envTableViewer.refresh();
+      updateEnvironmentVariables ();
+      return;
+    }
+
+    if (!oldName.equals(name)) {
+      envTableViewer.remove(var);
+      var = new NameValue(name, value);
+      addAndCheckVariable(var);
+    } else {
+      var.setValue(value);
+      envTableViewer.update(var, null);
+    }
+    envName2NameValueMap.put(name, var);
+    updateEnvironmentVariables ();
+  }
+
+  private void handleAddButton () {
+    EditParamWizard wizard = new EditParamWizard(Messages.DDE_EnvVariable_Wizard_ADD_Title, 
+            Messages.DDE_EnvVariable_Wizard_ADD_Description, "", "");
+    WizardDialog dialog = new WizardDialog(form.getShell(), wizard);
+    if (dialog.open() != Window.OK) {
+      return;
+    }
+    String name  = wizard.getName();
+    String value = wizard.getValue();
+    if (name.length() == 0) {
+      return;
+    }
+    NameValue nv = new NameValue(name, value);
+    addAndCheckVariable(nv);
+    envName2NameValueMap.put(name, nv);
+    updateEnvironmentVariables ();
+  }
+  
+  private void handleDeleteButton() {
+    IStructuredSelection sel= (IStructuredSelection) envTableViewer.getSelection();
+    NameValue var= (NameValue) sel.getFirstElement();
+    if (var == null) {
+      return;
+    }
+    envName2NameValueMap.remove(var.getName());
+    envTableViewer.remove(var);
+    envTableViewer.refresh();
+    updateEnvironmentVariables ();
+  }
+  
+  protected boolean addAndCheckVariable(NameValue variable) {
+    String name= variable.getName();
+    TableItem[] items = envTableViewer.getTable().getItems();
+    for (int i = 0; i < items.length; i++) {
+      NameValue existingVariable = (NameValue) items[i].getData();
+      // Duplicate name ?
+      if (existingVariable.getName().equals(name)) {
+        envTableViewer.remove(existingVariable);
+        break;
+      }
+    }
+    envTableViewer.add(variable);
+    return true;
+  }
+
+  // TODO Need to optimize
+  protected void updateEnvironmentVariables () {
+    aeService.getEnvironmentVariables().clear();
+    for (NameValue nv: envName2NameValueMap.values()) {
+      aeService.getEnvironmentVariables().add(nv);
+    }
+  }
+  
+  /**
+   * Enable C++ settings if top-level AE is C++
+   * 
+   * @return void
+   */
+  protected void updateCPlusPlusSettings () {
+    if (aeService.isCPlusPlusTopAE()) {
+      customButton.setEnabled(true);
+      if (aeService.getCustomValue() != null) {
+        customButton.setSelection(true);
+        
+        envName2NameValueMap.clear();
+        if (aeService.getEnvironmentVariables() != null) {
+          for (NameValue nv: aeService.getEnvironmentVariables()) {
+            envName2NameValueMap.put(nv.getName(), nv);
+          }
+        }
+        if (customComposite == null) {
+          customComposite = createCustomizationSection(serviceSectionClient);
+        } else {
+          envTableViewer.setInput(envName2NameValueMap);
+          // envTableViewer.refresh();
+        }
+        serviceSectionClient.layout(true, true);
+        mForm.reflow(true);
+
+      } else {
+        customButton.setSelection(false);
+      }
+    } else {
+      customButton.setEnabled(false);      
+    }
   }
 }

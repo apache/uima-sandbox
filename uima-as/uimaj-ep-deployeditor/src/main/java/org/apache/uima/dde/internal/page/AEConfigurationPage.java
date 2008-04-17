@@ -21,9 +21,7 @@ package org.apache.uima.dde.internal.page;
 
 import org.apache.uima.aae.deployment.AEDeploymentDescription;
 import org.apache.uima.dde.internal.DeploymentDescriptorEditor;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 
@@ -35,11 +33,7 @@ public class AEConfigurationPage extends AbstractHeaderPage {
 
   static public final String PAGE_TITLE = "Deployment Configurations";
 
-//  static protected AEConfigurationPage instance = null;
-
   private ScrolledForm form;
-
-//  private TreeViewer aeConfigViewer;
 
   private MasterDetails md;
 
@@ -66,10 +60,6 @@ public class AEConfigurationPage extends AbstractHeaderPage {
     super(id, title);
     // TODO Auto-generated constructor stub
   }
-
-//  static public AEConfigurationPage getInstance() {
-//    return instance;
-//  }
 
   public void refresh() {
     md.refresh();
@@ -100,7 +90,4 @@ public class AEConfigurationPage extends AbstractHeaderPage {
       md.setInput(input);
     }
   }
-
-  /** ********************************************************************** */
-
 }

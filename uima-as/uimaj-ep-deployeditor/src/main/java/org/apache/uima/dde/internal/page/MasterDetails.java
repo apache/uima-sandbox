@@ -175,15 +175,6 @@ public class MasterDetails extends MasterDetailsBlock { // implements Listener {
   @Override
   protected void registerPages(DetailsPart detailsPart) {
     detailsPart.setPageLimit(10);
-    // register static page for the extensions
-    // detailsPart.registerPage(AEDeploymentMetaData_Impl.class, new
-    // AEMetaDataDetailsPage_V1(managedForm));
-    // detailsPart.registerPage(RemoteAEDeploymentMetaData_Impl.class, new
-    // RemoteAEMetaDataDetails_V1(managedForm));
-    // detailsPart.registerPage(AsyncAggregateErrorConfiguration_Impl.class, new
-    // AsyncAEErrorConfigDetailsPage_V0(managedForm));
-    // detailsPart.registerPage(AsyncPrimitiveErrorConfiguration_Impl.class, new
-    // AsyncAEErrorConfigDetailsPage_V0(managedForm));
 
     // register a dynamic provider for elements
     detailsPart.setPageProvider(new DetailsPageProvider(multiPageEditor, managedForm, this, detailsPart));
@@ -249,52 +240,14 @@ public class MasterDetails extends MasterDetailsBlock { // implements Listener {
       tc.setText(headers[i]);
       if (i == 0) {
         tc.setWidth(200);
-        // } else {
-        // tc.setWidth(100);
       }
       columns[i] = tc;
       if (i == 1 || i == 2) {
         tc.pack();
-        // Trace.err("pack: " + tc.getWidth());
       }
     }
-    // tree.addListener(SWT.MouseHover, this);
-    tree.addControlListener(new ControlAdapter() {
-      public void controlResized(ControlEvent e) {
-        // int width = tree.getSize().x;
-        // ScrollBar vBar = tree.getVerticalBar();
-        // if (vBar.isEnabled()) {
-        // // Trace.err("vBar.getSize().x: " + vBar.getSize().x);
-        // width -= vBar.getSize().x/2;
-        // } else {
-        // Trace.err("NO vBar");
-        // }
-        // width = width - tree.computeTrim(0,0,0,0).width ;
-        // columns[0].setWidth(width-140);
-        // columns[1].setWidth(70);
-        // columns[2].setWidth(70);
-      }
-    });
-    /*
-     * sectionClient.addControlListener(new ControlAdapter() { public void
-     * controlResized(ControlEvent e) { Rectangle area = sectionClient.getClientArea(); Point size =
-     * tree.computeSize(SWT.DEFAULT, SWT.DEFAULT); ScrollBar vBar = tree.getVerticalBar(); //
-     * Trace.err("vBar.getSize().x: " + vBar.getSize().x); int width = area.width -
-     * tree.computeTrim(0,0,0,0).width - vBar.getSize().x; if (size.y > area.height +
-     * tree.getHeaderHeight()) { // Subtract the scrollbar width from the total column width // if a
-     * vertical scrollbar will be required Point vBarSize = vBar.getSize(); width -= vBarSize.x; }
-     * Point oldSize = tree.getSize(); if (oldSize.x > area.width) { // table is getting smaller so
-     * make the columns // smaller first and then resize the table to // match the client area width
-     * columns[0].setWidth(width-140); columns[1].setWidth(70); columns[2].setWidth(70);
-     * tree.setSize(area.width, area.height); } else { // table is getting bigger so make the table //
-     * bigger first and then make the columns wider // to match the client area width
-     * tree.setSize(area.width, area.height); columns[0].setWidth(width-140);
-     * columns[1].setWidth(70); columns[2].setWidth(70); } } });
-     */
 
     aeConfigViewer = new TreeViewer(tree);
-    // AEConfigContentProvider_V1 contentProvider = new AEConfigContentProvider_V1();
-    // AEConfigLabelProvider_V0 labelProvider = new AEConfigLabelProvider_V0();
     DDTreeContentProvider contentProvider = new DDTreeContentProvider();
     DDTreeLabelProvider labelProvider = new DDTreeLabelProvider();
     aeConfigViewer.setContentProvider(contentProvider);
@@ -317,22 +270,6 @@ public class MasterDetails extends MasterDetailsBlock { // implements Listener {
     AbstractHeaderPage.createExpandOrCollapseAllMenu(toolkit, section, sectionToolbarComposite,
             aeConfigViewer, false);
 
-//    ImageHyperlink info = new ImageHyperlink(sectionToolbarComposite, SWT.NULL);
-//    toolkit.adapt(info, true, true);
-//    info.setImage(ImageLoader.getInstance().getImage(ImageLoader.ICON_UI_IDE_FILTER));
-//    info.setToolTipText("Filters");
-//    // info.setBackground(section.getTitleBarGradientBackground());
-//    info.addHyperlinkListener(new HyperlinkAdapter() {
-//      public void linkActivated(HyperlinkEvent e) {
-//        String[] ids = new String[0];
-//        FilterDialog dialog = new FilterDialog(aeConfigViewer.getControl().getShell(), ids);
-//        if (dialog.open() == Window.OK) {
-//
-//        }
-//
-//      }
-//    });
-
     ///////////////////////////////////////////////////////////////////////////
 
     HoverManager hover = new HoverManager(aeConfigViewer, getPresenterControlCreator("commandId"));
@@ -343,15 +280,12 @@ public class MasterDetails extends MasterDetailsBlock { // implements Listener {
     }
 
     return section;
-  } // createDelegatesConfigSection
+  } // createAEConfigSection
 
   private IInformationControlCreator getPresenterControlCreator(final String commandId) {
     return new IInformationControlCreator() {
       public IInformationControl createInformationControl(Shell parent) {
-        int shellStyle = SWT.RESIZE;
-        int treeStyle = SWT.V_SCROLL | SWT.H_SCROLL;
         return new DDEInformationControl(parent, SWT.TOOL | SWT.NO_TRIM, 0);
-        // DefaultInformationControl(parent, null);
       }
     };
   }
@@ -422,57 +356,4 @@ public class MasterDetails extends MasterDetailsBlock { // implements Listener {
     aeConfigViewer.setSelection(aeConfigViewer.getSelection());
   }
 
-//  public void handleEvent(Event event) {
-//    if (event.type == SWT.MouseHover) {
-//      handleHover(event);
-//    }
-//  }
-/*
-  // From CDE
-  public void handleHover(Event event) {
-    Tree tree = aeConfigViewer.getTree();
-    // next getItem call requires that table have SWT.FULL_SELECTION Style
-    TreeItem item = tree.getItem(new Point(event.x, event.y));
-    if (null != item) {
-      Object o = item.getData();
-      if (null == o)
-        throw new InternalErrorCDE("invalid state");
-
-      if (o instanceof AEDeploymentMetaData) {
-        setToolTipText(tree, "AEDeploymentMetaData");
-      } else if (o instanceof FeatureDescription) {
-      }
-    } else
-      tree.setToolTipText("");
-  }
-
-  public static void setToolTipText(Control w, String text) {
-    if (null != text)
-      w.setToolTipText(parseToFitInToolTips(text));
-  }
-
-  // tool tips seem to require no blanks following /n on Windows.
-  protected static String parseToFitInToolTips(String text) {
-    if (null == text)
-      return "";
-    StringBuffer buffer = new StringBuffer();
-    final int MAGIC_LENGTH = 65;
-    StringTokenizer tokenizer = new StringTokenizer(text);
-    int lengthAccumulator = 0;
-    while (tokenizer.hasMoreTokens()) {
-      if (lengthAccumulator > 0) {
-        buffer.append(' ');
-      }
-      String nextToken = tokenizer.nextToken();
-      buffer.append(nextToken);
-      lengthAccumulator += (nextToken.length() + 1);
-      if (lengthAccumulator > MAGIC_LENGTH && tokenizer.hasMoreTokens()) {
-        // this is to avoid a final blank line
-        buffer.append("\n"); //$NON-NLS-1$
-        lengthAccumulator = 0;
-      }
-    }
-    return new String(buffer);
-  }
-*/
 }

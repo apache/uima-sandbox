@@ -35,7 +35,13 @@ public class Messages extends NLS {
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
   }
 
+  // Pop-up Menu
+  static public String DDE_POPUP_ACTION_OPEN_IN_NEW_WINDOW;
+  static public String DDE_POPUP_ACTION_NOT_IN_WORKSPACE;  
+  
   // Overview Page
+  static public String DDE_OverviewPage_Title;
+  
   static public String DDE_OverviewPage_General_Section_Title;
 
   static public String DDE_OverviewPage_General_Section_Description;
@@ -43,6 +49,15 @@ public class Messages extends NLS {
   static public String DDE_OverviewPage_Service_Section_Title;
 
   static public String DDE_OverviewPage_Service_Section_Description;
+  
+  // Wizard for Adding/Editing Environment Variable
+  static public String DDE_EnvVariable_Wizard_Window_Title;
+  static public String DDE_EnvVariable_Wizard_ADD_Title;
+  static public String DDE_EnvVariable_Wizard_ADD_Description;
+  static public String DDE_EnvVariable_Wizard_EDIT_Title;
+  static public String DDE_EnvVariable_Wizard_EDIT_Description;
+  static public String DDE_EnvVariable_Table_NAME;
+  static public String DDE_EnvVariable_Table_VALUE;
 
   // AE Configurations Page
   static public String DDE_AEConfigPage_AEConfigTree_Section_Title;

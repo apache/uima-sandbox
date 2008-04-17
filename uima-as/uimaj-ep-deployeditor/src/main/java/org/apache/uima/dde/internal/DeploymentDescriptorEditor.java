@@ -21,7 +21,6 @@ package org.apache.uima.dde.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
@@ -29,7 +28,6 @@ import org.apache.uima.aae.deployment.AEDeploymentDescription;
 import org.apache.uima.aae.deployment.impl.AEDeploymentDescription_Impl;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.application.metadata.impl.UimaApplication_Impl;
-import org.apache.uima.application.util.UimaXmlParsingUtil;
 import org.apache.uima.dde.internal.page.AEConfigurationPage;
 import org.apache.uima.dde.internal.page.OverviewPage;
 import org.apache.uima.resource.ResourceSpecifier;
@@ -64,10 +62,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
 
 
-/**
- * 
- * 
- */
 public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEditorExtension {
 
   protected boolean isBadXML = true;
@@ -94,8 +88,6 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
 
   protected int sourceIndex = -1;
   
-  // private Color fadeColor; // used for disable table's items
-
   /** ********************************************************************** */
 
   public DeploymentDescriptorEditor() {
@@ -130,7 +122,7 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
     }
   }
 
-  protected void init(IEditorSite site, IEditorInput input) throws PartInitException {
+/*  protected void init(IEditorSite site, IEditorInput input) throws PartInitException {
     if (!(input instanceof IFileEditorInput)) {
       throw new PartInitException("Invalid Input: " + input.getClass().getName() + " (Must be IFileEditorInput)");
     }
@@ -144,8 +136,25 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
 
     try {
       aeDD = (AEDeploymentDescription) UimaXmlParsingUtil.parseUimaXmlDescriptor(filePathName);
-
       isBadXML = false;
+      ResourceSpecifier aed;
+      try {
+        aed = aeDD.getAeService()
+                    .resolveTopAnalysisEngineDescription(cde.createResourceManager(), false);
+        if (aed instanceof AnalysisEngineDescription
+                && ( ! ((AnalysisEngineDescription) aed).isPrimitive()) ) {
+          // if (aeDD.getAeService().getAnalysisEngineDeploymentMetaData().isAsync()) {
+          // Resolve delegates
+          aeDD.getAeService().getAnalysisEngineDeploymentMetaData()
+                                .resolveDelegates(cde.createResourceManager(), true);
+        }
+      } catch (InvalidXMLException e) {
+        e.printStackTrace();
+        isBadXML = true;
+        Utility.popMessage(Messages.getString("InvalidXMLException"), //$NON-NLS-1$
+                cde.getMessagesToRootCause(e), MessageDialog.ERROR);
+      }
+
     } catch (InvalidXMLException e) {
       Utility.popMessage(
               Messages.getString("MultiPageEditor.XMLerrorInDescriptorTitle"), //$NON-NLS-1$
@@ -157,7 +166,7 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
               cde.getMessagesToRootCause(e), MessageDialog.ERROR);
     }
   } // init
-  
+*/  
   public void setFileDirty() {
     cde.setFileDirty();
   }
@@ -175,14 +184,6 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
     aeConfigPage.setInput(aeDD);
   }
   
-  // From CDE
-//  public Color getFadeColor() {
-//    if (null == fadeColor)
-//      // COLOR_WIDGET_DARK_SHADOW is the same as black on SUSE KDE
-//      fadeColor = getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
-//    return fadeColor;
-//  }
-
   /** ********************************************************************** */
 
   /*
@@ -193,12 +194,7 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
   public void addPagesForCurrentEditor() {
     try {
 
-      if (!isBadXML) {
-        cde.addPage(overviewPage = new OverviewPage(this, "123", "Overview"));
-        cde.addPage(aeConfigPage = new AEConfigurationPage(this, "123", "Deployment Configurations"));
-      }
-      createSourcePage();
-      
+      // Resolve "import" (and Delegates if any);
       if (aeDD != null) {
         ResourceSpecifier aed;
         try {
@@ -217,8 +213,14 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
           Utility.popMessage(Messages.getString("InvalidXMLException"), //$NON-NLS-1$
                   cde.getMessagesToRootCause(e), MessageDialog.ERROR);
         }
-        // return;
       }
+      
+      if (!isBadXML) {
+        cde.addPage(overviewPage = new OverviewPage(this, "123", "Overview"));
+        cde.addPage(aeConfigPage = new AEConfigurationPage(this, "123", "Deployment Configurations"));
+      }
+      createSourcePage();
+            
     } catch (PartInitException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -251,9 +253,9 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
     return ((AEDeploymentDescription_Impl) aeDD).prettyPrint(MultiPageEditorContributor.getXMLindent());
   }
 
-  boolean inside = false;
+//  boolean inside = false;
   boolean isPageChangeRecursion = false;
-  public void pageChangeForCurrentEditor_OLD(int newPageIndex) {
+/*  public void pageChangeForCurrentEditor_OLD(int newPageIndex) {
     if (inside) {
       return;
     }
@@ -281,7 +283,7 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
     }
     cde.pageChangeSuper(newPageIndex);
   }
-
+*/
   public void pageChangeForCurrentEditor(int newPageIndex) {
     if (/*inside ||*/ isPageChangeRecursion) {
       return;
@@ -339,13 +341,6 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
 
   
   public void updateSourceFromModel() {
-//    XMLEditor sourceEd;
-//    if (sourceTextEditor == null) {
-//      sourceEd = cde.getSourceEditor ();
-//      sourceTextEditor = sourceEd;
-//    } else {
-//      sourceEd = sourceTextEditor;
-//    }
     sourceTextEditor.setIgnoreTextEvent(true);
     IDocument doc = sourceTextEditor.getDocumentProvider().getDocument(
             sourceTextEditor.getEditorInput());
