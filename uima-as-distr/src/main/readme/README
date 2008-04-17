@@ -1,12 +1,7 @@
      Apache UIMA Asynchronous Scaleout (UIMA-AS) Version 2.2.2 README
      ----------------------------------------------------------------
 
-*****************************************************************************
-* This is an alpha release of UIMA-AS.
-*****************************************************************************
-
-0. 
-    Changes in the 2.2.2 release
+0. Changes in the 2.2.2 release
   - Development has been moved to Apache, in the Apache UIMA incubator project
   - Package names are changed to org.apache.uima...
   - Name has been changed to Apache UIMA Asynchronous Scaleout (Apache UIMA-AS)
@@ -138,7 +133,7 @@ a. Create a Deployment Descriptor.
 
 b. Run the command:
 
-     deployAsyncService.sh/cmd testDD.xml
+     deployAsyncService.sh/cmd [testDD.xml]
 
   The argument to the command is the deployment descriptor you created in step (a).
 
@@ -166,7 +161,8 @@ To test a remote UIMA service you can use the script:
     -o  Specifies an Output Directory.  All CASes received by the client's
         CallbackListener will be serialized to XMI in the specified OutputDir.
         If omitted, no XMI files will be output.
-
+        
+  The full set of arguments are documented if you type the command with no arguments.
 
 3.4 Quick Test of an async service
 
@@ -174,7 +170,7 @@ Start two terminal windows, each with an environments setup as described in sect
 
   * In the first terminal window start the broker (as described in section 3.1),
     by running the commands:
-      cd $UIMA_HOME
+      cd some-writable-directory     
       startBroker.sh/bat
 
   * In the second terminal window, deploy a sample service and send it some CASes:
@@ -225,8 +221,9 @@ deleted when the client aggregate or application terminates.
 A more complicated approach is for the client to use an HTTP connector. In this case
 UIMA AS always creates reply queues on the service's broker.
 
-Note: There are bugs in the ActiveMQ HTTP connector associated with CASes larger than 64KB
-      and with doublebyte characters. However, the ActiveMQ jars distributed with UIMA AS
+Note: There are bugs in the standard ActiveMQ HTTP connector core librarys (which we have
+      patched) associated with CASes larger than 64KB
+      and with doublebyte characters. The ActiveMQ jars distributed with UIMA AS
       include the bug fixes described in http://issues.apache.org/activemq/browse/AMQ-1308
       
 3.7 Monitoring a broker and its queues
@@ -244,13 +241,14 @@ the name of the broker's machine.  For more details see http://activemq.apache.o
 
 Migrating a collection processing engine from the CPM to UIMA-AS is straightforward.
 
-First, create a UIMA aggreate that includes all the components specified in the CPE descriptor. 
+First, migrate the CPE descriptor to a standard UIMA aggregate descriptor:  
+create a UIMA aggregate that includes all the components specified in the CPE descriptor. 
 Transfer any parameter overrides in the CPE descriptor to the aggregate descriptor.
 Note that the aggreate descriptor must set <multipleDeploymentAllowed> to false 
 to be consistent with collection reader and CAS consumer delegates.
 
-Second, test the aggregate descriptor by instantiating the aggregate and sending it a single CAS.
-The contents of the CAS are not important; it's purpose is to start the collection reader delegate
+Second, test this aggregate descriptor by instantiating the aggregate and sending it a single CAS.
+The contents of the CAS are not important; its purpose is to start the collection reader delegate
 which will then create the actual CASes to be processed by the other aggregate components.
 The CAS Visual Debugger, CVD, is a useful tool for doing this test.
 
@@ -258,15 +256,18 @@ Next, create a UIMA-AS deployment descriptor that specifies desired scaleout and
 Vinci services are still supported, although it is recommended to replace them with UIMA-AS
 services to enable more efficient load balancing and greater scaleout capability.
 
-An example of CPM migration is embodied by the sample descriptors:
-  $UIMA_HOME/examples/deploy/as/MeetingFinderAggregate.xml
-  $UIMA_HOME/examples/deploy/as/Deploy_MeetingFinder.xml
+An example of this kind of migration is embodied by the sample descriptors:
+  Original:  
+     $UIMA_HOME/examples/descriptors/collection_processing_engine/MeetingFinderCPE_Integrated.xml
+  Migrated:
+     $UIMA_HOME/examples/deploy/as/MeetingFinderAggregate.xml
+     $UIMA_HOME/examples/deploy/as/Deploy_MeetingFinder.xml
 
 
 5. Known problems/limitations with Release 2.2.2
 
-  1. Only one remote CAS multiplier per aggregate is supported.
-  2. Jira issues UIMA-844, UIMA-845, UIMA-874, UIMA-914
+   Only one remote CAS multiplier per aggregate is supported.
+
 
 Disclaimer
 -----------
