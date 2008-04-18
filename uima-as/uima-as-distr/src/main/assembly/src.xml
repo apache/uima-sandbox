@@ -110,7 +110,8 @@ under the License.
         <exclude>build_overview_and_setup.xml</exclude>    
         <exclude>build_references.xml</exclude>    
         <exclude>build_tutorials_and_users_guildes.xml</exclude>    
-        <exclude>build_all_books.xml</exclude>    
+        <exclude>build_all_books.xml</exclude>
+        <exclude>README.USER.txt</exclude>  <!-- remove, because it has misleading info in this context -->    
       </excludes>
     </fileSet>
     <!-- update site not part of the source distribution.  This is 
