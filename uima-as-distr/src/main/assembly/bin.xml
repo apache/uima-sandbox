@@ -321,7 +321,11 @@ under the License.
     <fileSet>
       <directory>src/main/examples</directory>
       <outputDirectory>examples</outputDirectory>
-    </fileSet> 
+    </fileSet>
+    <fileSet>
+      <directory>../uimaj-as-activemq/src/main/java/org/apache/uima/examples/as</directory>
+      <outputDirectory>examples/src/java/org/apache/uima/examples/as</outputDirectory>
+    </fileSet>
     
     <!-- activemq -->
     <fileSet>
