@@ -20,13 +20,10 @@
 package org.apache.uima.aae.controller;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.apache.uima.resource.ManagementObject;
 /**
  * Defines the JMX management interface for the C++ service.
- * @author bsiyer
- *
  */
 public interface UimacppServiceManagementMBean extends ManagementObject, 
 											java.io.Serializable {
