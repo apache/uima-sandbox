@@ -53,8 +53,6 @@ import org.apache.uima.util.Level;
  * the C++ service to the UIMA framework logger and to allow the proxy to send
  * JMX and administrative requests such as shutdown.
  * 
- * @author bsiyer
- * 
  */
 public class UimacppServiceController implements ControllerLifecycle {
   protected ServerSocket server;
@@ -855,8 +853,6 @@ class LoggerHandler implements Runnable {
 
 /**
  * accept socket connection from C++ service.
- * @author bsiyer
- *
  */
 class ConnectionHandler implements Runnable {
   UimacppServiceController controller;
