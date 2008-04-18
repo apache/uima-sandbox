@@ -617,9 +617,10 @@ public class OverviewPage extends AbstractHeaderPage {
     topComposite.setLayoutData(gd); 
 
     // <deployment protocol="jms" provider="activemq">
+    // Note: Need to add SWT.BORDER style to make the border VISIBLE in Linux
     brokerUrlDecoField = FormSection2.createLabelAndDecoratedText(toolkit, topComposite, 
             "Broker URL for input queue:", 
-            aeService.getBrokerURL(), SWT.WRAP, 10, 0);
+            aeService.getBrokerURL(), SWT.WRAP | SWT.BORDER, 10, 0);
     
     // Create an error decoration
     decorationBrokerUrl = FormSection2.registerFieldDecoration("brokerUrl",
@@ -630,8 +631,9 @@ public class OverviewPage extends AbstractHeaderPage {
     brokerUrl.setToolTipText("Enter the URL for the input queue");
     brokerUrl.addModifyListener(fModifyListener);    
 
+    // Note: Need to add SWT.BORDER style to make the border VISIBLE in Linux
     endPointDecoField = FormSection2.createLabelAndDecoratedText(toolkit, topComposite, 
-            "Name for input queue:", aeService.getEndPoint(), SWT.WRAP, 10, 0);
+            "Name for input queue:", aeService.getEndPoint(), SWT.WRAP | SWT.BORDER, 10, 0);
     endPoint = (Text) endPointDecoField.getControl();
     endPoint.setToolTipText("Enter the name for the input queue");
     endPoint.addModifyListener(fModifyListener);

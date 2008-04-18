@@ -64,6 +64,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -373,7 +374,8 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     compositeRemoteSetting = toolkit.createComposite(stackLayoutComposite, SWT.NONE);
     gl = new GridLayout(2, false);
-    gl.marginWidth = 0;
+    gl.marginWidth = 2;
+    gl.marginHeight = 2;
     compositeRemoteSetting.setLayout(gl);
     gd = new GridData(GridData.FILL_BOTH);
     compositeRemoteSetting.setLayoutData(gd);
@@ -416,22 +418,29 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     // /////////////////////////////////////////////////////////////////////
 
+    // Note: Need to add SWT.BORDER style to make the border VISIBLE in Linux
     brokerUrlDecoField = FormSection2.createLabelAndDecoratedText(toolkit, 
             compositeRemoteSetting, "Broker URL for remote service:", 
             currentMetaDataObject == null ?
-                    "":((RemoteAEDeploymentMetaData) currentMetaDataObject).getInputQueue().getBrokerURL(), SWT.WRAP, 10, 0);
+                    "":((RemoteAEDeploymentMetaData) currentMetaDataObject).getInputQueue().getBrokerURL(), 
+                    SWT.WRAP | SWT.BORDER, 10, 0);
     
     // Create an error decoration
     decorationBrokerUrl = FormSection2.registerFieldDecoration("brokerUrl2",
                   "The broker URL cannot be empty");
     brokerUrlDecoField.addFieldDecoration(decorationBrokerUrl, SWT.LEFT | SWT.TOP, false);    
     brokerUrl = (Text) brokerUrlDecoField.getControl();
+    FormData fd = (FormData) brokerUrl.getLayoutData();
+    fd.top.offset += 2; // make border visible in Linux
+    fd.left.offset += 2;   // make border visible in Linux
     brokerUrl.addModifyListener(fModifyListener);  
 
+    // Note: Need to add SWT.BORDER style to make the border VISIBLE in Linux
     endPointDecoField = FormSection2.createLabelAndDecoratedText(toolkit, 
             compositeRemoteSetting, "Queue name for remote service:", 
             currentMetaDataObject == null ?
-                    "":((RemoteAEDeploymentMetaData) currentMetaDataObject).getInputQueue().getEndPoint(), SWT.WRAP, 10, 0);
+                    "":((RemoteAEDeploymentMetaData) currentMetaDataObject).getInputQueue().getEndPoint(), 
+                    SWT.WRAP | SWT.BORDER, 10, 0);
     endPoint = (Text) endPointDecoField.getControl();
     endPoint.addModifyListener(fModifyListener);
     decorationEndPoint =
