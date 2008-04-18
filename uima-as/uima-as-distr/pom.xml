@@ -488,7 +488,7 @@
                 <!-- Build documentation for base UIMA tool book - 
                      needed by CVD -->
                 <ant dir="../uima-docbooks" 
-                     target="build_tools.xml" inheritAll="false"/>
+                     antfile="../uima-docbooks/build_tools.xml" inheritAll="false"/>
                 <!-- build eclipse update site 
                      Deleted from here, moved to a "deploy" step -->
                   
