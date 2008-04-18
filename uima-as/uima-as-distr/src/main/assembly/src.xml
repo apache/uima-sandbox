@@ -87,6 +87,32 @@ under the License.
         <include>README.FIRST</include>
       </includes>
     </fileSet>
+    <!-- include part of the base docbook - need to build the
+         tools documentation to produce the help files
+         needed by the CVD tool -->
+    <fileSet>
+      <directory>../uima-docbooks</directory>
+      <outputDirectory>/uima-docbooks</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <!-- Directories does not exist -->
+        <!-- <exclude>docbook/**</exclude>  -->
+        <!-- <exclude>lib/**</exclude> -->
+        <!-- <exclude>Source_UIMA_SDK_Guide_Ref/**</exclude> -->
+        <exclude>.*</exclude>   
+        <exclude>LICENSE.txt</exclude>
+        <exclude>src/styles/titlepage/*.xsl</exclude>
+        <!-- exclude books not needed by uima-as -->
+        <exclude>src/docbook/overview_and_setup/**</exclude>     
+        <exclude>src/docbook/references/**</exclude>     
+        <exclude>src/docbook/tutorials_and_users_guildes/**</exclude>
+        <!-- exclude builders that reference non-existent parts -->
+        <exclude>build_overview_and_setup.xml</exclude>    
+        <exclude>build_references.xml</exclude>    
+        <exclude>build_tutorials_and_users_guildes.xml</exclude>    
+        <exclude>build_all_books.xml</exclude>    
+      </excludes>
+    </fileSet>
     <!-- update site not part of the source distribution.  This is 
          something built after the release vote, as part of deployment -->
     <!--fileSet>
