@@ -25,9 +25,9 @@
   <artifactId>SandboxAnnotatorPackage</artifactId>
   <packaging>pom</packaging>
   <version>2.2.2-incubating</version>
-  <name>Apache UIMA Java SDK Add-Ons</name>
+  <name>Apache UIMA Sandbox Annotator Add-Ons</name>
   <url>http://incubator.apache.org/uima</url>
-  <description>Components and tooling for the UIMA SDK</description>
+  <description>Annotator components for the UIMA SDK</description>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
