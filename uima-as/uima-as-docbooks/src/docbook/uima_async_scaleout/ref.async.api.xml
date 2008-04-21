@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY sisterProject "../../../../uima-docbooks/src/docbook/">
 <!ENTITY imgroot "../images/uima_async_scaleout/async.overview/" >
-<!ENTITY % uimaents SYSTEM "../../../../uima-docbooks/src/docbook/entities.ent" >
+<!ENTITY % uimaents SYSTEM "../entities.ent" >
   %uimaents;
   ]>
 <!--
