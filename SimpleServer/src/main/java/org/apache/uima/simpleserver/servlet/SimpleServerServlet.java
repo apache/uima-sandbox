@@ -411,9 +411,9 @@ public class SimpleServerServlet extends HttpServlet {
         + "<textarea name=\"text\" rows=\"25\" cols=\"80\"></textarea><br/>"
         + "Enter language(optional):<br/>" + "<input type=\"text\" name=\"lang\" /><br/>"
         + "Display result as<br/>"
-        + "<input type=\"radio\" name=\"mode\" value=\"xml\"/> XML document <br/>"
+        + "<input type=\"radio\" name=\"mode\" value=\"xml\" checked=\"checked\"/> XML document <br/>"
         + "<input type=\"radio\" name=\"mode\" value=\"inline\"/> inline XML <br/>"
-        + "<input type=\"radio\" name=\"mode\" value=\"csv\"/> CSV <br/>" + "" + "" + "" + "" + ""
+        + "" + "" + "" + "" + ""
         + "" + "" + "" + "<input type=\"submit\">" + "</form>" + "</body>" + "</html>";
     return str;
   }
