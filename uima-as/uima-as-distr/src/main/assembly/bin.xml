@@ -247,9 +247,6 @@ under the License.
            a bug. -->
       <outputDirectory></outputDirectory>
     </fileSet>
-    <fileSet>
-      <directory>/src/main/readme_src</directory>
-    </fileSet>
     
     <fileSet>
       <directory>target/site/apidocs</directory>
