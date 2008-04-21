@@ -41,11 +41,11 @@ echo  example tag uima-as-2.2.2 01
 @set tagURL=https://svn.apache.org/repos/asf/incubator/uima/sandbox/%svnloc%
 @set commitMsg=Create Tag for UIMA-AS
 
-svn copy --dry-run %asURL%/uima-as             %tagURL%                    -m "%commitMsg%"
-svn copy --dry-run %baseURL%/uimaj             %tagURL%/uimaj              -m "%commitMsg%"
-svn copy --dry-run %baseURL%/uimaj-distr       %tagURL%/uimaj-distr        -m "%commitMsg%"
-svn copy --dry-run %baseURL%/uimaj-examples    %tagURL%/uimaj-examples     -m "%commitMsg%"
-svn copy --dry-run %baseURL%/uima-docbooks     %tagURL%/uima-docbooks      -m "%commitMsg%"
-svn copy --dry-run %baseURL%/uima-docbook-tool %tagURL%/uima-docbook-tool  -m "%commitMsg%"
+svn copy  %asURL%/uima-as             %tagURL%                    -m "%commitMsg%"
+svn copy  %baseURL%/uimaj             %tagURL%/uimaj              -m "%commitMsg%"
+svn copy  %baseURL%/uimaj-distr       %tagURL%/uimaj-distr        -m "%commitMsg%"
+svn copy  %baseURL%/uimaj-examples    %tagURL%/uimaj-examples     -m "%commitMsg%"
+svn copy  %baseURL%/uima-docbooks     %tagURL%/uima-docbooks      -m "%commitMsg%"
+svn copy  %baseURL%/uima-docbook-tool %tagURL%/uima-docbook-tool  -m "%commitMsg%"
 
 @:exit
