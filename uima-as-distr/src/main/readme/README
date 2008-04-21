@@ -266,9 +266,11 @@ An example of this kind of migration is embodied by the sample descriptors:
 
 5. Known problems/limitations with Release 2.2.2
 
-  1. Only one remote CAS multiplier per aggregate is supported.
+  1. Remote CAS multiplier support is limited to a single, AS Primitive service.
   2. No automatic refresh for broken connections with temp reply queues.
-  3. Vinci service descriptors used in UIMA-AS must be wrapped in a synchronous aggregate.
+
+For up-to-date information on UIMA-AS issues, see 
+http://issues.apache.org/jira/secure/BrowseProject.jspa?id=12310570
 
 
 Disclaimer
