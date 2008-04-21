@@ -361,7 +361,8 @@
 			</para>
 			<para> 
 <programlisting><emphasis><![CDATA[<rule ruleId="ID1" regEx="TestRegex" matchStrategy="matchAll" 
-    matchType="uima.tcas.DocumentAnnotation" featurePath="my/feature/path" confidence="1.0">
+    matchType="uima.tcas.DocumentAnnotation" featurePath="my/feature/path" 
+    confidence="1.0">
 
   <matchTypeFilter>
     <feature name="language">en</feature>
@@ -824,9 +825,11 @@ public class SampleValidator implements
 	org.apache.uima.annotator.regex.extension.Validation {
 
    /* (non-Javadoc)
-    * @see org.apache.uima.annotator.regex.extension.Validation#validate(java.lang.String, java.lang.String)
+    * @see org.apache.uima.annotator.regex.extension.Validation
+    *      #validate(java.lang.String, java.lang.String)
     */
-   public boolean validate(String coveredText, String ruleID) throws Exception {
+   public boolean validate(String coveredText, String ruleID) 
+      throws Exception {
       
       //implement your custom validation, e.g. to validate ISBN numbers
       return validateISBNNumbers(coveredText);
@@ -1424,19 +1427,23 @@ package org.apache.uima.annotator.regex.extension;
 public interface Validation {
 	
 /**
- * The validate method validates the covered text of an annotator and returns true or
- * false whether the annotation is correct or not. The validate method is called between
- * a rule match and the annotation creation. The annotation is only created if the method
+ * The validate method validates the covered text of an annotator and 
+ * returns true or false whether the annotation is correct or not. 
+ * The validate method is called between a rule match and the 
+ * annotation creation. The annotation is only created if the method
  * returns true. 
  * 
- * @param coveredText covered text of the annotation that should be validated
+ * @param coveredText covered text of the annotation that should be 
+ *        validated 
  * @param ruleID ruleID of the rule which created the match
  * 
- * @return true if the annotation is valid or false if the annotation is invalid
+ * @return true if the annotation is valid or false if the annotation 
+ *         is invalid
  * 
  * @throws Exception throws an exception if an validation error occurred
  */
-public boolean validate(String coveredText, String ruleID) throws Exception;
+public boolean validate(String coveredText, String ruleID) 
+   throws Exception;
 
 }]]></programlisting>
 	</para>
@@ -1472,8 +1479,8 @@ package org.apache.uima.annotator.regex.extension;
 public interface Normalization {
 	
 /**
- * Custom feature value normalization. This interface must be implemented to 
- * perform a custom normalization on the given input string.
+ * Custom feature value normalization. This interface must be implemented 
+ * to perform a custom normalization on the given input string.
  * 
  * @param input input string which should be normalized
  *
