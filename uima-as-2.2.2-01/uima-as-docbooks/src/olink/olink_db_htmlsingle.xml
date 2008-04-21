@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE targetset SYSTEM "http://docbook.sourceforge.net/release/xsl/current/common/targetdatabase.dtd" [
+<!ENTITY % uimaents SYSTEM "../../../uima-docbook-tool/styles/uima-style/common/entities.ent" >  
+%uimaents;
+<!ENTITY otarget_overview SYSTEM "../../../uima-docbooks/src/olink/overview_and_setup/htmlsingle-target.db">
+<!ENTITY otarget_tug      SYSTEM "../../../uima-docbooks/src/olink/tutorials_and_users_guides/htmlsingle-target.db">
+<!ENTITY otarget_refs     SYSTEM "../../../uima-docbooks/src/olink/references/htmlsingle-target.db">
+<!ENTITY otarget_tools    SYSTEM "../../../uima-docbooks/src/olink/tools/htmlsingle-target.db">
+<!ENTITY otarget_async    SYSTEM "uima_async_scaleout/pdf-target.db">  
+]>
+<targetset>
+  <targetsetinfo>UIMA books olinks</targetsetinfo>
+  
+  <!-- Site map for generating relative paths between documents -->
+  <sitemap>
+    <dir name="target">
+      <dir name="overview_and_setup">
+        <document targetdoc="&uima_docs_overview;"
+                  baseuri="overview_and_setup.html">
+          &otarget_overview;
+        </document>
+      </dir>
+      <dir name="tutorials_and_users_guides">
+        <document targetdoc="&uima_docs_tutorial_guides;"
+                  baseuri="tutorials_and_users_guides.html">
+          &otarget_tug;
+        </document>
+      </dir>
+      <dir name="tools">
+        <document targetdoc="&uima_docs_tools;"
+                  baseuri="tools.html">
+          &otarget_tools;
+        </document>
+      </dir>
+      <dir name="references">
+        <document targetdoc="&uima_docs_ref;"
+                  baseuri="references.html">
+          &otarget_refs;
+        </document>
+      </dir> 
+      <dir name="uima_async_scaleout">
+        <document targetdoc="uima_async_scaleout"
+                  baseuri="uima_async_scaleout.html">
+          &otarget_async;
+        </document>
+      </dir>
+ 
+    </dir>  
+  </sitemap>
+</targetset>
