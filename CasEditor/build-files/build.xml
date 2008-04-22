@@ -45,7 +45,7 @@
 	<fail message="Unable to find equinox." 
 		unless="equinox" />
 	
-	<fileset dir="../../uimaj-ep-runtime/" includes="target/org.apache.uima.runtime_2.3.2.incubating.jar" id="uima.plugin.path" />
+	<fileset dir="../../" includes="uimaj-ep-runtime/target/org.apache.uima.runtime_2.2.2.incubating.jar" id="uima.plugin.path" />
 	<pathconvert property="uimaj-ep-runtime" refid="uima.plugin.path" setonempty="false" />
 	
 	<target name="copyRuntimePlugin" if="uimaj-ep-runtime">
