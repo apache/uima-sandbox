@@ -34,6 +34,10 @@
       <param-value>resources/WhitespaceTokenizer.pear</param-value>
     </init-param>
     <init-param>
+      <param-name>PearInstallPath</param-name> <!-- optional -->
+      <param-value>./</param-value> <!-- relative path names are evaluated relative to the PEAR file location -->
+    </init-param>
+    <init-param>
       <param-name>ResultSpecFile</param-name>
       <param-value>resources/WhitespaceTokenizer.xml</param-value>
     </init-param>

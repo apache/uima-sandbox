@@ -94,34 +94,36 @@ public class SimpleServerServlet extends HttpServlet {
   // this method can be overridden for non-standard parameter sets
   protected void declareServletParameters() {
     this.servletGETParameters.put(MODE_PARAMETER, "This parameter should define, what"
-        + " the servlet should return. Some options are available.");
+            + " the servlet should return. Some options are available.");
     Map<String, String> options = new HashMap<String, String>();
     this.servletGETParamOptions.put(MODE_PARAMETER, options);
     options.put("description", "will return a description of a service "
-        + "in  HTML (human-readable) format. This description is"
-        + " partially automatically generated, and partially created "
-        + "by the author of this service.");
+            + "in  HTML (human-readable) format. This description is"
+            + " partially automatically generated, and partially created "
+            + "by the author of this service.");
     options.put("xsd", "will return a XSD schema definition of the text " + "analysis results");
     options.put("form", "will show a form with input fields, which will "
-        + "allow you to try out this service");
+            + "allow you to try out this service");
     options.put("xmldesc", "will show a specification of this service in XML " + "format");
 
     this.servletPOSTParameters.put("text", "the value of this parameter is the "
-        + "text to analyze. Expected encoding is UTF-8. This " + "parameter must always be set.");
+            + "text to analyze. Expected encoding is UTF-8. This "
+            + "parameter must always be set.");
 
     this.servletPOSTParameters.put(MODE_PARAMETER, "This parameter should define, what"
-        + " view of the analyss result the servlet should return. "
-        + "If this parameter is not set, XML output will be produced.");
+            + " view of the analyss result the servlet should return. "
+            + "If this parameter is not set, XML output will be produced.");
     options = new HashMap<String, String>();
     options.put("xml", "means to output the result as a XML-document "
-        + "containing a list of found entities");
+            + "containing a list of found entities");
     options.put("inline", "returns inline-xml containing the analyzed "
-        + "text in which all found entities are represented by tags");
+            + "text in which all found entities are represented by tags");
     options.put("csv", "returns the found entities in a comma-separated list");
     this.servletPOSTParamOptions.put(MODE_PARAMETER, options);
 
     this.servletPOSTParameters.put("lang", "This parameter sets the language "
-        + "of the text. If this parameter is not set, the value" + "&quot;en&quot; will be used");
+            + "of the text. If this parameter is not set, the value"
+            + "&quot;en&quot; will be used");
 
   }
 
@@ -132,8 +134,8 @@ public class SimpleServerServlet extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     if (!this.initializationSuccessful) {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "The service is currently unavailable due to internal errors."
-              + "\nPlease contact the service provider.");
+              "The service is currently unavailable due to internal errors."
+                      + "\nPlease contact the service provider.");
       return;
     }
     response.setCharacterEncoding(DEFAULT_CODE_PAGE);
@@ -168,7 +170,7 @@ public class SimpleServerServlet extends HttpServlet {
     } catch (IOException e) {
       getLogger().log(Level.SEVERE, "An error occured processing this request", e);
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "An internal error occured, this service has not been properly initialized.");
+              "An internal error occured, this service has not been properly initialized.");
     }
   }
 
@@ -177,7 +179,7 @@ public class SimpleServerServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
+          throws IOException {
     analyze(request, response);
   }
 
@@ -185,7 +187,7 @@ public class SimpleServerServlet extends HttpServlet {
    * handles requests that send some text to be analyzed
    */
   protected void analyze(HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
+          throws IOException {
     System.out.println(this.getClass().getName() + ": POST request received: " + new Date());
     request.setCharacterEncoding(DEFAULT_CODE_PAGE);
     response.setCharacterEncoding(DEFAULT_CODE_PAGE);
@@ -215,7 +217,7 @@ public class SimpleServerServlet extends HttpServlet {
     }
     super.init();
     System.out.println("Servlet " + this.getClass().getCanonicalName()
-        + " -- initialisation begins");
+            + " -- initialisation begins");
     this.baseWebappDirectory = new File(getServletContext().getRealPath(""));
     // File xsdFile = new File(baseWebappDirectory.getAbsoluteFile()
     // + "/schema/ResultSpecification.xsd");
@@ -247,6 +249,7 @@ public class SimpleServerServlet extends HttpServlet {
     }
     String pearPath = getInitParameter("PearPath");
     String descriptorPath = getInitParameter("DescriptorPath");
+    String pearInstallPath = getInitParameter("PearInstallPath");
 
     try {
       if (pearPath == null) {
@@ -254,7 +257,19 @@ public class SimpleServerServlet extends HttpServlet {
         this.server.configureAnalysisEngine(descriptor, resultSpec);
       } else if (descriptorPath == null) {
         File pear = new File(this.baseWebappDirectory.getAbsoluteFile(), pearPath);
-        this.server.configurePear(pear, pear.getParentFile(), resultSpec);
+        // set default pear install directory
+        File pearInstallDir = pear.getParentFile();
+        // check if a special install directory is specified
+        if (pearInstallPath != null) {
+          // check if a relative path is set, relative path names are
+          // evaluated relative to the PEAR file.
+          if (pearInstallPath.startsWith(".")) {
+            pearInstallDir = new File(pear.getParentFile(), pearInstallPath);
+          } else {
+            pearInstallDir = new File(pearInstallPath);
+          }
+        }
+        this.server.configurePear(pear, pearInstallDir, resultSpec);
       }
     } catch (Exception e) {
       getLogger().log(Level.SEVERE, "UIMA Simple Service configuaration failed", e);
@@ -290,48 +305,48 @@ public class SimpleServerServlet extends HttpServlet {
   public String constructHtmlDescription(String servletURL) {
     ServerSpec rspec = this.server.getServiceSpec();
     String html = "<html>" + "<head>" + "<title>"
-        + rspec.getShortDescription()
-        + "</title>"
-        + "</head>"
-        + "<body>"
-        + "<h2>"
-        + rspec.getShortDescription()
-        + "</h2>"
-        + rspec.getLongDescription()
-        + "<h3>Usage</h3>"
-        + "In order to use this service, a POST- or GET-request should be sent to the server with the following URL:"
-        + "<pre>"
-        + servletURL
-        + "</pre>"
-        + "<br/>"
-        + "The following request parameters are expected:"
-        + constructParameterDescription()
-        + "<h3>Result</h3>"
-        + "If XML or inline-XML output is requested, it will contain the tags listed below. "
-        + "The XSD-definition of the output in XML-format can be downloaded "
-        + "<a href=\""
-        + servletURL
-        + "?mode=xsd\">here</a>."
-        + constructResultDescription()
-        + ""
-        + (getCustomDescription().equals("") ? "" : "<h3>Additional description </h3> "
-            + getCustomDescription())
-        + ""
-        + "<h3>Example of usage</h3>"
-        + "<pre>"
-        + "String text = \"Hello Mr. John Smith !\"; \n"
-        + "String parameters = \"text=\" + URLEncoder.encode(text, \"UTF-8\") + \"&mode=inline\";\n"
-        + "URL url = new URL(\""
-        + servletURL
-        + "\"); \n"
-        + "URLConnection connection = url.openConnection(); \n"
-        + "connection.setDoOutput(true); \n"
-        + "OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream()); \n"
-        + "writer.write(parameters);\n"
-        + "writer.flush(); \n\n"
-        + "BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), \"UTF-8\")); \n"
-        + "String line; \n" + "while ((line = reader.readLine()) != null) { \n"
-        + "    System.out.println(line);\n" + "} \n" + "</pre>" + "<body>" + "</html>";
+            + rspec.getShortDescription()
+            + "</title>"
+            + "</head>"
+            + "<body>"
+            + "<h2>"
+            + rspec.getShortDescription()
+            + "</h2>"
+            + rspec.getLongDescription()
+            + "<h3>Usage</h3>"
+            + "In order to use this service, a POST- or GET-request should be sent to the server with the following URL:"
+            + "<pre>"
+            + servletURL
+            + "</pre>"
+            + "<br/>"
+            + "The following request parameters are expected:"
+            + constructParameterDescription()
+            + "<h3>Result</h3>"
+            + "If XML or inline-XML output is requested, it will contain the tags listed below. "
+            + "The XSD-definition of the output in XML-format can be downloaded "
+            + "<a href=\""
+            + servletURL
+            + "?mode=xsd\">here</a>."
+            + constructResultDescription()
+            + ""
+            + (getCustomDescription().equals("") ? "" : "<h3>Additional description </h3> "
+                    + getCustomDescription())
+            + ""
+            + "<h3>Example of usage</h3>"
+            + "<pre>"
+            + "String text = \"Hello Mr. John Smith !\"; \n"
+            + "String parameters = \"text=\" + URLEncoder.encode(text, \"UTF-8\") + \"&mode=inline\";\n"
+            + "URL url = new URL(\""
+            + servletURL
+            + "\"); \n"
+            + "URLConnection connection = url.openConnection(); \n"
+            + "connection.setDoOutput(true); \n"
+            + "OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream()); \n"
+            + "writer.write(parameters);\n"
+            + "writer.flush(); \n\n"
+            + "BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), \"UTF-8\")); \n"
+            + "String line; \n" + "while ((line = reader.readLine()) != null) { \n"
+            + "    System.out.println(line);\n" + "} \n" + "</pre>" + "<body>" + "</html>";
 
     return html;
   }
@@ -342,14 +357,14 @@ public class SimpleServerServlet extends HttpServlet {
     s += "<h3>POST-parameters</h3> POST request should be sent to use " + "the service";
     s += parameterDescription(this.servletPOSTParameters, this.servletPOSTParamOptions);
     s += "<h3>GET-parameters</h3> GET request should be sent to obtain "
-        + "information about the service";
+            + "information about the service";
     s += parameterDescription(this.servletGETParameters, this.servletGETParamOptions);
     return s;
   }
 
   // routine used in the previous method
   public String parameterDescription(Map<String, String> params,
-      Map<String, Map<String, String>> options) {
+          Map<String, Map<String, String>> options) {
     String s = "";
     s += "<ul>";
     for (String param : params.keySet()) {
@@ -404,17 +419,28 @@ public class SimpleServerServlet extends HttpServlet {
 
   // creates a HTML page with a form which allows to try out the service
   public String getHtmlForm(String serverUrl) {
-    String str = "<html>" + "<head>" + "<title>" + serverUrl + " tryout form " + "</title>"
-        + "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" >" + "</head>"
-        + "<body>" + "<h2>Tryout form of " + serverUrl + "</h2>"
-        + "<form method=\"post\"  action=\"" + serverUrl + "\">" + "Enter text: <br/>"
-        + "<textarea name=\"text\" rows=\"25\" cols=\"80\"></textarea><br/>"
-        + "Enter language(optional):<br/>" + "<input type=\"text\" name=\"lang\" /><br/>"
-        + "Display result as<br/>"
-        + "<input type=\"radio\" name=\"mode\" value=\"xml\" checked=\"checked\"/> XML document <br/>"
-        + "<input type=\"radio\" name=\"mode\" value=\"inline\"/> inline XML <br/>"
-        + "" + "" + "" + "" + ""
-        + "" + "" + "" + "<input type=\"submit\">" + "</form>" + "</body>" + "</html>";
+    String str = "<html>" + "<head>" + "<title>"
+            + serverUrl
+            + " tryout form "
+            + "</title>"
+            + "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" >"
+            + "</head>"
+            + "<body>"
+            + "<h2>Tryout form of "
+            + serverUrl
+            + "</h2>"
+            + "<form method=\"post\"  action=\""
+            + serverUrl
+            + "\">"
+            + "Enter text: <br/>"
+            + "<textarea name=\"text\" rows=\"25\" cols=\"80\"></textarea><br/>"
+            + "Enter language(optional):<br/>"
+            + "<input type=\"text\" name=\"lang\" /><br/>"
+            + "Display result as<br/>"
+            + "<input type=\"radio\" name=\"mode\" value=\"xml\" checked=\"checked\"/> XML document <br/>"
+            + "<input type=\"radio\" name=\"mode\" value=\"inline\"/> inline XML <br/>" + "" + ""
+            + "" + "" + "" + "" + "" + "" + "<input type=\"submit\">" + "</form>" + "</body>"
+            + "</html>";
     return str;
   }
 
