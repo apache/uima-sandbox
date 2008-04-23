@@ -257,18 +257,19 @@ public class SimpleServerServlet extends HttpServlet {
         this.server.configureAnalysisEngine(descriptor, resultSpec);
       } else if (descriptorPath == null) {
         File pear = new File(this.baseWebappDirectory.getAbsoluteFile(), pearPath);
-        // set default pear install directory
-        File pearInstallDir = pear.getParentFile();
+        // get default servlet working directory
+        File pearInstallDir = (File) this.getServletContext().getAttribute(
+                "javax.servlet.context.tempdir");
         // check if a special install directory is specified
         if (pearInstallPath != null) {
+          pearInstallDir = new File(pearInstallPath);
           // check if a relative path is set, relative path names are
-          // evaluated relative to the PEAR file.
-          if (pearInstallPath.startsWith(".")) {
+          // evaluated relative to the PEAR file location.
+          if (!pearInstallDir.isAbsolute()) {
             pearInstallDir = new File(pear.getParentFile(), pearInstallPath);
-          } else {
-            pearInstallDir = new File(pearInstallPath);
           }
         }
+        getLogger().log(Level.INFO, "Install PEAR file to: " + pearInstallDir.getAbsolutePath());
         this.server.configurePear(pear, pearInstallDir, resultSpec);
       }
     } catch (Exception e) {
