@@ -16,38 +16,43 @@ REM   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 REM   KIND, either express or implied.  See the License for the
 REM   specific language governing permissions and limitations
 REM   under the License.
+REM  The form %~1 (as opposed to %1) removes surrounding quotes
 
 @echo on
 
-REM  The form %~1 (as opposed to %1) removes surrounding quotes
-
 @if "%~1"=="" goto usage
-@if not "%3"=="" goto usage
-@set leveldir=%~1-%~2
-@set svnloc=tags/%~1/%leveldir%
+@if "%~4"=="" goto usage
+@if not "%5"=="" goto usage
 @goto execute
 
 @:usage
 @echo off
 echo Run this command in its directory to tag a uima-as release
 echo This will copy the HEAD in the repository for several projects
-echo Usage: tag level release-candidate
-echo  example tag uima-as-2.2.2 01
+REM the period following echo inserts a blank line
+echo.  
+echo Usage: tag level release-candidate  core-uima-tag-base core-uima-tag-release-candidate
+echo.
+echo  example tag 2.2.2 01 2.2.2 05
 @echo on
 @goto exit
 
 
 @:execute
-@set baseURL=https://svn.apache.org/repos/asf/incubator/uima/uimaj/trunk
-@set asURL=https://svn.apache.org/repos/asf/incubator/uima/sandbox/trunk
-@set tagURL=https://svn.apache.org/repos/asf/incubator/uima/sandbox/%svnloc%
-@set commitMsg=Create Tag for UIMA-AS release candidate %2
+@setlocal
+@set asLastDir=uima-as-%~1-%~2
+@set asSvnloc=tags/uima-as-%~1/%asLastDir%
 
-svn copy  %asURL%/uima-as             %tagURL%                    -m "%commitMsg%"
-svn copy  %baseURL%/uimaj             %tagURL%/uimaj              -m "%commitMsg%"
-svn copy  %baseURL%/uimaj-distr       %tagURL%/uimaj-distr        -m "%commitMsg%"
-svn copy  %baseURL%/uimaj-examples    %tagURL%/uimaj-examples     -m "%commitMsg%"
-svn copy  %baseURL%/uima-docbooks     %tagURL%/uima-docbooks      -m "%commitMsg%"
-svn copy  %baseURL%/uima-docbook-tool %tagURL%/uima-docbook-tool  -m "%commitMsg%"
+@set baseURL=https://svn.apache.org/repos/asf/incubator/uima/uimaj/tags/uimaj-%3/uimaj-%3-%4
+@set asURL=https://svn.apache.org/repos/asf/incubator/uima/sandbox/trunk
+@set tagURL=https://svn.apache.org/repos/asf/incubator/uima/sandbox/%asSvnloc%
+@set commitMsg=Create Tag for uima-as-%1-%2 release candidate based on uimaj-%3-%4
+
+svn copy %asURL%/uima-as             %tagURL%                    -m "%commitMsg%"
+svn copy %baseURL%/uimaj             %tagURL%/uimaj              -m "%commitMsg%"
+svn copy %baseURL%/uimaj-distr       %tagURL%/uimaj-distr        -m "%commitMsg%"
+svn copy %baseURL%/uimaj-examples    %tagURL%/uimaj-examples     -m "%commitMsg%"
+svn copy %baseURL%/uima-docbooks     %tagURL%/uima-docbooks      -m "%commitMsg%"
+svn copy %baseURL%/uima-docbook-tool %tagURL%/uima-docbook-tool  -m "%commitMsg%"
 
 @:exit
