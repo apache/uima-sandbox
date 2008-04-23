@@ -19,6 +19,8 @@ REM   under the License.
 
 @echo on
 
+REM  The form %~1 (as opposed to %1) removes surrounding quotes
+
 @if "%~1"=="" goto usage
 @if not "%3"=="" goto usage
 @set leveldir=%~1-%~2
@@ -39,7 +41,7 @@ echo  example tag uima-as-2.2.2 01
 @set baseURL=https://svn.apache.org/repos/asf/incubator/uima/uimaj/trunk
 @set asURL=https://svn.apache.org/repos/asf/incubator/uima/sandbox/trunk
 @set tagURL=https://svn.apache.org/repos/asf/incubator/uima/sandbox/%svnloc%
-@set commitMsg=Create Tag for UIMA-AS
+@set commitMsg=Create Tag for UIMA-AS release candidate %2
 
 svn copy  %asURL%/uima-as             %tagURL%                    -m "%commitMsg%"
 svn copy  %baseURL%/uimaj             %tagURL%/uimaj              -m "%commitMsg%"
