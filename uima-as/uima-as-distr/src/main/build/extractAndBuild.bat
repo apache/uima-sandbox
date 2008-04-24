@@ -22,9 +22,10 @@ REM Run with -notest to skip the unit tests
 @echo on
 
 @if "%~1"=="" goto usage
+@if not "%4"=="" goto usage
 @if "%~1"=="trunk" goto trunk
-@set leveldir=%~1-%~2
-@set svnloc=tags/%~1/%leveldir%
+@set leveldir=uima-as-%~1-%~2
+@set svnloc=tags/uima-as-%~1/%leveldir%
 @goto checkargs
 
 @:trunk
@@ -35,7 +36,7 @@ REM Run with -notest to skip the unit tests
 @:checkargs
 @set jvmarg=
 @set mvnCommand=clean install
-@if not "%4"=="" goto usage
+
 @if "%~3"=="" goto execute
 @if "%~3"=="-notest" goto notest
 @if "%~3"=="-deploy" goto deploy
@@ -46,7 +47,7 @@ REM Run with -notest to skip the unit tests
 echo running this command in a directory produces an extract as a subdirectory of that directory.
 echo Usage: extractAndBuild.bat level release-candidate [-notest] [-deploy]
 echo            (-notest and -deploy cannot be used together)
-echo  examples of the 1st 2 arguments, level release-candidate, are  trunk trunk   or  uima-as-2.2.2  01
+echo  examples of the 1st 2 arguments, level release-candidate, are  trunk trunk   or  2.2.2  01
 echo  If trunk, repeat trunk, eg. extractAndBuild.bat trunk trunk 
 @echo on
 @goto exit
