@@ -22,7 +22,7 @@
 usage() {
   echo "Usage: extractAndBuild.sh <level> <release candidate> [-notest] [-deploy]"
   echo "           (-notest and -deploy cannot be used together)"
-  echo " examples of <level> <release candidate> :  uima-as-2.2.2 01"
+  echo " examples of <level> <release candidate> :  2.2.2 01"
   echo " for trunk, use trunk trunk  (yes, repeat trunk twice)"
 }
 
@@ -41,8 +41,8 @@ then
   leveldir=uima-as
   svnloc=trunk/uima-as
 else
-  leveldir=$1-$2
-  svnloc=tags/$1/$1-$2
+  leveldir=uima-as-$1-$2
+  svnloc=tags/uima-as-$1/$1-$2
 fi
 
 if [ $# -gt "3" ]
