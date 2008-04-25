@@ -310,14 +310,14 @@
    <value>
       <array>
          <string>dictionary1.xml</string> 
-         <string>dictionary2.xml</string>
+         <string>http://localhost/mydict/dictionary.xml</string>
       </array>
    </value>
 </nameValuePair>]]></programlisting>
 			</para>
 			<para>
-			  The specified dictionary file names must be available in the classpath or in the UIMA datapath. It is also
-			  possible to specify relative path names based on the classpath or datapath.
+			  The specified dictionary file names must be available in the classpath or in the UIMA datapath.
+			  Additionally it is possible to specify an HTTP URL to load the dictionary file.
 			</para>
 		</section>
 

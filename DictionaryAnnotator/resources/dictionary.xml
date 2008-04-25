@@ -21,7 +21,7 @@
 	xsi:schemaLocation="dictionary.xsd">
 	<typeCollection>
 		<dictionaryMetaData caseNormalization="true" multiWordEntries="true"/>
-		<languageId>en-XX</languageId>
+		<languageId>en</languageId>
 		<typeDescription>
 			<typeName>org.apache.uima.DictionaryEntry</typeName>
 		</typeDescription>
