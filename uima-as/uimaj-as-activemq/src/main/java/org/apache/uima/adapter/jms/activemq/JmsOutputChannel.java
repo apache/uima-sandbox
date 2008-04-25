@@ -660,7 +660,7 @@ public class JmsOutputChannel implements OutputChannel
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 			populateHeaderWithResponseContext(tm, anEndpoint, aCommand);
 			
-			endpointConnection.send(tm, true); 
+			endpointConnection.send(tm, false); 
 			addIdleTime(tm);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cpc_reply_sent__FINE",
@@ -829,7 +829,6 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			return;
 		}
-		anEndpoint.setReplyEndpoint(true);
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		try
@@ -866,7 +865,7 @@ public class JmsOutputChannel implements OutputChannel
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_metadata_reply__endpoint__FINEST",
                     new Object[] { serviceInputEndpoint, anEndpoint.getEndpoint() });
-			endpointConnection.send(tm, true);
+			endpointConnection.send(tm, false);
 		}
 		catch( JMSException e)
 		{
@@ -1321,7 +1320,7 @@ public class JmsOutputChannel implements OutputChannel
 			//	by anEndpoint.getDestination != null, we dont start the timer.
 			boolean startConnectionTimer = true;
 			
-			if ( anEndpoint.getDestination() != null )
+			if ( anEndpoint.getDestination() != null || !isRequest )
 			{
 				startConnectionTimer = false;
 			}
@@ -1448,7 +1447,7 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			//	Send Request Messsage to Delegate
 			// ----------------------------------------------------
-			endpointConnection.send(tm, true);
+			endpointConnection.send(tm, startTimer);
 			addIdleTime(tm);
 			
 		}

@@ -214,7 +214,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_open_to_endpoint__FINE", new Object[] { controller.getComponentName(), getEndpoint(), serverUri });
 
 //			setOpen(true);
-			startTimer(connectionCreationTimestamp);
+			//startTimer(connectionCreationTimestamp);
 		}
 		catch ( Exception e)
 		{
