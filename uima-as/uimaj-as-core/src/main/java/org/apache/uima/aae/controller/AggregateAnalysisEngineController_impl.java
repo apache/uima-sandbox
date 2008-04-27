@@ -148,7 +148,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	}
 
 	/**
-	 * 
+
+
 	 * @param aParentController
 	 * @param anEndpointName
 	 * @param aDescriptor
@@ -936,6 +937,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		try
 		{
 			cacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+			if ( cacheEntry.getState() != CacheEntry.FINAL_STATE )
+			{
+				cacheEntry.setState(CacheEntry.FINAL_STATE);
+			}
 		}
 		catch(Exception e)
 		{
@@ -1024,6 +1029,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				
 				if ( parentCASCacheEntry != null && parentCASCacheEntry.isSubordinate() 
 					    && parentCASCacheEntry.isReplyReceived()
+					    && parentCASCacheEntry.getState() == CacheEntry.FINAL_STATE
 						&& parentCASCacheEntry.getSubordinateCasInPlayCount() == 0)
 				{
 					//	All subordinate CASes have been processed. Process the parent
