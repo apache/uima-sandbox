@@ -523,6 +523,8 @@ public class InProcessCache implements InProcessCacheMBean
 	
 	public class CacheEntry
 	{
+		public static final int FINAL_STATE = 1;
+		
 		private CAS cas;
 
 		//	the following is set to true if the CAS has been created by CAS Multiplier
@@ -588,6 +590,9 @@ public class InProcessCache implements InProcessCacheMBean
 		private int subordinateCasInPlayCount = 0;
 		
 		private boolean replyReceived = false;
+		
+		private int state = 0;
+		
 		
 		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
 		{
@@ -900,7 +905,15 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			return replyReceived;
 		}
+		public int getState()
+		{
+			return state;
+		}
 		
+		public void setState( int aState )
+		{
+			state = aState;
+		}
 	}	
 
 
