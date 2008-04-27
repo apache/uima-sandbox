@@ -1283,21 +1283,32 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
 			}
-			//	The following is true when the analytic is actually a CAS Multiplier
+			//	The following is true when the analytic is a CAS Multiplier
 			if ( sequence > 0 && !isRequest )
 			{
 				//	Override MessageType set in the populateHeaderWithContext above.
-				
 				//	Make the reply message look like a request. This message will contain a new CAS 
 				//	produced by the CAS Multiplier. The client will treat this CAS
 				//	differently from the input CAS. 
 				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
-				tm.setStringProperty(AsynchAEMessage.InputCasReference, anInputCasReferenceId);
+				//	Add the top ancestor of this CAS. 
+				addTopCASParentReferenceId(tm, anInputCasReferenceId);
+				//	Add a sequence number assigned to this CAS by the controller
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
-
+				
 				if ( secondaryInputEndpoint != null )
 				{
 					tm.setStringProperty(AsynchAEMessage.MessageFrom, secondaryInputEndpoint);
+				}
+				if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
+				{
+					CacheEntry cacheEntry = getCacheEntry(aCasReferenceId);
+					if ( cacheEntry != null )
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+			                    "sendCasToCollocatedDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service_detail__FINE",
+			                    new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), aCasReferenceId, anInputCasReferenceId, cacheEntry.getInputCasReferenceId() });
+					}
 				}
 			}
 
@@ -1326,7 +1337,7 @@ public class JmsOutputChannel implements OutputChannel
 			}
 			
 			// ----------------------------------------------------
-			//	Send Request Messsage to Delegate
+			//	Send Request Messsage to the Endpoint
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startConnectionTimer);
 
@@ -1414,7 +1425,9 @@ public class JmsOutputChannel implements OutputChannel
 			if ( aNewCasReferenceId != null )
 			{
 				tm.setStringProperty(AsynchAEMessage.CasReference, aNewCasReferenceId);
-				tm.setStringProperty(AsynchAEMessage.InputCasReference, anInputCasReferenceId);
+				//	Add the initial Input Cas Reference Id. This is the top ancestor from
+				//	which all other CASes are produced
+				addTopCASParentReferenceId(tm, anInputCasReferenceId);
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
 				//	Override MessageType set in the populateHeaderWithContext above.
 				//	Add stats
@@ -1424,6 +1437,18 @@ public class JmsOutputChannel implements OutputChannel
 				//	produced by the CAS Multiplier. The client will treat this CAS
 				//	differently from the input CAS. 
 				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
+				if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
+				{
+					CacheEntry cacheEntry = getCacheEntry(aNewCasReferenceId);
+					if ( cacheEntry != null )
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+			                    "sendCasToCollocatedDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service_detail__FINE",
+			                    new Object[] {getAnalysisEngineController().getComponentName(),"Collocated", anEndpoint.getEndpoint(), aNewCasReferenceId, anInputCasReferenceId, cacheEntry.getInputCasReferenceId() });
+					}
+				}
+
+			
 			}
 			else
 			{
@@ -1466,6 +1491,33 @@ public class JmsOutputChannel implements OutputChannel
 		catch( Exception e)
 		{
 			throw new AsynchAEException(e);
+		}
+		
+	}
+
+	private CacheEntry getCacheEntry( String aCasReferenceId) throws Exception
+	{
+		CacheEntry cacheEntry = null;
+		if ( getAnalysisEngineController().getInProcessCache().entryExists(aCasReferenceId) )
+		{
+			cacheEntry = 
+				getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+		}
+		return cacheEntry; 
+	}
+	private void addTopCASParentReferenceId( TextMessage tm, String aCasReferenceId) throws Exception
+	{
+		CacheEntry cacheEntry = null;
+		if ( ( cacheEntry = getCacheEntry(aCasReferenceId)) != null )
+		{
+			if ( cacheEntry.getInputCasReferenceId() == null )
+			{
+				tm.setStringProperty(AsynchAEMessage.InputCasReference, aCasReferenceId);
+			}
+			else
+			{
+				tm.setStringProperty(AsynchAEMessage.InputCasReference, cacheEntry.getInputCasReferenceId());
+			}
 		}
 		
 	}
