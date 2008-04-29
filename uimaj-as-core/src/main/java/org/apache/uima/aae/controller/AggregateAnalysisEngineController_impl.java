@@ -1102,7 +1102,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				//	Decrement number of subordinate CASes still in play and fetch the
 				//	current count of subordinate CASes in play
 				aParentCasCacheEntry.decrementSubordinateCasInPlayCount();
-				if ( !aParentCasCacheEntry.isSubordinate() && aParentCasCacheEntry.isReplyReceived() && aParentCasCacheEntry.getSubordinateCasInPlayCount() == 0 )
+				if ( !aParentCasCacheEntry.isSubordinate() 
+                && aParentCasCacheEntry.isReplyReceived() 
+                && aParentCasCacheEntry.getState() == CacheEntry.FINAL_STATE
+                && aParentCasCacheEntry.getSubordinateCasInPlayCount() == 0 )
 				{
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 							"decrementCasSubordinateCount", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_no_children__FINEST", new Object[] { getComponentName(),aParentCasCacheEntry.getCasReferenceId()});
