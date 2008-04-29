@@ -155,7 +155,10 @@ public class UimacppServiceController implements ControllerLifecycle {
         commandArgs.add("-b");
         commandArgs.add(brokerURL);
       }
-
+      
+      commandArgs.add("-p");
+      commandArgs.add(Integer.toString(prefetchSize));
+      
       /* construct the process builder */
       builder = new ProcessBuilder(commandArgs);
       setEnvironmentVariables(envVarMap);
@@ -425,7 +428,8 @@ public class UimacppServiceController implements ControllerLifecycle {
       commandArgs.add(Integer.toString(2));
     } else if (uimaLogger.isLoggable(Level.FINE)) {
       commandArgs.add(Integer.toString(1));
-    } else if (uimaLogger.isLoggable(Level.CONFIG)) {
+    } else if (uimaLogger.isLoggable(Level.CONFIG) || 
+    		uimaLogger.isLoggable(Level.INFO)) {
       commandArgs.add(Integer.toString(0));
     } else {
       commandArgs.add(Integer.toString(-1));
