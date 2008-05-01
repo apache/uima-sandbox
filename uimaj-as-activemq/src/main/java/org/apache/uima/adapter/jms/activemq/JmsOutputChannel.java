@@ -383,6 +383,8 @@ public class JmsOutputChannel implements OutputChannel
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 			tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 			populateHeaderWithRequestContext(tm, anEndpoint, aCommand);
+			
+			// Only used to send a Stop or ReleaseCas request so probably no need to start a connection timer ?
 			endpointConnection.send(tm, true);
 			if ( aCommand == AsynchAEMessage.ReleaseCAS )
 			{
