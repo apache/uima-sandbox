@@ -540,4 +540,11 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	public void setIdleTime(long idleTime) {
 		this.idleTime = idleTime;
 	}
+	
+	/*
+	 * Print name of the endpoint rather than class hash code
+	 */
+	public String toString() {
+		return endpoint;
+	}
 }

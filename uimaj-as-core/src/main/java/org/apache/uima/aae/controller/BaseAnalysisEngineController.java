@@ -536,6 +536,14 @@ implements AnalysisEngineController, EventSubscriber
 		return ((ResourceCreationSpecifier)resourceSpecifier).getMetaData().getName();
 	}
 	
+	/**
+	 * Print the component name rather than the class name
+	 */
+	public String toString()
+	{
+		return getComponentName();
+	}
+	
 	public void addTimeSnapshot( long snapshot, String aKey )
 	{
 		if ( timeSnapshotMap.containsKey(aKey) )
