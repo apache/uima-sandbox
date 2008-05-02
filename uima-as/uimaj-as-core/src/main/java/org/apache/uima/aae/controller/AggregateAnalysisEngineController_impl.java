@@ -695,7 +695,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					// handle the CAS in delegate Aggregate services. When the CAS is processed
 					// in the Delegate Aggregate, the CAS produced in the parent Aggregate cannot
 					// be dropped in the delegate. Check Final Step logic.
-					getInProcessCache().getCacheEntryForCAS(aNewCasReferenceId).setNewCas(true, getName());
+					getInProcessCache().getCacheEntryForCAS(aNewCasReferenceId).setNewCas(true, getComponentName());
 				}
 				else
 				{
@@ -986,24 +986,27 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					}
 				}
 			}
-			else if ( isTopLevelComponent())
+			else //if ( isTopLevelComponent())
 			{
 				//	 This is a subordinate CAS. First get cache entry for the input (parent) CAS
 				parentCASCacheEntry = 
 					getInProcessCache().getCacheEntryForCAS(cacheEntry.getInputCasReferenceId());
-
-				replyWithInputCAS = decrementCasSubordinateCount( parentCASCacheEntry);
-				if ( parentCASCacheEntry != null )
+				if ( getMessageOrigin(aCasReferenceId) == null )
 				{
-					//	Set the flag to indicate that the cache entry for the parent CAS has been updated
-					//	In case an exception happens below, the error handler will be instructed to skip
-					//	decrementing subordinate count (since it's been done already)
-					subordinateCasInPlayCountDecremented = true;
+					replyWithInputCAS = decrementCasSubordinateCount( parentCASCacheEntry);
+					if ( parentCASCacheEntry != null )
+					{
+						//	Set the flag to indicate that the cache entry for the parent CAS has been updated
+						//	In case an exception happens below, the error handler will be instructed to skip
+						//	decrementing subordinate count (since it's been done already)
+						subordinateCasInPlayCountDecremented = true;
+					}
 				}
 				else
 				{
-					//	Input CAS doesnt exist
+					replyWithInputCAS = true;
 				}
+				
 			}
 			
 			// Cas Processing has been completed. Check if the CAS should be sent to
@@ -1015,7 +1018,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			// aggregate is not configured to output new CASes
 
 			String casProducer = cacheEntry.getCasProducerAggregateName();
-			boolean isNewCas = (cacheEntry.isNewCas() && casProducer != null && getName().equals(casProducer));
+			boolean isNewCas = (cacheEntry.isNewCas() && casProducer != null && getComponentName().equals(casProducer));
 
 			//	If debug level=FINEST show the size of the cache
 			getInProcessCache().dumpContents();
@@ -1027,7 +1030,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					dropCAS(aCasReferenceId, true);
 				}
 				
-				if ( parentCASCacheEntry != null && parentCASCacheEntry.isSubordinate() 
+				if ( parentCASCacheEntry != null //&& parentCASCacheEntry.isSubordinate() 
 					    && parentCASCacheEntry.isReplyReceived()
 					    && parentCASCacheEntry.getState() == CacheEntry.FINAL_STATE
 						&& parentCASCacheEntry.getSubordinateCasInPlayCount() == 0)
@@ -1037,7 +1040,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					finalStep(aStep, parentCASCacheEntry.getCasReferenceId());
 				}
 			}
-			
+/*			
 			if ( replyWithInputCAS && parentCASCacheEntry != null )
 			{
 				//	Reply with the input CAS
@@ -1047,7 +1050,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			{
 				replyToClient( aCasReferenceId );
 			}
-			
+*/			
+			if ( replyWithInputCAS && getMessageOrigin(aCasReferenceId) != null)
+			{
+				//	Reply with the input CAS
+				replyToClient( aCasReferenceId );
+			}
 			
 			String casMultiplierKey = cacheEntry.getCasMultiplierKey();
 			if ( isNewCas  && casMultiplierKey != null ) //&& cacheEntry.shouldSendRequestToFreeCas())
@@ -1085,6 +1093,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 			handleError(map, e);
 		}
+/*
 		finally
 		{
 			if ( aCasReferenceId != null && originMap.containsKey(aCasReferenceId))
@@ -1092,6 +1101,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				originMap.remove(aCasReferenceId);
 			}
 		}
+*/		
 	}
 	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry )
 	{

@@ -344,7 +344,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			long getNextTime = 0;         // stores time in next();   
 			long timeToProcessCAS = 0;    // stores time in hasNext() and next() for each CAS
 			boolean moreCASesToProcess = true;
-			
+/*			
 			
 			String parentCasReferenceId = null;
 			CacheEntry inputCasCacheEntry = null;
@@ -361,7 +361,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	and the getCacheEntryForCAS() will throw an exception. Ignore it
 				//	here, we are shutting down.
 			}
-
+*/
 			while (moreCASesToProcess)
 			{
 				hasNextTime = System.nanoTime();
@@ -415,6 +415,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				sequence++;
 				newCasReferenceId = getInProcessCache().register( casProduced, mContext, otsd);
 				CacheEntry newEntry = getInProcessCache().getCacheEntryForCAS(newCasReferenceId);
+/*
 				if ( parentCasReferenceId == null )
 				{
 					newEntry.setInputCasReferenceId(aCasReferenceId);
@@ -423,6 +424,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				{
 					newEntry.setInputCasReferenceId(parentCasReferenceId);
 				}
+*/
+				newEntry.setInputCasReferenceId(aCasReferenceId);
 				//	Add to the cache how long it took to process the generated (subordinate) CAS
 				getCasStatistics(newCasReferenceId).incrementAnalysisTime(timeToProcessCAS);
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_produced_new_cas__FINE", new Object[] { Thread.currentThread().getName(),getComponentName(),newCasReferenceId, aCasReferenceId });
@@ -446,7 +449,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	Increment how long it took to process the input CAS. This timer is exposed via JMX
 				statistic.increment(totalProcessTime);
 			}
-			
+/*			
 			if (newCasReferenceId != null)
 			{
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), newCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
@@ -456,6 +459,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
 
 			}
+*/
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
 			getMonitor().resetCountingStatistic("", Monitor.ProcessErrorCount);
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
 			//	Aggregate total time spent processing the input CAS
