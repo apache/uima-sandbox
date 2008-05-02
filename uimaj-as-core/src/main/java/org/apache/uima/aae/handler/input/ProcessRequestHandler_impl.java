@@ -230,13 +230,14 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				else
 				{
 					getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
+/*
 					if ( aMessageContext.propertyExists(AsynchAEMessage.InputCasReference))
 					{
 						CacheEntry cacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
 						String parentCasId = aMessageContext.getMessageStringProperty(AsynchAEMessage.InputCasReference);
 						cacheEntry.setInputCasReferenceId(parentCasId);
 					}
-					
+*/					
 					casStats = getController().getCasStatistics(casReferenceId);
 				}
 				casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
@@ -492,10 +493,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 
 			}
 //			Endpoint replyToEndpoint = aMessageContext.getEndpoint(); 
-			if ( getController() instanceof AggregateAnalysisEngineController )
-			{
-				((AggregateAnalysisEngineController)getController()).addMessageOrigin(casReferenceId, aMessageContext.getEndpoint());
-			}
 			
 			//	This is only used when handling CASes produced by CAS Multiplier
 			String inputCasReferenceId = null;
@@ -552,7 +549,14 @@ public class ProcessRequestHandler_impl extends HandlerBase
 
 				inputCasReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.InputCasReference);
 			}
-			
+			else
+			{
+				if ( getController() instanceof AggregateAnalysisEngineController )
+				{
+					((AggregateAnalysisEngineController)getController()).addMessageOrigin(casReferenceId, aMessageContext.getEndpoint());
+				}
+
+			}
 			cas = getController().getInProcessCache().getCasByReference(casReferenceId);
 			
 			long arrivalTime = System.nanoTime();

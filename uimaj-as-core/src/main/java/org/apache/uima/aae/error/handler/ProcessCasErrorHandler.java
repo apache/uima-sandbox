@@ -397,7 +397,6 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 								if ( parentCasCacheEntry.getSubordinateCasInPlayCount() == 0 &&
 									 parentCasCacheEntry.isPendingReply())
 								{
-									System.out.println("!!!!!!!!! ProcessCasErrorHandler: Controller:"+aController.getComponentName()+" Parent CAS has NO Subordinates.");
 									//	Complete processing of the Input CAS
 									if ( flowControllerContinueFlag ==  false )
 									{
@@ -431,6 +430,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 				try
 				{
 					sendExceptionToClient( t, casReferenceId, endpoint, aController );
+					//System.out.println("---------------------------- CAS Produced By CM:"+cacheEntry.getCasProducerKey());
 				}
 				catch( Exception e) 
 				{
