@@ -1293,8 +1293,11 @@ public class JmsOutputChannel implements OutputChannel
 				//	produced by the CAS Multiplier. The client will treat this CAS
 				//	differently from the input CAS. 
 				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
+/*
 				//	Add the top ancestor of this CAS. 
 				addTopCASParentReferenceId(tm, anInputCasReferenceId);
+*/
+				tm.setStringProperty(AsynchAEMessage.InputCasReference, anInputCasReferenceId);
 				//	Add a sequence number assigned to this CAS by the controller
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
 				
@@ -1433,9 +1436,12 @@ public class JmsOutputChannel implements OutputChannel
 			if ( aNewCasReferenceId != null )
 			{
 				tm.setStringProperty(AsynchAEMessage.CasReference, aNewCasReferenceId);
+/*
 				//	Add the initial Input Cas Reference Id. This is the top ancestor from
 				//	which all other CASes are produced
 				addTopCASParentReferenceId(tm, anInputCasReferenceId);
+*/
+				tm.setStringProperty(AsynchAEMessage.InputCasReference, anInputCasReferenceId);
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
 				//	Override MessageType set in the populateHeaderWithContext above.
 				//	Add stats
