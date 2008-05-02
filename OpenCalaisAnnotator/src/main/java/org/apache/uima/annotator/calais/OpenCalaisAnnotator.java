@@ -62,15 +62,55 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
 
   private SAXParser saxParser;
 
+  private Type anniversaryType;
+
+  private Type cityType;
+
+  private Type companyType;
+
+  private Type continentType;
+
+  private Type countryType;
+
+  private Type currencyType;
+
+  private Type emailAddressType;
+
+  private Type facilityType;
+
+  private Type faxNumberType;
+
+  private Type holidayType;
+
+  private Type industryTermType;
+
+  private Type naturalDisasterType;
+
+  private Type naturalFeatureType;
+
+  private Type organizationType;
+
   private Type personType;
 
-  private Feature personCalaisTypeFeat;
+  private Type phoneNumberType;
+
+  private Type provinceOrStateType;
+
+  private Type regionType;
+
+  private Type technologyType;
+
+  private Type urlType;
+
+  private Feature calaisTypeFeat;
 
   private String serviceParams;
 
   private Logger logger;
 
   private URL calaisService;
+
+  private HashMap<String, Type> typeMapping;
 
   public void process(CAS aCas) throws AnalysisEngineProcessException {
 
@@ -91,6 +131,7 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
       BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
       Document feedDoc = docBuilder.parse(in);
       String RdfXmlContent = feedDoc.getDocumentElement().getTextContent();
+      // System.out.println(RdfXmlContent);
 
       // create new InputStream for the RDF XML content
       BufferedInputStream bufByteIn = new BufferedInputStream(new ByteArrayInputStream(
@@ -109,16 +150,18 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
       Iterator<DescriptionElement> elementIt = elements.iterator();
       while (elementIt.hasNext()) {
         DescriptionElement element = elementIt.next();
-        if (element.getTypeURL().equals("http://s.opencalais.com/1/type/em/e/Person")) {
+        // if for the typeURL is a mapping available, create annotation in the CAS
+        Type currentType = this.typeMapping.get(element.getTypeURL());
+        if (currentType != null) {
+          // mapping is available, create annotation
+          // get reference element that contains the annotation span
           DescriptionElement refElement = subjectMap.get(element.getAboutURL());
           int begin = refElement.getOffset() - offset.getOffset();
           int end = begin + refElement.getLength();
-          AnnotationFS annotFs = aCas.createAnnotation(this.personType, begin, end);
-          annotFs.setStringValue(this.personCalaisTypeFeat, element.getTypeURL().intern());
+          // create annotation
+          AnnotationFS annotFs = aCas.createAnnotation(currentType, begin, end);
+          annotFs.setStringValue(this.calaisTypeFeat, element.getTypeURL().intern());
           aCas.addFsToIndexes(annotFs);
-
-          // System.out.println("Found person: " + aCas.getDocumentText().substring(begin,end) + "
-          // (" + begin + "," + end + ")");
         }
       }
     } catch (IOException ex) {
@@ -200,7 +243,6 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
     } catch (MalformedURLException ex) {
       throw new ResourceInitializationException(ex);
     }
-
   }
 
   /*
@@ -211,8 +253,54 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
   public void typeSystemInit(TypeSystem typeSystem) throws AnalysisEngineProcessException {
     super.typeSystemInit(typeSystem);
 
+    // get types and features
     this.personType = typeSystem.getType("org.apache.uima.calais.Person");
-    this.personCalaisTypeFeat = this.personType.getFeatureByBaseName("calaisType");
+    this.anniversaryType = typeSystem.getType("org.apache.uima.calais.Anniversary");
+    this.cityType = typeSystem.getType("org.apache.uima.calais.City");
+    this.companyType = typeSystem.getType("org.apache.uima.calais.Company");
+    this.continentType = typeSystem.getType("org.apache.uima.calais.Continent");
+    this.countryType = typeSystem.getType("org.apache.uima.calais.Country");
+    this.currencyType = typeSystem.getType("org.apache.uima.calais.Currency");
+    this.emailAddressType = typeSystem.getType("org.apache.uima.calais.EmailAddress");
+    this.facilityType = typeSystem.getType("org.apache.uima.calais.Facility");
+    this.faxNumberType = typeSystem.getType("org.apache.uima.calais.FaxNumber");
+    this.holidayType = typeSystem.getType("org.apache.uima.calais.Holiday");
+    this.industryTermType = typeSystem.getType("org.apache.uima.calais.IndustryTerm");
+    this.naturalDisasterType = typeSystem.getType("org.apache.uima.calais.NaturalDisaster");
+    this.naturalFeatureType = typeSystem.getType("org.apache.uima.calais.NaturalFeature");
+    this.organizationType = typeSystem.getType("org.apache.uima.calais.Organization");
+    this.phoneNumberType = typeSystem.getType("org.apache.uima.calais.PhoneNumber");
+    this.provinceOrStateType = typeSystem.getType("org.apache.uima.calais.ProviceOrState");
+    this.regionType = typeSystem.getType("org.apache.uima.calais.Region");
+    this.technologyType = typeSystem.getType("org.apache.uima.calais.Technology");
+    this.urlType = typeSystem.getType("org.apache.uima.calais.URL");
+    this.calaisTypeFeat = this.personType.getFeatureByBaseName("calaisType");
+
+    // create type mapping HashMap
+    this.typeMapping = new HashMap<String, Type>(20);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Person", this.personType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Anniversary", this.anniversaryType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/City", this.cityType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Company", this.companyType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Continent", this.continentType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Country", this.countryType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Currency", this.currencyType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/EmailAddress", this.emailAddressType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Facility", this.facilityType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/FaxNumber", this.faxNumberType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Holiday", this.holidayType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/IndustryTerm", this.industryTermType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/NaturalDisaster",
+            this.naturalDisasterType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/NaturalFeature",
+            this.naturalFeatureType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Organization", this.organizationType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/PhoneNumber", this.phoneNumberType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/ProvinceOrState",
+            this.provinceOrStateType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Region", this.regionType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/Technology", this.technologyType);
+    this.typeMapping.put("http://s.opencalais.com/1/type/em/e/URL", this.urlType);
 
   }
 
