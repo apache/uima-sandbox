@@ -368,6 +368,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	    appCtx.put(UimaAsynchronousEngine.ReplyWindow, 1);
 	    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
 	}
+
 	/**
 	 * Tests shutdown while running with multiple/concurrent threads
 	 * The Annotator throws an exception and the Aggregate error handling is setup to terminate
@@ -619,7 +620,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	public void testClientHttpTunnellingWithDoubleByteText() throws Exception
 	{
     System.out.println("-------------- testClientHttpTunnellingWithDoubleByteText -------------");
-		try
+    	try
 		{
 			File file = new File(relativeDataPath+"/DoubleByteText.txt");
 			System.out.println("Checking for existence of File:"+file.getAbsolutePath());
