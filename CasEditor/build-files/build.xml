@@ -107,9 +107,10 @@
 		</fileset>
 	</copy>
 		
-	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-src.zip"
-		       basedir="${outputLocation}/${buildLabel}/${buildId}-src"/>
-		
+	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-src.zip">
+		    <zipfileset dir="${outputLocation}/${buildLabel}/${buildId}-src" prefix="${buildId}-src"/>
+	</zip>
+
 	<delete dir="${outputLocation}/${buildLabel}/${buildId}-src"/>
 
 	<ant antfile="build_documentation.xml" dir=".." inheritall="true"/>
@@ -154,7 +155,6 @@
 	</copy>
 	
 	<!-- copy over docs -->
-	<!-- to doc/html and doc/pdf like michael did it -->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/docs/html">
 		<fileset dir="../target">
 			<include name="**/casEditorUserGuide/**"/>
