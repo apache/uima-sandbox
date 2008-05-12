@@ -28,26 +28,29 @@ under the License.
   <title>Asynchronous Scaleout Application Interface</title>
   
   <section id="ugr.ref.async.api.organization">
-    <title>Asynchonous API Overview</title>
+    <title>Asynchronous API Overview</title>
     <para>
       The Asynchronous API provides Java applications the capability to connect to
-      and to make reqests UIMA EE services. ProcessCas and CollectionProcessingComplete
+      and to make requests UIMA-AS services. ProcessCas and CollectionProcessingComplete
       requests are supported.
     </para>
 
     <para>
-      An application can prepare and send each CAS to a service one at a time, or
+      An application can use this API to 
+      prepare and send each CAS to a service one at a time, or
       alternately can use a UIMA collection reader to prepare the CASes to be delivered.
       The application must provide a listener class to receive asynchronous replies.
       For individual CAS requests a synchronous sendAndReceive call is available. 
-      Note that for synchronous requests to a
-      UIMA EE service, the standard UIMA Analysis Engine APIs
+      As an alternative for this case (for synchronous requests to a
+      UIMA-AS service), instead of using this client API, 
+      the standard UIMA Analysis Engine APIs
       can be used with an analysis engine instantiated from a JMS Service Descriptor.
       See <xref linkend="ugr.async.ov.concepts.jms_descriptor"/>.
     </para>
 
      <para>
-      Other options include specifying the maximum number of outstanding requests allowed, timeout
+      Other options available in this API include 
+       specifying the maximum number of outstanding requests allowed, timeout
       values and the size of local Cas pool to create.      
      </para>
     
@@ -69,7 +72,7 @@ under the License.
   <section id="ugr.ref.async.api.descriptor">
     <title>The UimaAsynchronousEngine Interface</title>
     
-    <para>An application developer's starting point for accessing UIMA EE services is the
+    <para>An application developer's starting point for accessing UIMA-AS services is the
       UimaAsynchronousEngine Interface. For each service an application wants to use, it
       must instantiate a client object:
 
@@ -82,9 +85,9 @@ under the License.
         <listitem>
           <para>void initialize( Map anApplicationContext ): Initializes asynchronous client. 
             Using configuration provided in a given Map object, this method creates a connection to 
-            UIMA EE Service queue, creates a response queue, and retrieves service metadata. 
+            the UIMA-AS Service queue, creates a response queue, and retrieves the service metadata. 
             This method blocks until a reply is received from the service or a timeout occurs.
-            If a collection reader has been specified, it's typesystem is merged with that from the
+            If a collection reader has been specified, its typesystem is merged with that from the
             service. The combined typesystem is used to create a Cas pool.
             On success the application is notified via the listener's initializationComplete() method.
             Asynchronous errors are delivered to the listener's entityProcessComplete() method.
@@ -93,8 +96,8 @@ under the License.
         </listitem>
 
         <listitem>
-          <para>void addStatusCallbackListener(StatusCallbackListener aListener):
-            Plugs-in application specific listener. The application receives callbacks
+          <para>void addStatusCallbackListener(UimaASStatusCallbackListener aListener):
+            Plugs in an application-specific listener. The application receives callbacks
             via methods in this listener class. More than one listener can be added.
           </para>
         </listitem>
@@ -108,9 +111,9 @@ under the License.
         </listitem>
 
         <listitem>
-          <para>void sendCAS( CAS aCAS ): Sends a given CAS for analysis to UIMA EE Service. 
+          <para>void sendCAS( CAS aCAS ): Sends a given CAS for analysis to the UIMA-AS Service. 
             This method may block if the client is configured to use a reply window which prevents 
-            from sending too many CASes to the service. Assuming the window is large enough to send 
+            sending too many CASes to the service. Assuming the window is large enough to send 
             the CAS this method returns as soon as the CAS is sent.
             The application is notified of responses or timeouts via entityProcessComplete().
          </para>
@@ -134,22 +137,22 @@ under the License.
 
         <listitem>
           <para>void collectionProcessingComplete(): Sends a Collection Processing Complete request 
-            to UIMA EE Analysis Service. The method blocks until the service replies or a timeout occurs.
-            On success the application is notified via the listener's initializationComplete() method.
-            Asynchronous errors are delivered to the listener's entityProcessComplete() method.
+            to the UIMA-AS Analysis Service. The method blocks until the service replies or a timeout occurs.
+            On success the application is notified via the listener's collectionProcessComplete() method.
+            
           </para>
         </listitem>
 
         <listitem>
           <para>void sendAndReceiveCAS(CAS aCAS):
             Send a CAS, wait for response. On success aCAS contains the analysis results.
-            Errors are delivered to the listener's entityProcessComplete() method.
+            Throws an exception on error.
           </para>
         </listitem>
 
         <listitem>
           <para>String deploy( String aDeploymentDescriptor, Map anApplicationContext):
-            Deploys UIMA EE service specified by given deployment descriptor and returns a handle
+            Deploys the UIMA-AS service specified by the given deployment descriptor and returns a handle
             to the Spring container for this service.
             The application context map must contain DD2SpringXsltFilePath and SaxonClasspath entries.
             This call blocks until the service is ready to process requests, or an exception occurs
@@ -165,9 +168,9 @@ under the License.
 
         <listitem>
           <para>void stop():
-           Stops the asynchronous client. Removes Cas pool, drops connection to the UIMA EE
-           service queue and stops listening on it's response queue. 
-           Also, terminates and undeploys any services which have been started with this client.
+           Stops the asynchronous client. Removes the Cas pool, drops the connection to the UIMA-AS
+           service queue and stops listening on its response queue. 
+           Terminates and undeploys any services which have been started with this client.
           </para>
         </listitem>
 
@@ -194,7 +197,7 @@ under the License.
         </listitem>
 
         <listitem>
-          <para>ServerURI: Broker connector for service. Required for initialize.</para>
+          <para>ServerUri: Broker connector for service. Required for initialize.</para>
         </listitem>
 
         <listitem>
@@ -202,12 +205,24 @@ under the License.
         </listitem>
 
         <listitem>
+          <para>Resource Manager: (Optional) a UIMA ResourceManager to use for the client.</para>
+        </listitem>
+
+        <listitem>
           <para>CasPoolSize: Size of Cas pool to create to send to specified service. Default = 1.</para>
+        </listitem>
+
+        <listitem>
+          <para>CAS_INITIAL_HEAPSIZE: (Optional) the initial CAS heapsize.</para>
         </listitem>
 
         <listitem>
           <para>ReplyWindow: Maximum number of outstanding process CAS requests that can be sent.
             Default = 5.</para>
+        </listitem>
+
+        <listitem>
+          <para>Application Name: optional name of the application using this API, for logging.</para>
         </listitem>
 
         <listitem>
@@ -234,7 +249,7 @@ under the License.
       <title>Status Callback Listener</title>
       <para>Asynchronous events are delivered to applications via methods in classes registered
           to the API object with addStatusCallbackListener(). These classes must implement the
-          interface org.apache.uima.aae.client.UimaAsStatusCallbackListener.
+          interface org.apache.uima.aae.client.UimaASStatusCallbackListener.
 
       <itemizedlist>
         <listitem>
@@ -284,7 +299,7 @@ under the License.
   </section>
   
   <section id="ugr.ref.async.api.usage">
-    <title>Asynchonous API Usage Scenarios</title>
+    <title>Asynchronous API Usage Scenarios</title>
 
   <section id="ugr.ref.async.api.usage_initialize">
     <title>Instantiating a Client API Object</title>
@@ -329,12 +344,12 @@ uimaAsEngine.sendCAS(cas);
   </section>
 
   <section id="ugr.ref.async.api.usage_getresults">
-    <title>Retrieving Asynchonous Results</title>
+    <title>Retrieving Asynchronous Results</title>
     <para>
       Asynchronous events resulting from the process Cas request are passed to the registered listener.
         <programlisting>
-// Callback Listener. Receives event notifications from CPE.
-class MyStatusCallbackListener implements StatusCallbackListener {
+// Callback Listener. Receives event notifications from UIMA-AS.
+class MyStatusCallbackListener implements UimaASStatusCallbackListener {
 
 // Method called when the processing of a Document is completed.
 public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
@@ -368,7 +383,7 @@ Map&lt;String,Object&gt; appCtx = new HashMap&lt;String,Object&gt;();
 appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, 
            System.getenv("UIMA_HOME") + "/bin/dd2spring.xsl");
 appCtx.put(UimaAsynchronousEngine.SaxonClasspath, 
-           "file:" + System.getenv("UIMA_HOME") + "/lib/saxon8.jar");
+           "file:" + System.getenv("UIMA_HOME") + "/saxon/saxon8.jar");
 uimaAsEngine.deploy(service, appCtx);
     </programlisting>
     </para>
@@ -381,7 +396,7 @@ uimaAsEngine.deploy(service, appCtx);
 
     <section id="ugr.ref.async.api.sample.code">
       <title>Sample Code</title>
-      <para>See $UIMA_HOME/examples/src/org/apache/uima/examples/ee/RunRemoteAsyncAE.java
+      <para>See $UIMA_HOME/examples/src/org/apache/uima/examples/as/RunRemoteAsyncAE.java
       </para>
     </section>
 
