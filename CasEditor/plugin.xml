@@ -263,7 +263,7 @@
 			name="Cas Editor">
 			<property
          name="aboutText"
-         value="Cas Editor&#x0A;Apache UIMA Version 2.2.2-incubating&#x0A;Copyright 2006, 2007 The Apache Software Foundation"/>
+         value="Cas Editor&#x0A;Apache UIMA Version 2.2.2-incubating&#x0A;Copyright 2006, 2008 The Apache Software Foundation"/>
 
 			<property name="preferenceCustomization"
 				value="plugin_customization.ini" />
