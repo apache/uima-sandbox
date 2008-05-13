@@ -95,7 +95,13 @@
 	</copy>
 	
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/uima-docbook-tool">
-		<fileset dir="../../uima-docbook-tool"/>
+		<fileset dir="../../uima-docbook-tool">
+			<exclude name="**/tools/**"/>
+		</fileset>
+		<fileset dir="../../uima-docbook-tool/">
+			<include name="**/tools/common-lib/**"/>
+			<include name="**/tools/fop-versions/**"/>
+		</fileset>
 	</copy>	
 		
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/SandboxDocs">
