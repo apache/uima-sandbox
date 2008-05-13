@@ -21,9 +21,10 @@
 
 <project name="org.apache.uima.caseditor" default="build" basedir=".">
 
+	<!-- user build properties-->
 	<property file="build_local.properties" />
+	<!-- general build properties-->
 	<property file="build.properties" />
-	
 	
 	<fail message="The eclipseLocation property must be set in the build_local.properties file." 
 		unless="eclipseLocation" />
@@ -31,28 +32,35 @@
 	<fail message="The outputLocation property must be set in the build_local.properties file." 
 		unless="outputLocation" />
 	
+	<!-- build directory == user specified outputLocation -->
 	<property name="buildDirectory" location="${outputLocation}" />
 	<property name="base" location="${outputLocation}/base" />
 	
-	<fileset dir="${eclipseLocation}/plugins" includes="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml" id="pde.plugin.path" />
+	<!-- set "buildFile" property to eclipse productBuild.xml -->
+	<fileset dir="${eclipseLocation}/plugins" 
+		     includes="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml" 
+		     id="pde.plugin.path" />	
 	<pathconvert property="buildfile" refid="pde.plugin.path" setonempty="false"/>
 	<fail message="Unable to find productBuild.xml." unless="buildfile" />
 
+	<!-- set "equinox" property to eclipse launcher -->
 	<fileset dir="${eclipseLocation}/plugins" 
-		includes="org.eclipse.equinox.launcher_*.jar" 
-		id="equinox.plugin.path" />
+		     includes="org.eclipse.equinox.launcher_*.jar" 
+		     id="equinox.plugin.path" />
 	<pathconvert property="equinox" refid="equinox.plugin.path" setonempty="false"/>
 	<fail message="Unable to find equinox." 
 		unless="equinox" />
 	
-	<fileset dir="../../" includes="uimaj-ep-runtime/target/org.apache.uima.runtime_2.2.2.incubating.jar" id="uima.plugin.path" />
+	<!-- set "uimaj-ep-runtime" property -->
+	<fileset dir="${eclipseLocation}/plugins" 
+		     includes="org.apache.uima.runtime_${uimaVersion}.jar" 
+		     id="uima.plugin.path" />
 	<pathconvert property="uimaj-ep-runtime" refid="uima.plugin.path" setonempty="false" />
+	<fail message="Unable to find UIMA runtime plugin verion ${uimaVersion}" 
+			unless="uimaj-ep-runtime" />
 	
-	<target name="copyRuntimePlugin" if="uimaj-ep-runtime">
-		<copy file="${uimaj-ep-runtime}"  
-				todir="${buildDirectory}/plugins/"/>
-	</target>
-	
+	<!-- prepare the build directory with the uima runtime plugin and
+	     with the CasEditor sources -->
 	<target name="prepareBuildDirectory">
 
 		<mkdir dir="${buildDirectory}/plugins" />
@@ -67,7 +75,13 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
+	<!-- copies the uimaj-runtime eclipse plugin to the build directory -->
+	<target name="copyRuntimePlugin" if="uimaj-ep-runtime">
+		<copy file="${uimaj-ep-runtime}"  
+				todir="${buildDirectory}/plugins/"/>
+	</target>
+
 	<target name="build" depends="prepareBuildDirectory">
 		<property name="buildResultsDirectory" value="${buildDirectory}/build-results" />
 		<property name="builder" location="./build-files" />
@@ -84,16 +98,17 @@
 			</classpath>
 		</java>
 		
-	<!-- Create directory for source build -->
+	<!-- ***** Create source distribution *****-->
 	<mkdir dir="${outputLocation}/${buildLabel}/${buildId}-src" />
-		
+
+	<!-- Copy CasEditor sources -->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/CasEditor">
 		<fileset dir="../">
 			<exclude name="**/target/**"/>
 			<exclude name="**/build_local.properties"/>
 		</fileset>
 	</copy>
-	
+	<!-- Copy uima-docbook-tool sources -->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/uima-docbook-tool">
 		<fileset dir="../../uima-docbook-tool">
 			<exclude name="**/tools/**"/>
@@ -103,36 +118,37 @@
 			<include name="**/tools/fop-versions/**"/>
 		</fileset>
 	</copy>	
-		
+	<!-- Copy SandboxDocs sources -->	
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src/SandboxDocs">
 		<fileset dir="../../SandboxDocs"/>
 	</copy>
-		
+	<!-- Copy CasEditor LICENSE, README, NOTICE files to toplevel dir of source disstribution -->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-src">
 		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
 		</fileset>
 	</copy>
-		
-	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-src.zip">
-		    <zipfileset dir="${outputLocation}/${buildLabel}/${buildId}-src" prefix="${buildId}-src"/>
+	<!-- create zip file for source distribution -->	
+	<zip destfile="${outputLocation}/${buildLabel}/${archivePrefix}-src-${buildId}.zip">
+		<zipfileset dir="${outputLocation}/${buildLabel}/${buildId}-src" prefix="${buildId}-src"/>
 	</zip>
-
+	<!-- clean soruce distribution build -->
 	<delete dir="${outputLocation}/${buildLabel}/${buildId}-src"/>
 
+	<!-- ***** build CasEditor documentation *****-->
 	<ant antfile="build_documentation.xml" dir=".." inheritall="true"/>
 		
-	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into win32 build -->
+	<!-- ***** update win32 build *****-->
 	<unzip src="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip" 
-			dest="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
-	
+   		   dest="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>		
 	<delete file="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip"/>
 	
+	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into win32 build -->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor">
 		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
 		</fileset>
 	</copy>
 	
-	<!-- copy over docs -->
+	<!-- copy over docs to win32 build-->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor/docs/html">
 		<fileset dir="../target">
 			<include name="**/casEditorUserGuide/**"/>
@@ -140,27 +156,27 @@
 			<exclude name="**/casEditorUserGuide/casEditorUserGuide.pdf*"/>
 		</fileset>
 	</copy>
-		
 	<copy file="../target/casEditorUserGuide/casEditorUserGuide.pdf"  
 			todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor/docs/pdf"/>	
 	
-	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86.zip"
+	<!-- create win32 build zip-->
+	<zip destfile="${outputLocation}/${buildLabel}/${archivePrefix}-win32.win32.x86-${buildId}.zip"
 		       basedir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
-
+	<!-- cleanup build directory-->
 	<delete dir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
 	
-	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into linux build -->
+	<!-- ***** update linux build *****-->
 	<unzip src="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip" 
-			dest="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
-	
+    	   dest="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
 	<delete file="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip"/>
-	
+		
+	<!-- Inject LICENSE, NOTICE and DISCLAIMER files into linux build -->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor">
 		<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
 		</fileset>
 	</copy>
 	
-	<!-- copy over docs -->
+	<!-- copy over docs to linux build-->
 	<copy todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/docs/html">
 		<fileset dir="../target">
 			<include name="**/casEditorUserGuide/**"/>
@@ -168,13 +184,21 @@
 			<exclude name="**/casEditorUserGuide/casEditorUserGuide.pdf*"/>
 		</fileset>
 	</copy>
-		
 	<copy file="../target/casEditorUserGuide/casEditorUserGuide.pdf"  
-			todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/docs/pdf"/>	
+		  todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/docs/pdf"/>
 		
-	<zip destfile="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86.zip"
+	<!-- create linux zip -->		
+	<zip destfile="${outputLocation}/${buildLabel}/${archivePrefix}-linux.gtk.x86-${buildId}.zip"
 		       basedir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
-		
+
+	<!-- create linux tar.gz -->		
+	<tar tarfile="${outputLocation}/${buildLabel}/${archivePrefix}-linux.gtk.x86-${buildId}.tar" 
+		 basedir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
+	<gzip src="${outputLocation}/${buildLabel}/${archivePrefix}-linux.gtk.x86-${buildId}.tar" 
+		  destfile="${outputLocation}/${buildLabel}/${archivePrefix}-linux.gtk.x86-${buildId}.tar.gz"/>
+	<delete file="${outputLocation}/${buildLabel}/${archivePrefix}-linux.gtk.x86-${buildId}.tar"/>
+
+	<!-- cleanup build directory-->		
 	<delete dir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86"/>
 		
 	</target>
