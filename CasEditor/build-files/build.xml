@@ -83,8 +83,8 @@
 	</target>
 
 	<target name="build" depends="prepareBuildDirectory">
-		<property name="buildResultsDirectory" value="${buildDirectory}/build-results" />
-		<property name="builder" location="./build-files" />
+		<!-- not used <property name="buildResultsDirectory" value="${buildDirectory}/build-results" /> -->
+		<!-- not used <property name="builder" location="./build-files" /> -->
 		<java classname="org.eclipse.core.launcher.Main" fork="true" failonerror="true">
 			<arg value="-application" />
 			<arg value="org.eclipse.ant.core.antRunner" />
