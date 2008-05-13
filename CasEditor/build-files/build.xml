@@ -51,23 +51,12 @@
 	<fail message="Unable to find equinox." 
 		unless="equinox" />
 	
-	<!-- set "uimaj-ep-runtime" property -->
-	<fileset dir="${eclipseLocation}/plugins" 
-		     includes="org.apache.uima.runtime_${uimaVersion}.jar" 
-		     id="uima.plugin.path" />
-	<pathconvert property="uimaj-ep-runtime" refid="uima.plugin.path" setonempty="false" />
-	<fail message="Unable to find UIMA runtime plugin verion ${uimaVersion}" 
-			unless="uimaj-ep-runtime" />
-	
 	<!-- prepare the build directory with the uima runtime plugin and
 	     with the CasEditor sources -->
 	<target name="prepareBuildDirectory">
 
 		<mkdir dir="${buildDirectory}/plugins" />
 		<mkdir dir="${buildDirectory}/features" />
-		
-		<antcall target="copyRuntimePlugin">
-		 </antcall>
 		
 		<copy todir="${buildDirectory}/plugins/org.apache.uima.caseditor">
 			<fileset dir="../">
@@ -76,15 +65,7 @@
 		</copy>
 	</target>
 
-	<!-- copies the uimaj-runtime eclipse plugin to the build directory -->
-	<target name="copyRuntimePlugin" if="uimaj-ep-runtime">
-		<copy file="${uimaj-ep-runtime}"  
-				todir="${buildDirectory}/plugins/"/>
-	</target>
-
 	<target name="build" depends="prepareBuildDirectory">
-		<!-- not used <property name="buildResultsDirectory" value="${buildDirectory}/build-results" /> -->
-		<!-- not used <property name="builder" location="./build-files" /> -->
 		<java classname="org.eclipse.core.launcher.Main" fork="true" failonerror="true">
 			<arg value="-application" />
 			<arg value="org.eclipse.ant.core.antRunner" />
