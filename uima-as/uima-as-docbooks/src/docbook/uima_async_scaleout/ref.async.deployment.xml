@@ -479,9 +479,9 @@ additionalErrorAction="terminate"/>
 <emphasis>not</emphasis> copied, therefore the retry and continue options are not allowed. </para></warning>
 <para>The timeout attribute specifies the timeout values used when sending the commands to the delegates. The units are milliseconds and a value of 0 has the special meaning of no timeout.</para>
 <para>The thresholdCount and thresholdWindow attributes specify the threshold at which the thresholdAction is taken. If xxx errors occur within a window of size yyy, the framework takes the specified action of either disabling this delegate, or terminating the containing AS Aggregate (or if not an AS Aggregate, terminating the AS Primitive). A thresholdCount of 0 (the default) has the special meaning of no threshold, i.e. errors ignored, and a thresholdWindow of 0 (the default) means no window, i.e. all errors counted. 
-<warning>
+<!--warning>
 <para>There are known issues with the threshold Window; see 
-<ulink url="https://issues.apache.org/jira/browse/UIMA-1026"></ulink>.</para></warning> </para>
+<ulink url="https://issues.apache.org/jira/browse/UIMA-1026"></ulink>.</para></warning--> </para>
 <para>An action of 'disable' applies to the specified delegate, removing it from the flow so the containing aggregate will no longer send it commands. The 'terminate' action applies to the entire service containing this component, disconnecting it from its input queue and shutting it down. Note that when disabling, the framework asks the flow controller to remove the delegate from the flow, but if the flow controller cannot reasonably operate without this component it can convert the action to 'terminate' by throwing an AnalysisEngineProcessException.FLOW_CANNOT_CONTINUE_AFTER_REMOVE exception. </para>
 <para>Note that the only action for an AS Primitive on getMetadata failure is to terminate, and this is always the case, so it is not listed as an configuration option. This is also the default action for an AS Aggregate getMetadata failure. </para></section>
 <section id="ugr.ref.async.deploy.descriptor.errorconfig.defaults">
