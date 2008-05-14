@@ -164,6 +164,26 @@
 		          </archive>
 		        </configuration>
       		</plugin> 
+      		
+      		<plugin>
+				<groupId>org.apache.uima</groupId>
+		  		<artifactId>PearPackagingMavenPlugin</artifactId>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+						  <classpath></classpath>
+						  <mainComponentDesc>desc/OpenCalaisAnnotator.xml</mainComponentDesc>
+						  <componentId>OpenCalaisAnnotator</componentId>
+						</configuration>
+						<goals>
+							<goal>package</goal>
+						</goals>
+					</execution>	
+				</executions>
+			</plugin>
+      		
 		</plugins>
 	</build>
 	<repositories>
