@@ -112,9 +112,6 @@ under the License.
 
         <listitem>
           <para>void sendCAS( CAS aCAS ): Sends a given CAS for analysis to the UIMA-AS Service. 
-            This method may block if the client is configured to use a reply window which prevents 
-            sending too many CASes to the service. Assuming the window is large enough to send 
-            the CAS this method returns as soon as the CAS is sent.
             The application is notified of responses or timeouts via entityProcessComplete().
          </para>
         </listitem>
@@ -214,11 +211,6 @@ under the License.
 
         <listitem>
           <para>CAS_INITIAL_HEAPSIZE: (Optional) the initial CAS heapsize.</para>
-        </listitem>
-
-        <listitem>
-          <para>ReplyWindow: Maximum number of outstanding process CAS requests that can be sent.
-            Default = 5.</para>
         </listitem>
 
         <listitem>
