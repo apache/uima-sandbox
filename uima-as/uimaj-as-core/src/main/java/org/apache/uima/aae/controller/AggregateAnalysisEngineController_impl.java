@@ -1022,7 +1022,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 			//	If debug level=FINEST show the size of the cache
 			getInProcessCache().dumpContents();
-			if (aStep.getForceCasToBeDropped() || (isNewCas && aggregateMetadata.getOperationalProperties().getOutputsNewCASes() == false))
+			// New CASes must be dropped if aggregate doesn't output them or if flow controller has ActionAfterCasMultiplier="drop"
+			if (isNewCas && (aStep.getForceCasToBeDropped() || !aggregateMetadata.getOperationalProperties().getOutputsNewCASes()))
 			{
 				endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
 				if ( cacheEntry.isReplyReceived())
