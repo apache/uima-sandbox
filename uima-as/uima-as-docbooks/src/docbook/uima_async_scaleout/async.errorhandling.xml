@@ -26,7 +26,7 @@ under the License.
 <para>This chapter discusses the high level architecture for Error Handling from the user's point of view. </para>
 <section id="ugr.async.eh.basic">
 <title>Basic concepts</title>
-<para>This chapter describes error configuration for AS components. The service client descriptor for connecting to an AS component also has some configuration related to errors, but that is discussed elsewhere.</para>
+<para>This chapter describes error configuration for AS components.</para>
 <para>The AS framework manages a collection of component parts written by users (user code) which can throw exceptions. In addition, the AS framework can run timers when sending commands to user code which can create timeouts.</para>
 <para>An AS component is either an AS aggregate or an AS primitive. AS aggregates can have multiple levels of aggregation; error configuration is done for each level of aggregation. The rest of this chapter focuses on the error configuration one level at a time (either for one particular level in an aggregate hierarchy, or for an AS primitive). </para>
 <para>There is a small number of commands which can be sent to an AS component. When a component returns the result, if an error occurs, an error result is returned instead of the normal result.</para>
@@ -39,7 +39,7 @@ under the License.
 <listitem>
 <para>timeouts of commands sent to delegates.</para></listitem></orderedlist>
 <para>The second and third class of errors is only possible for AS aggregates.</para>
-<para>When errors happen, the framework provides a standard set of configurable actions. These can be extended with (optional) user-supplied error handling code. See 
+<para>When errors happen, the framework provides a standard set of configurable actions. See 
 <xref linkend="ugr.async.eh.commands_allowed_actions"></xref> for a summary table of the actions available in different situations.</para></section>
 <section id="ugr.async.eh.incoming_commands">
 <title>Associating Errors with incoming commands</title>
@@ -58,9 +58,9 @@ under the License.
 <para>There are three incoming message commands supported by the AS framework: 
 <orderedlist spacing="compact">
 <listitem>
-<para>getMetadata - sent by the framework when setting up a new run</para></listitem>
+<para>getMetadata - sent by the framework when initializing connection to an AS component</para></listitem>
 <listitem>
-<para>processCas - sent repeatedly, once for each CAS</para></listitem>
+<para>processCas - sent once for each CAS</para></listitem>
 <listitem>
 <para>collectionProcessComplete - sent when an application calls this method</para></listitem>
 <!--listitem><para>terminate - stop running and clean up; sent by the framework as part
@@ -78,14 +78,10 @@ under the License.
 <para>Error handling actions are associated with these various commands. Some error handling actions make sense only if there is an associated CAS object, and are therefore only allowed with the processCas command. </para></section>
 <section id="ugr.async.eh.error_handling_overview">
 <title>Error handling overview</title>
-<para>When an error happens, it is either &quot;recovered&quot;, or not; only errors from delegates of an AS aggregate can be recovered.</para>
+<para>When an error happens, it is either &quot;recovered&quot;, or not; only errors from delegates of an AS aggregate can be recovered. Recovery may be achieved by retrying the request or by skipping the delegate.</para>
 <para>Commands normally return results; however if an non-recoverable error occurs, the command returns an error result instead. </para>
 <para>For AS aggregates, each level in aggregate hierarchy can be configured to try to recover the error. If a particular AS aggregate level does not recover, the error is sent up to the next level of the hierarchy (or to the calling client, if a top level). The error result is updated to reflect the actions the framework takes for this error. </para>
-<para>Non-recovered errors can optionally have an associated &quot;Terminate&quot; or &quot;Disable&quot; action (see below), triggered by the error when a threshold is reached. 
-<!--itemizedlist mark="none"><listitem><para>The "Disable" action is only available 
-      in AS Aggregates for non-recovered errors involving a delegate.</para></listitem>
-      </itemizedlist--> </para>
-<para>These actions, if they occur, are recorded in the error result, indicating that the additional Terminate or Disable action occurred. </para>
+<para>Non-recovered errors can optionally have an associated &quot;Terminate&quot; or &quot;Disable&quot; action (see below), triggered by the error when a threshold is reached. "Disable" applies to the delegate that generated the error while "Terminate" applies to the aggregate and any co-located aggregates it is contained within. </para>
 <figure id="ugr.async.eh.fig.basic_eh_chain">
 <title>Basic error handling chain for AS Aggregates for errors from delegates</title>
 <mediaobject>
@@ -93,38 +89,15 @@ under the License.
 <imagedata width="230px" format="JPG" fileref="&imgroot;basic_error_chain.jpg"></imagedata></imageobject>
 <textobject>
 <phrase>Basic error handling chain</phrase></textobject></mediaobject></figure>
-<para>The basic error handling chain starts with an error, and can attempt to recover using retry. If this fails (or is not configured), any Terminate or Disable action that is specified is examined to see if this error exceeded their threshold, and if so, the framework disables a delegate or terminates the entire component. If not, the error is counted for those thresholds, and recovery by the Continue action can be attempted. If that fails, an error result is returned to the caller. </para></section>
+<para>The basic error handling chain starts with an error, and can attempt to recover using retry. If this fails (or is not configured), the error count is incremented and checked against the thresholds for this delegate.  If the threshold has been reached the specified action is taken, disabling the delegate or terminating the entire component. If the Terminate error is not taken, recovery by the Continue action can be attempted. If that fails, an error result is returned to the caller. </para>
+<para>For AS primitives only the Terminate action is available, and Retry and Continue do not apply.</para></section>
+
 <section id="ugr.async.eh.error_results">
 <title>Error results</title>
-<note>
-<para>The ErrorResult object is not implemented yet. Instead, when an error occurs and is not recovered, the caller is notified via the standard callback mechanism for the client (
-<xref linkend="ugr.ref.async.error.status"></xref>).</para></note>
-<para>When an error occurs and is not recovered, an ErrorResult is returned to the caller. This is an object with the following methods: </para>
-<table frame="all" rowsep="1" colsep="1" id="ugr.async.eh.table.error_result">
-<title>ErrorResult class</title>
-<tgroup cols="2">
-<colspec colnum="1" colname="col1" colwidth="1*"></colspec>
-<colspec colnum="2" colname="col2" colwidth="2*"></colspec>
-<thead>
-<row>
-<entry>Method</entry>
-<entry>Description</entry></row></thead>
-<tbody>
-<row>
-<entry>Throwable getRootCause()</entry>
-<entry>Returns the underlying root cause first reported as an error</entry></row>
-<row>
-<entry>ErrorResultComponentPath getComponentKeyPath()</entry>
-<entry>Returns a path consisting of a list of component key names (for delegates) or brokerURL + endpoint elements, for top-level components not contained in an aggregate, leading down to the component that first reported the error. The path starts with the current component, and ends with the component associated with the original error.</entry></row>
-<row>
-<entry>wasTerminated()</entry>
-<entry>true if any termination occurred with this error</entry></row>
-<row>
-<entry>wasDisabled()</entry>
-<entry>true if any disabling occurred with this error</entry></row>
-<row>
-<entry>ErrorResultTDs getTDs()</entry>
-<entry>Returns a collection of path(s) to the component(s) that was/were terminated or disabled, together with a flag indicating which (could be both). </entry></row></tbody></tgroup></table></section>
+<para>Error results are returned instead of a CAS, if an error occurs and is not recovered.</para>
+<para>If the application uses the synchronous sendAndReceive() method, an Error Result is passed back to the client API.  The particular exception varies, depending on many factors, but will include a complete stack trace beginning with the cause of the error.  If the application uses an asynchronous API, the exception is wrapped in a EntityProcessStatus object and delivered via a callback listener registered by the application. See section 4.4 Status Callback Listener for details.</para>
+</section>
+
 <section id="ugr.async.eh.aggregate_managed">
 <title>Error Recovery actions</title>
 <para>When errors occur in delegates, the aggregate containing them can attempt to recover. There are two basic recovery actions: retrying the same command and continuing past (skipping) the failing component. </para>
@@ -152,10 +125,11 @@ under the License.
         </textobject>
       </mediaobject>
     </figure-->
-<para>When errors occur in delegates, retry is attempted (if configured), some number of times. If that fails, error counts are incremented and thresholds examined for Terminate/Disable actions. If those actions are not taken, Continue is attempted (if configured). If Continue fails, the error is not recovered, and the aggregate returns the error result from the delegate to the aggregate's caller. </para>
+<para>When errors occur in delegates, retry is attempted (if configured), some number of times. If that fails, error counts are incremented and thresholds examined for Terminate/Disable actions. If not reached, or if the action is Disable, Continue is attempted (if configured); if Continue fails, the error is not recovered, and the aggregate returns the error result from the delegate to the aggregate's caller. On Terminate, the error is returned to the caller.</para>
+
 <section id="ugr.async.eh.aggregate_managed.actions">
 <title>Aggregate Error Actions</title>
-<para>This section describes the error actions in more detail.</para>
+<para>This section describes in more detail the error actions valid only for AS aggregates.</para>
 <section id="ugr.async.eh.aggregate_managed.actions.retry">
 <title>Retry</title>
 <para>Retry is an action which re-sends the same command that failed back to the input queue of the delegate. (Note: It may be picked up by a different instance of that delegate, which may have a better chance of succeeding.) The framework will keep a copy of the CAS sent to remote components in order to have it to send again if a retry is required.</para>
@@ -173,7 +147,7 @@ under the License.
 <imagedata width="150px" format="JPG" fileref="&imgroot;disable_action.jpg"></imagedata></imageobject>
 <textobject>
 <phrase>Disable Action</phrase></textobject></mediaobject></figure>
-<para>The Disable action is allowed only on delegate errors. When trigger, it marks the particular delegate causing the error as &quot;disabled&quot; so it is always skipped in subsequent calls. When this action is taken, the framework calls the flow controller, telling it to remove the particular delegate from the flow.</para></section>
+<para>When this action is taken the framework marks the particular delegate causing the error as &quot;disabled&quot; so it will be skipped in subsequent calls. The framework calls the flow controller, telling it to remove the particular delegate from the flow.</para></section>
 <section id="ugr.async.eh.aggregate_managed.actions.continue">
 <title>Continue Option on Delegate Process CAS Failures</title>
 <para>For processCas commands, the Continue action causes the framework to give the flow controller object for that CAS the error details, and ask the flow controller if processing can continue. If the flow controller returns &quot;true&quot;, the flow controller will be called asking for the next step; if &quot;false&quot;, the framework stops processing the CAS, returning an error to the client reply queue, or just returning the CAS to the casPool of the CAS multiplier which created it. </para>
@@ -210,16 +184,16 @@ under the License.
     </figure-->
 <section id="ugr.async.eh.errors_passed_up.thresholds">
 <title>Thresholds for Terminate and Disable</title>
-<para>The Terminate and Disable actions are conditioned by testing against a threshold. Thresholds are specified as a &quot;rate&quot; based on processed CASes - so many errors per number of CASes processed. </para>
-<para>Thresholds are specified as two numbers - an error count and a window. The threshold is exceeded if the number of errors occurring within the window size is equal to or greater than &quot;error count&quot;. (A count of 0 for the error count is treated as a special value and disables the error threshold.)</para>
+<para>The Terminate and Disable actions are conditioned by testing against a threshold.</para>
+<para>Thresholds are specified as two numbers - an error count and a window. The threshold is reached if the number of errors occurring within the window size is equal to or greater than &quot;the error count&quot;. A value of 0 disables the error threshold so no action can be taken. A window of 0 means no window, i.e. all errors are counted.</para>
 <para>Errors associated with the processCas command are the only ones that are counted in the threshold measurements.</para></section>
 <section id="ugr.async.eh.terminate">
 <title>Terminate Action</title>
-<para>If the threshold is exceeded, the service represented by this component terminates, disconnecting itself as a listener from its input queue, and cleaning itself up (releasing resources, etc.). During cleanup, the component analysis engine's 
+<para>When this action is taken the service represented by this component sends an error reply and then terminates, disconnecting itself as a listener from its input queue, and cleaning itself up (releasing resources, etc.). During cleanup, the component analysis engine's 
 <literal>destroy</literal> method is called.</para>
-<itemizedlist mark="none">
-<listitem>
-<para>The termination action is cascaded down to all co-located, non-shared delegates, if any.</para></listitem></itemizedlist>
+
+<note><para>The termination action applies to the entire aggregate service. Remote delegates are not affected.</para></note>
+
 <figure id="ugr.async.eh.fig.terminate">
 <title>Terminate action</title>
 <mediaobject>
@@ -371,7 +345,10 @@ under the License.
 <row>
 <entry>collection Processing Complete</entry>
 <entry>Continue, Disable, Terminate</entry>
-<entry>Terminate</entry></row></tbody></tgroup></table></section>
+<entry>Terminate</entry></row></tbody></tgroup></table>
+<para>The rationale for providing the terminate action for primitive services is that only the service can know that it is no longer capable of continued operation. Consider a scaled component with multiple service instances, where one of them goes &quot;bad&quot; and starts throwing exceptions: the clients of this service have no way of stopping new requests from being delivered to this bad service instance. The teminate action allows the bad service to remove itself from further processing, and even allow life cycle management to restart a new instance.</para>
+</section>
+
 <!--
   There are predefined error conditions, and predefined actions that can be taken for
   these.</para>
