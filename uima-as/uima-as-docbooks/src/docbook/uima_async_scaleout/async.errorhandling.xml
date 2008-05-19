@@ -75,22 +75,49 @@ under the License.
     </orderedlist> </para></listitem>
     
     </itemizedlist-->
-<para>Error handling actions are associated with these various commands. Some error handling actions make sense only if there is an associated CAS object, and are therefore only allowed with the processCas command. </para></section>
+<para>Error handling actions are associated with these various commands. 
+  Some error handling actions make sense only if there is an associated CAS object, 
+  and are therefore only allowed with the processCas command. </para></section>
 <section id="ugr.async.eh.error_handling_overview">
 <title>Error handling overview</title>
-<para>When an error happens, it is either &quot;recovered&quot;, or not; only errors from delegates of an AS aggregate can be recovered. Recovery may be achieved by retrying the request or by skipping the delegate.</para>
+<para>When an error happens, it is either &quot;recovered&quot;, or not; 
+  only errors from delegates of an AS aggregate can be recovered. 
+  Recovery may be achieved by retrying the request or by skipping the delegate.</para>
 <para>Commands normally return results; however if an non-recoverable error occurs, the command returns an error result instead. </para>
-<para>For AS aggregates, each level in aggregate hierarchy can be configured to try to recover the error. If a particular AS aggregate level does not recover, the error is sent up to the next level of the hierarchy (or to the calling client, if a top level). The error result is updated to reflect the actions the framework takes for this error. </para>
-<para>Non-recovered errors can optionally have an associated &quot;Terminate&quot; or &quot;Disable&quot; action (see below), triggered by the error when a threshold is reached. "Disable" applies to the delegate that generated the error while "Terminate" applies to the aggregate and any co-located aggregates it is contained within. </para>
+<para>For AS aggregates, each level in aggregate hierarchy can be configured to try to recover the error. If a
+  particular AS aggregate level does not recover, the error is sent up to the next level of the hierarchy (or to the
+  calling client, if a top level). 
+  The error result is updated to reflect the actions the framework takes for this
+  error. </para>
+<para>Non-recovered errors can optionally have an associated &quot;Terminate&quot; or 
+  &quot;Disable&quot; action (see below), triggered by the error when a threshold is reached. 
+  "Disable" applies to the delegate that generated the error while "Terminate" applies to the 
+  aggregate and any co-located aggregates it is contained within.</para>
+  
 <figure id="ugr.async.eh.fig.basic_eh_chain">
 <title>Basic error handling chain for AS Aggregates for errors from delegates</title>
 <mediaobject>
 <imageobject>
-<imagedata width="230px" format="JPG" fileref="&imgroot;basic_error_chain.jpg"></imagedata></imageobject>
+  <imagedata width="324px" format="PNG" fileref="&imgroot;error_chain_aggr.png"></imagedata>
+  </imageobject>
 <textobject>
-<phrase>Basic error handling chain</phrase></textobject></mediaobject></figure>
-<para>The basic error handling chain starts with an error, and can attempt to recover using retry. If this fails (or is not configured), the error count is incremented and checked against the thresholds for this delegate.  If the threshold has been reached the specified action is taken, disabling the delegate or terminating the entire component. If the Terminate error is not taken, recovery by the Continue action can be attempted. If that fails, an error result is returned to the caller. </para>
-<para>For AS primitives only the Terminate action is available, and Retry and Continue do not apply.</para></section>
+<phrase>Basic error handling chain for aggregates</phrase></textobject></mediaobject></figure>
+  
+<para>The basic error handling chain starts with an error, and can attempt to recover using retry. 
+  If this fails (or is not configured), the error count is incremented and checked against the thresholds for this delegate.  If the threshold has been reached the specified action is taken, disabling the delegate or terminating the entire component. If the Terminate error is not taken, recovery by the Continue action can be attempted. If that fails, an error result is returned to the caller. </para>
+<para>For AS primitives, only the Terminate action is available, and Retry and Continue do not apply.</para>
+
+  <figure id="ugr.async.eh.fig.basic_eh_chain_prim">
+<title>Basic error handling chain for AS Primitives</title>
+<mediaobject>
+<imageobject>
+  <imagedata width="241px" format="PNG" fileref="&imgroot;error_chain_prim.png"></imagedata>
+  </imageobject>
+<textobject>
+<phrase>Basic error handling chain for aggregates</phrase></textobject></mediaobject></figure>
+
+  
+</section>
 
 <section id="ugr.async.eh.error_results">
 <title>Error results</title>
