@@ -148,13 +148,11 @@ under the License.
         </listitem>
 
         <listitem>
-          <para>String deploy( String aDeploymentDescriptor, Map anApplicationContext):
-            Deploys the UIMA-AS service specified by the given deployment descriptor and returns a handle
-            to the Spring container for this service.
-            The application context map must contain DD2SpringXsltFilePath and SaxonClasspath entries.
-            This call blocks until the service is ready to process requests, or an exception occurs
-            during deployment.
-          </para>
+          <para>String deploy( String aDeploymentDescriptor, Map anApplicationContext): Deploys the UIMA-AS
+            service specified by the given deployment descriptor in this JVM, and returns a handle to the Spring
+            container for this service. The application context map must contain DD2SpringXsltFilePath and
+            SaxonClasspath entries. This call blocks until the service is ready to process requests, or an
+            exception occurs during deployment. </para>
         </listitem>
 
         <listitem>
@@ -181,57 +179,57 @@ under the License.
     <!--======================================================-->    
     <section id="ugr.ref.async.context.map">
       <title>Application Context Map</title>
-      <para>The application context map is used to pass initialization parameters.
-        These parameters are itemized below.
-
-      <itemizedlist>
-        <listitem>
-          <para>DD2SpringXsltFilePath: Required for deploying services.</para>
-        </listitem>
-
-        <listitem>
-          <para>SaxonClasspath: Required for deploying services.</para>
-        </listitem>
-
-        <listitem>
-          <para>ServerUri: Broker connector for service. Required for initialize.</para>
-        </listitem>
-
-        <listitem>
-          <para>Endpoint: Service queue name. Required for initialize.</para>
-        </listitem>
-
-        <listitem>
-          <para>Resource Manager: (Optional) a UIMA ResourceManager to use for the client.</para>
-        </listitem>
-
-        <listitem>
-          <para>CasPoolSize: Size of Cas pool to create to send to specified service. Default = 1.</para>
-        </listitem>
-
-        <listitem>
-          <para>CAS_INITIAL_HEAPSIZE: (Optional) the initial CAS heapsize.</para>
-        </listitem>
-
-        <listitem>
-          <para>Application Name: optional name of the application using this API, for logging.</para>
-        </listitem>
-
-        <listitem>
-          <para>Timeout: Process CAS timeout in ms. Default = no timeout.</para>
-        </listitem>
-
-        <listitem>
-          <para>GetMetaTimeout: Initialize timeout in ms. Default = 60 seconds.</para>
-        </listitem>
-
-        <listitem>
-          <para>CpcTimeout: Collection process complete timeout. Default = no timeout.</para>
-        </listitem>
-
-      </itemizedlist></para>
-
-  </section>
+      <para>The application context map is used to pass initialization parameters. These parameters are itemized
+        below.
+        
+        <itemizedlist>
+          <listitem>
+            <para>DD2SpringXsltFilePath: Required for deploying services.</para>
+          </listitem>
+          
+          <listitem>
+            <para>SaxonClasspath: Required for deploying services.</para>
+          </listitem>
+          
+          <listitem>
+            <para>ServerUri: Broker connector for service. Required for initialize.</para>
+          </listitem>
+          
+          <listitem>
+            <para>Endpoint: Service queue name. Required for initialize.</para>
+          </listitem>
+          
+          <listitem>
+            <para>Resource Manager: (Optional) a UIMA ResourceManager to use for the client.</para>
+          </listitem>
+          
+          <listitem>
+            <para>CasPoolSize: Size of Cas pool to create to send to specified service. Default = 1.</para>
+          </listitem>
+          
+          <listitem>
+            <para>CAS_INITIAL_HEAPSIZE: (Optional) the initial CAS heapsize.</para>
+          </listitem>
+          
+          <listitem>
+            <para>Application Name: optional name of the application using this API, for logging.</para>
+          </listitem>
+          
+          <listitem>
+            <para>Timeout: Process CAS timeout in ms. Default = no timeout.</para>
+          </listitem>
+          
+          <listitem>
+            <para>GetMetaTimeout: Initialize timeout in ms. Default = 60 seconds.</para>
+          </listitem>
+          
+          <listitem>
+            <para>CpcTimeout: Collection process complete timeout. Default = no timeout.</para>
+          </listitem>
+          
+        </itemizedlist></para>
+      
+    </section>
 
 
     <!--======================================================-->    
