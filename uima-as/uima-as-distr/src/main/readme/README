@@ -233,6 +233,8 @@ When the broker starts it will print a message such as:
 
 Connect a JMX console to this service with:
          $JAVA_HOME/bin/jconsole service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi
+         
+(Note: jconsole is available in Java SDK (not JRE) distributions from Sun)         
 If your console is not on the same machine as the broker replace localhost by
 the name of the broker's machine.  For more details see http://activemq.apache.org/jmx.html
 
