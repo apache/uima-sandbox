@@ -352,9 +352,10 @@ public class UimacppServiceController implements ControllerLifecycle {
 
     String uimacppHome = (String) envVarMap.get("UIMACPP_HOME");
     if (uimacppHome == null) {
-      //       throw new ResourceInitializationException(new IOException(
-      //           "UIMACPP_HOME not specified." + uimacppHome));
-      uimacppHome = System.getenv("UIMA_HOME") + "/uimacpp";
+      uimacppHome = System.getenv("UIMACPP_HOME");
+      if (uimacppHome == null) {
+        uimacppHome = System.getenv("UIMA_HOME") + "/uimacpp";
+      }
     }
 
     if (!(new File(uimacppHome)).exists()) {
