@@ -55,7 +55,8 @@ REM   under the License.
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\config;%_REALLYNOQUOTES%
 
 @rem set path to support running C++ annotators
-set PATH=%UIMA_HOME%\uimacpp\bin;%UIMA_HOME%\uimacpp\examples\tutorial\src;%PATH%
+@if "%UIMACPP_HOME%"=="" set UIMACPP_HOME=%UIMA_HOME%\uimacpp
+set PATH=%UIMACPP_HOME%\bin;%UIMACPP_HOME%\examples\tutorial\src;%PATH%
 @rem Also set VNS_HOST and VNS_PORT to default values if they are not specified
 @if "%VNS_HOST%"=="" set VNS_HOST=localhost
 @if "%VNS_PORT%"=="" set VNS_PORT=9000

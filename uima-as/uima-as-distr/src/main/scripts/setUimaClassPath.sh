@@ -49,10 +49,15 @@ UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/uimaj-as-activemq.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/lib/uimaj-as-jms.jar
 UIMA_CLASSPATH=$UIMA_CLASSPATH:$UIMA_HOME/config:$CLASSPATH
 
+if [ "$UIMACPP_HOME" = "" ]
+then
+  UIMACPP_HOME=$UIMA_HOME/uimacpp
+fi
 #set LD_LIBRARY_PATH to support running C++ annotators
-LD_LIBRARY_PATH=$UIMA_HOME/uimacpp/lib:$UIMA_HOME/uimacpp/examples/tutorial/src:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$UIMACPP_HOME/lib:$UIMACPP_HOME/examples/tutorial/src:$LD_LIBRARY_PATH
 #also set DYLD_LIBRARY_PATH, used by Mac OSX
-DYLD_LIBRARY_PATH=$UIMA_HOME/uimacpp/lib:$UIMA_HOME/uimacpp/examples/tutorial/src:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$UIMACPP_HOME/lib:$UIMACPP_HOME/examples/tutorial/src:$DYLD_LIBRARY_PATH
+
 #also set default values for VNS_HOST and VNS_PORT
 if [ "$VNS_HOST" = "" ];
 then
