@@ -27,8 +27,10 @@ REM  The form %~1 (as opposed to %1) removes surrounding quotes
 
 @:usage
 @echo off
-echo Run this command in its directory to tag a uima-as release
+echo Run this command in any directory to tag a uima-as release
 echo This will copy the HEAD in the repository for several projects
+echo This command doesn't modify any local directories or files
+
 REM the period following echo inserts a blank line
 echo.  
 echo Usage: tag level release-candidate  core-uima-tag-base core-uima-tag-release-candidate
