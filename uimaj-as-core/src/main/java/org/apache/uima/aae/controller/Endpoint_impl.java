@@ -100,9 +100,11 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	private boolean tempReplyDestination;
 		
 	private int initialHeapSize;
+	
 	private volatile boolean replyDestinationFailed;
 	
 	private long idleTime=0;
+	
 	public int getCommand()
 	{
 		return command;

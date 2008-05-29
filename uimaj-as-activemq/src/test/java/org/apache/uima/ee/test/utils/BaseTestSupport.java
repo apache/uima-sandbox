@@ -174,12 +174,12 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 						break;
 
 					case EXCEPTION_LATCH:
-						// Initialize latch to open after CPC reply comes in.
+						// Initialize latch to open after Exception reply comes in.
 						exceptionCountLatch.await();
 						break;
 
 					case PROCESS_LATCH:
-						// Initialize latch to open after CPC reply comes in.
+						// Initialize latch to open after Process reply comes in.
 						processCountLatch.await();
 						break;
 					}
@@ -284,6 +284,10 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		runTest(appCtx, aUimaEeEngine, aBrokerURI, aTopLevelServiceQueueName, howMany, aLatchKind, SEND_CAS_ASYNCHRONOUSLY);
 	}
 
+	protected void runTest2(Map appCtx, BaseUIMAAsynchronousEngine_impl aUimaEeEngine, String aBrokerURI, String aTopLevelServiceQueueName, int howMany, int aLatchKind) throws Exception
+	{
+		runTest2(appCtx, aUimaEeEngine, aBrokerURI, aTopLevelServiceQueueName, howMany, aLatchKind, SEND_CAS_ASYNCHRONOUSLY);
+	}
 	/**
 	 * Initializes a given instance of the Uima EE client and executes a test. It uses synchronization to
 	 * enforce correct sequence of calls and setups expected result.
@@ -366,6 +370,86 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	}
 
 	/**
+	 * Initializes a given instance of the Uima EE client and executes a test. It uses synchronization to
+	 * enforce correct sequence of calls and setups expected result.
+	 *  
+	 * @param appCtx
+	 * @param aUimaEeEngine
+	 * @param aBrokerURI
+	 * @param aTopLevelServiceQueueName
+	 * @param howMany
+	 * @param aLatchKind
+	 * @param sendCasAsynchronously
+	 * @throws Exception
+	 */
+	protected void runTest2(Map appCtx, BaseUIMAAsynchronousEngine_impl aUimaEeEngine, String aBrokerURI, String aTopLevelServiceQueueName, int howMany, int aLatchKind, boolean sendCasAsynchronously) throws Exception
+	{
+		Thread t1 = null;
+		Thread t2 = null;
+
+		if (appCtx == null)
+		{
+			appCtx = buildContext(aBrokerURI, aTopLevelServiceQueueName, 0);
+		}
+		initialize(aUimaEeEngine, appCtx);
+
+		// Wait until the top level service returns its metadata
+		waitUntilInitialized();
+		for (int i=0; i < howMany; i++)
+		{
+			final AtomicBoolean ctrlMonitor = new AtomicBoolean();
+			// Create a thread that will block until the CPC reply come back
+			// from the top level service
+			if (aLatchKind == EXCEPTION_LATCH)
+			{
+				t1 = spinMonitorThread(ctrlMonitor, 1, EXCEPTION_LATCH);
+			}
+			else
+			{
+				t1 = spinMonitorThread(ctrlMonitor, 1, CPC_LATCH);
+				t2 = spinMonitorThread(ctrlMonitor, 1, PROCESS_LATCH);
+			}
+
+			if (!isStopped)
+			{
+				// Wait until the CPC Thread is ready.
+				waitOnMonitor(ctrlMonitor);
+				if (!isStopped)
+				{
+					// Send an in CAS to the top level service
+					sendCAS(aUimaEeEngine, 1, sendCasAsynchronously);
+				}
+				// Wait until ALL CASes return from the service
+				if (t2 != null)
+				{
+					t2.join();
+
+					if (!serviceShutdownException && !isStopped && !unexpectedException)
+					{
+						System.out.println("Sending CPC");
+
+						// Send CPC
+						aUimaEeEngine.collectionProcessingComplete();
+					}
+				}
+
+				// If have skipped CPC trip the latch
+				if ( serviceShutdownException || (unexpectedException && cpcLatch != null) )
+				{
+					cpcLatch.countDown();
+				}
+				t1.join();
+			}
+
+		}
+
+		if (unexpectedException)
+		{
+			fail("Unexpected exception returned");
+		}
+		aUimaEeEngine.stop();
+	}
+	/**
 	 * Sends a given number of CASs to Uima EE service. This method sends each CAS using either 
 	 * synchronous or asynchronous API. 
 	 * 
@@ -405,7 +489,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	protected void incrementCASesProcessed()
 	{
 		responseCounter++;
-		System.out.println(":::::::::::::: Received:" + responseCounter + " Reply");
+		System.out.println("Client:::::::::::::: Received:" + responseCounter + " Reply");
 
 	}
 	/**
@@ -416,16 +500,19 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	public void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
 	{
 		String casReferenceId="";
+		String parentCasReferenceId="";
+		if ( aProcessStatus instanceof UimaASProcessStatus )
+		{
+			casReferenceId = 
+				((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
+			parentCasReferenceId = 
+				((UimaASProcessStatus)aProcessStatus).getParentCasReferenceId();
+		}
 		if (aProcessStatus.isException())
 		{
 			if ( !expectingServiceShutdownException )
 				System.out.println(" Process Received Reply Containing Exception.");
 			
-			if ( aProcessStatus instanceof UimaASProcessStatus )
-			{
-				casReferenceId = 
-					((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
-			}
 
 			List list = aProcessStatus.getExceptions();
 			for( int i=0; i < list.size(); i++)
@@ -464,7 +551,14 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		}
 		else if (processCountLatch != null && aCAS != null)
 		{
-			System.out.println(" Received Reply Containing CAS");
+			if ( parentCasReferenceId != null )
+			{
+				System.out.println("Client Received Reply Containing CAS:"+casReferenceId+" The Cas Was Generated From Parent Cas Id:"+parentCasReferenceId);
+			}
+			else
+			{
+				System.out.println("Client Received Reply Containing CAS:"+casReferenceId);
+			}
 			
 			if ( doubleByteText != null )
 			{
@@ -472,18 +566,20 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 				if ( !doubleByteText.equals(returnedText))
 				{
 					  System.out.println("!!! DocumentText in CAS reply different from that in CAS sent !!!");
-            System.out.println("This is expected using http connector with vanilla AMQ 5.0 release,");
-            System.out.println("and the test file DoubleByteText.txt contains double byte chars.");
-            System.out.println("To fix, use uima-as-distr/src/main/lib/optional/activemq-optional-5.0.0.jar");
+					  System.out.println("This is expected using http connector with vanilla AMQ 5.0 release,");
+					  System.out.println("and the test file DoubleByteText.txt contains double byte chars.");
+					  System.out.println("To fix, use uima-as-distr/src/main/lib/optional/activemq-optional-5.0.0.jar");
 					  unexpectedException = true;
-            processCountLatch.countDown();
+					  processCountLatch.countDown();
 					  return;
 				}
 			}
-      // test worked, reset use of this text
-      doubleByteText = null;
-			
-			processCountLatch.countDown();
+			// test worked, reset use of this text
+			doubleByteText = null;
+			if ( parentCasReferenceId == null)
+			{
+				processCountLatch.countDown();
+			}
 			List eList = aProcessStatus.getProcessTrace().getEventsByComponentName("UimaEE", false);
 			for( int i=0; i < eList.size(); i++)
 			{
@@ -584,6 +680,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		//	Run until All CASes are sent
 		public void run()
 		{
+			UimaASProcessStatusImpl status=null;
 			try
 			{
 				while (howManyCASes-- > 0)
@@ -591,15 +688,16 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 					CAS cas = uimaClient.getCAS();
 					cas.setDocumentText(text);
 					ProcessTrace pt = new ProcessTrace_impl();
-					UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
 
 					try
 					{
 						// Send CAS and wait for a response
-						uimaClient.sendAndReceiveCAS(cas, pt);
+						String casReferenceId = uimaClient.sendAndReceiveCAS(cas, pt);
+						status = new UimaASProcessStatusImpl(pt, casReferenceId);
 					}
 					catch( ResourceProcessException rpe)
 					{
+						status = new UimaASProcessStatusImpl(pt);
 						status.addEventStatus("Process", "Failed", rpe);
 					}
 					finally

@@ -70,17 +70,13 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 
 	private List aeList = new ArrayList();
 	
-	private List cmOutstandingCASes = new ArrayList();
-	
 	private int throttleWindow = 0;
 	
 	private Object gater = new Object();
 	
 	private long howManyBeforeReplySeen = 0;
 	
-	private boolean isMultiplier = false;
 	
-	private Object syncObject = new Object();
 	
 	private PrimitiveServiceInfo serviceInfo = null;
 
@@ -148,10 +144,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				if (i == 0)
 				{
 					analysisEngineMetadata = ae.getAnalysisEngineMetaData();
-					if ( analysisEngineMetadata.getOperationalProperties().getOutputsNewCASes())
-					{
-						isMultiplier = true;
-					}
 				}
 			}
 			
@@ -163,7 +155,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			serviceInfo.setAnalysisEngineInstanceCount(analysisEnginePoolSize);
 			aeInstancePool.intialize(aeList);
 
-			
 			getMonitor().setThresholds(getErrorHandlerChain().getThresholds());
 			// Initialize Cas Manager
 			if (getCasManagerWrapper() != null)
@@ -182,6 +173,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 					// All internal components of this Primitive have been initialized. Open the latch
 					// so that this service can start processing requests.
 					latch.openLatch(getName(), isTopLevelComponent(), true);
+					
 				}
 				catch ( Exception e)
 				{
@@ -197,19 +189,19 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 		catch ( AsynchAEException e)
 		{
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+			e.printStackTrace();
 			throw e;
 		}
 		catch ( Exception e)
 		{
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+			e.printStackTrace();
 			throw new AsynchAEException(e);
 		}
 		
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_initialized_controller__INFO", new Object[] { getComponentName() });
 		super.serviceInitialized = true;
-	}
-	public boolean isMultiplier()
-	{
-		return isMultiplier;
 	}
 
 	/**
@@ -307,6 +299,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		  return;
 		}
 */	
+		boolean inputCASReturned = false;
 		boolean processingFailed = false;
 		// This is a primitive controller. No more processing is to be done on the Cas. Mark the destination as final and return CAS in reply.
 		anEndpoint.setFinal(true);
@@ -333,35 +326,19 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				
 				return;
 			}
+			//	Get input CAS entry from the InProcess cache
+			CacheEntry inputCASEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+
 			long time = System.nanoTime();
 			long totalProcessTime = 0;  // stored total time spent producing ALL CASes
 			CasIterator casIterator = ae.processAndOutputNewCASes(aCAS);
 			//	Store how long it took to call processAndOutputNewCASes()
 			totalProcessTime = ( System.nanoTime() - time);
 			long sequence = 1;
-			String newCasReferenceId = null;
 			long hasNextTime = 0;         // stores time in hasNext()
 			long getNextTime = 0;         // stores time in next();   
 			long timeToProcessCAS = 0;    // stores time in hasNext() and next() for each CAS
 			boolean moreCASesToProcess = true;
-/*			
-			
-			String parentCasReferenceId = null;
-			CacheEntry inputCasCacheEntry = null;
-			try
-			{
-				//	Fetch cache entry for the input CAS
-				inputCasCacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-				parentCasReferenceId = inputCasCacheEntry.getInputCasReferenceId();
-			}
-			catch( Exception e )
-			{
-				//	An exception be be thrown here if the service is being stopped.
-				//	The top level controller may have already cleaned up the cache
-				//	and the getCacheEntryForCAS() will throw an exception. Ignore it
-				//	here, we are shutting down.
-			}
-*/
 			while (moreCASesToProcess)
 			{
 				hasNextTime = System.nanoTime();
@@ -412,35 +389,37 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				}
 				OutOfTypeSystemData otsd = getInProcessCache().getOutOfTypeSystemData(aCasReferenceId);
 				MessageContext mContext = getInProcessCache().getMessageAccessorByReference(aCasReferenceId);
-				sequence++;
-				newCasReferenceId = getInProcessCache().register( casProduced, mContext, otsd);
-				CacheEntry newEntry = getInProcessCache().getCacheEntryForCAS(newCasReferenceId);
-/*
-				if ( parentCasReferenceId == null )
-				{
-					newEntry.setInputCasReferenceId(aCasReferenceId);
-				}
-				else
-				{
-					newEntry.setInputCasReferenceId(parentCasReferenceId);
-				}
-*/
+				CacheEntry newEntry = getInProcessCache().register( casProduced, mContext, otsd);
+				//	Associate input CAS with the new CAS
 				newEntry.setInputCasReferenceId(aCasReferenceId);
+				newEntry.setCasSequence(sequence);
 				//	Add to the cache how long it took to process the generated (subordinate) CAS
-				getCasStatistics(newCasReferenceId).incrementAnalysisTime(timeToProcessCAS);
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_produced_new_cas__FINE", new Object[] { Thread.currentThread().getName(),getComponentName(),newCasReferenceId, aCasReferenceId });
+				getCasStatistics(newEntry.getCasReferenceId()).incrementAnalysisTime(timeToProcessCAS);
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_produced_new_cas__FINE", new Object[] { Thread.currentThread().getName(),getComponentName(),newEntry.getCasReferenceId(), aCasReferenceId });
+				//	Add the generated CAS to the outstanding CAS Map. Client notification will release
+				//	this CAS back to its pool
 				synchronized(syncObject)
 				{
-					cmOutstandingCASes.add(newCasReferenceId);
-					getOutputChannel().sendReply(casProduced, aCasReferenceId, newCasReferenceId, anEndpoint, sequence);
+					if ( isTopLevelComponent() )
+					{
+						inputCASEntry.incrementSubordinateCasInPlayCount();
+						//	Add the id of the generated CAS to the map holding outstanding CASes. This
+						//	map will be referenced when a client sends Free CAS Notification. The map
+						//	stores the id of the CAS both as a key and a value. Map is used to facilitate
+						//	quick lookup
+						cmOutstandingCASes.put(newEntry.getCasReferenceId(),newEntry.getCasReferenceId());
+					}
+					//	Send generated CAS to the client
+					getOutputChannel().sendReply(newEntry, anEndpoint);
 				}
 				//	Remove Stats from the global Map associated with the new CAS
-				//	This stats for this CAS were added to the response message
+				//	These stats for this CAS were added to the response message
 				//	and are no longer needed
-				dropCasStatistics(newCasReferenceId);
+				dropCasStatistics(newEntry.getCasReferenceId());
 				//	Increment number of CASes processed by this service
 				getServicePerformance().incrementNumberOfCASesProcessed();
 				getServicePerformance().incrementAnalysisTime(timeToProcessCAS);
+				sequence++;
 			}
 
 			LongNumericStatistic statistic = null;
@@ -449,23 +428,28 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	Increment how long it took to process the input CAS. This timer is exposed via JMX
 				statistic.increment(totalProcessTime);
 			}
-/*			
-			if (newCasReferenceId != null)
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), newCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
-			}
-			else
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
-
-			}
-*/
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
 			getMonitor().resetCountingStatistic("", Monitor.ProcessErrorCount);
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
 			//	Aggregate total time spent processing the input CAS
 			getServicePerformance().incrementAnalysisTime(totalProcessTime);
-			getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
+			synchronized( cmOutstandingCASes )
+			{
+				if ( cmOutstandingCASes.size() == 0)
+				{
+					inputCASReturned = true;
+					//	Return an input CAS to the client if there are no outstanding child CASes in play
+					getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
+				}
+				else
+				{
+					//	Change the state of the input CAS. Since the input CAS is not returned to the client
+					//	until all children of this CAS has been fully processed we keep the input in the cache.
+					//	The client will send Free CAS Notifications to release CASes produced here. When the
+					//	last child CAS is freed, the input CAS is allowed to be returned to the client.
+					inputCASEntry.setPendingReply(true);
+				}
+			}
 		}
 		catch ( Throwable e)
 		{
@@ -507,8 +491,9 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 
 					getInProcessCache().releaseCASesProducedFromInputCAS(aCasReferenceId);
 				}
-				else
+				else if ( inputCASReturned )
 				{
+					//	Remove input CAS cache entry if the CAS has been sent to the client
 					dropCAS(aCasReferenceId, true);
 				}
 			}
@@ -619,32 +604,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	protected String getNameFromMetadata()
 	{
 		return super.getMetaData().getName();
-	}
-	public void releaseNextCas()
-	{
-		synchronized(syncObject)
-		{
-			if ( cmOutstandingCASes.size() > 0 )
-			{
-				try
-				{
-					String casReferenceId = (String)cmOutstandingCASes.remove(0);
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-			                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
-			                new Object[] { getName(), casReferenceId });
-					if ( casReferenceId != null && getInProcessCache().entryExists(casReferenceId))
-					{
-						dropCAS(casReferenceId, true);
-					}
-				}
-				catch( Exception e)
-				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-			                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
-			                new Object[] { e});
-				}
-			}
-		}
 	}
 	
 	public void setAnalysisEngineInstancePool( AnalysisEngineInstancePool aPool)

@@ -123,16 +123,6 @@ public class JmsMessageContext implements MessageContext
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 	                    "JmsMessageContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_reply_queue_server_not_defined__WARNING");
 			}
-//			if ( aMessage.getBooleanProperty(AsynchAEMessage.RemoveEndpoint))
-//			{
-//endpoint.setRemove(true);
-//System.out.println("Remove Endpoint is set:"+endpoint.remove());
-//			}
-//			else
-//			{
-//				System.out.println("Remove Endpoint is not set");				
-//				
-//			}
 		}
 		catch( Exception e)
 		{

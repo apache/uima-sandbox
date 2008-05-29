@@ -148,6 +148,14 @@ implements AnalysisEngineController, EventSubscriber
 	
 	protected ConcurrentHashMap perCasStatistics = new ConcurrentHashMap();
 
+	private boolean casMultiplier = false;
+	
+	protected Object syncObject = new Object();
+	
+	//	Map holding outstanding CASes produced by Cas Multiplier that have to be acked
+	protected ConcurrentHashMap cmOutstandingCASes = new ConcurrentHashMap();
+	
+
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -239,10 +247,13 @@ implements AnalysisEngineController, EventSubscriber
 				getUimaContextAdmin().getManagementInterface();
 			//	Override uima core jmx domain setting
 			mbean.setName(getComponentName(), getUimaContextAdmin(),jmxManagement.getJmxDomain());
-			if ( this instanceof PrimitiveAnalysisEngineController && resourceSpecifier instanceof AnalysisEngineDescription )
+//			if ( this instanceof PrimitiveAnalysisEngineController && resourceSpecifier instanceof AnalysisEngineDescription )
+			if ( resourceSpecifier instanceof AnalysisEngineDescription )
 			{
+				//	Is this service a CAS Multiplier?
 				if ( ((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes() )
 				{
+					casMultiplier = true;
 					System.out.println(getName()+"-Initializing CAS Pool for Context:"+getUimaContextAdmin().getQualifiedContextName());
 					System.out.println(getComponentName()+"-CasMultiplier Cas Pool Size="+aComponentCasPoolSize+" Cas Initialial Heap Size:"+anInitialCasHeapSize);
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
@@ -350,11 +361,6 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		if ( this instanceof PrimitiveAnalysisEngineController )
 		{
-//			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.ProcessCount)) == null )
-//			{
-//				statistic = new LongNumericStatistic(Monitor.ProcessCount);
-//				getMonitor().addStatistic("", statistic);
-//			}
 			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.ProcessErrorCount)) == null )
 			{
 				statistic = new LongNumericStatistic(Monitor.ProcessErrorCount);
@@ -451,7 +457,6 @@ implements AnalysisEngineController, EventSubscriber
 		String name = "";
 		int index = getIndex(); 
 		servicePerformance = new ServicePerformance();
-//		name = getJMXDomain()+key_value_list+",name="+thisComponentName+"_"+servicePerformance.getLabel();
 		name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+servicePerformance.getLabel();
 		
 		
@@ -471,10 +476,7 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		if ( pServiceInfo != null )
 		{
-//			name = getJMXDomain()+key_value_list+",name="+thisComponentName+"_"+serviceInfo.getLabel();
 			name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+serviceInfo.getLabel();
-			
-			
 			if ( !isTopLevelComponent() )
 			{
 				pServiceInfo.setBrokerURL("Embedded Broker");
@@ -483,10 +485,7 @@ implements AnalysisEngineController, EventSubscriber
 		}
 
 		serviceErrors = new ServiceErrors();
-//		name = getJMXDomain()+key_value_list+",name="+thisComponentName+"_"+serviceErrors.getLabel();
 		name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+serviceErrors.getLabel();
-		
-		
 		registerWithAgent(serviceErrors, name );
 	}
 
@@ -661,23 +660,12 @@ implements AnalysisEngineController, EventSubscriber
 			registeredWithJMXServer = true;
 			registerServiceWithJMX(jmxContext, false);
 		}
-/*		
-		if ( this instanceof AggregateAnalysisEngineController )
-		{
-			AggregateAnalysisEngineController aC = (AggregateAnalysisEngineController)this;
-			 if ( aC.requestForMetaSentToRemotes() == false && allDelegatesAreRemote )
-			 {
-				 aC.setRequestForMetaSentToRemotes();
-				 aC.sendRequestForMetadataToRemoteDelegates();
-			 }
-*/
 	}
 	public void addInputChannel( InputChannel anInputChannel )
 	{
 		if ( !inputChannelMap.containsKey(anInputChannel.getInputQueueName()))
 		{
 			inputChannelMap.put(anInputChannel.getInputQueueName(), anInputChannel);
-			
 		}
 	}
 	public InputChannel getInputChannel()
@@ -1111,53 +1099,6 @@ implements AnalysisEngineController, EventSubscriber
 	}
 	
 	/**
-	 * Logs controller statistics in a uima log.
-	 * 
-	 * @param aComponentName 
-	 * @param aStatsMap
-	 */
-/*	
-	protected void logStats(String aComponentName, Map aStatsMap)
-	{
-		float totalIdleTime = 0;
-		long numberCASesProcessed = 0;
-		float totalDeserializeTime = 0;
-		float totalSerializeTime = 0;
-		
-		if ( aStatsMap.containsKey(Monitor.IdleTime))
-		{
-			totalIdleTime = ((Float)aStatsMap.get(Monitor.IdleTime)).floatValue();
-		}
-		if ( aStatsMap.containsKey(Monitor.ProcessCount))
-		{
-			numberCASesProcessed = ((Long)aStatsMap.get(Monitor.ProcessCount)).longValue();
-		}
-		if ( aStatsMap.containsKey(Monitor.TotalDeserializeTime))
-		{
-			totalDeserializeTime = ((Float)aStatsMap.get(Monitor.TotalDeserializeTime)).floatValue();
-		}
-		if ( aStatsMap.containsKey(Monitor.TotalDeserializeTime))
-		{
-			totalSerializeTime = ((Float)aStatsMap.get(Monitor.TotalSerializeTime)).floatValue();
-		}
-		float totalAEProcessTime=0;
-		if ( aStatsMap.containsKey(Monitor.TotalAEProcessTime))
-		{
-			totalAEProcessTime = ((Float)aStatsMap.get(Monitor.TotalAEProcessTime)).floatValue();
-		}
-
-		if ( totalAEProcessTime > 0 )
-		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "logStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_primitive_stats__INFO", new Object[] { aComponentName, totalIdleTime, numberCASesProcessed, totalDeserializeTime, totalSerializeTime, totalAEProcessTime });
-		}
-		else
-		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "logStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_aggregate_stats__INFO", new Object[] { aComponentName, totalIdleTime, numberCASesProcessed, totalDeserializeTime, totalSerializeTime });
-		}
-		
-	}
-*/	
-	/**
 	 * Clears controller statistics.
 	 * 
 	 */
@@ -1366,14 +1307,14 @@ implements AnalysisEngineController, EventSubscriber
 			((AggregateAnalysisEngineController_impl)this).stopTimers();
 			//	Stops ALL input channels of this service including the reply channels
 			stopInputChannels();
-			int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).childControllerList.size();
+			int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).getChildControllerList().size();
 			//	send terminate event to all collocated child controllers
 			if ( childControllerListSize > 0 )
 			{
 				for( int i=0; i < childControllerListSize; i++ )
 				{
 					AnalysisEngineController childController = 
-						(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).childControllerList.get(i);
+						(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).getChildControllerList().get(i);
 					
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop_delegate__INFO", new Object[] { getComponentName(), childController.getComponentName() });
 					childController.stop();
@@ -1488,23 +1429,6 @@ implements AnalysisEngineController, EventSubscriber
 			//	fully processed.
 			stopCasMultiplier();
 			stop();
-/*
-			//	If the InProcessCache is not empty ( CASes are still in play), register self
-			//	(the top level controller) to receive a callback when all CASes are fully
-			//	processed and the cache becomes empty. 
-			if ( !getInProcessCache().isEmpty() )
-			{
-				System.out.println("Controller:"+getComponentName()+" Cache Not Empty. Registering Self For Callback");			
-				getInProcessCache().dumpContents();
-				getInProcessCache().registerCallbackWhenCacheEmpty(this.getEventListener());
-			}
-			else  
-			{
-				// Cache is already empty - trigger shutdown. If this controller is an 
-			    // aggregate, it will propagate stop() down the delegate hierarchy
-				getEventListener().onCacheEmpty();
-			}
-*/		
 		}
 	}
 
@@ -1621,16 +1545,14 @@ implements AnalysisEngineController, EventSubscriber
 	
 	public AnalysisEngineController getCasMultiplierController()
 	{
-		int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).childControllerList.size();
+		int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).getChildControllerList().size();
 		if ( childControllerListSize > 0 )
 		{
 			for( int i=0; i < childControllerListSize; i++ )
 			{
 				AnalysisEngineController childController = 
-					(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).childControllerList.get(i);
-				if ( childController instanceof PrimitiveAnalysisEngineController  &&
-				    ((PrimitiveAnalysisEngineController)childController).isMultiplier()
-			       )
+					(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).getChildControllerList().get(i);
+				if ( childController.isCasMultiplier() )
 				{
 					return childController;
 				}
@@ -1651,7 +1573,6 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		return null;
 	}
-	
 	 
 	/**
 	 * Callback method called the InProcessCache becomes empty meaning ALL CASes are processed.
@@ -1742,4 +1663,77 @@ implements AnalysisEngineController, EventSubscriber
 				perCasStatistics.remove(aCasReferenceId);
 		}
 	  }
+	  
+	  public boolean isCasMultiplier()
+	  {
+		  return casMultiplier;
+	  }
+	  
+		public void releaseNextCas(String casReferenceId)
+		{
+			synchronized(syncObject)
+			{
+				//	Check if the CAS is in the list of outstanding CASes and also exists in the cache
+				if ( cmOutstandingCASes.size() > 0 && cmOutstandingCASes.containsKey(casReferenceId) && getInProcessCache().entryExists(casReferenceId))
+				{
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+			                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
+			                new Object[] { getComponentName(), casReferenceId });
+					try
+					{
+						CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(casReferenceId);
+						String parentCasReferenceId = cacheEntry.getInputCasReferenceId(); 
+						Endpoint freeCasEndpoint = cacheEntry.getFreeCasEndpoint();
+						//	If the CAS was created by a remote Cas Multiplier, send a Free CAS Notification
+						//	to the CM.
+						if ( freeCasEndpoint != null )
+						{
+							UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+					                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_sending_fcq_req__FINE",
+					                new Object[] { getComponentName(), casReferenceId, cacheEntry.getCasMultiplierKey(), freeCasEndpoint.getDestination() });
+							freeCasEndpoint.setReplyEndpoint(true);
+							getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, casReferenceId, freeCasEndpoint);
+						}
+						cacheEntry = null;
+						//	Release the CAS and remove it from the InProcess cache
+						dropCAS(casReferenceId, true);
+						//	Check if the CAS has a parent CAS
+						if ( parentCasReferenceId != null )
+						{
+							//	Fetch the parent CAS from the InProcess Cache
+							cacheEntry = getInProcessCache().getCacheEntryForCAS(parentCasReferenceId);
+							if ( cacheEntry != null  )
+							{
+								//	Decrement number of child CASes in play
+								cacheEntry.decrementSubordinateCasInPlayCount();
+								if ( cacheEntry.isPendingReply() && cacheEntry.getSubordinateCasInPlayCount() == 0)
+								{
+									if ( this instanceof AggregateAnalysisEngineController )
+									{
+										((AggregateAnalysisEngineController)this).finalStep( cacheEntry.getFinalStep(), parentCasReferenceId);
+									}
+									else // PrimitiveAnalysisEngineController 
+									{
+										//	Return an input CAS to the client. The input CAS is returned
+										//	to the remote client only if all of the child CASes produced
+										//	from the input CAS have been fully processed.
+										getOutputChannel().sendReply(cacheEntry.getCasReferenceId(), cacheEntry.getMessageOrigin());
+										dropCAS(cacheEntry.getCasReferenceId(), true);
+									}
+								}
+								
+							}
+						}
+					}
+					catch( Exception e)
+					{
+						e.printStackTrace();
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+				                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
+				                new Object[] { e});
+					}
+				}
+			}
+		}
+	  
 }

@@ -78,6 +78,7 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
       System.out.println(msg);
       throw new AnalysisEngineProcessException(new Exception(msg));
     }
+    counter = 0;
 	}
   
 	public void process(CAS aCAS) throws AnalysisEngineProcessException
@@ -86,7 +87,7 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 		try
 		{
       if ( processDelay == 0 ) {
-			System.out.println("NoOpAnnotator.process() called for the " + counter + "th time.");
+			System.out.println("NoOpAnnotator.process() called for the " + counter + "th time. Hashcode:"+hashCode());
       }
      else {
 				System.out.println("NoOpAnnotator.process() called for the " + counter + "th time, delaying Response For:" +processDelay +" millis");

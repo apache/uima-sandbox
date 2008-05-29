@@ -21,6 +21,8 @@ package org.apache.uima.adapter.jms.client;
 
 import java.util.List;
 
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
 import javax.jms.InvalidDestinationException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -295,4 +297,11 @@ public abstract class BaseMessageSender implements Runnable,
 		engine.onException(e, aDestination);
 
 	}
+	/**
+	 * @override
+	 */
+	public MessageProducer getMessageProducer(Destination destination) throws Exception {
+		return null;
+	}
+
 }

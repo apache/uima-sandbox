@@ -81,13 +81,20 @@ public class SimpleCasGenerator extends CasMultiplier_ImplBase
     try
     {
   	  String filename = ((String) aContext.getConfigParameterValue("InputFile")).trim();
-  	  	URL url = this.getClass().getClassLoader().getResource(filename);
-        System.out.println("************ File::::"+url.getPath());
-  	  	// open input stream to file
-        File file = new File( url.getPath() );
-//        File file = new File( filename );
-        fis = new FileInputStream(file);
-          byte[] contents = new byte[(int) file.length()];
+  	  File file = null;
+  	  	try
+  	  	{
+  	  	    URL url = this.getClass().getClassLoader().getResource(filename);
+  	  	  	System.out.println("************ File::::"+url.getPath());
+  	  	  	// open input stream to file
+  	        file = new File( url.getPath() );
+  	  	}
+  	  	catch( Exception e)
+  	  	{
+  	  		file = new File(filename);
+  	  	}
+  	  	fis = new FileInputStream(file);
+         byte[] contents = new byte[(int) file.length()];
           fis.read(contents);
           text = new String(contents);
     }

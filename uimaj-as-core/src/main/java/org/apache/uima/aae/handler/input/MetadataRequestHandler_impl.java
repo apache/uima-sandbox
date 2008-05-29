@@ -78,7 +78,6 @@ public class MetadataRequestHandler_impl extends HandlerBase
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 				                "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_msg_for_next_handler__FINEST",
 				                new Object[] { messageType });
-
 						super.getDelegate().handle(anObjectToHandle);
 					}
 					else
@@ -92,6 +91,7 @@ public class MetadataRequestHandler_impl extends HandlerBase
 			}
 			catch( Exception e)
 			{
+				e.printStackTrace();
 				getController().getErrorHandlerChain().handle(e, HandlerBase.populateErrorContext( (MessageContext)anObjectToHandle ), getController());			
 			}
 		}

@@ -19,6 +19,7 @@
 
 package org.apache.uima.adapter.jms.client;
 
+import javax.jms.Destination;
 import javax.jms.MessageProducer;
 import javax.jms.TextMessage;
 
@@ -33,4 +34,7 @@ public interface MessageSender {
 	public TextMessage createTextMessage() throws Exception;
 
 	public void doStop();
+	
+	public MessageProducer getMessageProducer(Destination destination) throws Exception;
+
 }

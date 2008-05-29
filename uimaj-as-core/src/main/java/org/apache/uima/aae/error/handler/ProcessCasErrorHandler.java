@@ -392,8 +392,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 																getCacheEntryForCAS(parentCasReferenceId);
 							synchronized( parentCasCacheEntry )
 							{
-								((AggregateAnalysisEngineController)aController).
-								decrementCasSubordinateCount( parentCasCacheEntry);
+								parentCasCacheEntry.decrementSubordinateCasInPlayCount();
 								if ( parentCasCacheEntry.getSubordinateCasInPlayCount() == 0 &&
 									 parentCasCacheEntry.isPendingReply())
 								{

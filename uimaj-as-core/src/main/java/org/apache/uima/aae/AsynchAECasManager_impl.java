@@ -96,7 +96,7 @@ public class AsynchAECasManager_impl implements AsynchAECasManager {
     contextName = aContextName;
     setInitialized(true);
     if (aPerformanceTuningSettings != null) {
-      System.out.println("CasManager Iniatialized Cas Pool:" + aContextName + ". Cas Pool Size:"
+      System.out.println("CasManager Initialized Cas Pool:" + aContextName + ". Cas Pool Size:"
               + aCasPoolSize + " Initial Cas Heap Size:"
               + aPerformanceTuningSettings.get(UIMAFramework.CAS_INITIAL_HEAP_SIZE) + " cells");
     }

@@ -162,5 +162,9 @@ public interface AnalysisEngineController extends ControllerLifecycle
     public void notifyListenersWithInitializationStatus(Exception e);
   
 	public ServicePerformance getCasStatistics( String aCasReferenceId );
+	
+    public boolean isCasMultiplier();
+
+	public void releaseNextCas(String aCasReferenceId);
 
 }

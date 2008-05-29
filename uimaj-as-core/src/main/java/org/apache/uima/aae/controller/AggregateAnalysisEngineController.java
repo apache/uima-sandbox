@@ -31,6 +31,7 @@ import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
 import org.apache.uima.aae.jmx.ServiceErrors;
 import org.apache.uima.aae.jmx.ServiceInfo;
 import org.apache.uima.aae.jmx.ServicePerformance;
+import org.apache.uima.flow.FinalStep;
 
 public interface AggregateAnalysisEngineController extends AnalysisEngineController
 {
@@ -79,7 +80,7 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	
 	public String getLastDelegateKeyFromFlow(String anInputCasReferenceId);
 
-	public boolean sendRequestToReleaseCas();
+//	public boolean sendRequestToReleaseCas();
 	
 	public void registerChildController( AnalysisEngineController aChildController, String aDelegateKey) throws Exception;
 
@@ -105,5 +106,7 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 
 	public ServicePerformance getServicePerformance(String aDelegateKey );
 
-	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry );
+//	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry );
+	
+	public void finalStep( FinalStep aStep, String aCasReferenceId);
 }

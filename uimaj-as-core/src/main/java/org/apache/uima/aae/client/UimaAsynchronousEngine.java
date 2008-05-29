@@ -74,6 +74,7 @@ public interface UimaAsynchronousEngine
 	public final String ServerUri = "ServerURI";
 	public final String Endpoint = "Endpoint";
 	public final String CasPoolSize = "CasPoolSize";
+	public final String ShadowCasPoolSize ="ShadowCasPoolSize";
 	public static final String ReplyWindow = "ReplyWindow";
 	public static final String Timeout = "Timeout";
 	public static final String CpcTimeout = "CpcTimeout";
@@ -203,10 +204,10 @@ public interface UimaAsynchronousEngine
 	   * It doesn't use call-backs through a registered application listener.  
 	   *  
 	   * @param aCAS - a CAS to analyze.
-	   * 
+	   * @return - a unique id assigned to the CAS
 	   * @throws ResourceProcessException
 	   */
-	  public void sendAndReceiveCAS(CAS aCAS) throws ResourceProcessException;
+	  public String sendAndReceiveCAS(CAS aCAS) throws ResourceProcessException;
 	
 	  /**
 	   * Deploys a UIMA AS container and all services defined in provided deployment 

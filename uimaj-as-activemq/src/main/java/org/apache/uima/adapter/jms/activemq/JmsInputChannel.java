@@ -24,10 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.InputChannel;
@@ -265,7 +268,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	{
 		int command = aMessage.getIntProperty(AsynchAEMessage.Command);
 		int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
-
+		if ( isStopped() || getController() == null || getController().getInProcessCache() == null )
+		{
+			//	Shutting down 
+			return true;
+		}
 		if ( command == AsynchAEMessage.Process && msgType == AsynchAEMessage.Response )
 		{
 			String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
@@ -403,7 +410,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		try
 		{
 			boolean isAggregate = getController() instanceof AggregateAnalysisEngineController;
-			if ( isAggregate || !((PrimitiveAnalysisEngineController)getController()).isMultiplier() )
+			if ( isAggregate || !getController().isCasMultiplier() )
+//				if ( isAggregate || !((PrimitiveAnalysisEngineController)getController()).isMultiplier() )
 			{
 				long lastReplyTime = getController().getReplyTime();
 				if ( lastReplyTime > 0 )
@@ -442,7 +450,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			msgHandlerLatch.await();
 		}
 		catch( InterruptedException e) {}
-		
 		try
 		{
 			//	wait until the controller is plugged in
@@ -450,10 +457,18 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		}
 		catch( InterruptedException e) {}
 
-		
+		String eN = endpointName;
+		if ( getController() != null )
+		{
+			eN = getController().getComponentName();
+			if (eN == null )
+			{
+				eN = "";
+			}
+		}
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_msg__FINE",
-                new Object[] { endpointName });
+                new Object[] { eN });
 		JmsMessageContext messageContext = null;
 		long idleTime = 0;
 		try
@@ -464,7 +479,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				//	this service performance stats.
 				idleTime = computeIdleTime();
 			}
-
 			//	Wrap JMS Message in MessageContext
 			messageContext = new JmsMessageContext( aMessage, endpointName );
 			messageContext.getEndpoint().setIdleTime(idleTime);
@@ -502,9 +516,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			}
 			if ( validMessage(aMessage) )
 			{
-
-				
-				
 				String command = decodeIntToString(AsynchAEMessage.Command, aMessage.getIntProperty(AsynchAEMessage.Command) );
 				String messageType =  decodeIntToString(AsynchAEMessage.MessageType, aMessage.getIntProperty(AsynchAEMessage.MessageType) );
 				if ( ackMessageNow(aMessage))
@@ -541,6 +552,9 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			                    new Object[] { controller.getComponentName(), msgFrom, messageType, command, casRefId });
 					}
 				}
+				else
+				{
+				}
 				//	Delegate processing of the message contained in the MessageContext to the
 				//	chain of handlers
 				
@@ -575,16 +589,28 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	}
 	public synchronized void setListenerContainer(UimaDefaultMessageListenerContainer messageListener)
 	{
-			this.messageListener = messageListener;
-			System.setProperty("BrokerURI", messageListener.getBrokerUrl());
-			brokerURL = messageListener.getBrokerUrl();
-			listenerContainerList.add(messageListener);
+		this.messageListener = messageListener;
+		System.setProperty("BrokerURI", messageListener.getBrokerUrl());
+		brokerURL = messageListener.getBrokerUrl();
+		listenerContainerList.add(messageListener);
+		this.messageListener = messageListener;
 		if ( getController() != null )
 		{
 			try
 			{
 				getController().addInputChannel(this);
 			} catch( Exception e) {}
+		}
+	}
+	public ActiveMQConnectionFactory getConnectionFactory()
+	{
+		if (messageListener == null )
+		{
+			return null;
+		}
+		else
+		{
+			return (ActiveMQConnectionFactory)messageListener.getConnectionFactory();
 		}
 	}
 	public void ackMessage( MessageContext aMessageContext )

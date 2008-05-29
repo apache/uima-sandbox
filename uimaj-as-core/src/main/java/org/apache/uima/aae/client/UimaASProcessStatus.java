@@ -23,5 +23,5 @@ import org.apache.uima.collection.EntityProcessStatus;
 public interface UimaASProcessStatus extends EntityProcessStatus {
 	
 	public String getCasReferenceId();
-
+	public String getParentCasReferenceId();
 }

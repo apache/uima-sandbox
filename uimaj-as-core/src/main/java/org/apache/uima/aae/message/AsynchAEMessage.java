@@ -23,7 +23,7 @@ package org.apache.uima.aae.message;
 public interface AsynchAEMessage
 {
 	public static final String TotalTimeSpentInAnalytic = "TimeInAnalytic";
-	public static final String SendTime = "SendTime";
+//	public static final String SendTime = "SendTime";
 	public static final String TimeInService = "TimeInService";
 	public static final String Endpoint = "Endpoint";
 	public static final String DelegateStats = "DelegateStats";

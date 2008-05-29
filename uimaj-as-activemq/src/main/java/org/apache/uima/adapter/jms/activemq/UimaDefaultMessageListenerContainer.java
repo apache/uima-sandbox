@@ -47,6 +47,7 @@ implements ExceptionListener
 	private static final Class CLASS_NAME = UimaDefaultMessageListenerContainer.class;
 	private String destinationName="";
 	private Endpoint endpoint;
+	private boolean freeCasQueueListener;
 	
 	public UimaDefaultMessageListenerContainer()
 	{
@@ -54,6 +55,11 @@ implements ExceptionListener
 		setRecoveryInterval(60000);
 		setAcceptMessagesWhileStopping(false);
 		setExceptionListener(this);
+	}
+	public UimaDefaultMessageListenerContainer(boolean freeCasQueueListener)
+	{
+		this();
+		this.freeCasQueueListener = freeCasQueueListener;
 	}
 	private boolean disableListener( Throwable t)
 	{
@@ -218,5 +224,8 @@ implements ExceptionListener
 	{
 		endpoint = anEndpoint;
 	}
-
+	public boolean isFreeCasQueueListener()
+	{
+		return freeCasQueueListener;
+	}
 }
