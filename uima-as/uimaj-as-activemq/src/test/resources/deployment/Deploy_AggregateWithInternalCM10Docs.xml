@@ -23,15 +23,15 @@
 
 <analysisEngineDeploymentDescription xmlns="http://uima.apache.org/resourceSpecifier">
   
-  <name>Top Level TAE</name>
+  <name>Aggregate TAE Delegate With 10 Doc Cas Multiplier</name>
   <description></description>
   
   <deployment protocol="jms" provider="activemq">
     <casPool numberOfCASes="5"/>
     <service>
-      <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
+      <inputQueue endpoint="SecondLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
       <topDescriptor>
-        <import location="../descriptors/analysis_engine/SimpleTestAggregate.xml"/>
+        <import location="../descriptors/analysis_engine/SimpleTestAggregateWith1000DocCM.xml"/>
       </topDescriptor>
       <analysisEngine>
         <delegates>
@@ -40,17 +40,10 @@
 	        <casMultiplier poolSize="5"/> 
           </analysisEngine>
 
-          <remoteAnalysisEngine key="NoOp">
-	                  <inputQueue endpoint="NoOpAnnotatorQueue" brokerURL="http://localhost:8888"/>
-                      <replyQueue location="remote" />
-	                  <serializer method="xmi"/>
-                      <asyncAggregateErrorConfiguration>
-                            <getMetadataErrors maxRetries="3" timeout="4000" errorAction="disable" />
-                            <processCasErrors maxRetries="0" thresholdCount="1" thresholdWindow="10" continueOnRetryFailure="true" thresholdAction="disable" />
-                      </asyncAggregateErrorConfiguration>
-          </remoteAnalysisEngine>
+          <analysisEngine key="NoOp">
+          </analysisEngine>
 
-        </delegates>
+	    </delegates>
       </analysisEngine>
     </service>
   </deployment>

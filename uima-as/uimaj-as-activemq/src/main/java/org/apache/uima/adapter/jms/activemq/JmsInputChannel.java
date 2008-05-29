@@ -584,6 +584,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			try
 			{
 				getController().addInputChannel(this);
+				messageListener.setController(getController());
 			} catch( Exception e) {}
 		}
 	}

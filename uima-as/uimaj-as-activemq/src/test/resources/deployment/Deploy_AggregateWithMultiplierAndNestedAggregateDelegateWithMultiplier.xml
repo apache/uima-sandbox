@@ -31,27 +31,25 @@
     <service>
       <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
       <topDescriptor>
-        <import location="../descriptors/analysis_engine/SimpleTestAggregate.xml"/>
+        <import location="../descriptors/analysis_engine/ComplexAggregateTAEWith2InternalCM.xml"/>
       </topDescriptor>
       <analysisEngine>
         <delegates>
-        
           <analysisEngine key="TestMultiplier">
 	        <casMultiplier poolSize="5"/> 
           </analysisEngine>
-
-          <remoteAnalysisEngine key="NoOp">
-	                  <inputQueue endpoint="NoOpAnnotatorQueue" brokerURL="http://localhost:8888"/>
-                      <replyQueue location="remote" />
-	                  <serializer method="xmi"/>
-                      <asyncAggregateErrorConfiguration>
-                            <getMetadataErrors maxRetries="3" timeout="4000" errorAction="disable" />
-                            <processCasErrors maxRetries="0" thresholdCount="1" thresholdWindow="10" continueOnRetryFailure="true" thresholdAction="disable" />
-                      </asyncAggregateErrorConfiguration>
-          </remoteAnalysisEngine>
-
+			
+          <analysisEngine key="NestedAggregateWithInternalCM">
+              <delegates>
+				  <analysisEngine key="SimpleCasGenerator">
+					<casMultiplier poolSize="1"/> 
+				  </analysisEngine>
+	          </delegates>
+          </analysisEngine>
+			
         </delegates>
-      </analysisEngine>
+
+	  </analysisEngine>
     </service>
   </deployment>
   

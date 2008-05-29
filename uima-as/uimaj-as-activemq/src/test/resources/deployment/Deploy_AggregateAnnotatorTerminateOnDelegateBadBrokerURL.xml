@@ -45,7 +45,7 @@
                       <replyQueue location="remote" />
 	                  <serializer method="xmi"/>
                       <asyncAggregateErrorConfiguration>
-                            <getMetadataErrors maxRetries="3" timeout="4000" errorAction="disable" />
+                            <getMetadataErrors maxRetries="3" timeout="4000" errorAction="terminate" />
                             <processCasErrors maxRetries="0" thresholdCount="1" thresholdWindow="10" continueOnRetryFailure="true" thresholdAction="disable" />
                       </asyncAggregateErrorConfiguration>
           </remoteAnalysisEngine>
