@@ -82,6 +82,7 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 
 		if ( endpoint != null && aController instanceof AggregateAnalysisEngineController )
 		{
+/*			
       if ( isConnectionFailure( (Exception)t ) )
       {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
@@ -91,7 +92,7 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
         aController.notifyListenersWithInitializationStatus((Exception)t);
         return true;
       }
-
+*/
       Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
 	    	String key = ((AggregateAnalysisEngineController)aController).lookUpDelegateKey(endpoint.getEndpoint());
 	    	//	If threshold is not defined, assume action=terminate

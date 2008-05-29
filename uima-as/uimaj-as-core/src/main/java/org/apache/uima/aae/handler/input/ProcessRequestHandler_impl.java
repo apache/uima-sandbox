@@ -277,6 +277,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 						}
 						//	associate this subordinate CAS with the parent CAS
 						entry.setInputCasReferenceId(inputCasReferenceId);
+						entry.setReplyReceived();
 					}
 					DelegateStats stats = new DelegateStats();
 					if ( entry.getStat() == null )
@@ -521,6 +522,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
 						getServicePerformance(newCASProducedBy).
 							incrementNumberOfCASesProcessed();
 					CacheEntry subordinateCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
+					subordinateCasCacheEntry.setReplyReceived();
+
 					CacheEntry inputCasCacheEntry = getController().
 						getInProcessCache().
 							getCacheEntryForCAS(subordinateCasCacheEntry.getInputCasReferenceId());
