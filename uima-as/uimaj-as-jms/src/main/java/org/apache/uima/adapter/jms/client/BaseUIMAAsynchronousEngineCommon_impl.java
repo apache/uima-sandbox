@@ -99,7 +99,7 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected int howManyBeforeReplySeen = 0;
 
-	protected int receiveWindow = 0;
+//	protected int receiveWindow = 0;
 
 	protected CollectionReader collectionReader = null;
 
@@ -190,7 +190,7 @@ implements UimaAsynchronousEngine, MessageListener
 		listeners.remove(aListener);
 	}
 
-	public void setCollectionReader(CollectionReader aCollectionReader) throws ResourceInitializationException
+	public synchronized void setCollectionReader(CollectionReader aCollectionReader) throws ResourceInitializationException
 	{
 		if ( initialized )
 		{
@@ -201,20 +201,20 @@ implements UimaAsynchronousEngine, MessageListener
 		collectionReader = aCollectionReader;
 	}
 		
-	public synchronized void collectionProcessingComplete() throws ResourceProcessException
+	public void collectionProcessingComplete() throws ResourceProcessException
 	{
 		try
 		{
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_app_cpc_request_FINEST", new Object[] {});
 
-			if (howManySent > 0 && howManyRecvd < howManySent)
-			{
 				synchronized (cpcGate)
 				{
-					// This monitor is dedicated to single purpose event.
-					cpcGate.wait();
+					while (howManySent > 0 && howManyRecvd < howManySent)
+					{
+						// This monitor is dedicated to single purpose event.
+						cpcGate.wait();
+					}
 				}
-			}
 			if (!running)
 			{
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cpc_request_not_done_INFO", new Object[] {});
@@ -288,6 +288,10 @@ implements UimaAsynchronousEngine, MessageListener
 					long key = ((Long)it.next()).longValue();
 					ThreadMonitor threadMonitor = 
 						(ThreadMonitor)threadMonitorMap.get(key);
+					if ( threadMonitor == null || threadMonitor.getMonitor() == null)
+					{
+						continue;
+					}
 					synchronized( threadMonitor.getMonitor())
 					{
 						threadMonitor.setWasSignaled();
@@ -468,7 +472,7 @@ implements UimaAsynchronousEngine, MessageListener
 			throw new ResourceProcessException(e);
 		}
 	}
-
+/*
 	protected void waitUntilReadyToSendMessage(int aCommand)
 	{
 		if (receiveWindow > 0)
@@ -493,6 +497,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 
 	}
+*/	
 	protected ConcurrentHashMap getCache()
 	{
 		return clientCache;
@@ -506,7 +511,7 @@ implements UimaAsynchronousEngine, MessageListener
 		String casReferenceId = requestToCache.getCasReferenceId();
 		try
 		{
-			waitUntilReadyToSendMessage(AsynchAEMessage.Process);
+//			waitUntilReadyToSendMessage(AsynchAEMessage.Process);
 
 			if (!running)
 			{
@@ -893,6 +898,10 @@ implements UimaAsynchronousEngine, MessageListener
 			if ( clientCache.containsKey(casReferenceId) )
 			{
 				ClientRequest cacheEntry = (ClientRequest) clientCache.get(casReferenceId);
+				if ( cacheEntry == null )
+				{
+					return;
+				}
 				long timeWaitingForReply = cacheEntry.getTimeWaitingForReply()/ 1000000;
 
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
@@ -1030,6 +1039,7 @@ implements UimaAsynchronousEngine, MessageListener
 			}
 			else if (AsynchAEMessage.Process == command)
 			{
+/*				
 				if (receiveWindow > 0)
 				{
 					synchronized (gater)
@@ -1039,6 +1049,7 @@ implements UimaAsynchronousEngine, MessageListener
 					}
 
 				}
+*/				
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_process_reply_FINEST", new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom) });
 				
 				String casReferenceId = 
@@ -1090,15 +1101,18 @@ implements UimaAsynchronousEngine, MessageListener
 					if ( threadMonitorMap.containsKey(cachedRequest.getThreadId()))
 					{
 						ThreadMonitor threadMonitor = (ThreadMonitor) threadMonitorMap.get(cachedRequest.getThreadId());
-						//	Unblock the sending thread so that it can complete processing
-						//	of the reply. The message has been stored in the cache and 
-						//	when the thread wakes up due to notification below, it will
-						//	retrieve the reply and process it.
-						synchronized( threadMonitor.getMonitor() )
+						if ( threadMonitor != null && threadMonitor.getMonitor() != null )
 						{
-							threadMonitor.setWasSignaled();
-							cachedRequest.setReceivedProcessCasReply();
-							threadMonitor.getMonitor().notifyAll();
+							//	Unblock the sending thread so that it can complete processing
+							//	of the reply. The message has been stored in the cache and 
+							//	when the thread wakes up due to notification below, it will
+							//	retrieve the reply and process it.
+							synchronized( threadMonitor.getMonitor() )
+							{
+								threadMonitor.setWasSignaled();
+								cachedRequest.setReceivedProcessCasReply();
+								threadMonitor.getMonitor().notifyAll();
+							}
 						}
 					}
 				}
@@ -1161,29 +1175,30 @@ implements UimaAsynchronousEngine, MessageListener
 			cachedRequest.setSynchronousInvocation();
 			// send CAS. This call does not block. Instead we will block the sending thread below.
 			casReferenceId = sendCAS(aCAS, cachedRequest);
-
-			//cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
-			//	Block here
-			synchronized (threadMonitor.getMonitor())
+			if ( threadMonitor != null && threadMonitor.getMonitor() != null)
 			{
-				//	Block sending thread until a reply is received
-				while (!threadMonitor.wasSignaled && running)
+				//	Block here
+				synchronized (threadMonitor.getMonitor())
 				{
-					try
+					//	Block sending thread until a reply is received
+					while (!threadMonitor.wasSignaled && running)
 					{
-						threadMonitor.getMonitor().wait();
-					}
-					catch (InterruptedException e)
-					{
+						try
+						{
+							threadMonitor.getMonitor().wait();
+						}
+						catch (InterruptedException e)
+						{
+						}
 					}
 				}
 			}
 			try
 			{
-        // check if timeout exception
-        if (cachedRequest.isTimeoutException()) {
-          throw new ResourceProcessException(new UimaASProcessCasTimeout());
-        }
+				// check if timeout exception
+				if (cachedRequest.isTimeoutException()) {
+					throw new ResourceProcessException(new UimaASProcessCasTimeout());
+				}
 				//	Process reply in the sending thread
 				Message message = cachedRequest.getMessage();
 				handleProcessReply(message, false, pt);
@@ -1276,16 +1291,6 @@ implements UimaAsynchronousEngine, MessageListener
         notifyListeners(aCAS, status, AsynchAEMessage.Process);
       }
       cachedRequest.removeEntry(casReferenceId);
-
-//			if (sendAndReceiveCAS != null)
-//			{
-//				synchronized (sendAndReceiveCasMonitor)
-//				{
-//					error = true;
-//					sendAndReceiveCasMonitor.notifyAll();
-//				}
-//				sendAndReceiveCAS = aCAS;
-//			}
 
       synchronized (gater) {
         if (howManyBeforeReplySeen > 0) {
