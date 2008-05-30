@@ -91,7 +91,7 @@ implements ExceptionListener
 				(getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
 				
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-	                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+	                "handleListenerSetupFailure", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
 	                new Object[] {  endpointName, getBrokerUrl(), t });
 
 /*
