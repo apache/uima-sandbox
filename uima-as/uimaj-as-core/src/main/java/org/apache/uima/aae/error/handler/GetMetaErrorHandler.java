@@ -82,18 +82,7 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 
 		if ( endpoint != null && aController instanceof AggregateAnalysisEngineController )
 		{
-/*			
-      if ( isConnectionFailure( (Exception)t ) )
-      {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_terminate_service__INFO",
-                new Object[] {aController.getComponentName(), endpoint.getEndpoint()});
-        aController.terminate();
-        aController.notifyListenersWithInitializationStatus((Exception)t);
-        return true;
-      }
-*/
-      Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
+			Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
 	    	String key = ((AggregateAnalysisEngineController)aController).lookUpDelegateKey(endpoint.getEndpoint());
 	    	//	If threshold is not defined, assume action=terminate
 	    	if (  threshold == null || threshold.getMaxRetries() == 0 || 
@@ -106,7 +95,6 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 	    			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	    	                "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_terminate_service__INFO",
 	    	                new Object[] {aController.getComponentName(), endpoint.getEndpoint()});
-//	    			aController.propagateShutdownEventToTheTopComponent();
 	    			aController.terminate();
 	    			aController.notifyListenersWithInitializationStatus((Exception)t);
 	    		}
