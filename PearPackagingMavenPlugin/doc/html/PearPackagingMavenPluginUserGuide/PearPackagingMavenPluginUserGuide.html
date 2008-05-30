@@ -27,7 +27,7 @@
         service marks have been appropriately capitalized.  Use of such terms
         in this book should not be regarded as affecting the validity of the
         the trademark or service mark.
-        </p></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="preface"><a href="#d0e54">Overview</a></span></dt><dt><span class="chapter"><a href="#pear.packaging.maven.plugin.install.src">1. Installing The PEAR Packaging Plugin From Source</a></span></dt><dt><span class="chapter"><a href="#pear.packaging.maven.plugin.install">2. Installing The PEAR Packaging Plugin Using The Binary</a></span></dt><dt><span class="chapter"><a href="#pear.packaging.maven.plugin.usage">3. Using the PEAR Packaging Plugin</a></span></dt><dd><dl><dt><span class="section"><a href="#pear.packaging.maven.plugin.usage.configure">3.1. Calling The PEAR Packaging Plugin</a></span></dt></dl></dd></dl></div><div class="preface" lang="en" id="d0e54"><div class="titlepage"><div><div><h2 class="title"><a name="d0e54"></a>Overview</h2></div></div></div><p>
+        </p></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="preface"><a href="#d0e54">Overview</a></span></dt><dt><span class="chapter"><a href="#pear.packaging.maven.plugin.install.src">1. Installing The PEAR Packaging Plugin From Source</a></span></dt><dt><span class="chapter"><a href="#pear.packaging.maven.plugin.install">2. Installing The PEAR Packaging Plugin Using The Binary</a></span></dt><dt><span class="chapter"><a href="#pear.packaging.maven.plugin.usage">3. Using the PEAR Packaging Plugin</a></span></dt><dd><dl><dt><span class="section"><a href="#pear.packaging.maven.plugin.usage.configure">3.1. Calling The PEAR Packaging Plugin</a></span></dt><dt><span class="section"><a href="#pear.packaging.maven.plugin.usage.dependencies">3.2. Automatically including dependencies</a></span></dt></dl></dd></dl></div><div class="preface" lang="en" id="d0e54"><div class="titlepage"><div><div><h2 class="title"><a name="d0e54"></a>Overview</h2></div></div></div><p>
 			To make UIMA analysis components easily consumable for other users, UIMA defines
 			the PEAR (Processing Engine ARchive) file format. This allows applications and tools
 			to manage UIMA analysis components automatically for verification, deployment, 
@@ -45,13 +45,13 @@
              <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://svn.apache.org/repos/asf/incubator/uima/sandbox/trunk/PearPackagingMavenPlugin" target="_top">http://svn.apache.org/repos/asf/incubator/uima/sandbox/trunk/PearPackagingMavenPlugin</a>
            </p></blockquote></div><p>
 		  After downloading the code to the Apache UIMA build environment just call the provided maven build
-		  in the main directory of the PEAR Packaging plugin as shown in the listing below.
+		  in the main directory of the PEAR Packaging Plugin as shown in the listing below.
 		</p><p>
 		</p><pre class="programlisting">#PearPackagingMavenPlugin&gt; mvn install</pre><p>
 		</p><p>
 		  After successfully building the plugin is available in the local Maven repository and can be used
 		  in other Maven artifact builds from now. To integrate the plugin into other builds it is necessary to 
-		  know the PEAR Packaging plugin version number as it is available in the Maven repository. The plugin version number
+		  know the PEAR Packaging Plugin version number as it is available in the Maven repository. The plugin version number
 		  is displayed at the end of the Maven build as shown in the example below. For this example, the plugin 
 		  version number is: <code class="code">2.2.2-incubating</code> 
 		</p><p>
@@ -71,7 +71,7 @@ PearPackagingMavenPlugin-2.2.2-incubating.jar
 [INFO] Final Memory: 10M/24M
 [INFO] --------------------------------------------------------------</pre><p>
 		</p><p>
-		  To use the PEAR packaging plugin in a Maven build, it is necessary to add it as dependency to the
+		  To use the PEAR Packaging Plugin in a Maven build, it is necessary to add it as dependency to the
 		  POM. Important while adding the dependency is the version number of the plugin. With that the correct
 		  version of the plugin is used and can be found in the local Maven repository. The version number of the plugin was 
 		  displayed when installing the PEAR packaging Maven plugin to the Maven repository. The snippet below 
@@ -105,7 +105,7 @@ PearPackagingMavenPlugin-2.2.2-incubating.jar
    ....
 &lt;/dependencies&gt;</pre><p>
 		</p></div><div class="chapter" lang="en" id="pear.packaging.maven.plugin.usage"><div class="titlepage"><div><div><h2 class="title"><a name="pear.packaging.maven.plugin.usage"></a>Chapter&nbsp;3.&nbsp;Using the PEAR Packaging Plugin</h2></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="pear.packaging.maven.plugin.usage.configure"></a>3.1.&nbsp;Calling The PEAR Packaging Plugin</h2></div></div></div><p>
-		  To call the PEAR packaging plugin within a Maven build, the plugin must be added to the plugins section of the 
+		  To call the PEAR Packaging Plugin within a Maven build, the plugin must be added to the plugins section of the 
 		  POM as shown below:
 		</p><p>
 		</p><pre class="programlisting">&lt;build&gt;
@@ -127,12 +127,12 @@ PearPackagingMavenPlugin-2.2.2-incubating.jar
           
           &lt;mainComponentDesc&gt;
             &lt;!-- PEAR file main component descriptor --&gt;
-            desc/RegExAnnotator.xml
+            desc/${artifactId}.xml
           &lt;/mainComponentDesc&gt;
           
           &lt;componentId&gt;
             &lt;!-- PEAR file component ID --&gt;
-            SampleComponentID
+            ${artifactId}
           &lt;/componentId&gt;
           
           &lt;datapath&gt;
@@ -154,7 +154,7 @@ PearPackagingMavenPlugin-2.2.2-incubating.jar
 		</p><p>
 		  To configure the plugin with the specific settings of a PEAR package, the 
 		  <code class="code">&lt;configuration&gt;</code> element section is used. This sections contains all parameters 
-		  that are provided by the PEAR packaging plugin to package the right content and set the specific PEAR package settings.
+		  that are provided by the PEAR Packaging Plugin to package the right content and set the specific PEAR package settings.
 		  The details about each parameter and how it is used is shown below:
 		</p><p>
 			</p><div class="itemizedlist"><ul type="disc"><li><p>
@@ -169,10 +169,11 @@ PearPackagingMavenPlugin-2.2.2-incubating.jar
 						<code class="code">&lt;mainComponentDesc&gt;</code>
 						  - This element specifies the relative path to the main component descriptor 
 						  that should be used to run the PEAR content. The path must be relative to the 
-						  project root.
+						  project root. It is a good default to use <code class="code">desc/${artifactId}.xml</code> here.
 					</p></li><li><p>
 						<code class="code">&lt;componentID&gt;</code>
-						  - This element specifies the PEAR package component ID.
+						  - This element specifies the PEAR package component ID. It is a good default
+						  to use <code class="code">${artifactId}</code>.
 					</p></li><li><p>
 						<code class="code">&lt;datapath&gt;</code>
 						  - This element specifies the PEAR package UIMA datapath settings.
@@ -197,4 +198,84 @@ PearPackagingMavenPlugin-2.2.2-incubating.jar
 						  are written to. By default this parameters points to the default Maven output 
 						  directory - ${basedir}/target
 					</p></li></ul></div><p>
-		</p></div></div></div></body></html>
+		</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="pear.packaging.maven.plugin.usage.dependencies"></a>3.2.&nbsp;Automatically including dependencies</h2></div></div></div><p>
+			    The PEAR Packaging Plugin does not take care of automatically
+			    adding its dependencies to the PEAR archive. However, this
+			    behavior can be manually added. The following two build plugins
+			    hook into the build cycle in order to make sure all runtime
+				dependencies end up being packaged into the final PEAR
+				file.
+			</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+				While the dependencies will be automatically included in the 
+				PEAR file using this procedure, you still need to add them
+				manually to the PEAR classpath.
+				</p></div><p>
+				The first uses the <code class="code">maven-dependency-plugin</code>
+				to resolve the runtime dependencies of the PEAR into the
+				<code class="code">lib</code> folder, which is where the PEAR packaging
+				plugin expects them. The version is stripped from the file
+				names of the dependencies so it is not necessary to adapt
+				the PEAR classpath when changing the version of a dependency.
+			</p><pre class="programlisting">&lt;build&gt;
+ &lt;plugins&gt;
+  ...
+  &lt;plugin&gt;
+   &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+   &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt;
+   &lt;executions&gt;
+    &lt;!-- Copy the dependencies to the lib folder for the PEAR to copy --&gt;
+    &lt;execution&gt;
+     &lt;id&gt;copy-dependencies&lt;/id&gt;
+     &lt;phase&gt;package&lt;/phase&gt;
+     &lt;goals&gt;
+      &lt;goal&gt;copy-dependencies&lt;/goal&gt;
+     &lt;/goals&gt;
+     &lt;configuration&gt;
+      &lt;stripVersion&gt;true&lt;/stripVersion&gt;
+      &lt;outputDirectory&gt;${basedir}/lib&lt;/outputDirectory&gt;
+      &lt;overWriteReleases&gt;false&lt;/overWriteReleases&gt;
+      &lt;overWriteSnapshots&gt;true&lt;/overWriteSnapshots&gt;
+      &lt;includeScope&gt;runtime&lt;/includeScope&gt;
+     &lt;/configuration&gt;
+    &lt;/execution&gt;
+   &lt;/executions&gt;
+  &lt;/plugin&gt;
+  ...
+ &lt;/plugins&gt;
+&lt;/build&gt;
+</pre><p>
+				The second hooks into the <code class="code">clean</code>
+				phase of the build phase. It deletes the
+				<code class="code">lib</code> folder again.
+			</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>
+					The <code class="code">lib</code> folder is automatically filled and removed
+					during the build process. Therefore, it should not go into
+					the source control system and neither should you
+					manually place any jars in there.
+				</p></div><pre class="programlisting">&lt;build&gt;
+ &lt;plugins&gt;
+  ...
+  &lt;plugin&gt;
+   &lt;artifactId&gt;maven-antrun-plugin&lt;/artifactId&gt;
+   &lt;executions&gt;
+    &lt;!-- Clean the libraries after packaging --&gt;
+    &lt;execution&gt;
+     &lt;id&gt;CleanLib&lt;/id&gt;
+     &lt;phase&gt;clean&lt;/phase&gt;
+     &lt;configuration&gt;
+      &lt;tasks&gt;
+       &lt;delete dir="lib" deleteOnExit="true" quiet="true" failOnError="false"&gt;
+        &lt;fileset dir="lib" includes="*.jar"/&gt;
+       &lt;/delete&gt;
+      &lt;/tasks&gt;
+     &lt;/configuration&gt;
+     &lt;goals&gt;
+      &lt;goal&gt;run&lt;/goal&gt;
+     &lt;/goals&gt;
+    &lt;/execution&gt;		          				
+   &lt;/executions&gt;
+  &lt;/plugin&gt;
+  ...
+ &lt;/plugins&gt;
+&lt;/build&gt;
+</pre></div></div></div></body></html>
