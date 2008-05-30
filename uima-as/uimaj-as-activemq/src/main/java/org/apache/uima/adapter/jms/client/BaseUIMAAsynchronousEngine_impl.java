@@ -308,14 +308,14 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 ////		Thread t = new Thread((BaseMessageSender)messageDispatcher); //.doStart();
 		t.start();
 		//	Wait until the worker thread is fully initialized
-		while( !producerInitialized )
-		{
 			synchronized( sender )
 			{
-				//	blocks here. The worker thread will signal when it is fully initialized 
-				sender.wait();
+				while( !producerInitialized )
+				{
+					//	blocks here. The worker thread will signal when it is fully initialized 
+					sender.wait();
+				}
 			}
-		}
 		//	Check if the worker thread failed to initialize
 		if ( sender.failed())
 		{
@@ -416,7 +416,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			applicationName = (String) anApplicationContext.get(UimaAsynchronousEngine.ApplicationName);
 		}
 
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_init_uimaee_client__CONFIG", new Object[] { brokerURI, receiveWindow, casPoolSize, processTimeout, metadataTimeout, cpcTimeout });
+		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_init_uimaee_client__CONFIG", new Object[] { brokerURI, 0, casPoolSize, processTimeout, metadataTimeout, cpcTimeout });
 
 		try
 		{
@@ -657,23 +657,23 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	protected void waitForServiceNotification() throws Exception
 	{
 	  
-	  while( !serviceInitializationCompleted )
-	  {
-	    if ( serviceInitializationException )
-	    {
-	      throw new ResourceInitializationException();
-	    }
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
-
-
 	    synchronized( serviceMonitor )
 	    {
+	  	  while( !serviceInitializationCompleted )
+		  {
+		    if ( serviceInitializationException )
+		    {
+		      throw new ResourceInitializationException();
+		    }
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
+
+
 	      serviceMonitor.wait();
+	      if ( serviceInitializationException )
+	      {
+	        throw new ResourceInitializationException();
+	      }
 	    }
-      if ( serviceInitializationException )
-      {
-        throw new ResourceInitializationException();
-      }
 	  }
 	}
 	

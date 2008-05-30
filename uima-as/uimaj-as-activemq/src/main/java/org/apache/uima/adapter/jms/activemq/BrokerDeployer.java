@@ -335,7 +335,6 @@ public class BrokerDeployer implements ApplicationListener
 				System.out.println("Broker is stopped");
 				broker = null;
 				service = null;
-				System.gc();
 			}
 			catch( Exception e) { e.printStackTrace();}
 		}

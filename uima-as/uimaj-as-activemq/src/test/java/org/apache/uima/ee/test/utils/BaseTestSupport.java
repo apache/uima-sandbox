@@ -198,7 +198,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	{
 		synchronized (initializeMonitor)
 		{
-			if (!initialized)
+			while (!initialized)
 			{
 				initializeMonitor.wait();
 			}
@@ -210,7 +210,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		// Wait until the count down latch thread is ready
 		synchronized (aMonitor)
 		{
-			if (aMonitor.get() == false)
+			while (aMonitor.get() == false)
 			{
 				aMonitor.wait();
 			}
@@ -415,18 +415,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	 */
 	public void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
 	{
-		String casReferenceId="";
 		if (aProcessStatus.isException())
 		{
 			if ( !expectingServiceShutdownException )
 				System.out.println(" Process Received Reply Containing Exception.");
 			
-			if ( aProcessStatus instanceof UimaASProcessStatus )
-			{
-				casReferenceId = 
-					((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
-			}
-
 			List list = aProcessStatus.getExceptions();
 			for( int i=0; i < list.size(); i++)
 			{

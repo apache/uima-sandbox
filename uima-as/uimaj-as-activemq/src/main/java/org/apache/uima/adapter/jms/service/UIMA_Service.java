@@ -289,19 +289,21 @@ public class UIMA_Service implements ControllerCallbackListener
 	}
 	protected void waitForServiceNotification() throws Exception {
 
-		while (!serviceInitializationCompleted) {
-			if (serviceInitializationException) {
-				throw new ResourceInitializationException();
-			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
-
 			synchronized (serviceMonitor) {
-				serviceMonitor.wait();
+				while (!serviceInitializationCompleted) {
+					if (serviceInitializationException) {
+						throw new ResourceInitializationException();
+					}
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
+
+						serviceMonitor.wait();
+
+						if (serviceInitializationException) {
+							throw new ResourceInitializationException();
+						}
+
+				}
 			}
-			if (serviceInitializationException) {
-				throw new ResourceInitializationException();
-			}
-		}
 	}
 	public void notifyOnInitializationFailure(Exception e) {
 

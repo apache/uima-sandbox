@@ -186,7 +186,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	public String deploy(String springContextFile ) throws ResourceInitializationException {
 		if ( springContextFile == null )
 		{
-			throw new ResourceInitializationException(new Exception("Invalid Spring Context File:"+springContextFile));		
+			throw new ResourceInitializationException(new Exception("Spring Context File Not Specified"));		
 		}
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "deploy", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_deploy_container__CONFIG", new Object[] { springContextFile });
 		try {
@@ -239,17 +239,17 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	}
 	protected void waitForServiceNotification() throws Exception {
 
-		while (!serviceInitializationCompleted) {
-			if (serviceInitializationException) {
-				throw new ResourceInitializationException();
-			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
-
 			synchronized (serviceMonitor) {
+				while (!serviceInitializationCompleted) {
+					if (serviceInitializationException) {
+						throw new ResourceInitializationException();
+					}
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
+
 				serviceMonitor.wait();
-			}
-			if (serviceInitializationException) {
-				throw new ResourceInitializationException();
+				if (serviceInitializationException) {
+					throw new ResourceInitializationException();
+				}
 			}
 		}
 	}
