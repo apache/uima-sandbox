@@ -25,60 +25,45 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.UIMA_IllegalArgumentException;
 import org.apache.uima.aae.AsynchAECasManager;
-import org.apache.uima.aae.AsynchAECasManager_impl;
 import org.apache.uima.aae.UIDGenerator;
-import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
+import org.apache.uima.aae.client.UimaASProcessStatusImpl;
+import org.apache.uima.aae.client.UimaASStatusCallbackListener;
+import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.error.InvalidMessageException;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaASCollectionProcessCompleteTimeout;
 import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
 import org.apache.uima.aae.error.UimaASProcessCasTimeout;
 import org.apache.uima.aae.error.UimaEEServiceException;
-import org.apache.uima.aae.jmx.UimaASClientInfoMBean;
 import org.apache.uima.aae.jmx.UimaASClientInfo;
+import org.apache.uima.aae.jmx.UimaASClientInfoMBean;
 import org.apache.uima.aae.message.AsynchAEMessage;
+import org.apache.uima.adapter.jms.JmsConstants;
+import org.apache.uima.adapter.jms.message.PendingMessage;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.collection.EntityProcessStatus;
-import org.apache.uima.resource.CasDefinition;
-import org.apache.uima.resource.Resource;
-import org.apache.uima.resource.ResourceConfigurationException;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.impl.ProcessTrace_impl;
-import org.apache.uima.aae.client.UimaASProcessStatus;
-import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.client.UimaASProcessStatusImpl;
-import org.apache.uima.aae.client.UimaASStatusCallbackListener;
-import org.apache.uima.adapter.jms.JmsConstants;
-import org.apache.uima.adapter.jms.message.PendingMessage;
-import org.apache.uima.aae.controller.Endpoint;
 
 public abstract class BaseUIMAAsynchronousEngineCommon_impl 
 implements UimaAsynchronousEngine, MessageListener
@@ -1230,7 +1215,7 @@ implements UimaAsynchronousEngine, MessageListener
 		switch (aTimeoutKind)
 		{
 		case (MetadataTimeout):
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "notifyOnTimout", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_meta_timeout_INFO", new Object[] { anEndpoint });
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "notifyOnTimout", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_meta_timeout_INFO", new Object[] { anEndpoint });
 			status.addEventStatus("GetMeta", "Failed", new UimaASMetaRequestTimeout());
 			notifyListeners(null, status, AsynchAEMessage.GetMeta);
 			synchronized (metadataReplyMonitor)
