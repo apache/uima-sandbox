@@ -1069,6 +1069,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				(casDropped || (clientEndpoint != null && !clientEndpoint.isRemote() )) 
 				&& parentCASCacheEntry != null  
 			    && parentCASCacheEntry.isReplyReceived()
+			    && parentCASCacheEntry.isPendingReply()
 			    && parentCASCacheEntry.getState() == CacheEntry.FINAL_STATE
 				&& parentCASCacheEntry.getSubordinateCasInPlayCount() == 0
 			);
