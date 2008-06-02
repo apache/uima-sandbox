@@ -81,7 +81,6 @@ public class JMSExceptionHandler extends ErrorHandlerBase implements ErrorHandle
 		System.out.println("Handling JMS Connect Exception Due To::"+exception.getLocalizedMessage());
 		System.out.println("Exception Cause::"+exception.getClass().getName()+":::Message::"+exception.getLocalizedMessage());
 		
-//		String casReferenceId = (String)anErrorContext.get(AsynchAEMessage.CasReferenceId);
 		String casReferenceId = (String)anErrorContext.get(AsynchAEMessage.CasReference);
 		Endpoint endpoint = (Endpoint)anErrorContext.get(AsynchAEMessage.Endpoint);
 		
@@ -94,11 +93,14 @@ public class JMSExceptionHandler extends ErrorHandlerBase implements ErrorHandle
 			try
 			{
 				entry = aController.getInProcessCache().getCacheEntryForCAS(casReferenceId);
+				if ( endpoint.isRemote() && entry != null )
+				{
+					aController.dropCAS(casReferenceId, true );
+				}
 			}
-			catch( AsynchAEException e) {}
-			if ( endpoint.isRemote() && entry != null )
+			catch( AsynchAEException e) 
 			{
-				aController.dropCAS(casReferenceId, true );
+				System.out.println("Cas:"+casReferenceId+" Not Found In the Cache.");
 			}
 		}
 	}

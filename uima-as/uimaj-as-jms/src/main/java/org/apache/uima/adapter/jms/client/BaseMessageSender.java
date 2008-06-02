@@ -119,6 +119,7 @@ public abstract class BaseMessageSender implements Runnable,
 	/**
 	 * Signals any object that waits for the worker thread to initialize
 	 */
+
 	private void signal() {
 		synchronized (this) {
 			this.notifyAll();
