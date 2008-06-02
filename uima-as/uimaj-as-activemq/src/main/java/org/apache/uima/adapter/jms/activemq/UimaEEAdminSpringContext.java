@@ -56,7 +56,10 @@ implements UimaEEAdminContext, ApplicationListener
 				listenerEntry.setListenerContainer(listenerContainer);
 				listenerMap.put(listenerContainer.getDestinationName(), listenerEntry);
 			}
-			catch( Exception e) {}
+			catch( Exception e) 
+			{
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "UimaEEAdminSpringContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] {  e });
+			}
 		}
 	}
 	
@@ -86,9 +89,13 @@ implements UimaEEAdminContext, ApplicationListener
 					listenerEntry.setStopped(true);
 					if ( listenerMap.get(anEndpointName) != null )
 					{
-					UimaDefaultMessageListenerContainer listenerContainer = 
-						((ListenerEntry)listenerMap.get(anEndpointName)).getListenerContainer();
-					spinThreadForListenerShutdown(listenerContainer);
+						ListenerEntry entry = (ListenerEntry)listenerMap.get(anEndpointName);
+						if ( entry != null )
+						{
+							UimaDefaultMessageListenerContainer listenerContainer = 
+								entry.getListenerContainer();
+							spinThreadForListenerShutdown(listenerContainer);
+						}
 					}
 				}
 			}				

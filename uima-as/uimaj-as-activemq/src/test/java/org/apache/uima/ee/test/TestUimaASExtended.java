@@ -620,7 +620,6 @@ public class TestUimaASExtended extends BaseTestSupport
 	public void testClientHttpTunnellingWithDoubleByteText() throws Exception
 	{
     System.out.println("-------------- testClientHttpTunnellingWithDoubleByteText -------------");
-/*    	
     try
 		{
 			File file = new File(relativeDataPath+"/DoubleByteText.txt");
@@ -665,7 +664,6 @@ public class TestUimaASExtended extends BaseTestSupport
       e.printStackTrace();
       fail("Could not complete test");
 		}
-*/		
 	}
 	
 	public void testAggregateHttpTunnelling() throws Exception

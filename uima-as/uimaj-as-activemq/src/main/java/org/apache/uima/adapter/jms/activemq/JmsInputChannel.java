@@ -65,17 +65,17 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 
 	private final CountDownLatch controllerLatch = new CountDownLatch(1);
 	//	Reference to the first Message Handler in the Chain. 
-	private Handler handler;
+	private transient Handler handler;
 	//	The name of the queue this Listener is expecting to receive messages from
 	private String endpointName;
 	//	Reference to the Controller Object
-	private AnalysisEngineController controller;
+	private transient AnalysisEngineController controller;
 	
 	private int sessionAckMode;
 	
-	private UimaDefaultMessageListenerContainer messageListener;
+	private transient UimaDefaultMessageListenerContainer messageListener;
 	
-	private Session jmsSession;
+	private transient Session jmsSession;
 	
 	private String brokerURL="";
 	

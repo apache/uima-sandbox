@@ -195,7 +195,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	      {
 		      connection.close();
 	      }
-	      catch(Exception ex) {}
+	      catch(Exception ex) 
+	      {
+	    	  //	Shutting down, ignore a connection error
+	      }
 	      connection = null;
 			}
 			if ( jmxManager != null )
@@ -549,6 +552,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			}
 			// Fetch an administrative context which contains a Spring Container
 			adminContext = (UimaEEAdminSpringContext) springContainerRegistry.get(aSpringContainerId);
+			if ( adminContext == null )
+			{
+				throw new InvalidContainerException("Spring Container Does Not Contain Valid UimaEEAdminSpringContext Object");
+			}
 			// Fetch instance of the Container from its context
 			ApplicationContext ctx = adminContext.getSpringContainer();
 			// Query the container for objects that implement
