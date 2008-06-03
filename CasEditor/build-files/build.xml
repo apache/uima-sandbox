@@ -140,6 +140,11 @@
 	<copy file="../target/casEditorUserGuide/casEditorUserGuide.pdf"  
 			todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor/docs/pdf"/>	
 	
+	<!-- Inject MANIFEST.MF into caseditor.jar file -->
+	<jar destfile="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor/plugins/org.apache.uima.caseditor_${buildVersion}.incubating/caseditor.jar"
+		manifest="../src/main/manifest/MANIFEST.MF" update="true">
+	</jar>
+		
 	<!-- create win32 build zip-->
 	<zip destfile="${outputLocation}/${buildLabel}/${archivePrefix}-win32.win32.x86-${buildId}.zip"
 		       basedir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86"/>
@@ -167,6 +172,11 @@
 	</copy>
 	<copy file="../target/casEditorUserGuide/casEditorUserGuide.pdf"  
 		  todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/docs/pdf"/>
+
+	<!-- Inject MANIFEST.MF into caseditor.jar file -->
+	<jar destfile="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/plugins/org.apache.uima.caseditor_${buildVersion}.incubating/caseditor.jar"
+		manifest="../src/main/manifest/MANIFEST.MF" update="true">
+	</jar>		
 		
 	<!-- create linux zip -->		
 	<zip destfile="${outputLocation}/${buildLabel}/${archivePrefix}-linux.gtk.x86-${buildId}.zip"
