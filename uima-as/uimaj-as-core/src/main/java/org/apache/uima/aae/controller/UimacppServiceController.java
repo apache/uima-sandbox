@@ -195,7 +195,7 @@ public class UimacppServiceController implements ControllerLifecycle {
   }
   
   private void notifyInitializationStatus(Exception e) {
-    synchronized (this.InitializedState) {
+    synchronized (this) {
       if (!this.InitializedState) {
         this.InitializedStatus = e;
         this.InitializedState = true;
@@ -575,12 +575,14 @@ public class UimacppServiceController implements ControllerLifecycle {
       // wait for connection handler threads to complete
       t1.join();
       t2.join();
-
-      if (this.loggerConnection == null || 
-          this.loggerHandler == null || 
-          this.commandConnection == null) {
-        throw new ResourceInitializationException(new IOException(
-        "Could not establish socket connection with C++ service."));
+      synchronized(this)
+      {
+          if (this.loggerConnection == null || 
+                  this.loggerHandler == null || 
+                  this.commandConnection == null) {
+                throw new ResourceInitializationException(new IOException(
+                "Could not establish socket connection with C++ service."));
+              }
       }
      
       /* add the shutdown hook */
@@ -653,7 +655,10 @@ public class UimacppServiceController implements ControllerLifecycle {
       }
       listeners.clear();
     }
-    loggerConnection.close();
+    synchronized(this)
+    {
+        loggerConnection.close();
+    }
     commandConnection.close();
     server.close();
   } 
@@ -775,7 +780,7 @@ public class UimacppServiceController implements ControllerLifecycle {
   }
 
   public void addControllerCallbackListener(ControllerCallbackListener aListener) {
-    synchronized (this.InitializedState) {
+    synchronized (this) {
       this.listeners.add(aListener);
       // if already initialized, notify now
       if (this.InitializedState) {
