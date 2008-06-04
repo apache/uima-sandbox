@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+
+      <wizard
+            name="Deployment Descriptor File"
+            icon="icons/editor.gif"
+            category="org.apache.uima.cpe.UIMA"
+            class="org.apache.uima.dde.internal.wizards.DDENewWizard"
+            id="org.apache.uima.desceditor.fragments.dde.wizards.DDENewWizard">
+      </wizard>
+   </extension>
+
+   <extension
+         point="org.apache.uima.desceditor.externalEditor">
+      <editor
+            class="org.apache.uima.dde.internal.DeploymentDescriptorEditor"
+            id="org.apache.uima.dde"
+            name="Deployment Descriptor Editor">
+         <handlesElement
+               class="org.apache.uima.aae.deployment.AEService"
+               elementName="analysisEngineDeploymentDescription"
+               internalParseClass="org.apache.uima.aae.deployment.impl.AEDeploymentDescription_Impl"/>
+      </editor>
+   </extension>
+</plugin>
