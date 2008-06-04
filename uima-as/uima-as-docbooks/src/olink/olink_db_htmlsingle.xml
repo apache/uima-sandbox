@@ -6,7 +6,7 @@
 <!ENTITY otarget_tug      SYSTEM "../../../uima-docbooks/src/olink/tutorials_and_users_guides/htmlsingle-target.db">
 <!ENTITY otarget_refs     SYSTEM "../../../uima-docbooks/src/olink/references/htmlsingle-target.db">
 <!ENTITY otarget_tools    SYSTEM "../../../uima-docbooks/src/olink/tools/htmlsingle-target.db">
-<!ENTITY otarget_async    SYSTEM "uima_async_scaleout/pdf-target.db">  
+<!ENTITY otarget_async    SYSTEM "uima_async_scaleout/htmlsingle-target.db">  
 ]>
 <targetset>
   <targetsetinfo>UIMA books olinks</targetsetinfo>
