@@ -58,7 +58,7 @@ public class Dd2spring {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			UIMAFramework.getLogger(THIS_CLASS).logrb(Level.CONFIG, THIS_CLASS.getName(),
-          "convertDD2Spring", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "Cannot_convert_saxon_classpath_to_a_URL_SEVERE",
+          "convertDD2Spring", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMA_dd2spring_Cannot_convert_saxon_classpath_to_a_URL_SEVERE",
           new Object[] {saxonClasspath});
 			return null;
 		}
