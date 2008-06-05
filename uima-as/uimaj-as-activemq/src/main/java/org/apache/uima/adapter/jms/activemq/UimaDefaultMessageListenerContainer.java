@@ -21,38 +21,28 @@ package org.apache.uima.adapter.jms.activemq;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQDestination;
-import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
-import org.apache.uima.aae.controller.Endpoint_impl;
-import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.Threshold;
 import org.apache.uima.aae.error.handler.GetMetaErrorHandler;
-import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.jms.listener.AbstractJmsListeningContainer;
-import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.destination.DestinationResolver;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class UimaDefaultMessageListenerContainer extends DefaultMessageListenerContainer
 implements ExceptionListener
@@ -91,7 +81,7 @@ implements ExceptionListener
 				(getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
 				
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-	                "handleListenerSetupFailure", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+	                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
 	                new Object[] {  endpointName, getBrokerUrl(), t });
 
 /*
@@ -154,7 +144,7 @@ implements ExceptionListener
 								try {
 									System.out.println(">>>> Controller:"+controller.getComponentName()+" Disabling Listener On Queue:"+endpoint.getEndpoint()+". Component's "+delegateKey+" Broker:"+getBrokerUrl()+" is Invalid");
 									UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
-							                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disabled_delegate_bad_broker__INFO",
+							                "handleListenerSetupFailure", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disabled_delegate_bad_broker__INFO",
 							                new Object[] {  controller.getComponentName(), delegateKey, getBrokerUrl() });
 									//	Remove the delegate from the routing table. 
 									((AggregateAnalysisEngineController) controller).disableDelegates(list);
