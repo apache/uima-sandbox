@@ -433,7 +433,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				if (!shownOnce)
 				{
 					shownOnce = true;
-					cache.dumpContents();
+					cache.dumpContents(getComponentName());
 				}
 
 				if (cache.isEmpty())
@@ -474,7 +474,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 				"collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc__FINEST", new Object[] { getName() });
-		getInProcessCache().dumpContents();
+		getInProcessCache().dumpContents(getComponentName());
 
 		cacheClientEndpoint(anEndpoint);
 
@@ -938,7 +938,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		CacheEntry cacheEntry = null;
 		Endpoint freeCasEndpoint = null;
 		//	If debug level=FINEST dump the entire cache
-		getInProcessCache().dumpContents();
+		getInProcessCache().dumpContents(getComponentName());
 		
 		try
 		{
@@ -985,8 +985,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			CacheEntry parentCASCacheEntry = null;
 			//	If this service is not a Cas Multiplier and a given CAS has a parent
 			//	decrement a number of children the parent CAS has in play. The child
-			//	CAS will be dropped 
+			//	CAS will be dropped. If this aggragate *is* a cas multiplier, the client
+			//	will send it a Release CAS request and only than the child count of the
+			//	parent CAS can be decremented.
 //			if ( freeCasEndpoint == null && cacheEntry.isSubordinate() )
+//			if ( !isCasMultiplier() && cacheEntry.isSubordinate() && isTopLevelComponent())
 			if ( cacheEntry.isSubordinate() && isTopLevelComponent())
 			{
 				//	 This is a subordinate CAS. First get cache entry for the input (parent) CAS
@@ -1010,6 +1013,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			} 
 			else 
 			{
+				if ( cacheEntry.isSubordinate())
+				{
+					cacheEntry.setWaitingForRelease(true);
+				}
 				//	Send a reply to the Client. If the CAS is an input CAS it will be dropped
 				clientEndpoint = replyToClient( cacheEntry );
 			}

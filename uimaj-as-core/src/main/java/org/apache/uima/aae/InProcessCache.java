@@ -224,7 +224,7 @@ public class InProcessCache implements InProcessCacheMBean
 	{
 		size = i;
 	}
-	public synchronized void dumpContents()
+	public synchronized void dumpContents(String aControllerName)
 	{
 		if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 		{
@@ -239,16 +239,21 @@ public class InProcessCache implements InProcessCacheMBean
 				count++;
 				if ( entry.isSubordinate())
 				{
-					sb.append(key+ " Number Of Children CASes In Play:"+entry.getSubordinateCasInPlayCount()+" Parent CAS id:"+entry.getInputCasReferenceId()+"\n");
+					sb.append(key+ " Number Of Child CASes In Play:"+entry.getSubordinateCasInPlayCount()+" Parent CAS id:"+entry.getInputCasReferenceId());
 				}
 				else
 				{
-					sb.append(key+ " *** Input CAS. Number Of Children CASes In Play:"+entry.getSubordinateCasInPlayCount()+"\n");
+					sb.append(key+ " *** Input CAS. Number Of Child CASes In Play:"+entry.getSubordinateCasInPlayCount());
 				}
+				if ( entry.isWaitingForRelease() )
+				{
+					sb.append(" <<< Waiting For Release Request From Client");
+				}
+				sb.append("\n");
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                "dumpContents", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_cache_entry_key__FINEST",
-	                new Object[] { count, sb.toString() });
+	                new Object[] { aControllerName, count, sb.toString() });
 			sb.setLength(0);
 /*			
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
@@ -293,7 +298,7 @@ public class InProcessCache implements InProcessCacheMBean
 		casRefEntry.deleteCAS();
 	}
 
-	public CacheEntry[] getCacheEntriesForEndpoint(String anEndpointName )
+	public synchronized CacheEntry[] getCacheEntriesForEndpoint(String anEndpointName )
 	{
 		CacheEntry[] entries;
 		ArrayList list = new ArrayList();
@@ -384,8 +389,12 @@ public class InProcessCache implements InProcessCacheMBean
 		CacheEntry casRefEntry = getEntry(aCasReferenceId);
 		return casRefEntry.getOtsd();
 	}
-	private CacheEntry getEntry(String aCasReferenceId)
+	private synchronized CacheEntry getEntry(String aCasReferenceId)
 	{
+		if ( !cache.containsKey(aCasReferenceId))
+		{
+			return null;
+		}
 		return (CacheEntry) cache.get(aCasReferenceId);
 	}
 	public void addEndpoint( Endpoint anEndpoint, String aCasReferenceId)
@@ -481,6 +490,20 @@ public class InProcessCache implements InProcessCacheMBean
 		return casRefEntry.getNumberOfParallelDelegates();
 	}
  
+	public synchronized boolean hasNoSubordinates(String aCasReferenceId)
+	{
+		Iterator it = cache.keySet().iterator();
+		while( it.hasNext() )
+		{
+			String key = (String) it.next();
+			CacheEntry entry = (CacheEntry)cache.get(key);
+			if ( entry.getInputCasReferenceId() != null && entry.getInputCasReferenceId().equals(aCasReferenceId))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 	public void setNumberOfParallelDelegates(int aParallelDelegateCount, String aCasReferenceId)
 	throws AsynchAEException
 	{
@@ -492,7 +515,7 @@ public class InProcessCache implements InProcessCacheMBean
 		casRefEntry.setNumberOfParallelDelegates(aParallelDelegateCount);
 	}
 	
-	public CacheEntry getCacheEntryForCAS( String aCasReferenceId )
+	public synchronized CacheEntry getCacheEntryForCAS( String aCasReferenceId )
 	throws AsynchAEException
 	{
 		CacheEntry casRefEntry = getEntry(aCasReferenceId);
@@ -581,6 +604,7 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private FinalStep step;
 		
+		private boolean waitingForRealease;
 		
 		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
 		{
@@ -920,6 +944,15 @@ public class InProcessCache implements InProcessCacheMBean
 		public FinalStep getFinalStep()
 		{
 			return step;
+		}
+		public void setWaitingForRelease(boolean flag)
+		{
+			waitingForRealease = flag;
+		}
+		
+		public boolean isWaitingForRelease()
+		{
+			return waitingForRealease;
 		}
 	}	
 

@@ -853,7 +853,7 @@ implements AnalysisEngineController, EventSubscriber
 				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removed_cache_entry__FINE",
 				                new Object[] {aCasReferenceId, getComponentName() });
 					}
-					inProcessCache.dumpContents();
+					inProcessCache.dumpContents(getComponentName());
 				}	
 			}
 			//	Remove stats from the map maintaining CAS specific stats
@@ -1705,8 +1705,10 @@ implements AnalysisEngineController, EventSubscriber
 							if ( cacheEntry != null  )
 							{
 								//	Decrement number of child CASes in play
-								cacheEntry.decrementSubordinateCasInPlayCount();
-								if ( cacheEntry.isPendingReply() && cacheEntry.getSubordinateCasInPlayCount() == 0)
+								//	Decrement has already happened in the final step before the CAS was sent to the client
+								//cacheEntry.decrementSubordinateCasInPlayCount();
+//								if ( cacheEntry.isPendingReply() && cacheEntry.getSubordinateCasInPlayCount() == 0)
+								if ( cacheEntry.isPendingReply() && getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId()))
 								{
 									if ( this instanceof AggregateAnalysisEngineController )
 									{
