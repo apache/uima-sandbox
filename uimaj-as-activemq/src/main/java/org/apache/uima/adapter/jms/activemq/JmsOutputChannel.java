@@ -1360,7 +1360,7 @@ public class JmsOutputChannel implements OutputChannel
 
 			if ( getAnalysisEngineController().isTopLevelComponent() )
 			{
-				getAnalysisEngineController().getInProcessCache().dumpContents();
+				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
 			}
 			addIdleTime(tm);
 		}
@@ -1482,7 +1482,7 @@ public class JmsOutputChannel implements OutputChannel
 
 			if ( getAnalysisEngineController().isTopLevelComponent() )
 			{
-				getAnalysisEngineController().getInProcessCache().dumpContents();
+				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
 			}
 			addIdleTime(tm);
 		}
