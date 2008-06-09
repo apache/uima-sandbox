@@ -1,0 +1,46 @@
+	Apache UIMA Asynchronous Scaleout v2.2.2
+                               Release Notes
+   -----------------------------------------------------------------------
+
+CONTENTS
+1. What is UIMA-AS?
+2. Major Changes in this Release
+3. How to Get Involved
+4. How to Report Issues
+5. List of JIRA Issues Fixed in this Release   
+   
+   
+1. What is UIMA-AS?
+
+UIMA Asynchronous Scaleout (AS) is an add-on to Apache UIMA that provides a set of capabilities
+for achieving flexible scaleout.  It is a second generation design, replacing the
+CPM and Vinci Services. The CPM and Vinci are still available and are not being deprecated, 
+but new designs are encouraged to use UIMA-AS for scalability, and current designs 
+reaching limitations may want to move to UIMA-AS.
+  
+UIMA-AS is integrated with the new flow controller architecture, and can be applied to
+both primitive and aggregate analysis engines.
+
+2. Major Changes in this Release
+
+This is the first Apache release of UIMA-AS.  
+
+
+3. How to Get Involved
+
+The Apache UIMA project really needs and appreciates any contributions, 
+including documentation help, source code and feedback.  If you are interested
+in contributing, please visit http://incubator.apache.org/uima/get-involved.html.
+
+
+4. How to Report Issues
+
+The Apache UIMA project uses JIRA for issue tracking.  Please report any 
+issues you find at http://issues.apache.org/jira/browse/uima.
+
+
+5. List of JIRA Issues Fixed in this Release
+
+This is the first release of this component.
+
+
