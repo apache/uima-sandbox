@@ -17,12 +17,13 @@
  * under the License.
  */
 
-
 package org.apache.uima.examples.tagger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 
+import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
 import org.apache.uima.resource.DataResource;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.SharedResourceObject;
@@ -32,26 +33,38 @@ import org.apache.uima.resource.SharedResourceObject;
  */
 public class ModelResource implements IModelResource, SharedResourceObject {
 
-  private InputStream inputStream = null;
-  
-  /* (non-Javadoc)
-   * @see org.apache.uima.examples.tagger.IModelResource#getInputStream()
+  private ModelGeneration model = null;
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.uima.examples.tagger.IModelResource#getModel()
    */
-  public InputStream getInputStream() {
-    return this.inputStream;
+  public ModelGeneration getModel() {
+    return this.model;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.uima.resource.SharedResourceObject#load(org.apache.uima.resource.DataResource)
    */
   public void load(DataResource data) throws ResourceInitializationException {
     if (data != null) {
       try {
-        this.inputStream = data.getInputStream();
+        InputStream inputStream = data.getInputStream();
+        this.model = null;
+
+        ObjectInputStream p = new ObjectInputStream(inputStream);
+        this.model = (ModelGeneration) p.readObject();
+        p.close();
+
       } catch (IOException e) {
         throw new ResourceInitializationException(e);
+      } catch (ClassNotFoundException e) {
+        throw new ResourceInitializationException(e);
       }
-}
+    }
 
   }
 

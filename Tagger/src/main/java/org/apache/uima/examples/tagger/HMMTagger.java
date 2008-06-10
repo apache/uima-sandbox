@@ -79,6 +79,10 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
       this.N = ((Integer) aContext.getConfigParameterValue(n_param)).intValue();
           
       this.my_model = get_model();
+      
+      if (this.my_model == null) {
+        throw new ResourceInitializationException(new Exception("Could not load model file."));
+      }
 
     } catch (Exception e) {
       throw new ResourceInitializationException(e);
@@ -106,14 +110,14 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
     }
 
     catch (IOException e) {
-      System.err.println(e);
+      e.printStackTrace();
     } catch (ClassNotFoundException e) {
-      System.err.println(e);
+      e.printStackTrace();
     } finally {
       try {
         model.close();
       } catch (Exception e) {
-         //do nothing
+        e.printStackTrace();
       }
     }
     return oRead;
@@ -128,26 +132,7 @@ public class HMMTagger extends JCasAnnotator_ImplBase implements Tagger{
       throw new AnnotatorConfigurationException(e);
     }
 
-    InputStream model = modelResource.getInputStream();
-    ModelGeneration oRead = null;
-
-    try {
-      ObjectInputStream p = new ObjectInputStream(model);
-      oRead = (ModelGeneration) p.readObject();
-    }
-
-    catch (IOException e) {
-      System.err.println(e);
-    } catch (ClassNotFoundException e) {
-      System.err.println(e);
-    } finally {
-      try {
-        model.close();
-      } catch (Exception e) {
-         //do nothing
-      }
-    }
-    return oRead;
+    return modelResource.getModel();
   }
 
 

@@ -20,7 +20,7 @@
 
 package org.apache.uima.examples.tagger;
 
-import java.io.InputStream;
+import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
 
 /**
  * Model resource interface.
@@ -31,6 +31,6 @@ public interface IModelResource {
    * Obtain an input stream for this resource.
    * @return
    */
-  InputStream getInputStream();
+  ModelGeneration getModel();
 
 }
