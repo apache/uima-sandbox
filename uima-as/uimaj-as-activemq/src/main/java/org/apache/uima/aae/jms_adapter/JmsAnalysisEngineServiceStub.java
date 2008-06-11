@@ -42,11 +42,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.analysis_engine.AnalysisEngineServiceStub;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.collection.EntityProcessStatus;
 import org.apache.uima.resource.Parameter;
 import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -55,10 +57,13 @@ import org.apache.uima.resource.ResourceServiceException;
 import org.apache.uima.resource.metadata.ResourceMetaData;
 import org.apache.uima.util.Level;
 
-public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub {
+public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub, 
+  UimaASStatusCallbackListener {
   public static final String PARAM_BROKER_URL = "brokerUrl";
   public static final String PARAM_ENDPOINT = "endpoint";
   public static final String PARAM_TIMEOUT = "timeout";
+  private Object mux = new Object();
+  private boolean cpcReceived;
   private UimaAsynchronousEngine uimaEEEngine;
   
   public JmsAnalysisEngineServiceStub(Resource owner,
@@ -89,6 +94,7 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub {
       appCtxt.put(UimaAsynchronousEngine.Timeout, timeout);
     }
     uimaEEEngine = new BaseUIMAAsynchronousEngine_impl();
+    uimaEEEngine.addStatusCallbackListener(this);
     uimaEEEngine.initialize(appCtxt);
     System.out.println("adapter init complete");
   }
@@ -137,6 +143,7 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub {
    */
   public void destroy() {
     try {
+//      System.out.println("destroy methjdssdx");
       uimaEEEngine.stop();
     } catch (Exception e) {
       UIMAFramework.getLogger().log(Level.WARNING, e.getMessage(), e);
@@ -156,10 +163,52 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub {
    */
   public void callCollectionProcessComplete() throws ResourceServiceException {
     try {
+      cpcReceived = false;
       uimaEEEngine.collectionProcessingComplete();
+      // make this routine synchronous
+//      System.out.println("CPC no wakeup needed");
+      synchronized (mux) {
+        while (!cpcReceived) {
+          try {
+            mux.wait();
+//            System.out.println("CPC wakeup");
+          } catch (InterruptedException e) {
+            // Only here if something interrupts this thread
+            e.printStackTrace();
+          }
+        }
+      }
     } catch (ResourceProcessException e) {
       throw new ResourceServiceException(e);
     }
+  }
+
+
+  /* (non-Javadoc)
+   * @see org.apache.uima.aae.client.UimaASStatusCallbackListener#collectionProcessComplete(org.apache.uima.collection.EntityProcessStatus)
+   */
+  public void collectionProcessComplete(EntityProcessStatus aStatus) {
+    synchronized (mux) {
+//      System.out.println("CPC reply done got one");
+      cpcReceived = true;
+      mux.notifyAll();
+    }
+  }
+
+
+  /* (non-Javadoc)
+   * @see org.apache.uima.aae.client.UimaASStatusCallbackListener#entityProcessComplete(org.apache.uima.cas.CAS, org.apache.uima.collection.EntityProcessStatus)
+   */
+  public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
+    // not used
+  }
+
+
+  /* (non-Javadoc)
+   * @see org.apache.uima.aae.client.UimaASStatusCallbackListener#initializationComplete(org.apache.uima.collection.EntityProcessStatus)
+   */
+  public void initializationComplete(EntityProcessStatus aStatus) {
+    // not used
   }
 
 
