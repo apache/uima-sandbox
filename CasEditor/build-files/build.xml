@@ -140,10 +140,23 @@
 	<copy file="../target/casEditorUserGuide/casEditorUserGuide.pdf"  
 			todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor/docs/pdf"/>	
 	
-	<!-- Inject MANIFEST.MF into caseditor.jar file -->
+	<!-- Inject MANIFEST.MF, NOTICE, LICENSE, DISCLAIMER into caseditor plugin and caseditor.jar file -->
+	<copy todir="${outputLocation}/${buildLabel}/manifest-temp/META-INF">
+			<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+				<include name="NOTICE"/>
+				<include name="LICENSE"/>
+				<include name="DISCLAIMER"/>
+			</fileset>
+	</copy>
 	<jar destfile="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor/plugins/org.apache.uima.caseditor_${buildVersion}.incubating/caseditor.jar"
-		manifest="../src/main/manifest/MANIFEST.MF" update="true">
+		manifest="../src/main/manifest/MANIFEST.MF" update="true"
+		basedir="${outputLocation}/${buildLabel}/manifest-temp/"
+		includes="**">
 	</jar>
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-win32.win32.x86/CasEditor/plugins/org.apache.uima.caseditor_${buildVersion}.incubating/META-INF">
+		<fileset dir="${outputLocation}/${buildLabel}/manifest-temp/META-INF"/>
+	</copy>
+	<delete dir="${outputLocation}/${buildLabel}/manifest-temp/"/>
 		
 	<!-- create win32 build zip-->
 	<zip destfile="${outputLocation}/${buildLabel}/${archivePrefix}-win32.win32.x86-${buildId}.zip"
@@ -173,10 +186,23 @@
 	<copy file="../target/casEditorUserGuide/casEditorUserGuide.pdf"  
 		  todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/docs/pdf"/>
 
-	<!-- Inject MANIFEST.MF into caseditor.jar file -->
+	<!-- Inject MANIFEST.MF, NOTICE, LICENSE, DISCLAIMER into caseditor plugin and caseditor.jar file -->
+	<copy todir="${outputLocation}/${buildLabel}/manifest-temp/META-INF">
+			<fileset dir="${outputLocation}/plugins/org.apache.uima.caseditor/src/main/readme">
+				<include name="NOTICE"/>
+				<include name="LICENSE"/>
+				<include name="DISCLAIMER"/>
+			</fileset>
+	</copy>
 	<jar destfile="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/plugins/org.apache.uima.caseditor_${buildVersion}.incubating/caseditor.jar"
-		manifest="../src/main/manifest/MANIFEST.MF" update="true">
-	</jar>		
+		manifest="../src/main/manifest/MANIFEST.MF" update="true"
+		basedir="${outputLocation}/${buildLabel}/manifest-temp/"
+		includes="**">
+	</jar>
+	<copy todir="${outputLocation}/${buildLabel}/${buildId}-linux.gtk.x86/CasEditor/plugins/org.apache.uima.caseditor_${buildVersion}.incubating/META-INF">
+		<fileset dir="${outputLocation}/${buildLabel}/manifest-temp/META-INF"/>
+	</copy>
+	<delete dir="${outputLocation}/${buildLabel}/manifest-temp/"/>
 		
 	<!-- create linux zip -->		
 	<zip destfile="${outputLocation}/${buildLabel}/${archivePrefix}-linux.gtk.x86-${buildId}.zip"
