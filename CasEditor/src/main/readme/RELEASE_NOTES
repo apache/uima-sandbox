@@ -126,6 +126,7 @@ Release Notes - UIMA - Version 2.2.2
     * [UIMA-716] - Deletion of processor folder does not removes the folder in the Corpus Explorer
     * [UIMA-864] - update version from 2.2.2-incubating-SNAPSHOT to 2.2.2-incubating
     * [UIMA-885] - fix license header issues
+    * [UIMA-1029] - udpate CasEditor build for release 2.2.2
 
 ** Improvement
     * [UIMA-460] - Change CAS Editor Docs project to be a general sandbox docs project
@@ -162,14 +163,11 @@ Release Notes - UIMA - Version 2.2.2
     * [UIMA-515] - enable CASEditor to work with resource specifiers as cas processors
 
 
-
 ** Task
     * [UIMA-357] - Write documentation for the Cas Editor
     * [UIMA-573] - Cas Editor: Update documentation
     * [UIMA-581] - Cas Editor: Create a test plan
     * [UIMA-783] - Update Cas Editor version to 2.2.2
-
-
 
 ** Wish
     * [UIMA-448] - Add a sample annotation project
