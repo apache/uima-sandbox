@@ -1,0 +1,395 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Apache UIMA Dictionary Annotator Documentation</title><link rel="stylesheet" href="css/stylesheet-html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.72.0"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en" id="d0e2"><div class="titlepage"><div><div><h1 class="title"><a name="d0e2"></a>
+		Apache UIMA Dictionary Annotator Documentation
+	</h1></div><div><div class="authorgroup"><h3 class="corpauthor">Authors: The Apache UIMA Development Community</h3></div></div><div><span class="productname">Apache UIMA Sandbox<br></span></div><div><p class="releaseinfo">Version 2.2.2</p></div><div><p class="copyright">Copyright &copy; 2008 The Apache Software Foundation</p></div><div><div class="legalnotice"><a name="d0e15"></a><p> </p><p><b>Incubation Notice and Disclaimer.&nbsp;</b>Apache UIMA is an effort undergoing incubation at the Apache Software Foundation (ASF). 
+          Incubation is required of all newly accepted projects until a further review indicates that 
+          the infrastructure, communications, and decision making process have stabilized in a manner 
+          consistent with other successful ASF projects. While incubation status is not necessarily 
+          a reflection of the completeness or stability of the code, 
+          it does indicate that the project has yet to be fully endorsed by the ASF.</p><p> </p><p> </p><p><b>License and Disclaimer.&nbsp;</b>The ASF licenses this documentation
+           to you under the Apache License, Version 2.0 (the
+           "License"); you may not use this documentation except in compliance
+           with the License.  You may obtain a copy of the License at
+         
+         </p><div class="blockquote"><blockquote class="blockquote"><p>
+             <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://www.apache.org/licenses/LICENSE-2.0" target="_top">http://www.apache.org/licenses/LICENSE-2.0</a>
+           </p></blockquote></div><p>
+         
+           Unless required by applicable law or agreed to in writing,
+           this documentation and its contents are distributed under the License 
+           on an 
+           "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+           KIND, either express or implied.  See the License for the
+           specific language governing permissions and limitations
+           under the License.
+         </p><p> </p><p> </p><p><b>Trademarks.&nbsp;</b>All terms mentioned in the text that are known to be trademarks or 
+        service marks have been appropriately capitalized.  Use of such terms
+        in this book should not be regarded as affecting the validity of the
+        the trademark or service mark.
+        </p></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="preface"><a href="#d0e54">Introduction</a></span></dt><dt><span class="chapter"><a href="#sandbox.dictAnnotator.processingOverview">1. Processing Overview</a></span></dt><dt><span class="chapter"><a href="#sandbox.dictAnnotator.dictionaryCreation">2. Dictionary Creation</a></span></dt><dd><dl><dt><span class="section"><a href="#sandbox.dictAnnotator.dictionaryCreation.DictionaryCreator">2.1. Dictionary Creator</a></span></dt><dt><span class="section"><a href="#sandbox.dictAnnotator.dictionaryCreation.DictionaryFormat">2.2. Dictionary XML Format</a></span></dt></dl></dd><dt><span class="chapter"><a href="#sandbox.dictAnnotator.annotatorConfiguration">3. Annotator Configuration</a></span></dt><dd><dl><dt><span class="section"><a href="#sandbox.dictAnnotator.annotatorConfiguration.DictionaryFiles">3.1. Dictionary Files</a></span></dt><dt><span class="section"><a href="#sandbox.dictAnnotator.annotatorConfiguration.InputTokenType">3.2. Input Match Type</a></span></dt><dd><dl><dt><span class="section"><a href="#sandbox.dictAnnotator.annotatorConfiguration.InputTokenType.FeaturePath">3.2.1. Input Match Type Feature Path</a></span></dt></dl></dd><dt><span class="section"><a href="#sandbox.dictAnnotator.annotatorConfiguration.InputTokenFilter">3.3. Input Match Type Filters</a></span></dt></dl></dd></dl></div><div class="preface" lang="en" id="d0e54"><div class="titlepage"><div><div><h2 class="title"><a name="d0e54"></a>Introduction</h2></div></div></div><p>
+			The DictionaryAnnotator is an
+			Apache UIMA analysis engine that annotates words based on
+			dictionary entries. For each word in the document text 
+			that is available in the dictionary a new annotation is created.
+
+			The annotator can be configured with one or more independent 
+			dictionaries. The dictionaries can easily be created with the
+			dictionary creator command line tooling. For advanced usage
+			of the annotator the matching can also be improved by specifying 
+			multi word capabilities, match input type properties and input type 
+			filter settings.  
+		</p></div><div class="chapter" lang="en" id="sandbox.dictAnnotator.processingOverview"><div class="titlepage"><div><div><h2 class="title"><a name="sandbox.dictAnnotator.processingOverview"></a>Chapter&nbsp;1.&nbsp;Processing Overview</h2></div></div></div><p>
+			To use the DictionaryAnnotator at first a dictionary must be 
+			created because so far the annotator does not provide any dictionaries. 
+			The creation of a dictionary is very simple when using the 
+			dictionary creator command line tooling. The tooling takes as input a list 
+			words that should be added to the dictionary.
+			The output of the dictionary creator is the created dictionary as XML file 
+			and can be used to configure the annotator. For each dictionary additional 
+			meta data like the annotation output type for the created
+			annotation can be set. The dictionary and the DictionaryAnnotator can be
+			configured to work with single word dictionary entries like "Apache" or with
+			multi word entries like "Apache UIMA".
+		</p><p>
+			After the annotator is configured with the created dictionary the lookup
+			strategy settings must be defined. The dictionary lookup inside the annotator 
+			works with tokens. A token is a word or an arbitrary text fragment that is used for  
+			the dictionary lookup. If a token match a dictionary entry an annotation is created.
+			The kind of tokens that are used for the lookup can be configured and enhanced with
+			filter capabilities. To improve the dictionary lookup it is recommended that the
+			tokenization for the dictionary entries and the tokenization for the document text is the same. 
+			This can be achieved when using the	dictionary creator with some advanced settings.
+		</p><p>
+		    During the annotator processing for each token in the document text 
+		    that is available in the dictionary a new annotation with the dictionary 
+		    output type is created. These annotations can be used in a succeeding step to do 
+		    some further processing.
+		</p></div><div class="chapter" lang="en" id="sandbox.dictAnnotator.dictionaryCreation"><div class="titlepage"><div><div><h2 class="title"><a name="sandbox.dictAnnotator.dictionaryCreation"></a>Chapter&nbsp;2.&nbsp;Dictionary Creation</h2></div></div></div><p>
+		  To automatically create a dictionary, the DictionaryCreator command line tooling is provied.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sandbox.dictAnnotator.dictionaryCreation.DictionaryCreator"></a>2.1.&nbsp;Dictionary Creator</h2></div></div></div><p>
+				The DictionaryCreator command line tool should be used to create the 
+				DictionaryAnnotator dictionaries. The input for the DictionaryCreator 
+				is a text file that contains the dictionary entries, one entry per line. The output
+				is the created dictionary as XML file.
+		    </p><p>
+			    The usage below shows all possible command line parameters.
+			</p><pre class="programlisting">java 
+  -cp uimaj-an-dictionary.jar 
+  org.apache.uima.annotator.dict_annot.dictionary.impl.DictionaryCreator
+  -input &lt;InputFile&gt; 
+  -encoding &lt;InputFileEncoding&gt; 
+  -output &lt;OutputFile&gt; 
+  [-tokenizer &lt;TokenizerPearFile&gt; -tokenType &lt;tokenType&gt;] 
+  [-separator &lt;separatorChar&gt;]
+  [-lang &lt;dictionaryLanguage&gt;]</pre><p>
+			</p><p>
+			    When just using the mandatory settings the input content for the dictionary
+			    is tokenized/separated by using the whitespace character. This means that if 
+			    the line contains a whitespace character as in "Apache UIMA"
+			    the dictionary entry is treated as multi word entry where the mutli word 
+			    consists of the two tokens "Apache" and "UIMA". If the line just contains "DictionaryAnnotator"
+			    the dictionary entry in treated as single word entry and has only one token
+			    called "DictionaryAnnotator". 
+			</p><p>
+			    A sample XML dictionary file is shown below. 
+			   </p><pre class="programlisting">&lt;dictionary 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xsi:noNamespaceSchemaLocation="dictionary.xsd"&gt;
+   &lt;typeCollection&gt;
+      &lt;dictionaryMetaData 
+         caseNormalization="true" 
+         multiWordEntries="true" 
+         multiWordSeparator=" "/&gt;
+      &lt;typeDescription&gt;
+         &lt;typeName&gt; ADD DICTIONARY OUTPUT TYPE HERE&lt;/typeName&gt;
+      &lt;/typeDescription&gt;
+      &lt;entries&gt;
+         &lt;entry&gt;
+            &lt;key&gt;DictionaryAnnotator&lt;/key&gt;
+         &lt;/entry&gt;
+         &lt;entry&gt;
+            &lt;key&gt;Apache UIMA&lt;/key&gt;
+         &lt;/entry&gt;
+      &lt;/entries&gt;
+   &lt;/typeCollection&gt;
+&lt;/dictionary&gt;</pre><p> 
+			</p><p>
+			    In addition to the default creation, the DictionaryCreator can be configured with 
+			    additional parameters. 
+			</p><p>
+			    These are:
+			    </p><div class="itemizedlist"><ul type="disc"><li><p>
+								<code class="code">tokenization &lt;TokenizerPearFile&gt;</code> - 
+								To use an Apache UIMA tokenizer annotator PEAR that tokenize 
+								the input instead of the simple whitespace tokenization that is done
+								by default. When using a special tokenizer
+								the <code class="code">tokenType &lt;tokenType&gt;</code> parameter must also be set.
+							</p></li><li><p>
+								<code class="code">tokenType &lt;tokenType&gt;</code> - 
+								Specifies the token type to get	the tokens created by the tokenizer.
+								These tokens are used to create the single or multi word dictionary entries 
+								for	each line of the input.
+							</p></li><li><p>
+								<code class="code">lang &lt;languageCode&gt;</code> - 
+								In some cases it is necessary to specify the language for the created dictionary
+								and for the used tokenization.
+							</p></li><li><p>
+								<code class="code">separator &lt;separatorChar&gt;</code> - 
+								If no special tokenizer is used for the tokenization of the input dictionary content, 
+								by default the whitespace character is used to tokenizer the content. If another
+								separator character should be used instead, it can be specified by using this parameter.
+							</p></li></ul></div><p>
+			 </p><p>
+			   After the dictionary is created, it is necessary to update the created dictionary 
+			   with some additional meta data. The most important one that must be set is the 
+			   <code class="code">typeName</code> entry. The <code class="code">typeName</code> entry after the creation looks like
+			   <code class="code">&lt;typeName&gt; ADD DICTIONARY OUTPUT TYPE HERE&lt;/typeName&gt;</code> and must
+			   be updated with the UIMA type that should be used if the DictionaryAnnotator creates
+			   an annotation for a word based on this dictionary. For more details about the other
+			   meta data entries of the dictionary, please refer to  
+			   <a href="#sandbox.dictAnnotator.dictionaryCreation.DictionaryFormat" title="2.2.&nbsp;Dictionary XML Format">Section&nbsp;2.2, &#8220;Dictionary XML Format&#8221;</a>.
+			 </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sandbox.dictAnnotator.dictionaryCreation.DictionaryFormat"></a>2.2.&nbsp;Dictionary XML Format</h2></div></div></div><p>
+				The Dictionary XML Format is shown with an example below:
+			</p><p>
+			   </p><pre class="programlisting">&lt;dictionary 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xsi:noNamespaceSchemaLocation="dictionary.xsd"&gt;
+   &lt;typeCollection&gt;
+      &lt;dictionaryMetaData 
+         caseNormalization="true" 
+         multiWordEntries="true" 
+         multiWordSeparator=" "/&gt;
+      &lt;languageId&gt;en&lt;/languageId&gt;
+      &lt;typeDescription&gt;
+         &lt;typeName&gt;org.apache.uima.DictionaryEntry&lt;/typeName&gt;
+      &lt;/typeDescription&gt;
+      &lt;entries&gt;
+         &lt;entry&gt;
+            &lt;key&gt;DictionaryAnnotator&lt;/key&gt;
+         &lt;/entry&gt;
+         &lt;entry&gt;
+            &lt;key&gt;Apache UIMA&lt;/key&gt;
+         &lt;/entry&gt;
+      &lt;/entries&gt;
+   &lt;/typeCollection&gt;
+&lt;/dictionary&gt;</pre><p>
+			</p><p>
+			  The <code class="code">&lt;dictionaryMetaData&gt;</code> element specifies how the dictionary is used
+			  inside the DictionaryAnnoator. The attributes for the element are:
+			  </p><div class="itemizedlist"><ul type="disc"><li><p>
+			           <code class="code">caseNormalization</code> - 
+						If this parameter is set to <code class="code">true</code> all dictionary entries are treated
+						case normalized. This means that the dictionary matching is not case sensitive.
+					</p></li><li><p>
+			           <code class="code">multiWordSeparator</code> - 
+						Specifies the multi word separator character that is used in the XML document 
+						for multi words. If the DictionaryCreator creates the dictionary files this is by default
+						the "|" character.  
+					</p></li><li><p>
+			           <code class="code">multiWordEntries</code> - 
+						If this parameter is <code class="code">true</code> the dictionary is treated as 
+						multi word dictionary. This means that dictionary entries that are separated by
+						the <code class="code">multiWordSpearator</code> are treated as multi word entries. So for example 
+						"Apache|UIMA" is treated as multi word entry and the document text must
+						have after the tokenization two tokens "Apache" and "UIMA" to match the dictionary 
+						entry. 
+					</p></li></ul></div><p>
+			</p><p>
+			   The <code class="code">&lt;languageId&gt;</code> element specifies the language of the current dictionary if all 
+			   entries have the same language. This settings is not mandatory and can also be omitted. 
+			   content.
+			</p><p>
+			   The <code class="code">&lt;typeName&gt;</code> element specifies the output type that is used if 
+			   an annotation is created for a dictionary entry. 
+			</p><p>
+			   The <code class="code">&lt;key&gt;</code> elements specifies the dictionary entries. For each entry
+			   an own <code class="code">&lt;key&gt;</code> element is used. 
+			</p></div></div><div class="chapter" lang="en" id="sandbox.dictAnnotator.annotatorConfiguration"><div class="titlepage"><div><div><h2 class="title"><a name="sandbox.dictAnnotator.annotatorConfiguration"></a>Chapter&nbsp;3.&nbsp;Annotator Configuration</h2></div></div></div><p>
+		  To use the DictionaryAnnotator it must be configured with at least one dictionary 
+		  and with the input match type settings - the tokens - that the
+		  annotator will use to do the lookup. In addition to these mandatory settings
+		  it is possible to define input match type filters to filter the used annotations 
+		  before they are used for the lookup. The following paragraphs will 
+		  explain in detail how to configuration is done.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sandbox.dictAnnotator.annotatorConfiguration.DictionaryFiles"></a>3.1.&nbsp;Dictionary Files</h2></div></div></div><p>
+              To specify the annotator dictionary files there is a configuration parameter
+              definition in the annotator descriptor that looks like:
+			</p><p>
+			</p><pre class="programlisting">&lt;configurationParameter&gt;
+   &lt;name&gt;DictionaryFiles&lt;/name&gt;
+   &lt;description&gt;
+      list of dictionary files to configure the annotator
+   &lt;/description&gt;
+   &lt;type&gt;String&lt;/type&gt;
+   &lt;multiValued&gt;true&lt;/multiValued&gt;
+   &lt;mandatory&gt;true&lt;/mandatory&gt;
+&lt;/configurationParameter&gt;</pre><p>
+			</p><p>
+			   This parameter is mandatory and multi valued. This means that the setting must
+			   be available and one or more dictionary files can be specified with the same parameter.
+			   A sample setting for two dictionary files can look like:
+			</p><p>
+			  </p><pre class="programlisting">&lt;nameValuePair&gt;
+   &lt;name&gt;DictionaryFiles&lt;/name&gt;
+   &lt;value&gt;
+      &lt;array&gt;
+         &lt;string&gt;dictionary1.xml&lt;/string&gt; 
+         &lt;string&gt;http://localhost/mydict/dictionary.xml&lt;/string&gt;
+      &lt;/array&gt;
+   &lt;/value&gt;
+&lt;/nameValuePair&gt;</pre><p>
+			</p><p>
+			  The specified dictionary file names must be available in the classpath or in the UIMA datapath.
+			  Additionally it is possible to specify an HTTP URL to load the dictionary file.
+			</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sandbox.dictAnnotator.annotatorConfiguration.InputTokenType"></a>3.2.&nbsp;Input Match Type</h2></div></div></div><p>
+				The <code class="code">InputMatchType</code> parameter defines the annotation type that is used
+				for the dictionary lookup. All annotations of type <code class="code">InputMatchType</code> are used for the 
+				lookup in the dictionary. In most cases this type should be the output type of the tokenizer 
+				annotator component. If the dictionary was created by using the DictionaryCreator configured with
+				a tokenizer, it is recommended that the same tokenizer is also used in the annotator flow. Beyond 
+				that the <code class="code">InputMatchType</code> should be the same as the tokenType used for the 
+				dictionary creation.
+			</p><p>
+			   The parameter that defines the input match type is:
+			   </p><pre class="programlisting">&lt;configurationParameter&gt;
+   &lt;name&gt;InputMatchType&lt;/name&gt;
+   &lt;description&gt;&lt;/description&gt;
+   &lt;type&gt;String&lt;/type&gt;
+   &lt;multiValued&gt;false&lt;/multiValued&gt;
+   &lt;mandatory&gt;true&lt;/mandatory&gt;
+&lt;/configurationParameter&gt;</pre><p>
+			</p><p>
+			   The parameter setting is mandatory and single valued. A sample setting for 
+			   the <code class="code">InputMatchType</code> looks like:
+			</p><p>
+			  </p><pre class="programlisting">&lt;nameValuePair&gt;
+   &lt;name&gt;InputMatchType&lt;/name&gt;
+   &lt;value&gt;
+      &lt;string&gt;org.apache.uima.TokenAnnotation&lt;/string&gt; 
+   &lt;/value&gt;
+&lt;/nameValuePair&gt;</pre><p>
+			</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sandbox.dictAnnotator.annotatorConfiguration.InputTokenType.FeaturePath"></a>3.2.1.&nbsp;Input Match Type Feature Path</h3></div></div></div><p>
+					In some special cases it may be necessary to use a feature value or a 
+					featurePath value of the <code class="code">InputMatchType</code> for the dictionary lookup. In that case
+					not the covered text of the <code class="code">InputMatchType</code> annotation is used for the lookup but the
+					specified feature or featurePath value.
+				</p><p>
+				    To define a feature or featurePath that is used for the lookup the following
+				    parameter must be used:
+				    </p><pre class="programlisting">&lt;configurationParameter&gt;
+   &lt;name&gt;InputMatchFeaturePath&lt;/name&gt;
+   &lt;description&gt;&lt;/description&gt;
+   &lt;type&gt;String&lt;/type&gt;
+   &lt;multiValued&gt;false&lt;/multiValued&gt;
+   &lt;mandatory&gt;false&lt;/mandatory&gt;
+&lt;/configurationParameter&gt;</pre><p>
+				</p><p>  
+				    The parameter is not mandatory, it is just an optional addition. But if the parameter
+				    is used, the defined feature or featurePath must be valid for the <code class="code">InputMatchType</code>.
+				    A sample configuration with a feature called <code class="code">baseFormToken</code> is shown below:
+				    </p><pre class="programlisting">&lt;nameValuePair&gt;
+   &lt;name&gt;InputMatchFeaturePath&lt;/name&gt;
+   &lt;value&gt;
+      &lt;string&gt;baseFormToken&lt;/string&gt; 
+   &lt;/value&gt;
+&lt;/nameValuePair&gt;</pre><p>
+				</p><p>
+				   If a featurePath is specified the path separator for the feature is "/". 
+				</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sandbox.dictAnnotator.annotatorConfiguration.InputTokenFilter"></a>3.3.&nbsp;Input Match Type Filters</h2></div></div></div><p>
+                If not all <code class="code">InputMatchType</code> annotations should be used for the dictionary lookup it
+                is possible to define filters to filter the used annotations. To define a filter three
+                settings are necessary. The first one is the <code class="code">InputMatchFilterFeaturePath</code>
+                that specifies the feature or featurePath that should be used for the filtering. The
+                second parameter is the <code class="code">FilterConditionOperator</code> that defines the filter condition 
+                operator. The last parameter is <code class="code">FilterConditionValue</code> that defines the condition 
+                value for the comparison. 
+			</p><p>
+				The parameter definition for all three parameters looks like: 
+		    </p><pre class="programlisting">&lt;configurationParameter&gt;
+   &lt;name&gt;InputMatchFilterFeaturePath&lt;/name&gt;
+   &lt;description&gt;&lt;/description&gt;
+   &lt;type&gt;String&lt;/type&gt;
+   &lt;multiValued&gt;false&lt;/multiValued&gt;
+   &lt;mandatory&gt;false&lt;/mandatory&gt;
+&lt;/configurationParameter&gt;
+
+&lt;configurationParameter&gt;
+   &lt;name&gt;FilterConditionOperator&lt;/name&gt;
+   &lt;description&gt;&lt;/description&gt;
+   &lt;type&gt;String&lt;/type&gt;
+   &lt;multiValued&gt;false&lt;/multiValued&gt;
+   &lt;mandatory&gt;false&lt;/mandatory&gt;
+&lt;/configurationParameter&gt;
+
+&lt;configurationParameter&gt;
+   &lt;name&gt;FilterConditionValue&lt;/name&gt;
+   &lt;description&gt;&lt;/description&gt;
+   &lt;type&gt;String&lt;/type&gt;
+   &lt;multiValued&gt;false&lt;/multiValued&gt;
+   &lt;mandatory&gt;false&lt;/mandatory&gt;
+&lt;/configurationParameter&gt;</pre><p>
+				</p><p>
+				    For the <code class="code">InputMatchFilterFeaturePath</code> the same rules applies as for the 
+				    <code class="code">InputMatchFeaturePath</code>. The specified feature or featurePath must be valid
+				    for the <code class="code">InputMatchType</code> definition. If a featurePath is specified, the features
+				    are separated by "/". 
+				</p><p>
+				    The value for the <code class="code">FilterConditionOperator</code> can be one of:
+					</p><div class="itemizedlist"><ul type="disc"><li><p>
+					         <code class="code">NULL</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value must be NULL. No <code class="code">FilterConditionValue</code>
+							 must be specified.
+						  </p></li><li><p>
+					         <code class="code">NOT_NULL</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value must be set and is not NULL. No
+							 <code class="code">FilterConditionValue</code> must be specified.
+						  </p></li><li><p>
+					         <code class="code">EQUALS</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value must be equal to 
+							 the <code class="code">FilterConditionValue</code>.	 
+						  </p></li><li><p>
+					         <code class="code">NOT_EQUALS</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value is not equal 
+							 to the <code class="code">FilterConditionValue</code>	 
+						  </p></li><li><p>
+					         <code class="code">LESS</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value is less than 
+							 the <code class="code">FilterConditionValue</code>	 
+						  </p></li><li><p>
+					         <code class="code">LESS_EQ</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value is less or equal to 
+							 the <code class="code">FilterConditionValue</code>	 
+						  </p></li><li><p>
+					         <code class="code">GREATER</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value is greater than 
+							 the <code class="code">FilterConditionValue</code>	 
+						  </p></li><li><p>
+					         <code class="code">GREATER_EQ</code> - 
+							 <code class="code">InputMatchFilterFeaturePath</code> value is greater or equal to 
+							 the <code class="code">FilterConditionValue</code>	 
+						  </p></li></ul></div><p>
+				</p><p>
+				   A sample configuration for a filter that only use noun tokens for the dictionary lookup 
+				   is shown below:
+				   </p><pre class="programlisting">&lt;nameValuePair&gt;
+   &lt;name&gt;InputMatchFilterFeaturePath&lt;/name&gt;
+   &lt;value&gt;
+      &lt;string&gt;partOfSpeach&lt;/string&gt; 
+   &lt;/value&gt;
+&lt;/nameValuePair&gt;      
+
+&lt;nameValuePair&gt;
+   &lt;name&gt;FilterConditionOperator&lt;/name&gt;
+   &lt;value&gt;
+      &lt;string&gt;EQUALS&lt;/string&gt; 
+   &lt;/value&gt;
+&lt;/nameValuePair&gt;      
+
+&lt;nameValuePair&gt;
+   &lt;name&gt;FilterConditionValue&lt;/name&gt;
+   &lt;value&gt;
+      &lt;string&gt;noun&lt;/string&gt; 
+   &lt;/value&gt;
+&lt;/nameValuePair&gt;</pre><p>
+				</p></div></div></div></body></html>
