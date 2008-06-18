@@ -68,7 +68,8 @@
             </asyncAggregateErrorConfiguration>
           </remoteAnalysisEngine>
 			
-          <analysisEngine key="BlueJNoOpCandidateAnswer" async="false">
+          <analysisEngine key="BlueJNoOpCandidateAnswerCM" async="false">
+            <casMultiplier poolSize="3" initialFsHeapSize="2000000"/>
             <asyncAggregateErrorConfiguration>
               <getMetadataErrors maxRetries="0" timeout="0" errorAction="disable"/>
               <processCasErrors maxRetries="0" timeout="0" continueOnRetryFailure="false" thresholdCount="1" thresholdWindow="0" thresholdAction="terminate"/>

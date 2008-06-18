@@ -721,7 +721,9 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 		msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
-		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.ReleaseCAS); 
+		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.ReleaseCAS);
+		msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
+		msg.setJMSReplyTo(consumerDestination);
 	}
 
   public void notifyOnInitializationFailure(Exception e) {

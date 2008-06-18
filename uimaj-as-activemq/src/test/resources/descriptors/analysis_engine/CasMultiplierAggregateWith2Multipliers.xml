@@ -38,8 +38,9 @@
     </delegateAnalysisEngine>
 	  
 	  
-	<delegateAnalysisEngine key="BlueJNoOpCandidateAnswer">
-      <import location="BlueJNoOpCandidateAnswer.xml"/>
+	<delegateAnalysisEngine key="BlueJNoOpCandidateAnswerCM">
+      <!-- <import location="BlueJNoOpCandidateAnswer.xml"/> -->
+      <import location="../multiplier/SimpleCasGenerator.xml"/>
     </delegateAnalysisEngine>
 	  
     <delegateAnalysisEngine key="BlueJNoOpCC">
@@ -77,7 +78,7 @@
         <node>BlueJTestMultiplier1</node>
         <node>BlueJTestMultiplier2</node>
         <node>BlueJInnerRemoteCMAggregate</node>
-        <node>BlueJNoOpCandidateAnswer</node>
+        <node>BlueJNoOpCandidateAnswerCM</node>
         <node>BlueJNoOpCC</node>
       </fixedFlow>
     </flowConstraints>
