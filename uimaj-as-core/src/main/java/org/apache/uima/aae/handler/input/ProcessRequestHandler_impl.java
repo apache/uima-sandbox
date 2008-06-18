@@ -25,6 +25,7 @@ import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.controller.Endpoint_impl;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
@@ -275,6 +276,10 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				//	instance of CM will have an endpoint where it expects Free CAS
 				// notifications.
 				freeCasEndpoint = aMessageContext.getEndpoint();
+				//	Clone an endpoint where Free Cas Request will be sent
+				freeCasEndpoint = (Endpoint)((Endpoint_impl)freeCasEndpoint).clone();
+				//	Reset the destination
+				aMessageContext.getEndpoint().setDestination(null);
 				//	This CAS came in from a CAS Multiplier. Treat it differently than the
 				//	input CAS. In case the Aggregate needs to send this CAS to the
 				//	client, retrieve the client destination by looking up the client endpoint

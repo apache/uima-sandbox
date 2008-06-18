@@ -247,7 +247,7 @@ public class InProcessCache implements InProcessCacheMBean
 				}
 				if ( entry.isWaitingForRelease() )
 				{
-					sb.append(" <<< Waiting For Release Request From Client");
+					sb.append(" <<< Reached Final State in Controller:"+aControllerName);
 				}
 				sb.append("\n");
 			}
@@ -504,6 +504,22 @@ public class InProcessCache implements InProcessCacheMBean
 		}
 		return true;
 	}
+
+	public Endpoint getTopAncestorEndpoint(CacheEntry anEntry) throws Exception
+	{
+		if ( anEntry == null )
+		{
+			return null;
+		}
+		
+		if ( anEntry.getInputCasReferenceId() == null )
+		{
+			return anEntry.getMessageOrigin();
+		}
+		CacheEntry parentEntry = getCacheEntryForCAS(anEntry.getInputCasReferenceId());
+		return getTopAncestorEndpoint(parentEntry);
+	}
+	
 	public void setNumberOfParallelDelegates(int aParallelDelegateCount, String aCasReferenceId)
 	throws AsynchAEException
 	{
