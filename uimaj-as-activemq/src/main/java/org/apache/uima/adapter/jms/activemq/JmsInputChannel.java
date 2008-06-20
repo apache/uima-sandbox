@@ -444,6 +444,10 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	 */
 	public void onMessage(Message aMessage, Session aJmsSession )
 	{
+		if ( isStopped() )
+		{
+			return;
+		}
 		try
 		{
 			//	wait until message handlers are plugged in

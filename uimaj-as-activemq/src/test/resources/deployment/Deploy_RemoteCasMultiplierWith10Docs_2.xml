@@ -32,7 +32,7 @@
     <service>
       <inputQueue endpoint="TestMultiplierQueue2" brokerURL="tcp://localhost:8118" prefetch="0"/>
       <topDescriptor>
-       <import location="../descriptors/multiplier/SimpleCasGeneratorProducing10Cases.xml"/> 
+       <import location="../descriptors/multiplier/SimpleCasGeneratorProducing10Cases2.xml"/> 
       </topDescriptor>
       <analysisEngine>
       	  <casMultiplier poolSize="5"/> 

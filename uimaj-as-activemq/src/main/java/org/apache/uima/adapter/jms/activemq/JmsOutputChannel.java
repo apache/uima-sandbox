@@ -194,10 +194,10 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				serSharedData = cacheEntry.getDeserSharedData();//new XmiSerializationSharedData();
-        if (serSharedData == null) {
-          serSharedData = new XmiSerializationSharedData();
-          cacheEntry.setXmiSerializationData(serSharedData);
-        }
+				if (serSharedData == null) {
+					serSharedData = new XmiSerializationSharedData();
+					cacheEntry.setXmiSerializationData(serSharedData);
+				}
 			    serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 			    int maxOutgoingXmiId = serSharedData.getMaxXmiId();				
 				//	Save High Water Mark in case a merge is needed
@@ -238,7 +238,6 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			statistic.increment(System.nanoTime() - start);
 		}
-
 		
 		return serializedCas;
 	}
@@ -1358,10 +1357,10 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startConnectionTimer);
 
-			if ( getAnalysisEngineController().isTopLevelComponent() )
-			{
-				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
-			}
+//			if ( getAnalysisEngineController().isTopLevelComponent() )
+//			{
+//				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
+//			}
 			addIdleTime(tm);
 		}
 		catch( JMSException e)
@@ -1480,10 +1479,10 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startConnectionTimer);
 
-			if ( getAnalysisEngineController().isTopLevelComponent() )
-			{
-				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
-			}
+//			if ( getAnalysisEngineController().isTopLevelComponent() )
+//			{
+//				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
+//			}
 			addIdleTime(tm);
 		}
 		catch( JMSException e)
