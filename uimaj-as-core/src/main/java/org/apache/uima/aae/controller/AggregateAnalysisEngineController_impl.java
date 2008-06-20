@@ -955,8 +955,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		boolean subordinateCasInPlayCountDecremented=false;
 		CacheEntry cacheEntry = null;
 		Endpoint freeCasEndpoint = null;
-		//	If debug level=FINEST dump the entire cache
-		getInProcessCache().dumpContents(getComponentName());
 		
 		try
 		{
@@ -1026,6 +1024,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					//	Drop the CAS and remove cache entry for it
 					dropCAS(aCasReferenceId, true);
 					casDropped = true;
+					//	If debug level=FINEST dump the entire cache
+					getInProcessCache().dumpContents(getComponentName());
 				}
 			} 
 			else 

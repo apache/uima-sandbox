@@ -226,12 +226,12 @@ public class InProcessCache implements InProcessCacheMBean
 	}
 	public synchronized void dumpContents(String aControllerName)
 	{
+		int count=0;
 		if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 		{
-			int count=0;
 			Iterator it = cache.keySet().iterator();
-
 			StringBuffer sb = new StringBuffer("\n");
+
 			while( it.hasNext() )
 			{
 				String key = (String) it.next();
@@ -261,7 +261,30 @@ public class InProcessCache implements InProcessCacheMBean
 	                new Object[] { count });
 */
 		}
+		else if ( UIMAFramework.getLogger().isLoggable(Level.FINE) )
+		{
+			Iterator it = cache.keySet().iterator();
+			StringBuffer sb = new StringBuffer("\n");
+			int inFinalState=0;
+			
+			while( it.hasNext() )
+			{
+				String key = (String) it.next();
+				CacheEntry entry = (CacheEntry)cache.get(key);
+				count++;
+				if ( entry.isWaitingForRelease() )
+				{
+					inFinalState++;
+				}
+			}
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	                "dumpContents", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_abbrev_cache_stats___FINE",
+	                new Object[] { aControllerName, count, inFinalState });
+		
+			
+		}
 	}
+	
 	public synchronized void remove(String aCasReferenceId)
 	{
 		if (aCasReferenceId != null && cache.containsKey(aCasReferenceId))

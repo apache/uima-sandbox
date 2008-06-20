@@ -252,6 +252,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 
 		try
 		{
+
 			String newCASProducedBy = null;
 			//	Get the CAS Reference Id of the input CAS
 			//	Fetch id of the CAS from the message. If it doesnt exist the method will create an entry in the log file and return null
@@ -271,6 +272,10 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				inputCasReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.InputCasReference);
 				//	Fetch Cache entry for the parent CAS
 				CacheEntry inputCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(inputCasReferenceId);
+
+				computeStats(aMessageContext, inputCasReferenceId);
+
+				
 				// Fetch an endpoint where Free CAS Notification must be sent.
 				// This endpoint is unique per CM instance. Meaning, each 
 				//	instance of CM will have an endpoint where it expects Free CAS

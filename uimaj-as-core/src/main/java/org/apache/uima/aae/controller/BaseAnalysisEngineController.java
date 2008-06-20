@@ -1726,6 +1726,9 @@ implements AnalysisEngineController, EventSubscriber
 								
 							}
 						}
+						//	If debug level=FINEST dump the entire cache
+						getInProcessCache().dumpContents(getComponentName());
+
 					}
 					catch( Exception e)
 					{

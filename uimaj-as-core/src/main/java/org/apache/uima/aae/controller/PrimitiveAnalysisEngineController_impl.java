@@ -210,7 +210,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	public void collectionProcessComplete(Endpoint anEndpoint)// throws AsynchAEException
 	{
 		AnalysisEngine ae = null;
-		
+		long start = System.nanoTime();
 		try
 		{
 			ae = aeInstancePool.checkout();
@@ -219,6 +219,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				ae.collectionProcessComplete();
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_all_cases_processed__FINEST", new Object[] { getComponentName() });
+			getServicePerformance().incrementAnalysisTime(System.nanoTime()-start);
 			getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, anEndpoint);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_completed__FINE", new Object[] { getComponentName()});
 		}
@@ -281,24 +282,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		{
 			return;
 		}
-/*		
-		try
-		{
-		  //  Test to see if the connection to the reply endpoint can be created 
-		  //  If the client has died, dont waste time analyzing the CAS.
-		  getOutputChannel().bindWithClientEndpoint(anEndpoint);
-		}
-		catch( Exception e)
-		{
-		  if ( isTopLevelComponent() )
-		  {
-		    
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_client_drop_cas__INFO", new Object[] { getComponentName(), aCasReferenceId, anEndpoint.getEndpoint()});
-		    dropCAS(aCasReferenceId, true);
-		  }
-		  return;
-		}
-*/	
 		boolean inputCASReturned = false;
 		boolean processingFailed = false;
 		// This is a primitive controller. No more processing is to be done on the Cas. Mark the destination as final and return CAS in reply.
@@ -337,10 +320,12 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			long sequence = 1;
 			long hasNextTime = 0;         // stores time in hasNext()
 			long getNextTime = 0;         // stores time in next();   
-			long timeToProcessCAS = 0;    // stores time in hasNext() and next() for each CAS
 			boolean moreCASesToProcess = true;
+			
+			
 			while (moreCASesToProcess)
 			{
+				long timeToProcessCAS = 0;    // stores time in hasNext() and next() for each CAS
 				hasNextTime = System.nanoTime();
 				if ( !casIterator.hasNext() )
 				{
@@ -358,6 +343,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				timeToProcessCAS += (System.nanoTime()- getNextTime);
                 //	Add time to call hasNext() and next() to the running total
 				totalProcessTime += timeToProcessCAS;
+				
 				//	If the service is stopped or aborted, stop generating new CASes and just return the input CAS
 				if ( stopped || abortGeneratingCASes(aCasReferenceId))
 				{
@@ -418,26 +404,31 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				dropCasStatistics(newEntry.getCasReferenceId());
 				//	Increment number of CASes processed by this service
 				getServicePerformance().incrementNumberOfCASesProcessed();
-				getServicePerformance().incrementAnalysisTime(timeToProcessCAS);
+//				getServicePerformance().incrementAnalysisTime(timeToProcessCAS);
 				sequence++;
 			}
-
+/*
 			LongNumericStatistic statistic = null;
 			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.TotalAEProcessTime)) != null )
 			{
 				//	Increment how long it took to process the input CAS. This timer is exposed via JMX
 				statistic.increment(totalProcessTime);
 			}
+*/			
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
 			getMonitor().resetCountingStatistic("", Monitor.ProcessErrorCount);
+			
+			// Store total time spent processing this input CAS
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
-			//	Aggregate total time spent processing the input CAS
+			//	Aggregate total time spent processing in this service. This is separate from per CAS stats above 
 			getServicePerformance().incrementAnalysisTime(totalProcessTime);
+			
 			synchronized( cmOutstandingCASes )
 			{
 				if ( cmOutstandingCASes.size() == 0)
 				{
 					inputCASReturned = true;
+					
 					//	Return an input CAS to the client if there are no outstanding child CASes in play
 					getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
 				}
@@ -642,7 +633,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		if ( cmOutstandingCASes != null )
 		{
 			cmOutstandingCASes.clear();
-			cmOutstandingCASes = null;
 		}
 		if ( aeList != null )
 		{
