@@ -177,11 +177,11 @@ public abstract class BaseMessageSender implements Runnable,
 		// will call
 		// doStop() which sets the global flag 'done' to true.
 		while (!done) {
-			// First check if there are any pending messages in the shared
-			// 'queue'
-			if (pendingMessageList.size() == 0) {
+			synchronized (pendingMessageList) {
+				// First check if there are any pending messages in the shared
+				// 	'queue'
+				if (pendingMessageList.size() == 0) {
 				// Block waiting for a message
-				synchronized (pendingMessageList) {
 					try {
 						pendingMessageList.wait(0);
 					} catch (InterruptedException e) {

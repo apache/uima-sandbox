@@ -790,7 +790,6 @@ implements UimaAsynchronousEngine, MessageListener
 			return;
 		}
 		
-//		System.out.println(">>>>>>>>>>>>>> Client Handling Reply With Cas:"+casReferenceId);
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_process_reply_FINEST",
 				new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference) });
 

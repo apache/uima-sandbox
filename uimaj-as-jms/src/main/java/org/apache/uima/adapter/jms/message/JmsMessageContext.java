@@ -95,16 +95,7 @@ public class JmsMessageContext implements MessageContext
 			String msgFrom = (String)aMessage.getStringProperty(AsynchAEMessage.MessageFrom); 
 			if ( msgFrom != null )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-	                    "JmsMessageContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_message_from__FINE",
-	                    new Object[] { msgFrom, aMessage.getStringProperty(UIMAMessage.ServerURI) });
 				endpoint.setEndpoint( msgFrom);
-			}
-			else
-			{
-				//	Undefined sender of the message. This may be ok.
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-	                    "JmsMessageContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_reply_queue_not_defined__WARNING");
 			}
 			if ( aMessage.getJMSReplyTo() != null )
 			{
@@ -117,11 +108,6 @@ public class JmsMessageContext implements MessageContext
 				
 				endpoint.setServerURI(selectedServerURI);
 				endpoint.setRemote(endpoint.getServerURI().startsWith("vm")==false);
-			}
-			else if ( aMessage.getIntProperty(AsynchAEMessage.MessageType) != AsynchAEMessage.Response)
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-	                    "JmsMessageContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_reply_queue_server_not_defined__WARNING");
 			}
 		}
 		catch( Exception e)
