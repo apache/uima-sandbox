@@ -27,7 +27,9 @@
       <text>
          Cas Editor
 Apache UIMA Version 2.2.2-incubating
-Copyright 2006, 2008 The Apache Software FoundationThis product includes software developed at
+Copyright 2006, 2008 The Apache Software Foundation
+
+This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 This product contains icons developed by the SVG Icons project 
@@ -61,7 +63,6 @@ Eclipse Foundation (http://wwww.eclipse.org/).
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
       <linux type="ee">J2SE-1.5</linux>
@@ -132,7 +133,6 @@ Eclipse Foundation (http://wwww.eclipse.org/).
       <plugin id="org.eclipse.update.core.linux" fragment="true"/>
       <plugin id="org.eclipse.update.core.win32" fragment="true"/>
       <plugin id="org.eclipse.update.ui"/>
-      <plugin id="org.junit4"/>
    </plugins>
 
    <features>
