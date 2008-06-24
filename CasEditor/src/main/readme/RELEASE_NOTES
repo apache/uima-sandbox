@@ -168,6 +168,8 @@ Release Notes - UIMA - Version 2.2.2
     * [UIMA-573] - Cas Editor: Update documentation
     * [UIMA-581] - Cas Editor: Create a test plan
     * [UIMA-783] - Update Cas Editor version to 2.2.2
+    * [UIMA-1093] - Update NOTICE, LICENSE files and About dialog
+    * [UIMA-1094] - Remove junit dependency from binary distribution
 
 ** Wish
     * [UIMA-448] - Add a sample annotation project
