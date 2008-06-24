@@ -22,7 +22,7 @@
 	<groupId>org.apache.uima</groupId>
 	<artifactId>PearPackagingAntTask</artifactId>
 	<name>Apache UIMA PEAR packaging ANT task</name>
-	<version>2.2.2-incubating</version>
+	<version>2.3.0-incubating-SNAPSHOT</version>
 	<url>http://incubator.apache.org/uima</url>
 	<dependencies>
 		<dependency>
