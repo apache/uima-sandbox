@@ -24,7 +24,7 @@
   <groupId>org.apache.uima</groupId>
   <artifactId>SandboxDistr</artifactId>
   <packaging>pom</packaging>
-  <version>2.2.2-incubating</version>
+  <version>2.3.0-incubating-SNAPSHOT</version>
   <name>Apache UIMA Sandbox distribution build</name>
   <url>http://incubator.apache.org/uima</url>
   <description>Components and tooling for the UIMA SDK</description>
