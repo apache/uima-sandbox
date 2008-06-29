@@ -40,7 +40,7 @@ public class BrokerDeployer implements ApplicationListener
 {
 	private static final Class CLASS_NAME = BrokerDeployer.class;
     private static final int BASE_JMX_PORT = 1200;
-    private static final int MAX_PORT_THRESHOLD = 1400;
+    private static final int MAX_PORT_THRESHOLD = 200;
     
 	private static BrokerService service;
 	private Object semaphore = new Object();
@@ -104,13 +104,17 @@ public class BrokerDeployer implements ApplicationListener
 			
 			String connectorList = "";
 			service.setPersistent(false);
-			
 			int startPort = BASE_JMX_PORT;
+			
+			if ( System.getProperties().containsKey("com.sun.management.jmxremote.port") )
+			{
+				startPort = Integer.parseInt(System.getProperty("com.sun.management.jmxremote.port"));
+			}
 			while( startPort < MAX_PORT_THRESHOLD && !openPort(startPort))
 			{
 				startPort++;
 			}
-			if ( startPort < MAX_PORT_THRESHOLD )
+			if ( startPort < (startPort+MAX_PORT_THRESHOLD ) )
 			{
 				service.setUseJmx(true);
 				service.getManagementContext().setConnectorPort(startPort);

@@ -727,26 +727,34 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	}
 
   public void notifyOnInitializationFailure(Exception e) {
-
-    //  Initialization exception. Notify blocking thread and indicate a problem
-    serviceInitializationException = true;
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
-    synchronized(serviceMonitor)
-    {
-      serviceMonitor.notifyAll();
-    }
-    
+	  notifyOnInitializationFailure(null, e);
   }
 
   public void notifyOnInitializationSuccess() {
-    serviceInitializationCompleted =  true;
-    synchronized(serviceMonitor)
-    {
-      serviceMonitor.notifyAll();
-    }
+	  notifyOnInitializationSuccess(null);
   }
 
-  public void notifyOnTermination(String message) {
+  public void notifyOnInitializationFailure(AnalysisEngineController aController, Exception e) {
+
+	    //  Initialization exception. Notify blocking thread and indicate a problem
+	    serviceInitializationException = true;
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
+	    synchronized(serviceMonitor)
+	    {
+	      serviceMonitor.notifyAll();
+	    }
+	    
+	  }
+
+	  public void notifyOnInitializationSuccess(AnalysisEngineController aController) {
+	    serviceInitializationCompleted =  true;
+	    synchronized(serviceMonitor)
+	    {
+	      serviceMonitor.notifyAll();
+	    }
+	  }
+
+	  public void notifyOnTermination(String message) {
     
   }
 

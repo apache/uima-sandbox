@@ -28,6 +28,7 @@ import java.net.ServerSocket;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.ControllerCallbackListener;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
@@ -304,6 +305,20 @@ public class UIMA_Service implements ControllerCallbackListener
 		}
 	}
 	public void notifyOnInitializationFailure(Exception e) {
+		notifyOnInitializationFailure( null, e);
+	}
+
+	public void notifyOnInitializationSuccess() {
+		notifyOnInitializationSuccess(null);
+	}
+	public void notifyOnInitializationSuccess(AnalysisEngineController aController) {
+		serviceInitializationCompleted = true;
+		synchronized (serviceMonitor) {
+			serviceMonitor.notifyAll();
+		}
+	}
+
+	public void notifyOnInitializationFailure(AnalysisEngineController aController, Exception e) {
 
 		// Initialization exception. Notify blocking thread and indicate a
 		// problem
@@ -315,12 +330,6 @@ public class UIMA_Service implements ControllerCallbackListener
 
 	}
 
-	public void notifyOnInitializationSuccess() {
-		serviceInitializationCompleted = true;
-		synchronized (serviceMonitor) {
-			serviceMonitor.notifyAll();
-		}
-	}
 
 	public void notifyOnTermination(String message) {
 	}

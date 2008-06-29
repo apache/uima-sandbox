@@ -1303,7 +1303,7 @@ public class JmsOutputChannel implements OutputChannel
 				tm.setStringProperty(AsynchAEMessage.InputCasReference, anInputCasReferenceId);
 				//	Add a sequence number assigned to this CAS by the controller
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
-				
+				isRequest = true;
 				//	Add the name of the FreeCas Queue
 //				if ( secondaryInputEndpoint != null )
 //				{
@@ -1361,7 +1361,10 @@ public class JmsOutputChannel implements OutputChannel
 //			{
 //				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
 //			}
-			addIdleTime(tm);
+			if ( !isRequest )
+			{
+				addIdleTime(tm);
+			}
 		}
 		catch( JMSException e)
 		{
@@ -1430,6 +1433,7 @@ public class JmsOutputChannel implements OutputChannel
 				//	differently from the input CAS. 
 				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
 
+				isRequest = true;
 				//	Save the id of the parent CAS
 				tm.setStringProperty(AsynchAEMessage.InputCasReference, getTopParentCasReferenceId(entry.getCasReferenceId()));
 				//	Add a sequence number assigned to this CAS by the controller
@@ -1483,7 +1487,10 @@ public class JmsOutputChannel implements OutputChannel
 //			{
 //				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
 //			}
-			addIdleTime(tm);
+			if ( !isRequest )
+			{
+				addIdleTime(tm);
+			}
 		}
 		catch( JMSException e)
 		{
@@ -1542,15 +1549,14 @@ public class JmsOutputChannel implements OutputChannel
 	private void addIdleTime( Message aMessage )
 	{
 
-
+/*
 		if ( isProcessReply(aMessage ) && 
 			 ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController || 
 			   !getAnalysisEngineController().isCasMultiplier() ) )
-//			   !((PrimitiveAnalysisEngineController)getAnalysisEngineController()).isMultiplier() ) )
-			{
-				long t = System.nanoTime();
-				getAnalysisEngineController().saveReplyTime(t, "");
-			}
+
+*/
+		long t = System.nanoTime();
+		getAnalysisEngineController().saveReplyTime(t, "");
 	}
 	private void sendCasToCollocatedDelegate(boolean isRequest, String anInputCasReferenceId, String aNewCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence) 
 	throws AsynchAEException, ServiceShutdownException
@@ -1603,6 +1609,8 @@ public class JmsOutputChannel implements OutputChannel
 				//	produced by the CAS Multiplier. The client will treat this CAS
 				//	differently from the input CAS. 
 				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
+				isRequest = true;
+
 				if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
 				{
 					CacheEntry cacheEntry = getCacheEntry(aNewCasReferenceId);
@@ -1639,7 +1647,10 @@ public class JmsOutputChannel implements OutputChannel
 			//	Send Request Messsage to Delegate
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startTimer);
-			addIdleTime(tm);
+			if ( !isRequest )
+			{
+				addIdleTime(tm);
+			}
 			
 		}
 		catch( JMSException e)

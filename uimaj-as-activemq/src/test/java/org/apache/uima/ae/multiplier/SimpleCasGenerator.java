@@ -43,12 +43,14 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.util.Random;
 
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.CasMultiplier_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.AbstractCas;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.util.Level;
 
 /**
  * An example CasMultiplier, which generates the specified number of output CASes.
@@ -165,7 +167,8 @@ public class SimpleCasGenerator extends CasMultiplier_ImplBase
 			System.out.println("Initializing CAS with a Document of Size:"+text.length());
 		}
 		docCount++;
-		System.out.println("CasMult creating document#"+docCount);//+"Initializing CAS with a Document of Size:"+text.length());
+		if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
+			System.out.println("CasMult creating document#"+docCount);
 		cas.setDocumentText(this.text);
 		this.mCount++;
 		return cas;

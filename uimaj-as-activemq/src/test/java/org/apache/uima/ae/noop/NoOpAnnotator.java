@@ -19,6 +19,7 @@
 
 package org.apache.uima.ae.noop;
 
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -87,9 +88,11 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 		try
 		{
       if ( processDelay == 0 ) {
+  		if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
 			System.out.println("NoOpAnnotator.process() called for the " + counter + "th time. Hashcode:"+hashCode());
       }
      else {
+    	 if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
 				System.out.println("NoOpAnnotator.process() called for the " + counter + "th time, delaying Response For:" +processDelay +" millis");
 				synchronized( this )
 				{

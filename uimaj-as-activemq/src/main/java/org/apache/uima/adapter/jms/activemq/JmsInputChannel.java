@@ -29,6 +29,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import mx4j.tools.adaptor.http.GetAttributeCommandProcessor;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQMessage;
@@ -43,6 +45,7 @@ import org.apache.uima.aae.handler.HandlerBase;
 import org.apache.uima.aae.jmx.ServiceInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
+import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.message.JmsMessageContext;
 import org.apache.uima.util.Level;
@@ -174,6 +177,26 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				return false;
 			}
 			return true;
+		}
+		return false;
+	}
+	private boolean isRemoteRequest( Message aMessage ) throws Exception
+	{
+		Map properties = ((ActiveMQMessage)aMessage).getProperties();
+		if ( properties.containsKey(AsynchAEMessage.MessageType) &&
+			 properties.containsKey(AsynchAEMessage.Command) &&
+			 properties.containsKey(UIMAMessage.ServerURI))
+		{
+			int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+			int command = aMessage.getIntProperty(AsynchAEMessage.Command);
+			boolean isRemote = aMessage.getStringProperty(UIMAMessage.ServerURI).startsWith("vm") == false;
+			if ( isRemote && msgType == AsynchAEMessage.Request &&
+					(command == AsynchAEMessage.Process ||
+					 command == AsynchAEMessage.GetMeta ||
+					 command == AsynchAEMessage.CollectionProcessComplete) )
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -405,10 +428,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		return false;
 	}
 	
-	private synchronized long computeIdleTime()
+	public synchronized long computeIdleTime()
 	{
 		try
 		{
+/*
 			boolean isAggregate = getController() instanceof AggregateAnalysisEngineController;
 			if ( isAggregate || !getController().isCasMultiplier() )
 //				if ( isAggregate || !((PrimitiveAnalysisEngineController)getController()).isMultiplier() )
@@ -422,6 +446,20 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 					return delta;
 				}
 			}
+
+*/		
+			long lastReplyTime = getController().getReplyTime();
+			if ( lastReplyTime > 0 )
+			{
+				long t = System.nanoTime();
+				long delta = t-(long)lastReplyTime;
+				getController().saveIdleTime(delta, "", true);
+				return delta;
+			}
+
+		
+		
+		
 		}
 		catch( Exception e)
 		{
@@ -429,9 +467,31 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		}
 		return 0;
 	}
-
 	
+	public void checkpoint()
+	{
+		computeIdleTime();
+	}
 	
+	private boolean isCheckpointWorthy( Message aMessage ) throws Exception
+	{
+		Map properties = ((ActiveMQMessage)aMessage).getProperties();
+		if ( properties.containsKey(AsynchAEMessage.MessageType) &&
+			 properties.containsKey(AsynchAEMessage.Command) &&
+			 properties.containsKey(UIMAMessage.ServerURI))
+		{
+			int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+			int command = aMessage.getIntProperty(AsynchAEMessage.Command);
+			if ( msgType == AsynchAEMessage.Request &&
+					(command == AsynchAEMessage.Process ||
+					 command == AsynchAEMessage.GetMeta ||
+					 command == AsynchAEMessage.CollectionProcessComplete) )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	/**
 	 * Receives Messages from the JMS Provider. It checks the message header
 	 * to determine the type of message received. Based on the type,
@@ -448,6 +508,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		{
 			return;
 		}
+		
+		
 		try
 		{
 			//	wait until message handlers are plugged in
@@ -460,7 +522,10 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			controllerLatch.await();
 		}
 		catch( InterruptedException e) {}
+		long idleTime = 0;
 
+		boolean doCheckpoint = false;
+		
 		String eN = endpointName;
 		if ( getController() != null )
 		{
@@ -470,22 +535,18 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				eN = "";
 			}
 		}
+		
+
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_msg__FINE",
                 new Object[] { eN });
 		JmsMessageContext messageContext = null;
-		long idleTime = 0;
+
+		int requestType = 0;
 		try
 		{
-			if ( isProcessRequest(aMessage) )
-			{
-				//	Compute the time between waiting for this request and update
-				//	this service performance stats.
-				idleTime = computeIdleTime();
-			}
 			//	Wrap JMS Message in MessageContext
 			messageContext = new JmsMessageContext( aMessage, endpointName );
-			messageContext.getEndpoint().setIdleTime(idleTime);
 			if ( jmsSession == null )
 			{
 				jmsSession = aJmsSession;
@@ -561,6 +622,28 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				}
 				//	Delegate processing of the message contained in the MessageContext to the
 				//	chain of handlers
+				try
+				{
+					if ( isRemoteRequest( aMessage ))
+					{
+						//	Compute the time between waiting for this request 
+						idleTime = getController().getTotalIdleTime();
+						//	This idle time is reported to the client thus save it in the endpoint
+						//	object. This value will be fetched and added to the outgoing reply.
+						messageContext.getEndpoint().setIdleTime(idleTime);
+					}
+				}
+				catch( Exception e ) {}
+
+				//	Determine if this message is a request and either GetMeta, CPC, or Process
+				doCheckpoint = isCheckpointWorthy( aMessage );
+				requestType = aMessage.getIntProperty(AsynchAEMessage.Command);
+				//	Checkpoint
+				if ( doCheckpoint )
+				{
+					getController().beginProcess(requestType);
+				}
+
 				
 				if ( handler != null )
 				{
@@ -580,6 +663,13 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
                     "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", t);
 
 			controller.getErrorHandlerChain().handle(t, HandlerBase.populateErrorContext( messageContext ), controller);			
+		}
+		finally
+		{
+			if ( doCheckpoint )
+			{
+				getController().endProcess(requestType);
+			}
 		}
 	}
 	

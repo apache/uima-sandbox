@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIDGenerator;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
@@ -41,6 +42,7 @@ import org.apache.uima.util.Level;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.jms.support.destination.DestinationResolver;
+
 
 public class SpringContainerDeployer implements ControllerCallbackListener {
 	private static final Class CLASS_NAME = SpringContainerDeployer.class;
@@ -103,10 +105,26 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	{
 		((FileSystemXmlApplicationContext) ctx).setDisplayName(cntlr.getComponentName());
 		cntlr.addControllerCallbackListener(this);
+		
+		String inputQueueName = cntlr.getServiceEndpointName();
+		if ( inputQueueName != null )
+		{
+			if ( ctx.containsBean(inputQueueName) )
+			{
+				ActiveMQQueue queue = (ActiveMQQueue)ctx.getBean(inputQueueName);
+				if ( cntlr.getServiceInfo() != null )
+				{
+					cntlr.getServiceInfo().setInputQueueName(queue.getQueueName());
+				}
+			}
+		}
+		
+		
 		//	If this is a Cas Multiplier add a special temp queue for receiving Free CAS
 		//	notifications.
 		if ( cntlr.isCasMultiplier() )
 		{
+			
 			ActiveMQConnectionFactory cf = getTopLevelQueueConnectionFactory( ctx );
 			//	Create a listener and a temp queue for Free CAS notifications. 
 			UimaDefaultMessageListenerContainer connector =	produceListenerConnector(cf);
@@ -316,7 +334,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			}
 		}
 	}
-	public void notifyOnInitializationFailure(Exception e) {
+	public void notifyOnInitializationFailure(AnalysisEngineController aController, Exception e) {
 
 		// Initialization exception. Notify blocking thread and indicate a
 		// problem
@@ -328,11 +346,20 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 
 	}
 
-	public void notifyOnInitializationSuccess() {
+	public void notifyOnInitializationSuccess(AnalysisEngineController aController) {
 		serviceInitializationCompleted = true;
+		
 		synchronized (serviceMonitor) {
 			serviceMonitor.notifyAll();
 		}
+	}
+	public void notifyOnInitializationFailure( Exception e)
+	{
+		notifyOnInitializationFailure(null, e);
+	}
+	public void notifyOnInitializationSuccess()
+	{
+		notifyOnInitializationSuccess(null);
 	}
 
 	public void notifyOnTermination(String message) {
