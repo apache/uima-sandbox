@@ -32,5 +32,7 @@ public interface ServicePerformanceMBean extends Serializable
 	public double getCasDeserializationTime();
 	public double getCasSerializationTime();
 	public double getAnalysisTime();
-	
+	public double getCasPoolWaitTime();
+	public double getShadowCasPoolWaitTime();
+	public double getTimeSpentInCMGetNext();
 }

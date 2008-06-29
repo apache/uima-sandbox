@@ -142,6 +142,8 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	public void addTimeSnapshot( long snapshot, String aKey );
 	
 	public ServicePerformance getServicePerformance();
+
+	public ServiceInfo getServiceInfo();
 	
 	public long getTimeSnapshot( String aKey );
 
@@ -167,4 +169,12 @@ public interface AnalysisEngineController extends ControllerLifecycle
 
 	public void releaseNextCas(String aCasReferenceId);
 
+	public long getTotalIdleTime();
+	
+	//	This is called every time a request comes
+	public void beginProcess(int msgType);
+
+	//	This is called every time a request is completed
+	public void endProcess(int msgType);
+	
 }

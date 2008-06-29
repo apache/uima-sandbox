@@ -24,6 +24,7 @@ import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
@@ -291,8 +292,16 @@ public abstract class HandlerBase implements Handler
 				long idleTime = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.IdleTime)).longValue();
 				if ( idleTime > 0 )
 				{
-//					casStats.incrementIdleTime(idleTime);
-					if ( delegateServicePerformance != null )
+					Endpoint endp = aMessageContext.getEndpoint();
+					if ( endp != null && endp.isRemote() )
+					{
+						if ( delegateServicePerformance != null )
+						{
+							delegateServicePerformance.setIdleTime(idleTime);
+						}
+					}
+					//					casStats.incrementIdleTime(idleTime);
+					else if ( delegateServicePerformance != null )
 					{
 						delegateServicePerformance.
 							incrementIdleTime(idleTime);

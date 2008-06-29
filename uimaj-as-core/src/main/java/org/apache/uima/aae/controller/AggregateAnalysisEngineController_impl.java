@@ -131,6 +131,13 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	private boolean requestForMetaSentToRemotes = false;
 
+	private Object mux = new Object();
+	
+	private boolean isIdle = true;
+	
+	private long lastUpdate = System.nanoTime();
+	
+	private long totalIdleTime = 0;
 
 	private ConcurrentHashMap<String, Object[]> delegateStatMap = 
 		new ConcurrentHashMap();
@@ -424,6 +431,27 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, getClientEndpoint());
 		clientEndpoint = null;
 		clearStats();
+		
+		Map delegates = ((AggregateAnalysisEngineController)this).getDestinations();
+		Set set = delegates.entrySet();
+		for( Iterator it = set.iterator(); it.hasNext();)
+		{
+			Map.Entry entry = (Map.Entry)it.next();
+			Endpoint endpoint = (Endpoint)entry.getValue();
+			if ( endpoint != null )
+			{
+				//	Fetch stats for the delegate
+				ServicePerformance delegatePerformanceStats =
+					((AggregateAnalysisEngineController)this).
+						getDelegateServicePerformance((String)entry.getKey());
+				if ( delegatePerformanceStats != null )
+				{
+					delegatePerformanceStats.reset();
+				}
+			}
+		}
+		getServicePerformance().reset();
+		
 	}
 	/**
 	 * 
@@ -928,7 +956,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 							+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
 
 					ServicePerformance servicePerformance = new ServicePerformance();
-					
+					servicePerformance.setIdleTime(System.nanoTime());
+					servicePerformance.setRemoteDelegate();
+
 					registerWithAgent(servicePerformance, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
 
 					ServiceErrors serviceErrors = new ServiceErrors();
@@ -1791,7 +1821,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				pServiceInfo.setAnalysisEngineInstanceCount(1);
 
 				ServicePerformance servicePerformance = new ServicePerformance();
-
+				if ( anEndpoint.isRemote() )
+				{
+					servicePerformance.setRemoteDelegate();
+				}
 				ServiceErrors serviceErrors = new ServiceErrors();
 
 				serviceErrorMap.put(key, serviceErrors);
@@ -2020,4 +2053,36 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		return childControllerList;
 	}
+	
+	//	This is called every time a request comes
+	public void beginProcess(int msgType)
+	{
+		synchronized( mux )
+		{
+			isIdle = false;
+			lastUpdate = System.nanoTime();
+		}
+	}
+	//	This is called every time a request is completed
+	public void endProcess(int msgType)
+	{
+		synchronized( mux )
+		{
+			isIdle = true;
+			lastUpdate = System.nanoTime();
+		}
+	}
+	public long getTotalIdleTime()
+	{
+		synchronized( mux )
+		{
+			long now = System.nanoTime();
+			if ( isIdle )
+			{
+				totalIdleTime += ( now - lastUpdate);
+			}
+		}
+		return totalIdleTime;
+	}
+
 }

@@ -205,7 +205,7 @@ public class UimacppServiceController implements ControllerLifecycle {
       {
         //  If there is an exception, notify listener with failure
         if ( e != null ) {
-          (this.listeners.get(i)).notifyOnInitializationFailure(e);
+          (this.listeners.get(i)).notifyOnInitializationFailure( e);
         }
         // else, Success!
         else {

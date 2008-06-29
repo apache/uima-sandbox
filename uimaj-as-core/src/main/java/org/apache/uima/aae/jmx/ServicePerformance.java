@@ -23,6 +23,8 @@ import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.util.Formatter;
 
+import org.apache.uima.aae.controller.AnalysisEngineController;
+
 
 public class ServicePerformance implements ServicePerformanceMBean
 {
@@ -36,9 +38,26 @@ public class ServicePerformance implements ServicePerformanceMBean
 	private long maxSerializationTime=0;
 	private long maxDeserializationTime=0;
 	private long maxAnalysisTime=0;
-	
+	private long casPoolWaitTime=0;
+	private long shadowCasPoolWaitTime=0;
+	private long timeSpentInCMGetNext = 0;
 	private Object sem = new Object();
+	private AnalysisEngineController controller;
+	private boolean isRemoteDelegate = false;
+	
+	public ServicePerformance()
+	{
+	}
 
+	public ServicePerformance(AnalysisEngineController aController)
+	{
+		controller = aController;
+	}
+	
+	public void setRemoteDelegate()
+	{
+		isRemoteDelegate = true;
+	}
 	public String getLabel()
 	{
 		return label;
@@ -50,17 +69,49 @@ public class ServicePerformance implements ServicePerformanceMBean
 		numberOfCASesProcessed=0;
 		casDeserializationTime=0;
 		casSerializationTime=0;
+		casPoolWaitTime = 0;
+		shadowCasPoolWaitTime=0;
 		analysisTime=0;
+		maxSerializationTime=0;
+		maxDeserializationTime=0;
+		maxAnalysisTime=0;
+		timeSpentInCMGetNext = 0;
+
+	}
+	
+	
+	public void setIdleTime( long anIdleTime )
+	{
+		accumulatedIdleTime = anIdleTime;
 	}
 	public double getIdleTime()
 	{
-		if ( accumulatedIdleTime != 0)
+		
+		if ( controller != null )
+		{
+			//	Force update of the idle time
+			double time = ((double)controller.getTotalIdleTime()/(double) 1000000);
+			return time;
+		}
+		else if ( accumulatedIdleTime != 0)
+		{
 			synchronized( sem )
 			{
 				return((double)accumulatedIdleTime/(double) 1000000);
 			}
-		else
-			return 0;
+		}
+		
+			/*
+		 * 
+		if ( accumulatedIdleTime != 0)
+		{
+			synchronized( sem )
+			{
+				return((double)accumulatedIdleTime/(double) 1000000);
+			}
+		}
+*/		
+		return 0;
 	}
 
 	public long getRawIdleTime()
@@ -157,4 +208,33 @@ public class ServicePerformance implements ServicePerformanceMBean
 	{
 		return (double)maxAnalysisTime / (double)1000000;
 	}
+	public void incrementCasPoolWaitTime(long aCasPoolsWaitTime )
+	{
+		synchronized (sem ) 
+		{
+			casPoolWaitTime += aCasPoolsWaitTime;
+		}
+	}
+	public double getCasPoolWaitTime()
+	{
+		return (double)casPoolWaitTime/(double)1000000;
+	}
+	public void incrementShadowCasPoolWaitTime(long aShadowCasPoolWaitTime)
+	{
+		shadowCasPoolWaitTime += aShadowCasPoolWaitTime;
+	}
+	public double getShadowCasPoolWaitTime()
+	{
+		return (double)shadowCasPoolWaitTime/(double)1000000;
+	}
+	
+	public void incrementTimeSpentInCMGetNext(long aTimeSpentInCMGetNext )
+	{
+		timeSpentInCMGetNext += aTimeSpentInCMGetNext;
+	}
+	public double getTimeSpentInCMGetNext()
+	{
+		return (double)timeSpentInCMGetNext/(double)1000000;
+	}
+
 }

@@ -155,7 +155,7 @@ implements AnalysisEngineController, EventSubscriber
 	//	Map holding outstanding CASes produced by Cas Multiplier that have to be acked
 	protected ConcurrentHashMap cmOutstandingCASes = new ConcurrentHashMap();
 	
-
+	
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -456,12 +456,12 @@ implements AnalysisEngineController, EventSubscriber
 		
 		String name = "";
 		int index = getIndex(); 
-		servicePerformance = new ServicePerformance();
+		servicePerformance = new ServicePerformance(this);
 		name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+servicePerformance.getLabel();
 		
-		
 		registerWithAgent(servicePerformance, name );
-
+		servicePerformance.setIdleTime(System.nanoTime());
+		
 		ServiceInfo serviceInfo = getInputChannel().getServiceInfo();
 		ServiceInfo pServiceInfo = null;
 
@@ -1069,7 +1069,7 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		else
 		{
-			casStats = new ServicePerformance();
+			casStats = new ServicePerformance(this);
 			perCasStatistics.put( aCasReferenceId, casStats);
 		}
 		return casStats;
@@ -1117,6 +1117,9 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		//	Clear CAS statistics
 		perCasStatistics.clear();
+		
+		
+	
 	}
 	/**
 	 * Returns a copy of the controller statistics.
@@ -1646,12 +1649,12 @@ implements AnalysisEngineController, EventSubscriber
         if ( e != null )
         {
           ((ControllerCallbackListener)controllerListeners.get(i)).
-              notifyOnInitializationFailure(e);
+              notifyOnInitializationFailure(this, e);
         }
         else
         {
           ((ControllerCallbackListener)controllerListeners.get(i)).
-              notifyOnInitializationSuccess();
+              notifyOnInitializationSuccess(this);
         }
       }
 	  }
@@ -1740,5 +1743,5 @@ implements AnalysisEngineController, EventSubscriber
 				}
 			}
 		}
-	  
+		//	Called by ServicePerformance MBean on separate thread 
 }

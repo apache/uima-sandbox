@@ -131,6 +131,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		//	fetch the CAS from a shadow CAS pool. Otherwise, fetch the CAS
 		//	from the service CAS Pool.
 		// ************************************************************************* 
+
 		CAS cas = getCAS(aMessageContext.propertyExists(AsynchAEMessage.CasSequence), shadowCasPoolKey, aMessageContext.getEndpoint().getEndpoint());
 		long timeWaitingForCAS = System.nanoTime() - t1;
 		//	Check if we are still running
@@ -167,6 +168,19 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		if ( getController().isTopLevelComponent() )
 		{
 			getController().getServicePerformance().incrementCasDeserializationTime(timeToDeserializeCAS);
+			if ( aMessageContext.propertyExists(AsynchAEMessage.CasSequence) )
+			{
+				//	Fetch stats for the delegate
+				ServicePerformance delegatePerformanceStats =
+					((AggregateAnalysisEngineController)getController()).getDelegateServicePerformance(shadowCasPoolKey);
+				delegatePerformanceStats.incrementShadowCasPoolWaitTime(timeWaitingForCAS);
+			}
+			else
+			{
+				//	How long we waited for a CAS from the pool
+				getController().getServicePerformance().incrementCasPoolWaitTime(timeWaitingForCAS);
+			}
+			
 		}
 		getController().saveTime(inTime, casReferenceId,  getController().getName());
 		
