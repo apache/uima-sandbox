@@ -72,7 +72,7 @@ implements AnalysisEngineInstancePool
 	 *  
 	 * @see org.apache.uima.aae.controller.AnalysisEngineInstancePool#checkout()
 	 **/
-	public AnalysisEngine checkout() throws Exception
+	public synchronized AnalysisEngine checkout() throws Exception
 	{
 		AnalysisEngine ae = null;
 		

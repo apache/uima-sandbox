@@ -27,4 +27,6 @@ public interface ServiceInfoMBean extends Serializable
 	public String getInputQueueName();
 	public String getBrokerURL();
 	public String[] getDeploymentDescriptor();
+	public boolean isCASMultiplier();
+	public boolean isTopLevel();
 }

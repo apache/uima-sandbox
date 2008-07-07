@@ -137,7 +137,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	
 	private long lastUpdate = System.nanoTime();
 	
-	private long totalIdleTime = 0;
+	private long totalIdleTime = System.nanoTime();
 
 	private ConcurrentHashMap<String, Object[]> delegateStatMap = 
 		new ConcurrentHashMap();
@@ -428,6 +428,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		//	Log this controller's stats
 		logStats(getComponentName(),servicePerformance);
+		
+		endProcess(AsynchAEMessage.Process);
+
 		getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, getClientEndpoint());
 		clientEndpoint = null;
 		clearStats();
@@ -446,11 +449,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						getDelegateServicePerformance((String)entry.getKey());
 				if ( delegatePerformanceStats != null )
 				{
-					delegatePerformanceStats.reset();
+					//delegatePerformanceStats.reset();
 				}
 			}
 		}
-		getServicePerformance().reset();
+		//getServicePerformance().reset();
 		
 	}
 	/**
@@ -956,7 +959,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 							+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
 
 					ServicePerformance servicePerformance = new ServicePerformance();
-					servicePerformance.setIdleTime(System.nanoTime());
+					//servicePerformance.setIdleTime(System.nanoTime());
 					servicePerformance.setRemoteDelegate();
 
 					registerWithAgent(servicePerformance, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
@@ -1405,6 +1408,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			if ( endpoint.isRemote() && !cacheEntry.isSubordinate())
 			{
 				dropCAS(cacheEntry.getCasReferenceId(), true);
+				//	If the cache is empty change the state of the Aggregate to idle
+				if ( getInProcessCache().isEmpty() )
+				{
+					endProcess(AsynchAEMessage.Process);
+				}
 			}
 		}
 		return endpoint;
@@ -1601,6 +1609,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				endpoint.cancelTimer();
 				boolean collocatedAggregate = false;
 				ResourceMetaData resource = null;
+				ServiceInfo remoteDelegateServiceInfo = null;
 				if (aTypeSystem.trim().length() > 0)
 				{
 					if ( endpoint.isRemote() )
@@ -1627,7 +1636,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					if ( endpoint.isRemote())
 					{
 						Object o = null;
-						ServiceInfo remoteDelegateServiceInfo =
+						remoteDelegateServiceInfo =
 							getDelegateServiceInfo(key);
 						if ( remoteDelegateServiceInfo != null && remoteDelegateServiceInfo instanceof PrimitiveServiceInfo &&
 							 ( o = ((ProcessingResourceMetaData) resource).getConfigurationParameterSettings().getParameterValue(AnalysisEngineController.AEInstanceCount)) != null )
@@ -1672,6 +1681,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 							{
 								System.out.println("Setting Shadow Pool of Size:"+endpt.getShadowPoolSize()+" For Cas Multiplier:"+(String)remoteCasMultiplierList.get(i));						
 								getCasManagerWrapper().initialize(endpt.getShadowPoolSize(),(String)remoteCasMultiplierList.get(i));
+								if ( remoteDelegateServiceInfo != null )
+								{
+									remoteDelegateServiceInfo.setCASMultiplier();
+								}
 							}
 						}
 						if ( !isStopped() )
@@ -1950,7 +1963,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		if ( serviceInfo == null )
 		{
-			serviceInfo = new AggregateServiceInfo();
+			serviceInfo = new AggregateServiceInfo(isCasMultiplier());
 			if ( getInputChannel() != null )
 			{
 				serviceInfo.setInputQueueName(getInputChannel().getName());
@@ -2053,14 +2066,15 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		return childControllerList;
 	}
-	
+/*	
 	//	This is called every time a request comes
 	public void beginProcess(int msgType)
 	{
 		synchronized( mux )
 		{
 			isIdle = false;
-			lastUpdate = System.nanoTime();
+			long now = System.nanoTime();
+			lastUpdate = now;
 		}
 	}
 	//	This is called every time a request is completed
@@ -2069,20 +2083,32 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		synchronized( mux )
 		{
 			isIdle = true;
-			lastUpdate = System.nanoTime();
+			long now = System.nanoTime();
+			lastUpdate = now;
 		}
 	}
-	public long getTotalIdleTime()
+	public long getIdleTime()
 	{
+//		synchronized( mux )
+//		{
+//			long now = System.nanoTime();
+//			if ( isIdle )
+//			{
+//				long delta = (now -lastUpdate);
+//				totalIdleTime = delta;
+//			}
+//			return totalIdleTime;
+//		}
 		synchronized( mux )
 		{
 			long now = System.nanoTime();
 			if ( isIdle )
 			{
-				totalIdleTime += ( now - lastUpdate);
+				long delta = (now -lastUpdate);
+				totalIdleTime =+ delta;
 			}
+			return totalIdleTime;
 		}
-		return totalIdleTime;
 	}
-
+*/
 }

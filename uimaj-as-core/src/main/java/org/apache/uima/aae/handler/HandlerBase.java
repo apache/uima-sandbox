@@ -221,7 +221,7 @@ public abstract class HandlerBase implements Handler
 	{
 	}
 	
-	protected void aggregateDelegateStats(MessageContext aMessageContext, String aCasReferenceId) throws AsynchAEException
+	protected synchronized void aggregateDelegateStats(MessageContext aMessageContext, String aCasReferenceId) throws AsynchAEException
 	{
 		String delegateKey = "";
 		try
@@ -297,14 +297,19 @@ public abstract class HandlerBase implements Handler
 					{
 						if ( delegateServicePerformance != null )
 						{
-							delegateServicePerformance.setIdleTime(idleTime);
+							delegateServicePerformance.incrementIdleTime(idleTime);
+//							delegateServicePerformance.setIdleTime(idleTime);
 						}
+						else
+						{
+							System.out.println("!!!!!!!!!!!!handlerBase -- delegateServicePerformance is NULL !!!!!!!!!!!!!!!!!!!!!");
+						}
+				
 					}
 					//					casStats.incrementIdleTime(idleTime);
 					else if ( delegateServicePerformance != null )
 					{
-						delegateServicePerformance.
-							incrementIdleTime(idleTime);
+						delegateServicePerformance.incrementIdleTime(idleTime);
 					}
 				}
 			}

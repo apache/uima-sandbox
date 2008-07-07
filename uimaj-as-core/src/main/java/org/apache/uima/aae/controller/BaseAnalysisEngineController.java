@@ -155,7 +155,16 @@ implements AnalysisEngineController, EventSubscriber
 	//	Map holding outstanding CASes produced by Cas Multiplier that have to be acked
 	protected ConcurrentHashMap cmOutstandingCASes = new ConcurrentHashMap();
 	
+	private Object mux = new Object();
 	
+	
+	private long startTime = System.nanoTime();
+	
+	private Map<Long, AnalysisThreadState> threadStateMap =
+		new HashMap<Long,AnalysisThreadState>();
+	
+	
+
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -481,6 +490,10 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				pServiceInfo.setBrokerURL("Embedded Broker");
 			}
+			else
+			{
+				pServiceInfo.setTopLevel();
+			}
 			registerWithAgent(pServiceInfo, name );
 		}
 
@@ -699,12 +712,12 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		return replyTime;
 	}
-	
+/*	
 	public long getIdleTime( String aKey )
 	{
 		return idleTime;
 	}
-	
+*/	
 	public synchronized void saveIdleTime( long snapshot, String aKey, boolean accumulate )
 	{
 		if ( accumulate )
@@ -1222,10 +1235,12 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		return getInputChannel().getInputQueueName();
 	}
+/*
 	public long getIdleTime()
 	{
 		return 0;
 	}
+*/	
 	public long getTotalTimeSpentSerializingCAS()
 	{
 		return 0;
@@ -1743,5 +1758,220 @@ implements AnalysisEngineController, EventSubscriber
 				}
 			}
 		}
+		
+		private boolean validMessageForSnapshot( int msgType )
+		{
+			return ( AsynchAEMessage.Process == msgType || AsynchAEMessage.CollectionProcessComplete == msgType);
+		}
+		
 		//	Called by ServicePerformance MBean on separate thread 
+		
+		//	This is called every time a request comes
+		public void beginProcess(int msgType )
+		{
+			
+			
+			//	Disregard GetMeta as it comes on a non-process thread
+			if ( validMessageForSnapshot( msgType ) )
+			{
+				synchronized( mux )
+				{
+					AnalysisThreadState threadState = null;
+					if ( threadStateMap.containsKey(Thread.currentThread().getId()))
+					{
+						threadState = threadStateMap.get(Thread.currentThread().getId());
+						threadState.setIdle(false);
+						threadState.incrementIdleTime(System.nanoTime()-threadState.getLastUpdate());
+					}
+					else
+					{
+						threadStateMap.put(Thread.currentThread().getId(), new AnalysisThreadState());
+						
+						threadState = threadStateMap.get(Thread.currentThread().getId());
+						threadState.incrementIdleTime(System.nanoTime()-startTime);
+						threadState.setLastMessageDispatchTime(startTime);
+					}
+					threadState.computeIdleTimeBetweenProcessCalls();
+				}
+			}
+		}
+		//	This is called every time a request is completed
+		public void endProcess( int msgType )
+		{
+			//	Disregard GetMeta as it comes on a non-process thread
+			if ( validMessageForSnapshot( msgType ) )
+			{
+				synchronized( mux )
+				{
+					AnalysisThreadState threadState;
+					
+					if ( this instanceof AggregateAnalysisEngineController )
+					{
+						Set<Long> set = threadStateMap.keySet();
+						Iterator<Long> it = set.iterator();
+						threadState = threadStateMap.get(it.next());
+					}
+					else
+					{
+						threadState = threadStateMap.get(Thread.currentThread().getId());
+					}
+					threadState.setLastUpdate(System.nanoTime());
+					threadState.setIdle(true);
+				}
+				
+			}
+		}
+		public long getIdleTimeBetweenProcessCalls(int msgType)
+		{
+			if ( validMessageForSnapshot( msgType ) )
+			{
+				synchronized( mux )
+				{
+					
+					AnalysisThreadState threadState = null;					
+					if ( threadStateMap.containsKey(Thread.currentThread().getId()))
+					{
+						threadState = threadStateMap.get(Thread.currentThread().getId());
+					}
+					else
+					{
+						Set<Long> set = threadStateMap.keySet();
+						Iterator<Long> it = set.iterator();
+						threadState = threadStateMap.get(it.next());
+					}
+					return threadState.getIdleTimeBetweenProcessCalls();
+				}
+			}
+			return 0;
+		}
+		
+		public void resetIdleTimeBetweenProcessCalls()
+		{
+			synchronized( mux )
+			{
+				
+				AnalysisThreadState threadState = null;
+				if ( threadStateMap.containsKey(Thread.currentThread().getId()))
+				{
+					threadState = threadStateMap.get(Thread.currentThread().getId());
+				}
+				else
+				{
+					Set<Long> set = threadStateMap.keySet();
+					Iterator<Long> it = set.iterator();
+					threadState = threadStateMap.get(it.next());
+				}
+				threadState.setLastMessageDispatchTime();
+			}
+		}
+		public long getIdleTime()
+		{
+			synchronized( mux )
+			{
+				int howManyThreads = 0;
+				long now = System.nanoTime();
+				long serviceIdleTime = 0;
+				Set<Long> set = threadStateMap.keySet();
+				howManyThreads = threadStateMap.size();
+//				System.out.println("Controller:"+ getComponentName()+" Number of Process Treads::::::::::::::::::::::"+howManyThreads);
+				
+				//	Iterate over all processing threads to calculate the total amount of idle time 
+				for(Long key: set )
+				{	
+					//	Retrieve the current thread state information from the global map. The key is
+					//	the thread id.
+					 AnalysisThreadState threadState = threadStateMap.get(key);
+					 //	add this thread idle time
+					 serviceIdleTime += threadState.getIdleTime() ;
+					 
+					 //	If this thread is currently idle, compute amount of time elapsed since the last
+					 //	update. The last update has been done at the last startProcess() or endProcess() call.
+					 if ( threadState.isIdle())
+					 {
+						 //	compute idle time since the last update
+						 long delta = now - threadState.getLastUpdate();
+
+						 threadState.setLastUpdate(System.nanoTime());
+
+//							System.out.println("Controller:"+ getComponentName()+" IS IDLE --------------------");
+						 //	increment total idle time
+						 threadState.incrementIdleTime(delta);
+						 //	add the elapsed time since the last update to the total idle time
+						 serviceIdleTime += delta;
+					 }
+				}
+				//	If process CAS request has not yet been received, there are not process threads 
+				//	created yet. Simply return the delta since the service started. This is a special
+				//	case which is only executing if the client has not sent any CASes for processing.
+				if ( howManyThreads == 0)
+				{
+					return System.nanoTime()-startTime;
+				}
+				else
+				{
+					//	Return accumulated idle time from all processing threads. Divide the total idle by the 
+					//	number of process threads.
+					
+					if ( this instanceof PrimitiveAnalysisEngineController )
+					{
+						int aeInstanceCount = ((PrimitiveAnalysisEngineController)this).getAEInstanceCount();
+						serviceIdleTime += (aeInstanceCount - howManyThreads)*(System.nanoTime()-startTime);
+						return serviceIdleTime/aeInstanceCount;
+					}
+					else
+					{
+						return serviceIdleTime;
+					}
+				}
+			}
+		}
+		private class AnalysisThreadState
+		{
+			private boolean isIdle = false;
+			private long lastUpdate = 0;
+			private long totalIdleTime = 0;
+			//	Measures idle time between process CAS calls
+			private long idleTimeSinceLastProcess = 0;
+			private long lastMessageDispatchTime = 0;
+			
+			public boolean isIdle() {
+				return isIdle;
+			}
+			public void computeIdleTimeBetweenProcessCalls()
+			{
+				idleTimeSinceLastProcess = System.nanoTime() - lastMessageDispatchTime;
+			}
+			public void setLastMessageDispatchTime( long aTime )
+			{
+				lastMessageDispatchTime = aTime;
+			}
+			public void incrementIdleTime( long idleTime )
+			{
+				totalIdleTime += idleTime;
+			}
+			public void setIdle(boolean isIdle) {
+				this.isIdle = isIdle;
+			}
+			public long getIdleTime()
+			{
+				return totalIdleTime;
+			}
+			public void setLastMessageDispatchTime()
+			{
+				lastMessageDispatchTime = System.nanoTime();
+			}
+			public long getIdleTimeBetweenProcessCalls()
+			{
+				return idleTimeSinceLastProcess;
+			}
+			public long getLastUpdate() {
+				return lastUpdate;
+			}
+			public void setLastUpdate(long lastUpdate) {
+				this.lastUpdate = lastUpdate;
+			}
+			
+		}
+		
+		
 }

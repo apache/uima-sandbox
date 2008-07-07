@@ -30,7 +30,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 {
 	private static final long serialVersionUID = 1L;
 	private static final String label="Service Performance";
-	private long accumulatedIdleTime=0;
+	private long idleTime=0;
 	private long numberOfCASesProcessed=0;
 	private long casDeserializationTime=0;
 	private long casSerializationTime=0;
@@ -44,7 +44,8 @@ public class ServicePerformance implements ServicePerformanceMBean
 	private Object sem = new Object();
 	private AnalysisEngineController controller;
 	private boolean isRemoteDelegate = false;
-	
+	private long uptime = System.nanoTime();
+	long lastUpdate=System.nanoTime();
 	public ServicePerformance()
 	{
 	}
@@ -65,7 +66,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 
 	public synchronized void reset()
 	{
-		accumulatedIdleTime = 0;
+		idleTime = 0;
 		numberOfCASesProcessed=0;
 		casDeserializationTime=0;
 		casSerializationTime=0;
@@ -76,13 +77,16 @@ public class ServicePerformance implements ServicePerformanceMBean
 		maxDeserializationTime=0;
 		maxAnalysisTime=0;
 		timeSpentInCMGetNext = 0;
-
+		uptime = System.nanoTime();
 	}
 	
 	
 	public void setIdleTime( long anIdleTime )
 	{
-		accumulatedIdleTime = anIdleTime;
+		synchronized( sem )
+		{
+			idleTime = anIdleTime;
+		}
 	}
 	public double getIdleTime()
 	{
@@ -90,39 +94,41 @@ public class ServicePerformance implements ServicePerformanceMBean
 		if ( controller != null )
 		{
 			//	Force update of the idle time
-			double time = ((double)controller.getTotalIdleTime()/(double) 1000000);
-			return time;
+			return ((double)controller.getIdleTime()/(double) 1000000);
 		}
-		else if ( accumulatedIdleTime != 0)
+		else
 		{
 			synchronized( sem )
 			{
-				return((double)accumulatedIdleTime/(double) 1000000);
+				long now = System.nanoTime();
+				//	idle time is zero until we receive the first reply from the remote
+				//	The reply contains the actual idle time of the remote. The idle
+				//	time from the remote is added to the idle time tracked in this service
+				if ( idleTime == 0 || lastUpdate == 0)
+				{
+					return ( (double) (now-uptime)/ (double)1000000);
+				}
+				else
+				{
+					//	return current uptime and reset the last update
+					lastUpdate = 0;
+					return ((double)idleTime/(double) 1000000);
+				}
 			}
+			
 		}
-		
-			/*
-		 * 
-		if ( accumulatedIdleTime != 0)
-		{
-			synchronized( sem )
-			{
-				return((double)accumulatedIdleTime/(double) 1000000);
-			}
-		}
-*/		
-		return 0;
 	}
 
 	public long getRawIdleTime()
 	{
-		return accumulatedIdleTime;
+		return idleTime;
 	}
 	public void incrementIdleTime(long anIdleTime)
 	{
 		synchronized( sem )
 		{
-			accumulatedIdleTime += anIdleTime;
+			idleTime += anIdleTime;
+			lastUpdate = System.nanoTime();
 		}
 	}
 

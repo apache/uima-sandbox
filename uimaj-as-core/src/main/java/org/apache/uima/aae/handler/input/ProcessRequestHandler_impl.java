@@ -46,7 +46,8 @@ import org.apache.uima.util.Level;
 public class ProcessRequestHandler_impl extends HandlerBase
 {
 	private static final Class CLASS_NAME = ProcessRequestHandler_impl.class;
-
+	private Object mux = new Object();
+	
 	public ProcessRequestHandler_impl(String aName)
 	{
 		super(aName);
@@ -167,18 +168,21 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
 		if ( getController().isTopLevelComponent() )
 		{
-			getController().getServicePerformance().incrementCasDeserializationTime(timeToDeserializeCAS);
-			if ( aMessageContext.propertyExists(AsynchAEMessage.CasSequence) )
+			synchronized( mux )
 			{
-				//	Fetch stats for the delegate
-				ServicePerformance delegatePerformanceStats =
-					((AggregateAnalysisEngineController)getController()).getDelegateServicePerformance(shadowCasPoolKey);
-				delegatePerformanceStats.incrementShadowCasPoolWaitTime(timeWaitingForCAS);
-			}
-			else
-			{
-				//	How long we waited for a CAS from the pool
-				getController().getServicePerformance().incrementCasPoolWaitTime(timeWaitingForCAS);
+				getController().getServicePerformance().incrementCasDeserializationTime(timeToDeserializeCAS);
+				if ( aMessageContext.propertyExists(AsynchAEMessage.CasSequence) )
+				{
+					//	Fetch stats for the delegate
+					ServicePerformance delegatePerformanceStats =
+						((AggregateAnalysisEngineController)getController()).getDelegateServicePerformance(shadowCasPoolKey);
+						delegatePerformanceStats.incrementShadowCasPoolWaitTime(timeWaitingForCAS);
+				}
+				else
+				{
+					//	How long we waited for a CAS from the pool
+					getController().getServicePerformance().incrementCasPoolWaitTime(timeWaitingForCAS);
+				}
 			}
 			
 		}

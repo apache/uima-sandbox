@@ -377,7 +377,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	{
 		if ( serviceInfo == null )
 		{
-			serviceInfo = new ServiceInfo();
+			serviceInfo = new ServiceInfo(isCasMultiplier);
 			serviceInfo.setBrokerURL(serverURI);
 			serviceInfo.setInputQueueName(endpoint);
 			serviceInfo.setState("Active");
@@ -484,6 +484,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	public void setIsCasMultiplier(boolean trueORfalse)
 	{
 		isCasMultiplier = trueORfalse;
+		getServiceInfo().setCASMultiplier();
 	}
 	public void setShadowCasPoolSize( int aPoolSize )
 	{

@@ -30,7 +30,18 @@ public class ServiceInfo implements ServiceInfoMBean
 	private String inputQueueName="";
 	private String state="";
 	private String[] deploymentDescriptor= new String[] {""};
+	private boolean casMultiplier;
+	private boolean topLevel;
 	
+	public ServiceInfo()
+	{
+		this(false);
+	}
+	
+	public ServiceInfo( boolean isaCasMultiplier )
+	{
+		casMultiplier = isaCasMultiplier;
+	}
 	public String getLabel()
 	{
 		return label;
@@ -68,6 +79,20 @@ public class ServiceInfo implements ServiceInfoMBean
 	{
 		state = aState;
 	}
-
-
+	public boolean isCASMultiplier()
+	{
+		return casMultiplier;
+	}
+	public void setCASMultiplier()
+	{
+		casMultiplier = true;
+	}
+	public void setTopLevel()
+	{
+		topLevel = true;
+	}
+	public boolean isTopLevel()
+	{
+		return topLevel;
+	}
 }

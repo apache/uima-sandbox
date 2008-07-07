@@ -88,13 +88,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	
 	private String abortedCASReferenceId = null;
 	
-	private Object mux = new Object();
-	
-	
-	private long totalIdleTime = 0;
-	
-	private Map<Long, AnalysisThreadState> threadStateMap =
-		new HashMap<Long,AnalysisThreadState>();
 	
 	public PrimitiveAnalysisEngineController_impl(String anEndpointName, String anAnalysisEngineDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, int aWorkQueueSize, int anAnalysisEnginePoolSize) throws Exception
 	{
@@ -130,6 +123,11 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
     this(aParentController, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, 0, aJmxManagement);
   }
 
+  
+  public int getAEInstanceCount()
+  {
+	  return analysisEnginePoolSize;
+  }
   public void initialize() throws AsynchAEException
 	{
 		try
@@ -161,7 +159,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			
 			if ( serviceInfo == null )
 			{
-				serviceInfo = new PrimitiveServiceInfo();
+				serviceInfo = new PrimitiveServiceInfo(isCasMultiplier());
 			}
 
 			serviceInfo.setAnalysisEngineInstanceCount(analysisEnginePoolSize);
@@ -234,7 +232,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			getServicePerformance().incrementAnalysisTime(System.nanoTime()-start);
 			getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, anEndpoint);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_completed__FINE", new Object[] { getComponentName()});
-			getServicePerformance().reset();
+			//getServicePerformance().reset();
 	
 		}
 		catch ( Exception e)
@@ -353,15 +351,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				timeToProcessCAS = (System.nanoTime()-hasNextTime);
 				getNextTime = System.nanoTime();
 				CAS casProduced = casIterator.next();
-				
-				
-				
-				/* !!!!!!!!!!!!!!!!!!!!!! */
+				//	Accumulate amount of time spent in CM next()
 				getServicePerformance().incrementTimeSpentInCMGetNext(System.nanoTime() - getNextTime);
-				/* !!!!!!!!!!!!!!!!!!!!!! */
-
-				
-				
 				//	Add how long it took to call next()
 				timeToProcessCAS += (System.nanoTime()- getNextTime);
                 //	Add time to call hasNext() and next() to the running total
@@ -426,7 +417,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	and are no longer needed
 				dropCasStatistics(newEntry.getCasReferenceId());
 				//	Increment number of CASes processed by this service
-				getServicePerformance().incrementNumberOfCASesProcessed();
+				//getServicePerformance().incrementNumberOfCASesProcessed();
 //				getServicePerformance().incrementAnalysisTime(timeToProcessCAS);
 				sequence++;
 			}
@@ -664,84 +655,4 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 	}
 	
-	//	This is called every time a request comes
-	public void beginProcess(int msgType )
-	{
-		if ( AsynchAEMessage.Process == msgType )
-		{
-			synchronized( mux )
-			{
-				AnalysisThreadState threadState = null;
-				if ( threadStateMap.containsKey(Thread.currentThread().getId()))
-				{
-					threadState = threadStateMap.get(Thread.currentThread().getId());
-					threadState.setLastUpdate(System.nanoTime());
-					threadState.setIdle(false);
-				}
-				else
-				{
-					threadStateMap.put(Thread.currentThread().getId(), new AnalysisThreadState());
-				}
-			}
-		}
-	}
-	//	This is called every time a request is completed
-	public void endProcess( int msgType )
-	{
-		if ( AsynchAEMessage.Process == msgType )
-		{
-			synchronized( mux )
-			{
-				AnalysisThreadState threadState = threadStateMap.get(Thread.currentThread().getId());
-				threadState.setLastUpdate(System.nanoTime());
-				threadState.setIdle(true);
-			}
-			
-		}
-	}
-	public long getTotalIdleTime()
-	{
-		int howManyThreads = 0;
-		synchronized( mux )
-		{
-			long now = System.nanoTime();
-			Set<Long> set = threadStateMap.keySet();
-			for(Long key: set )
-			{	
-				 AnalysisThreadState threadState = threadStateMap.get(key);
-				 if ( threadState.isIdle())
-				 {
-					totalIdleTime += ( now - threadState.getLastUpdate() );
-				 }
-			}
-			howManyThreads = threadStateMap.size();
-		}
-		if ( howManyThreads == 0)
-		{
-			return totalIdleTime;
-		}
-		else
-		{
-			return totalIdleTime/howManyThreads;
-		}
-	}
-	private class AnalysisThreadState
-	{
-		private boolean isIdle = false;
-		private long lastUpdate = System.nanoTime();
-	
-		public boolean isIdle() {
-			return isIdle;
-		}
-		public void setIdle(boolean isIdle) {
-			this.isIdle = isIdle;
-		}
-		public long getLastUpdate() {
-			return lastUpdate;
-		}
-		public void setLastUpdate(long lastUpdate) {
-			this.lastUpdate = lastUpdate;
-		}
-		
-	}
 }
