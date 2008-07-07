@@ -92,6 +92,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	
 	private List listenerContainerList = new ArrayList();
 	
+	private Object mux = new Object();
+	
 	public AnalysisEngineController getController()
 	{
 		return controller;
@@ -182,6 +184,13 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	}
 	private boolean isRemoteRequest( Message aMessage ) throws Exception
 	{
+		
+		//	Dont do checkpoints if a message was sent from a Cas Multiplier
+		if ( aMessage.propertyExists(AsynchAEMessage.CasSequence))
+		{
+			return false;
+		}
+
 		Map properties = ((ActiveMQMessage)aMessage).getProperties();
 		if ( properties.containsKey(AsynchAEMessage.MessageType) &&
 			 properties.containsKey(AsynchAEMessage.Command) &&
@@ -192,7 +201,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			boolean isRemote = aMessage.getStringProperty(UIMAMessage.ServerURI).startsWith("vm") == false;
 			if ( isRemote && msgType == AsynchAEMessage.Request &&
 					(command == AsynchAEMessage.Process ||
-					 command == AsynchAEMessage.GetMeta ||
 					 command == AsynchAEMessage.CollectionProcessComplete) )
 			{
 				return true;
@@ -475,22 +483,30 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	
 	private boolean isCheckpointWorthy( Message aMessage ) throws Exception
 	{
-		Map properties = ((ActiveMQMessage)aMessage).getProperties();
-		if ( properties.containsKey(AsynchAEMessage.MessageType) &&
-			 properties.containsKey(AsynchAEMessage.Command) &&
-			 properties.containsKey(UIMAMessage.ServerURI))
+		synchronized( mux )
 		{
-			int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
-			int command = aMessage.getIntProperty(AsynchAEMessage.Command);
-			if ( msgType == AsynchAEMessage.Request &&
-					(command == AsynchAEMessage.Process ||
-					 command == AsynchAEMessage.GetMeta ||
-					 command == AsynchAEMessage.CollectionProcessComplete) )
+			//	Dont do checkpoints if a message was sent from a Cas Multiplier
+			if ( aMessage.propertyExists(AsynchAEMessage.CasSequence))
 			{
-				return true;
+				return false;
 			}
+			Map properties = ((ActiveMQMessage)aMessage).getProperties();
+			if ( properties.containsKey(AsynchAEMessage.MessageType) &&
+				 properties.containsKey(AsynchAEMessage.Command) &&
+				 properties.containsKey(UIMAMessage.ServerURI))
+			{
+				int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+				int command = aMessage.getIntProperty(AsynchAEMessage.Command);
+				if ( msgType == AsynchAEMessage.Request &&
+						(command == AsynchAEMessage.Process ||
+						 command == AsynchAEMessage.CollectionProcessComplete) )
+				{
+					return true;
+				}
+			}
+			return false;
+			
 		}
-		return false;
 	}
 	/**
 	 * Receives Messages from the JMS Provider. It checks the message header
@@ -627,7 +643,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 					if ( isRemoteRequest( aMessage ))
 					{
 						//	Compute the time between waiting for this request 
-						idleTime = getController().getTotalIdleTime();
+						idleTime = getController().getIdleTime();
 						//	This idle time is reported to the client thus save it in the endpoint
 						//	object. This value will be fetched and added to the outgoing reply.
 						messageContext.getEndpoint().setIdleTime(idleTime);
@@ -666,7 +682,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		}
 		finally
 		{
-			if ( doCheckpoint )
+			//	Call the end checkpoint for non-aggregates. For primitives the CAS has been fully processed if we are here
+			if ( doCheckpoint && getController() instanceof PrimitiveAnalysisEngineController )
 			{
 				getController().endProcess(requestType);
 			}

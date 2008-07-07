@@ -162,7 +162,7 @@ public class SimpleCasGenerator extends CasMultiplier_ImplBase
 			cas.setDocumentText(this.mDoc2);
 		}
 */
-		if (docCount ==0 )
+		if (docCount ==0 && UIMAFramework.getLogger().isLoggable(Level.FINE))
 		{
 			System.out.println("Initializing CAS with a Document of Size:"+text.length());
 		}
