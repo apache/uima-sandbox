@@ -428,7 +428,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 					getController().getInProcessCache().setCasProducer(casReferenceId, casMultiplierEndpoint.getEndpoint());
 					newCASProducedBy = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(casMultiplierEndpoint.getEndpoint());
 					casMultiplierEndpoint.setIsCasMultiplier(true);
-					((AggregateAnalysisEngineController)getController()).getServicePerformance(newCASProducedBy).incrementNumberOfCASesProcessed();
+//					((AggregateAnalysisEngineController)getController()).getServicePerformance(newCASProducedBy).incrementNumberOfCASesProcessed();
 					CacheEntry subordinateCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
 					CacheEntry inputCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(subordinateCasCacheEntry.getInputCasReferenceId());
 					if ( inputCasCacheEntry != null )
@@ -677,9 +677,9 @@ public class ProcessRequestHandler_impl extends HandlerBase
 
 				getController().getControllerLatch().waitUntilInitialized();
 
-				// If a Process Request, increment number of docs processed
+				// If a Process Request, increment number of CASes processed
 				if (messageContext.getMessageIntProperty(AsynchAEMessage.MessageType) == AsynchAEMessage.Request
-						&& command == AsynchAEMessage.Process) {
+						&& command == AsynchAEMessage.Process &&!messageContext.propertyExists(AsynchAEMessage.CasSequence)) {
 					// Increment number of CASes processed by this service
 					getController().getServicePerformance().incrementNumberOfCASesProcessed();
 				}

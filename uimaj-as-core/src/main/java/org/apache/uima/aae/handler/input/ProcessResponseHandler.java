@@ -316,11 +316,12 @@ public class ProcessResponseHandler extends HandlerBase
 			ServicePerformance delegateServicePerformance = 
 				((AggregateAnalysisEngineController)getController()).
 					getServicePerformance(delegateKey);
+			/*
 			if ( delegateServicePerformance != null )
 			{
 				delegateServicePerformance.incrementNumberOfCASesProcessed();
 			}
-
+*/
 			//CAS cas = getController().getInProcessCache().getCasByReference(casReferenceId);
 			if (cas != null)
 			{
