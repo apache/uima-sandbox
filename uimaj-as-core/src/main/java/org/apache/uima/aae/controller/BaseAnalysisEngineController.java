@@ -1780,18 +1780,22 @@ implements AnalysisEngineController, EventSubscriber
 					if ( threadStateMap.containsKey(Thread.currentThread().getId()))
 					{
 						threadState = threadStateMap.get(Thread.currentThread().getId());
-						threadState.setIdle(false);
-						threadState.incrementIdleTime(System.nanoTime()-threadState.getLastUpdate());
+						if (threadState.isIdle) {
+							threadState.setIdle(false);
+							threadState.incrementIdleTime(System.nanoTime()-threadState.getLastUpdate());
+							threadState.computeIdleTimeBetweenProcessCalls();
+						}
 					}
 					else
 					{
 						threadStateMap.put(Thread.currentThread().getId(), new AnalysisThreadState());
 						
 						threadState = threadStateMap.get(Thread.currentThread().getId());
+						threadState.setIdle(false);
 						threadState.incrementIdleTime(System.nanoTime()-startTime);
 						threadState.setLastMessageDispatchTime(startTime);
+						threadState.computeIdleTimeBetweenProcessCalls();
 					}
-					threadState.computeIdleTimeBetweenProcessCalls();
 				}
 			}
 		}
