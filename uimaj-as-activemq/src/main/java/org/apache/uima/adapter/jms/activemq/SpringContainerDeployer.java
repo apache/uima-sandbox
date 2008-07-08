@@ -117,6 +117,13 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 					cntlr.getServiceInfo().setInputQueueName(queue.getQueueName());
 				}
 			}
+			else
+			{
+				if ( cntlr.getServiceInfo() != null )
+				{
+					cntlr.getServiceInfo().setInputQueueName(inputQueueName);
+				}
+			}
 		}
 		
 		
