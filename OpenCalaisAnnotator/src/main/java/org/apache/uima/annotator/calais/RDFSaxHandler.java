@@ -83,7 +83,7 @@ public class RDFSaxHandler extends DefaultHandler {
          this.enableOffset = true;
      } else if(qName.equals("c:length")) {
          this.enableLength = true;
-     } else if(qName.equals("c:document")) {
+     } else if(qName.equals("rdf:RDF")) {
          this.enableDocument = true;
      }
    }

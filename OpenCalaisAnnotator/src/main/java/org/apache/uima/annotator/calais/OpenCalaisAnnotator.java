@@ -119,7 +119,7 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
       URLConnection connection = this.calaisService.openConnection();
       connection.setDoOutput(true);
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection
-              .getOutputStream()));
+              .getOutputStream(), "UTF-8"));
       writer.write(this.serviceParams);
       writer.write(aCas.getDocumentText());
       writer.flush();
@@ -131,11 +131,11 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
       BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
       Document feedDoc = docBuilder.parse(in);
       String RdfXmlContent = feedDoc.getDocumentElement().getTextContent();
-      // System.out.println(RdfXmlContent);
+      //System.out.println(RdfXmlContent);
 
       // create new InputStream for the RDF XML content
       BufferedInputStream bufByteIn = new BufferedInputStream(new ByteArrayInputStream(
-              RdfXmlContent.getBytes()));
+              RdfXmlContent.getBytes(feedDoc.getXmlEncoding())));
 
       // create SAX handler
       ArrayList<DescriptionElement> elements = new ArrayList<DescriptionElement>();
@@ -323,10 +323,10 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
 
     // set processing directives
     buffer.append("<c:processingDirectives");
-    // set parameter contentType = text/text
-    buffer.append(" c:contentType=\"text/txt\"");
-    // set parameter outputFormat = xml/rdf
-    buffer.append(" c:outputFormat=\"xml/rdf\">");
+    // set parameter contentType = TEXT/TXT
+    buffer.append(" c:contentType=\"TEXT/TXT\"");
+    // set parameter outputFormat = XML/RDF
+    buffer.append(" c:outputFormat=\"XML/RDF\">");
     // close processing directives
     buffer.append("</c:processingDirectives>");
 
@@ -347,6 +347,10 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
     // set parameter externalID
     buffer.append(" c:submitter=\"");
     buffer.append(submitter);
+    buffer.append("\"");
+    // set parameter externalID
+    buffer.append(" c:calculateRelevanceScore=\"");
+    buffer.append("false");
     buffer.append("\"");
     // close user directives
     buffer.append("></c:userDirectives>");
