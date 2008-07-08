@@ -100,20 +100,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 		{
 			synchronized( sem )
 			{
-				long now = System.nanoTime();
-				//	idle time is zero until we receive the first reply from the remote
-				//	The reply contains the actual idle time of the remote. The idle
-				//	time from the remote is added to the idle time tracked in this service
-				if ( idleTime == 0 || lastUpdate == 0)
-				{
-					return ( (double) (now-uptime)/ (double)1000000);
-				}
-				else
-				{
-					//	return current uptime and reset the last update
-					lastUpdate = 0;
-					return ((double)idleTime/(double) 1000000);
-				}
+				return ((double)idleTime/(double) 1000000);
 			}
 			
 		}
