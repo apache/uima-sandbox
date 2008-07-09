@@ -33,10 +33,10 @@ public class RDFSaxHandler extends DefaultHandler {
     private boolean enableDocument = false;
     private Offset offset;
     
-    private ArrayList<DescriptionElement> elements;
-    private HashMap<String, DescriptionElement> subjectMap;
+    private HashMap<String, DescriptionElement> elements;
+    private ArrayList<DescriptionElement> subjectMap;
   
-   public RDFSaxHandler(ArrayList<DescriptionElement> elements, HashMap<String, DescriptionElement> subjectMap, Offset offset) {
+   public RDFSaxHandler(HashMap<String, DescriptionElement> elements, ArrayList<DescriptionElement> subjectMap, Offset offset) {
      this.elements = elements;
      this.subjectMap = subjectMap;
      this.offset = offset;
@@ -52,9 +52,9 @@ public class RDFSaxHandler extends DefaultHandler {
          throws SAXException {
      
      if(qName.equals("rdf:Description")) {
-       this.elements.add(this.currentDesc);
+       this.elements.put(this.currentDesc.getAboutURL(), this.currentDesc);
        if(this.currentDesc.getSubjectURL() != null) {
-         this.subjectMap.put(this.currentDesc.getSubjectURL(), this.currentDesc);
+         this.subjectMap.add(this.currentDesc);
        }
      }
 

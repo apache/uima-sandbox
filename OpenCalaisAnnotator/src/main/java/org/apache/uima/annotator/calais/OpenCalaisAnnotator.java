@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -111,6 +112,8 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
   private URL calaisService;
 
   private HashMap<String, Type> typeMapping;
+  
+  private String[] charsToReplace = {"<", ">", "\"", "'", "&"};
 
   public void process(CAS aCas) throws AnalysisEngineProcessException {
 
@@ -121,7 +124,14 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection
               .getOutputStream(), "UTF-8"));
       writer.write(this.serviceParams);
-      writer.write(aCas.getDocumentText());
+      String modifiedText = aCas.getDocumentText();
+      for(int i = 0; i < this.charsToReplace.length; i++) {
+        modifiedText = modifiedText.replaceAll(this.charsToReplace[i], "");
+      }
+      modifiedText = modifiedText.replaceAll("\n", " ");
+      modifiedText = modifiedText.replaceAll("\r", " ");
+     
+      writer.write(modifiedText);
       writer.flush();
       writer.close();
 
@@ -138,26 +148,58 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
               RdfXmlContent.getBytes(feedDoc.getXmlEncoding())));
 
       // create SAX handler
-      ArrayList<DescriptionElement> elements = new ArrayList<DescriptionElement>();
-      HashMap<String, DescriptionElement> subjectMap = new HashMap<String, DescriptionElement>();
+      HashMap<String, DescriptionElement> elements = new HashMap<String, DescriptionElement>();
+      ArrayList<DescriptionElement> subjectMap = new ArrayList<DescriptionElement>();
       Offset offset = new Offset();
       RDFSaxHandler saxHandler = new RDFSaxHandler(elements, subjectMap, offset);
 
       // parse RDF XML content returned by the calais service
       this.saxParser.parse(bufByteIn, saxHandler);
 
+      //check offset correction
+      String text = aCas.getDocumentText();
+      ArrayList<Integer> positionsList = new ArrayList<Integer>();
+      int index = -1;
+      for(int i = 0; i < this.charsToReplace.length; i++) {
+        index = text.indexOf(this.charsToReplace[i]);
+        while(index > -1) {
+          positionsList.add(index);
+          index = text.indexOf(this.charsToReplace[i],index + 1);
+        }
+      }
+     //now the positions list contains all positions where characters have been removed
+      Integer[] positions = positionsList.toArray(new Integer[]{});
+      
+      Arrays.sort(positions);
+            
       // analyze entities
-      Iterator<DescriptionElement> elementIt = elements.iterator();
+      Iterator<DescriptionElement> elementIt = subjectMap.iterator();
       while (elementIt.hasNext()) {
         DescriptionElement element = elementIt.next();
-        // if for the typeURL is a mapping available, create annotation in the CAS
-        Type currentType = this.typeMapping.get(element.getTypeURL());
+        
+        // retrieve subject URL, the subject URL must be equal to an about URL in the elements
+        // map to get the type of the current element
+        DescriptionElement typeElement = elements.get(element.getSubjectURL());
+        String typeURL = typeElement.getTypeURL();
+        
+        // get current CAS type for the type URL
+        Type currentType = this.typeMapping.get(typeURL);
+        
+        //if mapping is available, create an annotation
         if (currentType != null) {
-          // mapping is available, create annotation
           // get reference element that contains the annotation span
-          DescriptionElement refElement = subjectMap.get(element.getAboutURL());
-          int begin = refElement.getOffset() - offset.getOffset();
-          int end = begin + refElement.getLength();
+
+          int begin = element.getOffset() - offset.getOffset();
+          
+          //make begin offset correction
+          for(int i = 0; i < positions.length; i++) {
+            Integer pos = positions[i];
+            if(pos < begin) {
+              begin++;
+            }
+          }
+                  
+          int end = begin + element.getLength();
           // create annotation
           AnnotationFS annotFs = aCas.createAnnotation(currentType, begin, end);
           annotFs.setStringValue(this.calaisTypeFeat, element.getTypeURL().intern());
@@ -324,9 +366,9 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
     // set processing directives
     buffer.append("<c:processingDirectives");
     // set parameter contentType = TEXT/TXT
-    buffer.append(" c:contentType=\"TEXT/TXT\"");
+    buffer.append(" c:contentType=\"TEXT/html\"");
     // set parameter outputFormat = XML/RDF
-    buffer.append(" c:outputFormat=\"XML/RDF\">");
+    buffer.append(" c:outputFormat=\"xml/rdf\">");
     // close processing directives
     buffer.append("</c:processingDirectives>");
 
