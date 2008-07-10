@@ -1040,10 +1040,11 @@ public class JmsOutputChannel implements OutputChannel
 //					aTextMessage.setLongProperty(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
-				//aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, anEndpoint.getIdleTime() );
+//				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, anEndpoint.getIdleTime() );
 				long iT =getAnalysisEngineController().getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
+//				long iT =getAnalysisEngineController().getIdleTime(); 
 //				System.out.println("##### Controller:"+getAnalysisEngineController().getComponentName()+" Adding Idle Time To Reply Msg:"+iT);
-				getAnalysisEngineController().resetIdleTimeBetweenProcessCalls();
+//				getAnalysisEngineController().resetIdleTimeBetweenProcessCalls();
 				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, iT );
 				String lookupKey = getAnalysisEngineController().getName();//getInProcessCache().getMessageAccessorByReference(aCasReferenceId).getEndpointName();
 				long arrivalTime = getAnalysisEngineController().getTime( aCasReferenceId, lookupKey); //serviceInputEndpoint);

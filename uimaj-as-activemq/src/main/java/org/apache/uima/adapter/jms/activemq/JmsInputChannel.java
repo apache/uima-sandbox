@@ -642,8 +642,9 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				{
 					if ( isRemoteRequest( aMessage ))
 					{
-						//	Compute the time between waiting for this request 
+						//	Compute the idle time waiting for this request 
 						idleTime = getController().getIdleTime();
+						
 						//	This idle time is reported to the client thus save it in the endpoint
 						//	object. This value will be fetched and added to the outgoing reply.
 						messageContext.getEndpoint().setIdleTime(idleTime);
