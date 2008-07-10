@@ -297,8 +297,8 @@ public abstract class HandlerBase implements Handler
 					{
 						if ( delegateServicePerformance != null )
 						{
+							
 							delegateServicePerformance.incrementIdleTime(idleTime);
-//							delegateServicePerformance.setIdleTime(idleTime);
 						}
 						else
 						{

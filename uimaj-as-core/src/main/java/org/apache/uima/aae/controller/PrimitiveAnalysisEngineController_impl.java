@@ -629,6 +629,10 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 		
 		serviceInfo.setState("Running");
+		if ( isCasMultiplier() )
+		{
+			serviceInfo.setCASMultiplier();
+		}
 		return serviceInfo;
 	}
 	

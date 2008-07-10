@@ -230,7 +230,13 @@ implements AnalysisEngineController, EventSubscriber
                 new Object[] { endpointName });
 		
 		resourceSpecifier = UimaClassFactory.produceResourceSpecifier(aDescriptor);
-
+		//	Is this service a CAS Multiplier?
+		if ( resourceSpecifier instanceof AnalysisEngineDescription &&
+				((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes() )
+		{
+			casMultiplier = true;
+		}
+		
 		paramsMap = new HashMap();
 		if ( aJmxManagement == null )
 		{
@@ -262,7 +268,7 @@ implements AnalysisEngineController, EventSubscriber
 				//	Is this service a CAS Multiplier?
 				if ( ((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes() )
 				{
-					casMultiplier = true;
+//					casMultiplier = true;
 					System.out.println(getName()+"-Initializing CAS Pool for Context:"+getUimaContextAdmin().getQualifiedContextName());
 					System.out.println(getComponentName()+"-CasMultiplier Cas Pool Size="+aComponentCasPoolSize+" Cas Initialial Heap Size:"+anInitialCasHeapSize);
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
@@ -494,6 +500,10 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				pServiceInfo.setTopLevel();
 			}
+			if ( isCasMultiplier())
+			{
+				pServiceInfo.setCASMultiplier();
+			}
 			registerWithAgent(pServiceInfo, name );
 		}
 
@@ -585,6 +595,10 @@ implements AnalysisEngineController, EventSubscriber
 			sInfo.setInputQueueName(aServiceInfo.getInputQueueName());
 			sInfo.setState(aServiceInfo.getState());
 			sInfo.setDeploymentDescriptor(deploymentDescriptor);
+			if ( isCasMultiplier())
+			{
+				sInfo.setCASMultiplier();
+			}
 		}
 		else
 		{
@@ -1821,6 +1835,7 @@ implements AnalysisEngineController, EventSubscriber
 					}
 					threadState.setLastUpdate(System.nanoTime());
 					threadState.setIdle(true);
+					threadState.setLastMessageDispatchTime();
 				}
 				
 			}
@@ -1848,7 +1863,7 @@ implements AnalysisEngineController, EventSubscriber
 			}
 			return 0;
 		}
-		
+/*		
 		public void resetIdleTimeBetweenProcessCalls()
 		{
 			synchronized( mux )
@@ -1868,6 +1883,7 @@ implements AnalysisEngineController, EventSubscriber
 				threadState.setLastMessageDispatchTime();
 			}
 		}
+*/	
 		public long getIdleTime()
 		{
 			synchronized( mux )
@@ -1937,7 +1953,6 @@ implements AnalysisEngineController, EventSubscriber
 			//	Measures idle time between process CAS calls
 			private long idleTimeSinceLastProcess = 0;
 			private long lastMessageDispatchTime = 0;
-			
 			public boolean isIdle() {
 				return isIdle;
 			}
@@ -1966,7 +1981,10 @@ implements AnalysisEngineController, EventSubscriber
 			}
 			public long getIdleTimeBetweenProcessCalls()
 			{
-				return idleTimeSinceLastProcess;
+				long val = idleTimeSinceLastProcess;
+				//	Reset so that only one reply contains a non-zero value
+				idleTimeSinceLastProcess = 0;
+				return val;
 			}
 			public long getLastUpdate() {
 				return lastUpdate;
