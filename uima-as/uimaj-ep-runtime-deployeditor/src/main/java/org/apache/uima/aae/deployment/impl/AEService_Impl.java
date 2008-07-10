@@ -543,19 +543,10 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
    */
   public ResourceSpecifier resolveTopAnalysisEngineDescription(
           ResourceManager aResourceManager, boolean recursive) throws InvalidXMLException {
-    // Trace.err(10, "0");
     if (importDescriptor == null) {
       return null;
     }
-    
-    // Comment out to allow replacement of Top AE
-//    if (importResolved) {
-//      if (topAnalysisEngineDescription == null) {
-//        Trace.bug("topAnalysisEngineDescription == null");
-//      }
-//      return topAnalysisEngineDescription;
-//    }
-    
+        
     topAnalysisEngineDescription = resolveImport(aResourceManager);
 
     // If C++ descriptor, active C++ settings
@@ -563,11 +554,13 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
       if (((ResourceCreationSpecifier)topAnalysisEngineDescription).getFrameworkImplementation().equalsIgnoreCase(Constants.CPP_FRAMEWORK_NAME)) {
         cPlusPlusTopAE = true;
       } else {
-        // Check that there are NO for C++ Settings
-        if (customValue != null) {
-          throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
-                  new Object[]{TAG_CUSTOM});
-        }
+        cPlusPlusTopAE = false;
+        // Check that there are NO Settings for C++ 
+        // Note: Comment out to be "user-friendly" when switching from C++ to Java AE
+//        if (customValue != null) {
+//          throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+//                  new Object[]{TAG_CUSTOM});
+//        }
       }
     }
     

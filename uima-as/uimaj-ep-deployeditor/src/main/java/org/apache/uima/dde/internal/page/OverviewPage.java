@@ -499,7 +499,8 @@ public class OverviewPage extends AbstractHeaderPage {
     glayout.numColumns = 3;
     tableComposite.setLayout(glayout);
     
-    final Table table = toolkit.createTable(tableComposite, SWT.HIDE_SELECTION | SWT.FULL_SELECTION
+    // Add SWT.BORDER style to make table's border visible in Linux
+    final Table table = toolkit.createTable(tableComposite, SWT.BORDER | SWT.HIDE_SELECTION | SWT.FULL_SELECTION
             | SWT.H_SCROLL | SWT.V_SCROLL);
     table.setLinesVisible(true);
     table.setHeaderVisible(true);
@@ -880,9 +881,9 @@ public class OverviewPage extends AbstractHeaderPage {
           aeService.getAnalysisEngineDeploymentMetaData(multiPageEditor
                   .cde.createResourceManager()).setDelegates(delegates);
           
-          // If C++ descriptor, activate C++ settings
-          updateCPlusPlusSettings ();
         }
+        // If C++ descriptor, activate C++ settings
+        updateCPlusPlusSettings ();
       } else {
         Trace.err("Cannot resolve: " + relativeFile);
       }
@@ -1159,9 +1160,27 @@ public class OverviewPage extends AbstractHeaderPage {
 
       } else {
         customButton.setSelection(false);
+        // Clear Env vars
+        if (aeService.getEnvironmentVariables() != null) {
+          aeService.getEnvironmentVariables().clear();
+        }
+        if (customComposite != null) {
+          customComposite.dispose();
+          customComposite = null;
+        }
       }
     } else {
-      customButton.setEnabled(false);      
+      customButton.setSelection(false);
+      customButton.setEnabled(false);
+      aeService.setCustomValue(null);
+      if (aeService.getEnvironmentVariables() != null) {
+        aeService.getEnvironmentVariables().clear();
+      }
+      if (customComposite != null) {
+        customComposite.dispose();
+        customComposite = null;
+      }
+
     }
   }
 }
