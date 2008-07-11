@@ -37,9 +37,15 @@ import org.apache.activemq.broker.jmx.QueueViewMBean;
 import org.apache.uima.aae.jmx.ServiceInfoMBean;
 import org.apache.uima.aae.jmx.ServicePerformanceMBean;
 
+/**
+ *	Collects metrics from UIMA-AS Service MBeans at defined intervals and
+ *	passes the metrics for formatting to the registered {@link JmxMonitorListener} 
+ *
+ */
 public class JmxMonitor implements Runnable {
 	private static final Class CLASS_NAME = JmxMonitor.class;
-
+	public static final String CheckpointFrequency = "jmx.monitor.frequency";
+	public static final String FormatterListener = "jmx.monitor.formatter";
 	private boolean running = false;
 	private MBeanServerConnection mbsc;
 	private ObjectName uimaServicePattern;
@@ -52,6 +58,14 @@ public class JmxMonitor implements Runnable {
 	private int maxNameLength=0;
 	private boolean verbose = false;
 	
+	/**
+	 * Creates a connection to an MBean Server identified by <code>remoteServerURI</code>
+	 * 
+	 * @param remoteServerURI - URI to MBeanServer
+	 * @return - connection to MBeanServer
+	 * 
+	 * @throws Exception
+	 */
 	private MBeanServerConnection getServerConnection( String remoteServerURI) throws Exception
 	{
 		JMXServiceURL url = new JMXServiceURL(remoteServerURI);
@@ -60,6 +74,11 @@ public class JmxMonitor implements Runnable {
 		return server;
 	}
 	
+	/**
+	 * Registers custom {@link JmxMonitorListener}
+	 * 
+	 * @param listener - listener to receive metrics for formatting
+	 */
 	public void addJmxMonitorListener( JmxMonitorListener listener)
 	{
 		listeners.add( listener );
@@ -68,7 +87,12 @@ public class JmxMonitor implements Runnable {
 	{
 		echo("\nRemote JVM Info: \n\tJVM::"+runtime.getVmName()+"\n\tJVM Vendor::"+runtime.getVmVendor()+"\n\tJVM Version::"+runtime.getVmVersion()+"\n\n");
 	}
-	
+	/**
+	 * Passes metrics to all registered {@link JmxMonitorListener} objects
+	 * 
+	 * @param uptime - time when the metrics were collected
+	 * @param metrics - current metrics 
+	 */
 	public void notifyListeners( long uptime, ServiceMetrics[] metrics )
 	{
 		for( JmxMonitorListener listener: listeners)
@@ -108,12 +132,13 @@ public class JmxMonitor implements Runnable {
 		mbsc = getServerConnection(remoteServerURI);
 		
 		ObjectName objName = new  ObjectName(ManagementFactory.RUNTIME_MXBEAN_NAME);
+		
+		//	Construct query string to fetch UIMA-AS MBean names from the JMX Server registry
 		uimaServicePattern = new ObjectName("org.apache.uima:type=ee.jms.services,*");
+		//	Construct query string to fetch Queue MBean names from the JMX Server registry
 		uimaServiceQueuePattern = new ObjectName("org.apache.activemq:BrokerName=localhost,Type=Queue,*");
-		//	Fetch UIMA AS MBeans from the JMX Server
+		//	Fetch UIMA AS MBean names from the JMX Server that match the name pattern
 		Set<ObjectName> names = new HashSet<ObjectName>(mbsc.queryNames(uimaServicePattern, null));
-		//	Fetch All queue MBeans from the JMX Server
-		//		names = new TreeSet<ObjectName>(mbsc.queryNames(uimaServicePattern, null));
 		String key = "";
 		if ( verbose )
 			System.out.println("\nFound UIMA AS Services Managed by JMX Server:"+remoteServerURI);
@@ -122,7 +147,7 @@ public class JmxMonitor implements Runnable {
 			
 			//	Set up a key for matching Service Performance MBean names
 			String perfKey = "_Service Performance";
-			//	Check if the current name is for the Service Performance MBean
+			//	Check if the current name is the Service Performance MBean
 			if ( name.toString().endsWith(perfKey) )
 			{
 				if ( servicePerformanceNames == null )
@@ -143,18 +168,19 @@ public class JmxMonitor implements Runnable {
 					maxNameLength = nameLen;
 				}
 				
-				//	Create Service Info proxy
+				//	Create a proxy object to the Service Info MBean
 				ServiceInfoMBean infoMBeanProxy = getServiceInfoMBean(names, key);
 				key = key.substring(key.indexOf(",name=")+",name=".length());
-				
 				
 				long depth = 0; 
 				//	Create a Map entry containing MBeans
 				StatEntry entry = new StatEntry(perfMBeanProxy, infoMBeanProxy);
+				
 				String location = "Collocated";
-				//	If a service is colocated in the same JVM fetch the service queue proxy 
+				//	If a service is co-located in the same JVM fetch the service queue proxy 
 				if ( infoMBeanProxy.getBrokerURL().startsWith("Embedded Broker"))
 				{
+					//	Create a proxy to the service queue MBean
 					QueueViewMBean queueProxy = getQueueMBean(mbsc, infoMBeanProxy.getInputQueueName());
 					if (queueProxy != null )
 					{
@@ -165,7 +191,8 @@ public class JmxMonitor implements Runnable {
 				else
 				{
 					//	The MBean is for a remote service. Connect to this service Broker and create a proxy
-					//	to an input queue for the service.
+					//	to an input queue for the service. Assumption: the broker registers JMX server on 
+					//	port 1099.
 					location = "Remote";	
 					int spos = infoMBeanProxy.getBrokerURL().indexOf("//");
 					int endpos = infoMBeanProxy.getBrokerURL().lastIndexOf(":");
@@ -189,7 +216,6 @@ public class JmxMonitor implements Runnable {
 				if ( verbose )
 					System.out.println("\nUIMA AS Service:"+key+"[>>> "+location+" <<<]\n\tService Broker:"+infoMBeanProxy.getBrokerURL()+"\n\tQueue Name:"+infoMBeanProxy.getInputQueueName());
 
-				//System.out.println("Info Bean:"+key+" Broker URL:"+infoMBeanProxy.getBrokerURL()+" Service Queue Name:"+infoMBeanProxy.getInputQueueName()+" Input Queue Depth:"+depth);
 				stats.put(name, entry);
 
 				/** jdk1.6 code
@@ -199,7 +225,13 @@ public class JmxMonitor implements Runnable {
 			}
 		}
 	}
-	
+	/**
+	 * Returns a proxy object to an UIMA-AS Service Info MBean identified by a <code>key</code>
+	 * 
+	 * @param names - list of MBean names 
+	 * @param key - target name to find in the list of MBeans
+	 * @return - proxy to MBean identified by <code>key</code>
+	 */
 	private ServiceInfoMBean getServiceInfoMBean(Set<ObjectName> names, String key)
 	{
 		String target = key+"_Service Info";
@@ -227,18 +259,21 @@ public class JmxMonitor implements Runnable {
 		return null;
 	}
 	
-	
+	/**
+	 * Retrieves metrics from UIMA-AS MBeans at defined interval. 
+	 * 
+	 */
 	public void run()
 	{
 		running = true;
 		boolean initial = true;
 		while( running )
 		{
-			
 			long uptime = System.nanoTime() - startTime;
 			
 			ServiceMetrics[] metrics = new ServiceMetrics[servicePerformanceNames.size()];
 			int index = 0;
+			//	iterate over all Performance MBeans to retrieve current metrics
 			for (ObjectName name : servicePerformanceNames) {
 				try
 				{
@@ -269,9 +304,8 @@ public class JmxMonitor implements Runnable {
 					double deltaTimeInCMGetNext = 0;
 					if ( timeInCMGetNext > 0 )
 					{
-						deltaTimeInCMGetNext = timeInCMGetNext - entry.getLastWaitTimeOnCMGetNext();
+						deltaTimeInCMGetNext = timeInCMGetNext - entry.getWaitTimeOnCMGetNext();
 					}
-					
 					boolean isRemote = entry.getServiceInfoMBeanProxy().getBrokerURL().startsWith("tcp:");
 					boolean topLevel = entry.getServiceInfoMBeanProxy().isTopLevel();
 					
@@ -305,7 +339,8 @@ public class JmxMonitor implements Runnable {
 					//	Save current metrics for the next delta
 					entry.setIdleTime(idleTime);
 					entry.incrementCASCount(processCount);
-					entry.setLastWaitTimeOnCMGetNext(timeInCMGetNext);
+					//entry.setWaitTimeOnCMGetNext(timeInCMGetNext);
+					entry.incrementWaitTimeOnCMGetNext(timeInCMGetNext);
 				}
 				catch( Exception e){e.printStackTrace();}
 			} // for
@@ -325,6 +360,18 @@ public class JmxMonitor implements Runnable {
 			//	Notify listeners with current metrics collected from MBeans
 			notifyListeners(uptime, metrics);
 		}
+		
+		running = false;
+	}
+	
+	public boolean isRunning()
+	{
+		return running;
+	}
+	
+	public void doStop()
+	{
+		running = false;
 	}
 	/*
 	 * For simplicity, we declare "throws Exception". Real programs will usually
@@ -383,7 +430,7 @@ public class JmxMonitor implements Runnable {
 		String name="";
 		
 		double lastIdleTime = 0;
-		double lastWaitTimeOnCMGetNext = 0;
+		double waitTimeOnCMGetNext = 0;
 		long casProcessedCount = 0;
 		double cpWaitTime;
 		double scpWaitTime;
@@ -434,14 +481,13 @@ public class JmxMonitor implements Runnable {
 			return name;
 		}
 
-		public void setLastWaitTimeOnCMGetNext( double aLastWaitTimeOnCMGetNext)
+		public void incrementWaitTimeOnCMGetNext( double aWaitTimeOnCMGetNext )
 		{
-			lastWaitTimeOnCMGetNext = aLastWaitTimeOnCMGetNext;
+			waitTimeOnCMGetNext =+ aWaitTimeOnCMGetNext;
 		}
-		
-		public double getLastWaitTimeOnCMGetNext()
+		public double getWaitTimeOnCMGetNext()
 		{
-			return lastWaitTimeOnCMGetNext;
+			return waitTimeOnCMGetNext;
 		}
 		public double getTotalCPWaitTime()
 		{

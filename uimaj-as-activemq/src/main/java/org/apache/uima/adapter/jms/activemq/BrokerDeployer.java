@@ -105,10 +105,10 @@ public class BrokerDeployer implements ApplicationListener
 			String connectorList = "";
 			service.setPersistent(false);
 			int startPort = BASE_JMX_PORT;
-			
 			if ( System.getProperties().containsKey("com.sun.management.jmxremote.port") )
 			{
 				startPort = Integer.parseInt(System.getProperty("com.sun.management.jmxremote.port"));
+				
 			}
 			while( startPort < MAX_PORT_THRESHOLD && !openPort(startPort))
 			{
@@ -118,6 +118,9 @@ public class BrokerDeployer implements ApplicationListener
 			{
 				service.setUseJmx(true);
 				service.getManagementContext().setConnectorPort(startPort);
+				
+				System.setProperty("com.sun.management.jmxremote.port", String.valueOf(startPort)); 
+
 				System.out.println("JMX Console connect URI:  service:jmx:rmi:///jndi/rmi://localhost:"+startPort+"/jmxrmi");
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
 	                    "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jmx_uri__CONFIG",

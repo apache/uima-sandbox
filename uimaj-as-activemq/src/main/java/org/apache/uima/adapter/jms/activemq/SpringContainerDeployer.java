@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.jms.ConnectionFactory;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.uima.UIMAFramework;
@@ -51,7 +49,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	private boolean serviceInitializationException;
 	private Object serviceMonitor = new Object();
 	private ConcurrentHashMap springContainerRegistry=null;
-	
+	private FileSystemXmlApplicationContext context = null;
 	public SpringContainerDeployer(){
 	}
 
@@ -285,8 +283,8 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 		    if (!springContextFile.startsWith("file:")) {
 		      springContextFile = "file:" + springContextFile;
 		    }
-			ApplicationContext ctx = new FileSystemXmlApplicationContext(springContextFile);
-			return initializeContainer(ctx);
+			context = new FileSystemXmlApplicationContext(springContextFile);
+			return initializeContainer(context);
 		} catch (ResourceInitializationException e) {
 			//e.printStackTrace();
 			throw e;
@@ -314,8 +312,8 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			// synchronous ( one bean at a time), some beans run in a separate
 			// threads. The completion of container deployment doesnt
 			// necessarily mean that all beans have initialized completely.
-			ApplicationContext ctx = new FileSystemXmlApplicationContext(springContextFiles);
-			return initializeContainer(ctx);
+			context = new FileSystemXmlApplicationContext(springContextFiles);
+			return initializeContainer(context);
 		} catch (ResourceInitializationException e) {
 			e.printStackTrace();
 			throw e;
@@ -372,4 +370,18 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	public void notifyOnTermination(String message) {
 	}
 
+	public FileSystemXmlApplicationContext getSpringContext()
+	{
+		return context;
+	}
+	
+	public boolean isInitialized()
+	{
+		return serviceInitializationCompleted;
+	}
+	
+	public boolean initializationFailed()
+	{
+		return serviceInitializationException;
+	}
 }
