@@ -210,24 +210,50 @@ public class ServicePerformance implements ServicePerformanceMBean
 	}
 	public double getCasPoolWaitTime()
 	{
-		return (double)casPoolWaitTime/(double)1000000;
+		synchronized (sem ) 
+		{
+			return (double)casPoolWaitTime/(double)1000000;
+		}
 	}
 	public void incrementShadowCasPoolWaitTime(long aShadowCasPoolWaitTime)
 	{
-		shadowCasPoolWaitTime += aShadowCasPoolWaitTime;
+		synchronized (sem ) 
+		{
+			shadowCasPoolWaitTime += aShadowCasPoolWaitTime;
+		}
 	}
 	public double getShadowCasPoolWaitTime()
 	{
-		return (double)shadowCasPoolWaitTime/(double)1000000;
+		synchronized (sem ) 
+		{
+			return (double)shadowCasPoolWaitTime/(double)1000000;
+		}
 	}
 	
 	public void incrementTimeSpentInCMGetNext(long aTimeSpentInCMGetNext )
 	{
-		timeSpentInCMGetNext += aTimeSpentInCMGetNext;
+		synchronized (sem ) 
+		{
+			timeSpentInCMGetNext += aTimeSpentInCMGetNext;
+		}
 	}
 	public double getTimeSpentInCMGetNext()
 	{
-		return (double)timeSpentInCMGetNext/(double)1000000;
+//		synchronized (sem ) 
+//		{
+//			return (double)timeSpentInCMGetNext/(double)1000000;
+//		}
+		
+		if ( controller != null )
+		{
+			//	Force update of the wait time
+			return ((double)controller.getTimeWaitingForCAS()/(double) 1000000);
+		}
+		else
+		{
+			return 0;
+		}		
+		
 	}
 
 }

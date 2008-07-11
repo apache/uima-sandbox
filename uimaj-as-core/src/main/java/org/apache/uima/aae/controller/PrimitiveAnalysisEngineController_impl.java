@@ -350,9 +350,17 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	Measure how long it took to call hasNext()
 				timeToProcessCAS = (System.nanoTime()-hasNextTime);
 				getNextTime = System.nanoTime();
+				
+				
+				super.beginWait();
 				CAS casProduced = casIterator.next();
+				super.endWait();
+				
+				long delta = System.nanoTime() - getNextTime;
 				//	Accumulate amount of time spent in CM next()
-				getServicePerformance().incrementTimeSpentInCMGetNext(System.nanoTime() - getNextTime);
+				//getServicePerformance().incrementTimeSpentInCMGetNext(delta);
+//				System.out.println(getComponentName()+" CMCPWait:"+(double)delta/(double)1000000 +" Total:"+getServicePerformance().getTimeSpentInCMGetNext());
+				
 				//	Add how long it took to call next()
 				timeToProcessCAS += (System.nanoTime()- getNextTime);
                 //	Add time to call hasNext() and next() to the running total

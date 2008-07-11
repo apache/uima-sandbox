@@ -157,8 +157,15 @@ implements AnalysisEngineController, EventSubscriber
 	
 	private Object mux = new Object();
 	
+	private Object waitmux = new Object();
+	
+	private boolean waitingForCAS = false;
 	
 	private long startTime = System.nanoTime();
+	
+	private long totalWaitTimeForCAS = 0;
+	
+	private long lastCASWaitTimeUpdate = 0;
 	
 	private Map<Long, AnalysisThreadState> threadStateMap =
 		new HashMap<Long,AnalysisThreadState>();
@@ -1944,6 +1951,51 @@ implements AnalysisEngineController, EventSubscriber
 					}
 				}
 			}
+		}
+
+		public void beginWait()
+		{
+			synchronized( waitmux )
+			{
+				if ( !waitingForCAS )
+				{
+					waitingForCAS = true;
+					lastCASWaitTimeUpdate = System.nanoTime();
+				}
+				else
+				{
+					
+				}
+			}
+		}
+		public void endWait()
+		{
+			synchronized( waitmux )
+			{
+				long delta= (System.nanoTime() - lastCASWaitTimeUpdate); 
+				totalWaitTimeForCAS += delta;
+				waitingForCAS = false;
+			}
+		}
+
+		public long getTimeWaitingForCAS()
+		{
+			synchronized( waitmux )
+			{
+				long now = System.nanoTime();
+				if ( waitingForCAS )
+				{
+					long delta= (System.nanoTime() - lastCASWaitTimeUpdate); 
+					totalWaitTimeForCAS += delta;
+					lastCASWaitTimeUpdate = now;					
+					return totalWaitTimeForCAS;
+				}
+				else
+				{
+					return totalWaitTimeForCAS;
+				}
+			}
+			
 		}
 		private class AnalysisThreadState
 		{

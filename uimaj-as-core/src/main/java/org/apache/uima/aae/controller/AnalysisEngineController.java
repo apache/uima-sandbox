@@ -181,6 +181,7 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	//	Returns the idle time between process CAS calls
 	public long getIdleTimeBetweenProcessCalls(int msgType);
 	
+	public long getTimeWaitingForCAS();
 	//public void resetIdleTimeBetweenProcessCalls();
 
 }
