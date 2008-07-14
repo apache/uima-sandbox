@@ -46,6 +46,25 @@ public class ServicePerformance implements ServicePerformanceMBean
 	private boolean isRemoteDelegate = false;
 	private long uptime = System.nanoTime();
 	long lastUpdate=System.nanoTime();
+	
+	
+	private Object waitmux = new Object();
+	
+	private boolean waitingForCAS = false;
+	
+	private long totalWaitTimeForCAS = 0;
+	
+	private long lastCASWaitTimeUpdate = 0;
+
+	private Object shadowPoolMux = new Object();
+	private boolean waitingForSPCAS = false;
+	private long lastSPCASWaitTimeUpdate = 0;
+	
+	private Object getNextMux = new Object();
+	private boolean waitingInGetNext = false;
+	private long lastGetNextWaitTimeUpdate = 0;
+	private long totalGetNextWaitTime = 0;
+	
 	public ServicePerformance()
 	{
 	}
@@ -212,48 +231,139 @@ public class ServicePerformance implements ServicePerformanceMBean
 	{
 		synchronized (sem ) 
 		{
-			return (double)casPoolWaitTime/(double)1000000;
-		}
-	}
-	public void incrementShadowCasPoolWaitTime(long aShadowCasPoolWaitTime)
-	{
-		synchronized (sem ) 
-		{
-			shadowCasPoolWaitTime += aShadowCasPoolWaitTime;
+			return (double)getTimeWaitingForCAS()/(double)1000000;
 		}
 	}
 	public double getShadowCasPoolWaitTime()
 	{
-		synchronized (sem ) 
+		return ((double)getTimeWaitingForShadowPoolCAS()/(double) 1000000);
+	}
+	
+	public double getTimeSpentInCMGetNext()
+	{
+		//	Force update of the wait time
+		return ((double)getTimeWaitingInGetNext()/(double) 1000000);
+	}
+
+	public void beginWaitOnCASPool()
+	{
+		synchronized( waitmux )
 		{
-			return (double)shadowCasPoolWaitTime/(double)1000000;
+			if ( !waitingForCAS )
+			{
+				waitingForCAS = true;
+				lastCASWaitTimeUpdate = System.nanoTime();
+			}
+		}
+	}
+	public void endWaitOnCASPool()
+	{
+		synchronized( waitmux ) 
+		{
+			long delta= (System.nanoTime() - lastCASWaitTimeUpdate); 
+			totalWaitTimeForCAS += delta;
+			waitingForCAS = false;
+		}
+	}
+
+
+	
+	public long getTimeWaitingForCAS()
+	{
+		synchronized( waitmux )
+		{
+			long now = System.nanoTime();
+			if ( waitingForCAS )
+			{
+				long delta= (System.nanoTime() - lastCASWaitTimeUpdate); 
+				totalWaitTimeForCAS += delta;
+				lastCASWaitTimeUpdate = now;					
+			}
+			return totalWaitTimeForCAS;
 		}
 	}
 	
-	public void incrementTimeSpentInCMGetNext(long aTimeSpentInCMGetNext )
+	
+	
+	public void beginWaitOnShadowCASPool()
 	{
-		synchronized (sem ) 
+		synchronized( shadowPoolMux )
 		{
-			timeSpentInCMGetNext += aTimeSpentInCMGetNext;
+			if ( !waitingForSPCAS )
+			{
+				waitingForSPCAS = true;
+				lastSPCASWaitTimeUpdate = System.nanoTime();
+			}
 		}
 	}
-	public double getTimeSpentInCMGetNext()
+	public void endWaitOnShadowCASPool()
 	{
-//		synchronized (sem ) 
-//		{
-//			return (double)timeSpentInCMGetNext/(double)1000000;
-//		}
-		
-		if ( controller != null )
+		synchronized( shadowPoolMux ) 
 		{
-			//	Force update of the wait time
-			return ((double)controller.getTimeWaitingForCAS()/(double) 1000000);
+			long delta= (System.nanoTime() - lastSPCASWaitTimeUpdate); 
+			shadowCasPoolWaitTime += delta;
+			waitingForSPCAS = false;
 		}
-		else
+	}
+	
+	public long getTimeWaitingForShadowPoolCAS()
+	{
+		synchronized( shadowPoolMux )
 		{
-			return 0;
-		}		
+			long now = System.nanoTime();
+			if ( waitingForSPCAS )
+			{
+				long delta= (System.nanoTime() - lastSPCASWaitTimeUpdate); 
+				shadowCasPoolWaitTime += delta;
+				lastSPCASWaitTimeUpdate = now;					
+			}
+			return shadowCasPoolWaitTime;
+		}
 		
 	}
+	
+	
+	public void beginGetNextWait()
+	{
+		synchronized( getNextMux )
+		{
+			if ( !waitingInGetNext )
+			{
+				waitingInGetNext = true;
+				lastGetNextWaitTimeUpdate = System.nanoTime();
+			}
+			else
+			{
+				
+			}
+		}
+	}
+	public void endGetNextWait()
+	{
+		synchronized( getNextMux )
+		{
+			long delta= (System.nanoTime() - lastGetNextWaitTimeUpdate); 
+			totalGetNextWaitTime += delta;
+			waitingInGetNext = false;
+		}
+	}
+	
+	public long getTimeWaitingInGetNext()
+	{
+		synchronized( getNextMux )
+		{
+			long now = System.nanoTime();
+			if ( waitingInGetNext )
+			{
+				long delta= (System.nanoTime() - lastGetNextWaitTimeUpdate); 
+				totalGetNextWaitTime += delta;
+				lastGetNextWaitTimeUpdate = now;					
+			}
+			return totalGetNextWaitTime;
+		}
 
+	}
+	
+	
+	
 }

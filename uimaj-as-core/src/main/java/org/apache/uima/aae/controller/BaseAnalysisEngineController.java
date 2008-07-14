@@ -1953,50 +1953,6 @@ implements AnalysisEngineController, EventSubscriber
 			}
 		}
 
-		public void beginWait()
-		{
-			synchronized( waitmux )
-			{
-				if ( !waitingForCAS )
-				{
-					waitingForCAS = true;
-					lastCASWaitTimeUpdate = System.nanoTime();
-				}
-				else
-				{
-					
-				}
-			}
-		}
-		public void endWait()
-		{
-			synchronized( waitmux )
-			{
-				long delta= (System.nanoTime() - lastCASWaitTimeUpdate); 
-				totalWaitTimeForCAS += delta;
-				waitingForCAS = false;
-			}
-		}
-
-		public long getTimeWaitingForCAS()
-		{
-			synchronized( waitmux )
-			{
-				long now = System.nanoTime();
-				if ( waitingForCAS )
-				{
-					long delta= (System.nanoTime() - lastCASWaitTimeUpdate); 
-					totalWaitTimeForCAS += delta;
-					lastCASWaitTimeUpdate = now;					
-					return totalWaitTimeForCAS;
-				}
-				else
-				{
-					return totalWaitTimeForCAS;
-				}
-			}
-			
-		}
 		private class AnalysisThreadState
 		{
 			private boolean isIdle = false;

@@ -37,7 +37,6 @@ import org.apache.uima.util.Level;
 public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 
 	private static final Class CLASS_NAME = JmxMonitorListener.class;
-	private int maxNameLength=0;
 	private boolean firsttime = true;
 	private double lastSampleTime = 0;
 	private double period;
@@ -74,7 +73,7 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 				items = items + "\t" + srvName + "-CASes";
 				items = items + "\t" + srvName + "-InQ";
 				items = items + "\t" + srvName + "-S/S CPW";
-				items = items + "\t" + srvName + "-CM CPW";
+				items = items + "\t" + srvName + "-CMgetNext";
 			}
 			UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, items);
 		}
