@@ -1489,7 +1489,7 @@
                            endpoint="{if (@endpoint) then @endpoint
                                                      else if (@queueName) then @queueName
                                                                           else ''}"
-                           prefetch="{if (@prefetch) then @prefetch else '1'}"/>
+                           prefetch="{if (@prefetch) then @prefetch else '0'}"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -1498,7 +1498,7 @@
                        endpoint="{if (@endpoint) then @endpoint
                                                  else if (@queueName) then @queueName
                                                                       else ''}"
-                       prefetch="{if (@prefetch) then @prefetch else '1'}"/>    
+                       prefetch="{if (@prefetch) then @prefetch else '0'}"/>    
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
