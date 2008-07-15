@@ -269,7 +269,8 @@ public class JmxMonitor implements Runnable {
 		boolean initial = true;
 		while( running )
 		{
-			long uptime = System.nanoTime() - startTime;
+			long sampleStart = System.nanoTime();
+			long uptime = sampleStart - startTime;
 			
 			ServiceMetrics[] metrics = new ServiceMetrics[servicePerformanceNames.size()];
 			int index = 0;
@@ -344,21 +345,32 @@ public class JmxMonitor implements Runnable {
 				}
 				catch( Exception e){e.printStackTrace();}
 			} // for
+			initial = false;
+			
+			//	Notify listeners with current metrics collected from MBeans
+			notifyListeners(uptime, metrics);
+
+			long sampleEnd = System.nanoTime();
+			long time2wait;
+			if (interval > (sampleEnd - sampleStart)/1000000) {
+				time2wait = interval - (sampleEnd - sampleStart)/1000000;
+			}
+			else {
+				// Increase interval to a multiple of the requested interval 
+				long newInterval = interval * ( 1 + ((sampleEnd - sampleStart)/1000000) / interval);
+				time2wait = newInterval - (sampleEnd - sampleStart)/1000000;
+			}
 			synchronized( this )
 			{
 				try
 				{
-					wait(interval);
+					wait(time2wait);
 				}
 				catch( InterruptedException e)
 				{
 					running = false;
 				}
 			}
-			initial = false;
-			
-			//	Notify listeners with current metrics collected from MBeans
-			notifyListeners(uptime, metrics);
 		}
 		
 		running = false;
