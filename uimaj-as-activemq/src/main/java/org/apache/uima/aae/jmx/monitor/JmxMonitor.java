@@ -350,16 +350,19 @@ public class JmxMonitor implements Runnable {
 			//	Notify listeners with current metrics collected from MBeans
 			notifyListeners(uptime, metrics);
 
+			// compute wait time till next sample 
 			long sampleEnd = System.nanoTime();
 			long time2wait;
-			if (interval > (sampleEnd - sampleStart)/1000000) {
-				time2wait = interval - (sampleEnd - sampleStart)/1000000;
+			long timeLost = (200000 + sampleEnd - sampleStart)/1000000;
+			if (interval > timeLost) {
+				time2wait = interval - timeLost;
 			}
 			else {
 				// Increase interval to a multiple of the requested interval 
-				long newInterval = interval * ( 1 + ((sampleEnd - sampleStart)/1000000) / interval);
-				time2wait = newInterval - (sampleEnd - sampleStart)/1000000;
+				long newInterval = interval * ( 1 + (timeLost / interval));
+				time2wait = newInterval - timeLost;
 			}
+
 			synchronized( this )
 			{
 				try
