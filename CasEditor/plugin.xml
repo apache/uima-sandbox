@@ -263,7 +263,7 @@
 			name="Cas Editor">
 			<property
          name="aboutText"
-         value="Cas Editor&#x0A;Apache UIMA Version 2.2.2-incubating&#x0A;Copyright 2006, 2008 The Apache Software Foundation&#x0D;&#x0D;This product includes software developed at&#x0A;The Apache Software Foundation (http://www.apache.org/).&#x0A;&#x0A;This product contains icons developed by the SVG Icons project &#x0A;(http://sourceforge.net/projects/svgicons), licensed under the &#x0A;BSD license (see LICENSE file).&#x0A;&#x0A;This product includes software developed at the &#x0A;Eclipse Foundation (http://wwww.eclipse.org/)."/>
+         value="Cas Editor&#x0A;Apache UIMA Version 2.2.2-incubating&#x0A;Copyright 2006, 2008 The Apache Software Foundation&#x0A;&#x0A;This product includes software developed at&#x0A;The Apache Software Foundation (http://www.apache.org/).&#x0A;&#x0A;This product contains icons developed by the SVG Icons project &#x0A;(http://sourceforge.net/projects/svgicons), licensed under the &#x0A;BSD license (see LICENSE file).&#x0A;&#x0A;This product includes software developed at the &#x0A;Eclipse Foundation (http://wwww.eclipse.org/).&#x0D;&#x0D;This software includes/uses ICU ( http://source.icu-project.org )&#x0A;Copyright (c) 1995-2006 International Business Machines Corporation&#x0A;and others."/>
 
 			<property name="preferenceCustomization"
 				value="plugin_customization.ini" />

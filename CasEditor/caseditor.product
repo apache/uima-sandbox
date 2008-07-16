@@ -37,7 +37,9 @@ This product contains icons developed by the SVG Icons project
 BSD license (see LICENSE file).
 
 This product includes software developed at the 
-Eclipse Foundation (http://wwww.eclipse.org/).
+Eclipse Foundation (http://wwww.eclipse.org/).This software includes/uses ICU ( http://source.icu-project.org )
+Copyright (c) 1995-2006 International Business Machines Corporation
+and others.
       </text>
    </aboutInfo>
 
@@ -63,6 +65,7 @@ Eclipse Foundation (http://wwww.eclipse.org/).
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
       <linux type="ee">J2SE-1.5</linux>

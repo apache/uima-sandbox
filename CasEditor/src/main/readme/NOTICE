@@ -10,3 +10,7 @@ BSD license (see LICENSE file).
 
 This product includes software developed at the 
 Eclipse Foundation (http://wwww.eclipse.org/).
+
+This software includes/uses ICU ( http://source.icu-project.org )
+Copyright (c) 1995-2006 International Business Machines Corporation
+and others.
