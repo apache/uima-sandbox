@@ -19,6 +19,7 @@
 
 package org.apache.uima.aae.controller;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -220,7 +221,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	public void collectionProcessComplete(Endpoint anEndpoint)// throws AsynchAEException
 	{
 		AnalysisEngine ae = null;
-		long start = System.nanoTime();
+//		long start = System.nanoTime();
+		long start = super.getCpuTime();
 		try
 		{
 			ae = aeInstancePool.checkout();
@@ -229,7 +231,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				ae.collectionProcessComplete();
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_all_cases_processed__FINEST", new Object[] { getComponentName() });
-			getServicePerformance().incrementAnalysisTime(System.nanoTime()-start);
+			getServicePerformance().incrementAnalysisTime(super.getCpuTime()-start);
+//			getServicePerformance().incrementAnalysisTime(System.nanoTime()-start);
 			getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, anEndpoint);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_completed__FINE", new Object[] { getComponentName()});
 			//getServicePerformance().reset();
@@ -324,42 +327,40 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			//	Get input CAS entry from the InProcess cache
 			CacheEntry inputCASEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 
-			long time = System.nanoTime();
+			long time = super.getCpuTime();
 			long totalProcessTime = 0;  // stored total time spent producing ALL CASes
 			CasIterator casIterator = ae.processAndOutputNewCASes(aCAS);
 			//	Store how long it took to call processAndOutputNewCASes()
-			totalProcessTime = ( System.nanoTime() - time);
+			totalProcessTime = ( super.getCpuTime() - time);
 			long sequence = 1;
 			long hasNextTime = 0;         // stores time in hasNext()
 			long getNextTime = 0;         // stores time in next();   
 			boolean moreCASesToProcess = true;
-			
-			
 			while (moreCASesToProcess)
 			{
 				long timeToProcessCAS = 0;    // stores time in hasNext() and next() for each CAS
-				hasNextTime = System.nanoTime();
+				hasNextTime = super.getCpuTime();
 				if ( !casIterator.hasNext() )
 				{
 					moreCASesToProcess = false;
 					//	Measure how long it took to call hasNext()
-					timeToProcessCAS = (System.nanoTime()-hasNextTime);
+					timeToProcessCAS = (super.getCpuTime()-hasNextTime);
 					totalProcessTime += timeToProcessCAS;
 					break;
 				}
 				//	Measure how long it took to call hasNext()
-				timeToProcessCAS = (System.nanoTime()-hasNextTime);
-				getNextTime = System.nanoTime();
+				timeToProcessCAS = (super.getCpuTime()-hasNextTime);
+				getNextTime = super.getCpuTime();
 				
 				//	Get the next CAS. Aggregate time spent waiting for the CAS
-				getServicePerformance().beginGetNextWait();
+				//getServicePerformance().beginGetNextWait();
 				CAS casProduced = casIterator.next();
-				getServicePerformance().endGetNextWait();
+				//getServicePerformance().endGetNextWait();
 				
-				long delta = System.nanoTime() - getNextTime;
+				//long delta = super.getCpuTime() - getNextTime;
 				
 				//	Add how long it took to call next()
-				timeToProcessCAS += (System.nanoTime()- getNextTime);
+				timeToProcessCAS += (super.getCpuTime()- getNextTime);
                 //	Add time to call hasNext() and next() to the running total
 				totalProcessTime += timeToProcessCAS;
 				
@@ -422,26 +423,15 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	and are no longer needed
 				dropCasStatistics(newEntry.getCasReferenceId());
 				//	Increment number of CASes processed by this service
-				//getServicePerformance().incrementNumberOfCASesProcessed();
-//				getServicePerformance().incrementAnalysisTime(timeToProcessCAS);
 				sequence++;
 			}
-/*
-			LongNumericStatistic statistic = null;
-			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.TotalAEProcessTime)) != null )
-			{
-				//	Increment how long it took to process the input CAS. This timer is exposed via JMX
-				statistic.increment(totalProcessTime);
-			}
-*/			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (System.nanoTime() - time) / (double) 1000000 });
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (super.getCpuTime() - time) / (double) 1000000 });
 			getMonitor().resetCountingStatistic("", Monitor.ProcessErrorCount);
 			
 			// Store total time spent processing this input CAS
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
 			//	Aggregate total time spent processing in this service. This is separate from per CAS stats above 
 			getServicePerformance().incrementAnalysisTime(totalProcessTime);
-			
 			synchronized( cmOutstandingCASes )
 			{
 				if ( cmOutstandingCASes.size() == 0)

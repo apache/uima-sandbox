@@ -19,6 +19,8 @@
 
 package org.apache.uima.aae.controller;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -490,6 +492,7 @@ implements AnalysisEngineController, EventSubscriber
 		if ( this instanceof PrimitiveAnalysisEngineController )
 		{
 			pServiceInfo = ((PrimitiveAnalysisEngineController)this).getServiceInfo();
+			servicePerformance.setProcessThreadCount(((PrimitiveAnalysisEngineController)this).getServiceInfo().getAnalysisEngineInstanceCount());
 		}
 		else
 		{
@@ -733,26 +736,7 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		return replyTime;
 	}
-/*	
-	public long getIdleTime( String aKey )
-	{
-		return idleTime;
-	}
-*/	
-	public synchronized void saveIdleTime( long snapshot, String aKey, boolean accumulate )
-	{
-		if ( accumulate )
-		{
-			LongNumericStatistic statistic;
-			//	Accumulate idle time across all processing threads
-			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.IdleTime)) != null )
-			{
-				statistic.increment(snapshot);
-			}
-		}
-		getServicePerformance().incrementIdleTime(snapshot);
-		idleTime += snapshot;
-	}
+
 	protected void handleAction( String anAction, String anEndpoint, ErrorContext anErrorContext )
 	throws Exception
 	{
@@ -1870,27 +1854,6 @@ implements AnalysisEngineController, EventSubscriber
 			}
 			return 0;
 		}
-/*		
-		public void resetIdleTimeBetweenProcessCalls()
-		{
-			synchronized( mux )
-			{
-				
-				AnalysisThreadState threadState = null;
-				if ( threadStateMap.containsKey(Thread.currentThread().getId()))
-				{
-					threadState = threadStateMap.get(Thread.currentThread().getId());
-				}
-				else
-				{
-					Set<Long> set = threadStateMap.keySet();
-					Iterator<Long> it = set.iterator();
-					threadState = threadStateMap.get(it.next());
-				}
-				threadState.setLastMessageDispatchTime();
-			}
-		}
-*/	
 		public long getIdleTime()
 		{
 			synchronized( mux )
@@ -1900,8 +1863,6 @@ implements AnalysisEngineController, EventSubscriber
 				long serviceIdleTime = 0;
 				Set<Long> set = threadStateMap.keySet();
 				howManyThreads = threadStateMap.size();
-//				System.out.println("Controller:"+ getComponentName()+" Number of Process Treads::::::::::::::::::::::"+howManyThreads);
-				
 				//	Iterate over all processing threads to calculate the total amount of idle time 
 				for(Long key: set )
 				{	
@@ -1920,7 +1881,6 @@ implements AnalysisEngineController, EventSubscriber
 
 						 threadState.setLastUpdate(System.nanoTime());
 
-//							System.out.println("Controller:"+ getComponentName()+" IS IDLE --------------------");
 						 //	increment total idle time
 						 threadState.incrementIdleTime(delta);
 						 //	add the elapsed time since the last update to the total idle time
@@ -1951,6 +1911,21 @@ implements AnalysisEngineController, EventSubscriber
 					}
 				}
 			}
+		}
+
+		/**
+		 * Returns CPU Time with nanosecond precision (not nanosecond accuracy). If the OS/JVM
+		 * does not support reporting the CPU Time, returns the wall clock time. 
+		 */
+		public synchronized long getCpuTime() 
+		{
+			if ( ManagementFactory.getPlatformMBeanServer() != null )
+			{
+				//ManagementFactory.getRuntimeMXBean().getVmVersion();
+				ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+			    return bean.isCurrentThreadCpuTimeSupported( ) ? bean.getCurrentThreadCpuTime( ) : System.nanoTime();
+			}
+			return System.nanoTime();
 		}
 
 		private class AnalysisThreadState

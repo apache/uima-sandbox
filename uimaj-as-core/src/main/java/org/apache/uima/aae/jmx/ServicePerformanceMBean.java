@@ -35,4 +35,5 @@ public interface ServicePerformanceMBean extends Serializable
 	public double getCasPoolWaitTime();
 	public double getShadowCasPoolWaitTime();
 	public double getTimeSpentInCMGetNext();
+	public int getProcessThreadCount();
 }

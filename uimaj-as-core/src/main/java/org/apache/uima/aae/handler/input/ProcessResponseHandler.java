@@ -212,14 +212,14 @@ public class ProcessResponseHandler extends HandlerBase
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId, xmi });
 			}
 			
-			long t1 = System.nanoTime();
+			long t1 = getController().getCpuTime();
 			
 			synchronized (monitor)
 			{
 				XmiSerializationSharedData deserSharedData;
 				if (totalNumberOfParallelDelegatesProcessingCas > 1 && cacheEntry.howManyDelegatesResponded() > 0)
 				{
-          // process secondary reply from a parallel step
+					// process secondary reply from a parallel step
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_delegate_responded_count_FINEST",
 			                new Object[] { cacheEntry.howManyDelegatesResponded(), casReferenceId});
@@ -229,18 +229,18 @@ public class ProcessResponseHandler extends HandlerBase
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_high_water_mark_FINEST",
 			                new Object[] { highWaterMark, casReferenceId });
 
-          deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
+					deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
 					UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark);
 				}
-        else // general case, or first reply from a parallel step
+				else // general case, or first reply from a parallel step
 				{
 					//	Processing the reply from a standard, non-parallel delegate
-          deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-          if (deserSharedData == null) {
-            deserSharedData = new XmiSerializationSharedData();
-            getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).setXmiSerializationData(deserSharedData);
-          }
-          UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+					deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
+					if (deserSharedData == null) {
+						deserSharedData = new XmiSerializationSharedData();
+						getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).setXmiSerializationData(deserSharedData);
+					}
+					UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 				}
 			}
 
@@ -253,7 +253,7 @@ public class ProcessResponseHandler extends HandlerBase
 				}
 			}
 		
-			long timeToDeserializeCAS = System.nanoTime() - t1;
+			long timeToDeserializeCAS = getController().getCpuTime() - t1;
 
             getController().
             	getServicePerformance().

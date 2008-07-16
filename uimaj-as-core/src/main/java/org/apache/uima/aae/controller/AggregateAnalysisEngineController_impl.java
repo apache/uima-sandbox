@@ -2066,49 +2066,4 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		return childControllerList;
 	}
-/*	
-	//	This is called every time a request comes
-	public void beginProcess(int msgType)
-	{
-		synchronized( mux )
-		{
-			isIdle = false;
-			long now = System.nanoTime();
-			lastUpdate = now;
-		}
-	}
-	//	This is called every time a request is completed
-	public void endProcess(int msgType)
-	{
-		synchronized( mux )
-		{
-			isIdle = true;
-			long now = System.nanoTime();
-			lastUpdate = now;
-		}
-	}
-	public long getIdleTime()
-	{
-//		synchronized( mux )
-//		{
-//			long now = System.nanoTime();
-//			if ( isIdle )
-//			{
-//				long delta = (now -lastUpdate);
-//				totalIdleTime = delta;
-//			}
-//			return totalIdleTime;
-//		}
-		synchronized( mux )
-		{
-			long now = System.nanoTime();
-			if ( isIdle )
-			{
-				long delta = (now -lastUpdate);
-				totalIdleTime =+ delta;
-			}
-			return totalIdleTime;
-		}
-	}
-*/
 }

@@ -135,7 +135,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		String xmi = aMessageContext.getStringMessage();
 		
 		//	Time how long we wait on Cas Pool to fetch a new CAS
-		long t1 = System.nanoTime();
+		long t1 = getController().getCpuTime();
 		// ************************************************************************* 
 		//	Fetch CAS from a Cas Pool. If the CAS came from a Cas Multiplier
 		//	fetch the CAS from a shadow CAS pool. Otherwise, fetch the CAS
@@ -143,7 +143,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		// ************************************************************************* 
 
 		CAS cas = getCAS(aMessageContext.propertyExists(AsynchAEMessage.CasSequence), shadowCasPoolKey, aMessageContext.getEndpoint().getEndpoint());
-		long timeWaitingForCAS = System.nanoTime() - t1;
+		long timeWaitingForCAS = getController().getCpuTime() - t1;
 		//	Check if we are still running
 		if ( getController().isStopped() )
 		{
@@ -154,10 +154,10 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		// ************************************************************************* 
 		//	Deserialize the CAS from the message
 		// ************************************************************************* 
-	    t1 = System.nanoTime();
+	    t1 = getController().getCpuTime();
 		XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
 		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
-		long timeToDeserializeCAS = System.nanoTime() - t1;
+		long timeToDeserializeCAS = getController().getCpuTime() - t1;
 
 		LongNumericStatistic statistic;
 		if ( (statistic = getController().getMonitor().getLongNumericStatistic("",Monitor.TotalDeserializeTime)) != null )

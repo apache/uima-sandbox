@@ -260,14 +260,11 @@ public abstract class HandlerBase implements Handler
 				long timeToSerializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToSerializeCAS)).longValue();
 				if ( timeToSerializeCAS > 0)
 				{
-//					casStats.incrementCasSerializationTime(timeToSerializeCAS);
 					if ( delegateServicePerformance != null )
 					{
 						delegateServicePerformance.
 						incrementCasSerializationTime(timeToSerializeCAS);
 					}
-//					getController().getServicePerformance().
-//						incrementCasSerializationTime(timeToSerializeCAS);
 				}
 			}
 			if (aMessageContext.propertyExists(AsynchAEMessage.TimeToDeserializeCAS))
@@ -275,39 +272,21 @@ public abstract class HandlerBase implements Handler
 				long timeToDeserializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToDeserializeCAS)).longValue();
 				if ( timeToDeserializeCAS > 0 )
 				{
-//					casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
-
 					if ( delegateServicePerformance != null )
 					{
 						delegateServicePerformance.
 							incrementCasDeserializationTime(timeToDeserializeCAS);
 					}
-//					getController().getServicePerformance().
-//						incrementCasDeserializationTime(timeToDeserializeCAS);
 				}
 			}
 
 			if (aMessageContext.propertyExists(AsynchAEMessage.IdleTime))
 			{
 				long idleTime = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.IdleTime)).longValue();
-				if ( idleTime > 0 )
+				if ( idleTime > 0 && delegateServicePerformance != null )
 				{
 					Endpoint endp = aMessageContext.getEndpoint();
-					if ( endp != null && endp.isRemote() )
-					{
-						if ( delegateServicePerformance != null )
-						{
-							
-							delegateServicePerformance.incrementIdleTime(idleTime);
-						}
-						else
-						{
-							System.out.println("!!!!!!!!!!!!handlerBase -- delegateServicePerformance is NULL !!!!!!!!!!!!!!!!!!!!!");
-						}
-				
-					}
-					//					casStats.incrementIdleTime(idleTime);
-					else if ( delegateServicePerformance != null )
+					if ( endp != null && endp.isRemote())
 					{
 						delegateServicePerformance.incrementIdleTime(idleTime);
 					}
@@ -329,15 +308,18 @@ public abstract class HandlerBase implements Handler
 			if (aMessageContext.propertyExists(AsynchAEMessage.TimeInProcessCAS))
 			{
 				long timeInProcessCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeInProcessCAS)).longValue();
-//				casStats.incrementAnalysisTime(timeInProcessCAS);
-				if ( delegateServicePerformance != null )
+				Endpoint endp = aMessageContext.getEndpoint();
+				if ( endp != null && endp.isRemote())
 				{
-					delegateServicePerformance.
-						incrementAnalysisTime(timeInProcessCAS);
+					if ( delegateServicePerformance != null )
+					{
+						delegateServicePerformance.incrementAnalysisTime(timeInProcessCAS);
+					}
 				}
-				//	Accumulate processing time
-				getController().getServicePerformance().
-					incrementAnalysisTime(timeInProcessCAS);
+				else 
+				{
+					getController().getServicePerformance().incrementAnalysisTime(timeInProcessCAS);
+				}
 				if ( inputCasReferenceId != null )
 				{
 					ServicePerformance inputCasStats = 

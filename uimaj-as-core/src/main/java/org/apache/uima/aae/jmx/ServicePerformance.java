@@ -46,7 +46,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 	private boolean isRemoteDelegate = false;
 	private long uptime = System.nanoTime();
 	long lastUpdate=System.nanoTime();
-	
+	private int processThreadCount=1;
 	
 	private Object waitmux = new Object();
 	
@@ -362,6 +362,14 @@ public class ServicePerformance implements ServicePerformanceMBean
 			return totalGetNextWaitTime;
 		}
 
+	}
+
+	public int getProcessThreadCount() {
+		return processThreadCount;
+	}
+
+	public void setProcessThreadCount(int processThreadCount) {
+		this.processThreadCount = processThreadCount;
 	}
 	
 	

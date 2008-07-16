@@ -32,6 +32,8 @@ public class ServiceMetrics {
 	private boolean isCasMultiplier;
 	private boolean topLevelService;
 	private long queueDepth;
+	private int processThreadCount;
+	private double analysisTime;
 	
 	public boolean isTopLevelService() {
 		return topLevelService;
@@ -105,6 +107,18 @@ public class ServiceMetrics {
 	public void setQueueDepth(long queueDepth) {
 		this.queueDepth = queueDepth;
 	}
-	
+	public int getProcessThreadCount() {
+		return processThreadCount;
+	}
+	public void setProcessThreadCount(int aProcessThreadCount) {
+		processThreadCount = aProcessThreadCount;
+	}
+	public double getAnalysisTime() {
+		return analysisTime;
+	}
+	public void setAnalysisTime(double analysisTime) {
+		this.analysisTime = analysisTime;
+	}
+
 	
 }

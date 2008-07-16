@@ -58,10 +58,6 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	public InputChannel getInputChannel();
 
 	public InputChannel getInputChannel(String aQueueName );
-/*	
-	public long getIdleTime( String aKey );
-*/	
-	public void saveIdleTime( long snapshot, String aKey, boolean accumulate );
 
 	public void saveReplyTime( long snapshot, String aKey );
 	
@@ -180,5 +176,6 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	
 	//	Returns the idle time between process CAS calls
 	public long getIdleTimeBetweenProcessCalls(int msgType);
-	
+
+	public long getCpuTime();
 }

@@ -69,11 +69,14 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 			for( ServiceMetrics serviceMetrics: metrics ) {
 				String srvName = serviceMetrics.getServiceName();
 				srvName = srvName.substring(0, srvName.indexOf("_Service Performance"));
+				items = items + "\t" + srvName + "-CPU";
 				items = items + "\t" + srvName + "-Idle";
 				items = items + "\t" + srvName + "-CASes";
 				items = items + "\t" + srvName + "-InQ";
-				items = items + "\t" + srvName + "-S/S CPW";
-				items = items + "\t" + srvName + "-CMgetNext";
+				if (serviceMetrics.isTopLevelService() ||
+						(serviceMetrics.isCasMultiplier() && serviceMetrics.isServiceRemote()) ) {
+					items = items + "\t" + srvName + "-CPW";
+				}
 			}
 			UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, items);
 		}
@@ -84,16 +87,16 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 		lastSampleTime = sampleTime;
 		for( ServiceMetrics serviceMetrics: metrics )
 		{
+			items = items + "\t" + format(serviceMetrics.getAnalysisTime()/period);
 			items = items + "\t" + format(serviceMetrics.getIdleTime()/period);
 			items = items + "\t" + serviceMetrics.getProcessCount();
 			items = items + "\t" + serviceMetrics.getQueueDepth();
-			if ( serviceMetrics.isCasMultiplier() && serviceMetrics.isServiceRemote() && !serviceMetrics.isTopLevelService() ) {
-				items = items + "\t" + format(serviceMetrics.getShadowCasPoolWaitTime()/period);
-			}
-			else {
+			if ( serviceMetrics.isTopLevelService() ) {
 				items = items + "\t" + format(serviceMetrics.getCasPoolWaitTime()/period);
 			}
-			items = items + "\t" + format(serviceMetrics.getTimeInCMGetNext()/period);
+			if ( serviceMetrics.isCasMultiplier() && serviceMetrics.isServiceRemote() ) {
+				items = items + "\t" + format(serviceMetrics.getShadowCasPoolWaitTime()/period);
+			}
 		}
 		UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, items);
 	}
