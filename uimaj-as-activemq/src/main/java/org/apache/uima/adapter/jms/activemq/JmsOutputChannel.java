@@ -172,7 +172,7 @@ public class JmsOutputChannel implements OutputChannel
 	public String serializeCAS(boolean isReply, CAS aCAS, String aCasReferenceId, String aSerializerKey) throws Exception
 	{
 		
-		long start = System.nanoTime();
+		long start = getAnalysisEngineController().getCpuTime();
 		
 		String serializedCas = null;
 		
@@ -236,7 +236,7 @@ public class JmsOutputChannel implements OutputChannel
 		LongNumericStatistic statistic;
 		if ( (statistic = getAnalysisEngineController().getMonitor().getLongNumericStatistic("",Monitor.TotalSerializeTime)) != null )
 		{
-			statistic.increment(System.nanoTime() - start);
+			statistic.increment(getAnalysisEngineController().getCpuTime() - start);
 		}
 		
 		return serializedCas;
@@ -494,7 +494,6 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			if (anEndpoint.isRemote())
 			{
-				long t1 = System.nanoTime();
 				String serializedCAS = getSerializedCasAndReleaseIt(false, aCasReferenceId,anEndpoint, anEndpoint.isRetryEnabled());
 				if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 				{
@@ -925,7 +924,8 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-				long t1 = System.nanoTime();
+//				long t1 = System.nanoTime();
+				long t1 = getAnalysisEngineController().getCpuTime();
 				//	Serialize CAS for remote Delegates
 				String serializer = anEndpoint.getSerializer();
 				if ( serializer == null || serializer.trim().length() == 0)
@@ -933,7 +933,8 @@ public class JmsOutputChannel implements OutputChannel
 					serializer = "xmi";
 				}
 				serializedCAS = serializeCAS(isReply, cas, aCasReferenceId, serializer);
-				long timeToSerializeCas = System.nanoTime()-t1;
+//				long timeToSerializeCas = System.nanoTime()-t1;
+				long timeToSerializeCas = getAnalysisEngineController().getCpuTime()-t1;
 				entry.incrementTimeToSerializeCAS(timeToSerializeCas);
 				casStats.incrementCasSerializationTime(timeToSerializeCas);
 				getAnalysisEngineController().getServicePerformance().
@@ -1037,18 +1038,13 @@ public class JmsOutputChannel implements OutputChannel
 					getAnalysisEngineController().getCasStatistics(aCasReferenceId);
 				
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
-//					aTextMessage.setLongProperty(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
-//				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, anEndpoint.getIdleTime() );
 				long iT =getAnalysisEngineController().getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
-//				long iT =getAnalysisEngineController().getIdleTime(); 
-//				System.out.println("##### Controller:"+getAnalysisEngineController().getComponentName()+" Adding Idle Time To Reply Msg:"+iT);
-//				getAnalysisEngineController().resetIdleTimeBetweenProcessCalls();
 				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, iT );
-				String lookupKey = getAnalysisEngineController().getName();//getInProcessCache().getMessageAccessorByReference(aCasReferenceId).getEndpointName();
+				String lookupKey = getAnalysisEngineController().getName();
 				long arrivalTime = getAnalysisEngineController().getTime( aCasReferenceId, lookupKey); //serviceInputEndpoint);
-				long timeInService = System.nanoTime()-arrivalTime;
+				long timeInService = getAnalysisEngineController().getCpuTime()-arrivalTime;
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "populateStats", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timein_service__FINEST",
 	                    new Object[] { serviceInputEndpoint, (double)timeInService/(double)1000000 });

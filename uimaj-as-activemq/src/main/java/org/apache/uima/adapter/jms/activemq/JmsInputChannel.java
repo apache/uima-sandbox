@@ -436,51 +436,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		return false;
 	}
 	
-	public synchronized long computeIdleTime()
-	{
-		try
-		{
-/*
-			boolean isAggregate = getController() instanceof AggregateAnalysisEngineController;
-			if ( isAggregate || !getController().isCasMultiplier() )
-//				if ( isAggregate || !((PrimitiveAnalysisEngineController)getController()).isMultiplier() )
-			{
-				long lastReplyTime = getController().getReplyTime();
-				if ( lastReplyTime > 0 )
-				{
-					long t = System.nanoTime();
-					long delta = t-(long)lastReplyTime;
-					getController().saveIdleTime(delta, "", true);
-					return delta;
-				}
-			}
-
-*/		
-			long lastReplyTime = getController().getReplyTime();
-			if ( lastReplyTime > 0 )
-			{
-				long t = System.nanoTime();
-				long delta = t-(long)lastReplyTime;
-				getController().saveIdleTime(delta, "", true);
-				return delta;
-			}
-
-		
-		
-		
-		}
-		catch( Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 0;
-	}
-	
-	public void checkpoint()
-	{
-		computeIdleTime();
-	}
-	
 	private boolean isCheckpointWorthy( Message aMessage ) throws Exception
 	{
 		synchronized( mux )
@@ -817,22 +772,5 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	{
 		return stopped;
 	}
-/*	
-	private void spinThreadForListenerShutdown(final UimaDefaultMessageListenerContainer listenerContainer)
-	{
-		new Thread("Shutdown Thread For Listener:"+listenerContainer.getEndpointName()) {
-			public void run()
-			{
-				try
-				{
-					listenerContainer.stop();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
-			                "spinThreadForListenerShutdown.run()", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stop_listener__INFO",
-			                new Object[] {  listenerContainer.getEndpointName() });
-				}
-				catch( Exception e) { e.printStackTrace();}
-			}
-		}.start();
-	}
-*/	
+
 }

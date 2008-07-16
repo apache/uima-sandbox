@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
@@ -59,6 +60,7 @@ import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.collection.EntityProcessStatus;
+import org.apache.uima.util.ProcessTraceEvent;
 import org.apache.uima.util.XMLInputSource;
 
 /**
@@ -389,7 +391,17 @@ public class RunRemoteAsyncAE {
       }
       
       //if output dir specified, dump CAS to XMI
-      System.out.println("Process CAS request completed.");
+      System.out.println("Process CAS request completed");
+//      System.out.println("Process CAS request completed at " + (System.currentTimeMillis() - mStartTime));
+//		List eList = aStatus.getProcessTrace().getEventsByComponentName("UimaEE", false);
+//		for( int i=0; i < eList.size(); i++)
+//		{
+//		  ProcessTraceEvent eEvent = (ProcessTraceEvent)eList.get(i);
+//		  if (eEvent.getDescription().startsWith("Idle")) {
+//			  System.out.println("Received Process Event - "+eEvent.getDescription()+" Duration::"+eEvent.getDuration()+" ms"); // / (float) 1000000);
+//		  }
+//		}
+      
       if (outputDir != null) {
         // try to retreive the filename of the input file from the CAS
         File outFile = null;

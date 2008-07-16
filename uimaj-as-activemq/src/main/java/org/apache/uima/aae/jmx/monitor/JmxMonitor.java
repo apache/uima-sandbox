@@ -20,6 +20,8 @@ package org.apache.uima.aae.jmx.monitor;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +38,8 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.activemq.broker.jmx.QueueViewMBean;
 import org.apache.uima.aae.jmx.ServiceInfoMBean;
 import org.apache.uima.aae.jmx.ServicePerformanceMBean;
+
+import com.sun.management.OperatingSystemMXBean;
 
 /**
  *	Collects metrics from UIMA-AS Service MBeans at defined intervals and
@@ -57,7 +61,10 @@ public class JmxMonitor implements Runnable {
 	private List<JmxMonitorListener> listeners = new ArrayList<JmxMonitorListener>();
 	private int maxNameLength=0;
 	private boolean verbose = false;
-	
+    private ThreadMXBean threads = null;
+    private RuntimeMXBean runtime = null;
+    private OperatingSystemMXBean os = null;
+    
 	/**
 	 * Creates a connection to an MBean Server identified by <code>remoteServerURI</code>
 	 * 
@@ -129,10 +136,60 @@ public class JmxMonitor implements Runnable {
 	public void initialize(String remoteServerURI, long samplingInterval) throws Exception
 	{
 		interval = samplingInterval;
+		//	Connect to the remote JMX Server
 		mbsc = getServerConnection(remoteServerURI);
+		//	Fetch remote JVM's MXBeans
+		ObjectName runtimeObjName = new  ObjectName(ManagementFactory.RUNTIME_MXBEAN_NAME);
+		ObjectName threadObjName = new ObjectName(ManagementFactory.THREAD_MXBEAN_NAME);
+		ObjectName osObjName = new ObjectName( ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
 		
-		ObjectName objName = new  ObjectName(ManagementFactory.RUNTIME_MXBEAN_NAME);
+		Set<ObjectName> mbeans = mbsc.queryNames(threadObjName, null);
+	    for (ObjectName name: mbeans) 
+	    {
+	    	/*
+			1.6 Approach for creating proxies */ 
+		    threads = 
+		    	ManagementFactory.newPlatformMXBeanProxy(
+		    			mbsc, name.toString(), ThreadMXBean.class);
+		    threads.setThreadCpuTimeEnabled(true);
+		    			
+//			threads = MBeanServerInvocationHandler.newProxyInstance(mbsc, name, ThreadMXBean.class, true);
+		    long threadIds[] = threads.getAllThreadIds();
+		    for (long threadId: threadIds) 
+		    {
+		    	ThreadInfo threadInfo = threads.getThreadInfo(threadId);
+//		    	System.out.println (threadInfo.getThreadName() + " / " + threadInfo.getThreadState());
+		    }
+	    }
+
 		
+		mbeans = mbsc.queryNames(runtimeObjName, null);
+	    for (ObjectName name: mbeans) 
+	    {
+	    	/*
+			1.6 Approach for creating proxies
+		    threads = 
+		    	ManagementFactory.newPlatformMXBeanProxy(
+		    			mbsc, name.toString(), ThreadMXBean.class);
+		    			*/
+			runtime = MBeanServerInvocationHandler.newProxyInstance(mbsc, name,RuntimeMXBean.class, true);
+	    }
+	    
+		mbeans = mbsc.queryNames(osObjName, null);
+	    for (ObjectName name: mbeans) 
+	    {
+	    	/*
+			1.6 Approach for creating proxies
+		    threads = 
+		    	ManagementFactory.newPlatformMXBeanProxy(
+		    			mbsc, name.toString(), ThreadMXBean.class);
+		    			*/
+			os = MBeanServerInvocationHandler.newProxyInstance(mbsc, name,OperatingSystemMXBean.class, true);
+	    }
+	    
+	    
+	    
+	    System.out.println(runtime.getVmName()+"::"+runtime.getVmVendor()+"::"+runtime.getVmVersion());
 		//	Construct query string to fetch UIMA-AS MBean names from the JMX Server registry
 		uimaServicePattern = new ObjectName("org.apache.uima:type=ee.jms.services,*");
 		//	Construct query string to fetch Queue MBean names from the JMX Server registry
@@ -267,6 +324,7 @@ public class JmxMonitor implements Runnable {
 	{
 		running = true;
 		boolean initial = true;
+		long totalCpuTime=0;
 		while( running )
 		{
 			long sampleStart = System.nanoTime();
@@ -284,7 +342,7 @@ public class JmxMonitor implements Runnable {
 					double idleTime = entry.getServicePerformanceMBeanProxy().getIdleTime();
 					double casPoolWaitTime = entry.getServicePerformanceMBeanProxy().getCasPoolWaitTime();
 					double shadowCasPoolWaitTime = entry.getServicePerformanceMBeanProxy().getShadowCasPoolWaitTime();
-					double timeInCMGetNext = entry.getServicePerformanceMBeanProxy().getTimeSpentInCMGetNext();
+					double analysisTime = entry.getServicePerformanceMBeanProxy().getAnalysisTime();
 					long processCount = entry.getServicePerformanceMBeanProxy().getNumberOfCASesProcessed();
 					QueueViewMBean queueInfo = entry.getQueueInfo();
 
@@ -293,7 +351,6 @@ public class JmxMonitor implements Runnable {
 					{
 						queueDepth = queueInfo.getQueueSize();
 					}
-					double casPoolWait = 0.0;
 					//	compute the delta idle time by subtracting previously reported idle time from the
 					//	current idle time
 					double deltaIdleTime = 0;
@@ -302,10 +359,10 @@ public class JmxMonitor implements Runnable {
 						deltaIdleTime = idleTime - entry.getIdleTime();
 					}
 					
-					double deltaTimeInCMGetNext = 0;
-					if ( timeInCMGetNext > 0 )
+					double deltaAnalysisTime = 0;
+					if ( analysisTime > 0 )
 					{
-						deltaTimeInCMGetNext = timeInCMGetNext - entry.getWaitTimeOnCMGetNext();
+						deltaAnalysisTime = analysisTime - entry.getAnalysisTime();
 					}
 					boolean isRemote = entry.getServiceInfoMBeanProxy().getBrokerURL().startsWith("tcp:");
 					boolean topLevel = entry.getServiceInfoMBeanProxy().isTopLevel();
@@ -318,9 +375,9 @@ public class JmxMonitor implements Runnable {
 					serviceMetrics.setIdleTime(deltaIdleTime);
 					serviceMetrics.setServiceName(name.getKeyProperty("name"));
 					serviceMetrics.setProcessCount(processCount-entry.getLastCASCount());
-					serviceMetrics.setTimeInCMGetNext(deltaTimeInCMGetNext);
 					serviceMetrics.setQueueDepth(queueDepth);
-
+					serviceMetrics.setProcessThreadCount(entry.getServicePerformanceMBeanProxy().getProcessThreadCount());
+					serviceMetrics.setAnalysisTime(deltaAnalysisTime);
 					//	populate shadow CAS pool metric for remote CAS multiplier. Filter out the top level service
 					if ( entry.getServiceInfoMBeanProxy().isCASMultiplier() && isRemote && !topLevel )
 					{
@@ -340,8 +397,7 @@ public class JmxMonitor implements Runnable {
 					//	Save current metrics for the next delta
 					entry.setIdleTime(idleTime);
 					entry.incrementCASCount(processCount);
-					//entry.setWaitTimeOnCMGetNext(timeInCMGetNext);
-					entry.incrementWaitTimeOnCMGetNext(timeInCMGetNext);
+					entry.incrementAnalysisTime(analysisTime);
 				}
 				catch( Exception e){e.printStackTrace();}
 			} // for
@@ -450,6 +506,8 @@ public class JmxMonitor implements Runnable {
 		double cpWaitTime;
 		double scpWaitTime;
 		
+		double analysisTime = 0.0;
+		
 		public StatEntry( ServicePerformanceMBean perfBean, ServiceInfoMBean infoBean)
 		{
 			servicePerformanceMBeanProxy = perfBean;
@@ -521,6 +579,12 @@ public class JmxMonitor implements Runnable {
 		public void setSCPWaitTime(double aWaitTime)
 		{
 			scpWaitTime = aWaitTime;
+		}
+		public double getAnalysisTime() {
+			return analysisTime;
+		}
+		public void incrementAnalysisTime(double anAnalysisTime) {
+			analysisTime =+ anAnalysisTime;
 		}
 	}
 }
