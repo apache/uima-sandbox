@@ -29,4 +29,5 @@ public interface ServiceInfoMBean extends Serializable
 	public String[] getDeploymentDescriptor();
 	public boolean isCASMultiplier();
 	public boolean isTopLevel();
+	public String getServiceKey();
 }

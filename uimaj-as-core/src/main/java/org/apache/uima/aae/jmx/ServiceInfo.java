@@ -32,6 +32,7 @@ public class ServiceInfo implements ServiceInfoMBean
 	private String[] deploymentDescriptor= new String[] {""};
 	private boolean casMultiplier;
 	private boolean topLevel;
+	private String serviceKey;
 	
 	public ServiceInfo()
 	{
@@ -94,5 +95,13 @@ public class ServiceInfo implements ServiceInfoMBean
 	public boolean isTopLevel()
 	{
 		return topLevel;
+	}
+
+	public String getServiceKey() {
+		return serviceKey;
+	}
+
+	public void setServiceKey(String serviceKey) {
+		this.serviceKey = serviceKey;
 	}
 }

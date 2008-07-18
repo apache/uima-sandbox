@@ -145,7 +145,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			}
 			
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_primitive_ctrl_init_info__CONFIG", new Object[] { analysisEnginePoolSize });
-
+			//	Instantiate and initialize UIMA analytics
 			for (int i = 0; i < analysisEnginePoolSize; i++)
 			{
 				AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(resourceSpecifier, paramsMap);
@@ -157,7 +157,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 					analysisEngineMetadata = ae.getAnalysisEngineMetaData();
 				}
 			}
-			
 			if ( serviceInfo == null )
 			{
 				serviceInfo = new PrimitiveServiceInfo(isCasMultiplier());
@@ -166,6 +165,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			serviceInfo.setAnalysisEngineInstanceCount(analysisEnginePoolSize);
 			aeInstancePool.intialize(aeList);
 
+			
 			getMonitor().setThresholds(getErrorHandlerChain().getThresholds());
 			// Initialize Cas Manager
 			if (getCasManagerWrapper() != null)
@@ -178,9 +178,23 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 						if (isTopLevelComponent())
 						{
 							getCasManagerWrapper().initialize("PrimitiveAEService");
+							CAS cas = getCasManagerWrapper().getNewCas("PrimitiveAEService");
+							cas.release();
 						}
 					}
 					
+					//	Component's Cas Pool is registered lazily, when the process() is called for
+					//	the first time. For monitoring purposes, we need the comoponent's Cas Pool 
+					//	MBeans to register during initialization of the service though.
+					//	For a Cas Multiplier force creation of the Cas Pool and registration 
+					//	of a Cas Pool with the JMX Server. Just get the CAS and release it back 
+					//	to the component's Cas Pool.
+					if ( isCasMultiplier() && !isTopLevelComponent() )
+					{
+						CAS cas = (CAS)getUimaContext().getEmptyCas(CAS.class);
+						cas.release();
+					}
+
 					// All internal components of this Primitive have been initialized. Open the latch
 					// so that this service can start processing requests.
 					latch.openLatch(getName(), isTopLevelComponent(), true);

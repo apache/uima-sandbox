@@ -271,13 +271,11 @@ implements AnalysisEngineController, EventSubscriber
 				getUimaContextAdmin().getManagementInterface();
 			//	Override uima core jmx domain setting
 			mbean.setName(getComponentName(), getUimaContextAdmin(),jmxManagement.getJmxDomain());
-//			if ( this instanceof PrimitiveAnalysisEngineController && resourceSpecifier instanceof AnalysisEngineDescription )
 			if ( resourceSpecifier instanceof AnalysisEngineDescription )
 			{
 				//	Is this service a CAS Multiplier?
 				if ( ((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes() )
 				{
-//					casMultiplier = true;
 					System.out.println(getName()+"-Initializing CAS Pool for Context:"+getUimaContextAdmin().getQualifiedContextName());
 					System.out.println(getComponentName()+"-CasMultiplier Cas Pool Size="+aComponentCasPoolSize+" Cas Initialial Heap Size:"+anInitialCasHeapSize);
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
@@ -493,6 +491,12 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			pServiceInfo = ((PrimitiveAnalysisEngineController)this).getServiceInfo();
 			servicePerformance.setProcessThreadCount(((PrimitiveAnalysisEngineController)this).getServiceInfo().getAnalysisEngineInstanceCount());
+			//	If this is a Cas Multiplier, add the key to the JMX MBean.
+			//	This will help the JMX Monitor to fetch the CM Cas Pool MBean
+			if ( isCasMultiplier() )
+			{
+				pServiceInfo.setServiceKey(getUimaContextAdmin().getQualifiedContextName());
+			}
 		}
 		else
 		{
@@ -551,6 +555,7 @@ implements AnalysisEngineController, EventSubscriber
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "initializeComponentCasPool", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_pool_config_INFO",
 	                new Object[] { getComponentName(), getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize, anInitialCasHeapSize/4});
+			
 		}
 
 	}
