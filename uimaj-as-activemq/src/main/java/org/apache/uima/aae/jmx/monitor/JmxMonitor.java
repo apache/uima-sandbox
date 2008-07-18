@@ -38,6 +38,7 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.activemq.broker.jmx.QueueViewMBean;
 import org.apache.uima.aae.jmx.ServiceInfoMBean;
 import org.apache.uima.aae.jmx.ServicePerformanceMBean;
+import org.apache.uima.util.impl.CasPoolManagementImplMBean;
 
 import com.sun.management.OperatingSystemMXBean;
 
@@ -237,6 +238,16 @@ public class JmxMonitor implements Runnable {
 				//	If a service is co-located in the same JVM fetch the service queue proxy 
 				if ( infoMBeanProxy.getBrokerURL().startsWith("Embedded Broker"))
 				{
+
+					if ( infoMBeanProxy.isCASMultiplier())
+					{
+						CasPoolManagementImplMBean casPoolMBean = getCasPoolMBean(names, infoMBeanProxy.getServiceKey());
+						if ( casPoolMBean != null )
+						{
+							entry.setCasPoolMBean(casPoolMBean);
+						}
+					}
+					
 					//	Create a proxy to the service queue MBean
 					QueueViewMBean queueProxy = getQueueMBean(mbsc, infoMBeanProxy.getInputQueueName());
 					if (queueProxy != null )
@@ -293,7 +304,6 @@ public class JmxMonitor implements Runnable {
 	{
 		String target = key+"_Service Info";
 		for (ObjectName name : names) {
-			ServiceInfoMBean infoMBeanProxy = null;
 			if ( name.toString().equals(target) )
 			{
 				return MBeanServerInvocationHandler.newProxyInstance(mbsc, name,ServiceInfoMBean.class, true);
@@ -302,6 +312,16 @@ public class JmxMonitor implements Runnable {
 		return null;
 	}
 
+	private CasPoolManagementImplMBean getCasPoolMBean(Set<ObjectName> names, String target)
+	{
+		for (ObjectName name : names) {
+			if ( name.toString().endsWith(target) )
+			{
+				return MBeanServerInvocationHandler.newProxyInstance(mbsc, name,CasPoolManagementImplMBean.class, true);
+			}
+		}		
+		return null;
+	}
 	private QueueViewMBean getQueueMBean(MBeanServerConnection server, String key) throws Exception
 	{
 		Set<ObjectName> queues= new HashSet<ObjectName>(server.queryNames(uimaServiceQueuePattern, null));
@@ -329,7 +349,7 @@ public class JmxMonitor implements Runnable {
 		{
 			long sampleStart = System.nanoTime();
 			long uptime = sampleStart - startTime;
-			
+			int cmFreeCasInstanceCount = 0;
 			ServiceMetrics[] metrics = new ServiceMetrics[servicePerformanceNames.size()];
 			int index = 0;
 			//	iterate over all Performance MBeans to retrieve current metrics
@@ -338,6 +358,12 @@ public class JmxMonitor implements Runnable {
 				{
 					//	Fetch previous metrics for service identified by 'name'
 					StatEntry entry = stats.get(name);
+					ServiceInfoMBean serviceInfo = entry.getServiceInfoMBeanProxy();
+
+					boolean isRemote = serviceInfo.getBrokerURL().startsWith("tcp:");
+					boolean topLevel = serviceInfo.isTopLevel();
+
+					
 					//	Get the current reading from MBeans 
 					double idleTime = entry.getServicePerformanceMBeanProxy().getIdleTime();
 					double casPoolWaitTime = entry.getServicePerformanceMBeanProxy().getCasPoolWaitTime();
@@ -345,7 +371,11 @@ public class JmxMonitor implements Runnable {
 					double analysisTime = entry.getServicePerformanceMBeanProxy().getAnalysisTime();
 					long processCount = entry.getServicePerformanceMBeanProxy().getNumberOfCASesProcessed();
 					QueueViewMBean queueInfo = entry.getQueueInfo();
-
+					
+					if ( serviceInfo.isCASMultiplier() && !isRemote && entry.getCasPoolMBean() != null)
+					{
+						cmFreeCasInstanceCount = entry.getCasPoolMBean().getAvailableInstances();
+					}
 					long queueDepth = -1;
 					if ( queueInfo != null )
 					{
@@ -364,8 +394,6 @@ public class JmxMonitor implements Runnable {
 					{
 						deltaAnalysisTime = analysisTime - entry.getAnalysisTime();
 					}
-					boolean isRemote = entry.getServiceInfoMBeanProxy().getBrokerURL().startsWith("tcp:");
-					boolean topLevel = entry.getServiceInfoMBeanProxy().isTopLevel();
 					
 					ServiceMetrics serviceMetrics = new ServiceMetrics();
 					serviceMetrics.setCasMultiplier(entry.getServiceInfoMBeanProxy().isCASMultiplier());
@@ -378,6 +406,7 @@ public class JmxMonitor implements Runnable {
 					serviceMetrics.setQueueDepth(queueDepth);
 					serviceMetrics.setProcessThreadCount(entry.getServicePerformanceMBeanProxy().getProcessThreadCount());
 					serviceMetrics.setAnalysisTime(deltaAnalysisTime);
+					serviceMetrics.setCmFreeCasInstanceCount(cmFreeCasInstanceCount);
 					//	populate shadow CAS pool metric for remote CAS multiplier. Filter out the top level service
 					if ( entry.getServiceInfoMBeanProxy().isCASMultiplier() && isRemote && !topLevel )
 					{
@@ -498,6 +527,7 @@ public class JmxMonitor implements Runnable {
 		ServicePerformanceMBean servicePerformanceMBeanProxy;
 		ServiceInfoMBean serviceInfoMBeanProxy;
 		QueueViewMBean queueInfo;
+		CasPoolManagementImplMBean casPoolMBeanProxy;
 		String name="";
 		
 		double lastIdleTime = 0;
@@ -522,6 +552,17 @@ public class JmxMonitor implements Runnable {
 		{
 			return queueInfo;
 		}
+		
+		public void setCasPoolMBean( CasPoolManagementImplMBean anMBean) 
+		{
+			casPoolMBeanProxy = anMBean;
+		}
+		
+		public CasPoolManagementImplMBean getCasPoolMBean()
+		{
+			return casPoolMBeanProxy;
+		}
+		
 		public double getIdleTime() {
 			return lastIdleTime;
 		}
