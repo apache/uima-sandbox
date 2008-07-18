@@ -115,7 +115,7 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected int howManyBeforeReplySeen = 0;
 
-	protected int receiveWindow = 5;
+	protected int receiveWindow = 0;
 
 	protected CollectionReader collectionReader = null;
 
