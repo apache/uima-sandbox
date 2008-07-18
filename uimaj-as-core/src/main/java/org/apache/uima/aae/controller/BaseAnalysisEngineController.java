@@ -66,6 +66,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.impl.AnalysisEngineManagementImpl;
 import org.apache.uima.analysis_engine.metadata.SofaMapping;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceCreationSpecifier;
 import org.apache.uima.resource.ResourceSpecifier;
@@ -240,8 +241,9 @@ implements AnalysisEngineController, EventSubscriber
 		
 		resourceSpecifier = UimaClassFactory.produceResourceSpecifier(aDescriptor);
 		//	Is this service a CAS Multiplier?
-		if ( resourceSpecifier instanceof AnalysisEngineDescription &&
-				((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes() )
+		if ( (resourceSpecifier instanceof AnalysisEngineDescription &&
+				((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes()) 
+				|| resourceSpecifier instanceof CollectionReaderDescription)
 		{
 			casMultiplier = true;
 		}
