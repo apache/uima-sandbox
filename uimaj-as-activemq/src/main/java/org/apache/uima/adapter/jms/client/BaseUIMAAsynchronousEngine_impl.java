@@ -388,11 +388,11 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		clientSideJmxStats.setEndpointName(endpoint);
 		int casPoolSize = 1;
 
-		if (anApplicationContext.containsKey(UimaAsynchronousEngine.ReplyWindow))
-		{
-			receiveWindow = ((Integer) anApplicationContext.get(UimaAsynchronousEngine.ReplyWindow)).intValue();
-			clientSideJmxStats.setReplyWindowSize(receiveWindow);
-		}
+//		if (anApplicationContext.containsKey(UimaAsynchronousEngine.ReplyWindow))
+//		{
+//			receiveWindow = ((Integer) anApplicationContext.get(UimaAsynchronousEngine.ReplyWindow)).intValue();
+//			clientSideJmxStats.setReplyWindowSize(receiveWindow);
+//		}
 
 		if (anApplicationContext.containsKey(UimaAsynchronousEngine.CasPoolSize))
 		{
