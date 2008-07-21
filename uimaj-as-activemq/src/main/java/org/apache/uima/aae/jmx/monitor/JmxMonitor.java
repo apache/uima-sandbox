@@ -19,6 +19,7 @@
 package org.apache.uima.aae.jmx.monitor;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -40,7 +41,6 @@ import org.apache.uima.aae.jmx.ServiceInfoMBean;
 import org.apache.uima.aae.jmx.ServicePerformanceMBean;
 import org.apache.uima.util.impl.CasPoolManagementImplMBean;
 
-import com.sun.management.OperatingSystemMXBean;
 
 /**
  *	Collects metrics from UIMA-AS Service MBeans at defined intervals and
