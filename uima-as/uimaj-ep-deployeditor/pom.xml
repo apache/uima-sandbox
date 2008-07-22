@@ -312,7 +312,7 @@
             </Import-Package-->
 
             <Bundle-Activator>org.apache.uima.editors.dde.internal.Activator</Bundle-Activator>
-            <Bundle-SymbolicName>org.apache.uima.editors.dde;singleton:=true</Bundle-SymbolicName>
+            <Bundle-SymbolicName>org.apache.uima.deployeditor;singleton:=true</Bundle-SymbolicName>
 
             <Eclipse-LazyStart>true</Eclipse-LazyStart>
           </instructions>

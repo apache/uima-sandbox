@@ -56,7 +56,7 @@
 
   <build>
 
-    <finalName>org.apache.uima.runtime-deployeditor_${uimaj-as-release-eclipse-version}</finalName>
+    <finalName>org.apache.uima.runtime.fragments.deployeditor_${uimaj-as-release-eclipse-version}</finalName>
 
     <plugins>
 
