@@ -924,7 +924,6 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-//				long t1 = System.nanoTime();
 				long t1 = getAnalysisEngineController().getCpuTime();
 				//	Serialize CAS for remote Delegates
 				String serializer = anEndpoint.getSerializer();
@@ -933,8 +932,10 @@ public class JmsOutputChannel implements OutputChannel
 					serializer = "xmi";
 				}
 				serializedCAS = serializeCAS(isReply, cas, aCasReferenceId, serializer);
-//				long timeToSerializeCas = System.nanoTime()-t1;
 				long timeToSerializeCas = getAnalysisEngineController().getCpuTime()-t1;
+				
+				getAnalysisEngineController().incrementSerializationTime(timeToSerializeCas);
+				
 				entry.incrementTimeToSerializeCAS(timeToSerializeCas);
 				casStats.incrementCasSerializationTime(timeToSerializeCas);
 				getAnalysisEngineController().getServicePerformance().
@@ -959,37 +960,6 @@ public class JmsOutputChannel implements OutputChannel
 		CAS cas = null;
 		try
 		{
-			
-			
-/*			
-			String serializedCAS = null;
-			//	Using Cas reference Id retrieve CAS from the shared Cash
-			cas = getAnalysisEngineController().getInProcessCache().getCasByReference(aCasReferenceId);
-
-			if ( cas == null )
-			{
-				serializedCAS = getAnalysisEngineController().getInProcessCache().getSerializedCAS( aCasReferenceId );
-			}
-			else
-			{
-				CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-				long t1 = System.nanoTime();
-				//	Serialize CAS for remote Delegates
-				String serializer = anEndpoint.getSerializer();
-				if ( serializer == null || serializer.trim().length() == 0)
-				{
-					serializer = "xmi";
-				}
-				serializedCAS = serializeCAS(isReply, cas, aCasReferenceId, serializer);
-				entry.incrementTimeToSerializeCAS(System.nanoTime()-t1);
-				if ( cacheSerializedCas )
-				{
-					getAnalysisEngineController().getInProcessCache().saveSerializedCAS(aCasReferenceId, serializedCAS);
-				}
-			}
-			return serializedCAS;
-*/			
-
 			return getSerializedCas(isReply, aCasReferenceId, anEndpoint, cacheSerializedCas);
 		}
 		catch( Exception e)
@@ -1020,7 +990,6 @@ public class JmsOutputChannel implements OutputChannel
 	{
 		if ( anEndpoint.isFinal() )
 		{
-			//aTextMessage.setLongProperty(AsynchAEMessage.TotalTimeSpentInAnalytic, (System.nanoTime()-anEndpoint.getEntryTime()));
 			aTextMessage.setLongProperty("SENT-TIME", System.nanoTime());
 		}
 
