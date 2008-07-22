@@ -152,7 +152,22 @@ public class ServicePerformance implements ServicePerformanceMBean
 	
 	public double getAnalysisTime()
 	{
-		return (double)analysisTime/(double)1000000;
+//		return (double)analysisTime/(double)1000000;
+		
+		if ( controller != null )
+		{
+			return ((double)controller.getAnalysisTime()/(double) 1000000);
+		}
+		else
+		{
+			synchronized( sem )
+			{
+				return (double)analysisTime/(double)1000000;
+			}
+			
+		}
+		
+		
 	}
 	
 	public long getRawAnalysisTime()

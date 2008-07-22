@@ -158,7 +158,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
 		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 		long timeToDeserializeCAS = getController().getCpuTime() - t1;
-
+		getController().incrementDeserializationTime(timeToDeserializeCAS);
 		LongNumericStatistic statistic;
 		if ( (statistic = getController().getMonitor().getLongNumericStatistic("",Monitor.TotalDeserializeTime)) != null )
 		{

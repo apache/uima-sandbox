@@ -178,4 +178,11 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	public long getIdleTimeBetweenProcessCalls(int msgType);
 
 	public long getCpuTime();
+	
+	public long getAnalysisTime();
+	
+	public void incrementSerializationTime(long cpuTime);
+	
+	public void incrementDeserializationTime(long cpuTime);
+
 }

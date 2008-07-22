@@ -119,10 +119,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	
 	private Object counterMonitor = new Object();
 	
-//	protected List childControllerList = new ArrayList();
-	private List childControllerList = new ArrayList();
+	protected List childControllerList = new ArrayList();
+//	private List childControllerList = new ArrayList();
 	
-//	protected Map delegateStats = new HashMap();
 	private Map delegateStats = new HashMap();
 	
 	private AggregateServiceInfo serviceInfo = null;

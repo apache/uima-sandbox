@@ -311,6 +311,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		{
 			return;
 		}
+		
 		boolean inputCASReturned = false;
 		boolean processingFailed = false;
 		// This is a primitive controller. No more processing is to be done on the Cas. Mark the destination as final and return CAS in reply.
@@ -343,7 +344,11 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 
 			long time = super.getCpuTime();
 			long totalProcessTime = 0;  // stored total time spent producing ALL CASes
+			
+//			super.beginAnalysis();
 			CasIterator casIterator = ae.processAndOutputNewCASes(aCAS);
+//			super.endAnalysis();
+			
 			//	Store how long it took to call processAndOutputNewCASes()
 			totalProcessTime = ( super.getCpuTime() - time);
 			long sequence = 1;
@@ -354,25 +359,21 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			{
 				long timeToProcessCAS = 0;    // stores time in hasNext() and next() for each CAS
 				hasNextTime = super.getCpuTime();
+//				super.beginAnalysis();
 				if ( !casIterator.hasNext() )
 				{
 					moreCASesToProcess = false;
 					//	Measure how long it took to call hasNext()
 					timeToProcessCAS = (super.getCpuTime()-hasNextTime);
 					totalProcessTime += timeToProcessCAS;
-					break;
+//					super.endAnalysis();
+					break;   // from while
 				}
 				//	Measure how long it took to call hasNext()
 				timeToProcessCAS = (super.getCpuTime()-hasNextTime);
 				getNextTime = super.getCpuTime();
-				
-				//	Get the next CAS. Aggregate time spent waiting for the CAS
-				//getServicePerformance().beginGetNextWait();
 				CAS casProduced = casIterator.next();
-				//getServicePerformance().endGetNextWait();
-				
-				//long delta = super.getCpuTime() - getNextTime;
-				
+//				super.endAnalysis();
 				//	Add how long it took to call next()
 				timeToProcessCAS += (super.getCpuTime()- getNextTime);
                 //	Add time to call hasNext() and next() to the running total
@@ -445,7 +446,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			// Store total time spent processing this input CAS
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
 			//	Aggregate total time spent processing in this service. This is separate from per CAS stats above 
-			getServicePerformance().incrementAnalysisTime(totalProcessTime);
+//			getServicePerformance().incrementAnalysisTime(totalProcessTime);
 			synchronized( cmOutstandingCASes )
 			{
 				if ( cmOutstandingCASes.size() == 0)

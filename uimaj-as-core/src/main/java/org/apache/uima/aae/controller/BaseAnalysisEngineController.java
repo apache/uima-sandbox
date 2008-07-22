@@ -169,7 +169,7 @@ implements AnalysisEngineController, EventSubscriber
 	private long totalWaitTimeForCAS = 0;
 	
 	private long lastCASWaitTimeUpdate = 0;
-	
+
 	private Map<Long, AnalysisThreadState> threadStateMap =
 		new HashMap<Long,AnalysisThreadState>();
 	
@@ -1781,8 +1781,6 @@ implements AnalysisEngineController, EventSubscriber
 		//	This is called every time a request comes
 		public void beginProcess(int msgType )
 		{
-			
-			
 			//	Disregard GetMeta as it comes on a non-process thread
 			if ( validMessageForSnapshot( msgType ) )
 			{
@@ -1800,7 +1798,7 @@ implements AnalysisEngineController, EventSubscriber
 					}
 					else
 					{
-						threadStateMap.put(Thread.currentThread().getId(), new AnalysisThreadState());
+						threadStateMap.put(Thread.currentThread().getId(), new AnalysisThreadState(Thread.currentThread().getId()));
 						
 						threadState = threadStateMap.get(Thread.currentThread().getId());
 						threadState.setIdle(false);
@@ -1819,23 +1817,11 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				synchronized( mux )
 				{
-					AnalysisThreadState threadState;
-					
-					if ( this instanceof AggregateAnalysisEngineController )
-					{
-						Set<Long> set = threadStateMap.keySet();
-						Iterator<Long> it = set.iterator();
-						threadState = threadStateMap.get(it.next());
-					}
-					else
-					{
-						threadState = threadStateMap.get(Thread.currentThread().getId());
-					}
+					AnalysisThreadState threadState = getThreadState();					
 					threadState.setLastUpdate(System.nanoTime());
 					threadState.setIdle(true);
 					threadState.setLastMessageDispatchTime();
 				}
-				
 			}
 		}
 		public long getIdleTimeBetweenProcessCalls(int msgType)
@@ -1844,18 +1830,7 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				synchronized( mux )
 				{
-					
-					AnalysisThreadState threadState = null;					
-					if ( threadStateMap.containsKey(Thread.currentThread().getId()))
-					{
-						threadState = threadStateMap.get(Thread.currentThread().getId());
-					}
-					else
-					{
-						Set<Long> set = threadStateMap.keySet();
-						Iterator<Long> it = set.iterator();
-						threadState = threadStateMap.get(it.next());
-					}
+					AnalysisThreadState threadState = getThreadState();					
 					return threadState.getIdleTimeBetweenProcessCalls();
 				}
 			}
@@ -1865,11 +1840,10 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			synchronized( mux )
 			{
-				int howManyThreads = 0;
 				long now = System.nanoTime();
 				long serviceIdleTime = 0;
 				Set<Long> set = threadStateMap.keySet();
-				howManyThreads = threadStateMap.size();
+				int howManyThreads = threadStateMap.size();
 				//	Iterate over all processing threads to calculate the total amount of idle time 
 				for(Long key: set )
 				{	
@@ -1928,21 +1902,166 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			if ( ManagementFactory.getPlatformMBeanServer() != null )
 			{
-				//ManagementFactory.getRuntimeMXBean().getVmVersion();
 				ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
 			    return bean.isCurrentThreadCpuTimeSupported( ) ? bean.getCurrentThreadCpuTime( ) : System.nanoTime();
 			}
 			return System.nanoTime();
 		}
+		private synchronized long getCpuTime(long threadId) 
+		{
+			if ( ManagementFactory.getPlatformMBeanServer() != null )
+			{
+				ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+			    return bean.isCurrentThreadCpuTimeSupported( ) ? bean.getThreadCpuTime(threadId): System.nanoTime();
+			}
+			return System.nanoTime();
+		}
+		
+		private AnalysisThreadState getFirstThreadState()
+		{
+			Set<Long> set = threadStateMap.keySet();
+			Iterator<Long> it = set.iterator();
+			return threadStateMap.get(it.next());
 
+		}
+		/**
+		 * Returns the {@link AnalysisThreadState} object associated with the current thread.
+		 * 
+		 * @return
+		 */
+		private AnalysisThreadState getThreadState()
+		{
+			AnalysisThreadState threadState;
+			if ( this instanceof AggregateAnalysisEngineController )
+			{
+				threadState = getFirstThreadState();
+			}
+			else
+			{
+				threadState = threadStateMap.get(Thread.currentThread().getId());
+				if ( threadState == null )
+				{
+					//	This may be the case if the thread processing
+					//	FreeCASRequest is returning an input CAS to the client.
+					//	This thread is different from the process thread, thus
+					//	we just return the first thread's state.
+					threadState = getFirstThreadState();
+				}
+			}
+			return threadState;
+		}
+		
+		/**
+		 * Returns the total CPU time all processing threads spent in analysis.
+		 * This method subtracts the serialization and de-serialization time from
+		 * the total. If this service is an aggregate, the return time is a sum
+		 * of CPU utilization in each colocated delegate.
+		 */
+		public long getAnalysisTime()
+		{
+			Set<Long> set = threadStateMap.keySet();
+			Iterator<Long> it = set.iterator();
+			long totalCpuProcessTime = 0;
+			//	Iterate over all processing threads
+			while( it.hasNext())
+			{
+				long threadId = it.next();
+				synchronized( mux )
+				{
+					//	Fetch the next thread's stats
+					AnalysisThreadState threadState = threadStateMap.get(threadId);
+					//	If an Aggregate service, sum up the CPU times of all collocated
+					//	delegates.
+					if ( this instanceof AggregateAnalysisEngineController_impl )
+					{
+						//	Get a list of all colocated delegate controllers from the Aggregate
+						List<AnalysisEngineController> delegateControllerList = 
+							((AggregateAnalysisEngineController_impl)this).childControllerList; 							
+						//	Iterate over all colocated delegates
+						for( int i=0; i < delegateControllerList.size(); i++)
+						{	
+							//	Get the next delegate's controller
+							AnalysisEngineController delegateController =
+								(AnalysisEngineController)delegateControllerList.get(i);
+							if ( delegateController != null && !delegateController.isStopped())
+							{
+								//	get the CPU time for all processing threads in the current controller
+								totalCpuProcessTime += delegateController.getAnalysisTime();
+							}
+						}
+					}
+					else  // Primitive Controller
+					{
+						//	Get the CPU time of a thread with a given ID
+						totalCpuProcessTime += getCpuTime(threadId);
+					}
+					//	Subtract serialization and deserialization times from the total CPU used
+					if ( totalCpuProcessTime > 0 )
+					{
+						totalCpuProcessTime -= threadState.getDeserializationTime();
+						totalCpuProcessTime -= threadState.getSerializationTime();
+					}
+				}
+			}
+			return totalCpuProcessTime;
+		}
+		/**
+		 * Increments the time this thread spent in serialization of a CAS
+		 */
+		public void incrementSerializationTime(long cpuTime)
+		{
+			synchronized( mux )
+			{
+				AnalysisThreadState threadState = getThreadState();
+				threadState.incrementSerializationTime(cpuTime);
+			}
+		}
+		/**
+		 * Increments the time this thread spent in deserialization of a CAS
+		 */
+		public void incrementDeserializationTime(long cpuTime)
+		{
+			synchronized( mux )
+			{
+				AnalysisThreadState threadState = getThreadState();
+				threadState.incrementDeserializationTime(cpuTime);
+			}
+		}
 		private class AnalysisThreadState
 		{
+			private long threadId;
+			
 			private boolean isIdle = false;
 			private long lastUpdate = 0;
 			private long totalIdleTime = 0;
 			//	Measures idle time between process CAS calls
 			private long idleTimeSinceLastProcess = 0;
 			private long lastMessageDispatchTime = 0;
+			
+			private long serializationTime = 0;
+			private long deserializationTime = 0;
+			
+			public AnalysisThreadState( long aThreadId )
+			{
+				threadId = aThreadId;
+			}
+			
+			public long getThreadId()
+			{
+				return threadId;
+			}
+			public long getSerializationTime() {
+				return serializationTime;
+			}
+			public void incrementSerializationTime(long serializationTime) {
+				this.serializationTime += serializationTime;
+			}
+			public long getDeserializationTime() {
+				return deserializationTime;
+			}
+			public void incrementDeserializationTime(long deserializationTime) {
+				this.deserializationTime += deserializationTime;
+			}
 			public boolean isIdle() {
 				return isIdle;
 			}
