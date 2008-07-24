@@ -211,39 +211,45 @@ public class ProcessResponseHandler extends HandlerBase
 		                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_rcvd_reply_FINEST",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId, xmi });
 			}
-			
 			long t1 = getController().getCpuTime();
+			/* --------------------- */
+			/** DESERIALIZE THE CAS. */ 
+			/* --------------------- */
 			
-			synchronized (monitor)
+			//	check if the CAS is part of the Parallel Step
+			if (totalNumberOfParallelDelegatesProcessingCas > 1 )
 			{
-				XmiSerializationSharedData deserSharedData;
-				if (totalNumberOfParallelDelegatesProcessingCas > 1 && cacheEntry.howManyDelegatesResponded() > 0)
+				//	Synchronized because replies are merged into the same CAS.
+				synchronized (monitor)
 				{
-					// process secondary reply from a parallel step
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+					//	Check if this a secondary reply in a parallel step. If it is the first reply, deserialize the CAS
+					//	using a standard approach. There is no merge to be done yet. Otherwise, we need to
+					//	merge the CAS with previous results.
+					if ( cacheEntry.howManyDelegatesResponded() > 0 )
+					{
+						// process secondary reply from a parallel step
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_delegate_responded_count_FINEST",
 			                new Object[] { cacheEntry.howManyDelegatesResponded(), casReferenceId});
-					
-					int highWaterMark = cacheEntry.getHighWaterMark();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+				
+						int highWaterMark = cacheEntry.getHighWaterMark();
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_high_water_mark_FINEST",
 			                new Object[] { highWaterMark, casReferenceId });
-
-					deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-					UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark);
-				}
-				else // general case, or first reply from a parallel step
-				{
-					//	Processing the reply from a standard, non-parallel delegate
-					deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-					if (deserSharedData == null) {
-						deserSharedData = new XmiSerializationSharedData();
-						getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).setXmiSerializationData(deserSharedData);
+						deserialize( xmi, cas, casReferenceId, highWaterMark);
 					}
-					UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+					else
+					{
+						//	first reply from a parallel step
+						deserialize(xmi, cas, casReferenceId);
+					}
 				}
 			}
-
+			else // general case
+			{
+				//	Processing a reply from a standard, non-parallel delegate
+				deserialize(xmi, cas, casReferenceId);
+			}
 			
 			if ( cacheEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 )
 			{
@@ -298,6 +304,23 @@ public class ProcessResponseHandler extends HandlerBase
 			incrementDelegateProcessCount(aMessageContext);
 		}
 
+	}
+	private void deserialize( String xmi, CAS cas, String casReferenceId, int highWaterMark ) throws Exception
+	{
+		XmiSerializationSharedData deserSharedData;
+		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
+		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark);
+	}
+	private void deserialize( String xmi, CAS cas, String casReferenceId ) throws Exception
+	{
+		//	Processing the reply from a standard, non-parallel delegate
+		XmiSerializationSharedData deserSharedData;
+		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
+		if (deserSharedData == null) {
+			deserSharedData = new XmiSerializationSharedData();
+			getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).setXmiSerializationData(deserSharedData);
+		}
+		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 	}
 	private void handleProcessResponseWithCASReference(MessageContext aMessageContext )
 	{
