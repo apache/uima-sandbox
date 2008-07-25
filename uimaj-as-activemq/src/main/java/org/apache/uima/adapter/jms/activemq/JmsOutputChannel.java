@@ -52,6 +52,7 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaEEServiceException;
+import org.apache.uima.aae.jmx.ServiceInfo;
 import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
@@ -395,6 +396,7 @@ public class JmsOutputChannel implements OutputChannel
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
 						JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_release_cas_req__FINE", new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint(),aCasReferenceId });
 			}
+				
 		}
 		catch( JMSException e)
 		{
@@ -461,6 +463,34 @@ public class JmsOutputChannel implements OutputChannel
 	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_releasecas_request__endpoint__FINEST",
 	                    new Object[] {getAnalysisEngineController().getName(), endpointConnection.getEndpoint()});
+			}
+			else if ( aCommand == AsynchAEMessage.GetMeta )
+			{
+				if ( anEndpoint.getDestination() != null )
+				{
+					String replyQueueName = ((ActiveMQDestination)anEndpoint.getDestination()).getPhysicalName().replaceAll(":","_");
+					if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController )
+					{
+						String delegateKey =
+							((AggregateAnalysisEngineController)getAnalysisEngineController()).lookUpDelegateKey(anEndpoint.getEndpoint());
+						ServiceInfo serviceInfo =((AggregateAnalysisEngineController)getAnalysisEngineController()).getDelegateServiceInfo(delegateKey);
+						if (serviceInfo != null )
+						{
+							serviceInfo.setReplyQueueName(replyQueueName);
+							serviceInfo.setServiceKey(delegateKey);
+							System.out.println("Service:"+delegateKey+" Directed to Reply To:"+replyQueueName);
+						}
+					}
+				}
+				else if ( !anEndpoint.isRemote())
+				{
+					ServiceInfo serviceInfo =((AggregateAnalysisEngineController)getAnalysisEngineController()).getServiceInfo();
+					if (serviceInfo != null )
+					{
+						serviceInfo.setReplyQueueName(controllerInputEndpoint);
+						System.out.println("Aggregate Service Reply Queue:"+getAnalysisEngineController().getComponentName()+" Reply To:"+controllerInputEndpoint);
+					}
+				}
 			}
 			else 
 			{
@@ -1087,7 +1117,7 @@ public class JmsOutputChannel implements OutputChannel
 	                    "populateHeaderWithRequestContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
 	                    new Object[] {getAnalysisEngineController().getComponentName(), anEndpoint.getServerURI(), anEndpoint.getEndpoint()});
 			}
-			else
+			else // collocated
 			{
 				aMessage.setStringProperty(UIMAMessage.ServerURI, anEndpoint.getServerURI());
 			}
