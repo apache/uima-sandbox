@@ -1831,7 +1831,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				pServiceInfo.setInputQueueName(serviceInfo.getInputQueueName());
 				pServiceInfo.setState(serviceInfo.getState());
 				pServiceInfo.setAnalysisEngineInstanceCount(1);
-
 				ServicePerformance servicePerformance = new ServicePerformance();
 				if ( anEndpoint.isRemote() )
 				{

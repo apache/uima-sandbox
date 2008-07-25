@@ -99,7 +99,7 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 			items = items + "\t" + format(serviceMetrics.getAnalysisTime()/period);
 			items = items + "\t" + format(serviceMetrics.getIdleTime()/period);
 			items = items + "\t" + serviceMetrics.getProcessCount();
-			items = items + "\t" + serviceMetrics.getQueueDepth();
+			items = items + "\t" + serviceMetrics.getInputQueueDepth();
 			if ( serviceMetrics.isTopLevelService() ) {
 				items = items + "\t" + format(serviceMetrics.getCasPoolWaitTime()/period);
 			}

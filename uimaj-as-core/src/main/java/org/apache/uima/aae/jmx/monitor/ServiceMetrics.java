@@ -31,7 +31,8 @@ public class ServiceMetrics {
 	private boolean isServiceRemote;
 	private boolean isCasMultiplier;
 	private boolean topLevelService;
-	private long queueDepth;
+	private long inputQueueDepth;
+	private long replyQueueDepth;
 	private int processThreadCount;
 	private double analysisTime;
 	private int cmFreeCasInstanceCount;
@@ -101,11 +102,17 @@ public class ServiceMetrics {
 	public void setCasMultiplier(boolean isCasMultiplier) {
 		this.isCasMultiplier = isCasMultiplier;
 	}
-	public long getQueueDepth() {
-		return queueDepth;
+	public long getInputQueueDepth() {
+		return inputQueueDepth;
 	}
-	public void setQueueDepth(long queueDepth) {
-		this.queueDepth = queueDepth;
+	public void setInputQueueDepth(long queueDepth) {
+		this.inputQueueDepth = queueDepth;
+	}
+	public long getReplyQueueDepth() {
+		return replyQueueDepth;
+	}
+	public void setReplyQueueDepth(long queueDepth) {
+		this.replyQueueDepth = queueDepth;
 	}
 	public int getProcessThreadCount() {
 		return processThreadCount;

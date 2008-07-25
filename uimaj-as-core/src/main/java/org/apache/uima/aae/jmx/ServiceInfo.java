@@ -28,11 +28,13 @@ public class ServiceInfo implements ServiceInfoMBean
 	private static final String label="Service Info";
 	private String brokerURL="";
 	private String inputQueueName="";
+	private String replyQueueName="";
 	private String state="";
 	private String[] deploymentDescriptor= new String[] {""};
 	private boolean casMultiplier;
 	private boolean topLevel;
 	private String serviceKey;
+	private boolean aggregate;
 	
 	public ServiceInfo()
 	{
@@ -104,4 +106,23 @@ public class ServiceInfo implements ServiceInfoMBean
 	public void setServiceKey(String serviceKey) {
 		this.serviceKey = serviceKey;
 	}
+	
+	public String getReplyQueueName()
+	{
+		return replyQueueName;
+	}
+	
+	public void setReplyQueueName(String aReplyQueueName)
+	{
+		replyQueueName = aReplyQueueName;
+	}
+
+	public boolean isAggregate() {
+		return aggregate;
+	}
+
+	public void setAggregate(boolean aggregate) {
+		this.aggregate = aggregate;
+	}
+
 }

@@ -504,6 +504,7 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			pServiceInfo = 
 				((AggregateAnalysisEngineController)this).getServiceInfo();
+			pServiceInfo.setAggregate(true);
 		}
 		if ( pServiceInfo != null )
 		{
