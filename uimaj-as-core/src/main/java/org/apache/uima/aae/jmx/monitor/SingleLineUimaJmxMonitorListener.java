@@ -79,6 +79,9 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 				items = items + "\t" + srvName + "-Idle";
 				items = items + "\t" + srvName + "-CASes";
 				items = items + "\t" + srvName + "-InQ";
+				if (serviceMetrics.isServiceRemote() || serviceMetrics.isTopLevelService()) {
+					items = items + "\t" + srvName + "-RepQ";
+				}
 				if (serviceMetrics.isTopLevelService() ||
 						(serviceMetrics.isCasMultiplier() && serviceMetrics.isServiceRemote()) ) {
 					items = items + "\t" + srvName + "-CPW";
@@ -100,6 +103,9 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 			items = items + "\t" + format(serviceMetrics.getIdleTime()/period);
 			items = items + "\t" + serviceMetrics.getProcessCount();
 			items = items + "\t" + serviceMetrics.getInputQueueDepth();
+			if (serviceMetrics.isServiceRemote() || serviceMetrics.isTopLevelService()) {
+				items = items + "\t" + serviceMetrics.getReplyQueueDepth();
+			}
 			if ( serviceMetrics.isTopLevelService() ) {
 				items = items + "\t" + format(serviceMetrics.getCasPoolWaitTime()/period);
 			}
