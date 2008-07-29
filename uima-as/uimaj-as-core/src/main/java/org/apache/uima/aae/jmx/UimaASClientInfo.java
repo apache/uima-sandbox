@@ -49,7 +49,6 @@ public class UimaASClientInfo implements
 	
 	public void reset()
 	{
-		applicationName="";
 		idleTime = 0;
 		serializationTime=0;
 		deserializationTime=0;
@@ -59,7 +58,6 @@ public class UimaASClientInfo implements
 		maxDeserializationTime=0;
 		maxIdleTime=0;
 		maxProcessTime=0;
-		endpointName="";
 		replyWindowSize=0;
 		casPoolSize=0;
 		_metaTimeoutErrorCount=0;
