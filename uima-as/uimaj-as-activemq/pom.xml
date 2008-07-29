@@ -251,7 +251,7 @@
 		<dependency>
 			<groupId>xstream</groupId>
 			<artifactId>xstream</artifactId>
-			<version>1.1.2</version>
+			<version>1.2.2</version>
 		</dependency>
 	
 		<dependency>
