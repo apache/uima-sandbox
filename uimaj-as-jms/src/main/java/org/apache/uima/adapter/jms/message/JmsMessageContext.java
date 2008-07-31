@@ -51,6 +51,42 @@ public class JmsMessageContext implements MessageContext
 		
 	}
 
+	public JmsMessageContext(Message aMessage, String anEndpointName) throws AsynchAEException
+	{
+		this();
+		endpointName = anEndpointName;
+		message = aMessage;
+		try
+		{
+			String msgFrom = (String)aMessage.getStringProperty(AsynchAEMessage.MessageFrom); 
+			if ( msgFrom != null )
+			{
+				endpoint.setEndpoint( msgFrom);
+			}
+			if ( aMessage.getJMSReplyTo() != null )
+			{
+				endpoint.setDestination(aMessage.getJMSReplyTo());
+			}
+			if ( aMessage.propertyExists(UIMAMessage.ServerURI) )
+			{
+				String selectedServerURI = chooseServerURI(aMessage.getStringProperty(UIMAMessage.ServerURI));
+				endpoint.setServerURI(selectedServerURI);
+				endpoint.setRemote(endpoint.getServerURI().startsWith("vm")==false);
+			}
+			//	Check if the client attached a special property that needs to be echoed back.
+			//	This enables the client to match the reply with the endpoint.
+			if ( aMessage.propertyExists(AsynchAEMessage.EndpointServer))
+			{
+				endpoint.setRemote(true);
+				endpoint.setEndpointServer(aMessage.getStringProperty(AsynchAEMessage.EndpointServer));
+			}
+		
+		}
+		catch( Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+	}
 	public String getEndpointName()
 	{
 		return endpointName;
@@ -84,36 +120,6 @@ public class JmsMessageContext implements MessageContext
 		}
 		
 		return serverURI;
-	}
-	public JmsMessageContext(Message aMessage, String anEndpointName) throws AsynchAEException
-	{
-		this();
-		endpointName = anEndpointName;
-		message = aMessage;
-		try
-		{
-			String msgFrom = (String)aMessage.getStringProperty(AsynchAEMessage.MessageFrom); 
-			if ( msgFrom != null )
-			{
-				endpoint.setEndpoint( msgFrom);
-			}
-			if ( aMessage.getJMSReplyTo() != null )
-			{
-				endpoint.setDestination(aMessage.getJMSReplyTo());
-			}
-			if ( aMessage.getStringProperty(UIMAMessage.ServerURI) != null )
-			{
-				
-				String selectedServerURI = chooseServerURI(aMessage.getStringProperty(UIMAMessage.ServerURI));
-				
-				endpoint.setServerURI(selectedServerURI);
-				endpoint.setRemote(endpoint.getServerURI().startsWith("vm")==false);
-			}
-		}
-		catch( Exception e)
-		{
-			throw new AsynchAEException(e);
-		}
 	}
 	public boolean propertyExists(String aKey) throws AsynchAEException
 	{
