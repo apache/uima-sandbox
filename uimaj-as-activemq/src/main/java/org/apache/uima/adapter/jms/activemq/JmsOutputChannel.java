@@ -431,12 +431,20 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			JmsEndpointConnection_impl endpointConnection = 
 				getEndpointConnection(anEndpoint);
-
+			
 			TextMessage tm = endpointConnection.produceTextMessage(null);
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 			tm.setText("");    // Need this to prevent the Broker from throwing an exception when sending a message to C++ service
 			
 			populateHeaderWithRequestContext(tm, anEndpoint, aCommand);
+			
+			//	For remotes add a special property to the message. This property
+			//	will be echoed back by the service. This property enables matching
+			//	the reply with the right endpoint object managed by the aggregate.
+			if ( anEndpoint.isRemote() )
+			{
+				tm.setStringProperty(AsynchAEMessage.EndpointServer, anEndpoint.getServerURI());
+			}
 			boolean startTimer = false;
 			//	Start timer for endpoints that are remote and are managed by a different broker
 			//	than this service. If an endpoint contains a destination object, the outgoing
@@ -1149,6 +1157,10 @@ public class JmsOutputChannel implements OutputChannel
 			if ( hostIP != null )
 			{
 				aMessage.setStringProperty(AsynchAEMessage.ServerIP,hostIP);
+			}
+			if ( anEndpoint.getEndpointServer() != null )
+			{
+				aMessage.setStringProperty(AsynchAEMessage.EndpointServer, anEndpoint.getEndpointServer());
 			}
 		}
 		else
