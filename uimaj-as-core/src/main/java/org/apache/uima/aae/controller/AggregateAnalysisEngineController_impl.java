@@ -385,7 +385,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			String key = lookUpDelegateKey( aDelegateKey);
 			if ( endpoint == null )
 			{
-				
 				endpoint = (Endpoint) destinationMap.get(key);
 				if ( endpoint == null )
 				{
@@ -401,7 +400,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			
 			if (sendReply && allDelegatesCompletedCollection() && getClientEndpoint() != null)
 			{
-				
 				sendCpcReply();
 			}
 		}
@@ -944,37 +942,40 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				remoteEndpoints[i].initialize();
 				remoteEndpoints[i].setController(this);
 				String key = lookUpDelegateKey(remoteEndpoints[i].getEndpoint());
-				Endpoint endpoint = ((Endpoint) destinationMap.get(key));
-				if ( key != null && endpoint != null)
+				if ( key != null && destinationMap.containsKey(key))
 				{
-					ServiceInfo serviceInfo = endpoint.getServiceInfo();
-					PrimitiveServiceInfo pServiceInfo = new PrimitiveServiceInfo();
-					pServiceInfo.setBrokerURL(serviceInfo.getBrokerURL());
-					pServiceInfo.setInputQueueName(serviceInfo.getInputQueueName());
-					pServiceInfo.setState(serviceInfo.getState());
-					pServiceInfo.setAnalysisEngineInstanceCount(1);
-					
-					registerWithAgent(pServiceInfo, super.getManagementInterface().getJmxDomain()
-							+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
+					Endpoint endpoint = ((Endpoint) destinationMap.get(key));
+					if ( key != null && endpoint != null)
+					{
+						ServiceInfo serviceInfo = endpoint.getServiceInfo();
+						PrimitiveServiceInfo pServiceInfo = new PrimitiveServiceInfo();
+						pServiceInfo.setBrokerURL(serviceInfo.getBrokerURL());
+						pServiceInfo.setInputQueueName(serviceInfo.getInputQueueName());
+						pServiceInfo.setState(serviceInfo.getState());
+						pServiceInfo.setAnalysisEngineInstanceCount(1);
+						
+						registerWithAgent(pServiceInfo, super.getManagementInterface().getJmxDomain()
+								+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceInfo.getLabel());
 
-					ServicePerformance servicePerformance = new ServicePerformance();
-					//servicePerformance.setIdleTime(System.nanoTime());
-					servicePerformance.setRemoteDelegate();
+						ServicePerformance servicePerformance = new ServicePerformance();
+						//servicePerformance.setIdleTime(System.nanoTime());
+						servicePerformance.setRemoteDelegate();
 
-					registerWithAgent(servicePerformance, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
+						registerWithAgent(servicePerformance, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+servicePerformance.getLabel());
 
-					ServiceErrors serviceErrors = new ServiceErrors();
-					
-					registerWithAgent(serviceErrors, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceErrors.getLabel());
-					remoteIndex++;
+						ServiceErrors serviceErrors = new ServiceErrors();
+						
+						registerWithAgent(serviceErrors, super.getManagementInterface().getJmxDomain()+super.jmxContext+",r"+remoteIndex+"="+key+" [Remote Uima EE Service],name="+key+"_"+serviceErrors.getLabel());
+						remoteIndex++;
 
-					serviceErrorMap.put(key, serviceErrors);
-					Object[] delegateStatsArray = 
-						new Object[] { pServiceInfo, servicePerformance, serviceErrors }; 
+						serviceErrorMap.put(key, serviceErrors);
+						Object[] delegateStatsArray = 
+							new Object[] { pServiceInfo, servicePerformance, serviceErrors }; 
 
-					delegateStatMap.put( key, delegateStatsArray);					
+						delegateStatMap.put( key, delegateStatsArray);					
+					}
+					dispatchMetadataRequest(remoteEndpoints[i]);
 				}
-				dispatchMetadataRequest(remoteEndpoints[i]);
 			}
 		}
 	}
@@ -1535,13 +1536,58 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	
 	public String lookUpDelegateKey(String anEndpointName)
 	{
-
+		return lookUpDelegateKey(anEndpointName, null);
+	}
+	/**
+	 * Returns a delegate key given an endpoint (queue) name and a server uri.
+	 * If a server is null, only the endpoint name will be used for matching.
+	 */
+	public String lookUpDelegateKey(String anEndpointName, String server)
+	{
+		String key = null;
 		if (destinationToKeyMap.containsKey(anEndpointName))
 		{
-			return (String) destinationToKeyMap.get(anEndpointName);
+			Set keys = destinationMap.keySet();
+			Iterator it = keys.iterator();
+			//	Find an endpoint for the GetMeta reply. To succeed, match the endpoint (queue) name
+			//	as well as the server URI. We allow endpoints managed by different servers to have
+			//	the same queue name.
+			//	iterate over all endpoints until a match [queue,server] is found.
+			while( it.hasNext())
+			{
+				key = (String)it.next();
+				Endpoint_impl endp = (Endpoint_impl) destinationMap.get(key);
+
+				//	Check if a queue name matches
+				if ( endp != null &&  endp.getEndpoint().equalsIgnoreCase(anEndpointName))
+				{
+					//	Check if server match is requested as well
+					if ( server != null )
+					{
+						//	server URIs must match
+						if (  endp.getServerURI() != null && endp.getServerURI().equalsIgnoreCase(server) )
+						{
+							//	found a match for [queue,server]
+							break;
+						}
+						//	Not found yet. Reset the key
+						key = null;
+						continue;
+					}
+					//	found a match for [queue]
+					break;
+				}
+				//	Not found yet. Reset the key
+				key = null;
+			}
 		}
 
-		return null;
+//		if (destinationToKeyMap.containsKey(anEndpointName))
+//		{
+//			return (String) destinationToKeyMap.get(anEndpointName);
+//		}
+
+		return key;
 	}
 
 	public Endpoint lookUpEndpoint(String anAnalysisEngineKey, boolean clone) throws AsynchAEException
@@ -1588,15 +1634,35 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     	}
     	return null;
     }
-
     public void mergeTypeSystem(String aTypeSystem, String fromDestination) throws AsynchAEException
+    {
+    	mergeTypeSystem(aTypeSystem, fromDestination, null);
+    }
+    public void mergeTypeSystem(String aTypeSystem, String fromDestination, String fromServer) throws AsynchAEException
 	{
 		try
 		{
-			String key = findKeyForValue(fromDestination);
-			Endpoint_impl endpoint = (Endpoint_impl) destinationMap.get(key);
+			Set keys = destinationMap.keySet();
+			Iterator it = keys.iterator();
+			Endpoint_impl endpoint = null;
+			String key = null;
+			//	Find an endpoint for the GetMeta reply. To succeed, match the endpoint (queue) name
+			//	as well as the server URI. We allow endpoints managed by different servers to have
+			//	the same queue name.
+			//	iterate over all endpoints until a match [queue,server] is found.
+			while( it.hasNext())
+			{
+				key = (String)it.next();
+				Endpoint_impl endp = (Endpoint_impl) destinationMap.get(key);
 
-			
+				if ( endp.getServerURI() != null && endp.getServerURI().equalsIgnoreCase(fromServer) && endp.getEndpoint().equalsIgnoreCase(fromDestination))
+				{
+					endpoint = endp;
+					break;
+				}
+				
+			}
+
 			if (endpoint == null)
 			{
 				// Log invalid reply and move on

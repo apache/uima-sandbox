@@ -26,6 +26,7 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.handler.HandlerBase;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
+import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.util.Level;
 
 public class MetadataResponseHandler_impl extends HandlerBase
@@ -65,7 +66,18 @@ public class MetadataResponseHandler_impl extends HandlerBase
 
 						String analysisEngineMetadata = ((MessageContext)anObjectToHandle).getStringMessage();
 						String fromEndpoint = ((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.MessageFrom);
-						((AggregateAnalysisEngineController) getController()).mergeTypeSystem(analysisEngineMetadata, fromEndpoint);
+						String fromServer = null;
+						if ( ((MessageContext)anObjectToHandle).propertyExists(AsynchAEMessage.EndpointServer))
+						{
+							
+							fromServer =((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.EndpointServer); 
+
+						}
+						else if ( ((MessageContext)anObjectToHandle).propertyExists(UIMAMessage.ServerURI)) 
+						{
+							fromServer = ((MessageContext)anObjectToHandle).getMessageStringProperty(UIMAMessage.ServerURI);
+						}
+						((AggregateAnalysisEngineController) getController()).mergeTypeSystem(analysisEngineMetadata, fromEndpoint, fromServer);
 					}
 				}
 				else

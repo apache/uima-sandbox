@@ -40,6 +40,7 @@ import org.apache.uima.aae.handler.HandlerBase;
 import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
+import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.monitor.statistics.DelegateStats;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
@@ -444,7 +445,7 @@ public class ProcessResponseHandler extends HandlerBase
 		}
 		return true;
 	}
-	private void handleProcessResponseWithException(MessageContext aMessageContext)
+	private void handleProcessResponseWithException(MessageContext aMessageContext, String delegateKey)
 	{
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "handleProcessResponseWithException", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_handling_exception_from_delegate_FINE",
@@ -485,7 +486,7 @@ public class ProcessResponseHandler extends HandlerBase
 			{
 				isCpCError = true;
 				((AggregateAnalysisEngineController)getController()).
-					processCollectionCompleteReplyFromDelegate(aMessageContext.getEndpoint().getEndpoint(), false);
+					processCollectionCompleteReplyFromDelegate(delegateKey, false);
 			}
 			else
 			{
@@ -521,11 +522,10 @@ public class ProcessResponseHandler extends HandlerBase
 
 	}
 
-	private void handleCollectionProcessCompleteReply(MessageContext aMessageContext)
+	private void handleCollectionProcessCompleteReply(MessageContext aMessageContext, String delegateKey)
 	{
 		try
 		{
-			String delegateKey = ((Endpoint)aMessageContext.getEndpoint()).getEndpoint();
 			if ( getController() instanceof AggregateAnalysisEngineController )
 			{
 				((AggregateAnalysisEngineController) getController())
@@ -560,9 +560,24 @@ public class ProcessResponseHandler extends HandlerBase
 			int command = messageContext.getMessageIntProperty(AsynchAEMessage.Command);
 			String delegate = ((Endpoint)messageContext.getEndpoint()).getEndpoint();
 			String key = null;
+			String fromServer = null;
 			if ( getController() instanceof AggregateAnalysisEngineController )
 			{
-				key = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(delegate);
+				if ( ((Endpoint)messageContext.getEndpoint()).isRemote() )
+				{
+					if ( ((MessageContext)anObjectToHandle).propertyExists(AsynchAEMessage.EndpointServer))
+					{
+						
+						fromServer =((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.EndpointServer); 
+
+					}
+					else if ( ((MessageContext)anObjectToHandle).propertyExists(UIMAMessage.ServerURI)) 
+					{
+						fromServer = ((MessageContext)anObjectToHandle).getMessageStringProperty(UIMAMessage.ServerURI);
+					}
+				}
+
+				key = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(delegate, fromServer);
 			}
 			if (AsynchAEMessage.CASRefID == payload)
 			{
@@ -583,11 +598,19 @@ public class ProcessResponseHandler extends HandlerBase
 			}
 			else if (AsynchAEMessage.Exception == payload)
 			{
-				handleProcessResponseWithException(messageContext);
+				if ( key == null )
+				{
+					key = ((Endpoint)messageContext.getEndpoint()).getEndpoint();
+				}
+				handleProcessResponseWithException(messageContext, key);
 			}
 			else if (AsynchAEMessage.None == payload && AsynchAEMessage.CollectionProcessComplete == command)
 			{
-				handleCollectionProcessCompleteReply(messageContext);
+				if ( key == null )
+				{
+					key = ((Endpoint)messageContext.getEndpoint()).getEndpoint();
+				}
+				handleCollectionProcessCompleteReply(messageContext, key);
 			}
 			else if (AsynchAEMessage.None == payload && AsynchAEMessage.ACK == command)
 			{

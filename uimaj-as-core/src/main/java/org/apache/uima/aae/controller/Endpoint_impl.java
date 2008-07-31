@@ -105,6 +105,10 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	
 	private long idleTime=0;
 	
+	//	This is supplied by the remote client. It needs to be
+	//	echoed back to the client. 
+	private String endpointServer = null;
+	
 	public int getCommand()
 	{
 		return command;
@@ -550,4 +554,13 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	public String toString() {
 		return endpoint;
 	}
+	
+	public void setEndpointServer( String anEndpointServer ){
+		endpointServer = anEndpointServer;
+	}
+	
+	public String getEndpointServer() {
+		return endpointServer;
+	}
+
 }

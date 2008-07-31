@@ -37,6 +37,8 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 {
 	public void mergeTypeSystem(String aTypeSystem, String fromDestination) throws AsynchAEException;
 
+	public void mergeTypeSystem(String aTypeSystem, String fromDestination, String fromServer) throws AsynchAEException;
+
 	public void sendRequestForMetadataToRemoteDelegates() throws AsynchAEException;
 	
 	public void addMessageOrigin( String aCasReferenceId, Endpoint anEndpoint );
@@ -61,6 +63,8 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	
 	public String lookUpDelegateKey( String aDelegateEndpointName );
 	
+	public String lookUpDelegateKey( String aDelegateEndpointName, String server );
+
 	public UimaContext getChildUimaContext( String aDelegateEndpointName ) throws Exception;
 	
 //	public void retryCAS( String aCasReferenceId, Endpoint anEndpoint )throws AsynchAEException;

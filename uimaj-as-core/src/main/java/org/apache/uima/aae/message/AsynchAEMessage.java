@@ -23,7 +23,6 @@ package org.apache.uima.aae.message;
 public interface AsynchAEMessage
 {
 	public static final String TotalTimeSpentInAnalytic = "TimeInAnalytic";
-//	public static final String SendTime = "SendTime";
 	public static final String TimeInService = "TimeInService";
 	public static final String Endpoint = "Endpoint";
 	public static final String DelegateStats = "DelegateStats";
@@ -31,14 +30,13 @@ public interface AsynchAEMessage
 	
 	public static final String CasReference = "CasReference";
 	public static final String InputCasReference = "InputCasReference";
-//	public static final String CasReferenceId = "CasReferenceId";
 	public static final String MessageFrom = "MessageFrom";
 	public static final String XCASREFId = "XCASRefId";
 	public static final String XCas = "XCas";
 	public static final String AEMetadata = "Metadata";
 	public static final String CasSequence = "CasSequence";
 	public static final String ReplyToEndpoint = "ReplyToEndpoint";
-	
+	public static final String EndpointServer = "EndpointServer";
 	public static final String ServerIP = "ServerIP";
 	public static final String RemoveEndpoint = "RemoveEndpoint";
 	public static final String Aborted = "Aborted";
