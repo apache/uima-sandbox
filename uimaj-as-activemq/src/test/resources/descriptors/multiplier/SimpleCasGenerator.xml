@@ -95,11 +95,7 @@
       </nameValuePair>
     
     </configurationParameterSettings>
-    <typeSystemDescription>
-      <imports>
-        <import name="org.apache.uima.examples.SourceDocumentInformation"/>
-      </imports>
-    </typeSystemDescription>
+    <typeSystemDescription/>
     <capabilities>
       <capability>
         <inputs/>

@@ -539,7 +539,13 @@ public class TestUimaASExtended extends BaseTestSupport
 		runTest2(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, PROCESS_LATCH);
 	}
 	
-	
+	public void testTypesystemMergeWithMultiplier() throws Exception
+	{
+    System.out.println("-------------- testTypesystemMergeWithMultiplier -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithMergedTypes.xml");
+		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	}
 	
 	public void testStopAggregateWithRemoteMultiplier() throws Exception
 	{
