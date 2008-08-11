@@ -670,10 +670,15 @@ under the License.
     <section id="ugr.async.ov.concepts.first_limits.compatibility">
       <title>Compatibility with earlier version of remoting and scaleout</title>
       <titleabbrev>Compatibility</titleabbrev>
-      <para>A Vinci client service descriptor or a SOAP service descriptor can be used in an aggregate descriptor as
-        before, and can be used as a primitive analysis engine in a deployment descriptor. There is a new type of client
-        service descriptor for an AS service, the JMS service descriptor; see <xref
-          linkend="ugr.async.ov.concepts.jms_descriptor"/> </para></section></section>
+      <para>There is a new type of client
+        service descriptor for an AS service, the JMS service descriptor (see <xref 
+        linkend="ugr.async.ov.concepts.jms_descriptor"/>), which can be used along with Vinci
+        and/or SOAP services in base UIMA applications. Conversely, Vinci services
+        <emphasis role="bold"> cannot</emphasis> be used within a UIMA AS service
+        because they do not comply to the UIMA standard requiring preservation of feature
+        structure IDs. SOAP service calls currently use a binary serialization of the CAS
+        which does preserve IDs and therefore can be called from a UIMA AS service.
+      </para></section></section>
   <!-- of ov.concepts.first_limits -->
   <!-- ======================================================= -->
   <!-- |             Application Level Concepts              | -->
