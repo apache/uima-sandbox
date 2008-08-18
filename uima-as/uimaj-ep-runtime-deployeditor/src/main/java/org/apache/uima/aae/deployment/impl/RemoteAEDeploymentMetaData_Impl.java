@@ -56,7 +56,8 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
   protected int initialFsHeapSize = DEFAULT_CAS_INITIAL_HEAP_SIZE;
 
   protected InputQueue    inputQueue = new InputQueue_Impl();
-  protected String        replyQueueLocation = DEFAULT_REPLY_QUEUE_LOCATION; // NOT defined
+  protected String        replyQueueLocation = null; // DEFAULT_REPLY_QUEUE_LOCATION; // NOT defined
+  protected int           replyQueueConsumers = -1; // DEFAULT_CONCURRENT_CONSUMERS; // NOT defined
   protected String        serializerMethod = "xmi"; // NOT defined
 
   protected AsyncAEErrorConfiguration errorConfiguration;
@@ -156,9 +157,36 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
           }
           
         } else if (TAG_REPLY_QUEUE.equalsIgnoreCase(elem.getTagName())) {
-          // setReplyQueueLocation(elem.getAttribute(TAG_ATTR_LOCATION));
-          setReplyQueueLocation(DDParserUtil.checkAndGetAttributeValue(TAG_REPLY_QUEUE, TAG_ATTR_LOCATION, elem, true));
-
+          val = DDParserUtil.checkAndGetAttributeValue(TAG_REPLY_QUEUE, TAG_ATTR_LOCATION, elem, false);
+          if (val != null && val.trim().length() > 0) {
+            val = val.trim();
+            if ( /*val.equalsIgnoreCase("local") ||*/  val.equalsIgnoreCase("remote")) {
+              setReplyQueueLocation(val);
+            } else {
+              throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                      new Object[] {val, TAG_ATTR_LOCATION });
+            }
+          }
+          
+          int n;
+          val = DDParserUtil.checkAndGetAttributeValue(TAG_REPLY_QUEUE, TAG_ATTR_CONCURRENT_CONSUMERS, elem, false);
+          if (val == null || val.trim().length() == 0) {
+            n = 1;
+          } else {
+            try {
+              n = Integer.parseInt(val);
+              if (n <= 0) {
+                // n = 1;
+                throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                        new Object[] { n, TAG_ATTR_CONCURRENT_CONSUMERS });
+              }
+            } catch (NumberFormatException e) {
+              throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                      new Object[] { TAG_ATTR_CONCURRENT_CONSUMERS }, e);
+            }
+          }
+          setReplyQueueConcurrentConsumers(n);
+                    
         } else if (TAG_SERIALIZER.equalsIgnoreCase(elem.getTagName())) {
           // setSerializerMethod(elem.getAttribute(TAG_ATTR_METHOD));
           setSerializerMethod(DDParserUtil.checkAndGetAttributeValue(TAG_SERIALIZER, TAG_ATTR_METHOD, elem, true));
@@ -270,10 +298,17 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
       attrs.clear();
     }
 
-    // <replyQueue location="[local|remote]"/> <!-- optional -->
-    if (getReplyQueueLocation() != null) {
-      attrs.addAttribute("", TAG_ATTR_LOCATION, TAG_ATTR_LOCATION,
-              null, getReplyQueueLocation());
+    // <replyQueue concurrentConsumers="1" location="[local|remote]"/> <!-- optional -->
+    // Note: location="local" is NO longer support. Will be warned by DDE
+    if (replyQueueConsumers > 1 || replyQueueLocation != null) {
+      if (replyQueueConsumers > 1) {
+        attrs.addAttribute("", TAG_ATTR_CONCURRENT_CONSUMERS, TAG_ATTR_CONCURRENT_CONSUMERS,
+                null, "" + replyQueueConsumers);        
+      }
+      if (replyQueueLocation != null) {
+        attrs.addAttribute("", TAG_ATTR_LOCATION, TAG_ATTR_LOCATION,
+                null, replyQueueLocation);
+      }
       aContentHandler.startElement("",
               TAG_REPLY_QUEUE, TAG_REPLY_QUEUE, attrs);
       aContentHandler.endElement("", "", TAG_REPLY_QUEUE);
@@ -402,6 +437,14 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
    */
   public void setInitialFsHeapSize(int initialFsHeapSize) {
       this.initialFsHeapSize = initialFsHeapSize;
+  }
+
+  public int getReplyQueueConcurrentConsumers() {
+    return replyQueueConsumers;
+  }
+
+  public void setReplyQueueConcurrentConsumers(int concurrentConsumers) {
+    replyQueueConsumers = concurrentConsumers;    
   }
 
 

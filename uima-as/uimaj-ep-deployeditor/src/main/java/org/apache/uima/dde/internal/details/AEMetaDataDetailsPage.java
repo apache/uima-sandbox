@@ -151,6 +151,8 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
   protected Text endPoint;
 
   protected CCombo remoteQueueLocation;
+  
+  protected Spinner replyQueueConsumers;
 
   protected Label serializerMethod;
 
@@ -202,17 +204,11 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
       } else if (e.getSource() == initialFsHeapSizeRemote) {
           updateInitialFsHeapSize(initialFsHeapSizeRemote.getSelection());
 
-      } else if (e.getSource() == remoteQueueLocation) {
-        String location;
-        if (remoteQueueLocation.getText().equals("no")) {
-          location = "local";
-        } else {
-          location = "remote";
-        }
-        ((RemoteAEDeploymentMetaData) currentMetaDataObject).setReplyQueueLocation(location);
+      } else if (e.getSource() == replyQueueConsumers) {
+        ((RemoteAEDeploymentMetaData) currentMetaDataObject).setReplyQueueConcurrentConsumers(replyQueueConsumers.getSelection());
       }
       multiPageEditor.setFileDirty();
-    }
+    } 
   };
 
   protected SelectionListener deploymentListener = new SelectionAdapter() {
@@ -383,7 +379,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     // /////////////////////////////////////////////////////////////////////
 
     // Run in AS mode
-    asMode = toolkit.createButton(compositeCoLocatedSetting, "Run as AS aggregate", SWT.CHECK);
+    asMode = toolkit.createButton(compositeCoLocatedSetting, Messages.DDE_AEMetaDataDetails_RunAsASAggregate, SWT.CHECK);
     gd = new GridData();
     gd.horizontalSpan = 2;
     asMode.setLayoutData(gd);
@@ -391,13 +387,13 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     // <scaleout numberOfInstances="1"/> <!-- optional -->
     scaleout = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
-            "Number of replicated instances:", SWT.BORDER, 1, Integer.MAX_VALUE, false);
+            Messages.DDE_AEMetaDataDetails_NumberOfReplicatedInstances, SWT.BORDER, 1, Integer.MAX_VALUE, false);
     scaleout.setSelection(1);
     scaleout.addSelectionListener(asynAggregateListener);
 
     // <casMultiplier poolSize="5"/> <!-- optional -->
     casMultiplierLabel = toolkit.createLabel(compositeCoLocatedSetting,
-            "Pool size for CAS Multiplier:");
+            Messages.DDE_AEMetaDataDetails_PoolSizeOfCM);
     casMultiplier = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
             casMultiplierLabel, SWT.BORDER, 0, Integer.MAX_VALUE, false);
     casMultiplier.setSelection(0);
@@ -405,7 +401,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     
     // initialFsHeapSize (default size is 2M)
     initialFsHeapSizeLabel = toolkit.createLabel(compositeCoLocatedSetting,
-            "Initial size of CAS heap (in bytes):");
+            Messages.DDE_AEMetaDataDetails_InitalSizeOfCASHeap);
     initialFsHeapSize = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
             initialFsHeapSizeLabel, SWT.BORDER, 1, 
             Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
@@ -420,7 +416,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     // Note: Need to add SWT.BORDER style to make the border VISIBLE in Linux
     brokerUrlDecoField = FormSection2.createLabelAndDecoratedText(toolkit, 
-            compositeRemoteSetting, "Broker URL for remote service:", 
+            compositeRemoteSetting, Messages.DDE_AEMetaDataDetails_BrokerURLForRemote, 
             currentMetaDataObject == null ?
                     "":((RemoteAEDeploymentMetaData) currentMetaDataObject).getInputQueue().getBrokerURL(), 
                     SWT.WRAP | SWT.BORDER, 10, 0);
@@ -437,7 +433,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     // Note: Need to add SWT.BORDER style to make the border VISIBLE in Linux
     endPointDecoField = FormSection2.createLabelAndDecoratedText(toolkit, 
-            compositeRemoteSetting, "Queue name for remote service:", 
+            compositeRemoteSetting, Messages.DDE_AEMetaDataDetails_QueueNameForRemote, 
             currentMetaDataObject == null ?
                     "":((RemoteAEDeploymentMetaData) currentMetaDataObject).getInputQueue().getEndPoint(), 
                     SWT.WRAP | SWT.BORDER, 10, 0);
@@ -448,16 +444,16 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     decorationEndPoint.setDescription("The name of the queue cannot be empty");
     endPointDecoField.addFieldDecoration(decorationEndPoint, SWT.LEFT | SWT.TOP, false);    
    
-    remoteQueueLocation = FormSection.createLabelAndCCombo(toolkit, compositeRemoteSetting,
-            "Service client is inside firewall:", SWT.BORDER | SWT.FLAT | SWT.READ_ONLY);
-    remoteQueueLocation.add("no");  // local
-    remoteQueueLocation.add("yes"); // remote
-    remoteQueueLocation.select(0);
-    remoteQueueLocation.addSelectionListener(asynAggregateListener);
+    replyQueueConsumers = FormSection2.createLabelAndSpinner(toolkit, compositeRemoteSetting,
+            Messages.DDE_AEMetaDataDetails_NumberOfConsumers, SWT.BORDER, 1, 
+            Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
+    replyQueueConsumers.setSelection(1);
+    replyQueueConsumers.addSelectionListener(asynAggregateListener);
+
 
     // <casMultiplier poolSize="5"/> <!-- optional -->
     casMultiplierLabelRemote = toolkit.createLabel(compositeRemoteSetting,
-            "Pool size of CasMultiplier:");
+            Messages.DDE_AEMetaDataDetails_PoolSizeOfCM);
     casMultiplierRemote = FormSection2.createLabelAndSpinner(toolkit, compositeRemoteSetting,
             casMultiplierLabelRemote, SWT.BORDER, 0, Integer.MAX_VALUE, false);
     casMultiplierRemote.setSelection(0);
@@ -465,7 +461,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
     // initialFsHeapSize (default size is 2M)
     initialFsHeapSizeLabelRemote = toolkit.createLabel(compositeRemoteSetting,
-            "Initial size of CAS heap (in bytes):");
+            Messages.DDE_AEMetaDataDetails_InitalSizeOfCASHeap);
     initialFsHeapSizeRemote = FormSection2.createLabelAndSpinner(toolkit, compositeRemoteSetting,
             initialFsHeapSizeLabelRemote, SWT.BORDER, 1, 
             Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
@@ -618,18 +614,8 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
       endPoint.setText(obj.getInputQueue().getEndPoint());
     }
 
-    if (obj.getReplyQueueLocation() != null) {
-      String yesOrno;
-      if (obj.getReplyQueueLocation().equals("local")) {
-        yesOrno = "no";
-      } else {
-        yesOrno = "yes";
-      }
-
-      int i = remoteQueueLocation.indexOf(yesOrno);
-      if (i >= 0) {
-        remoteQueueLocation.select(i);
-      }
+    if (obj.getReplyQueueConcurrentConsumers() > 0) {
+      replyQueueConsumers.setSelection(obj.getReplyQueueConcurrentConsumers());
     }
 
     if (obj.getResourceSpecifier() != null) {

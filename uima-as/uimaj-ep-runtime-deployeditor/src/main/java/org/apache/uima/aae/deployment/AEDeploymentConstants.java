@@ -42,6 +42,7 @@ public interface AEDeploymentConstants
     final static String     DEFAULT_ADDITIONAL_ERROR_ACTION = "terminate";
     final static boolean    DEFAULT_CONTINUE_ON_RETRY_FAILURE = false;
     final static String     DEFAULT_REPLY_QUEUE_LOCATION = "local";
+    final static int        DEFAULT_CONCURRENT_CONSUMERS = 1;
 
     final static public int    UNDEFINED_INT   = -1; // used to identify undefined integer
 
@@ -88,6 +89,7 @@ public interface AEDeploymentConstants
     final static public String TAG_IMPORT                  = "import";
 
     final static public String TAG_REPLY_QUEUE             = "replyQueue";
+    final static public String TAG_ATTR_CONCURRENT_CONSUMERS    = "concurrentConsumers";
 
     final static public String TAG_SERIALIZER              = "serializer";
     final static public String TAG_ATTR_METHOD             = "method";

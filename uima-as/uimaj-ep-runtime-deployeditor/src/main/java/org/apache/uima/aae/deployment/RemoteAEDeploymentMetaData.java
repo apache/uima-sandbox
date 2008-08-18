@@ -108,6 +108,11 @@ public interface RemoteAEDeploymentMetaData {
      */
     public void setReplyQueueLocation(String replyQueueLocation);
 
+    public int getReplyQueueConcurrentConsumers();
+
+    public void setReplyQueueConcurrentConsumers(int concurrentConsumers);
+    
+
     /**
      * @return the serializerMethod
      */

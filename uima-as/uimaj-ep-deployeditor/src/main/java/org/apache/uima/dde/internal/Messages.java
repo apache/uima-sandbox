@@ -68,6 +68,21 @@ public class Messages extends NLS {
 
   static public String DDE_AEConfigPage_ErrorConfig_Section_Title;
 
+  static public String DDE_AEMetaDataDetails_RunAsASAggregate;
+
+  static public String DDE_AEMetaDataDetails_NumberOfReplicatedInstances;
+
+  static public String DDE_AEMetaDataDetails_PoolSizeOfCM;
+
+  static public String DDE_AEMetaDataDetails_InitalSizeOfCASHeap;
+  
+  static public String DDE_AEMetaDataDetails_BrokerURLForRemote;
+
+  static public String DDE_AEMetaDataDetails_QueueNameForRemote;
+
+  static public String DDE_AEMetaDataDetails_NumberOfConsumers;
+
+
   /** ************************************************************************ */
 
   private Messages() {

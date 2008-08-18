@@ -289,10 +289,10 @@ public class OverviewPage extends AbstractHeaderPage {
     public void widgetSelected(SelectionEvent event) {
       if (event.getSource() == casPoolSize) {
         aeDeploymentDescription.setCasPoolSize(casPoolSize.getSelection());
-        multiPageEditor.setFileDirty();
+
       } else if (event.getSource() == initialFsHeapSize) {
         aeDeploymentDescription.setInitialFsHeapSize(initialFsHeapSize.getSelection());
-        multiPageEditor.setFileDirty();
+
       } else if (event.getSource() == customButton) {
         // Customization of C++
         if (customComposite == null) {
@@ -310,6 +310,7 @@ public class OverviewPage extends AbstractHeaderPage {
         serviceSectionClient.layout(true, true);
         mForm.reflow(true);
       }
+      multiPageEditor.setFileDirty();
     }
   };
   
@@ -656,6 +657,13 @@ public class OverviewPage extends AbstractHeaderPage {
             Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
     casPoolSize.setSelection(aeDeploymentDescription.getCasPoolSize());
     casPoolSize.addSelectionListener(selectionListener);
+    try {
+      if (!aeDeploymentDescription.getAeService().getAnalysisEngineDeploymentMetaData().isAsync()) {
+        casPoolSize.setEnabled(false);
+      }
+    } catch (InvalidXMLException e) {
+      e.printStackTrace();
+    }
 
     // initialFsHeapSize (default size is 2M)
     initialFsHeapSize = FormSection2.createLabelAndSpinner(toolkit, topComposite,
