@@ -1052,7 +1052,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			//	is not a Cas Multiplier
 			if ( forceToDropTheCas( cacheEntry, aStep ) )
 			{
-				if ( cacheEntry.isReplyReceived())
+				if ( cacheEntry.isReplyReceived() ) //|| isTopLevelComponent())
 				{
 					//	Drop the CAS and remove cache entry for it
 					dropCAS(aCasReferenceId, true);
@@ -1463,6 +1463,19 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 			else if (step instanceof FinalStep)
 			{
+				//	Special case: check if this CAS has just been produced by a Cas Multiplier.
+				//	If so, we received a new CAS but there are no delegates in the pipeline. 
+				//	The CM was the last in the flow. In this case, set a property in the cache
+				//	to simulate receipt of the reply to this CAS. This is so that the CAS is
+				//	released in the finalStep() when the Aggregate is not a Cas Multiplier.
+				if ( newCAS)
+				{
+					CacheEntry entry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+					if ( entry != null )
+					{
+						entry.setReplyReceived();
+					}
+				}
 				finalStep((FinalStep) step, aCasReferenceId);
 			}
 
