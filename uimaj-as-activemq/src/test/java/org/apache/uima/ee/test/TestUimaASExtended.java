@@ -368,6 +368,22 @@ public class TestUimaASExtended extends BaseTestSupport
 	    appCtx.put(UimaAsynchronousEngine.ReplyWindow, 1);
 	    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
 	}
+	/**
+	 * Tests Aggregate configuration where the Cas Multiplier delegate is the
+	 * last delegate in the Aggregate's pipeline 
+	 *   
+	 * @throws Exception
+	 */
+	public void testAggregateProcessCallWithLastCM() throws Exception
+	{
+		
+	    System.out.println("-------------- testAggregateProcessCallWithLastCM -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		//	Deploy Uima EE Primitive Services each with 6000ms delay in process()
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithLastCM.xml");
+		super.setExpectingServiceShutdown();
+	    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
+	}
 
 	/**
 	 * Tests shutdown while running with multiple/concurrent threads
