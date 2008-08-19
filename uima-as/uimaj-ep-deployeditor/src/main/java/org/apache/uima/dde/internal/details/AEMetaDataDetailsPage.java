@@ -735,12 +735,18 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     }
   }
 
+  /**
+   * Update the number of instances
+   * 
+   * @param value
+   * @return void
+   */
   private void updateScaleOut(int value) {
     if (currentMetaDataObject instanceof AEDeploymentMetaData) {
       ((AEDeploymentMetaData) currentMetaDataObject).setNumberOfInstances(value);
 
-    } else if (currentMetaDataObject instanceof RemoteAEDeploymentMetaData) {
-      // ((RemoteAEDeploymentMetaData) currentMetaDataObject).setNumberOfInstances(value);
+      // Set CAS pool size to the number of instances
+      multiPageEditor.getOverviewPage().setCasPoolSize(value);
 
     }
     masterPart.refresh();
@@ -787,6 +793,13 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
       }
     }
     metaData.setAsync(toAsyncAggreagte);
+    
+    // Enable/Disable CAS Pool Size Control
+    multiPageEditor.getOverviewPage().enableCasPoolSizeSettings(toAsyncAggreagte);
+    if (!toAsyncAggreagte) {
+      // Set CAS pool size to the number of instances
+      multiPageEditor.getOverviewPage().setCasPoolSize(metaData.getNumberOfInstances());
+    }
 
     masterPart.refresh();
     multiPageEditor.setFileDirty();

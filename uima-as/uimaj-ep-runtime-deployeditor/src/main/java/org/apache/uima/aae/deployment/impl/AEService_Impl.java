@@ -503,6 +503,10 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
    */
   public void setImportDescriptor(Import importDescriptor) {
     this.importDescriptor = importDescriptor;
+    
+    // Handle the case that the top AE descriptor is reloaded
+    importResolved = false;
+    topAnalysisEngineDescription = null;
   }
 
   /**

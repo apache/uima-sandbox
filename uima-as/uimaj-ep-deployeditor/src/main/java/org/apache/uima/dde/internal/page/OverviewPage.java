@@ -22,6 +22,7 @@ package org.apache.uima.dde.internal.page;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -184,6 +185,21 @@ public class OverviewPage extends AbstractHeaderPage {
     new ColumnWeightData(300)
   };
 
+  /** ********************************************************************** */
+  
+  // Used by AEMetaDataDetailsPage
+  public void enableCasPoolSizeSettings (boolean enable) {
+    casPoolSize.setEnabled(enable);
+  }
+ 
+  // Used by AEMetaDataDetailsPage
+  public void setCasPoolSize (int number) {
+    casPoolSize.setSelection(number); // Update control
+    aeDeploymentDescription.setCasPoolSize(number); // Update descriptor
+  }
+  
+  /** ********************************************************************** */
+  
   /**
    * Content provider for the environment var table
    */
@@ -659,7 +675,20 @@ public class OverviewPage extends AbstractHeaderPage {
     casPoolSize.addSelectionListener(selectionListener);
     try {
       if (!aeDeploymentDescription.getAeService().getAnalysisEngineDeploymentMetaData().isAsync()) {
+        // Top AE is not Async (it is a UIMA-AS Primitive)
         casPoolSize.setEnabled(false);
+        // Display warning if CAS pool size is not equal to the number of instances
+        int instances = aeDeploymentDescription.getAeService().getAnalysisEngineDeploymentMetaData().getNumberOfInstances();
+        if (casPoolSize.getSelection() != instances) {
+          if (Window.OK == Utility.popOkCancel("Warning - CAS Pool Size", MessageFormat.format(
+                "The CAS pool size (={0}) is not equal to the number of instances (={1}).\n\n"
+                  + "Set the CAS pool size to " + instances + "?",
+                new Object[] { casPoolSize.getSelection(), instances }), 
+                MessageDialog.WARNING)) {
+            setCasPoolSize(instances);
+            multiPageEditor.setFileDirty();
+          }
+        }
       }
     } catch (InvalidXMLException e) {
       e.printStackTrace();
@@ -859,6 +888,9 @@ public class OverviewPage extends AbstractHeaderPage {
     aeService.setImportDescriptor(importDescriptor);
     String relativeFile = UimaDescriptionUtils.getDescriptorFromImport(importDescriptor);
     try {
+      // Set Async=false (default value) to handle the case of reloading the Top AE's descriptor
+      aeService.getAnalysisEngineDeploymentMetaData().setAsync(false);
+      
       ResourceSpecifier rs = aeService.resolveTopAnalysisEngineDescription(multiPageEditor.cde.createResourceManager(), false);
       if (rs != null) { 
         if (rs instanceof AnalysisEngineDescription) {

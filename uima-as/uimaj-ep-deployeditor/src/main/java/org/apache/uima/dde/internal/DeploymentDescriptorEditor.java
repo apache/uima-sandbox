@@ -184,6 +184,12 @@ public class DeploymentDescriptorEditor implements IUimaMultiPageEditor, IUimaEd
     aeConfigPage.setInput(aeDD);
   }
   
+  // AEMetaDataDetailsPage needs to access OverviewPage to enable/disable some controls
+  // (e.g., CAS Pool Size)
+  public OverviewPage getOverviewPage () {
+    return overviewPage;
+  }
+  
   /** ********************************************************************** */
 
   /*
