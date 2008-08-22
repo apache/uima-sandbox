@@ -51,6 +51,42 @@ public class JmsMessageContext implements MessageContext
 		
 	}
 
+	public JmsMessageContext(Message aMessage, String anEndpointName) throws AsynchAEException
+	{
+		this();
+		endpointName = anEndpointName;
+		message = aMessage;
+		try
+		{
+			String msgFrom = (String)aMessage.getStringProperty(AsynchAEMessage.MessageFrom); 
+			if ( msgFrom != null )
+			{
+				endpoint.setEndpoint( msgFrom);
+			}
+			if ( aMessage.getJMSReplyTo() != null )
+			{
+				endpoint.setDestination(aMessage.getJMSReplyTo());
+			}
+			if ( aMessage.propertyExists(UIMAMessage.ServerURI) )
+			{
+				String selectedServerURI = chooseServerURI(aMessage.getStringProperty(UIMAMessage.ServerURI));
+				endpoint.setServerURI(selectedServerURI);
+				endpoint.setRemote(endpoint.getServerURI().startsWith("vm")==false);
+			}
+			//	Check if the client attached a special property that needs to be echoed back.
+			//	This enables the client to match the reply with the endpoint.
+			if ( aMessage.propertyExists(AsynchAEMessage.EndpointServer))
+			{
+				endpoint.setRemote(true);
+				endpoint.setEndpointServer(aMessage.getStringProperty(AsynchAEMessage.EndpointServer));
+			}
+		
+		}
+		catch( Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+	}
 	public String getEndpointName()
 	{
 		return endpointName;
@@ -84,60 +120,6 @@ public class JmsMessageContext implements MessageContext
 		}
 		
 		return serverURI;
-	}
-	public JmsMessageContext(Message aMessage, String anEndpointName) throws AsynchAEException
-	{
-		this();
-		endpointName = anEndpointName;
-		message = aMessage;
-		try
-		{
-			String msgFrom = (String)aMessage.getStringProperty(AsynchAEMessage.MessageFrom); 
-			if ( msgFrom != null )
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-	                    "JmsMessageContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_message_from__FINE",
-	                    new Object[] { msgFrom, aMessage.getStringProperty(UIMAMessage.ServerURI) });
-				endpoint.setEndpoint( msgFrom);
-			}
-			else
-			{
-				//	Undefined sender of the message. This may be ok.
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-	                    "JmsMessageContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_reply_queue_not_defined__WARNING");
-			}
-			if ( aMessage.getJMSReplyTo() != null )
-			{
-				endpoint.setDestination(aMessage.getJMSReplyTo());
-			}
-			if ( aMessage.getStringProperty(UIMAMessage.ServerURI) != null )
-			{
-				
-				String selectedServerURI = chooseServerURI(aMessage.getStringProperty(UIMAMessage.ServerURI));
-				
-				endpoint.setServerURI(selectedServerURI);
-				endpoint.setRemote(endpoint.getServerURI().startsWith("vm")==false);
-			}
-			else if ( aMessage.getIntProperty(AsynchAEMessage.MessageType) != AsynchAEMessage.Response)
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-	                    "JmsMessageContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_reply_queue_server_not_defined__WARNING");
-			}
-//			if ( aMessage.getBooleanProperty(AsynchAEMessage.RemoveEndpoint))
-//			{
-//endpoint.setRemove(true);
-//System.out.println("Remove Endpoint is set:"+endpoint.remove());
-//			}
-//			else
-//			{
-//				System.out.println("Remove Endpoint is not set");				
-//				
-//			}
-		}
-		catch( Exception e)
-		{
-			throw new AsynchAEException(e);
-		}
 	}
 	public boolean propertyExists(String aKey) throws AsynchAEException
 	{

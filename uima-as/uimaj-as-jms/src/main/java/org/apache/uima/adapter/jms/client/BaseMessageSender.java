@@ -21,6 +21,8 @@ package org.apache.uima.adapter.jms.client;
 
 import java.util.List;
 
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
 import javax.jms.InvalidDestinationException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -119,7 +121,6 @@ public abstract class BaseMessageSender implements Runnable,
 	/**
 	 * Signals any object that waits for the worker thread to initialize
 	 */
-
 	private void signal() {
 		synchronized (this) {
 			this.notifyAll();
@@ -170,32 +171,37 @@ public abstract class BaseMessageSender implements Runnable,
 
 		producer = getMessageProducer();
 		int counter=0;
-///		MessageProducer producer = getMessageProducer();
-
 		// Wait for messages from application threads. The uima ee client engine
-		// will call
-		// doStop() which sets the global flag 'done' to true.
+		// will call doStop() which sets the global flag 'done' to true.
+		PendingMessage pm = null;
 		while (!done) {
-			// First check if there are any pending messages in the shared
-			// 'queue'
-			if (pendingMessageList.size() == 0) {
-				// Block waiting for a message
-				synchronized (pendingMessageList) {
+			synchronized (pendingMessageList) {
+				// First check if there are any pending messages in the shared
+				// 	'queue'
+				while (pendingMessageList.size() == 0) {
+					// Block waiting for a message
 					try {
 						pendingMessageList.wait(0);
 					} catch (InterruptedException e) {
 					}
+					//	Check if the engine is terminating. When the client is stopping
+					//	it will signal 'pendingMessageList'. Check the state of the client
+					//	and break out from the wait loop if the client is stopping
+					if (done) {
+						break; // done in this loop
+					}
 				}
+				// Check if the uima as client is in stopped state. If it is, don't read
+				//	a message from the queue and just break out from the while loop. When
+				//	the client is stopped, the 'pendingMessageList' is signaled but there
+				//	is no message to read. The signal is done to force this thread to
+				//	break out of wait().
+				if (done) {
+					break; // done here
+				}
+				// Remove the oldest message from the shared 'queue'
+				pm = (PendingMessage) pendingMessageList.remove(0);
 			}
-			// The uima ee engine may have decided to stop, so first check to
-			// see if
-			// we should continue since the thread may have slept for a while
-			// (in wait() )
-			if (done) {
-				break; // done here
-			}
-			// Remove the oldest message from the shared 'queue'
-			PendingMessage pm = (PendingMessage) pendingMessageList.remove(0);
 
 			try {
 				//	Request JMS Message from the concrete implementation
@@ -230,8 +236,6 @@ public abstract class BaseMessageSender implements Runnable,
 						}
 						if (  pm.getMessageType() == AsynchAEMessage.Process )
 						{
-							//					ClientRequest cacheEntry = (ClientRequest)
-							//						engine.getCache().get(pm.get(AsynchAEMessage.CasReference));
 							cacheEntry.setCASDepartureTime(System.nanoTime());
 						}
 					}
@@ -296,4 +300,11 @@ public abstract class BaseMessageSender implements Runnable,
 		engine.onException(e, aDestination);
 
 	}
+	/**
+	 * @override
+	 */
+	public MessageProducer getMessageProducer(Destination destination) throws Exception {
+		return null;
+	}
+
 }
