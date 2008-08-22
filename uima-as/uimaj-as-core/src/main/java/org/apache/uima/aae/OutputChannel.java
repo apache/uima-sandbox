@@ -19,6 +19,7 @@
 
 package org.apache.uima.aae;
 
+import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.AsynchAEException;
@@ -46,7 +47,9 @@ public interface OutputChannel extends Channel
 	
 	public void sendReply( String aCasReferenceId, Endpoint anEndpoint ) throws AsynchAEException;
 
-//	public void sendReply( AnalysisEngineMetaData anAnalysisEngineMetadata, Endpoint anEndpoint, boolean serialize ) throws AsynchAEException;
+	public void sendReply( CacheEntry entry, Endpoint anEndpoint ) throws AsynchAEException;
+
+	//	public void sendReply( AnalysisEngineMetaData anAnalysisEngineMetadata, Endpoint anEndpoint, boolean serialize ) throws AsynchAEException;
 	public void sendReply( ProcessingResourceMetaData aProcessingResourceMetadata, Endpoint anEndpoint, boolean serialize ) throws AsynchAEException;
 
 	public void sendReply(Throwable t, String aCasReferenceId, Endpoint anEndpoint, int aCommand) throws AsynchAEException;

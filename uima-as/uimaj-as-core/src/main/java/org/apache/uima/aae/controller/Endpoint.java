@@ -136,4 +136,8 @@ public interface Endpoint
 	public void setIdleTime( long anIdleTime );
 	
 	public long getIdleTime();
+	
+	public void setEndpointServer( String anEndpointServer );
+	
+	public String getEndpointServer();
 }

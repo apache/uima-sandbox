@@ -31,10 +31,13 @@ import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
 import org.apache.uima.aae.jmx.ServiceErrors;
 import org.apache.uima.aae.jmx.ServiceInfo;
 import org.apache.uima.aae.jmx.ServicePerformance;
+import org.apache.uima.flow.FinalStep;
 
 public interface AggregateAnalysisEngineController extends AnalysisEngineController
 {
 	public void mergeTypeSystem(String aTypeSystem, String fromDestination) throws AsynchAEException;
+
+	public void mergeTypeSystem(String aTypeSystem, String fromDestination, String fromServer) throws AsynchAEException;
 
 	public void sendRequestForMetadataToRemoteDelegates() throws AsynchAEException;
 	
@@ -60,6 +63,8 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	
 	public String lookUpDelegateKey( String aDelegateEndpointName );
 	
+	public String lookUpDelegateKey( String aDelegateEndpointName, String server );
+
 	public UimaContext getChildUimaContext( String aDelegateEndpointName ) throws Exception;
 	
 //	public void retryCAS( String aCasReferenceId, Endpoint anEndpoint )throws AsynchAEException;
@@ -79,7 +84,7 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	
 	public String getLastDelegateKeyFromFlow(String anInputCasReferenceId);
 
-	public boolean sendRequestToReleaseCas();
+//	public boolean sendRequestToReleaseCas();
 	
 	public void registerChildController( AnalysisEngineController aChildController, String aDelegateKey) throws Exception;
 
@@ -105,5 +110,7 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 
 	public ServicePerformance getServicePerformance(String aDelegateKey );
 
-	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry );
+//	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry );
+	
+	public void finalStep( FinalStep aStep, String aCasReferenceId);
 }

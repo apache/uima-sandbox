@@ -61,7 +61,7 @@ implements AnalysisEngineInstancePool
 	 */
 	public void checkin(AnalysisEngine anAnalysisEngine) throws Exception
 	{
-		// 
+		aeInstanceMap.put(Thread.currentThread().getName(), anAnalysisEngine);
 	}
 
 	/**
@@ -72,7 +72,7 @@ implements AnalysisEngineInstancePool
 	 *  
 	 * @see org.apache.uima.aae.controller.AnalysisEngineInstancePool#checkout()
 	 **/
-	public AnalysisEngine checkout() throws Exception
+	public synchronized AnalysisEngine checkout() throws Exception
 	{
 		AnalysisEngine ae = null;
 		
@@ -95,13 +95,24 @@ implements AnalysisEngineInstancePool
 			}
 		}
 		//	ae may have been assigned above already, no need to fetch it again
+		
+		/*
 		if ( ae == null )
 		{
 			//	Fetch ae instance from the map using thread name as key. This mechanism assures that a thread
 			//	uses the same ae instance every time.
 			ae = (AnalysisEngine)aeInstanceMap.get(Thread.currentThread().getName()) ;
 		}
+		
 		return ae;
+		*/
+		
+		if ( aeInstanceMap.containsKey(Thread.currentThread().getName()) )
+		{
+			return (AnalysisEngine)aeInstanceMap.remove(Thread.currentThread().getName()) ;
+		}
+		else
+			return null;
 	}
 
 	/* (non-Javadoc)

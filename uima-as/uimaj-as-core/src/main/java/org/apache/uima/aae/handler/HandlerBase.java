@@ -21,11 +21,14 @@ package org.apache.uima.aae.handler;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
+import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
+import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
 import org.apache.uima.aae.message.UIMAMessage;
@@ -165,6 +168,7 @@ public abstract class HandlerBase implements Handler
 
 	public Handler getDelegate()
     {
+//		System.out.println("In getDelegate() - Returning:"+delegateHandler.getName());
     	return delegateHandler;
     }
     
@@ -217,5 +221,156 @@ public abstract class HandlerBase implements Handler
 	{
 	}
 	
+	protected synchronized void aggregateDelegateStats(MessageContext aMessageContext, String aCasReferenceId) throws AsynchAEException
+	{
+		String delegateKey = "";
+		try
+		{
+			
+			delegateKey = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
+			CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+			if ( entry == null )
+			{
+				throw new AsynchAEException("CasReferenceId:"+aCasReferenceId+" Not Found in the Cache.");
+			}
+			CacheEntry inputCasEntry = null;
+			String inputCasReferenceId = entry.getInputCasReferenceId();
+			ServicePerformance casStats = 
+				((AggregateAnalysisEngineController)getController()).getCasStatistics(aCasReferenceId);
+			if ( inputCasReferenceId != null && 
+				 getController().getInProcessCache().entryExists(inputCasReferenceId) )
+			{
+				String casProducerKey = entry.getCasProducerKey();
+				if ( casProducerKey != null &&
+					((AggregateAnalysisEngineController)getController()).
+						isDelegateKeyValid(casProducerKey) )
+				{
+					//	Get entry for the input CAS
+					inputCasEntry = getController().
+								getInProcessCache().
+									getCacheEntryForCAS(inputCasReferenceId);
+				}
+				
+			}
+			ServicePerformance delegateServicePerformance =
+				((AggregateAnalysisEngineController)getController()).getServicePerformance(delegateKey);
+
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeToSerializeCAS))
+			{
+				long timeToSerializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToSerializeCAS)).longValue();
+				if ( timeToSerializeCAS > 0)
+				{
+					if ( delegateServicePerformance != null )
+					{
+						delegateServicePerformance.
+						incrementCasSerializationTime(timeToSerializeCAS);
+					}
+				}
+			}
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeToDeserializeCAS))
+			{
+				long timeToDeserializeCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeToDeserializeCAS)).longValue();
+				if ( timeToDeserializeCAS > 0 )
+				{
+					if ( delegateServicePerformance != null )
+					{
+						delegateServicePerformance.
+							incrementCasDeserializationTime(timeToDeserializeCAS);
+					}
+				}
+			}
+
+			if (aMessageContext.propertyExists(AsynchAEMessage.IdleTime))
+			{
+				long idleTime = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.IdleTime)).longValue();
+				if ( idleTime > 0 && delegateServicePerformance != null )
+				{
+					Endpoint endp = aMessageContext.getEndpoint();
+					if ( endp != null && endp.isRemote())
+					{
+						delegateServicePerformance.incrementIdleTime(idleTime);
+					}
+				}
+			}
+			
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeWaitingForCAS))
+			{
+				long timeWaitingForCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeWaitingForCAS)).longValue();
+				if ( aMessageContext.getEndpoint().isRemote())
+				{
+					entry.incrementTimeWaitingForCAS(timeWaitingForCAS);
+					if ( inputCasEntry != null )
+					{
+						inputCasEntry.incrementTimeWaitingForCAS(timeWaitingForCAS);
+					}
+				}
+			}
+			if (aMessageContext.propertyExists(AsynchAEMessage.TimeInProcessCAS))
+			{
+				long timeInProcessCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeInProcessCAS)).longValue();
+				Endpoint endp = aMessageContext.getEndpoint();
+				if ( endp != null && endp.isRemote())
+				{
+					if ( delegateServicePerformance != null )
+					{
+						delegateServicePerformance.incrementAnalysisTime(timeInProcessCAS);
+					}
+				}
+				else 
+				{
+					getController().getServicePerformance().incrementAnalysisTime(timeInProcessCAS);
+				}
+				if ( inputCasReferenceId != null )
+				{
+					ServicePerformance inputCasStats = 
+						((AggregateAnalysisEngineController)getController()).
+							getCasStatistics(inputCasReferenceId);
+					// Update processing time for this CAS
+					if ( inputCasStats != null )
+					{
+						inputCasStats.incrementAnalysisTime(timeInProcessCAS);
+					}
+				}
+			}
+		}
+		catch( AsynchAEException e)
+		{
+			throw e;
+		}
+		catch( Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+	}
+	protected void computeStats(MessageContext aMessageContext, String aCasReferenceId) throws AsynchAEException
+	{
+		if (aMessageContext.propertyExists(AsynchAEMessage.TimeInService))
+		{
+			long departureTime = getController().getTime(aCasReferenceId, aMessageContext.getEndpoint().getEndpoint());
+			long currentTime = System.nanoTime();
+			long roundTrip = currentTime - departureTime;
+			long timeInService = aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeInService);
+			long totalTimeInComms = currentTime - (departureTime - timeInService);
+
+			
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	                "computeStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_roundtrip_time__FINE",
+	                new Object[] { aCasReferenceId, aMessageContext.getEndpoint(),(double) roundTrip / (double) 1000000 });
+
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	                "computeStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_time_spent_in_delegate__FINE",
+	                new Object[] { aCasReferenceId, (double) timeInService / (double) 1000000, aMessageContext.getEndpoint() });
+
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	                "computeStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_time_spent_in_comms__FINE",
+	                new Object[] { aCasReferenceId, (double) totalTimeInComms / (double) 1000000, aMessageContext.getEndpoint() });
+		}
+		
+			if ( getController() instanceof AggregateAnalysisEngineController )
+			{
+				aggregateDelegateStats( aMessageContext, aCasReferenceId );
+			}			
+	}
+
 
 }

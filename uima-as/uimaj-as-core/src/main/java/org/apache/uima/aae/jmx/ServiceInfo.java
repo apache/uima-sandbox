@@ -28,9 +28,23 @@ public class ServiceInfo implements ServiceInfoMBean
 	private static final String label="Service Info";
 	private String brokerURL="";
 	private String inputQueueName="";
+	private String replyQueueName="";
 	private String state="";
 	private String[] deploymentDescriptor= new String[] {""};
+	private boolean casMultiplier;
+	private boolean topLevel;
+	private String serviceKey;
+	private boolean aggregate;
 	
+	public ServiceInfo()
+	{
+		this(false);
+	}
+	
+	public ServiceInfo( boolean isaCasMultiplier )
+	{
+		casMultiplier = isaCasMultiplier;
+	}
 	public String getLabel()
 	{
 		return label;
@@ -68,6 +82,47 @@ public class ServiceInfo implements ServiceInfoMBean
 	{
 		state = aState;
 	}
+	public boolean isCASMultiplier()
+	{
+		return casMultiplier;
+	}
+	public void setCASMultiplier()
+	{
+		casMultiplier = true;
+	}
+	public void setTopLevel()
+	{
+		topLevel = true;
+	}
+	public boolean isTopLevel()
+	{
+		return topLevel;
+	}
 
+	public String getServiceKey() {
+		return serviceKey;
+	}
+
+	public void setServiceKey(String serviceKey) {
+		this.serviceKey = serviceKey;
+	}
+	
+	public String getReplyQueueName()
+	{
+		return replyQueueName;
+	}
+	
+	public void setReplyQueueName(String aReplyQueueName)
+	{
+		replyQueueName = aReplyQueueName;
+	}
+
+	public boolean isAggregate() {
+		return aggregate;
+	}
+
+	public void setAggregate(boolean aggregate) {
+		this.aggregate = aggregate;
+	}
 
 }

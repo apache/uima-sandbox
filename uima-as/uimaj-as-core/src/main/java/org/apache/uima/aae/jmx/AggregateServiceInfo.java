@@ -26,4 +26,14 @@ extends ServiceInfo implements AggregateServiceInfoMBean
 	/**
 	 * 
 	 */
+	
+	public AggregateServiceInfo()
+	{
+		super(false);
+	}
+	
+	public AggregateServiceInfo( boolean isaCasMultiplier )
+	{
+		super(isaCasMultiplier);
+	}
 }

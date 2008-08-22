@@ -19,6 +19,8 @@
 
 package org.apache.uima.aae.controller;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,6 +66,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.impl.AnalysisEngineManagementImpl;
 import org.apache.uima.analysis_engine.metadata.SofaMapping;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceCreationSpecifier;
 import org.apache.uima.resource.ResourceSpecifier;
@@ -148,6 +151,30 @@ implements AnalysisEngineController, EventSubscriber
 	
 	protected ConcurrentHashMap perCasStatistics = new ConcurrentHashMap();
 
+	private boolean casMultiplier = false;
+	
+	protected Object syncObject = new Object();
+	
+	//	Map holding outstanding CASes produced by Cas Multiplier that have to be acked
+	protected ConcurrentHashMap cmOutstandingCASes = new ConcurrentHashMap();
+	
+	private Object mux = new Object();
+	
+	private Object waitmux = new Object();
+	
+	private boolean waitingForCAS = false;
+	
+	private long startTime = System.nanoTime();
+	
+	private long totalWaitTimeForCAS = 0;
+	
+	private long lastCASWaitTimeUpdate = 0;
+
+	private Map<Long, AnalysisThreadState> threadStateMap =
+		new HashMap<Long,AnalysisThreadState>();
+	
+	
+
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -213,7 +240,14 @@ implements AnalysisEngineController, EventSubscriber
                 new Object[] { endpointName });
 		
 		resourceSpecifier = UimaClassFactory.produceResourceSpecifier(aDescriptor);
-
+		//	Is this service a CAS Multiplier?
+		if ( (resourceSpecifier instanceof AnalysisEngineDescription &&
+				((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes()) 
+				|| resourceSpecifier instanceof CollectionReaderDescription)
+		{
+			casMultiplier = true;
+		}
+		
 		paramsMap = new HashMap();
 		if ( aJmxManagement == null )
 		{
@@ -239,8 +273,9 @@ implements AnalysisEngineController, EventSubscriber
 				getUimaContextAdmin().getManagementInterface();
 			//	Override uima core jmx domain setting
 			mbean.setName(getComponentName(), getUimaContextAdmin(),jmxManagement.getJmxDomain());
-			if ( this instanceof PrimitiveAnalysisEngineController && resourceSpecifier instanceof AnalysisEngineDescription )
+			if ( resourceSpecifier instanceof AnalysisEngineDescription )
 			{
+				//	Is this service a CAS Multiplier?
 				if ( ((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes() )
 				{
 					System.out.println(getName()+"-Initializing CAS Pool for Context:"+getUimaContextAdmin().getQualifiedContextName());
@@ -350,11 +385,6 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		if ( this instanceof PrimitiveAnalysisEngineController )
 		{
-//			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.ProcessCount)) == null )
-//			{
-//				statistic = new LongNumericStatistic(Monitor.ProcessCount);
-//				getMonitor().addStatistic("", statistic);
-//			}
 			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.ProcessErrorCount)) == null )
 			{
 				statistic = new LongNumericStatistic(Monitor.ProcessErrorCount);
@@ -450,43 +480,52 @@ implements AnalysisEngineController, EventSubscriber
 		
 		String name = "";
 		int index = getIndex(); 
-		servicePerformance = new ServicePerformance();
-//		name = getJMXDomain()+key_value_list+",name="+thisComponentName+"_"+servicePerformance.getLabel();
+		servicePerformance = new ServicePerformance(this);
 		name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+servicePerformance.getLabel();
 		
-		
 		registerWithAgent(servicePerformance, name );
-
+		servicePerformance.setIdleTime(System.nanoTime());
+		
 		ServiceInfo serviceInfo = getInputChannel().getServiceInfo();
 		ServiceInfo pServiceInfo = null;
 
 		if ( this instanceof PrimitiveAnalysisEngineController )
 		{
 			pServiceInfo = ((PrimitiveAnalysisEngineController)this).getServiceInfo();
+			servicePerformance.setProcessThreadCount(((PrimitiveAnalysisEngineController)this).getServiceInfo().getAnalysisEngineInstanceCount());
+			//	If this is a Cas Multiplier, add the key to the JMX MBean.
+			//	This will help the JMX Monitor to fetch the CM Cas Pool MBean
+			if ( isCasMultiplier() )
+			{
+				pServiceInfo.setServiceKey(getUimaContextAdmin().getQualifiedContextName());
+			}
 		}
 		else
 		{
 			pServiceInfo = 
 				((AggregateAnalysisEngineController)this).getServiceInfo();
+			pServiceInfo.setAggregate(true);
 		}
 		if ( pServiceInfo != null )
 		{
-//			name = getJMXDomain()+key_value_list+",name="+thisComponentName+"_"+serviceInfo.getLabel();
 			name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+serviceInfo.getLabel();
-			
-			
 			if ( !isTopLevelComponent() )
 			{
 				pServiceInfo.setBrokerURL("Embedded Broker");
+			}
+			else
+			{
+				pServiceInfo.setTopLevel();
+			}
+			if ( isCasMultiplier())
+			{
+				pServiceInfo.setCASMultiplier();
 			}
 			registerWithAgent(pServiceInfo, name );
 		}
 
 		serviceErrors = new ServiceErrors();
-//		name = getJMXDomain()+key_value_list+",name="+thisComponentName+"_"+serviceErrors.getLabel();
 		name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+serviceErrors.getLabel();
-		
-		
 		registerWithAgent(serviceErrors, name );
 	}
 
@@ -519,6 +558,7 @@ implements AnalysisEngineController, EventSubscriber
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "initializeComponentCasPool", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_pool_config_INFO",
 	                new Object[] { getComponentName(), getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize, anInitialCasHeapSize/4});
+			
 		}
 
 	}
@@ -573,6 +613,10 @@ implements AnalysisEngineController, EventSubscriber
 			sInfo.setInputQueueName(aServiceInfo.getInputQueueName());
 			sInfo.setState(aServiceInfo.getState());
 			sInfo.setDeploymentDescriptor(deploymentDescriptor);
+			if ( isCasMultiplier())
+			{
+				sInfo.setCASMultiplier();
+			}
 		}
 		else
 		{
@@ -661,23 +705,12 @@ implements AnalysisEngineController, EventSubscriber
 			registeredWithJMXServer = true;
 			registerServiceWithJMX(jmxContext, false);
 		}
-/*		
-		if ( this instanceof AggregateAnalysisEngineController )
-		{
-			AggregateAnalysisEngineController aC = (AggregateAnalysisEngineController)this;
-			 if ( aC.requestForMetaSentToRemotes() == false && allDelegatesAreRemote )
-			 {
-				 aC.setRequestForMetaSentToRemotes();
-				 aC.sendRequestForMetadataToRemoteDelegates();
-			 }
-*/
 	}
 	public void addInputChannel( InputChannel anInputChannel )
 	{
 		if ( !inputChannelMap.containsKey(anInputChannel.getInputQueueName()))
 		{
 			inputChannelMap.put(anInputChannel.getInputQueueName(), anInputChannel);
-			
 		}
 	}
 	public InputChannel getInputChannel()
@@ -711,26 +744,7 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		return replyTime;
 	}
-	
-	public long getIdleTime( String aKey )
-	{
-		return idleTime;
-	}
-	
-	public synchronized void saveIdleTime( long snapshot, String aKey, boolean accumulate )
-	{
-		if ( accumulate )
-		{
-			LongNumericStatistic statistic;
-			//	Accumulate idle time across all processing threads
-			if ( (statistic = getMonitor().getLongNumericStatistic("",Monitor.IdleTime)) != null )
-			{
-				statistic.increment(snapshot);
-			}
-		}
-		getServicePerformance().incrementIdleTime(snapshot);
-		idleTime += snapshot;
-	}
+
 	protected void handleAction( String anAction, String anEndpoint, ErrorContext anErrorContext )
 	throws Exception
 	{
@@ -865,7 +879,7 @@ implements AnalysisEngineController, EventSubscriber
 				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removed_cache_entry__FINE",
 				                new Object[] {aCasReferenceId, getComponentName() });
 					}
-					inProcessCache.dumpContents();
+					inProcessCache.dumpContents(getComponentName());
 				}	
 			}
 			//	Remove stats from the map maintaining CAS specific stats
@@ -1081,7 +1095,7 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		else
 		{
-			casStats = new ServicePerformance();
+			casStats = new ServicePerformance(this);
 			perCasStatistics.put( aCasReferenceId, casStats);
 		}
 		return casStats;
@@ -1111,53 +1125,6 @@ implements AnalysisEngineController, EventSubscriber
 	}
 	
 	/**
-	 * Logs controller statistics in a uima log.
-	 * 
-	 * @param aComponentName 
-	 * @param aStatsMap
-	 */
-/*	
-	protected void logStats(String aComponentName, Map aStatsMap)
-	{
-		float totalIdleTime = 0;
-		long numberCASesProcessed = 0;
-		float totalDeserializeTime = 0;
-		float totalSerializeTime = 0;
-		
-		if ( aStatsMap.containsKey(Monitor.IdleTime))
-		{
-			totalIdleTime = ((Float)aStatsMap.get(Monitor.IdleTime)).floatValue();
-		}
-		if ( aStatsMap.containsKey(Monitor.ProcessCount))
-		{
-			numberCASesProcessed = ((Long)aStatsMap.get(Monitor.ProcessCount)).longValue();
-		}
-		if ( aStatsMap.containsKey(Monitor.TotalDeserializeTime))
-		{
-			totalDeserializeTime = ((Float)aStatsMap.get(Monitor.TotalDeserializeTime)).floatValue();
-		}
-		if ( aStatsMap.containsKey(Monitor.TotalDeserializeTime))
-		{
-			totalSerializeTime = ((Float)aStatsMap.get(Monitor.TotalSerializeTime)).floatValue();
-		}
-		float totalAEProcessTime=0;
-		if ( aStatsMap.containsKey(Monitor.TotalAEProcessTime))
-		{
-			totalAEProcessTime = ((Float)aStatsMap.get(Monitor.TotalAEProcessTime)).floatValue();
-		}
-
-		if ( totalAEProcessTime > 0 )
-		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "logStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_primitive_stats__INFO", new Object[] { aComponentName, totalIdleTime, numberCASesProcessed, totalDeserializeTime, totalSerializeTime, totalAEProcessTime });
-		}
-		else
-		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "logStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_aggregate_stats__INFO", new Object[] { aComponentName, totalIdleTime, numberCASesProcessed, totalDeserializeTime, totalSerializeTime });
-		}
-		
-	}
-*/	
-	/**
 	 * Clears controller statistics.
 	 * 
 	 */
@@ -1176,6 +1143,9 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		//	Clear CAS statistics
 		perCasStatistics.clear();
+		
+		
+	
 	}
 	/**
 	 * Returns a copy of the controller statistics.
@@ -1278,10 +1248,12 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		return getInputChannel().getInputQueueName();
 	}
+/*
 	public long getIdleTime()
 	{
 		return 0;
 	}
+*/	
 	public long getTotalTimeSpentSerializingCAS()
 	{
 		return 0;
@@ -1366,14 +1338,14 @@ implements AnalysisEngineController, EventSubscriber
 			((AggregateAnalysisEngineController_impl)this).stopTimers();
 			//	Stops ALL input channels of this service including the reply channels
 			stopInputChannels();
-			int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).childControllerList.size();
+			int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).getChildControllerList().size();
 			//	send terminate event to all collocated child controllers
 			if ( childControllerListSize > 0 )
 			{
 				for( int i=0; i < childControllerListSize; i++ )
 				{
 					AnalysisEngineController childController = 
-						(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).childControllerList.get(i);
+						(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).getChildControllerList().get(i);
 					
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop_delegate__INFO", new Object[] { getComponentName(), childController.getComponentName() });
 					childController.stop();
@@ -1488,23 +1460,6 @@ implements AnalysisEngineController, EventSubscriber
 			//	fully processed.
 			stopCasMultiplier();
 			stop();
-/*
-			//	If the InProcessCache is not empty ( CASes are still in play), register self
-			//	(the top level controller) to receive a callback when all CASes are fully
-			//	processed and the cache becomes empty. 
-			if ( !getInProcessCache().isEmpty() )
-			{
-				System.out.println("Controller:"+getComponentName()+" Cache Not Empty. Registering Self For Callback");			
-				getInProcessCache().dumpContents();
-				getInProcessCache().registerCallbackWhenCacheEmpty(this.getEventListener());
-			}
-			else  
-			{
-				// Cache is already empty - trigger shutdown. If this controller is an 
-			    // aggregate, it will propagate stop() down the delegate hierarchy
-				getEventListener().onCacheEmpty();
-			}
-*/		
 		}
 	}
 
@@ -1621,16 +1576,14 @@ implements AnalysisEngineController, EventSubscriber
 	
 	public AnalysisEngineController getCasMultiplierController()
 	{
-		int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).childControllerList.size();
+		int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).getChildControllerList().size();
 		if ( childControllerListSize > 0 )
 		{
 			for( int i=0; i < childControllerListSize; i++ )
 			{
 				AnalysisEngineController childController = 
-					(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).childControllerList.get(i);
-				if ( childController instanceof PrimitiveAnalysisEngineController  &&
-				    ((PrimitiveAnalysisEngineController)childController).isMultiplier()
-			       )
+					(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).getChildControllerList().get(i);
+				if ( childController.isCasMultiplier() )
 				{
 					return childController;
 				}
@@ -1651,7 +1604,6 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		return null;
 	}
-	
 	 
 	/**
 	 * Callback method called the InProcessCache becomes empty meaning ALL CASes are processed.
@@ -1725,12 +1677,12 @@ implements AnalysisEngineController, EventSubscriber
         if ( e != null )
         {
           ((ControllerCallbackListener)controllerListeners.get(i)).
-              notifyOnInitializationFailure(e);
+              notifyOnInitializationFailure(this, e);
         }
         else
         {
           ((ControllerCallbackListener)controllerListeners.get(i)).
-              notifyOnInitializationSuccess();
+              notifyOnInitializationSuccess(this);
         }
       }
 	  }
@@ -1742,4 +1694,416 @@ implements AnalysisEngineController, EventSubscriber
 				perCasStatistics.remove(aCasReferenceId);
 		}
 	  }
+	  
+	  public boolean isCasMultiplier()
+	  {
+		  return casMultiplier;
+	  }
+	  
+		public void releaseNextCas(String casReferenceId)
+		{
+			synchronized(syncObject)
+			{
+				//	Check if the CAS is in the list of outstanding CASes and also exists in the cache
+				if ( cmOutstandingCASes.size() > 0 && cmOutstandingCASes.containsKey(casReferenceId) && getInProcessCache().entryExists(casReferenceId))
+				{
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+			                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
+			                new Object[] { getComponentName(), casReferenceId });
+					try
+					{
+						CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(casReferenceId);
+						String parentCasReferenceId = cacheEntry.getInputCasReferenceId(); 
+						Endpoint freeCasEndpoint = cacheEntry.getFreeCasEndpoint();
+						//	If the CAS was created by a remote Cas Multiplier, send a Free CAS Notification
+						//	to the CM.
+						if ( freeCasEndpoint != null )
+						{
+							UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+					                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_sending_fcq_req__FINE",
+					                new Object[] { getComponentName(), casReferenceId, cacheEntry.getCasMultiplierKey(), freeCasEndpoint.getDestination() });
+							freeCasEndpoint.setReplyEndpoint(true);
+							getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, casReferenceId, freeCasEndpoint);
+						}
+						cacheEntry = null;
+						//	Release the CAS and remove it from the InProcess cache
+						dropCAS(casReferenceId, true);
+						//	Check if the CAS has a parent CAS
+						if ( parentCasReferenceId != null )
+						{
+							//	Fetch the parent CAS from the InProcess Cache
+							cacheEntry = getInProcessCache().getCacheEntryForCAS(parentCasReferenceId);
+							if ( cacheEntry != null  )
+							{
+								//	Decrement number of child CASes in play
+								//	Decrement has already happened in the final step before the CAS was sent to the client
+								//cacheEntry.decrementSubordinateCasInPlayCount();
+//								if ( cacheEntry.isPendingReply() && cacheEntry.getSubordinateCasInPlayCount() == 0)
+								if ( cacheEntry.isPendingReply() && getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId()))
+								{
+									if ( this instanceof AggregateAnalysisEngineController )
+									{
+										((AggregateAnalysisEngineController)this).finalStep( cacheEntry.getFinalStep(), parentCasReferenceId);
+									}
+									else // PrimitiveAnalysisEngineController 
+									{
+										//	Return an input CAS to the client. The input CAS is returned
+										//	to the remote client only if all of the child CASes produced
+										//	from the input CAS have been fully processed.
+										getOutputChannel().sendReply(cacheEntry.getCasReferenceId(), cacheEntry.getMessageOrigin());
+										dropCAS(cacheEntry.getCasReferenceId(), true);
+									}
+								}
+								
+							}
+						}
+						//	If debug level=FINEST dump the entire cache
+						getInProcessCache().dumpContents(getComponentName());
+
+					}
+					catch( Exception e)
+					{
+						e.printStackTrace();
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+				                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
+				                new Object[] { e});
+					}
+				}
+			}
+		}
+		
+		private boolean validMessageForSnapshot( int msgType )
+		{
+			return ( AsynchAEMessage.Process == msgType || AsynchAEMessage.CollectionProcessComplete == msgType);
+		}
+		
+		//	Called by ServicePerformance MBean on separate thread 
+		
+		//	This is called every time a request comes
+		public void beginProcess(int msgType )
+		{
+			//	Disregard GetMeta as it comes on a non-process thread
+			if ( validMessageForSnapshot( msgType ) )
+			{
+				synchronized( mux )
+				{
+					AnalysisThreadState threadState = null;
+					if ( threadStateMap.containsKey(Thread.currentThread().getId()))
+					{
+						threadState = threadStateMap.get(Thread.currentThread().getId());
+						if (threadState.isIdle) {
+							threadState.setIdle(false);
+							threadState.incrementIdleTime(System.nanoTime()-threadState.getLastUpdate());
+							threadState.computeIdleTimeBetweenProcessCalls();
+						}
+					}
+					else
+					{
+						threadStateMap.put(Thread.currentThread().getId(), new AnalysisThreadState(Thread.currentThread().getId()));
+						
+						threadState = threadStateMap.get(Thread.currentThread().getId());
+						threadState.setIdle(false);
+						threadState.incrementIdleTime(System.nanoTime()-startTime);
+						threadState.setLastMessageDispatchTime(startTime);
+						threadState.computeIdleTimeBetweenProcessCalls();
+					}
+				}
+			}
+		}
+		//	This is called every time a request is completed
+		public void endProcess( int msgType )
+		{
+			//	Disregard GetMeta as it comes on a non-process thread
+			if ( validMessageForSnapshot( msgType ) )
+			{
+				synchronized( mux )
+				{
+					AnalysisThreadState threadState = getThreadState();					
+					threadState.setLastUpdate(System.nanoTime());
+					threadState.setIdle(true);
+					threadState.setLastMessageDispatchTime();
+				}
+			}
+		}
+		public long getIdleTimeBetweenProcessCalls(int msgType)
+		{
+			if ( validMessageForSnapshot( msgType ) )
+			{
+				synchronized( mux )
+				{
+					AnalysisThreadState threadState = getThreadState();					
+					return threadState.getIdleTimeBetweenProcessCalls();
+				}
+			}
+			return 0;
+		}
+		public long getIdleTime()
+		{
+			synchronized( mux )
+			{
+				long now = System.nanoTime();
+				long serviceIdleTime = 0;
+				Set<Long> set = threadStateMap.keySet();
+				int howManyThreads = threadStateMap.size();
+				//	Iterate over all processing threads to calculate the total amount of idle time 
+				for(Long key: set )
+				{	
+					//	Retrieve the current thread state information from the global map. The key is
+					//	the thread id.
+					 AnalysisThreadState threadState = threadStateMap.get(key);
+					 //	add this thread idle time
+					 serviceIdleTime += threadState.getIdleTime() ;
+					 
+					 //	If this thread is currently idle, compute amount of time elapsed since the last
+					 //	update. The last update has been done at the last startProcess() or endProcess() call.
+					 if ( threadState.isIdle())
+					 {
+						 //	compute idle time since the last update
+						 long delta = now - threadState.getLastUpdate();
+
+						 threadState.setLastUpdate(System.nanoTime());
+
+						 //	increment total idle time
+						 threadState.incrementIdleTime(delta);
+						 //	add the elapsed time since the last update to the total idle time
+						 serviceIdleTime += delta;
+					 }
+				}
+				//	If process CAS request has not yet been received, there are not process threads 
+				//	created yet. Simply return the delta since the service started. This is a special
+				//	case which is only executing if the client has not sent any CASes for processing.
+				if ( howManyThreads == 0)
+				{
+					return System.nanoTime()-startTime;
+				}
+				else
+				{
+					//	Return accumulated idle time from all processing threads. Divide the total idle by the 
+					//	number of process threads.
+					
+					if ( this instanceof PrimitiveAnalysisEngineController )
+					{
+						int aeInstanceCount = ((PrimitiveAnalysisEngineController)this).getAEInstanceCount();
+						serviceIdleTime += (aeInstanceCount - howManyThreads)*(System.nanoTime()-startTime);
+						return serviceIdleTime/aeInstanceCount;
+					}
+					else
+					{
+						return serviceIdleTime;
+					}
+				}
+			}
+		}
+
+		/**
+		 * Returns CPU Time with nanosecond precision (not nanosecond accuracy). If the OS/JVM
+		 * does not support reporting the CPU Time, returns the wall clock time. 
+		 */
+		public synchronized long getCpuTime() 
+		{
+			if ( ManagementFactory.getPlatformMBeanServer() != null )
+			{
+				ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+			    return bean.isCurrentThreadCpuTimeSupported( ) ? bean.getCurrentThreadCpuTime( ) : System.nanoTime();
+			}
+			return System.nanoTime();
+		}
+		private synchronized long getCpuTime(long threadId) 
+		{
+			if ( ManagementFactory.getPlatformMBeanServer() != null )
+			{
+				ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+			    return bean.isCurrentThreadCpuTimeSupported( ) ? bean.getThreadCpuTime(threadId): System.nanoTime();
+			}
+			return System.nanoTime();
+		}
+		
+		private AnalysisThreadState getFirstThreadState()
+		{
+			Set<Long> set = threadStateMap.keySet();
+			Iterator<Long> it = set.iterator();
+			return threadStateMap.get(it.next());
+
+		}
+		/**
+		 * Returns the {@link AnalysisThreadState} object associated with the current thread.
+		 * 
+		 * @return
+		 */
+		private AnalysisThreadState getThreadState()
+		{
+			AnalysisThreadState threadState;
+			if ( this instanceof AggregateAnalysisEngineController )
+			{
+				threadState = getFirstThreadState();
+			}
+			else
+			{
+				threadState = threadStateMap.get(Thread.currentThread().getId());
+				if ( threadState == null )
+				{
+					//	This may be the case if the thread processing
+					//	FreeCASRequest is returning an input CAS to the client.
+					//	This thread is different from the process thread, thus
+					//	we just return the first thread's state.
+					threadState = getFirstThreadState();
+				}
+			}
+			return threadState;
+		}
+		
+		/**
+		 * Returns the total CPU time all processing threads spent in analysis.
+		 * This method subtracts the serialization and de-serialization time from
+		 * the total. If this service is an aggregate, the return time is a sum
+		 * of CPU utilization in each colocated delegate.
+		 */
+		public long getAnalysisTime()
+		{
+			Set<Long> set = threadStateMap.keySet();
+			Iterator<Long> it = set.iterator();
+			long totalCpuProcessTime = 0;
+			//	Iterate over all processing threads
+			while( it.hasNext())
+			{
+				long threadId = it.next();
+				synchronized( mux )
+				{
+					//	Fetch the next thread's stats
+					AnalysisThreadState threadState = threadStateMap.get(threadId);
+					//	If an Aggregate service, sum up the CPU times of all collocated
+					//	delegates.
+					if ( this instanceof AggregateAnalysisEngineController_impl )
+					{
+						//	Get a list of all colocated delegate controllers from the Aggregate
+						List<AnalysisEngineController> delegateControllerList = 
+							((AggregateAnalysisEngineController_impl)this).childControllerList; 							
+						//	Iterate over all colocated delegates
+						for( int i=0; i < delegateControllerList.size(); i++)
+						{	
+							//	Get the next delegate's controller
+							AnalysisEngineController delegateController =
+								(AnalysisEngineController)delegateControllerList.get(i);
+							if ( delegateController != null && !delegateController.isStopped())
+							{
+								//	get the CPU time for all processing threads in the current controller
+								totalCpuProcessTime += delegateController.getAnalysisTime();
+							}
+						}
+					}
+					else  // Primitive Controller
+					{
+						//	Get the CPU time of a thread with a given ID
+						totalCpuProcessTime += getCpuTime(threadId);
+					}
+					//	Subtract serialization and deserialization times from the total CPU used
+					if ( totalCpuProcessTime > 0 )
+					{
+						totalCpuProcessTime -= threadState.getDeserializationTime();
+						totalCpuProcessTime -= threadState.getSerializationTime();
+					}
+				}
+			}
+			return totalCpuProcessTime;
+		}
+		/**
+		 * Increments the time this thread spent in serialization of a CAS
+		 */
+		public void incrementSerializationTime(long cpuTime)
+		{
+			synchronized( mux )
+			{
+				AnalysisThreadState threadState = getThreadState();
+				threadState.incrementSerializationTime(cpuTime);
+			}
+		}
+		/**
+		 * Increments the time this thread spent in deserialization of a CAS
+		 */
+		public void incrementDeserializationTime(long cpuTime)
+		{
+			synchronized( mux )
+			{
+				AnalysisThreadState threadState = getThreadState();
+				threadState.incrementDeserializationTime(cpuTime);
+			}
+		}
+		private class AnalysisThreadState
+		{
+			private long threadId;
+			
+			private boolean isIdle = false;
+			private long lastUpdate = 0;
+			private long totalIdleTime = 0;
+			//	Measures idle time between process CAS calls
+			private long idleTimeSinceLastProcess = 0;
+			private long lastMessageDispatchTime = 0;
+			
+			private long serializationTime = 0;
+			private long deserializationTime = 0;
+			
+			public AnalysisThreadState( long aThreadId )
+			{
+				threadId = aThreadId;
+			}
+			
+			public long getThreadId()
+			{
+				return threadId;
+			}
+			public long getSerializationTime() {
+				return serializationTime;
+			}
+			public void incrementSerializationTime(long serializationTime) {
+				this.serializationTime += serializationTime;
+			}
+			public long getDeserializationTime() {
+				return deserializationTime;
+			}
+			public void incrementDeserializationTime(long deserializationTime) {
+				this.deserializationTime += deserializationTime;
+			}
+			public boolean isIdle() {
+				return isIdle;
+			}
+			public void computeIdleTimeBetweenProcessCalls()
+			{
+				idleTimeSinceLastProcess = System.nanoTime() - lastMessageDispatchTime;
+			}
+			public void setLastMessageDispatchTime( long aTime )
+			{
+				lastMessageDispatchTime = aTime;
+			}
+			public void incrementIdleTime( long idleTime )
+			{
+				totalIdleTime += idleTime;
+			}
+			public void setIdle(boolean isIdle) {
+				this.isIdle = isIdle;
+			}
+			public long getIdleTime()
+			{
+				return totalIdleTime;
+			}
+			public void setLastMessageDispatchTime()
+			{
+				lastMessageDispatchTime = System.nanoTime();
+			}
+			public long getIdleTimeBetweenProcessCalls()
+			{
+				long val = idleTimeSinceLastProcess;
+				//	Reset so that only one reply contains a non-zero value
+				idleTimeSinceLastProcess = 0;
+				return val;
+			}
+			public long getLastUpdate() {
+				return lastUpdate;
+			}
+			public void setLastUpdate(long lastUpdate) {
+				this.lastUpdate = lastUpdate;
+			}
+			
+		}
+		
+		
 }

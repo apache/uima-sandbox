@@ -30,7 +30,16 @@ extends ServiceInfo implements PrimitiveServiceInfoMBean//, ServiceInfoMBean
 	/**
 	 * 
 	 */
+	public PrimitiveServiceInfo()
+	{
+		super(false);
+	}
 	
+	public PrimitiveServiceInfo( boolean isaCasMultiplier )
+	{
+		super(isaCasMultiplier);
+	}
+
 	private int instanceCount = 0;
 	
 	public int getAnalysisEngineInstanceCount()

@@ -47,15 +47,21 @@ public class UimaASProcessStatusImpl implements UimaASProcessStatus
 	  public boolean isProcessed = true;
 
 	  private String casReferenceId;
+
+	  private String parentCasId;
 	  
 	  public UimaASProcessStatusImpl(ProcessTrace p){
 	      this(p,null);
 	  }
 	  public UimaASProcessStatusImpl(ProcessTrace p, String aCasReferenceId) {
+	      this(p,aCasReferenceId,null);
+	  }
+
+	  public UimaASProcessStatusImpl(ProcessTrace p, String aCasReferenceId, String aParentCasReferenceId) {
 		    prT = p;
 		    casReferenceId = aCasReferenceId;
-		  }
-
+		    parentCasId = aParentCasReferenceId;
+	  }
 	  public UimaASProcessStatusImpl(ProcessTrace p, boolean aSkip) {
 	    prT = p;
 	    isSkipped = aSkip;
@@ -142,5 +148,8 @@ public class UimaASProcessStatusImpl implements UimaASProcessStatus
 
 	public String getCasReferenceId() {
 		return casReferenceId;
+	}
+	public String getParentCasReferenceId() {
+		return parentCasId;
 	}
 	}

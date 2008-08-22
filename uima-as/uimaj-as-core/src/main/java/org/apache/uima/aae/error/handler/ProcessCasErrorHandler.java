@@ -138,6 +138,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 	}
 	public boolean handleError(Throwable t, ErrorContext anErrorContext, AnalysisEngineController aController)
 	{
+		CacheEntry parentCasCacheEntry = null;
 		
 		if ( !isHandlerForError(anErrorContext, AsynchAEMessage.Process))
 		{
@@ -372,7 +373,6 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			  }
 			  catch( Exception exc) {}
 			}
-	
 			//	Check if the caller has already decremented number of subordinates. This property is only
 			//	set in the Aggregate's finalStep() method before the CAS is sent back to the client. If
 			//	there was a problem sending the CAS to the client, we dont want to update the counter 
@@ -388,12 +388,11 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 					{
 						try
 						{
-							CacheEntry parentCasCacheEntry = aController.getInProcessCache().
+							parentCasCacheEntry = aController.getInProcessCache().
 																getCacheEntryForCAS(parentCasReferenceId);
 							synchronized( parentCasCacheEntry )
 							{
-								((AggregateAnalysisEngineController)aController).
-								decrementCasSubordinateCount( parentCasCacheEntry);
+								parentCasCacheEntry.decrementSubordinateCasInPlayCount();
 								if ( parentCasCacheEntry.getSubordinateCasInPlayCount() == 0 &&
 									 parentCasCacheEntry.isPendingReply())
 								{
@@ -499,6 +498,11 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			}			
 			if ( casReferenceId != null && aController instanceof AggregateAnalysisEngineController )
 			{
+				if ( parentCasCacheEntry != null && parentCasCacheEntry.getSubordinateCasInPlayCount() == 0 &&
+						 parentCasCacheEntry.isPendingReply())
+					{
+					((AggregateAnalysisEngineController)aController).finalStep(parentCasCacheEntry.getFinalStep(), parentCasCacheEntry.getCasReferenceId());
+					}
 				//	Cleanup state information from local caches
 				((AggregateAnalysisEngineController)aController).dropFlow(casReferenceId, true);
 				((AggregateAnalysisEngineController)aController).removeMessageOrigin(casReferenceId);

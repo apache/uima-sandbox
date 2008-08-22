@@ -30,7 +30,6 @@ public interface InputChannel extends Channel
 	public void setServerUri(String aServerUri);
 	public String getInputQueueName();
 	public ServiceInfo getServiceInfo();
-//	public void stop() throws Exception;
 	public boolean isStopped();
     
 }
