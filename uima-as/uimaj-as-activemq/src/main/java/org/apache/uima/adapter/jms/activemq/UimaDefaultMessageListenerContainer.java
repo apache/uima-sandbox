@@ -35,6 +35,7 @@ import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.controller.Endpoint_impl;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.Threshold;
 import org.apache.uima.aae.error.handler.GetMetaErrorHandler;
@@ -50,15 +51,21 @@ implements ExceptionListener
 	private static final Class CLASS_NAME = UimaDefaultMessageListenerContainer.class;
 	private String destinationName="";
 	private Endpoint endpoint;
+	private boolean freeCasQueueListener;
 	private AnalysisEngineController controller;
 	private int retryCount = 2;
+	
 	public UimaDefaultMessageListenerContainer()
 	{
 		super();
-		setRecoveryInterval(20000);
-		//setAcceptMessagesWhileStopping(false);
+		setRecoveryInterval(60000);
+		setAcceptMessagesWhileStopping(false);
 		setExceptionListener(this);
-		
+	}
+	public UimaDefaultMessageListenerContainer(boolean freeCasQueueListener)
+	{
+		this();
+		this.freeCasQueueListener = freeCasQueueListener;
 	}
 	public void setController( AnalysisEngineController aController)
 	{
@@ -84,25 +91,6 @@ implements ExceptionListener
 	                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
 	                new Object[] {  endpointName, getBrokerUrl(), t });
 
-/*
-				while ( retryCount > 0 )
-			{
-				retryCount--;
-				String brokerURL = ((ActiveMQConnectionFactory)getConnectionFactory()).getBrokerURL();
-				System.out.println(">>>>> Retrying Connection To Broker:"+brokerURL+" Endpoint:"+endpoint.getEndpoint()+" Sleeping For 1 Minute Before Retry. Retries Remaining:"+retryCount);
-				//	Retry the connection
-				try
-				{
-					establishSharedConnection();
-					synchronized(this)
-					{
-						wait(60000);
-					}
-					break;
-				}
-				catch( Exception e) {}
-			}
-*/
 			boolean terminate = true;
 			if (  disableListener(t) )
 			{
@@ -311,5 +299,8 @@ implements ExceptionListener
 	{
 		endpoint = anEndpoint;
 	}
-
+	public boolean isFreeCasQueueListener()
+	{
+		return freeCasQueueListener;
+	}
 }

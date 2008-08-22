@@ -24,10 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import mx4j.tools.adaptor.http.GetAttributeCommandProcessor;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.InputChannel;
@@ -40,6 +45,7 @@ import org.apache.uima.aae.handler.HandlerBase;
 import org.apache.uima.aae.jmx.ServiceInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
+import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.message.JmsMessageContext;
 import org.apache.uima.util.Level;
@@ -85,6 +91,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	private boolean	channelRegistered = false;
 	
 	private List listenerContainerList = new ArrayList();
+	
+	private Object mux = new Object();
 	
 	public AnalysisEngineController getController()
 	{
@@ -171,6 +179,32 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				return false;
 			}
 			return true;
+		}
+		return false;
+	}
+	private boolean isRemoteRequest( Message aMessage ) throws Exception
+	{
+		
+		//	Dont do checkpoints if a message was sent from a Cas Multiplier
+		if ( aMessage.propertyExists(AsynchAEMessage.CasSequence))
+		{
+			return false;
+		}
+
+		Map properties = ((ActiveMQMessage)aMessage).getProperties();
+		if ( properties.containsKey(AsynchAEMessage.MessageType) &&
+			 properties.containsKey(AsynchAEMessage.Command) &&
+			 properties.containsKey(UIMAMessage.ServerURI))
+		{
+			int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+			int command = aMessage.getIntProperty(AsynchAEMessage.Command);
+			boolean isRemote = aMessage.getStringProperty(UIMAMessage.ServerURI).startsWith("vm") == false;
+			if ( isRemote && msgType == AsynchAEMessage.Request &&
+					(command == AsynchAEMessage.Process ||
+					 command == AsynchAEMessage.CollectionProcessComplete) )
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -265,7 +299,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	{
 		int command = aMessage.getIntProperty(AsynchAEMessage.Command);
 		int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
-
+		if ( isStopped() || getController() == null || getController().getInProcessCache() == null )
+		{
+			//	Shutting down 
+			return true;
+		}
 		if ( command == AsynchAEMessage.Process && msgType == AsynchAEMessage.Response )
 		{
 			String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
@@ -398,32 +436,33 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		return false;
 	}
 	
-	private synchronized long computeIdleTime()
+	private boolean isCheckpointWorthy( Message aMessage ) throws Exception
 	{
-		try
+		synchronized( mux )
 		{
-			boolean isAggregate = getController() instanceof AggregateAnalysisEngineController;
-			if ( isAggregate || !((PrimitiveAnalysisEngineController)getController()).isMultiplier() )
+			//	Dont do checkpoints if a message was sent from a Cas Multiplier
+			if ( aMessage.propertyExists(AsynchAEMessage.CasSequence))
 			{
-				long lastReplyTime = getController().getReplyTime();
-				if ( lastReplyTime > 0 )
+				return false;
+			}
+			Map properties = ((ActiveMQMessage)aMessage).getProperties();
+			if ( properties.containsKey(AsynchAEMessage.MessageType) &&
+				 properties.containsKey(AsynchAEMessage.Command) &&
+				 properties.containsKey(UIMAMessage.ServerURI))
+			{
+				int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+				int command = aMessage.getIntProperty(AsynchAEMessage.Command);
+				if ( msgType == AsynchAEMessage.Request &&
+						(command == AsynchAEMessage.Process ||
+						 command == AsynchAEMessage.CollectionProcessComplete) )
 				{
-					long t = System.nanoTime();
-					long delta = t-(long)lastReplyTime;
-					getController().saveIdleTime(delta, "", true);
-					return delta;
+					return true;
 				}
 			}
+			return false;
+			
 		}
-		catch( Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 0;
 	}
-
-	
-	
 	/**
 	 * Receives Messages from the JMS Provider. It checks the message header
 	 * to determine the type of message received. Based on the type,
@@ -436,38 +475,49 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	 */
 	public void onMessage(Message aMessage, Session aJmsSession )
 	{
+		if ( isStopped() )
+		{
+			return;
+		}
+		
+		
 		try
 		{
 			//	wait until message handlers are plugged in
 			msgHandlerLatch.await();
 		}
 		catch( InterruptedException e) {}
-		
 		try
 		{
 			//	wait until the controller is plugged in
 			controllerLatch.await();
 		}
 		catch( InterruptedException e) {}
+		long idleTime = 0;
 
+		boolean doCheckpoint = false;
 		
+		String eN = endpointName;
+		if ( getController() != null )
+		{
+			eN = getController().getComponentName();
+			if (eN == null )
+			{
+				eN = "";
+			}
+		}
+		
+
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_msg__FINE",
-                new Object[] { endpointName });
+                new Object[] { eN });
 		JmsMessageContext messageContext = null;
-		long idleTime = 0;
+
+		int requestType = 0;
 		try
 		{
-			if ( isProcessRequest(aMessage) )
-			{
-				//	Compute the time between waiting for this request and update
-				//	this service performance stats.
-				idleTime = computeIdleTime();
-			}
-
 			//	Wrap JMS Message in MessageContext
 			messageContext = new JmsMessageContext( aMessage, endpointName );
-			messageContext.getEndpoint().setIdleTime(idleTime);
 			if ( jmsSession == null )
 			{
 				jmsSession = aJmsSession;
@@ -502,9 +552,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			}
 			if ( validMessage(aMessage) )
 			{
-
-				
-				
 				String command = decodeIntToString(AsynchAEMessage.Command, aMessage.getIntProperty(AsynchAEMessage.Command) );
 				String messageType =  decodeIntToString(AsynchAEMessage.MessageType, aMessage.getIntProperty(AsynchAEMessage.MessageType) );
 				if ( ackMessageNow(aMessage))
@@ -541,8 +588,34 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			                    new Object[] { controller.getComponentName(), msgFrom, messageType, command, casRefId });
 					}
 				}
+				else
+				{
+				}
 				//	Delegate processing of the message contained in the MessageContext to the
 				//	chain of handlers
+				try
+				{
+					if ( isRemoteRequest( aMessage ))
+					{
+						//	Compute the idle time waiting for this request 
+						idleTime = getController().getIdleTime();
+						
+						//	This idle time is reported to the client thus save it in the endpoint
+						//	object. This value will be fetched and added to the outgoing reply.
+						messageContext.getEndpoint().setIdleTime(idleTime);
+					}
+				}
+				catch( Exception e ) {}
+
+				//	Determine if this message is a request and either GetMeta, CPC, or Process
+				doCheckpoint = isCheckpointWorthy( aMessage );
+				requestType = aMessage.getIntProperty(AsynchAEMessage.Command);
+				//	Checkpoint
+				if ( doCheckpoint )
+				{
+					getController().beginProcess(requestType);
+				}
+
 				
 				if ( handler != null )
 				{
@@ -563,6 +636,14 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 
 			controller.getErrorHandlerChain().handle(t, HandlerBase.populateErrorContext( messageContext ), controller);			
 		}
+		finally
+		{
+			//	Call the end checkpoint for non-aggregates. For primitives the CAS has been fully processed if we are here
+			if ( doCheckpoint && getController() instanceof PrimitiveAnalysisEngineController )
+			{
+				getController().endProcess(requestType);
+			}
+		}
 	}
 	
 	public int getSessionAckMode()
@@ -575,10 +656,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	}
 	public synchronized void setListenerContainer(UimaDefaultMessageListenerContainer messageListener)
 	{
-			this.messageListener = messageListener;
-			System.setProperty("BrokerURI", messageListener.getBrokerUrl());
-			brokerURL = messageListener.getBrokerUrl();
-			listenerContainerList.add(messageListener);
+		this.messageListener = messageListener;
+		System.setProperty("BrokerURI", messageListener.getBrokerUrl());
+		brokerURL = messageListener.getBrokerUrl();
+		listenerContainerList.add(messageListener);
+		this.messageListener = messageListener;
 		if ( getController() != null )
 		{
 			try
@@ -586,6 +668,17 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				getController().addInputChannel(this);
 				messageListener.setController(getController());
 			} catch( Exception e) {}
+		}
+	}
+	public ActiveMQConnectionFactory getConnectionFactory()
+	{
+		if (messageListener == null )
+		{
+			return null;
+		}
+		else
+		{
+			return (ActiveMQConnectionFactory)messageListener.getConnectionFactory();
 		}
 	}
 	public void ackMessage( MessageContext aMessageContext )
@@ -680,22 +773,5 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	{
 		return stopped;
 	}
-/*	
-	private void spinThreadForListenerShutdown(final UimaDefaultMessageListenerContainer listenerContainer)
-	{
-		new Thread("Shutdown Thread For Listener:"+listenerContainer.getEndpointName()) {
-			public void run()
-			{
-				try
-				{
-					listenerContainer.stop();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
-			                "spinThreadForListenerShutdown.run()", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stop_listener__INFO",
-			                new Object[] {  listenerContainer.getEndpointName() });
-				}
-				catch( Exception e) { e.printStackTrace();}
-			}
-		}.start();
-	}
-*/	
+
 }

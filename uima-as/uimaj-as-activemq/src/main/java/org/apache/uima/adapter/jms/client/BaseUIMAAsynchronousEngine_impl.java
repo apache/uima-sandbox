@@ -54,6 +54,8 @@ import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
 import org.apache.uima.adapter.jms.activemq.UimaEEAdminSpringContext;
 import org.apache.uima.adapter.jms.service.Dd2spring;
+import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceConfigurationException;
@@ -163,6 +165,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 			msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload);
 			msg.setJMSReplyTo(consumerDestination);
+			
 		}
 		catch (Exception e)
 		{
@@ -308,7 +311,6 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		//	in pendingMessageList. Upon arrival, each message is removed from 
 		//	pendingMessageList and it is sent to a destination.
 		
-////		Thread t = new Thread((BaseMessageSender)messageDispatcher); //.doStart();
 		t.start();
 		//	Wait until the worker thread is fully initialized
 			synchronized( sender )
@@ -342,6 +344,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "initializeConsumer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_init_jms_consumer_INFO", new Object[] { aBrokerURI, consumerDestination.getQueueName() });
 		consumer = consumerSession.createConsumer(consumerDestination);
 		consumer.setMessageListener(this);
+		System.out.println(">>>> Client Activated Temp Reply Queue:"+consumerDestination.getQueueName());
 	}
 	/**
 	 * Initialize the uima ee client. Takes initialization parameters from the
@@ -446,6 +449,16 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 				}
 
 				asynchManager.initialize(casPoolSize, "ApplicationCasPoolContext", performanceTuningSettings);
+
+				//	Create a special CasPool of size 1 to be used for deserializing CASes from a Cas Multiplier
+				if ( super.resourceMetadata != null && super.resourceMetadata instanceof AnalysisEngineMetaData )
+				{
+					if ( ((AnalysisEngineMetaData) super.resourceMetadata).getOperationalProperties().getOutputsNewCASes() )
+					{
+						//	Create a Shadow CAS Pool used to de-serialize CASes produced by a CAS Multiplier
+						asynchManager.initialize(1, SHADOW_CAS_POOL, performanceTuningSettings);
+					}
+				}
 				initialized = true;
 				remoteService = true;
 				// running = true;
@@ -715,33 +728,47 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 		msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
-		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.ReleaseCAS); 
+		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.ReleaseCAS);
+		msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
+		msg.setJMSReplyTo(consumerDestination);
 	}
 
   public void notifyOnInitializationFailure(Exception e) {
-
-    //  Initialization exception. Notify blocking thread and indicate a problem
-    serviceInitializationException = true;
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
-    synchronized(serviceMonitor)
-    {
-      serviceMonitor.notifyAll();
-    }
-    
+	  notifyOnInitializationFailure(null, e);
   }
 
   public void notifyOnInitializationSuccess() {
-    serviceInitializationCompleted =  true;
-    synchronized(serviceMonitor)
-    {
-      serviceMonitor.notifyAll();
-    }
+	  notifyOnInitializationSuccess(null);
   }
 
-  public void notifyOnTermination(String message) {
+  public void notifyOnInitializationFailure(AnalysisEngineController aController, Exception e) {
+
+	    //  Initialization exception. Notify blocking thread and indicate a problem
+	    serviceInitializationException = true;
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
+	    synchronized(serviceMonitor)
+	    {
+	      serviceMonitor.notifyAll();
+	    }
+	    
+	  }
+
+	  public void notifyOnInitializationSuccess(AnalysisEngineController aController) {
+	    serviceInitializationCompleted =  true;
+	    synchronized(serviceMonitor)
+	    {
+	      serviceMonitor.notifyAll();
+	    }
+	  }
+
+	  public void notifyOnTermination(String message) {
     
   }
 
+	protected MessageProducer getMessageProducer( Destination destination ) throws Exception
+	{
+		return sender.getMessageProducer(destination);
+	}
 
 
 }

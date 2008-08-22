@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
@@ -29,6 +30,8 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.command.ActiveMQDestination;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Initializes JMS session and creates JMS MessageProducer to be used for
@@ -45,7 +48,8 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 	private Session session = null;
 	private MessageProducer producer = null;
 	private String destinationName = null;
-
+	private ConcurrentHashMap producerMap = new ConcurrentHashMap();
+	
 	public ActiveMQMessageSender(Connection aConnection,
 			List pendingMessageList, String aDestinationName,
 			BaseUIMAAsynchronousEngineCommon_impl engine) throws Exception {
@@ -53,15 +57,28 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 		connection = aConnection;
 		destinationName = aDestinationName;
 	}
-
+	public MessageProducer getMessageProducer(Destination destination) throws Exception {
+		if ( producerMap.containsKey(destination))
+		{
+			return (MessageProducer) producerMap.get(destination);
+		}
+		createSession();
+		MessageProducer mProducer = session.createProducer(destination);
+		mProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+		producerMap.put(destination, mProducer);
+		return mProducer;
+	}
+	private void createSession() throws Exception {
+		if ( session == null )	{
+			session = connection.createSession(false, 0);
+		}
+	}
 	/**
 	 * Creates a jms session object used to instantiate message producer
 	 */
 	protected void initializeProducer() throws Exception {
-		session = connection.createSession(false, 0);
-		Queue producerDestination = session.createQueue(destinationName);
-		producer = session.createProducer(producerDestination);
-		producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+		createSession();
+		producer = getMessageProducer(session.createQueue(destinationName));
 	}
 
 	/**
@@ -96,5 +113,6 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 		if (producer != null) {
 			producer.close();
 		}
+		producerMap.clear();
 	}
 }

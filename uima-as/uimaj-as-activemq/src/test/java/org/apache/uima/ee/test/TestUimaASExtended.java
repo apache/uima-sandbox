@@ -368,6 +368,22 @@ public class TestUimaASExtended extends BaseTestSupport
 	    appCtx.put(UimaAsynchronousEngine.ReplyWindow, 1);
 	    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
 	}
+	/**
+	 * Tests Aggregate configuration where the Cas Multiplier delegate is the
+	 * last delegate in the Aggregate's pipeline 
+	 *   
+	 * @throws Exception
+	 */
+	public void testAggregateProcessCallWithLastCM() throws Exception
+	{
+		
+	    System.out.println("-------------- testAggregateProcessCallWithLastCM -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		//	Deploy Uima EE Primitive Services each with 6000ms delay in process()
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithLastCM.xml");
+		super.setExpectingServiceShutdown();
+	    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
+	}
 
 	/**
 	 * Tests shutdown while running with multiple/concurrent threads
@@ -460,6 +476,56 @@ public class TestUimaASExtended extends BaseTestSupport
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
+	public void testClientWithAggregateMultiplier() throws Exception
+	{
+    System.out.println("-------------- testClientWithAggregateMultiplier -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplier.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateMultiplier.xml");
+
+		Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue" );
+	    // reduce the cas pool size and reply window
+	    appCtx.remove(UimaAsynchronousEngine.ShadowCasPoolSize);
+	    appCtx.put(UimaAsynchronousEngine.ShadowCasPoolSize, Integer.valueOf(2));
+		runTest(appCtx, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	}
+	public void testClientProcessWithRemoteMultiplier() throws Exception
+	{
+    System.out.println("-------------- testClientProcessWithRemoteMultiplier -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplier.xml");
+
+		Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"TestMultiplierQueue" );
+	    appCtx.remove(UimaAsynchronousEngine.ShadowCasPoolSize);
+	    appCtx.put(UimaAsynchronousEngine.ShadowCasPoolSize, Integer.valueOf(1));
+	    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TestMultiplierQueue", 1, PROCESS_LATCH);
+	}
+
+	
+	public void testClientProcessWithComplexAggregateRemoteMultiplier() throws Exception
+	{
+		
+    System.out.println("-------------- testClientProcessWithComplexAggregateRemoteMultiplier -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith10Docs_1.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_CasMultiplierAggregateWithRemoteCasMultiplier.xml");
+		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	}
+	
+	
+	public void testProcessWithAggregateUsing2RemoteMultipliers() throws Exception
+	{
+    System.out.println("-------------- testProcessWithAggregateUsing2RemoteMultipliers -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith10Docs_1.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith10Docs_2.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWith2RemoteMultipliers.xml");
+		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	}
+	
 	public void testProcessWithAggregateUsing2CollocatedMultipliers() throws Exception
 	{
     System.out.println("-------------- testProcessWithAggregateUsing2CollocatedMultipliers -------------");
@@ -469,6 +535,34 @@ public class TestUimaASExtended extends BaseTestSupport
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
+	
+	public void testBlueJDeployment() throws Exception
+	{
+    System.out.println("-------------- testBlueJDeployment -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		//	Deploy replicated services for the inner remote aggregate CM
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		//	Deploy an instance of a remote aggregate CM containing a collocated Cas Multiplier
+		//	CM --> Replicated Remote Primitive --> NoOp CC
+		deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithCollocatedCM.xml");
+		//	Deploy top level Aggregate Cas Multiplier with 2 collocated Cas Multipliers
+		//	CM1 --> CM2 --> Remote AggregateCM --> Candidate Answer --> CC
+		deployService(eeUimaEngine, relativePath+"/Deploy_TopLevelBlueJAggregateCM.xml");
+		super.setExpectingServiceShutdown();
+		runTest2(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, PROCESS_LATCH);
+	}
+	
+	public void testTypesystemMergeWithMultiplier() throws Exception
+	{
+    System.out.println("-------------- testTypesystemMergeWithMultiplier -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithMergedTypes.xml");
+		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	}
+	
 	public void testStopAggregateWithRemoteMultiplier() throws Exception
 	{
     System.out.println("-------------- testStopAggregateWithRemoteMultiplier -------------");
@@ -501,7 +595,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		super.setExpectingServiceShutdown();
 		//	Spin a thread to cancel Process after 20 seconds
 		spinShutdownThread( eeUimaEngine, 20000 );
-		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,EXCEPTION_LATCH);
+		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,PROCESS_LATCH);//EXCEPTION_LATCH);
 	}
 	/**
 	 * Test correct reply from the service when its process method fails. Deploys the Primitive

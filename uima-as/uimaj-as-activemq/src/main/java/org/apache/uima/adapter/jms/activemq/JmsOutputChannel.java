@@ -22,7 +22,9 @@ package org.apache.uima.adapter.jms.activemq;
 import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -50,6 +52,7 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaEEServiceException;
+import org.apache.uima.aae.jmx.ServiceInfo;
 import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
@@ -88,12 +91,17 @@ public class JmsOutputChannel implements OutputChannel
 
 	private boolean aborting = false;
 	
+	private Destination freeCASTempQueue;
 	/**
 	 * Sets the ActiveMQ Broker URI 
 	 */
 	public void setServerURI( String aServerURI )
 	{
 		serverURI = aServerURI;
+	}
+	protected void setFreeCasQueue( Destination destination)
+	{
+		freeCASTempQueue = destination;
 	}
 	public String getServerURI()
 	{
@@ -165,7 +173,7 @@ public class JmsOutputChannel implements OutputChannel
 	public String serializeCAS(boolean isReply, CAS aCAS, String aCasReferenceId, String aSerializerKey) throws Exception
 	{
 		
-		long start = System.nanoTime();
+		long start = getAnalysisEngineController().getCpuTime();
 		
 		String serializedCas = null;
 		
@@ -187,10 +195,10 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				serSharedData = cacheEntry.getDeserSharedData();//new XmiSerializationSharedData();
-        if (serSharedData == null) {
-          serSharedData = new XmiSerializationSharedData();
-          cacheEntry.setXmiSerializationData(serSharedData);
-        }
+				if (serSharedData == null) {
+					serSharedData = new XmiSerializationSharedData();
+					cacheEntry.setXmiSerializationData(serSharedData);
+				}
 			    serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 			    int maxOutgoingXmiId = serSharedData.getMaxXmiId();				
 				//	Save High Water Mark in case a merge is needed
@@ -229,9 +237,8 @@ public class JmsOutputChannel implements OutputChannel
 		LongNumericStatistic statistic;
 		if ( (statistic = getAnalysisEngineController().getMonitor().getLongNumericStatistic("",Monitor.TotalSerializeTime)) != null )
 		{
-			statistic.increment(System.nanoTime() - start);
+			statistic.increment(getAnalysisEngineController().getCpuTime() - start);
 		}
-
 		
 		return serializedCas;
 	}
@@ -386,9 +393,10 @@ public class JmsOutputChannel implements OutputChannel
 			endpointConnection.send(tm, true);
 			if ( aCommand == AsynchAEMessage.ReleaseCAS )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "collectionProcessComplete", 
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
 						JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_release_cas_req__FINE", new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint(),aCasReferenceId });
 			}
+				
 		}
 		catch( JMSException e)
 		{
@@ -423,18 +431,20 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			JmsEndpointConnection_impl endpointConnection = 
 				getEndpointConnection(anEndpoint);
-
+			
 			TextMessage tm = endpointConnection.produceTextMessage(null);
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 			tm.setText("");    // Need this to prevent the Broker from throwing an exception when sending a message to C++ service
 			
 			populateHeaderWithRequestContext(tm, anEndpoint, aCommand);
-/*
-			if ( anEndpoint.getServerURI().toLowerCase().startsWith("http") )
+			
+			//	For remotes add a special property to the message. This property
+			//	will be echoed back by the service. This property enables matching
+			//	the reply with the right endpoint object managed by the aggregate.
+			if ( anEndpoint.isRemote() )
 			{
-				tm.setBooleanProperty(AsynchAEMessage.RemoveEndpoint, true);
+				tm.setStringProperty(AsynchAEMessage.EndpointServer, anEndpoint.getServerURI());
 			}
-*/
 			boolean startTimer = false;
 			//	Start timer for endpoints that are remote and are managed by a different broker
 			//	than this service. If an endpoint contains a destination object, the outgoing
@@ -461,6 +471,34 @@ public class JmsOutputChannel implements OutputChannel
 	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_releasecas_request__endpoint__FINEST",
 	                    new Object[] {getAnalysisEngineController().getName(), endpointConnection.getEndpoint()});
+			}
+			else if ( aCommand == AsynchAEMessage.GetMeta )
+			{
+				if ( anEndpoint.getDestination() != null )
+				{
+					String replyQueueName = ((ActiveMQDestination)anEndpoint.getDestination()).getPhysicalName().replaceAll(":","_");
+					if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController )
+					{
+						String delegateKey =
+							((AggregateAnalysisEngineController)getAnalysisEngineController()).lookUpDelegateKey(anEndpoint.getEndpoint());
+						ServiceInfo serviceInfo =((AggregateAnalysisEngineController)getAnalysisEngineController()).getDelegateServiceInfo(delegateKey);
+						if (serviceInfo != null )
+						{
+							serviceInfo.setReplyQueueName(replyQueueName);
+							serviceInfo.setServiceKey(delegateKey);
+							System.out.println("Service:"+delegateKey+" Directed to Reply To:"+replyQueueName);
+						}
+					}
+				}
+				else if ( !anEndpoint.isRemote())
+				{
+					ServiceInfo serviceInfo =((AggregateAnalysisEngineController)getAnalysisEngineController()).getServiceInfo();
+					if (serviceInfo != null )
+					{
+						serviceInfo.setReplyQueueName(controllerInputEndpoint);
+						System.out.println("Aggregate Service Reply Queue:"+getAnalysisEngineController().getComponentName()+" Reply To:"+controllerInputEndpoint);
+					}
+				}
 			}
 			else 
 			{
@@ -494,26 +532,7 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			if (anEndpoint.isRemote())
 			{
-				long t1 = System.nanoTime();
 				String serializedCAS = getSerializedCasAndReleaseIt(false, aCasReferenceId,anEndpoint, anEndpoint.isRetryEnabled());
-/*				
-				if ( analysisEngineController instanceof AggregateAnalysisEngineController )
-				{
-					String delegateKey
-					 	= ((AggregateAnalysisEngineController)analysisEngineController).
-					 		lookUpDelegateKey(anEndpoint.getEndpoint());
-					if ( delegateKey != null)
-					{
-						long timeToSerialize = System.nanoTime() - t1;
-//						((AggregateAnalysisEngineController)analysisEngineController).
-//							incrementCasSerializationTime(delegateKey, timeToSerialize);
-						
-						analysisEngineController.
-							getServicePerformance().
-								incrementCasSerializationTime(timeToSerialize);
-					}
-				}
-*/
 				if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 				{
 		            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
@@ -589,13 +608,8 @@ public class JmsOutputChannel implements OutputChannel
 				}
 			}
 		}
-//		catch ( AsynchAEException e)
-//		{
-//			throw e;
-//		}
 		catch ( Exception e)
 		{
-//			throw new AsynchAEException(e);
 			// Handle the error
 			ErrorContext errorContext = new ErrorContext();
 			errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
@@ -614,9 +628,6 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				//	Serializes CAS and releases it back to CAS Pool
 				String serializedCAS = getSerializedCas(true, aNewCasReferenceId, anEndpoint, anEndpoint.isRetryEnabled());
-
-				
-				
 				sendCasToRemoteEndpoint(false, serializedCAS, anInputCasReferenceId, aNewCasReferenceId, anEndpoint, false, sequence);
 			}
 			else
@@ -643,6 +654,41 @@ public class JmsOutputChannel implements OutputChannel
 		
 	}
 	
+	public void sendReply( CacheEntry entry, Endpoint anEndpoint ) throws AsynchAEException
+	{
+		try
+		{
+			anEndpoint.setReplyEndpoint(true);
+			if ( anEndpoint.isRemote() )
+			{
+				//	Serializes CAS and releases it back to CAS Pool
+				String serializedCAS = getSerializedCas(true, entry.getCasReferenceId(), anEndpoint, anEndpoint.isRetryEnabled());
+				sendCasToRemoteEndpoint(false, serializedCAS, entry, anEndpoint, false);
+			}
+			else
+			{
+	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_reply_with_sequence__FINE",
+	                    new Object[] { anEndpoint.getEndpoint(), entry.getCasReferenceId(), entry.getCasSequence() });
+				sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
+			}
+		}
+		catch( ServiceShutdownException e)
+		{
+			e.printStackTrace();
+		}
+		catch (AsynchAEException e)
+		{
+			throw e;
+		}
+		
+		catch (Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+		
+	}
+
 	public void sendReply( int aCommand, Endpoint anEndpoint ) throws AsynchAEException
 	{
 		anEndpoint.setReplyEndpoint(true);
@@ -670,7 +716,7 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-                    "sendReply", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
+                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
                     new Object[] { e});
 			
 		}
@@ -798,7 +844,7 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-                    "sendCasToCollocatedDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
+                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
 		}
 		catch( ServiceShutdownException e)
@@ -808,7 +854,7 @@ public class JmsOutputChannel implements OutputChannel
 		catch (AsynchAEException e)
 		{
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-                    "sendCasToCollocatedDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
+                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
 		}
 		catch (Exception e)
@@ -916,7 +962,7 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-				long t1 = System.nanoTime();
+				long t1 = getAnalysisEngineController().getCpuTime();
 				//	Serialize CAS for remote Delegates
 				String serializer = anEndpoint.getSerializer();
 				if ( serializer == null || serializer.trim().length() == 0)
@@ -924,7 +970,10 @@ public class JmsOutputChannel implements OutputChannel
 					serializer = "xmi";
 				}
 				serializedCAS = serializeCAS(isReply, cas, aCasReferenceId, serializer);
-				long timeToSerializeCas = System.nanoTime()-t1;
+				long timeToSerializeCas = getAnalysisEngineController().getCpuTime()-t1;
+				
+				getAnalysisEngineController().incrementSerializationTime(timeToSerializeCas);
+				
 				entry.incrementTimeToSerializeCAS(timeToSerializeCas);
 				casStats.incrementCasSerializationTime(timeToSerializeCas);
 				getAnalysisEngineController().getServicePerformance().
@@ -949,37 +998,6 @@ public class JmsOutputChannel implements OutputChannel
 		CAS cas = null;
 		try
 		{
-			
-			
-/*			
-			String serializedCAS = null;
-			//	Using Cas reference Id retrieve CAS from the shared Cash
-			cas = getAnalysisEngineController().getInProcessCache().getCasByReference(aCasReferenceId);
-
-			if ( cas == null )
-			{
-				serializedCAS = getAnalysisEngineController().getInProcessCache().getSerializedCAS( aCasReferenceId );
-			}
-			else
-			{
-				CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-				long t1 = System.nanoTime();
-				//	Serialize CAS for remote Delegates
-				String serializer = anEndpoint.getSerializer();
-				if ( serializer == null || serializer.trim().length() == 0)
-				{
-					serializer = "xmi";
-				}
-				serializedCAS = serializeCAS(isReply, cas, aCasReferenceId, serializer);
-				entry.incrementTimeToSerializeCAS(System.nanoTime()-t1);
-				if ( cacheSerializedCas )
-				{
-					getAnalysisEngineController().getInProcessCache().saveSerializedCAS(aCasReferenceId, serializedCAS);
-				}
-			}
-			return serializedCAS;
-*/			
-
 			return getSerializedCas(isReply, aCasReferenceId, anEndpoint, cacheSerializedCas);
 		}
 		catch( Exception e)
@@ -1010,7 +1028,6 @@ public class JmsOutputChannel implements OutputChannel
 	{
 		if ( anEndpoint.isFinal() )
 		{
-			//aTextMessage.setLongProperty(AsynchAEMessage.TotalTimeSpentInAnalytic, (System.nanoTime()-anEndpoint.getEntryTime()));
 			aTextMessage.setLongProperty("SENT-TIME", System.nanoTime());
 		}
 
@@ -1028,14 +1045,13 @@ public class JmsOutputChannel implements OutputChannel
 					getAnalysisEngineController().getCasStatistics(aCasReferenceId);
 				
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
-//					aTextMessage.setLongProperty(AsynchAEMessage.TimeWaitingForCAS, entry.getTimeWaitingForCAS());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
-				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, anEndpoint.getIdleTime() );
-				
-				String lookupKey = getAnalysisEngineController().getName();//getInProcessCache().getMessageAccessorByReference(aCasReferenceId).getEndpointName();
+				long iT =getAnalysisEngineController().getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
+				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, iT );
+				String lookupKey = getAnalysisEngineController().getName();
 				long arrivalTime = getAnalysisEngineController().getTime( aCasReferenceId, lookupKey); //serviceInputEndpoint);
-				long timeInService = System.nanoTime()-arrivalTime;
+				long timeInService = getAnalysisEngineController().getCpuTime()-arrivalTime;
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "populateStats", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timein_service__FINEST",
 	                    new Object[] { serviceInputEndpoint, (double)timeInService/(double)1000000 });
@@ -1109,7 +1125,7 @@ public class JmsOutputChannel implements OutputChannel
 	                    "populateHeaderWithRequestContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
 	                    new Object[] {getAnalysisEngineController().getComponentName(), anEndpoint.getServerURI(), anEndpoint.getEndpoint()});
 			}
-			else
+			else // collocated
 			{
 				aMessage.setStringProperty(UIMAMessage.ServerURI, anEndpoint.getServerURI());
 			}
@@ -1141,6 +1157,10 @@ public class JmsOutputChannel implements OutputChannel
 			if ( hostIP != null )
 			{
 				aMessage.setStringProperty(AsynchAEMessage.ServerIP,hostIP);
+			}
+			if ( anEndpoint.getEndpointServer() != null )
+			{
+				aMessage.setStringProperty(AsynchAEMessage.EndpointServer, anEndpoint.getEndpointServer());
 			}
 		}
 		else
@@ -1291,17 +1311,21 @@ public class JmsOutputChannel implements OutputChannel
 				//	produced by the CAS Multiplier. The client will treat this CAS
 				//	differently from the input CAS. 
 				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
-/*
-				//	Add the top ancestor of this CAS. 
-				addTopCASParentReferenceId(tm, anInputCasReferenceId);
-*/
 				tm.setStringProperty(AsynchAEMessage.InputCasReference, anInputCasReferenceId);
 				//	Add a sequence number assigned to this CAS by the controller
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
+				isRequest = true;
+				//	Add the name of the FreeCas Queue
+//				if ( secondaryInputEndpoint != null )
+//				{
+//					tm.setStringProperty(AsynchAEMessage.MessageFrom, secondaryInputEndpoint);
+//				}
 				
-				if ( secondaryInputEndpoint != null )
+				if ( freeCASTempQueue != null )
 				{
-					tm.setStringProperty(AsynchAEMessage.MessageFrom, secondaryInputEndpoint);
+					//	Attach a temp queue to the outgoing message. This a queue where
+					//  Free CAS notifications need to be sent from the client
+					tm.setJMSReplyTo(freeCASTempQueue);
 				}
 				if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
 				{
@@ -1309,7 +1333,7 @@ public class JmsOutputChannel implements OutputChannel
 					if ( cacheEntry != null )
 					{
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-			                    "sendCasToCollocatedDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service_detail__FINE",
+			                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service_detail__FINE",
 			                    new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), aCasReferenceId, anInputCasReferenceId, cacheEntry.getInputCasReferenceId() });
 					}
 				}
@@ -1344,11 +1368,14 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startConnectionTimer);
 
-			if ( getAnalysisEngineController().isTopLevelComponent() )
+//			if ( getAnalysisEngineController().isTopLevelComponent() )
+//			{
+//				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
+//			}
+			if ( !isRequest )
 			{
-				getAnalysisEngineController().getInProcessCache().dumpContents();
+				addIdleTime(tm);
 			}
-			addIdleTime(tm);
 		}
 		catch( JMSException e)
 		{
@@ -1373,6 +1400,150 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		
 	}
+	
+	private void sendCasToRemoteEndpoint( boolean isRequest, String aSerializedCAS, CacheEntry entry,  Endpoint anEndpoint, boolean startTimer ) 
+	throws AsynchAEException, ServiceShutdownException
+	{
+		
+		try
+		{
+			if ( aborting )
+			{
+				return;
+			}
+			//	Get the connection object for a given endpoint
+			JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
+			//	Create empty JMS Text Message
+			TextMessage tm = endpointConnection.produceTextMessage("");
+			
+			//	Save Serialized CAS in case we need to re-send it for analysis
+			if ( anEndpoint.isRetryEnabled() && getAnalysisEngineController().getInProcessCache().getSerializedCAS(entry.getCasReferenceId()) == null)
+			{
+				getAnalysisEngineController().getInProcessCache().saveSerializedCAS(entry.getCasReferenceId(), aSerializedCAS);
+			}
+
+			tm.setText(aSerializedCAS);
+			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload); 
+			//	Add Cas Reference Id to the outgoing JMS Header
+			tm.setStringProperty(AsynchAEMessage.CasReference, entry.getCasReferenceId());
+			//	Add common properties to the JMS Header
+			if ( isRequest == true )
+			{
+				populateHeaderWithRequestContext(tm, anEndpoint, AsynchAEMessage.Process); 
+			}
+			else
+			{
+				populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
+			}
+			//	The following is true when the analytic is a CAS Multiplier
+			if ( entry.isSubordinate() && !isRequest )
+			{
+				//	Override MessageType set in the populateHeaderWithContext above.
+				//	Make the reply message look like a request. This message will contain a new CAS 
+				//	produced by the CAS Multiplier. The client will treat this CAS
+				//	differently from the input CAS. 
+				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
+
+				isRequest = true;
+				//	Save the id of the parent CAS
+				tm.setStringProperty(AsynchAEMessage.InputCasReference, getTopParentCasReferenceId(entry.getCasReferenceId()));
+				//	Add a sequence number assigned to this CAS by the controller
+				tm.setLongProperty(AsynchAEMessage.CasSequence, entry.getCasSequence());
+				//	If this is a Cas Multiplier, add a reference to a special queue where
+				//	the client sends Free Cas Notifications
+				if ( freeCASTempQueue != null )
+				{
+					//	Attach a temp queue to the outgoing message. This is a queue where
+					//  Free CAS notifications need to be sent from the client
+					tm.setJMSReplyTo(freeCASTempQueue);
+				}
+				if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
+				{
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service_detail__FINE",
+		                    new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), entry.getCasReferenceId(), entry.getInputCasReferenceId(), entry.getInputCasReferenceId() });
+				}
+			}
+
+			//	Add stats
+			populateStats(tm, anEndpoint, entry.getCasReferenceId(), AsynchAEMessage.Process, isRequest);
+			if ( startTimer)
+			{
+				//	Start a timer for this request. The amount of time to wait
+				//	for response is provided in configuration for the endpoint
+				anEndpoint.startProcessRequestTimer(entry.getCasReferenceId());
+			}
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
+                    new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
+
+			//	By default start a timer associated with a connection to the endpoint. Once a connection is established with an
+			//	endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
+			//	the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
+			//	managing sessions. In case when we want the remote delegate to respond to a temporary queue, which is implied
+			//	by anEndpoint.getDestination != null, we dont start the timer.
+			boolean startConnectionTimer = true;
+			
+			if ( anEndpoint.getDestination() != null || !isRequest )
+			{
+				startConnectionTimer = false;
+			}
+			
+			// ----------------------------------------------------
+			//	Send Request Messsage to the Endpoint
+			// ----------------------------------------------------
+			endpointConnection.send(tm, startConnectionTimer);
+
+//			if ( getAnalysisEngineController().isTopLevelComponent() )
+//			{
+//				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
+//			}
+			if ( !isRequest )
+			{
+				addIdleTime(tm);
+			}
+		}
+		catch( JMSException e)
+		{
+			//	Unable to establish connection to the endpoint. Logit and continue
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                    "sendCasToRemoteDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
+                    new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
+			
+		}
+
+		catch( ServiceShutdownException e)
+		{
+			throw e;
+		}
+		catch( AsynchAEException e)
+		{
+			throw e;
+		}
+		catch( Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+		
+	}
+	
+	private String getTopParentCasReferenceId( String casReferenceId ) throws Exception
+	{
+		if ( !getAnalysisEngineController().getInProcessCache().entryExists(casReferenceId) )
+		{
+			return null;
+		}
+		
+		CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(casReferenceId); 
+		if ( entry.isSubordinate() )
+		{
+			//	Recurse until the top CAS reference Id is found
+			return getTopParentCasReferenceId(entry.getInputCasReferenceId());
+		}
+		//	Return the top ancestor CAS id
+		return entry.getCasReferenceId();
+	}
+	
 	private boolean isProcessReply( Message aMessage )
 	{
 		try
@@ -1389,14 +1560,14 @@ public class JmsOutputChannel implements OutputChannel
 	private void addIdleTime( Message aMessage )
 	{
 
-
+/*
 		if ( isProcessReply(aMessage ) && 
 			 ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController || 
-			   !((PrimitiveAnalysisEngineController)getAnalysisEngineController()).isMultiplier() ) )
-			{
-				long t = System.nanoTime();
-				getAnalysisEngineController().saveReplyTime(t, "");
-			}
+			   !getAnalysisEngineController().isCasMultiplier() ) )
+
+*/
+		long t = System.nanoTime();
+		getAnalysisEngineController().saveReplyTime(t, "");
 	}
 	private void sendCasToCollocatedDelegate(boolean isRequest, String anInputCasReferenceId, String aNewCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence) 
 	throws AsynchAEException, ServiceShutdownException
@@ -1449,6 +1620,8 @@ public class JmsOutputChannel implements OutputChannel
 				//	produced by the CAS Multiplier. The client will treat this CAS
 				//	differently from the input CAS. 
 				tm.setIntProperty( AsynchAEMessage.MessageType, AsynchAEMessage.Request);
+				isRequest = true;
+
 				if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
 				{
 					CacheEntry cacheEntry = getCacheEntry(aNewCasReferenceId);
@@ -1485,7 +1658,10 @@ public class JmsOutputChannel implements OutputChannel
 			//	Send Request Messsage to Delegate
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startTimer);
-			addIdleTime(tm);
+			if ( !isRequest )
+			{
+				addIdleTime(tm);
+			}
 			
 		}
 		catch( JMSException e)

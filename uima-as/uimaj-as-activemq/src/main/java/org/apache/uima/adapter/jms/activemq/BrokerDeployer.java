@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 
+import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
+import org.apache.activemq.broker.jmx.ManagementContext;
 //import org.apache.activemq.memory.UsageListener;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.adapter.jms.JmsConstants;
@@ -40,7 +42,7 @@ public class BrokerDeployer implements ApplicationListener
 {
 	private static final Class CLASS_NAME = BrokerDeployer.class;
     private static final int BASE_JMX_PORT = 1200;
-    private static final int MAX_PORT_THRESHOLD = 1400;
+    private static final int MAX_PORT_THRESHOLD = 200;
     
 	private static BrokerService service;
 	private Object semaphore = new Object();
@@ -104,16 +106,36 @@ public class BrokerDeployer implements ApplicationListener
 			
 			String connectorList = "";
 			service.setPersistent(false);
-			
 			int startPort = BASE_JMX_PORT;
+			if ( System.getProperties().containsKey("com.sun.management.jmxremote.port") )
+			{
+				startPort = Integer.parseInt(System.getProperty("com.sun.management.jmxremote.port"));
+				
+			}
 			while( startPort < MAX_PORT_THRESHOLD && !openPort(startPort))
 			{
 				startPort++;
 			}
-			if ( startPort < MAX_PORT_THRESHOLD )
+			if ( startPort < (startPort+MAX_PORT_THRESHOLD ) )
 			{
-				service.setUseJmx(true);
-				service.getManagementContext().setConnectorPort(startPort);
+				MBeanServer jmxServer = null;
+				//	Check if the MBeanServer is available. If it is, plug it into the
+				//	local Broker. We only need one MBeanServer in the JVM
+				if ( (jmxServer = ManagementContext.findTigerMBeanServer()) != null)
+				{
+					System.out.println(">>> Found TigerMBeanServer Running. Attaching Broker to Tiger.");
+					service.getManagementContext().setMBeanServer(jmxServer);
+					//	Specify JMX Port
+					service.getManagementContext().setConnectorPort(startPort);
+				}
+				else
+				{
+					service.getManagementContext().setConnectorPort(startPort);
+					service.setUseJmx(true);
+				}
+				
+				System.setProperty("com.sun.management.jmxremote.port", String.valueOf(startPort)); 
+
 				System.out.println("JMX Console connect URI:  service:jmx:rmi:///jndi/rmi://localhost:"+startPort+"/jmxrmi");
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
 	                    "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jmx_uri__CONFIG",
