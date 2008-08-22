@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDeploymentDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>Top Level TAE</name>
+  <description/>
+  <version/>
+  <vendor/>
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5" initialFsHeapSize="2000000"/>
+    <service>
+      <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
+      <topDescriptor>
+        <import location="../descriptors/analysis_engine/SimpleTestAggregateWithMergedTypes.xml"/>
+      </topDescriptor>
+      <analysisEngine async="true">
+        <scaleout numberOfInstances="1"/>
+        <casMultiplier poolSize="0" initialFsHeapSize="2000000"/>
+        <delegates>
+          <analysisEngine key="TestMultiplier" async="false">
+            <scaleout numberOfInstances="1"/>
+            <casMultiplier poolSize="5" initialFsHeapSize="2000000"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="0" errorAction="terminate"/>
+              <processCasErrors maxRetries="0" timeout="0" continueOnRetryFailure="false" thresholdCount="0" thresholdWindow="0" thresholdAction="terminate"/>
+              <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+          </analysisEngine>
+          <analysisEngine key="SimpleAnnotator" async="false">
+            <scaleout numberOfInstances="1"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="0" errorAction="terminate"/>
+              <processCasErrors maxRetries="0" timeout="0" continueOnRetryFailure="false" thresholdCount="1" thresholdWindow="0" thresholdAction="terminate"/>
+              <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+          </analysisEngine>
+        </delegates>
+        <asyncPrimitiveErrorConfiguration>
+          <processCasErrors thresholdCount="0" thresholdWindow="0" thresholdAction="terminate"/>
+          <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+        </asyncPrimitiveErrorConfiguration>
+      </analysisEngine>
+    </service>
+  </deployment>
+</analysisEngineDeploymentDescription>
