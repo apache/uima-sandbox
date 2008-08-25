@@ -88,7 +88,9 @@ under the License.
 
       <environmentVariables .../>  <!--optional -->
 
-      <analysisEngine key="key name" async="[true/false]">
+      <analysisEngine key="key name" async="[true/false]"
+             internalReplyQueueScaleout="nn1"
+             inputQueueScaleout="nn2">
 
         <scaleout numberOfInstances="1"/>       <!-- optional -->
                                                 <!-- optional --> 
@@ -97,15 +99,19 @@ under the License.
 
         <delegates>    <!-- optional, only for aggregates -->
                                        <!-- 0 or more -->
-          <analysisEngine key="key name" async="[true/false]">  
+          <analysisEngine key="key name" async="[true/false]"
+               internalReplyQueueScaleout="nn1"
+               inputQueueScaleout="nn2">
+  
                 ...    <!-- optional nested specifications -->
           </analysisEngine>
                 . . .
-          <remoteAnalysisEngine key="key name"> <!-- 0 or more -->
+          <remoteAnalysisEngine key="key name"  <!-- 0 or more -->
+               remoteReplyQueueScaleout="nn1">
+  
             <!-- next is either required or must be omitted -->
             <casMultiplier poolSize="5" initialFsHeapSize="nnn"/>
             <inputQueue ... />
-            <replyQueue location="[local|remote]"/><!-- optional-->
             <serializer method="xmi"/>
             <asyncAggregateErrorConfiguration ... />
           </remoteAnalysisEngine>
@@ -226,8 +232,11 @@ under the License.
       communication with some Perl, Ruby, PHP or Python-based applications; see
       <ulink url="http://activemq.apache.org/stomp.html"/> for more information. --></para>
     <!--para>If the brokerURL is omitted, it defaults to the internal common broker using
-    the "vm" protocol.</para--> <warning><para>When remote delegates are being used, and the replyQueue is
-    remote, the brokerURL value used for this remote delegate is used also for the remote reply Queue, and must be valid
+    the "vm" protocol.</para--> 
+    
+    <warning><para>When remote delegates are being used, 
+    <!-- and the replyQueue is remote, --> 
+      the brokerURL value used for this remote delegate is used also for the remote reply Queue, and must be valid
     for both the client to send requests and the remote service to send replies to. The URL to use for the reply is
     resolved on the remote system when sending a reply. Using "localhost" will not work, nor will partially specified
     URLs unless they resolve to the same URL on all nodes where services are running. The recommended best practice is
@@ -238,7 +247,7 @@ under the License.
     <para> The <literal>prefetch</literal> attribute controls prefetching of messages for an instance of the
       service. It can be 0 - which disables prefetching. This is useful in some realtime applications for reducing
       latency. In this case, when a new request arrives, any available instance will take the request; if prefetching
-      was set above 0, the request might be prefetched by a busy service. The default value if not specified is 1.
+      was set above 0, the request might be prefetched by a busy service. The default value if not specified is 0.
       </para>
     <note><para>The <literal>prefetch</literal> attribute is only used with the top inputQueue element for the
     service.</para></note>
@@ -328,7 +337,10 @@ under the License.
       name specified in the aggregate descriptor to identify the delegate. </para>
     
     
-    <programlisting><![CDATA[<analysisEngine key="key name" async="true">
+    <programlisting><![CDATA[<analysisEngine key="key name" async="true"
+             internalReplyQueueScaleout="nn1"
+             inputQueueScaleout="nn2">
+
   <scaleout numberOfInstances="1"/>        <!-- optional  -->
   <!-- casMultiplier is either required, or must be omitted-->
   <casMultiplier poolSize="5"  initialFsHeapSize="nn"/>               
@@ -342,11 +354,12 @@ under the License.
             ...       <!-- optional nested specifications -->
     </analysisEngine>
             . . . 
-    <remoteAnalysisEngine key="key name">  <!-- 0 or more -->
+    <remoteAnalysisEngine key="key name"   <!-- 0 or more -->
+             remoteReplyQueueScaleout="nn1">
+
       <!-- next is either required or must be omitted -->
       <casMultiplier poolSize="5" initialFsHeapSize="nnn"/>       
       <inputQueue ... />
-      <replyQueue location="[local|remote]"/> <!-- optional -->
       <serializer method="xmi"/>              <!-- optional -->
       <asyncAggregateErrorConfiguration .../> <!-- optional -->
     </remoteAnalysisEngine>
@@ -355,8 +368,30 @@ under the License.
 </analysisEngine>]]></programlisting>
     
     <para>&lt;analysisEngine> is used to specify deployment details for an analysis engine. It is optional, and if
-      omitted, defaults will be used: The analysis engine will be run asynchronously, with a scaleout of 1, using the
+      omitted, defaults will be used: The analysis engine will be run synchronously
+      (processing only one CAS at a time), with a scaleout of 1, using the
       default error configuration.</para>
+    
+    <para>
+      The attributes <code>internalReplyQueueScaleout</code> and <code>inputQueueScaleout</code> only
+      have meaning and are allowed when 
+      async="true" is specified (which in turn can only be set true for aggregates).
+      These attributes default to 1.  For asynchronous aggregates, they control the number of threads
+      used to do the work of the aggregate outside of running the delegates.  This work can include
+      one or more of the following:
+      <itemizedlist>
+        <listitem>
+          <para>deserializing an input CAS (only on the input Queue),
+          or serializing the resulting CAS back to a remote requester (only if the
+          requester is remote).</para>
+          <para>running the flow controller</para>
+          <para>serializing CASes being sent to remote delegates (only useful if one or more
+          of the delegates is remote)</para>
+        </listitem>
+      </itemizedlist>
+      These attributes provide a way to scale out this work on multi-core machines, if these
+      tasks become a bottleneck.
+    </para>
     
     <para> The &lt;scaleout ...> element specifies, for co-located primitive or non-AS aggregates
       (async="false") at the bottom of an aggregate tree, how many replicated instances are created.
@@ -379,7 +414,16 @@ under the License.
       than the default.</para>
     
     <para>The &lt;remoteAnalysisEngine> elements are used to specify that the delegate is not co-located, and how
-      to connect to it. The &lt;inputQueue> element specifies the remote's input queue. The &lt;serializer>
+      to connect to it.  The <code>remoteReplyQueueScaleout</code> is optional; if not specified it defaults to 1.
+      This scaleout is the number of threads that will be used to do the work of the containing aggregate 
+      when replies are returned from this remote delegate.  This work is described above.  
+      It may be useful to set this to > 1 if, for instance, 
+      there are many CASes coming back from a remote delegate (perhaps the remote is a CAS Multiplier), and each one 
+      has to be deserialized.
+      </para>
+    
+    <para>
+      The &lt;inputQueue> element specifies the remote's input queue. The &lt;serializer>
       element describes what method of serialization to use (for now "xmi" is the only allowed value, and this element
       can be omitted). The casMultiplier element inside a remoteAnalysisEngine element is only specified if the
       remote component is a CAS Multiplier, and it specifies the size of a pool of CASes kept to receive the new CASes
@@ -388,21 +432,13 @@ under the License.
     <note><para>Only one remote can be a remote CAS Multiplier, in the current design, and that remote can only have
     one instance. Scale out in any manner is not supported in the current release</para></note>
     
-    <para>For tcp: style connections, the &lt;replyQueue> element for each containing aggregate specifies the
-      location of the queue that receives replies from the delegates. The two values allowed for location are "local"
-      and "remote". Local means the reply queue is part of the process that is sending requests to the remote node;
-      remote means the reply queue is on the same node as the remote process's input queue. The choice is dependent on
-      both resource consumption (the queues store CASes in memory), and on firewall issues.</para>
     
-    <para>The default replyQueue location is local and normally does not have to be specified; users should set this
-      to remote if a firewall prevents the remote delegate from accessing TCP/IP connections on the client's
-      machine.</para>
-    <note><para>When replyQueue is set to remote, the brokerURL value used for this remote delegate must be valid for
+    
+    <note><para>The brokerURL value used for this remote delegate must be valid for
     both the client to send requests and the remote service to send replies.</para></note>
     
     <para>Services may be running on nodes with firewalls, where the only port open is the one for http. In this case,
-      you can use the http protocol, For http: style connections, the only supported configuration is remote, and is
-      the default.</para>
+      you can use the http protocol.</para>
     
     <para>The &lt;asyncPrimitiveErrorConfiguration> element is only allowed within a top-level analysis engine
       specification (that is, one that is not a delegate of another, containing analysis engine).</para>
