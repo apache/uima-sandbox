@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--==================================================================================-->
- <!-- Generated from                                                                                 -->
- <!-- file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/deploy/defaultingAEaggrAsync.xml -->
- <!-- 2 November, 2007, 2:33:33 P.M.                                                                 -->
+ <!-- Generated from                                                                               -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/aggrRmtConcurrentReply.xml -->
+ <!-- 4 August, 2008, 4:59:18 P.M.                                                                 -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -26,6 +26,14 @@
    <bean id="qBroker_tcp_c__ss_localhost_c_61616"
          class="org.apache.activemq.ActiveMQConnectionFactory">
       <property name="brokerURL" value="tcp://localhost:61616"/>
+      <property name="prefetchPolicy" ref="prefetchPolicy"/>
+   </bean>
+
+   <!-- Factory for specific external queue broker:  -->
+   <!--           tcp://some.remote:12345            -->
+   <bean id="qBroker_tcp_c__ss_some.remote_c_12345"
+         class="org.apache.activemq.ActiveMQConnectionFactory">
+      <property name="brokerURL" value="tcp://some.remote:12345"/>
       <property name="prefetchPolicy" ref="prefetchPolicy"/>
    </bean>
 
@@ -104,7 +112,7 @@
       </constructor-arg>
       <constructor-arg index="1" value="RoomNumberAnnotatorQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="delegate_map_RoomNumberAnnotatorQueue_1"/>
@@ -199,15 +207,20 @@
    <bean id="endpt_DateTime_1.2" class="org.apache.uima.aae.controller.Endpoint_impl">
 
      <!--     Broker URI     -->
-     <property name="serverURI" value="vm://localhost"/>
+     <property name="serverURI" value="tcp://some.remote:12345"/>
 
      <!-- Delegate key name or remote queue name -->
-     <property name="endpoint" value="inQ_DateTime_1.2"/>
+     <property name="endpoint" value="iq1"/>
+
+     <!-- Queue name used for replies, on the remote broker  -->
+     <property name="replyToEndpoint"
+                value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.34.65-ec420e1:11bfae8a82b:-8000"/>
 
      <!--      Timeouts      -->
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="serializer" value=""/>
       <property name="tempReplyDestination" value="true"/>
    </bean>
 
@@ -319,6 +332,58 @@
      <property name="messageListener"
                 ref="asAggr_return_q_listenerID_RoomNumberAnnotatorQueue_1"/>
       <property name="connectionFactory" ref="controllerJmsFactory"/>
+   </bean>
+
+   <!-- return queue for http or tcp remote service  -->
+   <!--               on remote broker               -->
+   <bean id="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime"
+         class="org.apache.activemq.command.ActiveMQQueue">
+      <constructor-arg index="0"
+                       value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.34.65-ec420e1:11bfae8a82b:-8000"/>
+   </bean>
+
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+   <!--    JMS msg listener for return queue for:    -->
+   <!-- rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime -->
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+   <bean id="asAggr_return_q_listenerID_RoomNumberAnnotatorQueue_1_DateTime"
+         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
+      <property name="messageHandler"
+                ref="aggregate_return_metaMsgHandler_RoomNumberAnnotatorQueue_1"/>
+      <property name="endpointName" value=""/>
+      <property name="controller" ref="asAggr_ctlr_RoomNumberAnnotatorQueue_1"/>
+   </bean>
+
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+   <!-- JMS msg listener container for return queue for: -->
+   <!--   rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime   -->
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+   <bean id="asAggr_return_msgLsnrCntnr_RoomNumberAnnotatorQueue_1_DateTime"
+         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
+
+     <!-- Define number of JMS Consumers -->
+     <property name="concurrentConsumers" value="31"/>
+
+     <!--    return Queue    -->
+     <property name="destinationResolver"
+                ref="destinationResolver_RoomNumberAnnotatorQueue_1_DateTime"/>
+      <property name="destinationName" value=""/>
+      <property name="targetEndpoint" ref="endpt_DateTime_1.2"/>
+
+     <!-- POJO to delegate JMS Messages to -->
+     <property name="messageListener"
+                ref="asAggr_return_q_listenerID_RoomNumberAnnotatorQueue_1_DateTime"/>
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345"/>
+   </bean>
+
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+   <!--      Destination Resolver for DateTime       -->
+   <!-- rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime -->
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+   <bean id="destinationResolver_RoomNumberAnnotatorQueue_1_DateTime"
+         class="org.apache.uima.adapter.jms.activemq.TempDestinationResolver"
+         singleton="false">
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345"/>
    </bean>
 
    <!-- ================================== -->
@@ -446,7 +511,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="RoomNumber"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -551,127 +616,6 @@
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
    <!--   Internal Input Queue for   -->
-   <!--           DateTime           -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="inQ_DateTime_1.2" class="org.apache.activemq.command.ActiveMQQueue">
-      <constructor-arg index="0" value="inQ_DateTime_1.2"/>
-   </bean>
-   <!--=======================================-->
-   <!-- Primitive or non-Async Aggr: DateTime -->
-   <!--=======================================-->
-   <bean id="primitive_ctlr_DateTime_1.2"
-         class="org.apache.uima.aae.controller.PrimitiveAnalysisEngineController_impl"
-         init-method="initialize">
-      <constructor-arg index="0" ref="asAggr_ctlr_RoomNumberAnnotatorQueue_1"/>
-
-     <!--      Key name      -->
-     <constructor-arg index="1" value="DateTime"/>
-      <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex3/TutorialDateTime.xml"/>
-      <constructor-arg index="3" ref="casManager"/>
-      <constructor-arg index="4" ref="inProcessCache"/>
-
-     <!-- this parameter is ignored  -->
-     <constructor-arg index="5" value="10"/>
-
-     <!-- scaleout number of instances -->
-     <constructor-arg index="6" value="1"/>
-      <property name="outputChannel" ref="outChnl_DateTime_1.2"/>
-   </bean>
-
-   <!-- ThreadPool Task Executor -->
-   <bean id="pooling_DateTime_1.2"
-         class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-      <property name="corePoolSize" value="1"/>
-      <property name="maxPoolSize" value="1"/>
-      <property name="queueCapacity" value="1"/>
-   </bean>
- 
-   <!--==============================================-->
-   <!--   M E S S A G E    H A N D L E R: primitive  -->
-   <!--  for controller: primitive_ctlr_DateTime_1.2 -->
-   <!--==============================================-->
-   
-   <bean id="primitive_metaMsgHandler_DateTime_1.2"
-         class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
-      <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_DateTime_1.2"/>
-      <property name="delegate" ref="primitive_processRequestHandler_DateTime_1.2"/>
-   </bean>
-
-   <bean id="primitive_processRequestHandler_DateTime_1.2"
-         class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
-      <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_DateTime_1.2"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener for input queue for:  -->
-   <!--            inQ_DateTime_1.2            -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_q_listenerID_DateTime_1.2"
-         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
-      <property name="messageHandler" ref="primitive_metaMsgHandler_DateTime_1.2"/>
-      <property name="endpointName" value="inQ_DateTime_1.2"/>
-      <property name="controller" ref="primitive_ctlr_DateTime_1.2"/>
-      <property name="listenerContainer" ref="primitive_input_msgLsnrCntnr_DateTime_1.2"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener container for input queue for:  -->
-   <!--                 inQ_DateTime_1.2                 -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_DateTime_1.2"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Connect to pooling task executor for primitive -->
-     <property name="taskExecutor" ref="pooling_DateTime_1.2"/>
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_DateTime_1.2"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_DateTime_1.2"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2000 OR Command=2002"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- GetMeta JMS msg listener container for input queue for:  -->
-   <!--                     inQ_DateTime_1.2                     -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_DateTime_1.2_getMeta"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_DateTime_1.2"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_DateTime_1.2"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2001"/>
-   </bean>
-
-   <!-- ================================== -->
-   <!-- OutputChannel - for flows out of   -->
-   <!-- this component, both to delegates  -->
-   <!--  (if aggr) and back up to sender   -->
-   <!-- ================================== -->
-   <bean id="outChnl_DateTime_1.2"
-         class="org.apache.uima.adapter.jms.activemq.JmsOutputChannel"
-         init-method="initialize">
-      <property name="serviceInputEndpoint" value="inQ_DateTime_1.2"/>
-      <property name="controller" ref="primitive_ctlr_DateTime_1.2"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!--   Internal Input Queue for   -->
    <!--           Meeting            -->
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
    <bean id="inQ_Meeting_1.3" class="org.apache.activemq.command.ActiveMQQueue">
@@ -688,7 +632,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="Meeting"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

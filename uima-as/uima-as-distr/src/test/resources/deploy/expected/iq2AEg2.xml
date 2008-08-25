@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--==================================================================================-->
- <!-- Generated from                                                                                 -->
- <!-- file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/deploy/defaultingAEaggrAsync.xml -->
- <!-- 2 November, 2007, 2:33:33 P.M.                                                                 -->
- <!--==================================================================================-->
+<!--===============================================================================-->
+ <!-- Generated from                                                                -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/iq2AEg2.xml -->
+ <!-- 25 August, 2008, 4:08:44 P.M.                                                 -->
+ <!--===============================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
@@ -104,7 +104,7 @@
       </constructor-arg>
       <constructor-arg index="1" value="RoomNumberAnnotatorQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="delegate_map_RoomNumberAnnotatorQueue_1"/>
@@ -310,7 +310,7 @@
          class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
 
      <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
+     <property name="concurrentConsumers" value="37"/>
 
      <!--    return Queue    -->
      <property name="destination" ref="asynAggr_retQ_RoomNumberAnnotatorQueue_1"/>
@@ -446,7 +446,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="RoomNumber"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -567,7 +567,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="DateTime"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex3/TutorialDateTime.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex3/TutorialDateTime.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -688,7 +688,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="Meeting"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--==================================================================================-->
- <!-- Generated from                                                                            -->
- <!-- file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/deploy/defaultingAEaggr.xml -->
- <!-- 2 November, 2007, 2:33:35 P.M.                                                            -->
- <!--==================================================================================-->
+<!--=============================================================================-->
+ <!-- Generated from                                                              -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/iq1AE.xml -->
+ <!-- 25 August, 2008, 1:56:17 P.M.                                               -->
+ <!--=============================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
@@ -76,7 +76,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="RoomNumberAnnotatorQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex2/RoomNumberAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

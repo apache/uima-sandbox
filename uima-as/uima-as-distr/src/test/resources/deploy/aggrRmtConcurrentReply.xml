@@ -19,9 +19,13 @@
     * under the License.
     ***************************************************************
    -->
+<!-- test concurrent reply consumer -->
 <analysisEngineDeploymentDescription
   xmlns="http://uima.apache.org/resourceSpecifier">
-  <deployment protocol="jms" provider="activemq">    
+  <name>Meeting Detector TAE</name>
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/>
+    
       <service>
         <inputQueue endpoint="RoomNumberAnnotatorQueue"
           brokerURL="tcp://localhost:61616"/>
@@ -30,13 +34,12 @@
             location="../descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
         </topDescriptor>
         <analysisEngine async="true">
-          <delegates>
-            <remoteAnalysisEngine key="RoomNumber">
-              <inputQueue endpoint="RoomNumber"
-                brokerURL="tcp://localhost:61616"/>
-            </remoteAnalysisEngine>
-          </delegates>
-        </analysisEngine>
+        <delegates>
+          <remoteAnalysisEngine key="DateTime" remoteReplyQueueScaleout="31">
+            <inputQueue endpoint="iq1" brokerURL="tcp://some.remote:12345"/>
+          </remoteAnalysisEngine>
+        </delegates>
+          </analysisEngine>
       </service>
 
   </deployment>

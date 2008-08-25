@@ -51,6 +51,7 @@
       12/10/2007 add check for inconsistency - disallow remote delegate specifying 
                  vm://localhost as the brokerURL broker
       11/xx/2007 NOT YET DONE rename pool elements for consistency between cas multiplier and main cas pool
+      further updates moved to SVN comments
     --> 
 
   <!--============================================================-->       
@@ -88,7 +89,7 @@
  
   <xsl:param name="useRelativePaths"/>
   
-  <xsl:param name="noTempQueues" select="()"/>
+  <!--xsl:param name="noTempQueues" select="()"/-->  <!-- not used anymore -->
   
   <xsl:variable name="document-uri" select="document-uri(.)"/>
   
@@ -109,12 +110,17 @@
          ]">
        <xsl:sequence select="."/>
     </xsl:for-each-group-->
-    <xsl:for-each-group group-by="@brokerURL"
-      select="$ddd//u:inputQueue
-         [ @brokerURL ne 'vm://localhost' and 
+    
+    <!-- inputQueue elements occur at the top and within remote delegates
+         get the unique set of elements
+      The code for the first select used to include this "and" clause
+      and 
            (not(ancestor::u:delegates) or
             (../u:replyQueue/@location eq 'remote'))
-         ]">
+          -->
+    <xsl:for-each-group group-by="@brokerURL"
+      select="$ddd//u:inputQueue
+         [ @brokerURL ne 'vm://localhost' ]">
        <!--xsl:message select="('*** ', ..)"/-->
        <xsl:sequence select="."/>
     </xsl:for-each-group>
@@ -418,8 +424,7 @@
           value="{if ($remoteAnalysisEngine) then $remoteAnalysisEngine/u:inputQueue/@endpoint
                                              else f:getInternalInputQueueName($aeDelegate)}"/>
         
-        <xsl:if test="$remoteAnalysisEngine/u:replyQueue[@location eq 'remote'] and 
-                      not(f:isRmtTempQ($remoteAnalysisEngine))">
+        <xsl:if test="$remoteAnalysisEngine">
           <xsl:sequence
             select="f:generateLineComment('Queue name used for replies, on the remote broker',5)"/>
           <property name="replyToEndpoint"
@@ -457,9 +462,9 @@
             value="{$remoteAnalysisEngine/serializer/@method}"/>
         </xsl:if>
         
-        <xsl:if test="f:isRmtTempQ($remoteAnalysisEngine)">
+        <!--xsl:if test="(f:isRmtTempQ$remoteAnalysisEngine)"-->
           <property name="tempReplyDestination" value="true"/>
-        </xsl:if>
+        <!--/xsl:if-->
         <!--
           <xsl:variable name="msgListenerContainerID" 
              select="concat('asAggr_return_msgLsnrCntnr_', $aeNameUnique,
@@ -481,7 +486,8 @@
       <!-- used as 1st part of ctlr name -->
       <xsl:with-param name="msgHandlerChainID"
         select="f:getMetaMsgHandlerID(., 'aggregate_input')"/>
-      <xsl:with-param name="nbrConcurrentConsumers" select="'1'"/>
+      <xsl:with-param name="nbrConcurrentConsumers" select=
+        "if (f:isTopLevelAggr($input_q_ID)) then string(@inputQueueScaleout) else '1'"/>
       <xsl:with-param name="remote" select="()"/>
       <xsl:with-param name="poolingTaskExecutor" select="()"/>
     </xsl:call-template>
@@ -512,7 +518,7 @@
         <!-- used as 1st part of ctlr name -->
         <xsl:with-param name="msgHandlerChainID"
           select="f:getMetaMsgHandlerID($analysisEngine, 'aggregate_return')"/>
-        <xsl:with-param name="nbrConcurrentConsumers" select="'1'"/>
+        <xsl:with-param name="nbrConcurrentConsumers" select="string(@internalReplyQueueScaleout)"/>
         <xsl:with-param name="remote" select="()"/>
         <xsl:with-param name="poolingTaskExecutor" select="()"/>
       </xsl:call-template>
@@ -520,18 +526,18 @@
     
     <!-- we iterate over all the delegates in order to have the right value for position() -->
     <xsl:for-each select="u:delegates/*">
-      <xsl:if test="self::u:remoteAnalysisEngine[u:replyQueue/@location eq 'remote']">
+      <xsl:if test="self::u:remoteAnalysisEngine">
         <!--xsl:message select="('delegate', .)"/-->
         <xsl:variable name="returnQ_ID" select="f:getRemoteReturnQueueID($analysisEngine, .)"/>
         <xsl:variable name="returnQ_ID_GUID" select="f:getRemoteReturnQueueName($analysisEngine, .)"/>
         
-        <xsl:if test="not(f:isRmtTempQ(.))">
+        <!--xsl:if test="not(f:isRmtTempQ(.))"-->
           <xsl:sequence
             select="f:generateLineComment(('return queue for http or tcp remote service', 'on remote broker'), 3)"/>
           <bean id="{$returnQ_ID}" class="org.apache.activemq.command.ActiveMQQueue">
             <constructor-arg index="0" value="{$returnQ_ID_GUID}"/>
           </bean>
-        </xsl:if>
+        <!--/xsl:if-->
         
         <xsl:variable name="brokerID" select="f:getQbrokerID(u:inputQueue)"/>
         <!--xsl:message select="('generating input channel for remote reply queue', u:remoteAnalysisEngine/@key)"/-->
@@ -539,16 +545,19 @@
           <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/>
           <xsl:with-param name="q_ID" select="$returnQ_ID"/>
           <!-- if tempQ, use endpoint bean id instead of endpoint name in next parm -->
-          <xsl:with-param name="q_endpointName"
+          <!--xsl:with-param name="q_endpointName"
             select="if (f:isRmtTempQ(.)) then f:getEndpointName(@key, concat($uniq, '.', position())) 
-                             else $returnQ_ID_GUID"/>
+                             else $returnQ_ID_GUID"/-->
+          <xsl:with-param name="q_endpointName"
+            select="f:getEndpointName(@key, concat($uniq, '.', position()))"/>
           <xsl:with-param name="queueFactoryID" select="$brokerID"/>
           <xsl:with-param name="inputOrReturn" select="'return'"/>
           <xsl:with-param name="kind" select="'asAggr'"/>
           <!-- used as 1st part of ctlr name -->
           <xsl:with-param name="msgHandlerChainID"
             select="f:getMetaMsgHandlerID($analysisEngine, 'aggregate_return')"/>
-          <xsl:with-param name="nbrConcurrentConsumers" select="'1'"/>
+          <xsl:with-param name="nbrConcurrentConsumers" 
+            select="@remoteReplyQueueScaleout"/>  
           <xsl:with-param name="remote" select="."/>
           <xsl:with-param name="poolingTaskExecutor" select="()"/>
         </xsl:call-template>
@@ -732,6 +741,7 @@
         <xsl:with-param name="poolingTaskExecutor" select="$poolingTaskExecutorID"/>     
       </xsl:call-template>
    
+      <!-- next to be commented out due to design change summer 2008 -->
       <xsl:if test="parent::u:service and u:casMultiplier">
         <xsl:call-template name="generateCMSyncInputChannel">
           <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/> 
@@ -942,7 +952,8 @@
     <bean id="{$q_listenerID}"
         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
       <property name="messageHandler" ref="{$msgHandlerChainID}"/>
-      <property name="endpointName" value="{if (f:isRmtTempQ($remote)) then '' else $q_endpointName}"/>
+      <!--property name="endpointName" value="{if (f:isRmtTempQ($remote)) then '' else $q_endpointName}"/-->
+      <property name="endpointName" value="{if ($remote[self::u:remoteAnalysisEngine]) then '' else $q_endpointName}"/>
       <property name="controller" ref="{$ctlrID}"/>
       <xsl:if test="$inputOrReturn eq 'input'">
         <property name="listenerContainer" ref="{$msgListenerContainerID}"/>
@@ -967,7 +978,7 @@
       
       <xsl:sequence select="f:generateLineComment(concat($inputOrReturn, ' Queue'), 5)"/>
       <xsl:choose>
-        <xsl:when test="f:isRmtTempQ($remote)">
+        <xsl:when test="$remote[self::u:remoteAnalysisEngine]">
           <property name="destinationResolver" ref="{f:getDestinationResolverID($aeNameUnique, $remote/@key)}"/>
           <property name="destinationName" value="" />
           <property name="targetEndpoint" ref="{$q_endpointName}" />
@@ -986,7 +997,7 @@
       </xsl:if>
     </bean>
     
-    <xsl:if test="f:isRmtTempQ($remote)">
+    <xsl:if test="$remote[self::u:remoteAnalysisEngine]">
       <xsl:sequence select="f:generateLineComment((
         '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
         concat('Destination Resolver for ',$remote/@key),
@@ -1036,6 +1047,8 @@
   <!--================================================-->
   <!--   Generate a Cas Multiplier Sync input Channel -->
   <!--================================================-->
+  
+  <!-- note: NO LONGER USED as of UIMA-1019 design change -->
   <xsl:template name="generateCMSyncInputChannel">
     <xsl:param name="aeNameUnique"/>
     <xsl:param name="q_ID"/>   <!-- this is a descriptor-unique bean id of the input (or ret) q endpoint -->
@@ -1590,8 +1603,42 @@
         ('deployment descriptor for AE:', $key,
          'has delegate?', if (u:delegates) then 'true' else 'false',
          'async is:', $async), .)"/-->
+    
+    <xsl:variable name="internalReplyQueueScaleout" as="xs:string">
+      <xsl:choose>
+        <xsl:when test="(string($async) = 'false') and @internalReplyQueueScaleout">
+          <xsl:sequence select="f:msgWithLineNumber('WARN',
+              ('deployment descriptor for analysisEngine:', $key,
+               'specifies', concat('internalReplyQueueScaleout=&quot;', string(@internalReplyQueueScaleout),
+               '&quot;, this is ignored for async=&quot;false&quot; analysisEngine specifications.')),
+              .)"/>
+          <xsl:value-of select="'1'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="if (@internalReplyQueueScaleout) then @internalReplyQueueScaleout else '1'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="inputQueueScaleout" as="xs:string">
+      <xsl:choose>
+        <xsl:when test="(string($async) = 'false') and @inputQueueScaleout">
+          <xsl:sequence select="f:msgWithLineNumber('WARN',
+              ('deployment descriptor for analysisEngine:', $key,
+               'specifies', concat('inputQueueScaleout=&quot;', string(@inputQueueScaleout),
+               '&quot;, this is ignored for async=&quot;false&quot; analysisEngine specifications.')),
+              .)"/>
+          <xsl:value-of select="'1'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="if (@inputQueueScaleout) then @inputQueueScaleout else '1'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
          
-    <u:analysisEngine key="{$key}" async="{$async}">
+    <u:analysisEngine key="{$key}" async="{$async}"
+      internalReplyQueueScaleout="{$internalReplyQueueScaleout}"
+      inputQueueScaleout        ="{$inputQueueScaleout}">
       
       <i:local_ae_descriptor file_path="{$local_ae_descriptor_file_path[1]}">
         <!--xsl:message select="'local_ae_descriptor'"/>
@@ -1947,8 +1994,12 @@
   <xsl:template mode="addDefaults" match="u:remoteDelegate|u:remoteAnalysisEngine">
     <xsl:param tunnel="yes" name="defaultErrorConfig"/>
     <!--xsl:message select="'*** remote delegate defaulting pass 1 called '"/-->
-    <!--xsl:sequence select="f:validate(.)"/-->    
-    <u:remoteAnalysisEngine key="{@key}">
+    <!--xsl:sequence select="f:validate(.)"/-->  
+    
+    <xsl:variable name="remoteReplyQueueScaleout" as="xs:string"
+      select="if (@remoteReplyQueueScaleout) then @remoteReplyQueueScaleout else '1'"/>
+      
+    <u:remoteAnalysisEngine key="{@key}" remoteReplyQueueScaleout="{$remoteReplyQueueScaleout}">
       <xsl:if test="u:casMultiplier">
         <u:casMultiplier poolSize="{if (u:casMultiplier/@poolSize) then u:casMultiplier/@poolSize else '1'}"
                 initialFsHeapSize="{if (u:casMultiplier/@initialFsHeapSize) then u:casMultiplier/@initialFsHeapSize else '2000000'}"/>
@@ -1962,7 +2013,9 @@
       
       <xsl:choose>
         <xsl:when test="u:replyQueue">
-          <xsl:if test="not(u:replyQueue/@location = ('local', 'remote'))">
+          <xsl:sequence select="f:msgWithLineNumber('WARNING',
+            ('replyQueue element no longer used - all reply queues are remote for remote delegates'), u:replyQueue)"/>
+          <!--xsl:if test="not(u:replyQueue/@location = ('local', 'remote')) and u:replyQueue/@location">
             <xsl:sequence select="f:msgWithLineNumber('ERROR', 
               ('replyQueue location attribute, ', u:replyQueue/@location, ', must have a value of either ''local'' or ''remote'''), u:replyQueue)"/>
           </xsl:if>
@@ -1971,12 +2024,19 @@
             <xsl:sequence select="f:msgWithLineNumber('ERROR', 
               '''local'' replyQueue location is not supported for ''http://'' style connections', u:replyQueue)"/>
           </xsl:if>
-          <u:replyQueue location="{if (u:replyQueue/@location) then u:replyQueue/@location else
-            if (starts-with($tmp/u:inputQueue/@brokerURL, 'http://')) then 'remote' else 'local'}"/>
+          <xsl:if test="(u:replyQueue/@location eq 'local')">
+            <xsl:sequence select="f:msgWithLineNumber('ERROR',
+              '''local'' replyQueue location is no longer supported and will be forcedto remote', u:replyQueue)"/>   
+          </xsl:if-->
+          <!--u:replyQueue location="{if (u:replyQueue/@location) then u:replyQueue/@location else
+            if (starts-with($tmp/u:inputQueue/@brokerURL, 'http://')) then 'remote' else 'local'}"/-->
+          <!--u:replyQueue location="remote" concurrentConsumers=
+            "{if (u:replyQueue/@concurrentConsumers) then u:replyQueue/@concurrentConsumers else '1'}"/-->
         </xsl:when>
         <xsl:otherwise>
-          <u:replyQueue location="{
-            if (starts-with($tmp/u:inputQueue/@brokerURL, 'http://')) then 'remote' else 'local'}"/>
+          <!--u:replyQueue location="remote" concurrentConsumers="1"/-->
+          <!--u:replyQueue location="{
+            if (starts-with($tmp/u:inputQueue/@brokerURL, 'http://')) then 'remote' else 'local'}"/-->
           <!--xsl:message select="('*** replyQueue', 
             if (starts-with($tmp/u:inputQueue/@brokerURL, 'http://')) then 'remote' else 'local')"/-->
         </xsl:otherwise>
@@ -2090,15 +2150,15 @@
     </xsl:choose>    
   </xsl:function>
  
-  <xsl:function name="f:isRmtTempQ">
-    <xsl:param name="rmtNode"/>
+  <!--xsl:function name="f:isRmtTempQ">
+    <xsl:param name="rmtNode"/-->
     <!--xsl:message select="not($noTempQueues) and 
       ($rmtNode/u:replyQueue/@location eq 'remote') and
       ($topLevelInputQueueBroker ne 'vm://localhost') and
       ($rmtNode/u:inputQueue/@brokerURL eq $topLevelInputQueueBroker)"/-->
-    <xsl:sequence select="not($noTempQueues) and 
+    <!--xsl:sequence select="not($noTempQueues) and 
       ($rmtNode/u:replyQueue/@location eq 'remote')"/>
-  </xsl:function> 
+  </xsl:function--> 
   
   <xsl:function name="f:isAggr">
     <xsl:param name="aeNode"/>
@@ -2108,6 +2168,11 @@
   <xsl:function name="f:isCPP">
     <xsl:param name="aeNode"/>
     <xsl:sequence select="$aeNode/*/u:frameworkImplementation[text() eq 'org.apache.uima.cpp']"/>
+  </xsl:function>
+      
+  <xsl:function name="f:isTopLevelAggr">
+    <xsl:param name="qname"/>
+    <xsl:sequence select="starts-with($qname, 'top_level_input_queue_service')"/>
   </xsl:function>
   
   <xsl:function name="f:getUserHandlerDispatcherID">
@@ -2464,7 +2529,9 @@
             <u:environmentVariables i:maxone="">
               <u:environmentVariable name=""/>
             </u:environmentVariables>
-            <u:analysisEngine i:maxone="" key="" async="">
+            <u:analysisEngine i:maxone="" key="" async="" 
+                internalReplyQueueScaleout=""
+                inputQueueScaleout="">
               <u:scaleout i:maxone="" numberOfInstances=""/>
               <u:casMultiplier i:maxone="" poolSize="" initialFsHeapSize=""/>
               <u:asyncPrimitiveErrorConfiguration i:maxone="">
@@ -2480,7 +2547,7 @@
               </u:asyncAggregateErrorConfiguration>
               <u:delegates i:maxone="">
                 <u:analysisEngine/>
-                <u:remoteAnalysisEngine key="">
+                <u:remoteAnalysisEngine key="" remoteReplyQueueScaleout="">
                   <u:casMultiplier i:maxone="" poolSize="" initialFsHeapSize=""/>
                   <u:inputQueue i:maxone="" i:required="" brokerURL="" endpoint="" queueName=""/>
                   <u:replyQueue i:maxone="" location=""/>

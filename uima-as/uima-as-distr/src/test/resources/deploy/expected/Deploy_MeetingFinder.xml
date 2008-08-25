@@ -51,7 +51,7 @@
 
    <!-- Create prefetch policy -->
    <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
-      <property name="queuePrefetch" value="1"/>
+      <property name="queuePrefetch" value="0"/>
    </bean>
 
    <!--=================================-->
@@ -200,6 +200,7 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!-- ==================================== -->
@@ -219,6 +220,7 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="100000"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!-- ==================================== -->
@@ -238,6 +240,7 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!-- ==================================== -->
@@ -256,6 +259,7 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

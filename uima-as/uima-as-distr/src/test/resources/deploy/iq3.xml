@@ -21,23 +21,31 @@
    -->
 <analysisEngineDeploymentDescription
   xmlns="http://uima.apache.org/resourceSpecifier">
-  <deployment protocol="jms" provider="activemq">    
-      <service>
-        <inputQueue endpoint="RoomNumberAnnotatorQueue"
+  
+  <name>remote Cas Multiplier</name>
+  <description></description>
+  
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/>
+
+    <service>
+      <inputQueue endpoint="MeetingDetectorTaeQueue"
           brokerURL="tcp://localhost:61616"/>
-        <topDescriptor>
-          <import
-            location="../descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
-        </topDescriptor>
-        <analysisEngine async="true">
-          <delegates>
-            <remoteAnalysisEngine key="RoomNumber">
-              <inputQueue endpoint="RoomNumber"
-                brokerURL="tcp://localhost:61616"/>
-            </remoteAnalysisEngine>
-          </delegates>
-        </analysisEngine>
-      </service>
+      <topDescriptor>    
+        <import location="../descriptors/cas_multiplier/SegmenterAndTokenizerAE.xml"/>
+      </topDescriptor>
+      <analysisEngine>
+        
+        <delegates>
+          <remoteAnalysisEngine key="Segmenter" remoteReplyQueueScaleout="35">
+            <inputQueue endpoint="iq3rmt" brokerURL="tcp://some.remote:12345"/>
+            <casMultiplier poolSize='7' initialFsHeapSize='999'/>
+          </remoteAnalysisEngine>
+        </delegates>
+      </analysisEngine>
+        
+    </service>
 
   </deployment>
+  
 </analysisEngineDeploymentDescription>

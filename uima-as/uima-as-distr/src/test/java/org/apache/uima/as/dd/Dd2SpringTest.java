@@ -49,7 +49,8 @@ public class Dd2SpringTest extends TestCase{
   // get rid of uniqifiers that are generated
   private static String uniquifiersPattern = 
       // sample:   9.67.165.27-44fb4c2a:1165912164d:-8000
-      "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.[\\-0-9a-fA-F]{9,12}\\:[0-9a-fA-F]{8,12}"
+      // another:  9.2.34.65754d945a:11bfaf7fad7:-7fff
+      "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.?[\\-0-9a-fA-F]{6,12}\\:[0-9a-fA-F]{8,12}\\:\\-[0-9a-fA-F]{4,4}"
       ;
   
   // get rid of part of file name that is system specific
@@ -89,6 +90,30 @@ public class Dd2SpringTest extends TestCase{
     
   }
 
+  public void testDd2Spring_inputQueueScaleout3() throws Exception {
+    checkDd2Spring("iq3.xml");
+  }
+  
+  public void testDd2Spring_inputQueueScaleout2g2() throws Exception {
+    checkDd2Spring("iq2AEg2.xml");
+  }
+  
+  public void testDd2Spring_inputQueueScaleout2g() throws Exception {
+    checkDd2Spring("iq2AEg.xml");
+  }
+
+  public void testDd2Spring_inputQueueScaleout2() throws Exception {
+    checkDd2Spring("iq2AE.xml");
+  }
+
+  public void testDd2Spring_inputQueueScaleout1() throws Exception {
+    checkDd2Spring("iq1AE.xml");
+  }
+
+  public void testDd2Spring_concurRemoteConsumers() throws Exception {
+    checkDd2Spring("aggrRmtConcurrentReply.xml");
+  }
+
   public void testDd2Spring_multiLevelAsyncDefaulting() throws Exception {
     checkDd2Spring("Deploy_MeetingFinder.xml");
   }
@@ -104,7 +129,7 @@ public class Dd2SpringTest extends TestCase{
   public void testDd2Spring_NotCPP() throws Exception {   
     checkDd2SpringErrMsg(
         "envVar/envVarNotCPP.xml",
-        "\n *** ERROR: line-number: 28 Service element contains an environmentVariables element, \n" +
+        "running test envVar/envVarNotCPP.xml: \n *** ERROR: line-number: 28 Service element contains an environmentVariables element, \n" +
           " but the referenced top-level descriptor isn't a C++ component");
   }
  
@@ -131,7 +156,7 @@ public class Dd2SpringTest extends TestCase{
   public void testDd2Spring_CPPwrongProtocol() throws Exception {   
     checkDd2SpringErrMsg(
         "envVar/envVarCPPwrongProtocol.xml",
-        "\n *** ERROR: line-number: 28 top level input Queue broker protocol must be tcp:// for a top level C++ component");
+        "running test envVar/envVarCPPwrongProtocol.xml: \n *** ERROR: line-number: 28 top level input Queue broker protocol must be tcp:// for a top level C++ component");
   }
 
 
@@ -151,7 +176,7 @@ public class Dd2SpringTest extends TestCase{
   }
  
   private void checkDd2Spring(String dd) throws Exception {
-    
+    System.err.print("running test " + dd + ": ");
     File springContextFile = 
       dd2SpringInstance.convertDd2Spring(pathToDds + dd, dd2SpringXsltFilePath, saxonClasspath, "");
 

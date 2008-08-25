@@ -21,7 +21,10 @@
    -->
 <analysisEngineDeploymentDescription
   xmlns="http://uima.apache.org/resourceSpecifier">
-  <deployment protocol="jms" provider="activemq">    
+  <name>Meeting Detector TAE</name>
+  <deployment protocol="jms" provider="activemq">
+    <casPool numberOfCASes="5"/>
+    
       <service>
         <inputQueue endpoint="RoomNumberAnnotatorQueue"
           brokerURL="tcp://localhost:61616"/>
@@ -29,15 +32,8 @@
           <import
             location="../descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
         </topDescriptor>
-        <analysisEngine async="true">
-          <delegates>
-            <remoteAnalysisEngine key="RoomNumber">
-              <inputQueue endpoint="RoomNumber"
-                brokerURL="tcp://localhost:61616"/>
-            </remoteAnalysisEngine>
-          </delegates>
-        </analysisEngine>
+        <analysisEngine async="true" inputQueueScaleout="34"/>
+        
       </service>
-
   </deployment>
 </analysisEngineDeploymentDescription>

@@ -30,7 +30,7 @@
      <constructor-arg index="3" value="1"/>
 
      <!--   prefetch limit   -->
-     <constructor-arg index="4" value="1"/>
+     <constructor-arg index="4" value="0"/>
 
      <!--    Env Vars map    -->
      <constructor-arg index="5">

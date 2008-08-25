@@ -51,7 +51,7 @@
 
    <!-- Create prefetch policy -->
    <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
-      <property name="queuePrefetch" value="1"/>
+      <property name="queuePrefetch" value="0"/>
    </bean>
  
    <!--=================================-->
@@ -185,6 +185,10 @@
      <!-- Delegate key name or remote queue name -->
      <property name="endpoint" value="RoomNumber"/>
 
+     <!-- Queue name used for replies, on the remote broker  -->
+     <property name="replyToEndpoint"
+                value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_RoomNumber_9.2.34.65754d945a:11bfaf7fad7:-7fff"/>
+
      <!--      Timeouts      -->
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
@@ -209,6 +213,7 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!-- ==================================== -->
@@ -227,6 +232,7 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -318,6 +324,14 @@
      <property name="messageListener"
                 ref="asAggr_return_q_listenerID_RoomNumberAnnotatorQueue_1"/>
       <property name="connectionFactory" ref="controllerJmsFactory"/>
+   </bean>
+
+   <!-- return queue for http or tcp remote service  -->
+   <!--               on remote broker               -->
+   <bean id="rmtRtrnQ_RoomNumberAnnotatorQueue_1_RoomNumber"
+         class="org.apache.activemq.command.ActiveMQQueue">
+      <constructor-arg index="0"
+                       value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_RoomNumber_9.2.34.65754d945a:11bfaf7fad7:-7fff"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
