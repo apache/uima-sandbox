@@ -462,9 +462,9 @@
             value="{$remoteAnalysisEngine/serializer/@method}"/>
         </xsl:if>
         
-        <!--xsl:if test="(f:isRmtTempQ$remoteAnalysisEngine)"-->
+        <xsl:if test="$remoteAnalysisEngine">
           <property name="tempReplyDestination" value="true"/>
-        <!--/xsl:if-->
+        </xsl:if>
         <!--
           <xsl:variable name="msgListenerContainerID" 
              select="concat('asAggr_return_msgLsnrCntnr_', $aeNameUnique,
