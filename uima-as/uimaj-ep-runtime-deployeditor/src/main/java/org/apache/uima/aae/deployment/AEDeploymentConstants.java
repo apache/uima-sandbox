@@ -89,8 +89,10 @@ public interface AEDeploymentConstants
     final static public String TAG_IMPORT                  = "import";
 
     final static public String TAG_REPLY_QUEUE             = "replyQueue";
-    final static public String TAG_ATTR_CONCURRENT_CONSUMERS    = "concurrentConsumers";
-
+    final static public String TAG_ATTR_INPUT_QUEUE_SCALEOUT = "inputQueueScaleout";
+    final static public String TAG_ATTR_INTERNAL_REPLYQUEUE_SCALEOUT = "internalReplyQueueScaleout";
+    final static public String TAG_ATTR_REMOTE_REPLYQUEUE_SCALEOUT = "remoteReplyQueueScaleout";
+    
     final static public String TAG_SERIALIZER              = "serializer";
     final static public String TAG_ATTR_METHOD             = "method";
 

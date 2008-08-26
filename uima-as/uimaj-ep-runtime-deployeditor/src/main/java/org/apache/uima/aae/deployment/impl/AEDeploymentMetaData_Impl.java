@@ -106,6 +106,10 @@ AEDeploymentConstants, AEDeploymentMetaData {
   protected ResourceSpecifier resourceSpecifier;
 
   protected Import importedAE;    // import by location|name of AE descriptor
+  
+  protected int inputQueueScaleout = -1;
+
+  protected int internalReplyQueueScaleout = -1;
 
   /** ********************************************************************** */
 
@@ -296,14 +300,58 @@ AEDeploymentConstants, AEDeploymentMetaData {
         if (AEDeploymentConstants.TAG_ATTR_KEY.equalsIgnoreCase(name)) {
           // Set "key = ..." attribute
           setKey(val);
+          
         } else if (AEDeploymentConstants.TAG_ATTR_ASYNC.equalsIgnoreCase(name)) {
           // Set "async =[yes|no]" attribute
           setAsync(Boolean.parseBoolean(val));
+          
+        } else if (AEDeploymentConstants.TAG_ATTR_INPUT_QUEUE_SCALEOUT.equalsIgnoreCase(name)) {
+          // Set "inputQueueScaleout =nnn" attribute
+          try {
+            int n = Integer.parseInt(val);
+            if (n > 0) {
+              setInputQueueScaleout(n);
+            } else {
+              throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                      new Object[] { n, TAG_ATTR_INPUT_QUEUE_SCALEOUT });
+            }
+          } catch (NumberFormatException e) {
+            throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                    new Object[] { TAG_ATTR_INPUT_QUEUE_SCALEOUT }, e);
+          }
+          
+        } else if (AEDeploymentConstants.TAG_ATTR_INTERNAL_REPLYQUEUE_SCALEOUT.equalsIgnoreCase(name)) {
+          // Set "inputQueueScaleout =nnn" attribute
+          try {
+            int n = Integer.parseInt(val);
+            if (n > 0) {
+              setInternalReplyQueueScaleout(n);
+            } else {
+              throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                      new Object[] { n, TAG_ATTR_INTERNAL_REPLYQUEUE_SCALEOUT });
+            }
+          } catch (NumberFormatException e) {
+            throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                    new Object[] { TAG_ATTR_INTERNAL_REPLYQUEUE_SCALEOUT }, e);
+          }
+          
         } else {
           throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
                   new Object[]{name});
         }
       }
+      
+      // Check validity of queue listeners
+      if (!isAsync()) {
+        if (getInputQueueScaleout() > 1) {
+          throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                  new Object[] { getInputQueueScaleout(), TAG_ATTR_INPUT_QUEUE_SCALEOUT });
+        }
+        if (getInternalReplyQueueScaleout() > 1) {
+          throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                  new Object[] { getInternalReplyQueueScaleout(), TAG_ATTR_INTERNAL_REPLYQUEUE_SCALEOUT });
+        }
+      }      
     }
 
     // Has "key = ..." attribute ?
@@ -492,6 +540,16 @@ AEDeploymentConstants, AEDeploymentMetaData {
     attrs.addAttribute("", AEDeploymentConstants.TAG_ATTR_ASYNC,
             AEDeploymentConstants.TAG_ATTR_ASYNC, null, Boolean.toString(isAsync()));
     // }
+    if (inputQueueScaleout > 0) {
+      attrs.addAttribute("", AEDeploymentConstants.TAG_ATTR_INPUT_QUEUE_SCALEOUT,
+              AEDeploymentConstants.TAG_ATTR_INPUT_QUEUE_SCALEOUT, null, 
+              "" + inputQueueScaleout);
+    }
+    if (internalReplyQueueScaleout > 0) {
+      attrs.addAttribute("", AEDeploymentConstants.TAG_ATTR_INTERNAL_REPLYQUEUE_SCALEOUT,
+              AEDeploymentConstants.TAG_ATTR_INTERNAL_REPLYQUEUE_SCALEOUT, null, 
+              "" + internalReplyQueueScaleout);
+    }
     aContentHandler.startElement("", AEDeploymentConstants.TAG_ANALYSIS_ENGINE,
             AEDeploymentConstants.TAG_ANALYSIS_ENGINE, attrs);
     attrs.clear();
@@ -626,6 +684,10 @@ AEDeploymentConstants, AEDeploymentMetaData {
   public void setAsync(boolean async) {
     issetAsync = true;
     this.async = async;
+    if (!async) {
+      inputQueueScaleout = -1; // undefined
+      internalReplyQueueScaleout = -1; // undefined
+    }
   }
 
   /**
@@ -703,6 +765,22 @@ AEDeploymentConstants, AEDeploymentMetaData {
 
   public void setInitialFsHeapSize(int initialFsHeapSize) {
       this.initialFsHeapSize = initialFsHeapSize;
+  }
+
+  public int getInputQueueScaleout() {
+    return inputQueueScaleout;
+  }
+
+  public int getInternalReplyQueueScaleout() {
+    return internalReplyQueueScaleout;
+  }
+
+  public void setInputQueueScaleout(int numberOfListeners) {
+    inputQueueScaleout = numberOfListeners;    
+  }
+
+  public void setInternalReplyQueueScaleout(int numberOfListeners) {
+    internalReplyQueueScaleout = numberOfListeners;    
   }
 
   /** ********************************************************************** */

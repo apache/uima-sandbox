@@ -32,7 +32,6 @@ import org.apache.uima.dde.internal.page.AEConfigurationPage;
 import org.apache.uima.dde.internal.page.OverviewPage;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.Import;
-import org.apache.uima.taeconfigurator.Messages;
 import org.apache.uima.taeconfigurator.editors.MultiPageEditor;
 import org.apache.uima.taeconfigurator.editors.MultiPageEditorContributor;
 import org.apache.uima.taeconfigurator.editors.point.IUimaEditorExtension;

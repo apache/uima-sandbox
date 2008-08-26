@@ -72,6 +72,26 @@ public interface AEDeploymentMetaData
      * @return the numberOfInstances
      */
     public int getNumberOfInstances();
+    
+    /**
+     * Get the number of reply queue listeners for co-located delegates.
+     * (Only applicable if the AE is an Async Aggregate)
+     * 
+     * @return int Number of listeners
+     */
+    public int getInputQueueScaleout();
+
+    public void setInputQueueScaleout(int numberOfListeners);
+
+    /**
+     * Get the number of reply queue listeners for co-located delegates.
+     * (Only applicable if the AE is an Async Aggregate)
+     * 
+     * @return int Number of listeners
+     */
+    public int getInternalReplyQueueScaleout();
+    
+    public void setInternalReplyQueueScaleout(int numberOfListeners);
 
     /**
      * @param numberOfInstances the numberOfInstances to set

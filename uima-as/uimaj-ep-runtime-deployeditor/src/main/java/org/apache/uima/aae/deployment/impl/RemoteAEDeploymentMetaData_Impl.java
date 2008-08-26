@@ -57,7 +57,7 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
 
   protected InputQueue    inputQueue = new InputQueue_Impl();
   protected String        replyQueueLocation = null; // DEFAULT_REPLY_QUEUE_LOCATION; // NOT defined
-  protected int           replyQueueConsumers = -1; // DEFAULT_CONCURRENT_CONSUMERS; // NOT defined
+  protected int           remoteReplyQueueScaleout = -1; // DEFAULT_CONCURRENT_CONSUMERS; // NOT defined
   protected String        serializerMethod = "xmi"; // NOT defined
 
   protected AsyncAEErrorConfiguration errorConfiguration;
@@ -94,7 +94,7 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
   {
     String val;
 
-    // Check for "key" attribute
+    // Check for "key" and "remoteReplyQueueScaleout" attributes
     NamedNodeMap map = aElement.getAttributes();
     if (map != null) {
       for (int i=0; i<map.getLength(); ++i) {
@@ -109,6 +109,21 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
         if (AEDeploymentConstants.TAG_ATTR_KEY.equalsIgnoreCase(name)) {
           // Set "key = ..." attribute
           setKey(val);
+        } else if (AEDeploymentConstants.TAG_ATTR_REMOTE_REPLYQUEUE_SCALEOUT.equalsIgnoreCase(name)) {          
+          // "remoteReplyQueueScaleout" attribute
+          try {
+            int n = Integer.parseInt(val);
+            if (n > 0) {
+              setRemoteReplyQueueScaleout(n);
+            } else {
+              throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
+                      new Object[] { n, TAG_ATTR_REMOTE_REPLYQUEUE_SCALEOUT });
+            }
+          } catch (NumberFormatException e) {
+            throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
+                    new Object[] { TAG_ATTR_REMOTE_REPLYQUEUE_SCALEOUT }, e);
+          }
+
         } else {
           throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
                   new Object[]{name});
@@ -168,25 +183,6 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
             }
           }
           
-          int n;
-          val = DDParserUtil.checkAndGetAttributeValue(TAG_REPLY_QUEUE, TAG_ATTR_CONCURRENT_CONSUMERS, elem, false);
-          if (val == null || val.trim().length() == 0) {
-            n = 1;
-          } else {
-            try {
-              n = Integer.parseInt(val);
-              if (n <= 0) {
-                // n = 1;
-                throw new InvalidXMLException(InvalidXMLException.INVALID_ELEMENT_TEXT,
-                        new Object[] { n, TAG_ATTR_CONCURRENT_CONSUMERS });
-              }
-            } catch (NumberFormatException e) {
-              throw new InvalidXMLException(InvalidXMLException.UNKNOWN_ELEMENT,
-                      new Object[] { TAG_ATTR_CONCURRENT_CONSUMERS }, e);
-            }
-          }
-          setReplyQueueConcurrentConsumers(n);
-                    
         } else if (TAG_SERIALIZER.equalsIgnoreCase(elem.getTagName())) {
           // setSerializerMethod(elem.getAttribute(TAG_ATTR_METHOD));
           setSerializerMethod(DDParserUtil.checkAndGetAttributeValue(TAG_SERIALIZER, TAG_ATTR_METHOD, elem, true));
@@ -268,6 +264,10 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
     if (getKey() != null && getKey().trim().length() > 0) {
       attrs.addAttribute("", TAG_ATTR_KEY, AEDeploymentConstants.TAG_ATTR_KEY, null, getKey());
     }
+    if (remoteReplyQueueScaleout > 0) {
+      attrs.addAttribute("", TAG_ATTR_REMOTE_REPLYQUEUE_SCALEOUT, TAG_ATTR_REMOTE_REPLYQUEUE_SCALEOUT,
+              null, "" + remoteReplyQueueScaleout);        
+    }
     aContentHandler.startElement("", TAG_REMOTE_DELEGATE, 
             TAG_REMOTE_DELEGATE, attrs);
     attrs.clear();
@@ -298,17 +298,11 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
       attrs.clear();
     }
 
-    // <replyQueue concurrentConsumers="1" location="[local|remote]"/> <!-- optional -->
+    // <replyQueue location="[local|remote]"/> <!-- optional -->
     // Note: location="local" is NO longer support. Will be warned by DDE
-    if (replyQueueConsumers > 1 || replyQueueLocation != null) {
-      if (replyQueueConsumers > 1) {
-        attrs.addAttribute("", TAG_ATTR_CONCURRENT_CONSUMERS, TAG_ATTR_CONCURRENT_CONSUMERS,
-                null, "" + replyQueueConsumers);        
-      }
-      if (replyQueueLocation != null) {
-        attrs.addAttribute("", TAG_ATTR_LOCATION, TAG_ATTR_LOCATION,
+    if (replyQueueLocation != null) {
+      attrs.addAttribute("", TAG_ATTR_LOCATION, TAG_ATTR_LOCATION,
                 null, replyQueueLocation);
-      }
       aContentHandler.startElement("",
               TAG_REPLY_QUEUE, TAG_REPLY_QUEUE, attrs);
       aContentHandler.endElement("", "", TAG_REPLY_QUEUE);
@@ -439,12 +433,12 @@ implements RemoteAEDeploymentMetaData, AEDeploymentConstants
       this.initialFsHeapSize = initialFsHeapSize;
   }
 
-  public int getReplyQueueConcurrentConsumers() {
-    return replyQueueConsumers;
+  public int getRemoteReplyQueueScaleout() {
+    return remoteReplyQueueScaleout;
   }
 
-  public void setReplyQueueConcurrentConsumers(int concurrentConsumers) {
-    replyQueueConsumers = concurrentConsumers;    
+  public void setRemoteReplyQueueScaleout(int concurrentConsumers) {
+    remoteReplyQueueScaleout = concurrentConsumers;    
   }
 
 

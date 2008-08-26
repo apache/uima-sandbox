@@ -96,6 +96,7 @@ public class AETreeBuilder {
     remoteMetaData.setParent(metaData.getParent());
     remoteMetaData.setKey(metaData.getKey());
     remoteMetaData.setCasMultiplierPoolSize(metaData.getCasMultiplierPoolSize());
+    remoteMetaData.setRemoteReplyQueueScaleout(-1);
     try {
       remoteMetaData.setResourceSpecifier(metaData.getResourceSpecifier(), null, false);
     } catch (InvalidXMLException e) {

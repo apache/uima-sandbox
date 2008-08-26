@@ -80,9 +80,21 @@ public class Messages extends NLS {
 
   static public String DDE_AEMetaDataDetails_QueueNameForRemote;
 
-  static public String DDE_AEMetaDataDetails_NumberOfConsumers;
+  static public String DDE_RemoteReplyQueueScaleout; // for remote delegates
 
+  static public String DDE_InputQueueScaleout; // for input queue
 
+  static public String DDE_ReplyQueueListenersForCoLocated; // for co-located delegates
+  
+  static public String Hover_Disable_NumberOfReplicatedInstances; // If disable, hover messages
+  
+  static public String Hover_RemoteReplyQueueScaleout; // for remote delegates
+  
+  static public String Hover_InputQueueScaleout; // for input queue
+
+  static public String Hover_ReplyQueueListenersForCoLocated; // for co-located delegates
+  
+  
   /** ************************************************************************ */
 
   private Messages() {

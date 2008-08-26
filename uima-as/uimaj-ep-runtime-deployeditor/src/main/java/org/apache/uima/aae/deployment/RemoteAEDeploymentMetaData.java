@@ -108,9 +108,14 @@ public interface RemoteAEDeploymentMetaData {
      */
     public void setReplyQueueLocation(String replyQueueLocation);
 
-    public int getReplyQueueConcurrentConsumers();
+    /**
+     * Get the number of reply queue listeners for remote delegates.
+     * 
+     * @return int Number of listeners
+     */
+    public int getRemoteReplyQueueScaleout();
 
-    public void setReplyQueueConcurrentConsumers(int concurrentConsumers);
+    public void setRemoteReplyQueueScaleout(int concurrentConsumers);
     
 
     /**

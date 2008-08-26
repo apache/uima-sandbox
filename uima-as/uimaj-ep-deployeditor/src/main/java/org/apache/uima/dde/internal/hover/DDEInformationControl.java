@@ -263,8 +263,8 @@ public class DDEInformationControl extends PopupDialog implements IInformationCo
             + (obj.getInputQueue() != null ? obj.getInputQueue().getBrokerURL() : "") + "</li>");
     buf.append("<li><b>Queue Name:</b> "
             + (obj.getInputQueue() != null ? obj.getInputQueue().getEndPoint() : "") + "</li>");
-    if (obj.getReplyQueueConcurrentConsumers() > 0) {
-      buf.append("<li><b>Concurrent Consumers for reply queue:</b> " + obj.getReplyQueueConcurrentConsumers() + "</li>");
+    if (obj.getRemoteReplyQueueScaleout() > 0) {
+      buf.append("<li><b>Concurrent Consumers for reply queue:</b> " + obj.getRemoteReplyQueueScaleout() + "</li>");
     }
     // Error Config
     toStringFromErrorConfig(buf, obj.getAsyncAEErrorConfiguration());

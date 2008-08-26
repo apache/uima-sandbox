@@ -30,6 +30,10 @@ import org.apache.uima.application.metadata.impl.UimaApplication_Impl;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.dde.internal.DeploymentDescriptorEditor;
 import org.apache.uima.dde.internal.Messages;
+import org.apache.uima.dde.internal.hover.DDEInformationControl;
+import org.apache.uima.dde.internal.hover.GenericHoverManager;
+import org.apache.uima.dde.internal.hover.HoverManager;
+import org.apache.uima.dde.internal.hover.IGenericHoverOwner;
 import org.apache.uima.dde.internal.page.MasterDetails;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.MetaDataObject;
@@ -54,6 +58,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.DecoratedField;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -64,6 +71,8 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -72,6 +81,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.AbstractFormPart;
@@ -136,6 +146,14 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
   private MetaDataObject currentMetaDataObject;
 
+  protected Label labelInputQueueScaleout;
+
+  protected Spinner inputQueueScaleout;
+
+  protected Label labelReplyQueueForCoLocated;
+
+  protected Spinner replyQueueListenersForCoLocated;
+  
   // For Remote Deployment
 
   private DecoratedField brokerUrlDecoField;
@@ -152,7 +170,9 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
 
   protected CCombo remoteQueueLocation;
   
-  protected Spinner replyQueueConsumers;
+  protected Label labelRemoteReplyQueueScaleout;
+
+  protected Spinner remoteReplyQueueScaleout;
 
   protected Label serializerMethod;
 
@@ -204,8 +224,14 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
       } else if (e.getSource() == initialFsHeapSizeRemote) {
           updateInitialFsHeapSize(initialFsHeapSizeRemote.getSelection());
 
-      } else if (e.getSource() == replyQueueConsumers) {
-        ((RemoteAEDeploymentMetaData) currentMetaDataObject).setReplyQueueConcurrentConsumers(replyQueueConsumers.getSelection());
+      } else if (e.getSource() == remoteReplyQueueScaleout) {
+        ((RemoteAEDeploymentMetaData) currentMetaDataObject).setRemoteReplyQueueScaleout(remoteReplyQueueScaleout.getSelection());
+
+      } else if (e.getSource() == inputQueueScaleout) {
+        ((AEDeploymentMetaData) currentMetaDataObject).setInputQueueScaleout(inputQueueScaleout.getSelection());
+
+      } else if (e.getSource() == replyQueueListenersForCoLocated) {
+        ((AEDeploymentMetaData) currentMetaDataObject).setInternalReplyQueueScaleout(replyQueueListenersForCoLocated.getSelection());
       }
       multiPageEditor.setFileDirty();
     } 
@@ -386,10 +412,50 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     asMode.addSelectionListener(asynAggregateListener);
 
     // <scaleout numberOfInstances="1"/> <!-- optional -->
+    Label labelScaleout = toolkit.createLabel(compositeCoLocatedSetting, Messages.DDE_AEMetaDataDetails_NumberOfReplicatedInstances);
     scaleout = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
-            Messages.DDE_AEMetaDataDetails_NumberOfReplicatedInstances, SWT.BORDER, 1, Integer.MAX_VALUE, false);
+            labelScaleout, SWT.BORDER, 1, Integer.MAX_VALUE, false);
     scaleout.setSelection(1);
     scaleout.addSelectionListener(asynAggregateListener);
+    GenericHoverManager hover = new GenericHoverManager(new IGenericHoverOwner() {
+      public void computeInformation(GenericHoverManager hoverManager, Point ptHoverEventLocation) {
+        if (!scaleout.isEnabled()) {
+          hoverManager.setDisplayedInformation(Messages.Hover_Disable_NumberOfReplicatedInstances, 
+                new Rectangle(1, ptHoverEventLocation.y, 1, 1));  
+        } else {
+          hoverManager.setDisplayedInformation(null, null);
+        }
+      }     
+    }, getPresenterControlCreator("commandId"));
+    hover.install(labelScaleout);
+
+    labelInputQueueScaleout = toolkit.createLabel(compositeCoLocatedSetting, Messages.DDE_InputQueueScaleout);
+    inputQueueScaleout = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
+            labelInputQueueScaleout, SWT.BORDER, 1, 
+            Integer.MAX_VALUE, false);
+    inputQueueScaleout.setSelection(1);
+    inputQueueScaleout.addSelectionListener(asynAggregateListener);
+    hover = new GenericHoverManager(new IGenericHoverOwner() {
+      public void computeInformation(GenericHoverManager hoverManager, Point ptHoverEventLocation) {
+        hoverManager.setDisplayedInformation(Messages.Hover_InputQueueScaleout, 
+                new Rectangle(1, ptHoverEventLocation.y, 1, 1));        
+      }      
+    }, getPresenterControlCreator("commandId"));
+    hover.install(labelInputQueueScaleout);
+    
+    labelReplyQueueForCoLocated = toolkit.createLabel(compositeCoLocatedSetting, Messages.DDE_ReplyQueueListenersForCoLocated);
+    replyQueueListenersForCoLocated = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
+            labelReplyQueueForCoLocated, SWT.BORDER, 1, 
+            Integer.MAX_VALUE, false);
+    replyQueueListenersForCoLocated.setSelection(1);
+    replyQueueListenersForCoLocated.addSelectionListener(asynAggregateListener);
+    hover = new GenericHoverManager(new IGenericHoverOwner() {
+      public void computeInformation(GenericHoverManager hoverManager, Point ptHoverEventLocation) {
+        hoverManager.setDisplayedInformation(Messages.Hover_ReplyQueueListenersForCoLocated, 
+                new Rectangle(1, ptHoverEventLocation.y, 1, 1));        
+      }     
+    }, getPresenterControlCreator("commandId"));
+    hover.install(labelReplyQueueForCoLocated);
 
     // <casMultiplier poolSize="5"/> <!-- optional -->
     casMultiplierLabel = toolkit.createLabel(compositeCoLocatedSetting,
@@ -444,12 +510,21 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     decorationEndPoint.setDescription("The name of the queue cannot be empty");
     endPointDecoField.addFieldDecoration(decorationEndPoint, SWT.LEFT | SWT.TOP, false);    
    
-    replyQueueConsumers = FormSection2.createLabelAndSpinner(toolkit, compositeRemoteSetting,
-            Messages.DDE_AEMetaDataDetails_NumberOfConsumers, SWT.BORDER, 1, 
-            Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
-    replyQueueConsumers.setSelection(1);
-    replyQueueConsumers.addSelectionListener(asynAggregateListener);
+    labelRemoteReplyQueueScaleout = toolkit.createLabel(compositeRemoteSetting, Messages.DDE_RemoteReplyQueueScaleout);
+    remoteReplyQueueScaleout = FormSection2.createLabelAndSpinner(toolkit, compositeRemoteSetting,
+            labelRemoteReplyQueueScaleout, SWT.BORDER, 1, 
+            Integer.MAX_VALUE, false);
+    remoteReplyQueueScaleout.setSelection(1);
+    remoteReplyQueueScaleout.addSelectionListener(asynAggregateListener);
+    hover = new GenericHoverManager(new IGenericHoverOwner() {
 
+      public void computeInformation(GenericHoverManager hoverManager, Point ptHoverEventLocation) {
+        hoverManager.setDisplayedInformation(Messages.Hover_RemoteReplyQueueScaleout, 
+                new Rectangle(1, ptHoverEventLocation.y, 1, 1));        
+      }
+      
+    }, getPresenterControlCreator("commandId"));
+    hover.install(labelRemoteReplyQueueScaleout);
 
     // <casMultiplier poolSize="5"/> <!-- optional -->
     casMultiplierLabelRemote = toolkit.createLabel(compositeRemoteSetting,
@@ -504,9 +579,19 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     if (obj.isAsync()) {
       scaleout.setSelection(1);
       scaleout.setEnabled(false);
+      scaleout.setToolTipText("For AS Aggregate, only 1 instance is allowed.");
+      labelInputQueueScaleout.setVisible(true);
+      inputQueueScaleout.setVisible(true);
+      labelReplyQueueForCoLocated.setVisible(true);
+      replyQueueListenersForCoLocated.setVisible(true);
     } else {
       scaleout.setEnabled(true);
+      scaleout.setToolTipText(null);
       scaleout.setSelection(obj.getNumberOfInstances());
+      labelInputQueueScaleout.setVisible(false);
+      inputQueueScaleout.setVisible(false);
+      labelReplyQueueForCoLocated.setVisible(false);
+      replyQueueListenersForCoLocated.setVisible(false);
     }
     
     ResourceSpecifier rs = obj.getResourceSpecifier();
@@ -538,6 +623,14 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
         } else {
           asMode.setEnabled(true);
           asMode.setSelection(obj.isAsync());
+          if (obj.isAsync()) {
+            if (obj.getInputQueueScaleout() > 0) {
+              inputQueueScaleout.setSelection(obj.getInputQueueScaleout());
+            }
+            if (obj.getInternalReplyQueueScaleout() > 0) {
+              replyQueueListenersForCoLocated.setSelection(obj.getInternalReplyQueueScaleout());
+            }
+          }
         }
       } else if (rs instanceof CollectionReaderDescription) {
         // Handle as CAS Multiplier
@@ -614,9 +707,8 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
       endPoint.setText(obj.getInputQueue().getEndPoint());
     }
 
-    if (obj.getReplyQueueConcurrentConsumers() > 0) {
-      replyQueueConsumers.setSelection(obj.getReplyQueueConcurrentConsumers());
-    }
+    int n = obj.getRemoteReplyQueueScaleout() > 0 ? obj.getRemoteReplyQueueScaleout() : 1;
+    remoteReplyQueueScaleout.setSelection(n);
 
     if (obj.getResourceSpecifier() != null) {
       // Is AnalysisEngineDescription ?
@@ -668,6 +760,15 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
   protected void showStatus(String msg, int msgType) {
     FormMessage.setMessage(mform.getForm().getForm(), msg, msgType);    
   }
+
+  private IInformationControlCreator getPresenterControlCreator(final String commandId) {
+    return new IInformationControlCreator() {
+      public IInformationControl createInformationControl(Shell parent) {
+        return new DefaultInformationControl(parent, SWT.WRAP, null);
+      }
+    };
+  }
+
 
   /** ********************************************************************** */
 
@@ -799,76 +900,14 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     if (!toAsyncAggreagte) {
       // Set CAS pool size to the number of instances
       multiPageEditor.getOverviewPage().setCasPoolSize(metaData.getNumberOfInstances());
+
+      // Set number of listeners to default value (=1)
+      inputQueueScaleout.setSelection(1);
+      replyQueueListenersForCoLocated.setSelection(1);
     }
 
     masterPart.refresh();
     multiPageEditor.setFileDirty();
   }
-  
-  /** ********************************************************************** */
-  /*                        Context Sensitive Pop-up Menu                    */
-  /** ********************************************************************** */
-
-  /**
-   * Creates a pop-up menu on the given control
-   * 
-   * @param menuControl
-   *          the control with which the pop-up menu will be associated
-   */
-  private void createContextMenu(Control menuControl) {
-    MenuManager menuMgr = new MenuManager("#PopUp"); //$NON-NLS-1$
-    menuMgr.setRemoveAllWhenShown(true);
-    menuMgr.addMenuListener(new IMenuListener() {
-      public void menuAboutToShow(IMenuManager mgr) {
-        fillContextMenu(mgr);
-      }
-    });
-    Menu menu = menuMgr.createContextMenu(menuControl);
-    menuControl.setMenu(menu);
-
-    // register the context menu such that other plugins may contribute to it
-    // 
-    // __workbenchPartSite.registerContextMenu(menuMgr, _catTreeViewer);
-  }
-
-  /**
-   * Adds items to the context menu
-   * 
-   * @param menu
-   *          The menu to contribute to
-   */
-  protected void fillContextMenu(IMenuManager menu) {
-    Action action = new Action() {
-      public void run() {
-        handleBrowseDD();
-      }
-    };
-    action.setText("Browse DD ...");
-    action.setEnabled(true);
-    menu.add(action);
-
-  } // fillContextMenu
-  
-  protected void handleBrowseDD() {
-    IResource resource = WorkspaceResourceDialog.getWorkspaceResourceElement(multiPageEditor.cde.getEditorSite().getShell(),
-            getWorkspaceRoot(), "Select UIMA deployment descriptor",
-            "Select Analysis Engine's deployment descriptor file");
-    if (resource != null) {
-      XMLizable xmlizable = UimaApplication_Impl.parseUimaXmlDescriptor(resource.getLocation().toOSString());
-      if (xmlizable == null || !(xmlizable instanceof AEDeploymentDescription_Impl)) {
-          // Trace.err("xmlizable: " + xmlizable.getClass().getName());
-          return;
-      }
-      AEService aeService = ((AEDeploymentDescription_Impl) xmlizable).getAeService();
-      brokerUrl.setText(aeService.getBrokerURL());
-      endPoint.setText(aeService.getEndPoint());          
-    }
-  }
-    /**
-     * Convenience method to get the workspace root.
-     */
-    private IWorkspaceRoot getWorkspaceRoot() {
-        return ResourcesPlugin.getWorkspace().getRoot();
-    }
 
 }
