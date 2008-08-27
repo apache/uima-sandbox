@@ -486,8 +486,7 @@
       <!-- used as 1st part of ctlr name -->
       <xsl:with-param name="msgHandlerChainID"
         select="f:getMetaMsgHandlerID(., 'aggregate_input')"/>
-      <xsl:with-param name="nbrConcurrentConsumers" select=
-        "if (f:isTopLevelAggr($input_q_ID)) then string(@inputQueueScaleout) else '1'"/>
+      <xsl:with-param name="nbrConcurrentConsumers" select="string(@inputQueueScaleout)"/>
       <xsl:with-param name="remote" select="()"/>
       <xsl:with-param name="poolingTaskExecutor" select="()"/>
     </xsl:call-template>
@@ -2168,11 +2167,6 @@
   <xsl:function name="f:isCPP">
     <xsl:param name="aeNode"/>
     <xsl:sequence select="$aeNode/*/u:frameworkImplementation[text() eq 'org.apache.uima.cpp']"/>
-  </xsl:function>
-      
-  <xsl:function name="f:isTopLevelAggr">
-    <xsl:param name="qname"/>
-    <xsl:sequence select="starts-with($qname, 'top_level_input_queue_service')"/>
   </xsl:function>
   
   <xsl:function name="f:getUserHandlerDispatcherID">

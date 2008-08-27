@@ -375,7 +375,8 @@ under the License.
     <para>
       The attributes <code>internalReplyQueueScaleout</code> and <code>inputQueueScaleout</code> only
       have meaning and are allowed when 
-      async="true" is specified (which in turn can only be set true for aggregates).
+      async="true" is specified (which in turn can only be set true for aggregates) or is the default (
+      which happens when the aggregate has delegate deployment options specified in the deployment descriptor).
       These attributes default to 1.  For asynchronous aggregates, they control the number of threads
       used to do the work of the aggregate outside of running the delegates.  This work can include
       one or more of the following:
@@ -386,11 +387,23 @@ under the License.
           requester is remote).</para>
           <para>running the flow controller</para>
           <para>serializing CASes being sent to remote delegates (only useful if one or more
-          of the delegates is remote)</para>
+          of the delegates is remote).  
+            
+          </para>
         </listitem>
       </itemizedlist>
+      </para>
+    
+    <para>
       These attributes provide a way to scale out this work on multi-core machines, if these
       tasks become a bottleneck.
+    </para>
+
+    <para>Note that if an aggregates flow controller specifies
+            that the first delegate the CAS should flow to is a remote, the work of serializing
+            the CAS to that remote is done using the inputQueue thread, and the scaleout
+            parameter that would apply would be the inputQueueScaleout.  For subsequent delegates,
+            the work is done on the internalReplyQueueScaleout threads.
     </para>
     
     <para> The &lt;scaleout ...> element specifies, for co-located primitive or non-AS aggregates
