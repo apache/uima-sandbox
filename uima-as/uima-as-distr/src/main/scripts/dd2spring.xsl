@@ -741,19 +741,19 @@
       </xsl:call-template>
    
       <!-- next to be commented out due to design change summer 2008 -->
-      <xsl:if test="parent::u:service and u:casMultiplier">
+      <!--xsl:if test="parent::u:service and u:casMultiplier">
         <xsl:call-template name="generateCMSyncInputChannel">
           <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/> 
           <xsl:with-param name="q_ID" select="$input_q_ID"/>
           <xsl:with-param name="queueFactoryID" select="$inputQueueFactoryID"/>
           <xsl:with-param name="inputOrReturn" select="'input'"/>
-          <xsl:with-param name="kind" select="'primitive'"/>  <!-- used in ctrl id name -->
-          <xsl:with-param name="msgHandlerChainID" select="f:getMetaMsgHandlerID(., 'primitive')"/>
+          <xsl:with-param name="kind" select="'primitive'"/-->  <!-- used in ctrl id name -->
+          <!--xsl:with-param name="msgHandlerChainID" select="f:getMetaMsgHandlerID(., 'primitive')"/>
           <xsl:with-param name="nbrConcurrentConsumers" select="u:scaleout/@numberOfInstances"/> 
           <xsl:with-param name="remote" select="()"/>
           <xsl:with-param name="poolingTaskExecutor" select="$poolingTaskExecutorID"/>       
         </xsl:call-template>      
-      </xsl:if>
+      </xsl:if-->
       
       
       <xsl:variable name="origin_q_name" select=
@@ -1048,16 +1048,16 @@
   <!--================================================-->
   
   <!-- note: NO LONGER USED as of UIMA-1019 design change -->
-  <xsl:template name="generateCMSyncInputChannel">
+  <!--xsl:template name="generateCMSyncInputChannel">
     <xsl:param name="aeNameUnique"/>
-    <xsl:param name="q_ID"/>   <!-- this is a descriptor-unique bean id of the input (or ret) q endpoint -->
-    <xsl:param name="queueFactoryID"/>
-    <xsl:param name="inputOrReturn"/> <!-- input or return -->
-    <xsl:param name="kind"/> <!-- either primitive or asAggr, used as 1st part of ctlr name -->
-    <xsl:param name="msgHandlerChainID"/>
+    <xsl:param name="q_ID"/-->   <!-- this is a descriptor-unique bean id of the input (or ret) q endpoint -->
+    <!--xsl:param name="queueFactoryID"/>
+    <xsl:param name="inputOrReturn"/--> <!-- input or return -->
+    <!--xsl:param name="kind"/--> <!-- either primitive or asAggr, used as 1st part of ctlr name -->
+    <!--xsl:param name="msgHandlerChainID"/>
     <xsl:param name="nbrConcurrentConsumers"/>
-    <xsl:param name="remote"/>  <!-- is always () -->
-    <xsl:param name="poolingTaskExecutor"/>
+    <xsl:param name="remote"/-->  <!-- is always () -->
+    <!--xsl:param name="poolingTaskExecutor"/>
     
     <xsl:variable name="q_listenerID" select="concat($kind, '_', $inputOrReturn, '_q_listenerID_',$aeNameUnique,
              if ($remote) then concat('_', $remote/@key) else '')"/>    
@@ -1074,7 +1074,7 @@
        concat($q_ID, '__CasSync'),
       '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'),3)"/>    
     <bean id="{$msgListenerContainerID}"
-      class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
+      class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer"-->
 
       <!-- next commented out - because pool instances are "pinned" to particular ae engine instances -->
       <!--xsl:if test="$poolingTaskExecutor">
@@ -1082,7 +1082,7 @@
         <property name="taskExecutor" ref="{$poolingTaskExecutor}"/>
       </xsl:if-->
 
-      <xsl:sequence select="f:generateLineComment('Define number of JMS Consumers',5)"/>
+      <!--xsl:sequence select="f:generateLineComment('Define number of JMS Consumers',5)"/>
       <property name="concurrentConsumers" value="{$nbrConcurrentConsumers}"/>
       
       <xsl:sequence select="f:generateLineComment(concat($inputOrReturn, ' Queue'), 5)"/>
@@ -1093,7 +1093,7 @@
       
       <property name="connectionFactory" ref="{$queueFactoryID}"/>
     </bean>
-  </xsl:template>
+  </xsl:template-->
     
   <!--==========================================-->
   <!--   Generate an output Channel             -->
