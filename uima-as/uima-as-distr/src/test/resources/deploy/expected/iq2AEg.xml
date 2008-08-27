@@ -189,7 +189,6 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
-      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!-- ==================================== -->
@@ -208,7 +207,6 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
-      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!-- ==================================== -->
@@ -227,7 +225,6 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
-      <property name="tempReplyDestination" value="true"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
