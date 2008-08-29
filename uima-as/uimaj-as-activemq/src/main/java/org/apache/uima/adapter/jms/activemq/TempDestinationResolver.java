@@ -31,14 +31,29 @@ public class TempDestinationResolver implements DestinationResolver
 {
 	private ActiveMQConnectionFactory factory = null;
 	private UimaDefaultMessageListenerContainer listener;
-	
+	private Destination destination = null;
+	private Object mutex = new Object();
+
+	/**
+	 * This method is called by the Spring listener code. It creates a single temp queue for all listener instances.
+	 * If the Spring listener is configured with more than one concurrentConsumer, this method will be 
+	 * called more than once. The temp queue is created only once and cached on the first call. Subsequent
+	 * requests receive the same queue.
+	 */
 	public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain) throws JMSException
 	{
-		Destination destination = session.createTemporaryQueue();
-
-		if ( listener != null )
+		
+		synchronized( mutex )
 		{
-			listener.setDestination(destination);
+			if ( destination == null )
+			{
+				destination = session.createTemporaryQueue();
+				if ( listener != null )
+				{
+					listener.setDestination(destination);
+				}
+				System.out.println(">>> Created New Temp Queue:"+destination+" Listener Hash:"+listener.hashCode());
+			}
 		}
 		return destination;
 	}
