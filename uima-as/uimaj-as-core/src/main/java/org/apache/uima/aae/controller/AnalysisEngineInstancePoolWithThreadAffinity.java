@@ -59,7 +59,7 @@ implements AnalysisEngineInstancePool
 	/* (non-Javadoc)
 	 * @see org.apache.uima.aae.controller.AnalysisEngineInstancePool#checkin(org.apache.uima.analysis_engine.AnalysisEngine)
 	 */
-	public void checkin(AnalysisEngine anAnalysisEngine) throws Exception
+	public synchronized void checkin(AnalysisEngine anAnalysisEngine) throws Exception
 	{
 		aeInstanceMap.put(Thread.currentThread().getName(), anAnalysisEngine);
 	}
