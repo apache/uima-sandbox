@@ -183,6 +183,17 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 						}
 					}
 					
+					//	Component's Cas Pool is registered lazily, when the process() is called for
+					//	the first time. For monitoring purposes, we need the comoponent's Cas Pool 
+					//	MBeans to register during initialization of the service though.
+					//	For a Cas Multiplier force creation of the Cas Pool and registration 
+					//	of a Cas Pool with the JMX Server. Just get the CAS and release it back 
+					//	to the component's Cas Pool.
+					if ( isCasMultiplier() && !isTopLevelComponent() )
+					{
+						CAS cas = (CAS)getUimaContext().getEmptyCas(CAS.class);
+						cas.release();
+					}
 
 					// All internal components of this Primitive have been initialized. Open the latch
 					// so that this service can start processing requests.
