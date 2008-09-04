@@ -475,6 +475,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	 */
 	public void onMessage(Message aMessage, Session aJmsSession )
 	{
+		String casRefId = null;
+
 		if ( isStopped() )
 		{
 			return;
@@ -541,7 +543,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			                new Object[] { endpointName, sessionAckMode });
 				}
 			}
-			String casRefId = null;
 			if ( aMessage.getStringProperty(AsynchAEMessage.CasReference) == null )
 			{
 				casRefId = "CasReferenceId Not In Message";
@@ -643,6 +644,9 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			{
 				getController().endProcess(requestType);
 			}
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                    "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_processed__FINE",
+                    new Object[] { getController().getComponentName(), casRefId });
 		}
 	}
 	

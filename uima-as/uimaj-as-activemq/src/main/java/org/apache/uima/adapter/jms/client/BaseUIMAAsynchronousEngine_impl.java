@@ -76,8 +76,8 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	private Session consumerSession = null;
 
 	private Connection connection = null;
-	private boolean serviceInitializationException;
-	private boolean serviceInitializationCompleted;
+	private volatile boolean serviceInitializationException;
+	private volatile boolean serviceInitializationCompleted;
 	
 	private Object serviceMonitor = new Object();
 	
