@@ -53,14 +53,13 @@ public class InProcessCache implements InProcessCacheMBean
 	private static final Class CLASS_NAME = InProcessCache.class;
 
 	private transient UIDGenerator idGenerator = new UIDGenerator();
-//	private Map cache = new HashMap();
 	private ConcurrentHashMap cache = new ConcurrentHashMap();
 
 	private String name = "InProcessCache";
 	private List callbackListeners = new ArrayList();
 	
 	int size = 0;
-	
+
 	public void registerCallbackWhenCacheEmpty(EventSubscriber aController )
 	{
 		if ( !callbackListeners.isEmpty() )
@@ -255,11 +254,6 @@ public class InProcessCache implements InProcessCacheMBean
 	                "dumpContents", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_cache_entry_key__FINEST",
 	                new Object[] { aControllerName, count, sb.toString() });
 			sb.setLength(0);
-/*			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-	                "dumpContents", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_cache_size__FINEST",
-	                new Object[] { count });
-*/
 		}
 		else if ( UIMAFramework.getLogger().isLoggable(Level.FINE) )
 		{
@@ -455,7 +449,7 @@ public class InProcessCache implements InProcessCacheMBean
 		CacheEntry casRefEntry = getEntry(aCasReferenceId);
 		return casRefEntry.getStartTime();
 	}
-	public boolean entryExists(String aCasReferenceId) 
+	public synchronized boolean entryExists(String aCasReferenceId) 
 	{
 		try
 		{
@@ -472,32 +466,28 @@ public class InProcessCache implements InProcessCacheMBean
 		return true;
 	}
 
-	public synchronized CacheEntry register(CAS aCAS, MessageContext aMessageContext, OutOfTypeSystemData otsd)
+	public CacheEntry register(CAS aCAS, MessageContext aMessageContext, OutOfTypeSystemData otsd)
 	throws AsynchAEException
 	{
-//		String casReferenceId = idGenerator.nextId(); 
 		return register(aCAS, aMessageContext, otsd, idGenerator.nextId());
-//		return casReferenceId;
 	}
 	
-	public synchronized CacheEntry register(CAS aCAS, MessageContext aMessageContext, XmiSerializationSharedData sharedData)
+	public CacheEntry register(CAS aCAS, MessageContext aMessageContext, XmiSerializationSharedData sharedData)
 	throws AsynchAEException
 	{
-//		String casReferenceId = idGenerator.nextId(); 
 		return register(aCAS, aMessageContext, sharedData, idGenerator.nextId());
-//		return casReferenceId;
 	}	
-	public synchronized CacheEntry register(CAS aCAS, MessageContext aMessageContext, OutOfTypeSystemData otsd, String aCasReferenceId)
+	public CacheEntry register(CAS aCAS, MessageContext aMessageContext, OutOfTypeSystemData otsd, String aCasReferenceId)
 	throws AsynchAEException
 	{
 		return registerCacheEntry(aCasReferenceId, new CacheEntry(aCAS, aCasReferenceId, aMessageContext, otsd));
 	}
-	public synchronized CacheEntry register(CAS aCAS, MessageContext aMessageContext, XmiSerializationSharedData sharedData, String aCasReferenceId)
+	public CacheEntry register(CAS aCAS, MessageContext aMessageContext, XmiSerializationSharedData sharedData, String aCasReferenceId)
 	throws AsynchAEException
 	{
 		return registerCacheEntry(aCasReferenceId, new CacheEntry(aCAS, aCasReferenceId, aMessageContext, sharedData));
 	}	
-	private CacheEntry registerCacheEntry( String aCasReferenceId, CacheEntry entry )
+	private synchronized CacheEntry registerCacheEntry( String aCasReferenceId, CacheEntry entry )
 	{
 		cache.put(aCasReferenceId, entry);
 		return entry;
@@ -513,15 +503,19 @@ public class InProcessCache implements InProcessCacheMBean
 		return casRefEntry.getNumberOfParallelDelegates();
 	}
  
-	public synchronized boolean hasNoSubordinates(String aCasReferenceId)
+	public boolean hasNoSubordinates(String aCasReferenceId)
 	{
 		Iterator it = cache.keySet().iterator();
 		while( it.hasNext() )
 		{
 			String key = (String) it.next();
 			CacheEntry entry = (CacheEntry)cache.get(key);
-			if ( entry.getInputCasReferenceId() != null && entry.getInputCasReferenceId().equals(aCasReferenceId))
+			if ( entry != null && entry.getInputCasReferenceId() != null && entry.getInputCasReferenceId().equals(aCasReferenceId))
 			{
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		                "hasNoSubordinates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cache_entry_exists___FINE",
+		                new Object[] { entry.getCasReferenceId(), entry.getInputCasReferenceId() });
+
 				return false;
 			}
 		}
@@ -560,7 +554,7 @@ public class InProcessCache implements InProcessCacheMBean
 		CacheEntry casRefEntry = getEntry(aCasReferenceId);
 		if ( casRefEntry == null )
 		{
-			throw new AsynchAEException("Cas Not Found In CasManager Cache. CasReferenceId::"+aCasReferenceId+" is Invalid");
+			throw new AsynchAEException( "Cas Not Found In CasManager Cache. CasReferenceId::"+aCasReferenceId+" is Invalid");
 		}
 		return casRefEntry;
 	}

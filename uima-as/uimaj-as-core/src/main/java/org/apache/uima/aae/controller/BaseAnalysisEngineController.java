@@ -78,7 +78,7 @@ implements AnalysisEngineController, EventSubscriber
 {
 	private static final Class CLASS_NAME = BaseAnalysisEngineController.class;
 
-	protected HashMap statsMap = new HashMap();
+	protected ConcurrentHashMap statsMap = new ConcurrentHashMap();
 
 	protected Monitor monitor = new MonitorBaseImpl();
 
@@ -110,7 +110,7 @@ implements AnalysisEngineController, EventSubscriber
 	
 	protected ConcurrentHashMap inputChannelMap = new ConcurrentHashMap();
 
-	protected Map idleTimeMap = new HashMap();
+	protected ConcurrentHashMap idleTimeMap = new ConcurrentHashMap();
 
 	private UimaEEAdminContext adminContext;
 
@@ -120,18 +120,18 @@ implements AnalysisEngineController, EventSubscriber
 	
 	protected long idleTime = 0;
 
-	protected HashMap serviceErrorMap = new HashMap();
+	protected ConcurrentHashMap serviceErrorMap = new ConcurrentHashMap();
 
 	private boolean registeredWithJMXServer = false; 
 	protected String jmxContext = "";
 	
-	protected HashMap mBeanMap = new HashMap();
+	protected ConcurrentHashMap mBeanMap = new ConcurrentHashMap();
 	
 	protected ServicePerformance servicePerformance = null;
 	
 	protected ServiceErrors serviceErrors = null;
 	
-	protected Map timeSnapshotMap = new HashMap();
+	protected ConcurrentHashMap timeSnapshotMap = new ConcurrentHashMap();
 
 	private String deploymentDescriptor = "";
 	
@@ -173,8 +173,8 @@ implements AnalysisEngineController, EventSubscriber
 	private Map<Long, AnalysisThreadState> threadStateMap =
 		new HashMap<Long,AnalysisThreadState>();
 	
+	protected final Object finalStepMux = new Object();
 	
-
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -851,11 +851,16 @@ implements AnalysisEngineController, EventSubscriber
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dropping_cas__FINE",
                 new Object[] {aCasReferenceId, getName() });
-			synchronized (inProcessCache)
-			{
 				if ( inProcessCache.entryExists(aCasReferenceId))
 				{
 					CAS cas = inProcessCache.getCasByReference(aCasReferenceId);
+					if (deleteCacheEntry)
+					{
+						inProcessCache.remove(aCasReferenceId);
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removed_cache_entry__FINE",
+				                new Object[] {aCasReferenceId, getComponentName() });
+					}
 					if ( cas != null )
 					{
 						int casHashCode = cas.hashCode();
@@ -872,15 +877,7 @@ implements AnalysisEngineController, EventSubscriber
 				                new Object[] {aCasReferenceId, getComponentName() });
 						
 					}
-					if (deleteCacheEntry)
-					{
-						inProcessCache.remove(aCasReferenceId);
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removed_cache_entry__FINE",
-				                new Object[] {aCasReferenceId, getComponentName() });
-					}
 					inProcessCache.dumpContents(getComponentName());
-				}	
 			}
 			//	Remove stats from the map maintaining CAS specific stats
 			if ( perCasStatistics.containsKey(aCasReferenceId))
@@ -1702,72 +1699,101 @@ implements AnalysisEngineController, EventSubscriber
 	  
 		public void releaseNextCas(String casReferenceId)
 		{
-			synchronized(syncObject)
+			//	Check if the CAS is in the list of outstanding CASes and also exists in the cache
+			if ( cmOutstandingCASes.size() > 0 && cmOutstandingCASes.containsKey(casReferenceId) && getInProcessCache().entryExists(casReferenceId))
 			{
-				//	Check if the CAS is in the list of outstanding CASes and also exists in the cache
-				if ( cmOutstandingCASes.size() > 0 && cmOutstandingCASes.containsKey(casReferenceId) && getInProcessCache().entryExists(casReferenceId))
+				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
+		                new Object[] { getComponentName(), casReferenceId });
+
+				CacheEntry cacheEntry = null;
+				
+				try
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-			                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
-			                new Object[] { getComponentName(), casReferenceId });
-					try
+					cacheEntry = getInProcessCache().getCacheEntryForCAS(casReferenceId);
+				}
+				catch( AsynchAEException e)
+				{
+					//	The Cas has already been removed. It may have reached the final step
+					//	and all of its children have been processed.
+					return;
+				}
+				try
+				{
+					synchronized( finalStepMux )
 					{
-						CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(casReferenceId);
-						String parentCasReferenceId = cacheEntry.getInputCasReferenceId(); 
-						Endpoint freeCasEndpoint = cacheEntry.getFreeCasEndpoint();
-						//	If the CAS was created by a remote Cas Multiplier, send a Free CAS Notification
-						//	to the CM.
-						if ( freeCasEndpoint != null )
-						{
-							UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-					                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_sending_fcq_req__FINE",
-					                new Object[] { getComponentName(), casReferenceId, cacheEntry.getCasMultiplierKey(), freeCasEndpoint.getDestination() });
-							freeCasEndpoint.setReplyEndpoint(true);
-							getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, casReferenceId, freeCasEndpoint);
-						}
-						cacheEntry = null;
-						//	Release the CAS and remove it from the InProcess cache
+						//	Release the CAS and remove a corresponding entry from the InProcess cache.
 						dropCAS(casReferenceId, true);
-						//	Check if the CAS has a parent CAS
-						if ( parentCasReferenceId != null )
+						//  Remove the Cas from the outstanding CAS list. The id of the Cas was
+						//	added to this list by the Cas Multiplier before the Cas was sent to 
+						//	to the client. 
+						cmOutstandingCASes.remove(casReferenceId);
+					}
+					String parentCasReferenceId = cacheEntry.getInputCasReferenceId(); 
+					Endpoint freeCasEndpoint = cacheEntry.getFreeCasEndpoint();
+					//	If the CAS was created by a remote Cas Multiplier, send a Free CAS Notification
+					//	to the CM.
+					if ( freeCasEndpoint != null )
+					{
+						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+				                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_sending_fcq_req__FINE",
+				                new Object[] { getComponentName(), casReferenceId, cacheEntry.getCasMultiplierKey(), freeCasEndpoint.getDestination() });
+						freeCasEndpoint.setReplyEndpoint(true);
+						getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, casReferenceId, freeCasEndpoint);
+					}
+					cacheEntry = null;
+					//	Check if the CAS has a parent CAS
+					if ( parentCasReferenceId != null )
+					{
+						try
 						{
 							//	Fetch the parent CAS from the InProcess Cache
 							cacheEntry = getInProcessCache().getCacheEntryForCAS(parentCasReferenceId);
-							if ( cacheEntry != null  )
+						}
+						catch( AsynchAEException e)
+						{
+							//	The Cas has already been removed. It may have reached the final step
+							//	and all of its children have been processed.
+							return;
+						}
+						if ( cacheEntry != null  )
+						{
+							boolean casHasNoSubordinates;
+							boolean casPendingReply;
+							
+							//	Check if the parentCAS has any children and if it has already reached the Final State
+							//	in its flow. 
+							synchronized( finalStepMux )
 							{
-								//	Decrement number of child CASes in play
-								//	Decrement has already happened in the final step before the CAS was sent to the client
-								//cacheEntry.decrementSubordinateCasInPlayCount();
-//								if ( cacheEntry.isPendingReply() && cacheEntry.getSubordinateCasInPlayCount() == 0)
-								if ( cacheEntry.isPendingReply() && getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId()))
+								casHasNoSubordinates = getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId());
+								casPendingReply = cacheEntry.isPendingReply();
+							}
+							if (  casPendingReply && casHasNoSubordinates )
+							{
+								if ( this instanceof AggregateAnalysisEngineController )
 								{
-									if ( this instanceof AggregateAnalysisEngineController )
-									{
-										((AggregateAnalysisEngineController)this).finalStep( cacheEntry.getFinalStep(), parentCasReferenceId);
-									}
-									else // PrimitiveAnalysisEngineController 
-									{
-										//	Return an input CAS to the client. The input CAS is returned
-										//	to the remote client only if all of the child CASes produced
-										//	from the input CAS have been fully processed.
-										getOutputChannel().sendReply(cacheEntry.getCasReferenceId(), cacheEntry.getMessageOrigin());
-										dropCAS(cacheEntry.getCasReferenceId(), true);
-									}
+									((AggregateAnalysisEngineController)this).finalStep( cacheEntry.getFinalStep(), parentCasReferenceId);
 								}
-								
+								else // PrimitiveAnalysisEngineController 
+								{
+									//	Return an input CAS to the client. The input CAS is returned
+									//	to the remote client only if all of the child CASes produced
+									//	from the input CAS have been fully processed.
+									getOutputChannel().sendReply(cacheEntry.getCasReferenceId(), cacheEntry.getMessageOrigin());
+									dropCAS(cacheEntry.getCasReferenceId(), true);
+								}
 							}
 						}
-						//	If debug level=FINEST dump the entire cache
-						getInProcessCache().dumpContents(getComponentName());
-
 					}
-					catch( Exception e)
-					{
-						e.printStackTrace();
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-				                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
-				                new Object[] { e});
-					}
+					//	If debug level=FINEST dump the entire cache
+					getInProcessCache().dumpContents(getComponentName());
+				}
+				catch( Exception e)
+				{
+					e.printStackTrace();
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+			                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
+			                new Object[] { e});
 				}
 			}
 		}

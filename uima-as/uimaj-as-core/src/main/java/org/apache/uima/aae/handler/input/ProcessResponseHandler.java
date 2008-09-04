@@ -160,7 +160,7 @@ public class ProcessResponseHandler extends HandlerBase
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 		                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_endpoint__WARNING",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId});
-				throw new AsynchAEException("Unable to lookup endpoint:"+aMessageContext.getEndpoint().getEndpoint()+ " Cas Reference Id:"+casReferenceId);
+				return;
 			}
 			
 			// Check if this reply message is expected. A message is expected
@@ -254,10 +254,7 @@ public class ProcessResponseHandler extends HandlerBase
 			
 			if ( cacheEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 )
 			{
-				synchronized( cacheEntry )
-				{
-					cacheEntry.incrementHowManyDelegatesResponded();
-				}
+				cacheEntry.incrementHowManyDelegatesResponded();
 			}
 		
 			long timeToDeserializeCAS = getController().getCpuTime() - t1;

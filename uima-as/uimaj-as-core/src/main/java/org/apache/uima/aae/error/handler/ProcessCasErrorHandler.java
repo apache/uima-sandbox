@@ -332,31 +332,12 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		catch( Exception e) {}
 		//	Determine where to send the message
 		Endpoint endpoint = getDestination(aController, anErrorContext);
-/*
-		//	Notify the parent of the exception
-		if ( endpoint != null && casReferenceId != null && !endpoint.isCasMultiplier())
-		{
-			try
-			{
-				aController.getOutputChannel().sendReply(t, casReferenceId, endpoint, AsynchAEMessage.Process);
-				aController.dropStats(casReferenceId, endpoint.getEndpoint());
-			}
-			catch( Exception e)
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
-						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
-			}
-		}
-*/		
 		//	If the error occured during parallel step, treat the exception as response from the delegate
 		//	When all responses from delegates are accounted for we allow the CAS to move on to the next
 		//	step in the flow
 		if ( cacheEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 && ( cacheEntry.howManyDelegatesResponded() < totalNumberOfParallelDelegatesProcessingCas))
 		{
-			synchronized( cacheEntry )
-			{
-				cacheEntry.incrementHowManyDelegatesResponded();
-			}
+			cacheEntry.incrementHowManyDelegatesResponded();
 		}
 
 		if (aController instanceof AggregateAnalysisEngineController && t instanceof Exception)
@@ -429,7 +410,6 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 				try
 				{
 					sendExceptionToClient( t, casReferenceId, endpoint, aController );
-					//System.out.println("---------------------------- CAS Produced By CM:"+cacheEntry.getCasProducerKey());
 				}
 				catch( Exception e) 
 				{

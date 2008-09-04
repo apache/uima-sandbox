@@ -53,7 +53,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		super(aName);
 	}
 
-	private synchronized void cacheStats(String aCasReferenceId, long aTimeWaitingForCAS, long aTimeToDeserializeCAS )
+	private void cacheStats(String aCasReferenceId, long aTimeWaitingForCAS, long aTimeToDeserializeCAS )
 	throws Exception
 	{
 		CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
