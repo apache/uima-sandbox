@@ -98,10 +98,9 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected static final int ProcessTimeout = 3;
 
-	protected boolean initialized;
+	protected volatile boolean initialized;
 
 	protected List listeners = new ArrayList();
-
 
 	protected AsynchAECasManager asynchManager;
 
@@ -109,23 +108,15 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected Object metadataReplyMonitor = new Object();
 
-
 	protected boolean remoteService = false;
-
-
-
-
-
 
 	protected Object gater = new Object();
 
 	protected int howManyBeforeReplySeen = 0;
 
-//	protected int receiveWindow = 0;
-
 	protected CollectionReader collectionReader = null;
 
-	protected boolean running = false;
+	protected volatile boolean running = false;
 
 	protected final Object sendAndReceiveCasMonitor = new Object();
 
@@ -148,11 +139,9 @@ implements UimaAsynchronousEngine, MessageListener
 	//	Default timeout for CpC requests is no timeout  
 	protected int cpcTimeout = 0;
 
-	protected boolean abort = false;
+	protected volatile boolean abort = false;
 
 	protected static final String uniqueIdentifier = String.valueOf(System.nanoTime());
-
-//	protected boolean error;
 
 	protected Exception exc;
 
@@ -164,9 +153,9 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected ConcurrentHashMap springContainerRegistry = new ConcurrentHashMap();
 
-	protected boolean receivedMetaReply;
+	protected volatile boolean receivedMetaReply;
 
-	protected boolean receivedCpcReply;
+	protected volatile boolean receivedCpcReply;
 
 	protected MessageConsumer consumer = null;
 
@@ -174,7 +163,7 @@ implements UimaAsynchronousEngine, MessageListener
 		new UimaASClientInfo();
 	
 	protected List pendingMessageList = new ArrayList();
-	protected boolean producerInitialized;
+	protected volatile boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
 	abstract protected TextMessage createTextMessage() throws Exception;
 	abstract protected void setMetaRequestMessage(TextMessage msg) throws Exception;
@@ -879,6 +868,8 @@ implements UimaAsynchronousEngine, MessageListener
 				{
 					//	Send FreeCAS message to a Cas Multiplier
 					msgProducer.send(msg);
+				
+					System.out.println("------------> Client Sent Free Cas Request For CAS:"+casReferenceId+" To:"+freeCASNotificationDestination);
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReplyFromCasMultiplier", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_client_sending_release_cas_FINEST",
 							new Object[] { freeCASNotificationDestination, message.getStringProperty(AsynchAEMessage.CasReference) });
 				}
@@ -889,7 +880,9 @@ implements UimaAsynchronousEngine, MessageListener
 				} 
 			}
 		}
+		System.out.println("------------> Client Deserializing CAS:"+casReferenceId);
 		CAS cas = deserializeCAS(((TextMessage) message).getText(), SHADOW_CAS_POOL );
+		System.out.println("++++++++++++> Client Deserialized CAS:"+casReferenceId);
 		completeProcessingReply(cas, casReferenceId, payload, true, message, inputCasCachedRequest, null);
 	}
 
@@ -1156,6 +1149,7 @@ implements UimaAsynchronousEngine, MessageListener
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_process_reply_FINEST", new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom) });
 				handleProcessReply(message, true, null);
 			}
+			System.out.println("#### Client Completed Processing Of the Message. Waiting For Next Message...");
 		}
 		catch (Exception e)
 		{

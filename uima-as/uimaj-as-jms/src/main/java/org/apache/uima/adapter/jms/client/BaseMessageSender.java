@@ -56,11 +56,11 @@ public abstract class BaseMessageSender implements Runnable,
 	// Global flag controlling lifecycle of this thread. It will be set to true
 	// when the
 	// uima ee engine calls doStop()
-	protected boolean done;
+	protected volatile boolean done;
 	// A reference to the uima ee client engine
 	protected BaseUIMAAsynchronousEngineCommon_impl engine;
 	// Global flag to indicate failure of the worker thread
-	protected boolean workerThreadFailed;
+	protected volatile boolean workerThreadFailed;
 	// If the worker thread fails, store the reason for the failure
 	protected Exception exception;
 
