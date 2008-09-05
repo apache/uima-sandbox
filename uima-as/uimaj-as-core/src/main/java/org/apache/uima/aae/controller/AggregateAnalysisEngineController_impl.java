@@ -1609,7 +1609,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			throw new AsynchAEException(e);
 		}
 	}
-
 	private void completeInitialization() throws Exception
 	{
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "completeInitialization", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_all_ts_merged__CONFIG");
@@ -1647,7 +1646,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				flowControllerContainer.removeAnalysisEngines(disabledDelegateList);
 			}
 		}
-		
+		//	Before processing CASes, send notifications to all collocated delegates to
+		//	complete initialization. Currently this call forces all collocated Cas Multiplier delegates
+		//	to initialize their internal Cas Pools. CM Cas Pool is lazily initialized on 
+		//	the first process call. The JMX Monitor needs all the Cas Pools to initialize 
+		//	before the process call.
+	    onInitialize();
 
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "completeInitialization", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_initialized_controller__INFO",new Object[] { getComponentName() });
 		// Open latch to allow messages to be processed. The
@@ -1980,4 +1984,20 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		return childControllerList;
 	}
+	
+	/**
+	 * Force all collocated delegates to perform any post-initialization steps.
+	 */
+	public void onInitialize()
+    {
+		//	For each collocated delegate
+		for( int i=0; i < childControllerList.size(); i++ )
+		{
+			AnalysisEngineController delegateController = 
+				(AnalysisEngineController)childControllerList.get(i);
+			//	notify the delegate 
+			delegateController.onInitialize();
+		}
+    }
+
 }

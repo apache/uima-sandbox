@@ -185,4 +185,5 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	
 	public void incrementDeserializationTime(long cpuTime);
 
+	public void onInitialize();
 }

@@ -19,14 +19,8 @@
 
 package org.apache.uima.aae.controller;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.management.ObjectName;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager;
@@ -38,15 +32,10 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.jmx.JmxManagement;
-import org.apache.uima.aae.jmx.JmxManager;
 import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
 import org.apache.uima.aae.monitor.Monitor;
-import org.apache.uima.aae.monitor.statistics.ComponentStatistics;
-import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
-import org.apache.uima.aae.monitor.statistics.Statistic;
-import org.apache.uima.aae.monitor.statistics.Statistics;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.CasIterator;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
@@ -58,33 +47,24 @@ import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.resource.metadata.impl.ConfigurationParameter_impl;
 import org.apache.uima.util.Level;
 
-import sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap;
-
 public class PrimitiveAnalysisEngineController_impl 
 extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineController
 {
 	private static final Class CLASS_NAME = PrimitiveAnalysisEngineController_impl.class;
-
+	//	Stores AE metadata
 	private AnalysisEngineMetaData analysisEngineMetadata;
-
+	//	Controls when the controller is ready to process
 	private ControllerLatch latch = new ControllerLatch();
-
+	//	Number of AE instances
 	private int analysisEnginePoolSize;
-
+	//	Mutex
 	protected Object notifyObj = new Object();
-
+	//	Temp list holding instances of AE 
 	private List aeList = new ArrayList();
-	
-	private int throttleWindow = 0;
-	
-	private Object gater = new Object();
-	
-	private long howManyBeforeReplySeen = 0;
-	
-	
-	
+	//	Stores service info for JMX
 	private PrimitiveServiceInfo serviceInfo = null;
-
+	//	Pool containing instances of AE. The default implementation provides Thread affinity
+	//	meaning each thread executes the same AE instance.
 	private AnalysisEngineInstancePool aeInstancePool = null;
 	
 	private String abortedCASReferenceId = null;
@@ -119,17 +99,17 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		super(aParentController, aComponentCasPoolSize, anInitialCasHeapSize, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, null, aJmxManagement);
 		analysisEnginePoolSize = anAnalysisEnginePoolSize;
 	}
-  public PrimitiveAnalysisEngineController_impl(AnalysisEngineController aParentController, String anEndpointName, String anAnalysisEngineDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, int aWorkQueueSize, int anAnalysisEnginePoolSize, JmxManagement aJmxManagement) throws Exception
-  {
-    this(aParentController, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, 0, aJmxManagement);
-  }
+	public PrimitiveAnalysisEngineController_impl(AnalysisEngineController aParentController, String anEndpointName, String anAnalysisEngineDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, int aWorkQueueSize, int anAnalysisEnginePoolSize, JmxManagement aJmxManagement) throws Exception
+	{
+		this(aParentController, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, 0, aJmxManagement);
+	}
 
   
-  public int getAEInstanceCount()
-  {
-	  return analysisEnginePoolSize;
-  }
-  public void initialize() throws AsynchAEException
+	public int getAEInstanceCount()
+	{
+		return analysisEnginePoolSize;
+	}
+	public void initialize() throws AsynchAEException
 	{
 		try
 		{
@@ -182,18 +162,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 							cas.release();
 						}
 					}
-					
-					//	Component's Cas Pool is registered lazily, when the process() is called for
-					//	the first time. For monitoring purposes, we need the comoponent's Cas Pool 
-					//	MBeans to register during initialization of the service though.
-					//	For a Cas Multiplier force creation of the Cas Pool and registration 
-					//	of a Cas Pool with the JMX Server. Just get the CAS and release it back 
-					//	to the component's Cas Pool.
-					if ( isCasMultiplier() && !isTopLevelComponent() )
-					{
-						CAS cas = (CAS)getUimaContext().getEmptyCas(CAS.class);
-						cas.release();
-					}
 
 					// All internal components of this Primitive have been initialized. Open the latch
 					// so that this service can start processing requests.
@@ -229,13 +197,31 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		super.serviceInitialized = true;
 	}
 
+  	/**
+  	 * Forces initialization of a Cas Pool if this is a Cas Multiplier delegate collocated with
+  	 * an aggregate. The parent aggregate calls this method when all type systems have been 
+  	 * merged.
+  	 */
+    public void onInitialize()
+    {
+		//	Component's Cas Pool is registered lazily, when the process() is called for
+		//	the first time. For monitoring purposes, we need the comoponent's Cas Pool 
+		//	MBeans to register during initialization of the service. For a Cas Multiplier 
+    	//  force creation of the Cas Pool and registration of a Cas Pool with the JMX Server. 
+    	//  Just get the CAS and release it back to the component's Cas Pool.
+		if ( isCasMultiplier() && !isTopLevelComponent() )
+		{
+			System.out.println(">>>>>> CAS Multiplier::"+getComponentName()+" Initializing its Cas Pool");
+			CAS cas = (CAS)getUimaContext().getEmptyCas(CAS.class);
+			cas.release();
+		}
+    }
 	/**
 	 * 
 	 */
 	public void collectionProcessComplete(Endpoint anEndpoint)// throws AsynchAEException
 	{
 		AnalysisEngine ae = null;
-//		long start = System.nanoTime();
 		long start = super.getCpuTime();
 		try
 		{
@@ -246,10 +232,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_all_cases_processed__FINEST", new Object[] { getComponentName() });
 			getServicePerformance().incrementAnalysisTime(super.getCpuTime()-start);
-//			getServicePerformance().incrementAnalysisTime(System.nanoTime()-start);
 			getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, anEndpoint);
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_completed__FINE", new Object[] { getComponentName()});
-			//getServicePerformance().reset();
 	
 		}
 		catch ( Exception e)
@@ -277,24 +261,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 	}
 
-	private void rejectAndReturnInputCAS(String aCasReferenceId, Endpoint anEndpoint)
-	{
-		if ( getInProcessCache() != null )
-		{
-			try
-			{
-				//	Set a flag on the input CAS to indicate that the processing was aborted
-				getInProcessCache().getCacheEntryForCAS(aCasReferenceId).setAborted(true);
-				getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
-			}
-			catch( Exception e)
-			{
-				e.printStackTrace();
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "rejectAndReturnInputCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
-			}
-		}
-		
-	}
 	public void addAbortedCasReferenceId( String aCasReferenceId )
 	{
 		abortedCASReferenceId = aCasReferenceId;
@@ -345,9 +311,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			long time = super.getCpuTime();
 			long totalProcessTime = 0;  // stored total time spent producing ALL CASes
 			
-//			super.beginAnalysis();
 			CasIterator casIterator = ae.processAndOutputNewCASes(aCAS);
-//			super.endAnalysis();
 			
 			//	Store how long it took to call processAndOutputNewCASes()
 			totalProcessTime = ( super.getCpuTime() - time);
@@ -359,21 +323,18 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			{
 				long timeToProcessCAS = 0;    // stores time in hasNext() and next() for each CAS
 				hasNextTime = super.getCpuTime();
-//				super.beginAnalysis();
 				if ( !casIterator.hasNext() )
 				{
 					moreCASesToProcess = false;
 					//	Measure how long it took to call hasNext()
 					timeToProcessCAS = (super.getCpuTime()-hasNextTime);
 					totalProcessTime += timeToProcessCAS;
-//					super.endAnalysis();
 					break;   // from while
 				}
 				//	Measure how long it took to call hasNext()
 				timeToProcessCAS = (super.getCpuTime()-hasNextTime);
 				getNextTime = super.getCpuTime();
 				CAS casProduced = casIterator.next();
-//				super.endAnalysis();
 				//	Add how long it took to call next()
 				timeToProcessCAS += (super.getCpuTime()- getNextTime);
                 //	Add time to call hasNext() and next() to the running total
@@ -445,8 +406,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			
 			// Store total time spent processing this input CAS
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
-			//	Aggregate total time spent processing in this service. This is separate from per CAS stats above 
-//			getServicePerformance().incrementAnalysisTime(totalProcessTime);
 			synchronized( cmOutstandingCASes )
 			{
 				if ( cmOutstandingCASes.size() == 0)
@@ -594,28 +553,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			// tbi
 		}
 	}
-
-	public int getThrottleWindowSize()
-	{
-		return throttleWindow;
-	}
-	
-
-	public void throttleNext()
-	{
-		if (throttleWindow > 0)
-		{
-			synchronized (gater)
-			{
-				howManyBeforeReplySeen--;
-				gater.notifyAll();
-			}
-		}
-	}
-	
-
-	
-	
 	protected String getNameFromMetadata()
 	{
 		return super.getMetaData().getName();
