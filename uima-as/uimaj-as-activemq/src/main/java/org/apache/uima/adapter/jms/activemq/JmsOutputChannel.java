@@ -60,6 +60,7 @@ import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.Marker;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
@@ -190,7 +191,13 @@ public class JmsOutputChannel implements OutputChannel
 			if ( isReply )
 			{
 				serSharedData = cacheEntry.getDeserSharedData();
-			    serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
+				if (cacheEntry.acceptsDeltaCas())  {
+			      serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData, cacheEntry.getMarker());
+			      cacheEntry.setSentDeltaCas(true);
+				} else {
+				  serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
+				  cacheEntry.setSentDeltaCas(false);
+				}
 			}
 			else
 			{
@@ -1080,6 +1087,8 @@ public class JmsOutputChannel implements OutputChannel
 	{
 		aMessage.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
 		aMessage.setIntProperty(AsynchAEMessage.Command, aCommand); 
+		//TODO override default based on system property
+		aMessage.setBooleanProperty(AsynchAEMessage.AcceptsDeltaCas, true); 
 		long timeout = getCommandTimeoutValue(anEndpoint, aCommand);
 		if ( timeout > 0 )
 		{
@@ -1144,7 +1153,7 @@ public class JmsOutputChannel implements OutputChannel
 		aMessage.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Response); 
 		aMessage.setIntProperty(AsynchAEMessage.Command, aCommand); 
 		aMessage.setStringProperty(AsynchAEMessage.MessageFrom, serviceInputEndpoint);
-		
+	
 		if (anEndpoint.isRemote())
 		{
 			aMessage.setStringProperty(UIMAMessage.ServerURI, getServerURI());
@@ -1269,7 +1278,7 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		return false;
 	}
-	private void sendCasToRemoteEndpoint( boolean isRequest, String aSerializedCAS, String anInputCasReferenceId, String aCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence ) 
+	private void sendCasToRemoteEndpoint( boolean isRequest, String aSerializedCAS, String anInputCasReferenceId, String aCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence) 
 	throws AsynchAEException, ServiceShutdownException
 	{
 		
@@ -1302,6 +1311,8 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
+				CacheEntry entry = this.getCacheEntry(aCasReferenceId);
+				tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
 			}
 			//	The following is true when the analytic is a CAS Multiplier
 			if ( sequence > 0 && !isRequest )
@@ -1434,6 +1445,7 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
+				tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
 			}
 			//	The following is true when the analytic is a CAS Multiplier
 			if ( entry.isSubordinate() && !isRequest )

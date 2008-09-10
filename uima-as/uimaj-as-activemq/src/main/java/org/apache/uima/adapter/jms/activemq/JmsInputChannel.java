@@ -209,6 +209,17 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		return false;
 	}
 	
+	private boolean acceptsDeltaCas( Message aMessage ) throws Exception
+	{
+		Map properties = ((ActiveMQMessage)aMessage).getProperties();
+		boolean acceptsDeltaCas = false;
+		if ( properties.containsKey(AsynchAEMessage.AcceptsDeltaCas) )
+		{
+			acceptsDeltaCas = aMessage.getBooleanProperty(AsynchAEMessage.AcceptsDeltaCas);
+		}
+		return acceptsDeltaCas;
+	}
+	
 	/**
 	 * Validate command contained in the header of the JMS Message
 	 * 
