@@ -37,6 +37,7 @@ import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
 import org.apache.uima.aae.monitor.statistics.DelegateStats;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.Marker;
 import org.apache.uima.cas.impl.OutOfTypeSystemData;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.flow.FinalStep;
@@ -487,6 +488,13 @@ public class InProcessCache implements InProcessCacheMBean
 	{
 		return registerCacheEntry(aCasReferenceId, new CacheEntry(aCAS, aCasReferenceId, aMessageContext, sharedData));
 	}	
+	public CacheEntry register(CAS aCAS, MessageContext aMessageContext, XmiSerializationSharedData sharedData, 
+			String aCasReferenceId, Marker marker, boolean acceptsDeltaCas)
+	throws AsynchAEException
+	{
+		return registerCacheEntry(aCasReferenceId, new CacheEntry(aCAS, aCasReferenceId, aMessageContext, sharedData, marker, acceptsDeltaCas));
+	}	
+
 	private synchronized CacheEntry registerCacheEntry( String aCasReferenceId, CacheEntry entry )
 	{
 		cache.put(aCasReferenceId, entry);
@@ -639,6 +647,12 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private boolean waitingForRealease;
 		
+		private Marker marker = null;
+		
+		private boolean acceptsDeltaCas = false;
+		
+		private boolean sentDeltaCas = false;
+
 		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
 		{
 			this(aCas, aCasReferenceId, aMessageAccessor);
@@ -649,6 +663,15 @@ public class InProcessCache implements InProcessCacheMBean
 			this(aCas, aCasReferenceId, aMessageAccessor);
 			deserSharedData = sdata;
 		}
+		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, 
+				 XmiSerializationSharedData sdata, Marker aMarker, boolean acceptsDeltaCas)
+		{
+			this(aCas, aCasReferenceId, aMessageAccessor);
+			deserSharedData = sdata;
+			this.marker = aMarker;
+			this.acceptsDeltaCas = acceptsDeltaCas;
+		}
+
 		private CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor )
 		{
 			cas = aCas;
@@ -987,6 +1010,22 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			return waitingForRealease;
 		}
+		public boolean acceptsDeltaCas() {
+			return this.acceptsDeltaCas;
+		}
+		
+		public void setSentDeltaCas(boolean sendingDeltaCas) {
+			this.sentDeltaCas = sendingDeltaCas;
+		}	
+		
+		public boolean sentDeltaCas() {
+			return this.sentDeltaCas;
+		}		
+		
+		public Marker getMarker() {
+			return this.marker;
+		}
+
 	}	
 
 

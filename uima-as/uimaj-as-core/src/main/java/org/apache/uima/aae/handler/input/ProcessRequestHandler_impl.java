@@ -40,6 +40,7 @@ import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.aae.monitor.statistics.TimerStats;
 import org.apache.uima.analysis_engine.asb.impl.FlowContainer;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.Marker;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.util.Level;
 
@@ -156,7 +157,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		// ************************************************************************* 
 	    t1 = getController().getCpuTime();
 		XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1
+				);
 		long timeToDeserializeCAS = getController().getCpuTime() - t1;
 		getController().incrementDeserializationTime(timeToDeserializeCAS);
 		LongNumericStatistic statistic;
@@ -167,10 +169,24 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				"handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialize_cas_time_FINE",
 				new Object[] { timeToDeserializeCAS / 1000 });
+		
+		// *************************************************************************
+		// Check and set up for Delta CAS reply
+		// *************************************************************************
+		boolean acceptsDeltaCas = false;
+		Marker marker = null;
+		if (aMessageContext.propertyExists(AsynchAEMessage.AcceptsDeltaCas)) {
+	      acceptsDeltaCas = aMessageContext.getMessageBooleanProperty(AsynchAEMessage.AcceptsDeltaCas);
+	      if (acceptsDeltaCas ) {
+	    	 marker = cas.createMarker();
+	      }
+		}
+		
 		// ************************************************************************* 
 		//	Register the CAS with a local cache
 		// ************************************************************************* 
-		CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
+		//CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
+		CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId, marker, acceptsDeltaCas);
 
 		//	Update Stats
 		ServicePerformance casStats = getController().getCasStatistics(casReferenceId);

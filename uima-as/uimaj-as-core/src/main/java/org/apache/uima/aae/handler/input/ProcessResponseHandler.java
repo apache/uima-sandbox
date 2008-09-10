@@ -46,6 +46,7 @@ import org.apache.uima.aae.monitor.statistics.DelegateStats;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.aae.monitor.statistics.TimerStats;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.impl.AllowPreexistingFS;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.util.Level;
 
@@ -226,9 +227,10 @@ public class ProcessResponseHandler extends HandlerBase
 					//	Check if this a secondary reply in a parallel step. If it is the first reply, deserialize the CAS
 					//	using a standard approach. There is no merge to be done yet. Otherwise, we need to
 					//	merge the CAS with previous results.
-					if ( cacheEntry.howManyDelegatesResponded() > 0 )
-					{
+					//if ( cacheEntry.howManyDelegatesResponded() > 0 )
+					//{
 						// process secondary reply from a parallel step
+					//Use Delta CAS deserialization
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_delegate_responded_count_FINEST",
 			                new Object[] { cacheEntry.howManyDelegatesResponded(), casReferenceId});
@@ -237,19 +239,24 @@ public class ProcessResponseHandler extends HandlerBase
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_high_water_mark_FINEST",
 			                new Object[] { highWaterMark, casReferenceId });
-						deserialize( xmi, cas, casReferenceId, highWaterMark);
-					}
-					else
-					{
+						deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.disallow);
+					//}
+					//else
+					//{
 						//	first reply from a parallel step
-						deserialize(xmi, cas, casReferenceId);
-					}
+					//	deserialize(xmi, cas, casReferenceId);
+					//}
 				}
 			}
 			else // general case
 			{
-				//	Processing a reply from a standard, non-parallel delegate
+			  //	Processing a reply from a standard, non-parallel delegate
+			  if (cacheEntry.sentDeltaCas()) {
+				int highWaterMark = cacheEntry.getHighWaterMark();
+				deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.allow);
+			  } else {
 				deserialize(xmi, cas, casReferenceId);
+			  }
 			}
 			
 			if ( cacheEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 )
@@ -303,12 +310,21 @@ public class ProcessResponseHandler extends HandlerBase
 		}
 
 	}
+	
+	private void deserialize( String xmi, CAS cas, String casReferenceId, int highWaterMark, AllowPreexistingFS allow ) throws Exception
+	{
+		XmiSerializationSharedData deserSharedData;
+		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
+		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, allow);
+	}
+	/**
 	private void deserialize( String xmi, CAS cas, String casReferenceId, int highWaterMark ) throws Exception
 	{
 		XmiSerializationSharedData deserSharedData;
 		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark);
+		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, AllowPreexistingFS.allow);
 	}
+	**/
 	private void deserialize( String xmi, CAS cas, String casReferenceId ) throws Exception
 	{
 		//	Processing the reply from a standard, non-parallel delegate

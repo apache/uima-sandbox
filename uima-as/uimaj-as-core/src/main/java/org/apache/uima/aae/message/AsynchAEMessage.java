@@ -75,5 +75,6 @@ public interface AsynchAEMessage
 	public static final int Request = 3000;
 	public static final int Response = 3001;
 	
-
+	public static final String AcceptsDeltaCas = "AcceptsDeltaCas";
+	public static final String SentDeltaCas = "SentDeltaCas";
 }

@@ -30,6 +30,7 @@ public interface MessageContext
 	public int getMessageIntProperty( String aMessagePropertyName ) throws AsynchAEException;
 	public long getMessageLongProperty( String aMessagePropertyName ) throws AsynchAEException;
 	public Object getMessageObjectProperty( String aMessagePropertyName ) throws AsynchAEException;
+	public boolean getMessageBooleanProperty( String aMessagePropertyName ) throws AsynchAEException;
 	public Endpoint getEndpoint();
 
 	public String getStringMessage() throws AsynchAEException;

@@ -35,7 +35,9 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.Marker;
 import org.apache.uima.cas.TypeSystem;
+import org.apache.uima.cas.impl.AllowPreexistingFS;
 import org.apache.uima.cas.impl.OutOfTypeSystemData;
 import org.apache.uima.cas.impl.XCASDeserializer;
 import org.apache.uima.cas.impl.XCASSerializer;
@@ -145,6 +147,26 @@ public class UimaSerializer
 			writer.close();
 		}
 	}
+	
+	public static String serializeCasToXmi(CAS aCAS, XmiSerializationSharedData serSharedData, Marker aMarker) throws Exception
+	{
+		Writer writer = new StringWriter();
+		try
+		{
+			XMLSerializer xmlSer = new XMLSerializer(writer, false);
+			XmiCasSerializer ser = new XmiCasSerializer(aCAS.getTypeSystem()); 
+			ser.serialize(aCAS, xmlSer.getContentHandler(), null, serSharedData, aMarker);
+			return writer.toString();
+		}
+		catch( Exception e)
+		{
+			throw e;
+		}
+		finally
+		{
+			writer.close();
+		}
+	}
 /*
 	public static  String serializeCasToXmi(CAS cas, XmiSerializationSharedData serSharedData) throws IOException, SAXException
 	{
@@ -158,7 +180,8 @@ public class UimaSerializer
 */
 	
 	/** Utility method for deserializing a CAS from an XMI String */
-	public static void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, boolean aLenient, int aMergePoint) 
+	public static void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
+			boolean aLenient, int aMergePoint) 
 	throws FactoryConfigurationError, ParserConfigurationException, SAXException, IOException
 	{
 		
@@ -166,10 +189,10 @@ public class UimaSerializer
 		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
 	    XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
 	    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint);
-	    xmlReader.setContentHandler(handler);
+	    xmlReader.setContentHandler(handler); 
 	    xmlReader.parse(new InputSource(reader));
 
-	    
+    
 	    
 	    
 	    
@@ -191,6 +214,19 @@ public class UimaSerializer
 		
 	}
 
+	public static void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
+			boolean aLenient, int aMergePoint, AllowPreexistingFS allow) 
+	throws FactoryConfigurationError, ParserConfigurationException, SAXException, IOException
+	{
+		
+		Reader reader = new StringReader(anXmlStr);
+		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+	    XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
+	    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint, allow);
+	    xmlReader.setContentHandler(handler); 
+	    xmlReader.parse(new InputSource(reader));
 
 
 }
+	
+}	
