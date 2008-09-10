@@ -212,6 +212,20 @@ public class JmsMessageContext implements MessageContext
 			throw new AsynchAEException(e);
 		}
 	}
+	
+	public boolean getMessageBooleanProperty(String aMessagePropertyName) throws AsynchAEException
+	{
+		try
+		{
+			return message.getBooleanProperty(aMessagePropertyName);
+		}
+		catch( Exception e)
+		{
+			throw new AsynchAEException(e);
+		}
+	}
+	
+	
 
 	public Object getObjectMessage() throws AsynchAEException
 	{

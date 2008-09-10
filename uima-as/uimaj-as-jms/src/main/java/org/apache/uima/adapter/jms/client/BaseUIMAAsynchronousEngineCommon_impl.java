@@ -65,6 +65,7 @@ import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.message.PendingMessage;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.impl.AllowPreexistingFS;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.collection.EntityProcessStatus;
@@ -189,11 +190,16 @@ implements UimaAsynchronousEngine, MessageListener
 	 * 
 	 * @throws Exception
 	 */
-	protected String serializeCAS(CAS aCAS) throws Exception
+	protected String serializeCAS(CAS aCAS,  XmiSerializationSharedData serSharedData) throws Exception
 	{
-		XmiSerializationSharedData serSharedData = new XmiSerializationSharedData();
 		return UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 
+	}
+	
+	protected String serializeCAS(CAS aCAS) throws Exception
+	{
+		XmiSerializationSharedData serSharedData  = new XmiSerializationSharedData();
+		return UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 	}
 
 	public void removeStatusCallbackListener(UimaASStatusCallbackListener aListener)
@@ -530,7 +536,8 @@ implements UimaAsynchronousEngine, MessageListener
 
 			PendingMessage msg = new PendingMessage(AsynchAEMessage.Process);
 			long t1 = System.nanoTime();
-			String serializedCAS = serializeCAS(aCAS);
+			XmiSerializationSharedData serSharedData = new XmiSerializationSharedData();
+			String serializedCAS = serializeCAS(aCAS, serSharedData);
 			requestToCache.setSerializationTime(System.nanoTime()-t1);
 			msg.put( AsynchAEMessage.CAS, serializedCAS);
 			msg.put( AsynchAEMessage.CasReference, casReferenceId);
@@ -546,6 +553,7 @@ implements UimaAsynchronousEngine, MessageListener
 				//	Store the serialized CAS in case the timeout occurs and need to send the 
 				//	the offending CAS to listeners for reporting
 				requestToCache.setCAS(serializedCAS);
+				requestToCache.setXmiSerializationSharedData(serSharedData);
 			}
 
 			clientCache.put(casReferenceId, requestToCache);
@@ -1106,11 +1114,27 @@ implements UimaAsynchronousEngine, MessageListener
 		UimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, -1);
 		return aCAS;
 	}
-
+	
+	private CAS deserialize(String aSerializedCAS, CAS aCAS, XmiSerializationSharedData deserSharedData, boolean deltaCas ) throws Exception
+	{
+		if (deltaCas) {
+		  UimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, deserSharedData.getMaxXmiId(), AllowPreexistingFS.allow);
+		} else {
+		  UimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, -1);
+		}
+		return aCAS;
+	}
+	
 	protected CAS deserializeCAS(String aSerializedCAS, ClientRequest cachedRequest) throws Exception
 	{
 		CAS cas = cachedRequest.getCAS();
 		return deserialize(aSerializedCAS, cas);
+	}
+
+	protected CAS deserializeCAS(String aSerializedCAS, ClientRequest cachedRequest, boolean deltaCas) throws Exception
+	{
+		CAS cas = cachedRequest.getCAS();
+		return deserialize(aSerializedCAS, cas, cachedRequest.getXmiSerializationSharedData(), deltaCas);
 	}
 	protected CAS deserializeCAS(String aSerializedCAS, String aCasPoolName) throws Exception
 	{
@@ -1246,7 +1270,11 @@ implements UimaAsynchronousEngine, MessageListener
 		else
 		{
 			long t1 = System.nanoTime();
-			CAS cas = deserializeCAS(((TextMessage) message).getText(), cachedRequest);
+			boolean deltaCas = false;
+			if (message.propertyExists(AsynchAEMessage.SentDeltaCas)) {
+				deltaCas = message.getBooleanProperty(AsynchAEMessage.SentDeltaCas);
+			}
+			CAS cas = deserializeCAS(((TextMessage) message).getText(), cachedRequest, deltaCas);
 			cachedRequest.setDeserializationTime(System.nanoTime() - t1);
 			completeProcessingReply( cas, casReferenceId, payload, doNotify,  message, cachedRequest, pt);
 		}
@@ -1399,6 +1427,8 @@ implements UimaAsynchronousEngine, MessageListener
 		
 		private long processErrorCount;
 		
+		private XmiSerializationSharedData sharedData;
+		
 		public long getMetaTimeoutErrorCount() {
 			return metaTimeoutErrorCount;
 		}
@@ -1463,6 +1493,7 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			uimaEEEngine = aUimaEEEngine;
 			casReferenceId = aCasReferenceId;
+			sharedData = null;
 		}
 		public String getCasReferenceId()
 		{
@@ -1664,6 +1695,14 @@ implements UimaAsynchronousEngine, MessageListener
 		public long getTimeWaitingForReply()
 		{
 			return timeWaitingForReply;
+		}
+		
+		public XmiSerializationSharedData getXmiSerializationSharedData() {
+			return sharedData;
+		}
+		
+		public void setXmiSerializationSharedData(XmiSerializationSharedData data) {
+			this.sharedData = data;
 		}
 	}
 
