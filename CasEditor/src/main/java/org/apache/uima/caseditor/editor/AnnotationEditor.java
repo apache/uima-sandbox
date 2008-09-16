@@ -565,7 +565,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
 
     public Object[] getSupertypes(Object annotationType) {
-      return null;
+      return new Object[0];
     }
 
     public String getTypeLabel(Annotation annotation) {
