@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: UIMA Cas Editor
 Bundle-SymbolicName: org.apache.uima.caseditor;singleton:=true
 Bundle-Version: 2.2.2.incubating
-Bundle-ClassPath: ./caseditor.jar
+Bundle-ClassPath: ./caseditor.jar;./target/classes
 Bundle-Activator: org.apache.uima.caseditor.CasEditorPlugin
 Bundle-Vendor: The Apache Software Foundation
 Require-Bundle: org.eclipse.core.runtime,

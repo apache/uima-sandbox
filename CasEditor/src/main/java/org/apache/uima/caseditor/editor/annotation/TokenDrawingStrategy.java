@@ -65,7 +65,7 @@ public class TokenDrawingStrategy implements IDrawingStrategy {
 
           boolean isDrawCloseBracket = annotationFS.getEnd() == offset + length;
           // and no space after offset
-          if (isDrawCloseBracket && offset + length <= textWidget.getText().length()
+          if (isDrawCloseBracket && offset + length < textWidget.getText().length()
                   && !isWhitespace(textWidget, offset + length)) {
             gc.drawLine(bounds.x + bounds.width, bounds.y + bounds.height - 1, bounds.x
                     + bounds.width - BRACKET_WIDTH, bounds.y + bounds.height - 1);

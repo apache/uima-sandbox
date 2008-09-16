@@ -22,6 +22,7 @@ package org.apache.uima.caseditor.uima;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas_data.CasData;
@@ -38,7 +39,8 @@ import org.eclipse.core.runtime.CoreException;
  * {@link CorpusElement}s.
  */
 public class CorporaCollectionReader extends CollectionReader_ImplBase {
-  private Iterator mDocumentIterator;
+	
+  private Iterator<DocumentElement> documentIterator;
 
   /**
    * Sets the <code>CorpusElement</code>s to be read.
@@ -47,13 +49,13 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
    */
   public void setCorpora(Collection<CorpusElement> corpora) {
     if (corpora != null) {
-      LinkedList<DocumentElement> documents = new LinkedList<DocumentElement>();
+      List<DocumentElement> documents = new LinkedList<DocumentElement>();
 
       for (CorpusElement element : corpora) {
         documents.addAll(element.getDocuments());
       }
 
-      mDocumentIterator = documents.iterator();
+      documentIterator = documents.iterator();
     }
   }
 
@@ -63,14 +65,14 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
    * @throws CollectionException -
    */
   public void getNext(CAS cas) throws CollectionException {
-    DocumentElement document = (DocumentElement) mDocumentIterator.next();
+    DocumentElement document = (DocumentElement) documentIterator.next();
 
     CAS documentCas = null;
 
     try {
       documentCas = document.getDocument(false).getCAS();
     } catch (CoreException e) {
-      // TODO Auto-generated catch block
+      // TODO Handle this exception well
       e.printStackTrace();
     }
 
@@ -85,8 +87,8 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
    * Checks if there is one more cas available.
    */
   public boolean hasNext() {
-    if (mDocumentIterator != null) {
-      return mDocumentIterator.hasNext();
+    if (documentIterator != null) {
+      return documentIterator.hasNext();
     } else {
       return false;
     }
