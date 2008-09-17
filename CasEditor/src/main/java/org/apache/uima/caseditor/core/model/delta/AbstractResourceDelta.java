@@ -138,6 +138,7 @@ public abstract class AbstractResourceDelta implements IResourceDelta {
   /**
    * Dummy method, does nothing.
    */
+  @SuppressWarnings("unchecked")
   public Object getAdapter(Class adapter) {
     return null;
   }

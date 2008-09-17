@@ -85,6 +85,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
    *
    * @throws CoreException
    */
+  @SuppressWarnings("unchecked")
   void initialize() throws CoreException {
     loadDotCorpus();
 

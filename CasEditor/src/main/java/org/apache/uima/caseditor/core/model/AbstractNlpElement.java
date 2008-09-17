@@ -44,6 +44,7 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   /**
    * Retrieves the {@link IResource} of the current instance.
    */
+  @SuppressWarnings("unchecked")
   @Override
   public Object getAdapter(Class adapter) {
     Object result;

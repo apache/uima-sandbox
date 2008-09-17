@@ -76,17 +76,17 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 				mDocument = null;
 			}
 
-			public Iterator getAnnotationIterator() {
-				return new Iterator() {
-					private Iterator mAnnotations =
+			public Iterator<EclipseAnnotationPeer> getAnnotationIterator() {
+				return new Iterator<EclipseAnnotationPeer>() {
+					private Iterator<AnnotationFS> mAnnotations =
 						mDocument.getCAS().getAnnotationIndex().iterator();
 
 					public boolean hasNext() {
 						return mAnnotations.hasNext();
 					}
 
-					public Object next() {
-						AnnotationFS annotation = (AnnotationFS) mAnnotations.next();
+					public EclipseAnnotationPeer next() {
+						AnnotationFS annotation = mAnnotations.next();
 
 						EclipseAnnotationPeer peer = new EclipseAnnotationPeer(annotation.getType().getName(), false, "");
 						peer.setAnnotation(annotation);

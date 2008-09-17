@@ -23,7 +23,7 @@ package org.apache.uima.caseditor.core.util;
  * This class usually specifies an continus are of text. This area has an start and end index. The
  * difference of the end and start is the length of the area.
  */
-public class Span implements Comparable {
+public class Span implements Comparable<Span> {
   /**
    * The start index of the text.
    */
@@ -94,16 +94,9 @@ public class Span implements Comparable {
   }
 
   /**
-   * Compares the current instance to another object. For objects of an other type, it retuns always
-   * 1;
+   * Compares the current instance to another {@link Span} object.
    */
-  public int compareTo(Object o) {
-    if (!(o instanceof Span)) {
-      return 1;
-    }
-
-    Span span = (Span) o;
-
+  public int compareTo(Span span) {
     return span.getStart() - getStart();
   }
 

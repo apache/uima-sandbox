@@ -72,8 +72,10 @@ public enum Primitives {
 
   private final String mTypeName;
 
+  @SuppressWarnings("unchecked")
   private final Class mType;
 
+  @SuppressWarnings("unchecked")
   private Primitives(String typeName, Class type) {
     mTypeName = typeName;
     mType = type;
@@ -93,6 +95,7 @@ public enum Primitives {
    *
    * @return the type
    */
+  @SuppressWarnings("unchecked")
   public Class getType() {
     return mType;
   }
@@ -143,6 +146,7 @@ public enum Primitives {
    * @param f
    * @return the class
    */
+  @SuppressWarnings("unchecked")
   public static Class getPrimitiveClass(Feature f) {
     assert Primitives.isPrimitive(f);
 
