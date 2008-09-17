@@ -67,85 +67,85 @@ class QuickTypeSelectionDialog extends PopupDialog {
   private final AnnotationEditor editor;
 
   private Text filterText;
-  
+
   private Map<Character, Type> shortcutTypeMap = new HashMap<Character, Type>();
-  
+
   private Map<Type, Character> typeShortcutMap = new HashMap<Type, Character>();
 
   /**
    * Initializes the current instance.
-   * 
+   *
    * @param parent
    * @param editor
    */
   QuickTypeSelectionDialog(Shell parent, AnnotationEditor editor) {
-    super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true, 
+    super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true,
     			false, true, null, null);
 
     this.editor = editor;
-    
-    // key shortcuts are assigned automatically to types, the shortcut 
+
+    // key shortcuts are assigned automatically to types, the shortcut
     // mapping may change if the type system is modified
-    
+
     String shortcutsString = "qwertzuiopasdfghjklyxcvbnm1234567890";
-    
+
     Set<Character> shortcuts = new HashSet<Character>();
-    
+
     for (int i = 0; i < shortcutsString.length(); i++) {
     	shortcuts.add(shortcutsString.charAt(i));
     }
-    
+
     Set<Type> types = new HashSet<Type>();
-   	Collections.addAll(types, getTypes());		
-   	
+   	Collections.addAll(types, getTypes());
+
    	// Try to create mappings with first letter of the type name as shortcut
    	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
-   		
+
    		Type type = it.next();
-   		
+
    		String name = type.getShortName();
-   		
+
    		Character candidateChar = Character.toLowerCase(name.charAt(0));
-   		
+
    		if (shortcuts.contains(candidateChar)) {
    			putShortcut(candidateChar, type);
-   			
+
    			shortcuts.remove(candidateChar);
    			it.remove();
    		}
    	}
-   	
+
    	// Now assign letters to the remaining types
    	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
-   		
+
    		if (shortcuts.size() > 0) {
-   			
+
    			Character candidateChar = shortcuts.iterator().next();
-   			
+
    			putShortcut(candidateChar, it.next());
-   			
+
    			shortcuts.remove(candidateChar);
    			it.remove();
    		}
    	}
   }
-  
+
   private void putShortcut(Character shortcut, Type type) {
 	  shortcutTypeMap.put(shortcut, type);
 	  typeShortcutMap.put(type, shortcut);
   }
-  
+
   @SuppressWarnings("unchecked")
   private Type[] getTypes() {
-	  
+
 	  TypeSystem typeSystem = editor.getDocument().getCAS().getTypeSystem();
-	  
+
       List<Type> types = typeSystem.getProperlySubsumedTypes(typeSystem
               .getType(CAS.TYPE_NAME_ANNOTATION));
 
       return types.toArray(new Type[types.size()]);
   }
-  
+
   private void annotateAndClose(Type annotationType) {
 		if (annotationType != null) {
 			Point textSelection = editor.getSelection();
@@ -163,7 +163,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
 
 		QuickTypeSelectionDialog.this.close();
 	}
-  
+
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite composite = (Composite) super.createDialogArea(parent);
@@ -171,7 +171,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
     // TODO: focus always goes to the text box, but should
     // go to the Tree control, find out why, can SWT.NO_FOCUS be used
     // to fix it ?
-    
+
     filterText = new Text(composite, SWT.NO_FOCUS);
     filterText.setBackground(parent.getBackground());
     filterText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -184,17 +184,17 @@ class QuickTypeSelectionDialog extends PopupDialog {
             GridData.FILL_VERTICAL));
 
     typeTree.getControl().setFocus();
-    
+
     filterText.addKeyListener(new KeyListener() {
 
       public void keyPressed(KeyEvent e) {
         if (e.keyCode == SWT.ARROW_DOWN || e.keyCode == SWT.ARROW_UP) {
           typeTree.getControl().setFocus();
-          
+
           Tree tree = (Tree) typeTree.getControl();
-          
+
           if (tree.getItemCount() > 0) {
-        	  
+
         	  tree.setSelection(tree.getItem(0));
           }
         }
@@ -241,7 +241,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
       }
     } });
 
-    
+
     typeTree.setLabelProvider(new ILabelProvider(){
 
 		public Image getImage(Object element) {
@@ -249,11 +249,11 @@ class QuickTypeSelectionDialog extends PopupDialog {
 		}
 
 		public String getText(Object element) {
-			
+
 			Type type = (Type) element;
-			
+
 			Character key = typeShortcutMap.get(type);
-			
+
 			if (typeShortcutMap != null) {
 				return "[" + key +"] " + type.getShortName();
 			}
@@ -263,7 +263,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
 		}
 
 		public void addListener(ILabelProviderListener listener) {
-			
+
 		}
 
 		public void dispose() {
@@ -275,12 +275,12 @@ class QuickTypeSelectionDialog extends PopupDialog {
 
 		public void removeListener(ILabelProviderListener listener) {
 		}});
-    
+
     typeTree.getControl().addKeyListener(new KeyListener() {
 
 		public void keyPressed(KeyEvent e) {
         	Type type = shortcutTypeMap.get(Character.toLowerCase(e.character));
-        	
+
         	if (type != null) {
         		annotateAndClose(type);
         	}
@@ -288,8 +288,8 @@ class QuickTypeSelectionDialog extends PopupDialog {
 
 		public void keyReleased(KeyEvent e) {
 		}});
-    
-    
+
+
     typeTree.getControl().addMouseMoveListener(new MouseMoveListener() {
 
       public void mouseMove(MouseEvent e) {
@@ -321,7 +321,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
     		editor.getAnnotationMode()});
 
     typeTree.setSelection(modeSelection, true);
-    
+
     return composite;
   }
 

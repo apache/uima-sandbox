@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,7 +38,7 @@ import org.eclipse.ui.progress.IProgressService;
  * This class executes a {@link IRunnableWithProgress} runnable.
  */
 public class RunnableAction extends Action {
-  
+
   private Shell mShell;
 
   private IRunnableWithProgress mRunnable;
@@ -47,7 +47,7 @@ public class RunnableAction extends Action {
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param shell
    * @param name
    * @param runnable
@@ -72,12 +72,12 @@ public class RunnableAction extends Action {
       progressService.run(true, false, mRunnable);
     } catch (InvocationTargetException e) {
 
-      Status status = new Status(IStatus.ERROR, CasEditorPlugin.ID, 0, getRootCauseStackTrace(e), 
+      Status status = new Status(IStatus.ERROR, CasEditorPlugin.ID, 0, getRootCauseStackTrace(e),
               null);
 
       ErrorDialog.openError(mShell, "Unexpected exception in " + mName,
               "Unexpected exception!", status);
-      
+
     } catch (InterruptedException e) {
       // task terminated ... just ignore
     }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,23 +35,23 @@ public class FileAdapter implements IWorkbenchAdapter {
   }
 
   public ImageDescriptor getImageDescriptor(Object object) {
-    
+
     ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
     return sharedImages.getImageDescriptor(ISharedImages.IMG_OBJ_FILE);
   }
 
   public String getLabel(Object o) {
     IFile file = (IFile) o;
-    
+
     return file.getName();
   }
 
   public Object getParent(Object o) {
     IFile file = (IFile) o;
-    
+
     // first check if there is an nlp element parent,
     // if this is not the case than use the resource parent
-    
+
     INlpElement parent;
     try {
       parent = CasEditorPlugin.getNlpModel().getParent(file);
@@ -59,7 +59,7 @@ public class FileAdapter implements IWorkbenchAdapter {
       CasEditorPlugin.log(e);
       parent = null;
     }
-    
+
     if (parent != null) {
       return parent;
     }

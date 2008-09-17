@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -53,20 +53,20 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 
 /**
  * This action launches the cpm with the configured cas consumer.
- * 
+ *
  * TODO: move over to core plugin
  */
 public class ConsumerActionRunnable implements IRunnableWithProgress
 {
     private CasConsumerConfiguration mConfiguration;
-    
+
     private Collection<CorpusElement> mCorpora;
 
     private boolean mIsProcessing = true;
-    
+
     /**
      * Initializes a new instance.
-     * 
+     *
      * @param config
      * @param corpora
      */
@@ -74,87 +74,87 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
             Collection<CorpusElement> corpora)
     {
         mConfiguration = config;
-        
+
         mCorpora = corpora;
     }
-    
-    public void run(IProgressMonitor monitor) 
+
+    public void run(IProgressMonitor monitor)
             throws InvocationTargetException, InterruptedException
     {
         monitor.beginTask("Consuming", IProgressMonitor.UNKNOWN);
-        
+
         monitor.subTask("Initializing, please stand by.");
-        
+
         InputStream inCollectionReaderDescripton = getClass()
                 .getResourceAsStream("CorporaCollectionReader.xml");
-        
+
         // TODO: inCollectionReaderDescripton check for null
-        
+
         CollectionReaderDescription collectionReaderDescripton;
         try
         {
-            collectionReaderDescripton = (CollectionReaderDescription) 
+            collectionReaderDescripton = (CollectionReaderDescription)
             UIMAFramework.getXMLParser().parseResourceSpecifier(
                     new XMLInputSource(inCollectionReaderDescripton,
                             new File("")));
         }
         catch (InvalidXMLException e)
         {
-            throw new InvocationTargetException(e, "CorporaCollectionReader.xml" 
+            throw new InvocationTargetException(e, "CorporaCollectionReader.xml"
                     + " could ne be parsed!");
         }
-        
-        NlpProject project = 
+
+        NlpProject project =
                 mConfiguration.getConsumerElement().getNlpProject();
-        
+
         InputStream inTypeSystemDescription;
         try
         {
-            inTypeSystemDescription = 
+            inTypeSystemDescription =
                 project.getDotCorpus().getTypeSystemFile().getContents();
         }
         catch (CoreException e)
         {
             throw new InvocationTargetException(e);
         }
-        
+
         TypeSystemDescription typeSystemDescriptor;
         try
         {
             typeSystemDescriptor = UIMAFramework.getXMLParser()
             .parseTypeSystemDescription(
                     new XMLInputSource(inTypeSystemDescription, new File("")));
-            
+
             typeSystemDescriptor.resolveImports();
         }
         catch (InvalidXMLException e)
         {
             throw new InvocationTargetException(e);
         }
-        
+
 //      set type system to collection reader
-        ProcessingResourceMetaData collectionReaderMetaData = 
+        ProcessingResourceMetaData collectionReaderMetaData =
             collectionReaderDescripton.getCollectionReaderMetaData();
-        
+
         collectionReaderMetaData.setTypeSystem(typeSystemDescriptor);
-        
+
         XMLParser xmlParser = UIMAFramework.getXMLParser();
-        
+
         InputStream inIndex = getClass().getResourceAsStream(
                 "Index.xml");
 
         if (inIndex == null)
         {
-            throw new InvocationTargetException(null, 
+            throw new InvocationTargetException(null,
                     "org/apache/uima/caseditor/ui/action/Index.xml"
                     + " is missing on the classpath");
         }
-        
+
         XMLInputSource xmlIndexSource = new XMLInputSource(inIndex,
                 new File(""));
-        
+
         FsIndexDescription indexDesciptor;
-        
+
         try
         {
             indexDesciptor = (FsIndexDescription) xmlParser
@@ -164,10 +164,10 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         {
             throw new InvocationTargetException(e);
         }
-        
+
         collectionReaderMetaData.setFsIndexes(new FsIndexDescription[]
                 {indexDesciptor});
-        
+
         CollectionReader collectionReader;
         try
         {
@@ -178,11 +178,11 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         {
             throw new InvocationTargetException(e);
         }
-        
+
         ((CorporaCollectionReader) collectionReader).setCorpora(mCorpora);
-        
+
         InputStream in = getClass().getResourceAsStream("DummyTAE.xml");
-        
+
 //      load dummy descriptor
         ResourceSpecifier textAnalysisEngineSpecifier;
         try
@@ -195,7 +195,7 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         {
             throw new InvocationTargetException(e);
         }
-        
+
         AnalysisEngine textAnalysisEngine;
         try
         {
@@ -206,10 +206,10 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         {
             throw new InvocationTargetException(e);
         }
-        
+
         CollectionProcessingManager collectionProcessingEngine = UIMAFramework
                 .newCollectionProcessingManager();
-        
+
         try
         {
             collectionProcessingEngine.setAnalysisEngine(textAnalysisEngine);
@@ -218,7 +218,7 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         {
             throw new InvocationTargetException(e);
         }
-        
+
         try
         {
             collectionProcessingEngine.addCasConsumer(mConfiguration
@@ -228,48 +228,48 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         {
             throw new InvocationTargetException(e);
         }
-        
+
         collectionProcessingEngine.setPauseOnException(false);
-        
+
         collectionProcessingEngine.addStatusCallbackListener(
                 new StatusCallbackListener(){
-            
-            public void entityProcessComplete(CAS cas, 
+
+            public void entityProcessComplete(CAS cas,
                     EntityProcessStatus status)
             {
                 // not implemented
             }
-            
+
             public void aborted()
             {
                 finishProcessing();
             }
-            
+
             public void batchProcessComplete()
             {
                 // not implemented
             }
-            
+
             public void collectionProcessComplete()
             {
                 finishProcessing();
             }
-            
+
             public void initializationComplete()
             {
                 // not implemented
             }
-            
+
             public void paused()
             {
                 // not implemented
             }
-            
+
             public void resumed()
             {
                 // not implemented
             }
-            
+
             private void finishProcessing()
             {
                 synchronized (ConsumerActionRunnable.this)
@@ -279,7 +279,7 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
                 }
             }
         });
-        
+
         monitor.subTask("Feeding comsumer, please stand by.");
 
         try
@@ -290,7 +290,7 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
         {
             throw new InvocationTargetException(e);
         }
-        
+
         synchronized(this)
         {
             // TODO: for cancel poll here
@@ -300,17 +300,17 @@ public class ConsumerActionRunnable implements IRunnableWithProgress
                 wait();
             }
         }
-        
+
         // refresh cas processor directory
         IResource processorFolder = mConfiguration.getBaseFolder();
-        
+
         try {
           processorFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
     	} catch (CoreException e) {
     		// maybe this fails, sorry
     		CasEditorPlugin.log(e);
     	}
-        
+
         monitor.done();
     }
 }

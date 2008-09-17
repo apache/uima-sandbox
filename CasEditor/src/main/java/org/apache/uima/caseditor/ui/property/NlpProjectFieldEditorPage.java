@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,63 +36,63 @@ public abstract class NlpProjectFieldEditorPage extends FieldEditorPreferencePag
         implements IWorkbenchPropertyPage
 {
     private ImageDescriptor mImage;
-    
+
     private IAdaptable mElement;
-    
+
     private IPreferenceStore mPreferenceStore;
-    
+
     NlpProjectFieldEditorPage(int style)
     {
         super(style);
     }
-    
-    public NlpProjectFieldEditorPage(String title, int style) 
+
+    public NlpProjectFieldEditorPage(String title, int style)
     {
           super(title, style);
     }
-    
-    public NlpProjectFieldEditorPage(String title, ImageDescriptor image, 
-            int style) 
+
+    public NlpProjectFieldEditorPage(String title, ImageDescriptor image,
+            int style)
     {
         super(title, image, style);
-        
+
         mImage = image;
     }
-    
+
     /**
      * Retrieves the project of the currently selected NLPElement.
-     * 
+     *
      * @return - project of selected NLPElement.
      */
     protected NlpProject getProject()
     {
         return ((INlpElement) getElement()).getNlpProject();
     }
-    
+
     @Override
     public void createControl(Composite parent)
     {
         if (isPropertyPage())
         {
             NlpProject nlpProject = getProject();
-            
+
             mPreferenceStore = new DotCorpusPreferenceStore(
                     nlpProject.getDotCorpus());
         }
-        
+
         super.createControl(parent);
-        
+
         if (isPropertyPage())
         {
             // updateFieldEditors();
         }
     }
-    
+
     @Override
     public IPreferenceStore getPreferenceStore()
     {
         IPreferenceStore result;
-        
+
         if (isPropertyPage())
         {
             result = mPreferenceStore;
@@ -101,10 +101,10 @@ public abstract class NlpProjectFieldEditorPage extends FieldEditorPreferencePag
         {
             result = super.getPreferenceStore();
         }
-        
+
         return result;
     }
-    
+
     @Override
     protected void createFieldEditors()
     {
@@ -119,13 +119,13 @@ public abstract class NlpProjectFieldEditorPage extends FieldEditorPreferencePag
     {
         mElement = element;
     }
-    
+
     /**
      * Indicates if current is used as a property page.
-     * 
+     *
      * @return - true if property page
      */
-    public boolean isPropertyPage() 
+    public boolean isPropertyPage()
     {
         return mElement != null;
     }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,17 +36,17 @@ final class CorpusExplorerUtil
     {
         // overridden to change access to private
     }
-    
+
 	static IStructuredSelection convertNLPElementsToResources(
 			IStructuredSelection selection)
 	{
-		
+
 		LinkedList<Object> newSelectionList = new LinkedList<Object>();
-		
+
         for (Iterator elements = selection.iterator(); elements.hasNext();)
         {
 			Object element = elements.next();
-			
+
 			if (element instanceof INlpElement)
 			{
 				INlpElement nlpElement = (INlpElement) element;
@@ -57,41 +57,41 @@ final class CorpusExplorerUtil
                 newSelectionList.add(element);
             }
 		}
-		
+
 		return new StructuredSelection(newSelectionList);
 	}
-	
+
     /**
      * TODO: Replace this method, the name is very ugly.
-     * 
-     * @param selection 
+     *
+     * @param selection
      * @return true if NLPProject or NonNLPResource is included
-     * 
-     * @deprecated 
+     *
+     * @deprecated
      */
     @Deprecated
     static boolean isContaingNLPProjectOrNonNLPResources(
             IStructuredSelection selection)
     {
         boolean isNLPProjectOrNonNLPResource = false;
-            
-        for (Iterator resources = selection.iterator() ; 
+
+        for (Iterator resources = selection.iterator() ;
                 resources.hasNext() && !isNLPProjectOrNonNLPResource;)
         {
             Object resource =  resources.next();
-            
+
             if (! (resource instanceof INlpElement))
-            {               
+            {
                 isNLPProjectOrNonNLPResource = true;
             }
-            
+
             // if nlp project return also
             if ((resource instanceof NlpProject))
             {
                 isNLPProjectOrNonNLPResource = true;
             }
         }
-        
+
         return isNLPProjectOrNonNLPResource;
     }
 }

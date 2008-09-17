@@ -180,7 +180,7 @@ final class RefactorGroup extends ActionGroup {
         mDeleteAction.selectionChanged(selection);
         mRenameAction.selectionChanged(selection);
     }
-  
+
 	void handleKeyPressed(KeyEvent e) {
 		if (e.keyCode == SWT.F2 && e.stateMask == 0) {
 			if (mRenameAction.isEnabled()) {
@@ -195,7 +195,7 @@ final class RefactorGroup extends ActionGroup {
 			}
 		}
 	}
-  
+
   /**
    * Destroy all swt elements which where created by this instance.
    */

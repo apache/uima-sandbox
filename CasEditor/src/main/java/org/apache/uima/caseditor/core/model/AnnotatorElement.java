@@ -118,7 +118,7 @@ public class AnnotatorElement extends AbstractNlpElement {
     }
 
     // TODO: refactor here
-    AnnotatorConfiguration annotatorConfiguration = new AnnotatorConfiguration(this, 
+    AnnotatorConfiguration annotatorConfiguration = new AnnotatorConfiguration(this,
         specifier); // cast is unsafe !!!
 
     annotatorConfiguration.setBaseFolder((IFolder) mParent.getResource());

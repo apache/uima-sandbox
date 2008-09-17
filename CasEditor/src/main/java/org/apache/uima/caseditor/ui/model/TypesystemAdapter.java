@@ -23,7 +23,7 @@ import org.apache.uima.caseditor.Images;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 public class TypesystemAdapter extends SingleElementAdapter {
-	
+
     /**
      * Retrieves the document element <code>ImageDescriptor</code>.
      */

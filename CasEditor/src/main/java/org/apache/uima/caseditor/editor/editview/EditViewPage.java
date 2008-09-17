@@ -535,10 +535,10 @@ final class EditViewPage extends Page implements ISelectionListener {
   private final EditView editView;
 
   EditViewPage(EditView editView, AnnotationDocument document) {
-	  
+
 	if (editView == null || document == null)
         throw new IllegalArgumentException("Parameters must not be null!");
-	 
+
     this.editView = editView;
     this.document = document;
   }

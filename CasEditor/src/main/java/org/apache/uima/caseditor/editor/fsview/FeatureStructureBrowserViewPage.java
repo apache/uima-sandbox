@@ -358,10 +358,10 @@ public final class FeatureStructureBrowserViewPage extends Page {
    * @param document
    */
   public FeatureStructureBrowserViewPage(AnnotationDocument document) {
-	
-	if (document == null) 
+
+	if (document == null)
 		throw new IllegalArgumentException("document parameter must not be null!");
-	  
+
     mCAS = document.getCAS();
     mDocument = document;
 

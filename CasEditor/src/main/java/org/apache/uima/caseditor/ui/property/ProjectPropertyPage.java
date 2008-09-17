@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,15 +35,15 @@ import org.eclipse.swt.widgets.Composite;
 public class ProjectPropertyPage extends NlpProjectFieldEditorPage
 {
     private DotCorpusPreferenceStore mDotCorpusPropertyStore;
-    
+
     private FileFieldEditor mTypeSystemFile;
-    
+
     private FolderPathEditor mCasProcessorFolders;
-    
+
     private FolderPathEditor mCorpusFolders;
-    
+
     private IntegerFieldEditor mEditorLineLengthHint;
-    
+
     /**
      * Initialize a new instance.
      */
@@ -51,37 +51,37 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
     {
         super(FieldEditorPreferencePage.GRID);
     }
-    
+
     @Override
     protected void createFieldEditors()
     {
         NlpProject nlpProject = ((INlpElement) getElement()).getNlpProject();
-        
+
         mDotCorpusPropertyStore = new DotCorpusPreferenceStore(nlpProject
                 .getDotCorpus());
-        
+
         Composite parent = getFieldEditorParent();
-        
+
         // uima config folder
         mCasProcessorFolders = new FolderPathEditor(
                 DotCorpusPreferenceStore.Key.TAGGER_CONFIG_FOLDER.name(),
-                "Processor Folders", "Processor folder selection", "Select the processor folder", 
+                "Processor Folders", "Processor folder selection", "Select the processor folder",
                 parent, nlpProject);
         mCasProcessorFolders.setPreferenceStore(mDotCorpusPropertyStore);
         addField(mCasProcessorFolders);
-        
+
         // corpus folder
         mCorpusFolders = new FolderPathEditor(
                 DotCorpusPreferenceStore.Key.CORPUS_FOLDERS.name(),
-                "Corpus Folders", "Corpus folder selection", "Select the corpus folder", 
+                "Corpus Folders", "Corpus folder selection", "Select the corpus folder",
                 parent, nlpProject);
-        
+
         mCorpusFolders.setPreferenceStore(mDotCorpusPropertyStore);
         addField(mCorpusFolders);
-        
+
         // type system file
         mTypeSystemFile = new FileFieldEditor(
-                DotCorpusPreferenceStore.Key.TYPE_SYSTEM_FILE.name(), "Typesystem", 
+                DotCorpusPreferenceStore.Key.TYPE_SYSTEM_FILE.name(), "Typesystem",
                 "Typesystem file selection", "Select the typesystem file", parent, nlpProject);
         mTypeSystemFile.setChangeButtonText("Browse...");
         mTypeSystemFile.setPreferenceStore(mDotCorpusPropertyStore);
@@ -94,7 +94,7 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
         mEditorLineLengthHint.setPreferenceStore(mDotCorpusPropertyStore);
         addField(mEditorLineLengthHint);
     }
-    
+
     @Override
     public boolean performOk()
     {
@@ -102,7 +102,7 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
         mCorpusFolders.store();
         mCasProcessorFolders.store();
         mEditorLineLengthHint.store();
-        
+
         try
         {
             mDotCorpusPropertyStore.save();
@@ -110,14 +110,14 @@ public class ProjectPropertyPage extends NlpProjectFieldEditorPage
         catch (IOException e)
         {
             // TODO: show error message with save error
-            MessageDialog.openError(getShell(), "Unable to save settings!", 
+            MessageDialog.openError(getShell(), "Unable to save settings!",
                     "Unable to save settings:" + e.getMessage());
             return false;
         }
 
         return true;
     }
-    
+
     @Override
     protected void performDefaults()
     {

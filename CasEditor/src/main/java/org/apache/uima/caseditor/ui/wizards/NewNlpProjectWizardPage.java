@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * TODO: 
+ * TODO:
  * should not be possible to crate an existing project
  * check if project name contains illegal chars
  */
@@ -42,17 +42,17 @@ public class NewNlpProjectWizardPage extends WizardPage {
   }
 
   public void createControl(Composite parent) {
-    
+
     Composite base = new Composite(parent, SWT.NULL);
     GridLayout layout = new GridLayout();
     layout.numColumns = 2;
     base.setLayout(layout);
     base.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    
+
     Label projectLabel = new Label(base, SWT.NONE);
     projectLabel.setText("Project name:");
     projectLabel.setFont(parent.getFont());
-    
+
     projectNameField = new Text(base, SWT.BORDER);
     GridData data = new GridData(GridData.FILL_HORIZONTAL);
     data.widthHint = 123;
@@ -61,12 +61,12 @@ public class NewNlpProjectWizardPage extends WizardPage {
 
     setControl(base);
   }
-  
+
   public IProject getProjectHandle() {
     return ResourcesPlugin.getWorkspace().getRoot().getProject(
             projectNameField.getText().trim());
   }
-  
+
   public IPath getLocationPath() {
     return getProjectHandle().getParent().getLocation();
   }

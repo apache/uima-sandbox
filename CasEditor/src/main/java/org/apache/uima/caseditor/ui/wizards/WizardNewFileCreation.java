@@ -30,13 +30,13 @@ final public class WizardNewFileCreation extends Wizard implements INewWizard
     /**
      * The ID of the new nlp project wizard.
      */
-    public static final String ID = 
+    public static final String ID =
         "org.apache.uima.caseditor.ui.wizards.WizardNewFileCreation";
-    
+
     // private WizardNewFileCreationPage mMainPage;
 
     private IStructuredSelection selection;
-    
+
     /**
      * Initializes the <code>NLPProjectWizard</code>.
      */
@@ -45,7 +45,7 @@ final public class WizardNewFileCreation extends Wizard implements INewWizard
         this.selection = selection;
         setWindowTitle("New file");
     }
-    
+
     /**
      * Adds the project wizard page to the wizard.
      */
@@ -57,7 +57,7 @@ final public class WizardNewFileCreation extends Wizard implements INewWizard
 //        mMainPage.setDescription("Create a file");
 //        addPage(mMainPage);
     }
-    
+
     /**
      * Creates the nlp project.
      */

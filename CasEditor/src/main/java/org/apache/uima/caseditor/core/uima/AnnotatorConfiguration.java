@@ -53,7 +53,7 @@ public class AnnotatorConfiguration {
   public AnnotatorElement getAnnotatorElement() {
 	  return element;
   }
-  
+
   /**
    * Only text analysis engines are supported.
    *
@@ -78,7 +78,7 @@ public class AnnotatorConfiguration {
   public IFolder getBaseFolder() {
 	  return mResourceBasePath;
   }
-  
+
   /**
    * Sets the base folder
    *

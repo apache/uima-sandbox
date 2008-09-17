@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -27,7 +27,7 @@ import org.eclipse.ui.texteditor.StatusLineContributionItem;
 
 /**
  * The <code>AnnotationEditor</code> action contributor.
- * 
+ *
  * Contributes the "annotation mode" status item to the status bar.
  */
 public class AnnotationEditorActionContributor extends EditorActionBarContributor {
@@ -42,7 +42,7 @@ public class AnnotationEditorActionContributor extends EditorActionBarContributo
 
   /**
    * Sets the active editor.
-   * 
+   *
    * @param part
    */
   @Override
@@ -53,9 +53,9 @@ public class AnnotationEditorActionContributor extends EditorActionBarContributo
       mActiveEditorPart = (AnnotationEditor) part;
 
       mActiveEditorPart.setStatusField(mStatusLineModeItem, ID);
-      
-      Type annotationType = mActiveEditorPart.getAnnotationMode(); 
-      
+
+      Type annotationType = mActiveEditorPart.getAnnotationMode();
+
       if (annotationType != null) {
     	  mStatusLineModeItem.setText(annotationType.getShortName());
       }
@@ -64,7 +64,7 @@ public class AnnotationEditorActionContributor extends EditorActionBarContributo
 
   /**
    * Contributes the status item to the status line.
-   * 
+   *
    * @param statusLineManager
    */
   @Override

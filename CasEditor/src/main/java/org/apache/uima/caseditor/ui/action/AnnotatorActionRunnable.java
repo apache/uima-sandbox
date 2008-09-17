@@ -76,7 +76,7 @@ public final class AnnotatorActionRunnable extends DocumentActionRunnable {
 
 
   @Override
-  protected void completedProcessing(IProgressMonitor monitor) 
+  protected void completedProcessing(IProgressMonitor monitor)
       throws InvocationTargetException {
   try {
       annotatorInstance.collectionProcessComplete();
@@ -86,10 +86,10 @@ public final class AnnotatorActionRunnable extends DocumentActionRunnable {
 
     annotatorInstance.destroy();
     annotatorInstance = null;
-    
+
     // refresh cas processor directory
     IResource processorFolder = mAnnotatorConfiguration.getBaseFolder();
-    
+
     try {
       processorFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 	} catch (CoreException e) {

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,7 +35,7 @@ import org.eclipse.ui.actions.CopyProjectOperation;
 import org.eclipse.ui.part.ResourceTransfer;
 
 
-final class PasteAction  extends ResourceAction 
+final class PasteAction  extends ResourceAction
 {
 
   private Shell mShell;
@@ -44,7 +44,7 @@ final class PasteAction  extends ResourceAction
 
   /**
    * Initializes the current instance.
-   * 
+   *
    * @param shell
    * @param clipboard
    */
@@ -61,9 +61,9 @@ final class PasteAction  extends ResourceAction
 
   /**
    * Locates the new parent resource for the pasted ones.
-   * 
+   *
    * If currently selected resource is a file, the parent of the file is returned.
-   * 
+   *
    * @return
    */
   private IContainer getNewParent() {
@@ -109,7 +109,7 @@ final class PasteAction  extends ResourceAction
     }
   }
 
-  
+
   @Override
   protected boolean updateSelection(IStructuredSelection selection) {
 
@@ -117,24 +117,24 @@ final class PasteAction  extends ResourceAction
             .getContents(ResourceTransfer.getInstance());
 
     String[] files = (String[]) mClipboard.getContents(FileTransfer.getInstance());
-    
+
     if (resources == null && files == null) {
       return false;
-    } 
+    }
 //    else if (resources.length == 0 && files.length == 0) {
 //      return false;
 //    }
 
     if (resources != null ) {
     if (resources[0].getType() == IResource.PROJECT) {
-      
+
       for (IResource resource : resources) {
         if (resource.getType() == IResource.PROJECT
                 && !((IProject) resource).isOpen()) {
           return false;
         }
       }
-      
+
       return true;
     }
 
@@ -169,7 +169,7 @@ final class PasteAction  extends ResourceAction
       }
     }
     }
-    
+
     return true;
   }
 }

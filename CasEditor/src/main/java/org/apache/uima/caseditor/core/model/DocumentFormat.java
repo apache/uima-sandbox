@@ -20,7 +20,7 @@
 package org.apache.uima.caseditor.core.model;
 
 /**
- * Specifies the format of the uima document. 
+ * Specifies the format of the uima document.
  */
 public enum DocumentFormat {
     XCAS,

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,11 +38,11 @@ class ModelAdapter extends
     public Object[] getChildren(Object o)
     {
         NlpModel nlpModel = (NlpModel) o;
-        
+
         LinkedList<Object> elementList = new LinkedList<Object>();
-        
+
         Collections.addAll(elementList, nlpModel.getNlpProjects());
-        
+
         try
         {
             Collections.addAll(elementList, nlpModel.getNonNlpProjects());
@@ -51,13 +51,13 @@ class ModelAdapter extends
         {
             e.printStackTrace();
         }
-        
+
         return elementList.toArray();
     }
-    
+
     /**
      * No image available.
-     * 
+     *
      * @return null
      */
     public ImageDescriptor getImageDescriptor(Object object)

@@ -415,7 +415,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       if (getAnnotationMode().equals(type)) {
     	  actionItem.setSelection(true);
       }
-      
+
       if (mTypesToDisplay.contains(type)) {
         actionItem.setSelection(true);
       }
@@ -585,8 +585,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     public boolean isSubtype(Object annotationType, Object potentialSupertype) {
 
       Type type = getDocument().getCAS().getTypeSystem().getType((String) annotationType);
-    	
-      return mShowAnnotationsMenu.getSelectedTypes().contains(type) || 
+
+      return mShowAnnotationsMenu.getSelectedTypes().contains(type) ||
           getAnnotationMode().equals(type);
     }
 
@@ -638,22 +638,22 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    */
   @Override
   public Object getAdapter(Class adapter) {
-	  
-	  
+
+
     if (IContentOutlinePage.class.equals(adapter) && getDocument() != null) {
       if (mOutlinePage == null) {
         mOutlinePage = new AnnotationOutline(this);
       }
 
       return mOutlinePage;
-    } 
+    }
     else if (CAS.class.equals(adapter) && getDocument() != null) {
       return getDocument().getCAS();
-    } 
+    }
     else {
       return super.getAdapter(adapter);
     }
-    
+
   }
 
   @Override
@@ -878,11 +878,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     for (Type displayType : mShowAnnotationsMenu.getSelectedTypes()) {
       showAnnotationType(displayType);
     }
-    
+
     if (!mShowAnnotationsMenu.getSelectedTypes().contains(getAnnotationMode())) {
       showAnnotationType(getAnnotationMode());
     }
-    
+
     mPainter.paint(IPainter.CONFIGURATION);
   }
 

@@ -46,7 +46,7 @@ public class EditorAnnotationStatus {
     mMode = mode;
 
     if (displayAnnotations != null) {
-    	
+
       for (Type type : displayAnnotations) {
         mDisplayAnnotations.add(type.getName());
       }

@@ -95,7 +95,7 @@ final class DocumentImportStructureProvider implements IImportStructureProvider 
     cas.setDocumentText(text);
 
     ByteArrayOutputStream out = new ByteArrayOutputStream(40000);
-    
+
     if (DocumentFormat.XCAS.equals(format)) {
 	    try {
 	      XCASSerializer.serialize(cas, out);
@@ -118,7 +118,7 @@ final class DocumentImportStructureProvider implements IImportStructureProvider 
     else {
     	throw new TaeError("Unkown document type!", null);
     }
-    
+
     return new ByteArrayInputStream(out.toByteArray());
   }
 

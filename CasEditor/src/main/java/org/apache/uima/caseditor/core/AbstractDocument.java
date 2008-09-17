@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -45,7 +45,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Registers a change listener.
-   * 
+   *
    * @param listener
    */
   public void addChangeListener(final IDocumentListener listener) {
@@ -54,7 +54,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Unregisters a change listener.
-   * 
+   *
    * @param listener
    */
   public void removeChangeListener(IDocumentListener listener) {
@@ -84,7 +84,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Sends an added message to registered listeners.
-   * 
+   *
    * @param annotation
    */
   protected void fireAddedAnnotation(FeatureStructure annotation) {
@@ -95,7 +95,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Sends an added message to registered listeners.
-   * 
+   *
    * @param annotations
    */
   protected void fireAddedAnnotation(Collection<FeatureStructure> annotations) {
@@ -106,7 +106,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Sends a removed message to registered listeners.
-   * 
+   *
    * @param annotation
    */
   protected void fireRemovedAnnotation(FeatureStructure annotation) {
@@ -117,7 +117,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Sends a removed message to registered listeners.
-   * 
+   *
    * @param annotations
    */
   protected void fireRemovedAnnotations(Collection<FeatureStructure> annotations) {
@@ -128,7 +128,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Sends an updated message to registered listeners.
-   * 
+   *
    * @param annotation
    */
   protected void fireUpdatedFeatureStructure(FeatureStructure annotation) {
@@ -139,7 +139,7 @@ public abstract class AbstractDocument implements IDocument {
 
   /**
    * Sends an updated message to registered listeners.
-   * 
+   *
    * @param annotations
    */
   protected void fireUpdatedFeatureStructures(Collection<FeatureStructure> annotations) {
@@ -153,7 +153,7 @@ public abstract class AbstractDocument implements IDocument {
       listener.changed();
     }
   }
-  
+
   /**
    * Retrieves the view map.
    */

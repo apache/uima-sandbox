@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,7 +36,7 @@ import org.eclipse.ui.part.ResourceTransfer;
  * The CopyAction can copy IResources to the <code>clipboard</code>.
  */
 final class CopyAction  extends ResourceAction {
-  
+
   /**
    * OS clipboard
    */
@@ -44,7 +44,7 @@ final class CopyAction  extends ResourceAction {
 
   /**
    * Initializes the current instance.
-   * 
+   *
    * @param clipboard
    */
   public CopyAction(Clipboard clipboard) {
@@ -53,7 +53,7 @@ final class CopyAction  extends ResourceAction {
     if (clipboard == null) {
         throw new IllegalArgumentException();
     }
-    
+
     mClipboard = clipboard;
   }
 
@@ -92,15 +92,15 @@ final class CopyAction  extends ResourceAction {
       }
     }
   }
-  
+
   @Override
   protected boolean updateSelection(IStructuredSelection selection) {
-    
+
     boolean result;
-    
-    int nonResources = getStructuredSelection().size() - 
+
+    int nonResources = getStructuredSelection().size() -
         getSelectedResources().size();
-    
+
     if (nonResources > 0) {
       result = false;
     }
@@ -111,7 +111,7 @@ final class CopyAction  extends ResourceAction {
     else if (selectionIsOfType(IResource.PROJECT)) {
       return false;
     }
-    else if (!selectionIsOfType(IResource.PROJECT) &&  
+    else if (!selectionIsOfType(IResource.PROJECT) &&
             !selectionIsOfType(IResource.FILE | IResource.FOLDER)) {
       result = false;
     }
@@ -121,16 +121,16 @@ final class CopyAction  extends ResourceAction {
     else {
       result = true;
     }
-    
+
     return result;
   }
-  
+
   @SuppressWarnings("unchecked")
   private boolean isAllHaveSameParent() {
     List<IResource> resources = getSelectedResources();
-    
+
     assert resources.size() > 0;
-    
+
     // search for non identical parent
     IResource parent = resources.get(0).getParent();
     for (IResource resource : resources) {
@@ -138,7 +138,7 @@ final class CopyAction  extends ResourceAction {
         return false;
       }
     }
-    
+
     return true;
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,7 +29,7 @@ import org.apache.uima.cas.FeatureStructure;
 public interface IDocumentListener {
   /**
    * This method is called if an {@link FeatureStructure} is added.
-   * 
+   *
    * @param newFeatureStructure -
    *          the added {@link FeatureStructure}.
    */
@@ -37,7 +37,7 @@ public interface IDocumentListener {
 
   /**
    * This method is called if multiple <code>FeatureStructure</code>s are added.
-   * 
+   *
    * @param newFeatureStructure -
    *          the added {@link FeatureStructure}s.
    */
@@ -45,7 +45,7 @@ public interface IDocumentListener {
 
   /**
    * This method is called if an {@link FeatureStructure} is removed.
-   * 
+   *
    * @param deletedFeatureStructure -
    *          the removed {@link FeatureStructure}.
    */
@@ -53,7 +53,7 @@ public interface IDocumentListener {
 
   /**
    * This method is called if multiple {@link FeatureStructure}s are removed.
-   * 
+   *
    * @param deletedFeatureStructure -
    *          the removed <code>Annotation</code>s.
    */
@@ -61,22 +61,22 @@ public interface IDocumentListener {
 
   /**
    * This method is called if the {@link FeatureStructure} changed.
-   * 
+   *
    * @param featureStructure
    */
   void updated(FeatureStructure featureStructure);
 
   /**
    * This method is called if the {@link FeatureStructure}s changed.
-   * 
+   *
    * @param featureStructure
    */
   void updated(Collection<FeatureStructure> featureStructure);
-  
+
   /**
-   * This method is called if {@link FeatureStructure}s in the 
+   * This method is called if {@link FeatureStructure}s in the
    * document are changed.
-   * 
+   *
    * Note: The text can not be changed
    */
   void changed();

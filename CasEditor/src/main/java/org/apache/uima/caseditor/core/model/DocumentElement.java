@@ -114,7 +114,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
     	InputStream in = mDocumentFile.getContents();
 
     	DocumentFormat format;
-    	
+
     	if (getResource().getFileExtension().equalsIgnoreCase("xcas")) {
     		format = DocumentFormat.XCAS;
     	}
@@ -125,7 +125,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
     		throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID,
     	              0, "Unkown file extension!", null));
     	}
-    	
+
     	document  = new DocumentUimaImpl(project, this, in, format);
 
     	mWorkingCopy = new SoftReference<DocumentUimaImpl>(document);

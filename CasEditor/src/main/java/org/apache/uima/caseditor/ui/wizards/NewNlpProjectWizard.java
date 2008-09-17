@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -40,12 +40,12 @@ final public class NewNlpProjectWizard extends Wizard implements INewWizard
      * The ID of the new nlp project wizard.
      */
     public static final String ID = "org.apache.uima.caseditor.wizards.NLPProjectWizard";
-    
+
     private NewNlpProjectWizardPage mMainPage;
-    
+
     public NewNlpProjectWizard() {
     }
-    
+
     /**
      * Initializes the <code>NLPProjectWizard</code>.
      */
@@ -53,7 +53,7 @@ final public class NewNlpProjectWizard extends Wizard implements INewWizard
     {
       setWindowTitle("New NLP project");
     }
-    
+
     /**
      * Adds the project wizard page to the wizard.
      */
@@ -65,7 +65,7 @@ final public class NewNlpProjectWizard extends Wizard implements INewWizard
         mMainPage.setDescription("Create a NLP project in the workspace");
         addPage(mMainPage);
     }
-    
+
     /**
      * Creates the nlp project.
      */
@@ -74,9 +74,9 @@ final public class NewNlpProjectWizard extends Wizard implements INewWizard
     {
         // TODO: only return true if everyting goes well
         IProject newNLPProject = mMainPage.getProjectHandle();
-        
+
         createProject(newNLPProject, mMainPage.getLocationPath());
-        
+
         try
         {
             NlpProject.addNLPNature(newNLPProject);
@@ -86,24 +86,24 @@ final public class NewNlpProjectWizard extends Wizard implements INewWizard
             e.printStackTrace();
             return false;
         }
-        
+
         return true;
     }
-    
+
     private static void createProject(IProject project, IPath location)
     {
         if (!project.exists())
         {
             IProjectDescription projectDescribtion = project.getWorkspace()
                     .newProjectDescription(project.getName());
-            
+
             if (Platform.getLocation().equals(location))
             {
                 location = null;
             }
-            
+
             projectDescribtion.setLocation(location);
-            
+
             try
             {
                 project.create(projectDescribtion, null);
@@ -113,9 +113,9 @@ final public class NewNlpProjectWizard extends Wizard implements INewWizard
                 // TODO: show error message
                 e.printStackTrace();
             }
-            
+
         }
-        
+
         if (!project.isOpen())
         {
             try

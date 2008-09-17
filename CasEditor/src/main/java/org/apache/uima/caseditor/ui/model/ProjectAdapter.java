@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -42,20 +42,20 @@ class ProjectAdapter extends
     public Object[] getChildren(Object o)
     {
         Object result[];
-        
+
         NlpProject nlpProject = (NlpProject) o;
-        
+
         if (nlpProject.getProject().isOpen())
         {
             LinkedList<Object> childrenList = new LinkedList<Object>();
-            
+
             childrenList.addAll(nlpProject.getCorpora());
-            
+
             if (nlpProject.getTypesystemElement() != null)
             {
                 childrenList.add(nlpProject.getTypesystemElement());
             }
-            
+
             IResource[] resources;
             try
             {
@@ -66,14 +66,14 @@ class ProjectAdapter extends
                 // TODO just log it
                 return new Object[]{};
             }
-            
+
             if (resources != null)
             {
                 Collections.addAll(childrenList, resources);
             }
-            
+
             childrenList.addAll(nlpProject.getCasProcessorFolders());
-            
+
             result = childrenList.toArray();
 
         }
@@ -83,22 +83,22 @@ class ProjectAdapter extends
             result = new Object[]
                                 {};
         }
-        
+
         return result;
     }
-    
+
     /**
      * Retrieves the <code>ImageDescriptor</code> for the
      * <code>NLPProject</code>.
-     * 
+     *
      * @return the <code>ImageDescriptor</code>
      */
     public ImageDescriptor getImageDescriptor(Object object)
     {
         NlpProject nlpProject = (NlpProject) object;
-        
+
         IProject project = nlpProject.getProject();
-        
+
         if (project.isOpen())
         {
           return CasEditorPlugin.getTaeImageDescriptor(Images.MODEL_PROJECT_OPEN);

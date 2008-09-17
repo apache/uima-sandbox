@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,16 +31,16 @@ public class TokenDrawingStrategy implements IDrawingStrategy {
   private static final int BRACKET_WIDTH = 5;
 
   private static boolean isWhitespace(StyledText textWidget, int offset) {
-    
+
     String characterString = textWidget.getText(offset, offset);
-    
+
     if (characterString.trim().length() == 0) {
       return true;
     }
-    
+
     return false;
   }
-  
+
   public void draw(Annotation annotation, GC gc, StyledText textWidget, int offset, int length,
           Color color) {
     if (length > 0) {
@@ -57,7 +57,7 @@ public class TokenDrawingStrategy implements IDrawingStrategy {
           if (isDrawOpenBracket && offset > 1 && !isWhitespace(textWidget, offset - 1)) {
             gc.drawLine(bounds.x, bounds.y + bounds.height - 1, bounds.x + BRACKET_WIDTH, bounds.y
                     + bounds.height - 1);
-            
+
             gc.drawLine(bounds.x, bounds.y, bounds.x, bounds.y + bounds.height - 1);
 
             gc.drawLine(bounds.x, bounds.y, bounds.x + BRACKET_WIDTH, bounds.y);

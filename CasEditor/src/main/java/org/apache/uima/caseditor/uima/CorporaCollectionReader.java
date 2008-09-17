@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.CoreException;
  * {@link CorpusElement}s.
  */
 public class CorporaCollectionReader extends CollectionReader_ImplBase {
-	
+
   private Iterator<DocumentElement> documentIterator;
 
   /**
@@ -65,7 +65,7 @@ public class CorporaCollectionReader extends CollectionReader_ImplBase {
    * @throws CollectionException -
    */
   public void getNext(CAS cas) throws CollectionException {
-    DocumentElement document = (DocumentElement) documentIterator.next();
+    DocumentElement document = documentIterator.next();
 
     CAS documentCas = null;
 

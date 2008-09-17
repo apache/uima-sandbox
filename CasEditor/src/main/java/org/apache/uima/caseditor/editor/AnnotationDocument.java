@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,7 +38,7 @@ import org.eclipse.jface.text.DocumentEvent;
 /**
  * The <code>AnnotationDocument</code> adapts the annotation document to the eclipse Document
  * (needed for the editor).
- * 
+ *
  * Note: Before an instance can be used, the project and document must be set.
  */
 public class AnnotationDocument extends Document implements IDocument {
@@ -51,7 +51,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Sets the project.
-   * 
+   *
    * @param project
    */
   public void setProject(NlpProject project) {
@@ -69,7 +69,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Retrieves the project.
-   * 
+   *
    * @return the project
    */
   public NlpProject getProject() {
@@ -78,7 +78,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotation
    */
   public void addFeatureStructure(FeatureStructure annotation) {
@@ -89,7 +89,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotations
    */
   public void addFeatureStructures(Collection<FeatureStructure> annotations) {
@@ -100,7 +100,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotations
    */
   public void addAnnotations(Collection<AnnotationFS> annotations) {
@@ -120,7 +120,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotation
    */
   public void removeFeatureStructure(FeatureStructure annotation) {
@@ -131,7 +131,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotationsToRemove
    */
   public void removeFeatureStructures(Collection<FeatureStructure> annotationsToRemove) {
@@ -142,7 +142,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotationsToRemove
    */
   public void removeAnnotations(Collection<AnnotationFS> annotationsToRemove) {
@@ -153,7 +153,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotation
    */
   public void update(FeatureStructure annotation) {
@@ -164,7 +164,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotations
    */
   public void updateFeatureStructure(Collection<FeatureStructure> annotations) {
@@ -175,7 +175,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotations
    */
   public void updateAnnotations(Collection<AnnotationFS> annotations) {
@@ -184,16 +184,16 @@ public class AnnotationDocument extends Document implements IDocument {
     fireDocumentChanged();
   }
 
-  
+
   public void changed() {
     mDocument.changed();
-    
-    fireDocumentChanged();   
+
+    fireDocumentChanged();
   }
-  
+
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param type
    * @return the annotations
    */
@@ -203,7 +203,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param annotationType
    * @return the view map
    */
@@ -213,7 +213,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param listener
    */
   public void addChangeListener(IDocumentListener listener) {
@@ -222,7 +222,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param listener
    */
   public void removeChangeListener(IDocumentListener listener) {
@@ -231,7 +231,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param type
    * @param span
    * @return the annotations
@@ -242,7 +242,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param out
    * @throws CoreException
    */
@@ -262,7 +262,7 @@ public class AnnotationDocument extends Document implements IDocument {
   /**
    * Wrap words at next space after lineLengthHint chars in a line. If the line is shorter than
    * lineLengthHint nothing happens. The space char is replaced with an line feed char.
-   * 
+   *
    * @param textString
    * @param lineLengthHint
    * @return input text with line breaks
@@ -292,7 +292,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @return the text
    */
   public String getText() {
@@ -307,7 +307,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param start
    * @param end
    * @return the text
@@ -318,7 +318,7 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @return the TCAS
    */
   public CAS getCAS() {
@@ -327,14 +327,14 @@ public class AnnotationDocument extends Document implements IDocument {
 
   /**
    * Call is forwarded to the set document.
-   * 
+   *
    * @param type
    * @return the type
    */
   public Type getType(String type) {
     return mDocument.getType(type);
   }
-  
+
   public DocumentElement getDocumentElement() {
     return mDocument.getDocumentElement();
   }

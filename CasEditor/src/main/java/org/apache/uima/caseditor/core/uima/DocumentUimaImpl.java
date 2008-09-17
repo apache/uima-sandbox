@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -71,7 +71,7 @@ public class DocumentUimaImpl extends AbstractDocument {
 
 	/**
 	 * Initializes a new instance.
-	 * 
+	 *
 	 * @param project
 	 */
 	public DocumentUimaImpl(NlpProject project, DocumentElement element,
@@ -111,7 +111,7 @@ public class DocumentUimaImpl extends AbstractDocument {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void addFeatureStructures(Collection<FeatureStructure> annotations) {
 		for (FeatureStructure annotation : annotations) {
@@ -128,7 +128,7 @@ public class DocumentUimaImpl extends AbstractDocument {
 
 	/**
 	 * Internally removes an annotation from the {@link CAS}.
-	 * 
+	 *
 	 * @param featureStructure
 	 */
 	private void removeAnnotationInternal(FeatureStructure featureStructure) {

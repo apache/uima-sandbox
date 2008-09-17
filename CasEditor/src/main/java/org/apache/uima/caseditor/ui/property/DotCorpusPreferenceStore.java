@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -54,26 +54,26 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
          * The corpus folders
          */
         CORPUS_FOLDERS,
-        
+
         /**
          * Line length hint for the editor.
          */
         EDITOR_LINE_LENGTH_HINT;
     }
-    
+
     private DotCorpusElement mDotCorpusElement;
 
-    
+
     /**
      * Initializes new instance with a <code>DotCorpus</code> config object.
-     * 
+     *
      * @param dotCorpusElement
      */
     public DotCorpusPreferenceStore(DotCorpusElement dotCorpusElement)
     {
         mDotCorpusElement = dotCorpusElement;
     }
-    
+
     /**
      * @return always false
      */
@@ -81,10 +81,10 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         return false;
     }
-    
+
     /**
      * Writes the DotCorpus to the file system.
-     * 
+     *
      * @throws IOException -
      *             if writing fails
      */
@@ -99,7 +99,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
             throw new IOException(e.getMessage());
         }
     }
-    
+
     /**
      * Not implemented
      */
@@ -107,7 +107,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         // currently not implemented, no need for this method
     }
-    
+
     /**
      * Not implemented
      */
@@ -115,7 +115,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         // currently not implemented, no need for this method
     }
-    
+
     /**
      * Not implemented
      */
@@ -124,17 +124,17 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         // currently not implemented, no need for this method
     }
-    
+
     /**
      * Not implemented.
-     * 
+     *
      * @return always false
      */
     public boolean contains(String name)
     {
         return false;
     }
-    
+
     /**
      * Not implemented
      */
@@ -142,7 +142,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         return false;
     }
-    
+
     /**
      * Not implemented
      */
@@ -150,9 +150,9 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         // currently not implemented, no need for this method
     }
-    
+
     // boolean
-    
+
     /**
      * Not implemented
      */
@@ -160,7 +160,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -168,7 +168,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -176,7 +176,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -184,9 +184,9 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     // int
-    
+
     /**
      * Not implemented
      */
@@ -194,7 +194,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         return getInt(name);
     }
-    
+
     /**
      * Not implemented
      */
@@ -202,41 +202,41 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Retrieves the following parameters:
      * + editor line length hint
      */
     public int getInt(String name)
     {
-        if (Key.EDITOR_LINE_LENGTH_HINT.equals(Key.valueOf(name))) 
+        if (Key.EDITOR_LINE_LENGTH_HINT.equals(Key.valueOf(name)))
         {
             return mDotCorpusElement.getEditorLineLengthHint();
         }
-        else 
+        else
         {
             throw new IllegalArgumentException("Unkown name: " + name);
         }
     }
-    
+
     /**
      * Sets the following parameters:
      * + editor line length hint
      */
     public void setValue(String name, int value)
     {
-        if (Key.EDITOR_LINE_LENGTH_HINT.equals(Key.valueOf(name))) 
+        if (Key.EDITOR_LINE_LENGTH_HINT.equals(Key.valueOf(name)))
         {
             mDotCorpusElement.setEditorLineLengthHint(value);
         }
-        else 
+        else
         {
             throw new IllegalArgumentException("Unkown name: " + name);
         }
     }
-    
+
     // long
-    
+
     /**
      * Not implemented
      */
@@ -244,7 +244,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -252,7 +252,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -260,7 +260,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -268,9 +268,9 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     // float
-    
+
     /**
      * Not implemented
      */
@@ -278,7 +278,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -286,7 +286,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -294,7 +294,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -302,9 +302,9 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     // double
-    
+
     /**
      * Not implemented
      */
@@ -312,7 +312,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -320,7 +320,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -328,7 +328,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Not implemented
      */
@@ -336,9 +336,9 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     // string
-    
+
     /**
      * @return always null
      */
@@ -346,7 +346,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         return getString(name);
     }
-    
+
     /**
      * Not implemented
      */
@@ -354,28 +354,28 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
     {
         throw new IllegalArgumentException("Not expected to be used!");
     }
-    
+
     /**
      * Retrieves the config value for the given name.
-     * 
+     *
      * @param name
      *            the config key
      */
     public String getString(String name)
     {
         Key key = Key.valueOf(name);
-        
+
         if (Key.TAGGER_CONFIG_FOLDER.equals(key))
         {
           StringBuilder pathStringBuilder = new StringBuilder();
-          
+
           for (IFolder folderName : mDotCorpusElement
                   .getCasProcessorFolders())
           {
               pathStringBuilder.append(folderName.getName());
               pathStringBuilder.append(File.pathSeparator);
           }
-          
+
           return pathStringBuilder.toString();
         }
         else if (Key.TYPE_SYSTEM_FILE.equals(key))
@@ -386,14 +386,14 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
         else if (Key.CORPUS_FOLDERS.equals(key))
         {
             StringBuilder pathStringBuilder = new StringBuilder();
-            
+
             for (IFolder folderName : mDotCorpusElement
                     .getCorpusFolderNameList())
             {
                 pathStringBuilder.append(folderName.getName());
                 pathStringBuilder.append(File.pathSeparator);
             }
-            
+
             return pathStringBuilder.toString();
         }
         else
@@ -401,25 +401,25 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
             throw new IllegalArgumentException("Provided key is unkown!");
         }
     }
-    
+
     /**
      * Sets the config value for the given config key.
      */
     public void setValue(String name, String value)
     {
         Key key = Key.valueOf(name);
-        
+
         if (Key.TAGGER_CONFIG_FOLDER.equals(key))
         {
-            StringTokenizer tokenizer = new StringTokenizer(value, 
+            StringTokenizer tokenizer = new StringTokenizer(value,
                     File.pathSeparator);
 
             // delete all corpus folders
             for (IFolder folder : mDotCorpusElement.getCasProcessorFolders())
-            {                
+            {
               mDotCorpusElement.removeCasProcessorFolder(folder.getName());
             }
-            
+
             while (tokenizer.hasMoreTokens())
             {
                 mDotCorpusElement.addCasProcessorFolder(tokenizer.nextToken());
@@ -438,7 +438,7 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
         }
         else if (Key.CORPUS_FOLDERS.equals(key))
         {
-            StringTokenizer tokenizer = new StringTokenizer(value, 
+            StringTokenizer tokenizer = new StringTokenizer(value,
                     File.pathSeparator);
 
             // delete all corpus folders
@@ -446,14 +446,14 @@ public class DotCorpusPreferenceStore implements IPersistentPreferenceStore
             {
                 mDotCorpusElement.removeCorpusFolder(corpus);
             }
-            
+
             while (tokenizer.hasMoreTokens())
             {
                 mDotCorpusElement.addCorpusFolder(tokenizer.nextToken());
             }
         }
     }
-    
+
     /**
      * Not implemented
      */

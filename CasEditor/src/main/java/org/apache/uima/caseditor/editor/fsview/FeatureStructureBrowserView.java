@@ -39,23 +39,23 @@ public final class FeatureStructureBrowserView extends AnnotationEditorView {
 
   @Override
   protected PageRec doCreatePage(IWorkbenchPart part) {
-    
+
     // if its not possible to create a result the view
 	// unavailable message is displayed
-	  
+
 	PageRec result = null;
 
     if ((part instanceof AnnotationEditor)) {
       AnnotationEditor editor = (AnnotationEditor) part;
 
       AnnotationDocument document = editor.getDocument();
-      
+
       if (document != null) {
-	      FeatureStructureBrowserViewPage page = 
+	      FeatureStructureBrowserViewPage page =
 	    	  new FeatureStructureBrowserViewPage(document);
 	      initPage(page);
 	      page.createControl(getPageBook());
-	
+
 	      result = new PageRec(part, page);
       }
     }

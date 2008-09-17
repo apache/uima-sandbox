@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 /**
  * Sorts <code>AnnotationFS</code>s for a Viewer. This implementation is based on
  * <code>AnnotationComparator</code>.
- * 
+ *
  * @see AnnotationComparator
  */
 class OutlineTableSorter extends ViewerSorter {
@@ -37,10 +37,10 @@ class OutlineTableSorter extends ViewerSorter {
 
   /**
    * Uses <code>AnnotationComparator</code> to compare the both objects.
-   * 
+   *
    * @return int the return value is if aObject < bObject negative number, if aObject == bObject 0,
    *         aObject > bObject a positive number or if both objects have different types 1.
-   * 
+   *
    * @see ViewerSorter
    */
   @Override

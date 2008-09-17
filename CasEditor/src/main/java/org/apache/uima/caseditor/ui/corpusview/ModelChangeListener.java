@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,28 +38,28 @@ class ModelChangeListener implements
         INlpModelChangeListener
 {
     private TreeViewer mTreeViewer;
-    
+
     /**
      * Initializes a new instance.
-     * 
+     *
      * @param treeViewer
      */
     public ModelChangeListener(TreeViewer treeViewer)
     {
         mTreeViewer = treeViewer;
     }
-    
+
     public void resourceChanged(INlpElementDelta delta)
     {
         final LinkedList<Object> updated = new LinkedList<Object>();
-        
+
         final LinkedList<Object> added = new LinkedList<Object>();
-        
+
         final LinkedList<Object> removed = new LinkedList<Object>();
-        
-        
+
+
         // INlpElementDelta childs[] = delta.getAffectedChildren();
-        
+
         INlpModelDeltaVisitor visitor = new INlpModelDeltaVisitor()
         {
             public boolean visit(INlpElementDelta delta)
@@ -67,10 +67,10 @@ class ModelChangeListener implements
               if (delta.getResource().getName().equals(".corpus")) {
                 return true;
               }
-              
+
                 //if (delta.getKind() == IResourceDelta.OPEN
-                //        || delta.getKind() == IResourceDelta.CONTENT)                
-             
+                //        || delta.getKind() == IResourceDelta.CONTENT)
+
                 if(delta.getKind().equals(Kind.CHANGED))
                 {
                     if (delta.isNlpElement())
@@ -104,15 +104,15 @@ class ModelChangeListener implements
                         removed.add(delta.getResource());
                     }
                 }
-                
+
                 return true;
             }
         };
-        
+
         delta.accept(visitor);
-        
+
         Display display = mTreeViewer.getControl().getDisplay();
-        
+
         if (!display.isDisposed())
         {
             display.asyncExec(new Runnable()
@@ -123,30 +123,30 @@ class ModelChangeListener implements
                     {
                         return;
                     }
-                    
+
                     mTreeViewer.remove(removed.toArray());
-                    
+
                     // TODO: add multiple elements at a time
                     // TODO: refactor
                     for (Object add : added)
                     {
-                        ITreeContentProvider contentProvider = 
-                                (ITreeContentProvider) 
+                        ITreeContentProvider contentProvider =
+                                (ITreeContentProvider)
                                 mTreeViewer.getContentProvider();
-                        
-                        // seems to make problems 
+
+                        // seems to make problems
                         mTreeViewer.add(
-                                contentProvider.getParent(add), 
+                                contentProvider.getParent(add),
                                 add);
                     }
-                    
+
                     if (updated.size() > 0)
                     {
                         // mTreeViewer.update(updated.toArray(), null);
-                        
+
                         // mTreeViewer.refresh(true);
                     }
-                    
+
                     // mTreeViewer.refresh();
                 }
             });
@@ -159,10 +159,10 @@ class ModelChangeListener implements
     public void refresh(final INlpElement element)
     {
         Display display = mTreeViewer.getControl().getDisplay();
-        
+
         display.asyncExec(new Runnable()
         {
-            
+
             public void run()
             {
                 mTreeViewer.refresh(element);

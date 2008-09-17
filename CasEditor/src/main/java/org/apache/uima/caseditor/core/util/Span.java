@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,7 +36,7 @@ public class Span implements Comparable<Span> {
 
   /**
    * Initializes a new <code>Span</code> instance.
-   * 
+   *
    * @param start
    * @param length
    */
@@ -47,7 +47,7 @@ public class Span implements Comparable<Span> {
 
   /**
    * Returns the start index.
-   * 
+   *
    * @return - start index
    */
   public int getStart() {
@@ -56,7 +56,7 @@ public class Span implements Comparable<Span> {
 
   /**
    * Returns the length.
-   * 
+   *
    * @return - length
    */
   public int getLength() {
@@ -65,7 +65,7 @@ public class Span implements Comparable<Span> {
 
   /**
    * Returns the end index.
-   * 
+   *
    * @return - end index
    */
   public int getEnd() {
@@ -74,7 +74,7 @@ public class Span implements Comparable<Span> {
 
   /**
    * Returns true if the given span is a subset of this span.
-   * 
+   *
    * @param containingSpan -
    *          the span to compare
    * @return - true if containingSpan is a subset.

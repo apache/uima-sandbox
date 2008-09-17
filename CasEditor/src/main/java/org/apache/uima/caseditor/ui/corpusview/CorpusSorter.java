@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -34,10 +34,10 @@ final class CorpusSorter extends ViewerSorter
 	private static final int CAT_CORPUS = 1;
 	private static final int CAT_FOLDER = 2;
 	private static final int CAT_FILE = 3;
-	
+
     /**
      * Maps the element type to a category coded as number:
-     * 
+     *
      * 1 for CorpusElement
      * 2 for IFolder
      * 3 for IFile

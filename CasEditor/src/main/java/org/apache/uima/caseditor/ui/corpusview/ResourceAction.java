@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,21 +38,21 @@ public abstract class ResourceAction extends BaseSelectionListenerAction {
 
   /**
    * Retrieves all selected items which are not {@link IResource}s.
-   * 
+   *
    * @return selected item which are not a {@link IResource}s
    */
   protected List<Object> getSelectedNonResources() {
     List<Object> nonResources = new ArrayList<Object>();
 
     for (Iterator it = getStructuredSelection().iterator(); it.hasNext(); ) {
-      
+
       Object selection = it.next();
-      
+
       if (selection instanceof IAdaptable) {
         IAdaptable adapter = (IAdaptable) selection;
-        
+
         IResource resource = (IResource) adapter.getAdapter(IResource.class);
-        
+
         if (resource == null) {
           nonResources.add(selection);
         }
@@ -61,38 +61,38 @@ public abstract class ResourceAction extends BaseSelectionListenerAction {
         nonResources.add(selection);
       }
     }
-    
+
     return nonResources;
   }
-  
+
   /**
    * Retrieves all selected {@link IResource} items.
-   * 
+   *
    * @return all selected {@link IResource} items
    */
   protected List<IResource> getSelectedResources() {
-    
+
     List<IResource> resources = new ArrayList<IResource>();
-    
+
     for (Iterator it = getStructuredSelection().iterator(); it.hasNext(); ) {
       Object selection = it.next();
-      
+
       if (selection instanceof IResource) {
         resources.add((IResource) selection);
       } else if (selection instanceof IAdaptable) {
         IAdaptable adapter = (IAdaptable) selection;
-        
+
         IResource resource = (IResource) adapter.getAdapter(IResource.class);
-        
+
         if (resource != null) {
           resources.add(resource);
         }
       }
     }
-    
+
     return resources;
   }
-  
+
   protected boolean resourceIsType(IResource resource, int resourceMask) {
     return (resource.getType() & resourceMask) != 0;
   }

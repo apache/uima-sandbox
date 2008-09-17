@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * The EventDispatcher routs received events to the registered handler objects.
- * 
+ *
  * @param <K>
  *          the key type
  * @param <E>
@@ -37,7 +37,7 @@ public class EventDispatcher<K, E> {
 
   /**
    * Initializes the current instance with a default handler.
-   * 
+   *
    * @param defaultHandler
    *          handles all unkown events, must not be null
    */
@@ -51,7 +51,7 @@ public class EventDispatcher<K, E> {
 
   /**
    * Registers the given handler for the given key.
-   * 
+   *
    * @param key
    * @param handler
    */
@@ -62,7 +62,7 @@ public class EventDispatcher<K, E> {
   /**
    * Notifies the registered handler, if there is no handler registered for this key the default
    * handler is notified.
-   * 
+   *
    * @param key
    *          the key type
    * @param event

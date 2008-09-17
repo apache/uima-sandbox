@@ -117,7 +117,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
       // removes the document annotation
       displayTypes.remove(typeSystem.getType(CAS.TYPE_NAME_DOCUMENT_ANNOTATION));
-      
+
       mEditorAnnotationStatus = new EditorAnnotationStatus(
               annotationType.getName(), displayTypes);
     }

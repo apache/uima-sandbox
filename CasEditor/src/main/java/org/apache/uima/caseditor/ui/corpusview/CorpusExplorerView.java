@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -51,18 +51,18 @@ import org.eclipse.ui.part.ViewPart;
  */
 public final class CorpusExplorerView extends ViewPart
 {
-    
+
     /**
      * The ID of the <code>CorpusExplorerView</code>.
      */
     public final static String ID = "org.apache.uima.caseditor.corpusview";
-    
+
     private TreeViewer mTreeViewer;
-    
+
     private CorpusExplorerActionGroup mActions;
-    
+
     private ModelChangeListener mModelChangeListener;
-    
+
     /**
      * Creates the main control of the current view.
      */
@@ -70,44 +70,44 @@ public final class CorpusExplorerView extends ViewPart
     public void createPartControl(Composite parent)
     {
         parent.setLayout(new FillLayout());
-        
+
         mTreeViewer = new TreeViewer(parent);
         mTreeViewer.setContentProvider(new BaseWorkbenchContentProvider());
-        
+
         mTreeViewer.setLabelProvider(new DecoratingLabelProvider(
                 new WorkbenchLabelProvider(), PlatformUI.getWorkbench()
                         .getDecoratorManager().getLabelDecorator()));
-        
+
         // performance optimization
         mTreeViewer.setUseHashlookup(true); // TODO: change back to true
-        
+
         initContextMenu();
-        
+
         mTreeViewer.setInput(CasEditorPlugin.getNlpModel());
-        
+
         mModelChangeListener = new ModelChangeListener(
                 mTreeViewer);
-        
+
         CasEditorPlugin.getNlpModel().addNlpModelChangeListener(mModelChangeListener);
-        
+
         mTreeViewer.setSorter(new CorpusSorter());
-        
+
         mActions = new CorpusExplorerActionGroup(this);
-        
+
         initListeners();
-        
+
         getSite().setSelectionProvider(mTreeViewer);
-        
+
         initDragAndDrop();
-        
+
         mActions.fillActionBars(getViewSite().getActionBars());
-        
+
         mActions.setContext(new ActionContext(
                 mTreeViewer.getSelection()));
-        
+
         mActions.updateActionBars();
     }
-    
+
     /**
      * Initializes the context menu.
      */
@@ -121,17 +121,17 @@ public final class CorpusExplorerView extends ViewPart
             {
                 IStructuredSelection selection = (IStructuredSelection) mTreeViewer
                         .getSelection();
-                
+
                 mActions.setContext(new ActionContext(selection));
                 mActions.fillContextMenu(manager);
             }
         });
-        
+
         Menu menu = menuManager.createContextMenu(mTreeViewer.getTree());
         mTreeViewer.getTree().setMenu(menu);
         getSite().registerContextMenu(menuManager, mTreeViewer);
     }
-    
+
     /**
      * Initializes the listeners.
      */
@@ -143,9 +143,9 @@ public final class CorpusExplorerView extends ViewPart
             {
                 IStructuredSelection selection = (IStructuredSelection) event
                         .getSelection();
-                
+
                 Object selectedElement = selection.getFirstElement();
-                
+
                 if (mTreeViewer.isExpandable(selectedElement))
                 {
                     mTreeViewer.setExpandedState(selectedElement, !mTreeViewer
@@ -153,7 +153,7 @@ public final class CorpusExplorerView extends ViewPart
                 }
             }
         });
-        
+
         mTreeViewer.addOpenListener(new IOpenListener()
         {
             public void open(OpenEvent event)
@@ -162,17 +162,17 @@ public final class CorpusExplorerView extends ViewPart
                         .getSelection());
             }
         });
-        
+
         mTreeViewer.addSelectionChangedListener(new ISelectionChangedListener()
         {
             public void selectionChanged(SelectionChangedEvent event)
             {
                 mActions.setContext(new ActionContext(event.getSelection()));
-                
+
                 mActions.updateActionBars();
             }
         });
-        
+
         mTreeViewer.getTree().addKeyListener(new KeyListener(){
 
 			public void keyPressed(KeyEvent e) {
@@ -182,7 +182,7 @@ public final class CorpusExplorerView extends ViewPart
 			public void keyReleased(KeyEvent e) {
 			}});
     }
-    
+
     /**
      * Initializes the drag and drop stuff. Note: currently disabled, cause drag
      * and drop did not work ...
@@ -190,33 +190,33 @@ public final class CorpusExplorerView extends ViewPart
     private void initDragAndDrop()
     {
         int ops = DND.DROP_COPY | DND.DROP_MOVE;
-        
+
         //Transfer[] transfers = new Transfer[]
         //{ LocalSelectionTransfer.getInstance(), ResourceTransfer.getInstance(),
         //        FileTransfer.getInstance(), PluginTransfer.getInstance() };
-        
+
         //mTreeViewer
         //        .addDragSupport(ops, transfers, new CorpusExplorerDragAdapter(
         //                getSite().getSelectionProvider()));
-        
+
        // CorpusExplorerDropAdapter adapter = new CorpusExplorerDropAdapter(
        //         mTreeViewer);
-        
+
         //adapter.setFeedbackEnabled(false);
-        
+
         // mTreeViewer.addDropSupport(ops | DND.DROP_DEFAULT, transfers, adapter);
     }
-    
+
     /**
      * Retrieves the <code>TreeViewer</code> of the current corupus explorer.
-     * 
+     *
      * @return the <code>TreeViewer</code>.
      */
     public ISelectionProvider getTreeViewer()
     {
         return mTreeViewer;
     }
-    
+
     /**
      * Sets the focus to the <code>TreeViewer</code>.
      */
@@ -225,12 +225,12 @@ public final class CorpusExplorerView extends ViewPart
     {
         mTreeViewer.getTree().setFocus();
     }
-    
+
     @Override
     public void dispose()
     {
         super.dispose();
-        
+
         // TaePlugin.getNLPModel().removeNLPModelChangeListener(
         // mModelChangeListener);
     }

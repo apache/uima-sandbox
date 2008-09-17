@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -41,16 +41,16 @@ public class FileElementFilter extends ViewerFilter {
         return false;
       }
     }
-    
+
     return false;
   }
-  
+
   /**
    * Checks if the given folder contains an {@link IFile} or one
    * of its subfolders.
    */
   private boolean containsFile(IFolder folder) throws CoreException {
-    
+
     for (IResource resource : folder.members()) {
       if (resource instanceof IFile) {
         return true;
@@ -59,7 +59,7 @@ public class FileElementFilter extends ViewerFilter {
         return containsFile((IFolder) resource);
       }
     }
-    
+
     return false;
   }
 }

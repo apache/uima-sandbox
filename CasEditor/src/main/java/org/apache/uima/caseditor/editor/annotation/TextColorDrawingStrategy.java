@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -37,16 +37,16 @@ public class TextColorDrawingStrategy implements IDrawingStrategy {
         AnnotationFS annotationFS = ((EclipseAnnotationPeer) annotation).getAnnotationFS();
 
         if (gc != null) {
-          
+
           int start = offset;
           int end = offset + length - 1;
-          
+
           Rectangle bounds = textWidget.getTextBounds(start, end);
 
           gc.setForeground(color);
-          
+
           gc.drawText(textWidget.getText(start, end), bounds.x, bounds.y, true);
-          
+
         } else {
           textWidget.redrawRange(offset, length, true);
         }

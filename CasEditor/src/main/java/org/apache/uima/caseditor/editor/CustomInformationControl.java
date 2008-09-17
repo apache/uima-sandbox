@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -45,7 +45,7 @@ public class CustomInformationControl implements IInformationControl, IInformati
 
   /**
    * Initializes a new instance.
-   * 
+   *
    * @param parent
    * @param contentHandler
    */
@@ -62,7 +62,7 @@ public class CustomInformationControl implements IInformationControl, IInformati
 
   /**
    * Sets the viewer control
-   * 
+   *
    * @param viewerControl
    */
   public void setControl(Control viewerControl) {
@@ -72,7 +72,7 @@ public class CustomInformationControl implements IInformationControl, IInformati
 
   /**
    * Retrieves the parent.
-   * 
+   *
    * @return the parent
    */
   public Composite getParent() {
@@ -155,7 +155,7 @@ public class CustomInformationControl implements IInformationControl, IInformati
 
   /**
    * Retrieves the control
-   * 
+   *
    * @return the control
    */
   public Control getControl() {
