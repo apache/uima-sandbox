@@ -19,7 +19,9 @@
 
 package org.apache.uima.caseditor.editor;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -95,8 +97,13 @@ class QuickTypeSelectionDialog extends PopupDialog {
     	shortcuts.add(shortcutsString.charAt(i));
     }
 
-    Set<Type> types = new HashSet<Type>();
+    List<Type> types = new ArrayList<Type>();
    	Collections.addAll(types, getTypes());
+   	Collections.sort(types, new Comparator<Type>() {
+		public int compare(Type o1, Type o2) {
+			return o1.getName().compareTo(o2.getName());
+		}
+   	});
 
    	// Try to create mappings with first letter of the type name as shortcut
    	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
@@ -115,6 +122,25 @@ class QuickTypeSelectionDialog extends PopupDialog {
    		}
    	}
 
+   	// Try to create mappings with second letter of the type name as shortcut
+   	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
+
+   		Type type = it.next();
+
+   		String name = type.getShortName();
+
+   		if (name.length() > 2) {
+	   		Character candidateChar = Character.toLowerCase(name.charAt(1));
+	
+	   		if (shortcuts.contains(candidateChar)) {
+	   			putShortcut(candidateChar, type);
+	
+	   			shortcuts.remove(candidateChar);
+	   			it.remove();
+	   		}
+   		}
+   	}
+   	
    	// Now assign letters to the remaining types
    	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
 
