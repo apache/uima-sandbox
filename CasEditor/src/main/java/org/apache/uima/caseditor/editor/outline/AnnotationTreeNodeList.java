@@ -29,7 +29,13 @@ import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
 
 /**
- * TODO: add javadoc here
+ * The {@link AnnotationTreeNodeList} class can build a tree of
+ * {@link AnnotationTreeNode} objects.
+ * 
+ * Currently this is not used, because it slows down the Cas Editor UI
+ * if the document contains to many annotations.
+ * 
+ * TODO: Rename this class
  */
 public class AnnotationTreeNodeList {
   private List<AnnotationTreeNode> mElements = new ArrayList<AnnotationTreeNode>();

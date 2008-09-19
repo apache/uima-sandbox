@@ -19,21 +19,13 @@
 
 package org.apache.uima.caseditor.editor.outline;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
-import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.Images;
-import org.apache.uima.caseditor.core.AbstractAnnotationDocumentListener;
-import org.apache.uima.caseditor.core.IDocument;
-import org.apache.uima.caseditor.core.model.NlpModel;
-import org.apache.uima.caseditor.core.model.NlpProject;
-import org.apache.uima.caseditor.editor.AnnotationDocument;
+import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.AnnotationSelection;
 import org.apache.uima.caseditor.editor.IAnnotationEditorModifyListener;
@@ -44,17 +36,16 @@ import org.apache.uima.caseditor.editor.action.MergeAnnotationAction;
 import org.apache.uima.caseditor.editor.action.WideLeftAnnotationSideAction;
 import org.apache.uima.caseditor.editor.action.WideRightAnnotationSideAction;
 import org.apache.uima.caseditor.ui.FeatureStructureTransfer;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -65,7 +56,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
@@ -76,14 +66,17 @@ import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 /**
- * This outline view displays all <code>AnnotationFS</code>s of the current mode/type from the
- * binded editor.
+ * This outline view displays all <code>AnnotationFS</code>s of the current
+ * mode/type from the binded editor.
  */
-public final class AnnotationOutline extends ContentOutlinePage implements ISelectionListener {
+public final class AnnotationOutline extends ContentOutlinePage 
+		implements ISelectionListener {
+  
   /**
    * This listener receive events from the bound editor.
    */
   protected class EditorListener implements IAnnotationEditorModifyListener {
+	  
     /**
      * Called if the editor annotation mode was changed.
      *
@@ -91,202 +84,12 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
      */
     public void annotationModeChanged(Type newMode) {
       changeAnnotationMode();
-    }
-  }
-
-  /**
-   * This <code>OutlineContentProvider</code> synchronizes the <code>AnnotationFS</code>s with
-   * the <code>TableViewer</code>.
-   */
-  private class OutlineContentProvider extends AbstractAnnotationDocumentListener implements
-          ITreeContentProvider {
-    private IDocument mInputDocument;
-
-    private AnnotationTreeNodeList mAnnotationNodeList;
-
-    private Map<AnnotationFS, AnnotationTreeNode> mParentNodeLookup =
-      new HashMap<AnnotationFS, AnnotationTreeNode>();
-
-    /**
-     * not implemented
-     */
-    public void dispose() {
-      // currently not implemented
+      mTableViewer.refresh();
     }
 
-    /**
-     * Gets called if the viewer input was changed. In this case, this only happens once if the
-     * {@link AnnotationOutline} is initialized.
-     *
-     * @param viewer
-     * @param oldInput
-     * @param newInput
-     */
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      if (oldInput != null) {
-        ((AnnotationDocument) oldInput).removeChangeListener(this);
-      }
-
-      if (newInput != null) {
-        ((AnnotationDocument) newInput).addChangeListener(this);
-
-        mInputDocument = (IDocument) newInput;
-
-        Collection<AnnotationFS> annotations = mEditor.getDocument().getAnnotations(
-                mEditor.getAnnotationMode());
-
-        mAnnotationNodeList = annotations != null ? new AnnotationTreeNodeList(mEditor
-                .getDocument(), annotations) : null;
-
-        mParentNodeLookup.clear();
-
-        // TODO:
-        // create a recursive method to fill the parent lookup table
-
-        mTableViewer.refresh();
-      }
-    }
-
-    /**
-     * Retrieves all children of the {@link NlpModel}. That are the {@link NlpProject}s and
-     * {@link IProject}s.
-     *
-     * @param inputElement
-     *          the {@link NlpModel}
-     * @return the nlp-projects and non-nlp projects
-     */
-    public Object[] getElements(Object inputElement) {
-      if (mAnnotationNodeList == null) {
-        return new Object[0];
-      }
-
-      return mAnnotationNodeList.getElements().toArray();
-    }
-
-    /**
-     * Adds the added annotations to the viewer.
-     *
-     * @param annotations
-     */
-    @Override
-    public void addedAnnotation(Collection<AnnotationFS> annotations) {
-      for (AnnotationFS annotation : annotations) {
-        if (!annotation.getType().getName().equals(mEditor.getAnnotationMode().getName())) {
-          return;
-        }
-
-        final AnnotationTreeNode annotationNode = new AnnotationTreeNode(mEditor.getDocument(),
-                annotation);
-
-        mAnnotationNodeList.add(annotationNode);
-        // mAnnotationNodeList.buildTree();
-
-        Display.getDefault().syncExec(new Runnable() {
-          public void run() {
-            mTableViewer.add(annotationNode.getParent() != null ? annotationNode.getParent()
-                    : mInputDocument, annotationNode);
-          }
-        });
-      }
-    }
-
-    /**
-     * Removes the removed annoations from the viewer.
-     *
-     * @param deletedAnnotations
-     */
-    @Override
-    public void removedAnnotation(Collection<AnnotationFS> deletedAnnotations) {
-      // TODO: what happens if someone removes an annoation which
-      // is not an element of this list e.g in the featruestructure view ?
-      final AnnotationTreeNode[] items = new AnnotationTreeNode[deletedAnnotations.size()];
-
-      int i = 0;
-      for (AnnotationFS annotation : deletedAnnotations) {
-        // TODO: maybe it is a problem if the parent is not correctly set!
-        items[i] = new AnnotationTreeNode(mEditor.getDocument(), annotation);
-        mAnnotationNodeList.remove(items[i]);
-        i++;
-      }
-
-
-      Display.getDefault().syncExec(new Runnable() {
-        public void run() {
-          mTableViewer.remove(items);
-        }
-      });
-    }
-
-    /**
-     * Updates the given annoation in the viewer.
-     *
-     * @param annotations
-     */
-    @Override
-    public void updatedAnnotation(Collection<AnnotationFS> featureStructres) {
-      Collection<AnnotationFS> annotations = new ArrayList<AnnotationFS>(featureStructres.size());
-
-      for (FeatureStructure structure : featureStructres) {
-        if (structure instanceof AnnotationFS) {
-          annotations.add((AnnotationFS) structure);
-        }
-      }
-
-      final Object[] items = new Object[annotations.size()];
-
-      int i = 0;
-      for (AnnotationFS annotation : annotations) {
-        items[i++] = new AnnotationTreeNode(mEditor.getDocument(), annotation);
-      }
-
-      Display.getDefault().syncExec(new Runnable() {
-        public void run() {
-          mTableViewer.update(items, null);
-        }
-      });
-
-      // repost current selection if outline is active
-      if (isActiveView()) {
-        ISelection currentSelection = getSite().getSelectionProvider().getSelection();
-
-        getSite().getSelectionProvider().setSelection(currentSelection);
-      }
-    }
-
-    public void changed() {
-
-      Collection<AnnotationFS> annotations = mEditor.getDocument().getAnnotations(
-              mEditor.getAnnotationMode());
-
-      mAnnotationNodeList = annotations != null ? new AnnotationTreeNodeList(mEditor
-              .getDocument(), annotations) : null;
-
-      mParentNodeLookup.clear();
-
-      Display.getDefault().syncExec(new Runnable() {
-        public void run() {
-          mTableViewer.refresh();
-        }
-      });
-    }
-
-    public Object[] getChildren(Object parentElement) {
-      AnnotationTreeNode node = (AnnotationTreeNode) parentElement;
-
-      return node.getChildren().toArray();
-    }
-
-    public Object getParent(Object element) {
-      AnnotationTreeNode node = (AnnotationTreeNode) element;
-
-      return node.getParent();
-    }
-
-    public boolean hasChildren(Object element) {
-      AnnotationTreeNode node = (AnnotationTreeNode) element;
-
-      return node.getChildren().size() > 0;
-    }
+	public void showAnnotationsChanged(Collection<Type> shownAnnotationTypes) {
+		mTableViewer.refresh();
+	}
   }
 
   /**
@@ -303,6 +106,8 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     }
   }
 
+  private OutlineStyles style = OutlineStyles.TYPE;
+  
   private Composite mOutlineComposite;
 
   private TreeViewer mTableViewer;
@@ -310,7 +115,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
   /**
    * The <code>AnnotationEditor</code> which is bound to this outline view.
    */
-  private AnnotationEditor mEditor;
+  private AnnotationEditor editor;
 
   /**
    * Creates a new <code>AnnotationOutline</code> object.
@@ -319,13 +124,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
    *          the editor to bind
    */
   public AnnotationOutline(AnnotationEditor editor) {
-    mEditor = editor;
-  }
-
-  private boolean isActiveView() {
-    IWorkbenchPart part = getSite().getPage().getActivePart();
-
-    return (part instanceof ContentOutline && ((ContentOutline) part).getCurrentPage() == this);
+    this.editor = editor;
   }
 
   /**
@@ -347,7 +146,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     changeAnnotationMode();
 
     // TODO: create a listener interface ... for editor listener
-    mEditor.addAnnotationListener(new EditorListener());
+    editor.addAnnotationListener(new EditorListener());
 
     DragSource source = new DragSource(mTableViewer.getTree(), DND.DROP_COPY);
 
@@ -391,7 +190,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
           IStatusLineManager statusLineManager) {
     // wide left annotation side action
     WideLeftAnnotationSideAction wideLeftAnnotationSideAction = new WideLeftAnnotationSideAction(
-            mEditor.getDocument());
+            editor.getDocument());
     wideLeftAnnotationSideAction.setText("Wides the left annotation side");
     wideLeftAnnotationSideAction.setImageDescriptor(CasEditorPlugin
             .getTaeImageDescriptor(Images.WIDE_LEFT_SIDE));
@@ -402,7 +201,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     // lower left annotation side action
     LowerLeftAnnotationSideAction lowerLeftAnnotationSideAction = new LowerLeftAnnotationSideAction(
-            mEditor.getDocument());
+            editor.getDocument());
     lowerLeftAnnotationSideAction.setText("Lowers the left annotation side");
     lowerLeftAnnotationSideAction.setImageDescriptor(CasEditorPlugin
             .getTaeImageDescriptor(Images.LOWER_LEFT_SIDE));
@@ -413,7 +212,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     // lower right annotation side action
     LowerRightAnnotationSideAction lowerRightAnnotionSideAction =
-      new LowerRightAnnotationSideAction(mEditor.getDocument());
+      new LowerRightAnnotationSideAction(editor.getDocument());
     lowerRightAnnotionSideAction.setText("Lowers the right annotation side");
     lowerRightAnnotionSideAction.setImageDescriptor(CasEditorPlugin
             .getTaeImageDescriptor(Images.LOWER_RIGHT_SIDE));
@@ -424,7 +223,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
 
     // wide right annotation side action
     WideRightAnnotationSideAction wideRightAnnotationSideAction = new WideRightAnnotationSideAction(
-            mEditor.getDocument());
+            editor.getDocument());
     wideRightAnnotationSideAction.setText("Wides the right annotation side");
 
     wideRightAnnotationSideAction.setImageDescriptor(CasEditorPlugin
@@ -435,7 +234,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     toolBarManager.add(wideRightAnnotationSideAction);
 
     // merge action
-    MergeAnnotationAction mergeAction = new MergeAnnotationAction(mEditor.getDocument());
+    MergeAnnotationAction mergeAction = new MergeAnnotationAction(editor.getDocument());
     getSite().getSelectionProvider().addSelectionChangedListener(mergeAction);
     mergeAction.setImageDescriptor(CasEditorPlugin.getTaeImageDescriptor(Images.MERGE));
 
@@ -463,7 +262,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
    */
   @Override
   public void setActionBars(IActionBars actionBars) {
-    DeleteFeatureStructureAction deleteAction = new DeleteFeatureStructureAction(mEditor
+    DeleteFeatureStructureAction deleteAction = new DeleteFeatureStructureAction(editor
             .getDocument());
 
     actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), deleteAction);
@@ -471,10 +270,36 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     getSite().getSelectionProvider().addSelectionChangedListener(deleteAction);
 
     actionBars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), new SelectAllAction());
-
+    
+    Action action = new SwitchStyleAction(this);
+    
+    IMenuManager dropDownMenu = actionBars.getMenuManager();    
+    dropDownMenu.add(action);
+    
     super.setActionBars(actionBars);
   }
 
+  OutlineStyles currentStyle() {
+	  return style;
+  }
+  
+  void switchStyle(OutlineStyles style) {
+	  
+	  this.style = style;
+	  
+	  if (OutlineStyles.MODE.equals(style)) {
+		  mTableViewer.setContentProvider(new ModeSensitiveContentProvider(
+				  editor, mTableViewer));
+	  } else if (OutlineStyles.TYPE.equals(style)) {
+		  mTableViewer.setContentProvider(new TypeGroupedContentProvider(
+				  editor, mTableViewer));
+	  } else {
+		  throw new TaeError("Unkown style!");
+	  }
+
+		mTableViewer.refresh();
+  }
+  
   /**
    * Sets the focus.
    */
@@ -484,7 +309,8 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
   }
 
   private void changeAnnotationMode() {
-    mTableViewer.setInput(mEditor.getDocument());
+    mTableViewer.setInput(editor.getDocument());
+    mTableViewer.refresh();
   }
 
   private void createTableViewer(Composite parent) {
@@ -511,8 +337,35 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
     // performance optimization, the table can contain many items
     mTableViewer.setUseHashlookup(false);
 
-    mTableViewer.setContentProvider(new OutlineContentProvider());
+    // Note: The type style is considered as the default
+    mTableViewer.setContentProvider(new TypeGroupedContentProvider(editor, mTableViewer));
+    
+    mTableViewer.setFilters(new ViewerFilter[]{new ViewerFilter() {
 
+    	// TODO: Improve this filter ... it is to sloooooooooow
+		@Override
+		public boolean select(Viewer viewer, Object parentElement,
+				Object element) {
+			Collection<Type> shownTypes = editor.getShownAnnotationTypes();
+			
+			if (element instanceof AnnotationTypeTreeNode) {
+				AnnotationTypeTreeNode typeNode = (AnnotationTypeTreeNode) element;
+				
+				if (shownTypes.contains(typeNode.getType()))
+					return true;
+				else 
+					return false;
+			}
+			else if (element instanceof AnnotationTreeNode) {
+				AnnotationTreeNode annotationNode = (AnnotationTreeNode) element;
+				
+				return shownTypes.contains(annotationNode.getAnnotation().getType());
+			}
+			else {
+				throw new TaeError("Unxexpected element type!");
+			}
+		}}});
+    
     mTableViewer.setLabelProvider(new OutlineLabelProvider());
 
     mTableViewer.setSorter(new OutlineTableSorter());
@@ -531,7 +384,7 @@ public final class AnnotationOutline extends ContentOutlinePage implements ISele
         AnnotationSelection annotations = new AnnotationSelection((StructuredSelection) selection);
 
         if (!annotations.isEmpty()) {
-          ISelection tableSelection = new StructuredSelection(new AnnotationTreeNode(mEditor
+          ISelection tableSelection = new StructuredSelection(new AnnotationTreeNode(editor
                   .getDocument(), annotations.getFirst()));
 
           mTableViewer.setSelection(tableSelection, true);

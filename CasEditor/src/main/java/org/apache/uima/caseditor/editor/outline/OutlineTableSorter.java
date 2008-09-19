@@ -54,7 +54,8 @@ class OutlineTableSorter extends ViewerSorter {
       AnnotationFS bAnnotation = (AnnotationFS) ((IAdaptable) bObject)
               .getAdapter(AnnotationFS.class);
 
-      result = mComperator.compare(aAnnotation, bAnnotation);
+      if (aAnnotation != null && bAnnotation != null)
+    	  result = mComperator.compare(aAnnotation, bAnnotation);
     }
 
     return result;

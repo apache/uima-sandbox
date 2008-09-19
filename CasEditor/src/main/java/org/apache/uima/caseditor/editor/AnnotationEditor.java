@@ -351,6 +351,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    * Creates the mode context sub menu.
    */
   private class ModeMenu extends TypeMenu {
+	  
     /**
      * Initializes a new instance.
      *
@@ -389,8 +390,6 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      */
     private Collection<Type> mTypesToDisplay = new HashSet<Type>();
 
-    private final TypeSystem typeSystem;
-
     /**
      * Initializes a new instance.
      *
@@ -399,8 +398,6 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      */
     ShowAnnotationsMenu(EditorAnnotationStatus status, TypeSystem typeSystem) {
       super(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION), typeSystem);
-
-      this.typeSystem = typeSystem;
 
       for (String typeName : status.getDisplayAnnotations()) {
         mTypesToDisplay.add(getDocument().getType(typeName));
@@ -431,6 +428,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
             mTypesToDisplay.remove(type);
           }
 
+          mEditorListener.showAnnotationsChanged(getShownAnnotationTypes());
+          
           // TODO: only synchronize annotation which
           // must be removed/added
           syncAnnotations();
@@ -450,7 +449,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         selectedTypes.add(type);
       }
 
-    	return Collections.unmodifiableCollection(selectedTypes);
+      return Collections.unmodifiableCollection(selectedTypes);
     }
 
     void setSelectedTypes(Collection<Type> types) {
@@ -459,6 +458,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       for (Type type : types) {
         mTypesToDisplay.add(type);
       }
+      
+      mEditorListener.showAnnotationsChanged(getSelectedTypes());
     }
   }
 
@@ -847,6 +848,10 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     fireAnnotationTypeChanged(getAnnotationMode());
   }
 
+  public Collection<Type> getShownAnnotationTypes() {
+	  return mShowAnnotationsMenu.getSelectedTypes();
+  }
+  
   /**
    * @param type
    */

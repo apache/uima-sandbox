@@ -19,6 +19,7 @@
 
 package org.apache.uima.caseditor.editor.outline;
 
+import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -44,7 +45,17 @@ class OutlineLabelProvider extends LabelProvider implements ITableLabelProvider 
 
     AnnotationFS annotation = (AnnotationFS) ((IAdaptable) element).getAdapter(AnnotationFS.class);
 
-    return getStringWithoutNewLine(annotation.getCoveredText());
+    if (annotation != null) {
+    	return getStringWithoutNewLine(annotation.getCoveredText());
+    }
+    
+    Type type = (Type) ((IAdaptable) element).getAdapter(Type.class);
+    
+    if (type != null) {
+    	return type.getShortName();
+    }
+    
+    return "Unkown type";
   }
 
   private static String getStringWithoutNewLine(String string) {

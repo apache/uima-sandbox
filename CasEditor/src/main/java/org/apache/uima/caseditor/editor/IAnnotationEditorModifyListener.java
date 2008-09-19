@@ -19,13 +19,23 @@
 
 package org.apache.uima.caseditor.editor;
 
+import java.util.Collection;
+
 import org.apache.uima.cas.Type;
 
 public interface IAnnotationEditorModifyListener {
+	
   /**
-   * Called if the editor annotation mode changed.
+   * Called when the editor annotation mode changed.
    *
    * @param newMode
    */
   public void annotationModeChanged(Type newMode);
+  
+  /**
+   * Called when the shown annotation types in the editor are changed.
+   * 
+   * @param shownAnnotationTypes
+   */
+  public void showAnnotationsChanged(Collection<Type> shownAnnotationTypes);
 }
