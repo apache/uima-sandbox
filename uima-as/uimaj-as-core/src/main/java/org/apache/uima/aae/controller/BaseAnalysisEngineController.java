@@ -19,6 +19,7 @@
 
 package org.apache.uima.aae.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.OutputChannel;
 import org.apache.uima.aae.UIMAEE_Constants;
+import org.apache.uima.aae.UimaAsContext;
 import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.UimaEEAdminContext;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
@@ -61,9 +63,14 @@ import org.apache.uima.aae.monitor.MonitorBaseImpl;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.aae.monitor.statistics.Statistic;
 import org.apache.uima.aae.monitor.statistics.Statistics;
+import org.apache.uima.aae.spi.transport.UimaMessage;
+import org.apache.uima.aae.spi.transport.UimaMessageListener;
+import org.apache.uima.aae.spi.transport.UimaTransport;
+import org.apache.uima.aae.spi.transport.vm.VmTransport;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.impl.AnalysisEngineManagementImpl;
+import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.analysis_engine.metadata.SofaMapping;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReaderDescription;
@@ -77,6 +84,8 @@ public abstract class BaseAnalysisEngineController extends Resource_ImplBase
 implements AnalysisEngineController, EventSubscriber
 {
 	private static final Class CLASS_NAME = BaseAnalysisEngineController.class;
+
+	protected volatile ControllerLatch latch = new ControllerLatch();
 
 	protected ConcurrentHashMap statsMap = new ConcurrentHashMap();
 
@@ -175,6 +184,14 @@ implements AnalysisEngineController, EventSubscriber
 	
 	protected final Object finalStepMux = new Object();
 	
+	protected ConcurrentHashMap<String, UimaTransport> transports
+	  = new ConcurrentHashMap<String, UimaTransport>();
+	
+  protected ConcurrentHashMap<String, UimaMessageListener> messageListeners
+  = new ConcurrentHashMap<String, UimaMessageListener>();
+  
+//	protected UimaTransport transport = new VmTransport();
+	
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -187,6 +204,8 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, aDestinationMap, aJmxManagement);
 	}
+	
+	
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, long anInitialCasHeapSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, Map aDestinationMap, JmxManagement aJmxManagement) throws Exception
 	{
 		casManager = aCasManager;
@@ -240,6 +259,17 @@ implements AnalysisEngineController, EventSubscriber
                 new Object[] { endpointName });
 		
 		resourceSpecifier = UimaClassFactory.produceResourceSpecifier(aDescriptor);
+
+		
+		if ( isTopLevelComponent())
+		{
+			System.out.println("************** Initializing Component:"+getComponentName());		
+		}
+		else
+		{
+			System.out.println("************** Initializing Component:"+getComponentName()+" Parent Controller:"+parentController.getComponentName());		
+		}
+		
 		//	Is this service a CAS Multiplier?
 		if ( (resourceSpecifier instanceof AnalysisEngineDescription &&
 				((AnalysisEngineDescription) resourceSpecifier).getAnalysisEngineMetaData().getOperationalProperties().getOutputsNewCASes()) 
@@ -262,7 +292,14 @@ implements AnalysisEngineController, EventSubscriber
 			}
 		}
 		paramsMap.put(AnalysisEngine.PARAM_MBEAN_NAME_PREFIX, jmxManagement.getJmxDomain()); 
-
+		if ( isTopLevelComponent() && System.getProperty("UseVmTransport") != null )
+		{
+		  System.out.println("Top Level Service:"+getComponentName()+ " Configured to Use Java VM Transport For Internal Messaging");
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+              "C'tor", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_using_vm_transport_INFO",
+              new Object[] { getComponentName() });
+		  
+		}
 
 		//	Top level component?
 		if (parentController == null)
@@ -293,10 +330,11 @@ implements AnalysisEngineController, EventSubscriber
 			paramsMap.put(Resource.PARAM_UIMA_CONTEXT, childContext);
 			initialize(resourceSpecifier, paramsMap);
 			initializeComponentCasPool(aComponentCasPoolSize, anInitialCasHeapSize );
-			if (aParentController instanceof AggregateAnalysisEngineController )
+			if (parentController instanceof AggregateAnalysisEngineController )
 			{
-				//	Register self with the parent controller 
-				((AggregateAnalysisEngineController) aParentController).registerChildController(this,delegateKey);
+
+			  //	Register self with the parent controller 
+				((AggregateAnalysisEngineController) parentController).registerChildController(this,delegateKey);
 			}
 		}
 
@@ -320,8 +358,99 @@ implements AnalysisEngineController, EventSubscriber
 			jmxManagement.registerMBean(inProcessCache, on);
 		}
 		initializeServiceStats();
-
+		
 	}
+  public UimaTransport getTransport(String aKey) throws Exception
+  {
+    return getTransport( null, aKey);
+  }
+
+	 public UimaTransport getTransport(UimaAsContext asContext)
+	 throws Exception
+	 {
+	   return getTransport(asContext, getName());
+	 }
+
+	 public UimaTransport getTransport(UimaAsContext asContext, String aKey)
+   throws Exception
+   {
+     UimaTransport transport = null;
+     if ( !transports.containsKey(aKey)) {
+       transport = new VmTransport(asContext);
+       transports.put( aKey, transport);
+     }
+     else {
+       transport = (UimaTransport) transports.get(aKey);
+     }
+       
+     return transport;
+   }
+
+	 /**
+	  * Initializes transport used for internal messaging between collocated Uima AS services.
+	  */
+	 public void initializeVMTransport(int parentControllerReplyConsumerCount) throws Exception
+	 {
+	   //  Check if internal messaging is enabled by checking system properties.
+	   if ( System.getProperty("UseVmTransport") == null)
+	   {
+	     return;
+	   }
+	   //  If this controller is an Aggregate Controller, force delegates to initialize
+	   //  their internal transports.
+	   if ( this instanceof AggregateAnalysisEngineController )
+	   {
+	     //  Get a list of all colocated delegate controllers.
+	     List childControllers = ((AggregateAnalysisEngineController_impl)this).childControllerList;
+	     
+	     for( int i=0; i < childControllers.size(); i++) 
+	     {
+	       AnalysisEngineController ctrl = (AnalysisEngineController)childControllers.get(i);
+	       //  Force initialization
+	       ctrl.initializeVMTransport(parentControllerReplyConsumerCount);
+	     }
+	   }
+	   
+	   //  Only delegate controllers execute the logic below
+	   if ( parentController != null )
+     {
+       UimaAsContext uimaAsContext = new UimaAsContext();
+       InputChannel ic = getInputChannel(endpointName);
+       int serviceRequestConsumerCount = ic.getConcurrentConsumerCount();
+       
+       System.out.println("Controller:"+getComponentName()+" Starting Request Listener With "+serviceRequestConsumerCount+" Concurrent Consumers. Reply Listener Configured With "+parentControllerReplyConsumerCount+" Concurrent Consumers");
+       
+       uimaAsContext.setConcurrentConsumerCount(serviceRequestConsumerCount);
+       uimaAsContext.put("EndpointName", endpointName);
+
+       UimaTransport vmTransport = getTransport(uimaAsContext);
+       // Creates delegate Listener for receiving requests from the parent
+       UimaMessageListener messageListener = vmTransport.produceUimaMessageListener(this);
+       messageListener.initialize(uimaAsContext);
+       messageListeners.put(getName(), messageListener);
+       // Creates parent controller dispatcher for this delegate. The dispatcher is wired
+       // with this delegate's listener.
+       UimaAsContext uimaAsContext2 = new UimaAsContext();
+       uimaAsContext2.setConcurrentConsumerCount(parentControllerReplyConsumerCount);
+       uimaAsContext2.put("EndpointName", endpointName);
+       UimaTransport parentVmTransport = parentController.getTransport(uimaAsContext2, endpointName);
+       parentVmTransport.produceUimaMessageDispatcher(this, vmTransport);
+       // Creates parent listener for receiving replies from this delegate. 
+       UimaMessageListener parentListener = parentVmTransport.produceUimaMessageListener(parentController);
+       parentListener.initialize(uimaAsContext2);
+       // Creates delegate's dispatcher. It is wired to send replies to the parent's listener.
+       vmTransport.produceUimaMessageDispatcher(parentController,parentVmTransport);
+       //transports.put(parentController.getName(), parentVmTransport);
+     }
+
+	 }
+	 
+	 public synchronized UimaMessageListener getUimaMessageListener(String aDelegateKey)
+	 {
+	   return messageListeners.get(aDelegateKey);
+	 }
+
+	
 	/**
 	 * Get the domain for Uima JMX. The domain includes a fixed string plus the name of the 
 	 * top level component. All uima ee objects are rooted at this domain. 
@@ -684,10 +813,6 @@ implements AnalysisEngineController, EventSubscriber
 					}
 				}
 			}
-			Endpoint endpoint = ((AggregateAnalysisEngineController) this).lookUpEndpoint(key, false);
-			endpoint.initialize();
-			endpoint.setController(this);
-			((AggregateAnalysisEngineController) this).dispatchMetadataRequest(endpoint);
 			// create child UimaContext and insert into mInitParams map
 			return uctx.createChild(key, sofamap);
 		}
@@ -2130,6 +2255,53 @@ implements AnalysisEngineController, EventSubscriber
 			}
 			
 		}
-		
+	  public void sendMetadata(Endpoint anEndpoint, AnalysisEngineMetaData metadata)
+	  {
+	    try
+	    {
+	      if ( metadata != null )
+	      {
+	        
+	        if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+	        {
+	          ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	          try
+	          {
+	            UimaMessage message = 
+	              getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.GetMeta,AsynchAEMessage.Response,getName());
+	            metadata.toXML(bos);
+	            message.addStringCargo(bos.toString());
+	            getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+	          }
+	          catch(Exception e)
+	          {
+	            e.printStackTrace();
+	          }
+	          finally
+	          {
+	            try
+	            {
+	              bos.close();
+	            }
+	            catch( Exception e) {}
+	          }
+	        }
+	        else
+	        {
+	          getOutputChannel().sendReply(metadata, anEndpoint, true);
+	        }
+	      }
+	    }
+	    catch ( Exception e)
+	    {
+	      HashMap map = new HashMap();
+	      map.put(AsynchAEMessage.Endpoint, anEndpoint);
+	      map.put(AsynchAEMessage.MessageType, Integer.valueOf(AsynchAEMessage.Request));
+	      map.put(AsynchAEMessage.Command, Integer.valueOf(AsynchAEMessage.Metadata));
+
+	      handleError(map, e);
+	    }
+	  }
+
 		
 }

@@ -29,15 +29,22 @@ import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.ErrorHandlerBase;
 import org.apache.uima.aae.error.ExpiredMessageException;
 import org.apache.uima.aae.error.InvalidMessageException;
+import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.Threshold;
+import org.apache.uima.aae.error.UimaEEServiceException;
 import org.apache.uima.aae.jmx.ServiceErrors;
+import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.monitor.Monitor;
+import org.apache.uima.aae.spi.transport.UimaMessage;
+import org.apache.uima.aae.spi.transport.UimaTransport;
+import org.apache.uima.aae.spi.transport.vm.VmTransport;
 import org.apache.uima.util.Level;
 
 public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHandler
@@ -102,11 +109,46 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		{
 			try
 			{
-				aController.getOutputChannel().sendReply(t, aCasReferenceId, anEndpoint, AsynchAEMessage.Process);
-				//aController.dropStats(aCasReferenceId, anEndpoint.getEndpoint());
+			   if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null )
+			   {
+			      anEndpoint.setReplyEndpoint(true);
+			      UimaTransport vmTransport = aController.getTransport(aController.getName()) ;//anEndpoint.getEndpoint());
+		        UimaMessage message = 
+		          vmTransport.produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Response,aController.getName());
+		        message.addIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.Exception); 
+		        message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+		        
+		        Throwable wrapper = null;
+		        if ( !(t instanceof UimaEEServiceException) )
+		        {
+		          //  Strip off AsyncAEException and replace with UimaEEServiceException
+		          if ( t instanceof AsynchAEException && t.getCause() != null )
+		          {
+		            wrapper = new UimaEEServiceException(t.getCause());
+		          }
+		          else
+		          {
+		            wrapper = new UimaEEServiceException(t);
+		          }
+		        }
+		        if ( wrapper == null )
+		        {
+		          message.addObjectProperty(AsynchAEMessage.Cargo, t);
+		        }
+		        else
+		        {
+              message.addObjectProperty(AsynchAEMessage.Cargo, wrapper);
+		        }
+		        vmTransport.getUimaMessageDispatcher().dispatch( message );
+			   }
+			   else
+			   {
+		        aController.getOutputChannel().sendReply(t, aCasReferenceId, anEndpoint, AsynchAEMessage.Process);
+			   }
 			}
 			catch( Exception e)
 			{
+			  e.printStackTrace();
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "sendExceptionToParent", 
 						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
 			}

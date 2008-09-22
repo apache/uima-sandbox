@@ -31,5 +31,5 @@ public interface InputChannel extends Channel
 	public String getInputQueueName();
 	public ServiceInfo getServiceInfo();
 	public boolean isStopped();
-    
+  public int getConcurrentConsumerCount();
 }

@@ -26,6 +26,7 @@ import org.apache.uima.aae.AsynchAECasManager;
 import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.OutputChannel;
+import org.apache.uima.aae.UimaAsContext;
 import org.apache.uima.aae.UimaEEAdminContext;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
@@ -35,6 +36,8 @@ import org.apache.uima.aae.jmx.ServiceErrors;
 import org.apache.uima.aae.jmx.ServiceInfo;
 import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.monitor.Monitor;
+import org.apache.uima.aae.spi.transport.UimaMessageListener;
+import org.apache.uima.aae.spi.transport.UimaTransport;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 
@@ -186,4 +189,12 @@ public interface AnalysisEngineController extends ControllerLifecycle
 	public void incrementDeserializationTime(long cpuTime);
 
 	public void onInitialize();
+	
+	public UimaMessageListener getUimaMessageListener(String aDelegateKey);
+
+  public UimaTransport getTransport(UimaAsContext aContext, String aKey) throws Exception;
+
+  public UimaTransport getTransport(String aKey) throws Exception;
+
+  public void initializeVMTransport(int parentControllerReplyConsumerCount) throws Exception;
 }

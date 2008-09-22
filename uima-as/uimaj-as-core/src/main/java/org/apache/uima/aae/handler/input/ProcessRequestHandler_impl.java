@@ -157,8 +157,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		// ************************************************************************* 
 	    t1 = getController().getCpuTime();
 		XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1
-				);
+		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 		long timeToDeserializeCAS = getController().getCpuTime() - t1;
 		getController().incrementDeserializationTime(timeToDeserializeCAS);
 		LongNumericStatistic statistic;
@@ -422,9 +421,12 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			String inputCasReferenceId = null;
 			CAS cas = null;
 			String casReferenceId = getCasReferenceId(aMessageContext);
+
+			// Check if this Cas has been sent from a Cas Multiplier. If so, its sequence will be > 0
 			if ( aMessageContext.propertyExists(AsynchAEMessage.CasSequence) )
 			{
 				isNewCAS = true;
+				
 				Endpoint casMultiplierEndpoint = aMessageContext.getEndpoint();
 
 				if ( casMultiplierEndpoint == null )
@@ -434,22 +436,80 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			                new Object[] { casReferenceId });
 					return;
 				}
-				//	
+        //  Get the id of the parent Cas
+				inputCasReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.InputCasReference);
+        	
 				if ( getController() instanceof AggregateAnalysisEngineController )
 				{
-					getController().getInProcessCache().setCasProducer(casReferenceId, casMultiplierEndpoint.getEndpoint());
-					newCASProducedBy = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(casMultiplierEndpoint.getEndpoint());
+				  //  Save the endpoint of the CM which produced the Cas
+				  getController().getInProcessCache().setCasProducer(casReferenceId, casMultiplierEndpoint.getEndpoint());
+					// Convert the endpoint to a key
+				  newCASProducedBy = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(casMultiplierEndpoint.getEndpoint());
 					casMultiplierEndpoint.setIsCasMultiplier(true);
-//					((AggregateAnalysisEngineController)getController()).getServicePerformance(newCASProducedBy).incrementNumberOfCASesProcessed();
-					CacheEntry subordinateCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
-					CacheEntry inputCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(subordinateCasCacheEntry.getInputCasReferenceId());
-					if ( inputCasCacheEntry != null )
-					{
-						synchronized( inputCasCacheEntry )
-						{
-							inputCasCacheEntry.incrementSubordinateCasInPlayCount();
-						}
-					}
+	        // Safety check. The input Cas should not be null here
+					if ( inputCasReferenceId != null )
+	        {
+	          try
+	          {
+	            Endpoint endp = null;
+	            
+	            // Located the origin of the parent Cas. The produced Cas will inherit the origin from its parent.
+	            // Once the origin is identified, save the origin using the produced Cas id as a key.
+	            if ( endp == null )
+	            {
+	              boolean gotTheEndpoint = false;
+	              String parentCasId = inputCasReferenceId;
+	              // Loop through the parent tree until an origin is found
+	              while( !gotTheEndpoint )
+	              {
+	                // Check if the current parent has an associated origin
+                  endp = ((AggregateAnalysisEngineController)getController()).getMessageOrigin(parentCasId);
+                  //  Check if there is an origin. If so, we are done
+                  if ( endp != null )
+                  {
+                    break;
+                  } 
+                  //  The current parent has no origin, get its parent and try again
+	                CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(parentCasId);
+                  parentCasId = entry.getInputCasReferenceId();
+                  //  Check if we reached the top of the hierarchy tree. If so, we have no origin. This should
+                  //  never be the case. Every Cas must have an origin
+                  if ( parentCasId == null )
+                  {
+                    break;
+                  }
+	              }
+	            }
+	            //   If origin not found log it as this indicates an error
+              if ( endp == null )
+              {
+                System.out.println("Endpoint Not Found For Cas Id:"+inputCasReferenceId);
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                        "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_msg_origin_not_found__INFO",
+                        new Object[] { getController().getComponentName(), inputCasReferenceId });
+              }
+              else
+              {
+                ((AggregateAnalysisEngineController)getController()).addMessageOrigin(casReferenceId, endp);
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+                        "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_msg_origin_added__FINEST",
+                        new Object[] { getController().getComponentName(), casReferenceId, newCASProducedBy });
+              }
+	          }
+	          catch( Exception e)
+	          {
+	            e.printStackTrace();
+	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleProcessRequestWithCASReference", 
+	                    UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
+
+	          }
+	        }
+	        else
+	        {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                    "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_input_cas_invalid__INFO",
+                    new Object[] { getController().getComponentName(), newCASProducedBy, casReferenceId });
+	        }
 				}
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_new_cas__FINE",
@@ -457,7 +517,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 
 				aMessageContext.getEndpoint().setEndpoint(casMultiplierEndpoint.getEndpoint());
 				aMessageContext.getEndpoint().setServerURI(casMultiplierEndpoint.getServerURI());
-				inputCasReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.InputCasReference);
 			}
 			else
 			{

@@ -23,6 +23,7 @@ public interface UimaEEAdminContext
 {
 	public void shutdown();
 	public void stopListener(String anEndpoint );
+  public int getConcurrentConsumerCount( String anEndpointName );
 
     
 }

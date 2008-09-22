@@ -19,6 +19,7 @@
 
 package org.apache.uima.aae.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +34,12 @@ import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.jmx.JmxManagement;
 import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
+import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
+import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.aae.monitor.Monitor;
+import org.apache.uima.aae.spi.transport.UimaMessage;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.CasIterator;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
@@ -53,8 +57,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	private static final Class CLASS_NAME = PrimitiveAnalysisEngineController_impl.class;
 	//	Stores AE metadata
 	private AnalysisEngineMetaData analysisEngineMetadata;
-	//	Controls when the controller is ready to process
-	private ControllerLatch latch = new ControllerLatch();
+
 	//	Number of AE instances
 	private int analysisEnginePoolSize;
 	//	Mutex
@@ -211,7 +214,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
     	//  Just get the CAS and release it back to the component's Cas Pool.
 		if ( isCasMultiplier() && !isTopLevelComponent() )
 		{
-			System.out.println(">>>>>> CAS Multiplier::"+getComponentName()+" Initializing its Cas Pool");
+			System.out.println(Thread.currentThread().getId()+" >>>>>> CAS Multiplier::"+getComponentName()+" Initializing its Cas Pool");
 			CAS cas = (CAS)getUimaContext().getEmptyCas(CAS.class);
 			cas.release();
 		}
@@ -232,7 +235,20 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_all_cases_processed__FINEST", new Object[] { getComponentName() });
 			getServicePerformance().incrementAnalysisTime(super.getCpuTime()-start);
-			getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, anEndpoint);
+
+			
+	    if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+	    {
+	        UimaMessage message = 
+	          getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
+	        //  Send CPC completion reply back to the client. Use internal (non-jms) transport
+	        getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+	    }
+	    else
+	    {
+	      getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, anEndpoint);
+	    }
+			
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_completed__FINE", new Object[] { getComponentName()});
 	
 		}
@@ -382,24 +398,47 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	this CAS back to its pool
 				synchronized(syncObject)
 				{
+          inputCASEntry.incrementSubordinateCasInPlayCount();
 					if ( isTopLevelComponent() )
 					{
-						inputCASEntry.incrementSubordinateCasInPlayCount();
+//						inputCASEntry.incrementSubordinateCasInPlayCount();
 						//	Add the id of the generated CAS to the map holding outstanding CASes. This
 						//	map will be referenced when a client sends Free CAS Notification. The map
 						//	stores the id of the CAS both as a key and a value. Map is used to facilitate
 						//	quick lookup
 						cmOutstandingCASes.put(newEntry.getCasReferenceId(),newEntry.getCasReferenceId());
 					}
-					//	Send generated CAS to the client
-					getOutputChannel().sendReply(newEntry, anEndpoint);
+	        //  Increment number of CASes processed by this service
+	        sequence++;
+
+		      if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+		      {
+		          UimaMessage message = 
+		            getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
+              message.addStringProperty(AsynchAEMessage.CasReference, newEntry.getCasReferenceId());
+              message.addStringProperty(AsynchAEMessage.InputCasReference, aCasReferenceId);
+              message.addLongProperty(AsynchAEMessage.CasSequence, sequence);
+              ServicePerformance casStats =
+                getCasStatistics(aCasReferenceId);
+              
+              message.addLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
+              message.addLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
+              message.addLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
+              long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
+              message.addLongProperty(AsynchAEMessage.IdleTime, iT );
+              
+		          getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+		      }
+		      else
+		      {
+	          //  Send generated CAS to the client
+	          getOutputChannel().sendReply(newEntry, anEndpoint);
+		      }
 				}
 				//	Remove Stats from the global Map associated with the new CAS
 				//	These stats for this CAS were added to the response message
 				//	and are no longer needed
 				dropCasStatistics(newEntry.getCasReferenceId());
-				//	Increment number of CASes processed by this service
-				sequence++;
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (super.getCpuTime() - time) / (double) 1000000 });
 			getMonitor().resetCountingStatistic("", Monitor.ProcessErrorCount);
@@ -412,8 +451,27 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				{
 					inputCASReturned = true;
 					
-					//	Return an input CAS to the client if there are no outstanding child CASes in play
-					getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
+          if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+          {
+              UimaMessage message = 
+                getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Response,getName());
+              message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+              ServicePerformance casStats =
+                getCasStatistics(aCasReferenceId);
+              
+              message.addLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
+              message.addLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
+              message.addLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
+              long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
+              message.addLongProperty(AsynchAEMessage.IdleTime, iT );
+              //  Send reply back to the client. Use internal (non-jms) transport
+              getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+          }
+          else
+          {
+            //	Return an input CAS to the client if there are no outstanding child CASes in play
+            getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
+          }
 				}
 				else
 				{
@@ -489,12 +547,11 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	{
 		addConfigIntParameter(AnalysisEngineController.AEInstanceCount, analysisEnginePoolSize);
 
-		
 		if ( getAnalysisEngineMetadata().getOperationalProperties().getOutputsNewCASes() )
 		{
 			addConfigIntParameter(AnalysisEngineController.CasPoolSize, super.componentCasPoolSize);
 		}
-		getOutputChannel().sendReply(getAnalysisEngineMetadata(), anEndpoint, true);
+		super.sendMetadata(anEndpoint, getAnalysisEngineMetadata());
 	}
 
 	private AnalysisEngineMetaData getAnalysisEngineMetadata()
@@ -526,7 +583,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		return getName();
 	}
 
-	public ControllerLatch getControllerLatch()
+	public synchronized ControllerLatch getControllerLatch()
 	{
 		return latch;
 	}

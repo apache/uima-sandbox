@@ -189,10 +189,10 @@ public class UimaSerializer
 		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
 	    XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
 	    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint);
-	    xmlReader.setContentHandler(handler); 
+	    xmlReader.setContentHandler(handler);
 	    xmlReader.parse(new InputSource(reader));
 
-    
+	    
 	    
 	    
 	    

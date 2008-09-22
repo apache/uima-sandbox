@@ -647,6 +647,8 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private boolean waitingForRealease;
 		
+		private Object childCountMux = new Object();
+		
 		private Marker marker = null;
 		
 		private boolean acceptsDeltaCas = false;
@@ -943,20 +945,29 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		public int getSubordinateCasInPlayCount()
 		{
-			return subordinateCasInPlayCount;
+      synchronized( childCountMux )
+      {
+        return subordinateCasInPlayCount;
+      }
 		}
 		
 		public void incrementSubordinateCasInPlayCount()
 		{
-			subordinateCasInPlayCount++;
+      synchronized( childCountMux )
+      {
+        subordinateCasInPlayCount++;
+      }
 		}
 		public int decrementSubordinateCasInPlayCount()
 		{
-			if ( subordinateCasInPlayCount > 0)
-			{
-				subordinateCasInPlayCount--;
-			}
-			return subordinateCasInPlayCount;
+		  synchronized( childCountMux )
+		  {
+	      if ( subordinateCasInPlayCount > 0)
+	      {
+	        subordinateCasInPlayCount--;
+	      }
+	      return subordinateCasInPlayCount;
+		  }
 		}
 		public void setReplyReceived()
 		{

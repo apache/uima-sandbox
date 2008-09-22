@@ -322,7 +322,7 @@ public class ProcessResponseHandler extends HandlerBase
 	{
 		XmiSerializationSharedData deserSharedData;
 		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, AllowPreexistingFS.allow);
+		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark);
 	}
 	**/
 	private void deserialize( String xmi, CAS cas, String casReferenceId ) throws Exception

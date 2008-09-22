@@ -20,6 +20,7 @@
 package org.apache.uima.aae.controller;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.aae.monitor.statistics.Statistic;
+import org.apache.uima.aae.spi.transport.UimaMessage;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.analysis_engine.asb.impl.FlowContainer;
@@ -60,12 +62,11 @@ import org.apache.uima.flow.FinalStep;
 import org.apache.uima.flow.ParallelStep;
 import org.apache.uima.flow.SimpleStep;
 import org.apache.uima.flow.Step;
-import org.apache.uima.resource.ResourceConfigurationException;
-import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.resource.metadata.ResourceMetaData;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.XMLInputSource;
+
 
 public class AggregateAnalysisEngineController_impl 
 extends BaseAnalysisEngineController 
@@ -80,11 +81,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
     private static final int SERVICE_ERROR_INDX = 2;
 
-	private volatile ControllerLatch latch = new ControllerLatch();
+	private ConcurrentHashMap flowMap = new ConcurrentHashMap();
 
-	private volatile ConcurrentHashMap flowMap = new ConcurrentHashMap();
-
-	private volatile ConcurrentHashMap destinationMap;
+	private ConcurrentHashMap destinationMap;
 
 	private Map destinationToKeyMap;
 
@@ -181,6 +180,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	 */
 	public void addMessageOrigin(String aCasReferenceId, Endpoint anEndpoint)
 	{
+	  if ( anEndpoint == null )
+	  {
+	    System.out.println("Controller:"+getComponentName()+" Endpoint is NULL. Cas Reference Id:"+aCasReferenceId);
+	  }
 		originMap.put(aCasReferenceId, anEndpoint);
 		if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
 		{
@@ -195,9 +198,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					sb.append("\t\nCAS:"+key+" Origin:"+e.getEndpoint());
 				}
 			}
+/*			
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "addMessageOrigin", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_msg_origin__FINE",
 	                new Object[] {getComponentName(), sb.toString()});
+*/
 		}
 	}
 
@@ -273,9 +278,13 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		synchronized( originMap )
 		{
+		  
 			if (originMap.containsKey(aCasReferenceId))
 			{
 				originMap.remove(aCasReferenceId);
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+                "removeMessageOrigin", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_remove_msg_origin_entry__FINEST",
+                new Object[] {getComponentName(), aCasReferenceId });
 			}
 		}
 	}
@@ -423,7 +432,18 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		
 		endProcess(AsynchAEMessage.Process);
 
-		getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, getClientEndpoint());
+    if ( !getClientEndpoint().isRemote() && System.getProperty("UseVmTransport") != null)
+    {
+        UimaMessage message = 
+          getTransport(getClientEndpoint().getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
+        //  Send reply back to the client. Use internal (non-jms) transport
+        getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+    }
+    else
+    {
+      getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, getClientEndpoint());
+    }
+		
 		clientEndpoint = null;
 		clearStats();
 	}
@@ -529,8 +549,26 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				Endpoint endpoint = (Endpoint)entry.getValue();
 				if (endpoint != null )
 				{
-					getOutputChannel().sendRequest(AsynchAEMessage.CollectionProcessComplete, endpoint);
-					endpoint.startCollectionProcessCompleteTimer();
+				  
+			    if ( !endpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+			    {
+			      try
+			      {
+			        UimaMessage message = 
+			          getTransport(endpoint.getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Request,getName());
+			          //  Send reply back to the client. Use internal (non-jms) transport
+			         getTransport(endpoint.getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+			      }
+			      catch( Exception e)
+			      {
+			        e.printStackTrace();
+			      }
+			    }
+			    else
+			    {
+			      getOutputChannel().sendRequest(AsynchAEMessage.CollectionProcessComplete, endpoint);
+					  endpoint.startCollectionProcessCompleteTimer();
+			    }
 				}
 			}
 		}
@@ -934,7 +972,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				(( AggregateAnalysisEngineController)childControllerList.get(i)).sendRequestForMetadataToRemoteDelegates();
 			}
 		}
-		Endpoint[] remoteEndpoints = new Endpoint[destinationMap.size()];
+		Endpoint[] delegateEndpoints = new Endpoint[destinationMap.size()];
 
 		//	First copy endpoints to an array so that we dont get Concurrent access problems
 		//	in case an error handler needs to disable the endpoint.
@@ -943,16 +981,16 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		int indx=0;
 		while (it.hasNext())
 		{
-			remoteEndpoints[indx++] = (Endpoint) destinationMap.get((String) it.next());
+		  delegateEndpoints[indx++] = (Endpoint) destinationMap.get((String) it.next());
 		}
 		//	Now send GetMeta request to all remote delegates
-		for( int i=0; i < remoteEndpoints.length; i++)
+		for( int i=0; i < delegateEndpoints.length; i++)
 		{
-			if ( remoteEndpoints[i].isRemote())
+			if ( delegateEndpoints[i].isRemote())
 			{
-				remoteEndpoints[i].initialize();
-				remoteEndpoints[i].setController(this);
-				String key = lookUpDelegateKey(remoteEndpoints[i].getEndpoint());
+			  delegateEndpoints[i].initialize();
+			  delegateEndpoints[i].setController(this);
+				String key = lookUpDelegateKey(delegateEndpoints[i].getEndpoint());
 				if ( key != null && destinationMap.containsKey(key))
 				{
 					Endpoint endpoint = ((Endpoint) destinationMap.get(key));
@@ -985,8 +1023,37 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 						delegateStatMap.put( key, delegateStatsArray);					
 					}
-					dispatchMetadataRequest(remoteEndpoints[i]);
+					dispatchMetadataRequest(delegateEndpoints[i]);
 				}
+			}
+			
+			else
+			{
+			  // collocated delegate
+	      delegateEndpoints[i].initialize();
+	      delegateEndpoints[i].setController(this);
+	      
+	      // Dispatch GetMeta to the collocated component
+	      if ( System.getProperty("UseVmTransport") != null)
+	      {
+	        delegateEndpoints[i].setWaitingForResponse(true);
+	        try
+	        {
+	          UimaMessage message = 
+	            getTransport(delegateEndpoints[i].getEndpoint()).produceMessage(AsynchAEMessage.GetMeta,AsynchAEMessage.Request,getName());
+
+	          getTransport(delegateEndpoints[i].getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+	        }
+	        catch( Exception e)
+	        {
+	          throw new AsynchAEException(e);
+	        }
+	      }
+	      else
+	      {
+	        ((AggregateAnalysisEngineController) this).dispatchMetadataRequest(delegateEndpoints[i]);
+	      }
+	      
 			}
 		}
 	}
@@ -995,11 +1062,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		Endpoint endpoint=null;
 		boolean casDropped = false;
-
+		boolean replySentToClient = false;
 		boolean subordinateCasInPlayCountDecremented=false;
+		boolean isSubordinate = false;
 		CacheEntry cacheEntry = null;
 		Endpoint freeCasEndpoint = null;
 		CacheEntry parentCASCacheEntry = null;
+
+		getInProcessCache().dumpContents(getComponentName());
 		
 		try
 		{
@@ -1023,6 +1093,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		{
 			endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
 			
+			boolean doReleaseParent = false;
+			
 			synchronized( super.finalStepMux)
 			{
 				//	Check if this CAS has children (subordinates)
@@ -1043,9 +1115,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 						"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_no_children__FINEST", new Object[] { getComponentName(),aCasReferenceId});
 
-
+				isSubordinate = cacheEntry.isSubordinate();
 				//	If this CAS has a parent, save the destination of a CM that produced it and where we may need to send Free Cas Notification
-				if ( cacheEntry.isSubordinate())
+				if ( isSubordinate )
 				{
 					freeCasEndpoint = cacheEntry.getFreeCasEndpoint();
 					// Decrement this Cas parent child count if this is a top controller
@@ -1059,39 +1131,56 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						subordinateCasInPlayCountDecremented = true;
 					}
 				}
+				
+	      Endpoint clientEndpoint = null;
+	      //  If the CAS was generated by this component but the Flow Controller wants to drop it OR this component
+	      //  is not a Cas Multiplier
+	      if ( forceToDropTheCas( cacheEntry, aStep ) )
+	      {
+	        if ( cacheEntry.isReplyReceived() ) 
+	        {
+	          //  Drop the CAS and remove cache entry for it
+	          dropCAS(aCasReferenceId, true);
+	          casDropped = true;
+	          //  If debug level=FINEST dump the entire cache
+	          getInProcessCache().dumpContents(getComponentName());
+	          // Set this state as if we sent the reply to the client. This triggers a cleanup of origin map and stats
+	          // for the current cas
+	          if ( isTopLevelComponent())
+	          {
+	            replySentToClient = true;
+	          }
+	        }
+	      } 
+	      else 
+	      {
+	        
+	        synchronized( super.finalStepMux)
+	        {
+	          if ( cacheEntry.isSubordinate())
+	          {
+	            cacheEntry.setWaitingForRelease(true);
+	          }
+	        }
+	        
+	        //  Send a reply to the Client. If the CAS is an input CAS it will be dropped
+	        clientEndpoint = replyToClient( cacheEntry );
+	        if ( clientEndpoint != null )
+	        {
+	          replySentToClient = true;
+	        }
+	      }
+	      if ( releaseParentCas(casDropped, clientEndpoint, parentCASCacheEntry) )
+	      {
+	        doReleaseParent = true;
+	      }
+				
 			}
 			
-			Endpoint clientEndpoint = null;
-			//	If the CAS was generated by this component but the Flow Controller wants to drop it OR this component
-			//	is not a Cas Multiplier
-			if ( forceToDropTheCas( cacheEntry, aStep ) )
-			{
-				if ( cacheEntry.isReplyReceived() ) 
-				{
-					//	Drop the CAS and remove cache entry for it
-					dropCAS(aCasReferenceId, true);
-					casDropped = true;
-					//	If debug level=FINEST dump the entire cache
-					getInProcessCache().dumpContents(getComponentName());
-				}
-			} 
-			else 
-			{
-				
-				synchronized( super.finalStepMux)
-				{
-					if ( cacheEntry.isSubordinate())
-					{
-						cacheEntry.setWaitingForRelease(true);
-					}
-				}
-				//	Send a reply to the Client. If the CAS is an input CAS it will be dropped
-				clientEndpoint = replyToClient( cacheEntry );
-			}
 			//	Now check if the parent CAS is ready for a finalStep. The parent CAS may 
 			//	have been processed already but	it is cached since its children are still 
 			//	in play.
-			if ( releaseParentCas(casDropped, clientEndpoint, parentCASCacheEntry) )
+			if ( doReleaseParent )
 			{
 				//	All subordinate CASes have been processed. Process the parent CAS recursively.
 				finalStep(parentCASCacheEntry.getFinalStep(), parentCASCacheEntry.getCasReferenceId());
@@ -1123,8 +1212,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		finally
 		{
-			removeMessageOrigin(aCasReferenceId);
-			dropStats(aCasReferenceId, super.getName());
+		  if ( replySentToClient )
+		  {
+	      removeMessageOrigin(aCasReferenceId);
+	      dropStats(aCasReferenceId, super.getName());
+		  }
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 					"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_show_internal_stats__FINEST", new Object[] { getName(), flowMap.size(),getInProcessCache().getSize(),originMap.size(), super.statsMap.size()});
 			//	freeCasEndpoint is a special endpoint for sending Free CAS Notification.
@@ -1179,7 +1271,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		// should return the origin.
 		if (isTopLevelComponent())
 		{
-			if ( cacheEntry.isSubordinate()) //getCasSequence() > 0 )
+			if ( cacheEntry.isSubordinate()) 
 			{
 				endpoint = getInProcessCache().getTopAncestorEndpoint(cacheEntry);	
 			}
@@ -1190,7 +1282,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		else
 		{
-			endpoint = getMessageOrigin(cacheEntry.getCasReferenceId());
+		  endpoint = getReplyEndpoint( cacheEntry );
+/*
+		  endpoint = getMessageOrigin(cacheEntry.getCasReferenceId());
+			if ( endpoint == null && cacheEntry.getInputCasReferenceId() != null)
+			{
+			  endpoint = getMessageOrigin(cacheEntry.getInputCasReferenceId());
+			}
+*/	
 			dropFlow(cacheEntry.getCasReferenceId(), false);
 		}
 		if ( endpoint != null )
@@ -1222,15 +1321,29 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						{
 							cmOutstandingCASes.put(cacheEntry.getCasReferenceId(),cacheEntry.getCasReferenceId());
 						}
+				    if ( !endpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+				    {
+				      sendVMMessage(AsynchAEMessage.Request, endpoint, cacheEntry);
+				    }
+				    else
+				    {
+	            // Send response to a given endpoint
+	            //getOutputChannel().sendReply(cacheEntry.getCas(), cacheEntry.getInputCasReferenceId(), aCasReferenceId, endpoint, cacheEntry.getCasSequence());
+	            getOutputChannel().sendReply(cacheEntry, endpoint);
 
-						// Send response to a given endpoint
-						//getOutputChannel().sendReply(cacheEntry.getCas(), cacheEntry.getInputCasReferenceId(), aCasReferenceId, endpoint, cacheEntry.getCasSequence());
-						getOutputChannel().sendReply(cacheEntry, endpoint);
+				    }
 					}
 					else
 					{
-						// Send response to a given endpoint
-						getOutputChannel().sendReply(cacheEntry.getCasReferenceId(), endpoint);
+            if ( !endpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+            {
+              sendVMMessage(AsynchAEMessage.Response, endpoint, cacheEntry);
+            }
+            else
+            {
+              // Send response to a given endpoint
+              getOutputChannel().sendReply(cacheEntry.getCasReferenceId(), endpoint);
+            }
 					}
 				}
 			}
@@ -1246,8 +1359,48 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 			}
 		}
+		else
+		{
+		  System.out.println("!!!!!!!!!!!!!!! Controller:"+getComponentName()+" Origin Endpoint Not Found For Cas:"+cacheEntry.getCasReferenceId()+" Or Its Parent Cas:"+cacheEntry.getInputCasReferenceId());
+		}
 		return endpoint;
 	}
+  private synchronized void sendVMMessage( int messageType, Endpoint endpoint, CacheEntry cacheEntry) throws Exception 
+  {
+    //  If the CAS was produced by this aggregate send the request message to the client
+    //  Otherwise send the response message.
+    UimaMessage message = getTransport(endpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,messageType,getName());
+    if ( cacheEntry.getCasProducerAggregateName() != null && cacheEntry.getCasProducerAggregateName().equals(getComponentName()))
+    {
+      message.addLongProperty(AsynchAEMessage.CasSequence, cacheEntry.getCasSequence());
+    }
+    message.addStringProperty(AsynchAEMessage.CasReference, cacheEntry.getCasReferenceId());
+    message.addStringProperty(AsynchAEMessage.InputCasReference, cacheEntry.getInputCasReferenceId());
+    ServicePerformance casStats = getCasStatistics(cacheEntry.getCasReferenceId());
+    
+    message.addLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
+    message.addLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
+    message.addLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
+    long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
+    message.addLongProperty(AsynchAEMessage.IdleTime, iT );
+    //  Send reply back to the client. Use internal (non-jms) transport
+    getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+  }
+	private Endpoint getReplyEndpoint(CacheEntry cacheEntry) throws Exception
+	{
+	  if ( cacheEntry == null )
+	  {
+	    return null;
+	  }
+    Endpoint endpoint = getMessageOrigin(cacheEntry.getCasReferenceId());
+    if ( endpoint == null && cacheEntry.getInputCasReferenceId() != null)
+    {
+      //  Recursively call self until an endpoint is found
+      endpoint = getReplyEndpoint(getInProcessCache().getCacheEntryForCAS(cacheEntry.getInputCasReferenceId()));
+    }
+    return endpoint;
+	}
+	
 	private void executeFlowStep(FlowContainer aFlow, String aCasReferenceId, boolean newCAS) throws AsynchAEException
 	{
 		Step step = null;
@@ -1323,7 +1476,25 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	private void dispatch(String aCasReferenceId, Endpoint anEndpoint) throws AsynchAEException
 	{
-		getOutputChannel().sendRequest(aCasReferenceId, anEndpoint);
+    if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+    {
+      try
+      {
+        UimaMessage message = 
+          getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
+        message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+          //  Send reply back to the client. Use internal (non-jms) transport
+         getTransport(anEndpoint.getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+      }
+      catch( Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
+    else
+    {
+      getOutputChannel().sendRequest(aCasReferenceId, anEndpoint);
+    }
 	}
 
 	private void dispatchProcessRequest(String aCasReferenceId, Endpoint anEndpoint, boolean addEndpointToCache) throws AsynchAEException
@@ -1771,24 +1942,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		dispatchMetadataRequest(anEndpoint);
 	}
 
-	public void sendMetadata(Endpoint anEndpoint)// throws AsynchAEException
+	public void sendMetadata(Endpoint anEndpoint)
 	{
-		try
-		{
-			if ( aggregateMetadata != null )
-			{
-				getOutputChannel().sendReply(aggregateMetadata, anEndpoint, true);
-			}
-		}
-		catch ( Exception e)
-		{
-			HashMap map = new HashMap();
-			map.put(AsynchAEMessage.Endpoint, anEndpoint);
-			map.put(AsynchAEMessage.MessageType, Integer.valueOf(AsynchAEMessage.Request));
-			map.put(AsynchAEMessage.Command, Integer.valueOf(AsynchAEMessage.Metadata));
-
-			handleError(map, e);
-		}
+    super.sendMetadata(anEndpoint, aggregateMetadata);
 	}
 
 	public ControllerLatch getControllerLatch()
@@ -1999,5 +2155,5 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			delegateController.onInitialize();
 		}
     }
-
+	
 }
