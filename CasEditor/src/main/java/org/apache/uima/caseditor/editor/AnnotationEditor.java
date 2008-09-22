@@ -22,8 +22,6 @@ package org.apache.uima.caseditor.editor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +40,14 @@ import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;
 import org.apache.uima.caseditor.editor.annotation.DrawingStyle;
 import org.apache.uima.caseditor.editor.annotation.EclipseAnnotationPeer;
 import org.apache.uima.caseditor.editor.context.AnnotationEditingControlCreator;
+import org.apache.uima.caseditor.editor.contextmenu.IModeMenuListener;
+import org.apache.uima.caseditor.editor.contextmenu.IShowAnnotationsListener;
+import org.apache.uima.caseditor.editor.contextmenu.ModeMenu;
+import org.apache.uima.caseditor.editor.contextmenu.ShowAnnotationsMenu;
 import org.apache.uima.caseditor.editor.outline.AnnotationOutline;
 import org.apache.uima.caseditor.ui.FeatureStructureTransfer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -80,10 +81,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -277,189 +274,6 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       mFeatureStructureSelectionProvider.clearSelection();
 
       syncAnnotations();
-    }
-  }
-
-  /**
-   */
-  private static abstract class TypeMenu extends ContributionItem {
-    private Type mParentType;
-
-    private TypeSystem mTypeSystem;
-
-    /**
-     * Initializes a new instance.
-     *
-     * @param parentType
-     * @param typeSystem
-     */
-    TypeMenu(Type parentType, TypeSystem typeSystem) {
-      mParentType = parentType;
-      mTypeSystem = typeSystem;
-    }
-
-    /**
-     * Fills the menu with type entries.
-     *
-     * @param menu
-     * @param index
-     */
-    @Override
-    public void fill(Menu menu, int index) {
-      fillTypeMenu(mParentType, menu, false);
-    }
-
-    private void fillTypeMenu(Type parentType, Menu parentMenu, boolean isParentIncluded) {
-      List<Type> childs = mTypeSystem.getDirectSubtypes(parentType);
-
-      Menu newSubMenu;
-
-      // has this type sub types ?
-      // yes
-      if (childs.size() != 0) {
-
-        if (isParentIncluded) {
-          MenuItem  subMenuItem = new MenuItem(parentMenu, SWT.CASCADE);
-          subMenuItem.setText(parentType.getShortName());
-
-          newSubMenu = new Menu(subMenuItem);
-          subMenuItem.setMenu(newSubMenu);
-        }
-        else {
-          newSubMenu = parentMenu;
-        }
-
-        insertAction(parentType, newSubMenu);
-
-        Iterator<Type> childsIterator = childs.iterator();
-
-        while (childsIterator.hasNext()) {
-          Type child = childsIterator.next();
-
-          fillTypeMenu(child, newSubMenu, true);
-        }
-      }
-      // no
-      else {
-        insertAction(parentType, parentMenu);
-      }
-    }
-    protected abstract void insertAction(final Type type, Menu parentMenu);
-  }
-
-  /**
-   * Creates the mode context sub menu.
-   */
-  private class ModeMenu extends TypeMenu {
-	  
-    /**
-     * Initializes a new instance.
-     *
-     * @param type
-     * @param typeSystem
-     */
-    ModeMenu(TypeSystem typeSystem) {
-      super(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION), typeSystem);
-    }
-
-    @Override
-    protected void insertAction(final Type type, Menu parentMenu) {
-      MenuItem actionItem = new MenuItem(parentMenu, SWT.PUSH);
-      actionItem.setText(type.getShortName());
-
-      actionItem.addListener(SWT.Selection, new Listener() {
-        public void handleEvent(Event e) {
-
-          IAction actionToExecute = new ChangeModeAction(type, type.getShortName(),
-                  AnnotationEditor.this);
-
-          actionToExecute.run();
-        }
-      });
-    }
-  }
-
-  /**
-   * Creates the show annotations context sub menu.
-   */
-  private class ShowAnnotationsMenu extends TypeMenu {
-
-    /**
-     * This collection contains all type names which are displayed in
-     * the editor.
-     */
-    private Collection<Type> mTypesToDisplay = new HashSet<Type>();
-
-    /**
-     * Initializes a new instance.
-     *
-     * @param type
-     * @param typeSystem
-     */
-    ShowAnnotationsMenu(EditorAnnotationStatus status, TypeSystem typeSystem) {
-      super(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION), typeSystem);
-
-      for (String typeName : status.getDisplayAnnotations()) {
-        mTypesToDisplay.add(getDocument().getType(typeName));
-      }
-    }
-
-    @Override
-    protected void insertAction(final Type type, Menu parentMenu) {
-      final MenuItem actionItem = new MenuItem(parentMenu, SWT.CHECK);
-      actionItem.setText(type.getShortName());
-
-      if (getAnnotationMode().equals(type)) {
-    	  actionItem.setSelection(true);
-      }
-
-      if (mTypesToDisplay.contains(type)) {
-        actionItem.setSelection(true);
-      }
-
-      // TODO: move this to an action
-      // do not access mTypesToDisplay directly !!!
-      actionItem.addListener(SWT.Selection, new Listener() {
-        public void handleEvent(Event e) {
-          if (actionItem.getSelection()) {
-            mTypesToDisplay.add(type);
-
-          } else {
-            mTypesToDisplay.remove(type);
-          }
-
-          mEditorListener.showAnnotationsChanged(getShownAnnotationTypes());
-          
-          // TODO: only synchronize annotation which
-          // must be removed/added
-          syncAnnotations();
-
-          EditorAnnotationStatus status = getDocument().getProject().getEditorAnnotationStatus();
-
-          getDocument().getProject().setEditorAnnotationStatus(
-                  new EditorAnnotationStatus(status.getMode(), getSelectedTypes()));
-        }
-      });
-    }
-
-    Collection<Type> getSelectedTypes() {
-      Collection<Type> selectedTypes = new LinkedList<Type>();
-
-      for (Type type : mTypesToDisplay) {
-        selectedTypes.add(type);
-      }
-
-      return Collections.unmodifiableCollection(selectedTypes);
-    }
-
-    void setSelectedTypes(Collection<Type> types) {
-      mTypesToDisplay = new HashSet<Type>();
-
-      for (Type type : types) {
-        mTypesToDisplay.add(type);
-      }
-      
-      mEditorListener.showAnnotationsChanged(getSelectedTypes());
     }
   }
 
@@ -741,6 +555,22 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 	    mShowAnnotationsMenu = new ShowAnnotationsMenu(
 	    		getDocument().getProject().getEditorAnnotationStatus(),
 	    		getDocument().getCAS().getTypeSystem());
+	    mShowAnnotationsMenu.addListener(new IShowAnnotationsListener() {
+
+			public void selectionChanged(Collection<Type> selection) {
+		          // TODO: only synchronize annotation which
+		          // must be removed/added
+		          syncAnnotations();
+
+		          EditorAnnotationStatus status = getDocument().getProject().getEditorAnnotationStatus();
+
+		          getDocument().getProject().setEditorAnnotationStatus(
+		                  new EditorAnnotationStatus(status.getMode(), selection));
+		          
+		          if (mEditorListener != null)
+		        	  	mEditorListener.showAnnotationsChanged(selection);
+			}
+	    });
 
 	    EditorAnnotationStatus status = getDocument().getProject().getEditorAnnotationStatus();
 
@@ -786,9 +616,21 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     TypeSystem typeSytem = getDocument().getCAS().getTypeSystem();
 
     // mode menu
-    MenuManager modeMenu = new MenuManager("Mode");
-    menu.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, modeMenu);
-    modeMenu.add(new ModeMenu(typeSytem));
+    MenuManager modeMenuManager = new MenuManager("Mode");
+    menu.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, modeMenuManager);
+    
+    ModeMenu modeMenu = new ModeMenu(typeSytem);
+    modeMenu.addListener(new IModeMenuListener(){
+
+		public void modeChanged(Type newMode) {
+	        IAction actionToExecute = new ChangeModeAction(newMode,
+	        		newMode.getShortName(),
+	                AnnotationEditor.this);
+
+	        actionToExecute.run();
+		}});
+    
+    modeMenuManager.add(modeMenu);
 
     // annotation menu
     MenuManager showAnnotationMenu = new MenuManager("Show Annotations");
@@ -836,7 +678,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     // TODO: check if this type is a subtype of Annotation
 
     mAnnotationMode = type;
-
+    
     highlight(0, 0);
 
     setProjectEditorStatus();
@@ -846,6 +688,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     syncAnnotations();
 
     fireAnnotationTypeChanged(getAnnotationMode());
+    
+    mShowAnnotationsMenu.setEditorAnnotationMode(type);
   }
 
   public Collection<Type> getShownAnnotationTypes() {
@@ -856,11 +700,9 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    * @param type
    */
   private void fireAnnotationTypeChanged(Type type) {
-    if (mEditorListener == null) {
-      return;
+    if (mEditorListener != null) {
+    	mEditorListener.annotationModeChanged(type);
     }
-
-    mEditorListener.annotationModeChanged(type);
   }
 
   private void showAnnotationType(Type type) {
