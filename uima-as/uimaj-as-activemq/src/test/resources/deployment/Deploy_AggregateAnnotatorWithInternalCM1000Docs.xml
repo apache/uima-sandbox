@@ -33,7 +33,7 @@
       <topDescriptor>
         <import location="../descriptors/analysis_engine/SimpleTestAggregateWith1000DocCM.xml"/>
       </topDescriptor>
-      <analysisEngine>
+      <analysisEngine internalReplyQueueScaleout="3">
         <delegates>
         
           <analysisEngine key="TestMultiplier">

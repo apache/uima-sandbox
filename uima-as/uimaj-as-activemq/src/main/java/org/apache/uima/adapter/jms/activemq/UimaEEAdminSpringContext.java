@@ -72,6 +72,27 @@ implements UimaEEAdminContext, ApplicationListener
 	{
 		return springContainer;
 	}
+
+	public int getConcurrentConsumerCount( String anEndpointName )
+	{
+    try
+    {
+      if ( anEndpointName != null && anEndpointName.trim().length() > 0 && springContainer.isActive() && listenerMap.containsKey(anEndpointName))
+      {
+        ListenerEntry listenerEntry = null;
+        
+        listenerEntry =((ListenerEntry)listenerMap.get(anEndpointName));
+        if ( listenerEntry != null && listenerEntry.isStopped() == false )
+        {
+              UimaDefaultMessageListenerContainer listenerContainer = 
+                listenerEntry.getListenerContainer();
+              return listenerContainer.getConcurrentConsumers();
+        }
+      }       
+    }
+    catch( Exception e) {}
+	  return -1;
+	}
 	/**
 	 * Stops a listener thread on a given endpoint
 	 */

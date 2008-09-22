@@ -44,6 +44,7 @@ import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.error.MessageTimeoutException;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.JmsOutputChannel;
@@ -159,7 +160,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
 		super.setExpectingServiceShutdown();
-		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, EXCEPTION_LATCH);
+		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
 	}
 	/**
 	 * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
@@ -173,9 +174,39 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateUsingRemoteTempQueue.xml");
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+		
 	}
 
-  /**
+	/**
+	 * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
+	 * 
+	 * @throws Exception
+	 */
+	public void testProcessAggregateServiceWith1000Docs() throws Exception
+	{
+		System.out.println("-------------- testProcessAggregateServiceWith1000Docs -------------");
+		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
+//		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWith1MillionDocs.xml");
+		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+		
+	}
+
+	
+	 public void testProcessAggregateWithInnerAggregateCM() throws Exception
+	  {
+	    System.out.println("-------------- testProcessAggregateWithInnerAggregateCM() -------------");
+	    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+	    System.setProperty(JmsConstants.SessionTimeoutOverride, "2500000");
+	    deployService(eeUimaEngine, relativePath+"/Deploy_ComplexAggregateWithInnerAggregateCM.xml");
+	    super.setExpectingServiceShutdown();
+	    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	  }
+
+   /**
    * Tests exception thrown in the Uima EE Client when the Collection Reader is added after
    * the uima ee client is initialized
    * 
@@ -444,6 +475,9 @@ public class TestUimaASExtended extends BaseTestSupport
     Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
     // Set an explicit process timeout so one of the 1st parallels is disabled but 2nd parallel flow continues.
     appCtx.put(UimaAsynchronousEngine.Timeout, 20000 );
+    addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
+    addExceptionToignore(org.apache.uima.aae.error.UimaASProcessCasTimeout.class);
+    
     runTest(appCtx, eeUimaEngine, null, null, 1, PROCESS_LATCH);
   }
 
@@ -655,6 +689,7 @@ public class TestUimaASExtended extends BaseTestSupport
     Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
     // Set an explicit CPC timeout as exceptions thrown in the 2nd annotator's CPC don't reach the client.
     appCtx.put(UimaAsynchronousEngine.CpcTimeout, 20000 );
+    addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
     runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
   }
 
@@ -667,6 +702,7 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlowDisableOnDelegateFailure.xml");
+    addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
   }
 

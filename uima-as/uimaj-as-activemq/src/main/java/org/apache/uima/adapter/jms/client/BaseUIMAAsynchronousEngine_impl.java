@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -132,7 +131,6 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	/**
 	 * Initialize JMS Message with properties relevant to Process CAS request.
 	 */
-	
 	protected void setCASMessage(String aCasReferenceId, CAS aCAS, TextMessage msg) throws ResourceProcessException
 	{
 		try{

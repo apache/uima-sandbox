@@ -628,7 +628,9 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 					getController().beginProcess(requestType);
 				}
 
-				
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+                "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_new_msg_in__FINEST",
+                new Object[] { getController().getComponentName(), msgFrom, command, messageType, casRefId });
 				if ( handler != null )
 				{
 					handler.handle( messageContext );
@@ -636,7 +638,10 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			}
 			else
 			{
-				controller.getErrorHandlerChain().handle(new InvalidMessageException(), HandlerBase.populateErrorContext( messageContext ), controller);			
+			  if ( !isStaleMessage(aMessage))
+			  {
+	        controller.getErrorHandlerChain().handle(new InvalidMessageException(), HandlerBase.populateErrorContext( messageContext ), controller);      
+			  }
 			}
 		
 		}
@@ -788,5 +793,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	{
 		return stopped;
 	}
-
+  public int getConcurrentConsumerCount()
+  {
+    return messageListener.getConcurrentConsumers();
+  }
 }

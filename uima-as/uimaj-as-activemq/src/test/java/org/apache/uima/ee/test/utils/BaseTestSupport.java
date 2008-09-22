@@ -20,6 +20,7 @@
 package org.apache.uima.ee.test.utils;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +67,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	protected boolean expectingServiceShutdownException = false;
 	protected long expectedProcessTime = 0;
 	boolean serviceShutdownException = false;
-
+	List<Class> exceptionsToIgnore = new ArrayList<Class>();
+	
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
 	{
 		Map<String, Object> appCtx = new HashMap();
@@ -77,6 +79,27 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		return containerId;
 	}
 
+	protected void addExceptionToignore( Class anExceptionToIgnore)
+	{
+	  exceptionsToIgnore.add( anExceptionToIgnore );
+	}
+	
+	protected boolean ignoreException( Class<?> anException )
+	{
+	  if ( anException == null )
+	  {
+	    return true;
+	  }
+	  for( int i=0; i < exceptionsToIgnore.size(); i++)
+	  {
+	    String name = anException.getName();
+	    if ( name.equals( exceptionsToIgnore.get(i).getName()) )
+	    {
+	      return true;
+	    }
+	  }
+	  return false;
+	}
 	protected void initialize(BaseUIMAAsynchronousEngine_impl eeUimaEngine, Map<String, Object> appCtx) throws Exception
 	{
 		eeUimaEngine.addStatusCallbackListener(this);
@@ -497,10 +520,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	 * is received. The reply contains either the CAS or an exception that occurred 
 	 * while processing the CAS.
 	 */
-	public void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
+	public synchronized void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
 	{
 		String casReferenceId="";
 		String parentCasReferenceId="";
+		boolean expectedException = false;
 		if ( aProcessStatus instanceof UimaASProcessStatus )
 		{
 			casReferenceId = 
@@ -523,7 +547,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 				{
 					serviceShutdownException = true;
 				}
-				if ( !expectingServiceShutdownException )
+				else if ( ignoreException( e.getClass()))
+				{
+				  expectedException = true;
+				}
+				if ( !expectedException && !expectingServiceShutdownException )
 				{
 					e.printStackTrace();
 				}
@@ -538,7 +566,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 			}
 			else if (processCountLatch != null)
 			{
-				if ( !(serviceShutdownException && expectingServiceShutdownException) )
+			  
+			  
+			  
+			  
+				if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
 				{
 				unexpectedException = true;
 				System.out.println(" ... when expecting normal completion!");

@@ -493,7 +493,6 @@ public class JmsOutputChannel implements OutputChannel
 						{
 							serviceInfo.setReplyQueueName(replyQueueName);
 							serviceInfo.setServiceKey(delegateKey);
-							System.out.println("Service:"+delegateKey+" Directed to Reply To:"+replyQueueName);
 						}
 					}
 				}
@@ -503,7 +502,6 @@ public class JmsOutputChannel implements OutputChannel
 					if (serviceInfo != null )
 					{
 						serviceInfo.setReplyQueueName(controllerInputEndpoint);
-						System.out.println("Aggregate Service Reply Queue:"+getAnalysisEngineController().getComponentName()+" Reply To:"+controllerInputEndpoint);
 					}
 				}
 			}
@@ -677,7 +675,22 @@ public class JmsOutputChannel implements OutputChannel
 	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_reply_with_sequence__FINE",
 	                    new Object[] { anEndpoint.getEndpoint(), entry.getCasReferenceId(), entry.getCasSequence() });
-				sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
+
+	            if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController && getAnalysisEngineController().isCasMultiplier() )
+	            {
+	              if ( ((AggregateAnalysisEngineController)getAnalysisEngineController()).getMessageOrigin(entry.getInputCasReferenceId()) != null)
+	              {
+	                sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
+	              }
+	              else
+	              {
+	                sendCasToCollocatedDelegate(false, entry.getCasReferenceId(), null, anEndpoint, false, 0);
+	              }
+	            }
+	            else
+	            {
+                sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
+	            }
 			}
 		}
 		catch( ServiceShutdownException e)
@@ -1153,7 +1166,7 @@ public class JmsOutputChannel implements OutputChannel
 		aMessage.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Response); 
 		aMessage.setIntProperty(AsynchAEMessage.Command, aCommand); 
 		aMessage.setStringProperty(AsynchAEMessage.MessageFrom, serviceInputEndpoint);
-	
+		
 		if (anEndpoint.isRemote())
 		{
 			aMessage.setStringProperty(UIMAMessage.ServerURI, getServerURI());

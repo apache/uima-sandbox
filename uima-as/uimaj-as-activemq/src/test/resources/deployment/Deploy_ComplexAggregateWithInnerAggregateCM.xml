@@ -31,24 +31,24 @@
     <service>
       <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
       <topDescriptor>
-        <import location="../descriptors/analysis_engine/SimpleTestAggregateWith1MillionDocs.xml"/>
+        <import location="../descriptors/analysis_engine/ComplexAggregateWithInnerAggregateCM.xml"/>
       </topDescriptor>
-      <analysisEngine inputQueueScaleout="3" internalReplyQueueScaleout="5">
+      <analysisEngine>
         <delegates>
         
           <analysisEngine key="TestMultiplier">
 	        <casMultiplier poolSize="5"/> 
           </analysisEngine>
 
-          <remoteAnalysisEngine key="NoOp" remoteReplyQueueScaleout="3">
-	                  <inputQueue endpoint="NoOpAnnotatorQueue" brokerURL="tcp://localhost:8118"/>
-	                  <serializer method="xmi"/>
-                      <asyncAggregateErrorConfiguration>
-                            <getMetadataErrors maxRetries="3" timeout="5000" errorAction="continue" />
-                            <processCasErrors maxRetries="0" timeout="5000" thresholdCount="1" thresholdAction="continue" />
-                      </asyncAggregateErrorConfiguration>
-          </remoteAnalysisEngine>
-
+          <analysisEngine key="MeetingDetectorAggregate" async="true">
+            <casMultiplier poolSize="25" initialFsHeapSize="20000"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="60000" errorAction="terminate"/>
+              <processCasErrors maxRetries="0" timeout="0" continueOnRetryFailure="false" thresholdCount="0" thresholdWindow="0" thresholdAction="terminate"/>
+              <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+          </analysisEngine>
+			
         </delegates>
       </analysisEngine>
     </service>
