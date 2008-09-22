@@ -35,7 +35,7 @@ import org.apache.uima.caseditor.editor.action.LowerRightAnnotationSideAction;
 import org.apache.uima.caseditor.editor.action.MergeAnnotationAction;
 import org.apache.uima.caseditor.editor.action.WideLeftAnnotationSideAction;
 import org.apache.uima.caseditor.editor.action.WideRightAnnotationSideAction;
-import org.apache.uima.caseditor.ui.FeatureStructureTransfer;
+import org.apache.uima.caseditor.editor.util.FeatureStructureTransfer;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;

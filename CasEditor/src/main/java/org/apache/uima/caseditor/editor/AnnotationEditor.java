@@ -45,7 +45,7 @@ import org.apache.uima.caseditor.editor.contextmenu.IShowAnnotationsListener;
 import org.apache.uima.caseditor.editor.contextmenu.ModeMenu;
 import org.apache.uima.caseditor.editor.contextmenu.ShowAnnotationsMenu;
 import org.apache.uima.caseditor.editor.outline.AnnotationOutline;
-import org.apache.uima.caseditor.ui.FeatureStructureTransfer;
+import org.apache.uima.caseditor.editor.util.FeatureStructureTransfer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;

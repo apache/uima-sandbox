@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.ui;
+package org.apache.uima.caseditor.editor.util;
 
 /**
  * This class is able to transfer a {@link org.apache.uima.cas.FeatureStructure}
