@@ -30,7 +30,7 @@
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>uimaj-as-eclipse-plugins</artifactId>
-    <version>2.2.2.incubating</version> <!-- this comment is a flag for changeVersion -->
+    <version>2.3.0.incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
   </parent>
   <dependencies>
     <dependency>
@@ -83,7 +83,7 @@
 
             <Bundle-SymbolicName>org.apache.uima.runtime.fragments.deployeditor;singleton:=true</Bundle-SymbolicName>
 
-            <Fragment-Host>org.apache.uima.runtime;bundle-version="2.2.2"</Fragment-Host>
+            <Fragment-Host>org.apache.uima.runtime;bundle-version="2.3.0"</Fragment-Host>
           </instructions>
         </configuration>
       </plugin>
