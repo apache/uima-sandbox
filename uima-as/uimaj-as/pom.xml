@@ -29,14 +29,14 @@
     <artifactId>uimaj</artifactId>
     
     <!-- the version of base UIMA this version goes with -->
-    <version>2.2.3-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
     
   </parent>
   <properties>
       <uimaj-as-release-version>2.3.0-incubating-SNAPSHOT</uimaj-as-release-version>
       <uimaj-as-release-eclipse-version>2.3.0.incubating-SNAPSHOT</uimaj-as-release-eclipse-version>
   </properties>
-  <version>2.2.3-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+  <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
 
   <name>Apache UIMA Asynch Scaleout framework</name>
   <url>http://incubator.apache.org/uima</url>
