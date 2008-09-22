@@ -60,7 +60,6 @@ import org.apache.uima.aae.error.UimaASProcessCasTimeout;
 import org.apache.uima.aae.error.UimaEEServiceException;
 import org.apache.uima.aae.jmx.UimaASClientInfo;
 import org.apache.uima.aae.jmx.UimaASClientInfoMBean;
-import org.apache.uima.aae.jmx.UimaASClientInfo;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.message.PendingMessage;
@@ -81,11 +80,6 @@ import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 import org.apache.uima.aae.client.UimaASProcessStatus;
-import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.client.UimaASProcessStatusImpl;
-import org.apache.uima.aae.client.UimaASStatusCallbackListener;
-import org.apache.uima.adapter.jms.JmsConstants;
-import org.apache.uima.adapter.jms.message.PendingMessage;
 import org.apache.uima.aae.controller.Endpoint;
 
 public abstract class BaseUIMAAsynchronousEngineCommon_impl 
@@ -877,7 +871,6 @@ implements UimaAsynchronousEngine, MessageListener
 					//	Send FreeCAS message to a Cas Multiplier
 					msgProducer.send(msg);
 				
-					System.out.println("------------> Client Sent Free Cas Request For CAS:"+casReferenceId+" To:"+freeCASNotificationDestination);
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReplyFromCasMultiplier", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_client_sending_release_cas_FINEST",
 							new Object[] { freeCASNotificationDestination, message.getStringProperty(AsynchAEMessage.CasReference) });
 				}
@@ -888,9 +881,7 @@ implements UimaAsynchronousEngine, MessageListener
 				} 
 			}
 		}
-		System.out.println("------------> Client Deserializing CAS:"+casReferenceId);
 		CAS cas = deserializeCAS(((TextMessage) message).getText(), SHADOW_CAS_POOL );
-		System.out.println("++++++++++++> Client Deserialized CAS:"+casReferenceId);
 		completeProcessingReply(cas, casReferenceId, payload, true, message, inputCasCachedRequest, null);
 	}
 
@@ -1124,6 +1115,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		return aCAS;
 	}
+
 	
 	protected CAS deserializeCAS(String aSerializedCAS, ClientRequest cachedRequest) throws Exception
 	{

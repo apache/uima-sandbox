@@ -31,6 +31,7 @@ import javax.jms.TextMessage;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.message.AsynchAEMessage;
+import org.apache.uima.aae.message.UimaMessageValidator;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngineCommon_impl.ClientRequest;
 import org.apache.uima.adapter.jms.message.PendingMessage;
@@ -211,7 +212,7 @@ public abstract class BaseMessageSender implements Runnable,
 						CLASS_NAME.getName(), "run",
 						JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
 						"UIMAJMS_sending_msg_to_endpoint__FINEST",
-						new Object[] { destination });
+						new Object[] { UimaMessageValidator.decodeIntToString(AsynchAEMessage.Command, message.getIntProperty(AsynchAEMessage.Command)), UimaMessageValidator.decodeIntToString(AsynchAEMessage.MessageType,message.getIntProperty(AsynchAEMessage.MessageType)), destination });
 				
 				if ( pm.containsKey(AsynchAEMessage.CasReference) )
 				{
