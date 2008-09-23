@@ -251,11 +251,11 @@ public class ProcessResponseHandler extends HandlerBase
 			else // general case
 			{
 			  //	Processing a reply from a standard, non-parallel delegate
-			  if (cacheEntry.sentDeltaCas()) {
-				int highWaterMark = cacheEntry.getHighWaterMark();
-				deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.allow);
+			  if (aMessageContext.getMessageBooleanProperty(AsynchAEMessage.SentDeltaCas)) {
+			    int highWaterMark = cacheEntry.getHighWaterMark();
+			    deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.allow);
 			  } else {
-				deserialize(xmi, cas, casReferenceId);
+			    deserialize(xmi, cas, casReferenceId);
 			  }
 			}
 			
