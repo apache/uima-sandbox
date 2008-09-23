@@ -795,7 +795,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_process_reply_FINEST",
-				new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference) });
+				new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference), message.toString()+((TextMessage) message).getText() });
 
 		//	Fetch entry from the client cache for a cas id returned from the service
 		//	The client cache maintains an entry for every outstanding CAS sent to the
@@ -1165,7 +1165,7 @@ implements UimaAsynchronousEngine, MessageListener
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_process_reply_FINEST", new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom) });
 				handleProcessReply(message, true, null);
 			}
-			System.out.println("#### Client Completed Processing Of the Message. Waiting For Next Message...");
+//			System.out.println("#### Client Completed Processing Of the Message. Waiting For Next Message...");
 		}
 		catch (Exception e)
 		{
