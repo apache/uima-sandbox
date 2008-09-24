@@ -191,6 +191,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
 //		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWith1MillionDocs.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 		
 	}

@@ -418,7 +418,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		}
 	}
 
-	public synchronized boolean send(Message aMessage, boolean startTimer) //throws AsynchAEException
+	public boolean send(Message aMessage, boolean startTimer) 
 	{
 		String destinationName = "";
 
