@@ -21,7 +21,6 @@ package org.apache.uima.aae.jmx.monitor;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -144,52 +143,21 @@ public class JmxMonitor implements Runnable {
 		ObjectName runtimeObjName = new  ObjectName(ManagementFactory.RUNTIME_MXBEAN_NAME);
 		ObjectName threadObjName = new ObjectName(ManagementFactory.THREAD_MXBEAN_NAME);
 		ObjectName osObjName = new ObjectName( ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
-		
-		Set<ObjectName> mbeans = mbsc.queryNames(threadObjName, null);
-	    for (ObjectName name: mbeans) 
-	    {
-	    	/*
-			1.6 Approach for creating proxies */ 
-		    threads = 
-		    	ManagementFactory.newPlatformMXBeanProxy(
-		    			mbsc, name.toString(), ThreadMXBean.class);
-		    threads.setThreadCpuTimeEnabled(true);
-		    			
-		    long threadIds[] = threads.getAllThreadIds();
-		    for (long threadId: threadIds) 
-		    {
-		    	ThreadInfo threadInfo = threads.getThreadInfo(threadId);
-		    }
-	    }
+    Set<ObjectName> mbeans = mbsc.queryNames(threadObjName, null);
 
-		
-		mbeans = mbsc.queryNames(runtimeObjName, null);
-	    for (ObjectName name: mbeans) 
-	    {
-	    	/*
-			1.6 Approach for creating proxies
-		    threads = 
-		    	ManagementFactory.newPlatformMXBeanProxy(
-		    			mbsc, name.toString(), ThreadMXBean.class);
-		    			*/
-			runtime = MBeanServerInvocationHandler.newProxyInstance(mbsc, name,RuntimeMXBean.class, true);
-	    }
+    mbeans = mbsc.queryNames(runtimeObjName, null);
+	  for (ObjectName name: mbeans) 
+	  {
+			runtime = (RuntimeMXBean)MBeanServerInvocationHandler.newProxyInstance(mbsc, name,RuntimeMXBean.class, true);
+	  }
 	    
 		mbeans = mbsc.queryNames(osObjName, null);
-	    for (ObjectName name: mbeans) 
-	    {
-	    	/*
-			1.6 Approach for creating proxies
-		    threads = 
-		    	ManagementFactory.newPlatformMXBeanProxy(
-		    			mbsc, name.toString(), ThreadMXBean.class);
-		    			*/
-			os = MBeanServerInvocationHandler.newProxyInstance(mbsc, name,OperatingSystemMXBean.class, true);
-	    }
+    for (ObjectName name: mbeans) 
+    {
+      os = (OperatingSystemMXBean)MBeanServerInvocationHandler.newProxyInstance(mbsc, name,OperatingSystemMXBean.class, true);
+	  }
 	    
-	    
-	    
-	    System.out.println(runtime.getVmName()+"::"+runtime.getVmVendor()+"::"+runtime.getVmVersion());
+    System.out.println(runtime.getVmName()+"::"+runtime.getVmVendor()+"::"+runtime.getVmVersion());
 		//	Construct query string to fetch UIMA-AS MBean names from the JMX Server registry
 		uimaServicePattern = new ObjectName("org.apache.uima:type=ee.jms.services,*");
 		//	Construct query string to fetch Queue MBean names from the JMX Server registry
@@ -215,7 +183,8 @@ public class JmxMonitor implements Runnable {
 				//	Reduce the Set to Service Performance MBeans only
 				servicePerformanceNames.add(name);
 				//	Create a proxy object for the Service Performance MBean
-				ServicePerformanceMBean perfMBeanProxy = MBeanServerInvocationHandler.newProxyInstance(mbsc, name,ServicePerformanceMBean.class, true);
+				ServicePerformanceMBean perfMBeanProxy = 
+				  (ServicePerformanceMBean)MBeanServerInvocationHandler.newProxyInstance(mbsc, name,ServicePerformanceMBean.class, true);
 				//	Extract the service name from the MBean name
 				int beginIndx = name.toString().indexOf(perfKey);
 				key = name.toString().substring(0, beginIndx);
@@ -303,10 +272,6 @@ public class JmxMonitor implements Runnable {
 
 				stats.put(name, entry);
 
-				/** jdk1.6 code
-				ServicePerformanceMBean mbeanProxy =
-					 JMX.newMBeanProxy(mbsc, name, ServicePerformanceMBean.class, true);
-					 **/
 			}
 		}
 	}
@@ -323,7 +288,7 @@ public class JmxMonitor implements Runnable {
 		for (ObjectName name : names) {
 			if ( name.toString().equals(target) )
 			{
-				return MBeanServerInvocationHandler.newProxyInstance(mbsc, name,ServiceInfoMBean.class, true);
+				return (ServiceInfoMBean)MBeanServerInvocationHandler.newProxyInstance(mbsc, name,ServiceInfoMBean.class, true);
 			}
 		}		
 		return null;
@@ -334,7 +299,7 @@ public class JmxMonitor implements Runnable {
 		for (ObjectName name : names) {
 			if ( name.toString().endsWith(target) )
 			{
-				return MBeanServerInvocationHandler.newProxyInstance(mbsc, name,CasPoolManagementImplMBean.class, true);
+				return (CasPoolManagementImplMBean)MBeanServerInvocationHandler.newProxyInstance(mbsc, name,CasPoolManagementImplMBean.class, true);
 			}
 		}		
 		return null;
@@ -348,7 +313,7 @@ public class JmxMonitor implements Runnable {
 			if ( name.toString().endsWith(target) )
 			{
 				System.out.println("Creating Proxy for Queue:"+name.toString());
-				return MBeanServerInvocationHandler.newProxyInstance(server, name,QueueViewMBean.class, true);
+				return (QueueViewMBean)MBeanServerInvocationHandler.newProxyInstance(server, name,QueueViewMBean.class, true);
 			}
 		}		
 		return null;
