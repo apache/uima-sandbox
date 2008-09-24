@@ -146,7 +146,7 @@ public class ProcessResponseHandler extends HandlerBase
 
 	}
 
-	private void handleProcessResponseWithXMI(MessageContext aMessageContext, String aDelegateKey)
+	private synchronized void handleProcessResponseWithXMI(MessageContext aMessageContext, String aDelegateKey)
 	{
 		CAS cas = null;
 		String casReferenceId = null;
@@ -336,7 +336,7 @@ public class ProcessResponseHandler extends HandlerBase
 		}
 		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 	}
-	private void handleProcessResponseWithCASReference(MessageContext aMessageContext )
+	private synchronized void handleProcessResponseWithCASReference(MessageContext aMessageContext )
 	{
 		String casReferenceId = null;
 		CacheEntry cacheEntry = null;
@@ -458,7 +458,7 @@ public class ProcessResponseHandler extends HandlerBase
 		}
 		return true;
 	}
-	private void handleProcessResponseWithException(MessageContext aMessageContext, String delegateKey)
+	private synchronized void handleProcessResponseWithException(MessageContext aMessageContext, String delegateKey)
 	{
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "handleProcessResponseWithException", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_handling_exception_from_delegate_FINE",
@@ -560,7 +560,7 @@ public class ProcessResponseHandler extends HandlerBase
 		getController().getMonitor().resetCountingStatistic(aDelegate, Monitor.ProcessErrorCount);
 		getController().getMonitor().resetCountingStatistic(aDelegate, Monitor.ProcessErrorRetryCount);
 	}
-	public synchronized void handle(Object anObjectToHandle) throws AsynchAEException
+	public  void handle(Object anObjectToHandle) throws AsynchAEException
 	{
 		super.validate(anObjectToHandle);
 		MessageContext messageContext = (MessageContext) anObjectToHandle;

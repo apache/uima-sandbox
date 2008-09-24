@@ -1094,6 +1094,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
 			
 			boolean doReleaseParent = false;
+			boolean sendReplyToClient = false;
 			
 			synchronized( super.finalStepMux)
 			{
@@ -1102,8 +1103,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				{
 					//	This CAS has child CASes still in play. This CAS will remain in the cache
 					//	until all its children are fully processed. 
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
-							"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_child_count__FINEST", new Object[] { getComponentName(),aCasReferenceId,cacheEntry.getSubordinateCasInPlayCount()});
+          if (UIMAFramework.getLogger().isLoggable(Level.FINEST) )
+          {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
+                      "finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_child_count__FINEST", new Object[] { getComponentName(),aCasReferenceId,cacheEntry.getSubordinateCasInPlayCount()});
+          }
 					// Leave input CAS in pending state. It will be returned to the client
 		    		// *only* if the last subordinate CAS is fully processed.
 		    		cacheEntry.setPendingReply(true);
@@ -1112,9 +1116,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					return;
 				}
 			
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
+        if (UIMAFramework.getLogger().isLoggable(Level.FINEST) )
+        {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), 
 						"finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_final_step_parent_cas_no_children__FINEST", new Object[] { getComponentName(),aCasReferenceId});
-
+        }
 				isSubordinate = cacheEntry.isSubordinate();
 				//	If this CAS has a parent, save the destination of a CM that produced it and where we may need to send Free Cas Notification
 				if ( isSubordinate )
@@ -1143,7 +1149,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	          dropCAS(aCasReferenceId, true);
 	          casDropped = true;
 	          //  If debug level=FINEST dump the entire cache
-	          getInProcessCache().dumpContents(getComponentName());
+	          if (UIMAFramework.getLogger().isLoggable(Level.FINEST) )
+	          {
+	            getInProcessCache().dumpContents(getComponentName());
+	          }
 	          // Set this state as if we sent the reply to the client. This triggers a cleanup of origin map and stats
 	          // for the current cas
 	          if ( isTopLevelComponent())
@@ -1155,14 +1164,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	      else 
 	      {
 	        
-	        synchronized( super.finalStepMux)
+	        if ( cacheEntry.isSubordinate())
 	        {
-	          if ( cacheEntry.isSubordinate())
-	          {
 	            cacheEntry.setWaitingForRelease(true);
-	          }
-	        }
-	        
+          }
 	        //  Send a reply to the Client. If the CAS is an input CAS it will be dropped
 	        clientEndpoint = replyToClient( cacheEntry );
 	        if ( clientEndpoint != null )
@@ -1170,13 +1175,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	          replySentToClient = true;
 	        }
 	      }
-	      if ( releaseParentCas(casDropped, clientEndpoint, parentCASCacheEntry) )
-	      {
-	        doReleaseParent = true;
-	      }
 				
 			}
-			
+
+      if ( releaseParentCas(casDropped, clientEndpoint, parentCASCacheEntry) )
+      {
+        doReleaseParent = true;
+      }
+
 			//	Now check if the parent CAS is ready for a finalStep. The parent CAS may 
 			//	have been processed already but	it is cached since its children are still 
 			//	in play.
@@ -1315,11 +1321,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					//	Check if this CAS is new, meaning it has a parent and this component is a Cas Multiplier
 					if ( cacheEntry.isSubordinate() && isCasMultiplier())
 					{
-						//	Add the generated CAS to the outstanding CAS Map. Client notification will release
-						//	this CAS back to its pool
-						synchronized(syncObject)
-						{
-							cmOutstandingCASes.put(cacheEntry.getCasReferenceId(),cacheEntry.getCasReferenceId());
+					  if ( endpoint.isRemote())
+            {
+					    //	Add the generated CAS to the outstanding CAS Map. Client notification will release
+					    //	this CAS back to its pool
+					    synchronized(syncObject)
+					    {
+					      cmOutstandingCASes.put(cacheEntry.getCasReferenceId(),cacheEntry.getCasReferenceId());
+	            }
 						}
 				    if ( !endpoint.isRemote() && System.getProperty("UseVmTransport") != null)
 				    {
@@ -1365,7 +1374,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		return endpoint;
 	}
-  private synchronized void sendVMMessage( int messageType, Endpoint endpoint, CacheEntry cacheEntry) throws Exception 
+  private void sendVMMessage( int messageType, Endpoint endpoint, CacheEntry cacheEntry) throws Exception 
   {
     //  If the CAS was produced by this aggregate send the request message to the client
     //  Otherwise send the response message.

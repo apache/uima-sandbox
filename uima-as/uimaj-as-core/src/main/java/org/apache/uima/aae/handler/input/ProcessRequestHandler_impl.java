@@ -349,9 +349,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				//	the aggregate until all of its subordinate CASes are 
 				//	fully processed. Only then, the aggregate can return
 				// it back to the client
-				synchronized (inputCasCacheEntry) {
-					inputCasCacheEntry.incrementSubordinateCasInPlayCount();
-				}
+        inputCasCacheEntry.incrementSubordinateCasInPlayCount();
 			}
 			else if ( getController().isTopLevelComponent() && getController() instanceof AggregateAnalysisEngineController )
 			{

@@ -401,7 +401,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
           inputCASEntry.incrementSubordinateCasInPlayCount();
 					if ( isTopLevelComponent() )
 					{
-//						inputCASEntry.incrementSubordinateCasInPlayCount();
 						//	Add the id of the generated CAS to the map holding outstanding CASes. This
 						//	map will be referenced when a client sends Free CAS Notification. The map
 						//	stores the id of the CAS both as a key and a value. Map is used to facilitate
@@ -410,7 +409,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 					}
 	        //  Increment number of CASes processed by this service
 	        sequence++;
-
+				}
 		      if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
 		      {
 		          UimaMessage message = 
@@ -434,7 +433,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	          //  Send generated CAS to the client
 	          getOutputChannel().sendReply(newEntry, anEndpoint);
 		      }
-				}
+				
 				//	Remove Stats from the global Map associated with the new CAS
 				//	These stats for this CAS were added to the response message
 				//	and are no longer needed
@@ -445,42 +444,47 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			
 			// Store total time spent processing this input CAS
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
-			synchronized( cmOutstandingCASes )
-			{
-				if ( cmOutstandingCASes.size() == 0)
-				{
-					inputCASReturned = true;
-					
-          if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
-          {
-              UimaMessage message = 
+      if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+      {
+          inputCASReturned = true;
+          UimaMessage message = 
                 getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Response,getName());
-              message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
-              ServicePerformance casStats =
+          message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+          ServicePerformance casStats =
                 getCasStatistics(aCasReferenceId);
               
-              message.addLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
-              message.addLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
-              message.addLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
-              long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
-              message.addLongProperty(AsynchAEMessage.IdleTime, iT );
-              //  Send reply back to the client. Use internal (non-jms) transport
-              getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
-          }
-          else
+          message.addLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
+          message.addLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
+          message.addLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
+          long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
+          message.addLongProperty(AsynchAEMessage.IdleTime, iT );
+          //  Send reply back to the client. Use internal (non-jms) transport
+          getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+      }
+      else
+      {
+          boolean sendReply = false;
+          synchronized( cmOutstandingCASes )
           {
-            //	Return an input CAS to the client if there are no outstanding child CASes in play
-            getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
-          }
-				}
-				else
-				{
-					//	Change the state of the input CAS. Since the input CAS is not returned to the client
-					//	until all children of this CAS has been fully processed we keep the input in the cache.
-					//	The client will send Free CAS Notifications to release CASes produced here. When the
-					//	last child CAS is freed, the input CAS is allowed to be returned to the client.
-					inputCASEntry.setPendingReply(true);
-				}
+            if ( cmOutstandingCASes.size() == 0)
+            {
+              inputCASReturned = true;
+              sendReply = true;
+            }
+            else
+            {
+              //  Change the state of the input CAS. Since the input CAS is not returned to the client
+              //  until all children of this CAS has been fully processed we keep the input in the cache.
+              //  The client will send Free CAS Notifications to release CASes produced here. When the
+              //  last child CAS is freed, the input CAS is allowed to be returned to the client.
+              inputCASEntry.setPendingReply(true);
+            }
+         }
+         if ( sendReply )
+         {
+           //  Return an input CAS to the client if there are no outstanding child CASes in play
+           getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
+         }
 			}
 		}
 		catch ( Throwable e)

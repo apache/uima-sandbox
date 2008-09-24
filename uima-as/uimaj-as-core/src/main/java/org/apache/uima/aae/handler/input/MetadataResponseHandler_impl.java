@@ -43,7 +43,7 @@ public class MetadataResponseHandler_impl extends HandlerBase
 	 * containing metadata.
 	 * 
 	 */
-	public synchronized void handle(Object anObjectToHandle)
+	public void handle(Object anObjectToHandle)
 	{
 
 		if (anObjectToHandle instanceof MessageContext)
