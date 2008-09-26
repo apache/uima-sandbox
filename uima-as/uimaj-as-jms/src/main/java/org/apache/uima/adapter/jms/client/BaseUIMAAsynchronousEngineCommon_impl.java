@@ -803,6 +803,10 @@ implements UimaAsynchronousEngine, MessageListener
 		ClientRequest cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
 		if ( cachedRequest != null )
 		{
+			//	Store the total latency for this CAS. The departure time is set right before the CAS
+			//	is sent to a service.
+			cachedRequest.setTimeWaitingForReply(System.nanoTime() - cachedRequest.getCASDepartureTime());
+			
 			//	Cancel the timer
 			try
 			{
@@ -958,9 +962,6 @@ implements UimaAsynchronousEngine, MessageListener
 					cpcGate.notifyAll();
 				}
 			}
-			//	Store the total latency for this CAS. The departure time is set right before the CAS
-			//	is sent to a service.
-			cachedRequest.setTimeWaitingForReply(System.nanoTime() - cachedRequest.getCASDepartureTime());
 
 			try
 			{
@@ -1018,11 +1019,16 @@ implements UimaAsynchronousEngine, MessageListener
 				{
 					return;
 				}
-				long timeWaitingForReply = cacheEntry.getTimeWaitingForReply()/ 1000000;
+				// Add time waiting for reply to the client JMX stats
+				long timeWaitingForReply = cacheEntry.getTimeWaitingForReply();
+				clientSideJmxStats.incrementTotalTimeWaitingForReply(timeWaitingForReply);
+				// Add CAS response latency time to the client JMX stats
+				long responseLatencyTime = cacheEntry.getSerializationTime() + timeWaitingForReply + cacheEntry.getDeserializationTime();
+				clientSideJmxStats.incrementTotalResponseLatencyTime(responseLatencyTime);
 
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timer_detail_FINEST",
 							new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), "Total Time Waiting For Reply", (float) timeWaitingForReply / (float) 1000000 });
-				pt.addEvent("UimaEE", "process", "Total Time Waiting For Reply", (int)timeWaitingForReply, "");
+				pt.addEvent("UimaEE", "process", "Total Time Waiting For Reply", (int)(timeWaitingForReply/1000000), "");
 			}
 		}
 		if (message.propertyExists(AsynchAEMessage.TimeToSerializeCAS))
