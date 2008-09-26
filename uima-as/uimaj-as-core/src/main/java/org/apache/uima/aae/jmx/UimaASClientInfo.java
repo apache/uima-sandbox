@@ -35,10 +35,14 @@ public class UimaASClientInfo implements
 	private long deserializationTime;
 	private long totalCasesProcessed;
 	private long totalProcessTime;
+	private long totalTimeWaitingForReply;
+	private long totalResponseLatencyTime;
 	private long maxSerializationTime;
 	private long maxDeserializationTime;
 	private long maxIdleTime;
 	private long maxProcessTime;
+	private long maxTimeWaitingForReply;
+	private long maxResponseLatencyTime;
 	private String endpointName;
 	private int replyWindowSize;
 	private int casPoolSize;
@@ -47,54 +51,56 @@ public class UimaASClientInfo implements
 	private long _processErrorCount;
 	private long _metaErrorCount;
 	
-	public void reset()
+	public synchronized void reset()
 	{
 		idleTime = 0;
 		serializationTime=0;
 		deserializationTime=0;
 		totalCasesProcessed=0;
 		totalProcessTime=0;
+		totalTimeWaitingForReply=0;
+		totalResponseLatencyTime=0;
 		maxSerializationTime=0;
 		maxDeserializationTime=0;
 		maxIdleTime=0;
 		maxProcessTime=0;
-		replyWindowSize=0;
-		casPoolSize=0;
+		maxTimeWaitingForReply=0;
+		maxResponseLatencyTime=0;
 		_metaTimeoutErrorCount=0;
 		_processTimeoutErrorCount=0;
 		_processErrorCount=0;
 		_metaErrorCount=0;
 	}
-    public long getMetaErrorCount()
+    public synchronized long getMetaErrorCount()
     {
     	return _metaErrorCount;
     }
-    public void incrementMetaErrorCount()
+    public synchronized void incrementMetaErrorCount()
     {
     	_metaErrorCount++;
     }
 
-	public long getMetaTimeoutErrorCount() {
+	public synchronized long getMetaTimeoutErrorCount() {
 		return _metaTimeoutErrorCount;
 	}
 
-	public void incrementMetaTimeoutErrorCount() {
+	public synchronized void incrementMetaTimeoutErrorCount() {
 		_metaTimeoutErrorCount++;
 	}
 
-	public long getProcessTimeoutErrorCount() {
+	public synchronized long getProcessTimeoutErrorCount() {
 		return _processTimeoutErrorCount;
 	}
 
-	public void incrementProcessTimeoutErrorCount() {
+	public synchronized void incrementProcessTimeoutErrorCount() {
 		_processTimeoutErrorCount++;
 	}
 
-	public long getProcessErrorCount() {
+	public synchronized long getProcessErrorCount() {
 		return _processErrorCount;
 	}
 
-	public void incrementProcessErrorCount() {
+	public synchronized void incrementProcessErrorCount() {
 		_processErrorCount++;
 	}
 
@@ -137,88 +143,119 @@ public class UimaASClientInfo implements
 		formatter.format ("%,.2f ms", aValue);
 		return formatter.out().toString();
 	}
-	public String getAverageDeserializationTime() {
+	private String format(double aValue )
+	{
+		return String.format("%,.2f ms", aValue);
+	}
+	public synchronized String getAverageDeserializationTime() {
 		if ( totalCasesProcessed > 0 )
 		{
-			float floatValue = (float)((float)deserializationTime/(float)totalCasesProcessed)/(float)1000000;
+			double floatValue = (double)((double)deserializationTime/(double)totalCasesProcessed)/(double)1000000;
 			return format(floatValue);
 		}
 		else
 			return "0.0";
 	}
 
-	public String getAverageIdleTime() {
+	public synchronized String getAverageIdleTime() {
 		if ( totalCasesProcessed > 0 )
 		{
-			float floatValue =  (float)((float)idleTime/(float)totalCasesProcessed)/(float)1000000;
+			double floatValue =  (double)((double)idleTime/(double)totalCasesProcessed)/(double)1000000;
 			return format(floatValue);
 		}
 		else
 			return "0.0";
 	}
 
-	public String getAverageSerializationTime() {
+	public synchronized String getAverageSerializationTime() {
 		if ( totalCasesProcessed > 0 )
 		{
-			float floatValue = (float)((float)serializationTime/(float)totalCasesProcessed)/(float)1000000;
+			double floatValue = (double)((double)serializationTime/(double)totalCasesProcessed)/(double)1000000;
 			return format(floatValue);
 		}
 		else
 			return "0.0";
 	}
 
-	public String getAverageTimeToProcessCas() {
+	public synchronized String getAverageTimeToProcessCas() {
 		if ( totalCasesProcessed > 0 )
 		{
-			float floatValue = (float)((float)totalProcessTime/(float)totalCasesProcessed)/(float)1000000;
+			double floatValue = (double)((double)totalProcessTime/(double)totalCasesProcessed)/(double)1000000;
 			return format(floatValue);
 		}
 		else
 			return "0.0";
 	}
 
-	
-	public String getMaxDeserializationTime() {
-		return format((float)maxDeserializationTime/(float)1000000);
+    public synchronized String getAverageTimeWaitingForReply() {
+    	return ( totalCasesProcessed > 0 ) ?
+    			format(((double)totalTimeWaitingForReply/(double)totalCasesProcessed)/(double)1000000) 
+    			: "0.0";
+    }
+    
+    public synchronized String getAverageResponseLatencyTime() {
+    	return ( totalCasesProcessed > 0 ) ?
+    			format(((double)totalResponseLatencyTime/(double)totalCasesProcessed)/(double)1000000) 
+    			: "0.0";
+    }
+    	
+	public synchronized String getMaxDeserializationTime() {
+		return format((double)maxDeserializationTime/(double)1000000);
 	}
 
-	public String getMaxIdleTime() {
-		return format((float)maxIdleTime/(float)1000000);
+	public synchronized String getMaxIdleTime() {
+		return format((double)maxIdleTime/(double)1000000);
 	}
 
-	public String getMaxProcessTime() {
-		return format((float)maxProcessTime/(float)1000000);
+	public synchronized String getMaxProcessTime() {
+		return format((double)maxProcessTime/(double)1000000);
 	}
 
-	public String getMaxSerializationTime() {
-		return format((float)maxSerializationTime/(float)1000000);
+	public synchronized String getMaxSerializationTime() {
+		return format((double)maxSerializationTime/(double)1000000);
 	}
 
-	public String getTotalDeserializationTime() {
-		return format((float)deserializationTime/(float)1000000);
+    public synchronized String getMaxTimeWaitingForReply() {
+    	return format((double)maxTimeWaitingForReply/(double)1000000);
+    }
+    
+    public synchronized String getMaxResponseLatencyTime() {
+    	return format((double)maxResponseLatencyTime/(double)1000000);
+    }
+
+	public synchronized String getTotalDeserializationTime() {
+		return format((double)deserializationTime/(double)1000000);
 	}
 
-	public String getTotalIdleTime() {
-		return format((float)idleTime/(float)1000000);
+	public synchronized String getTotalIdleTime() {
+		return format((double)idleTime/(double)1000000);
 	}
 
-	public long getTotalNumberOfCasesProcessed() {
+	public synchronized long getTotalNumberOfCasesProcessed() {
 		return totalCasesProcessed;
 	}
 
-	public String getTotalSerializationTime() {
-		return format((float)serializationTime/(float)1000000);
+	public synchronized String getTotalSerializationTime() {
+		return format((double)serializationTime/(double)1000000);
 	}
 
-	public String getTotalTimeToProcess() {
-		return format((float)totalProcessTime/(float)1000000);
+	public synchronized String getTotalTimeToProcess() {
+		return format((double)totalProcessTime/(double)1000000);
 	}
+
+    public synchronized String getTotalTimeWaitingForReply() {
+    	return format((double)totalTimeWaitingForReply/(double)1000000);
+    }
+    
+    public synchronized String getTotalResponseLatencyTime() {
+    	return format((double)totalResponseLatencyTime/(double)1000000);
+    }
 
 	public void setApplicationName(String anApplicationName) {
 		applicationName = anApplicationName;
 	}
 
-	public void incrementTotalIdleTime(long anIdleTime) {
+	public synchronized void incrementTotalIdleTime(long anIdleTime) {
 		if ( maxIdleTime < anIdleTime )
 		{
 			maxIdleTime = anIdleTime;
@@ -226,11 +263,11 @@ public class UimaASClientInfo implements
 		idleTime += anIdleTime;
 	}
 
-	public void incrementTotalNumberOfCasesProcessed() {
+	public synchronized void incrementTotalNumberOfCasesProcessed() {
 		totalCasesProcessed++;
 	}
 
-	public void incrementTotalSerializationTime(long aSerializationTime) {
+	public synchronized void incrementTotalSerializationTime(long aSerializationTime) {
 		
 		if ( maxSerializationTime < aSerializationTime )
 		{
@@ -239,7 +276,7 @@ public class UimaASClientInfo implements
 		serializationTime += aSerializationTime;
 	}
 
-	public void incrementTotalTimeToProcess(long aTimeToProcess) {
+	public synchronized void incrementTotalTimeToProcess(long aTimeToProcess) {
 		if ( maxProcessTime < aTimeToProcess )
 		{
 			maxProcessTime = aTimeToProcess;
@@ -247,11 +284,26 @@ public class UimaASClientInfo implements
 		totalProcessTime += aTimeToProcess;
 	}
 
-	public void incrementTotalDeserializationTime(long aDeserializationTime) {
+	public synchronized void incrementTotalDeserializationTime(long aDeserializationTime) {
 		if ( maxDeserializationTime < aDeserializationTime )
 		{
 			maxDeserializationTime = aDeserializationTime;
 		}
 		deserializationTime += aDeserializationTime;
 	}
+    public synchronized void incrementTotalTimeWaitingForReply( long aTimeWaitingForReply ) {
+    	if ( maxTimeWaitingForReply < aTimeWaitingForReply )
+    	{
+    		maxTimeWaitingForReply = aTimeWaitingForReply;
+    	}
+    	totalTimeWaitingForReply += aTimeWaitingForReply;
+    }
+    public synchronized void incrementTotalResponseLatencyTime( long aResponseLatencyTime ) {
+    	if ( maxResponseLatencyTime < aResponseLatencyTime )
+    	{
+    		maxResponseLatencyTime = aResponseLatencyTime;
+    	}
+    	totalResponseLatencyTime += aResponseLatencyTime;
+    }
+
 }

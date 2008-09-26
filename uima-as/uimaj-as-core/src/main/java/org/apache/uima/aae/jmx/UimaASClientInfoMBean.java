@@ -53,10 +53,20 @@ public interface UimaASClientInfoMBean {
 	public String getTotalIdleTime();
 	public String getAverageIdleTime();
 
+    public void incrementTotalTimeWaitingForReply( long aTimeWaitingForReply );
+    public String getTotalTimeWaitingForReply();
+    public String getAverageTimeWaitingForReply();
+    
+    public void incrementTotalResponseLatencyTime( long aResponseLatencyTime );
+    public String getTotalResponseLatencyTime();
+    public String getAverageResponseLatencyTime();
+    
     public String getMaxProcessTime();
     public String getMaxSerializationTime();
     public String getMaxDeserializationTime();
     public String getMaxIdleTime();
+    public String getMaxResponseLatencyTime();
+    public String getMaxTimeWaitingForReply();
 
     public long getMetaTimeoutErrorCount();
     public void incrementMetaTimeoutErrorCount();
