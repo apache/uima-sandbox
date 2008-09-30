@@ -248,8 +248,8 @@ public class Viterbi {
                 }
               } else {
                 Iterator posValuePairs2 = available_pos_zwischen.entrySet().iterator(); // iterate
-                                                                                        // over
-                                                                                        // words
+                // over
+                // words
                 while (posValuePairs2.hasNext()) {
                   Map.Entry<String, Double> entry = (Map.Entry<String, Double>) posValuePairs2
                       .next();
@@ -360,8 +360,13 @@ public class Viterbi {
 
             if (transition_probs.containsKey(ngram)) {
 
+              // The following commented-out expression used to throw the occasional NPE, probably
+              // because transition_probs.get(ngram2) is null. Make sure this does not happen. Not
+              // sure this is the correct way to fix it, though.  Test cases still go through...
+              double transProbNgram2 = (transition_probs.containsKey(ngram2) ? transition_probs
+                  .get(ngram2) : 0.0);
               ppp = (lambda3 * transition_probs.get(ngram))
-                  + (lambda2 * transition_probs.get(ngram2))
+                  + (lambda2 * transProbNgram2)
                   + (lambda1 * transition_probs.get(new NGram(key_next)));
             } else {
               // System.out.println(ngram2);
