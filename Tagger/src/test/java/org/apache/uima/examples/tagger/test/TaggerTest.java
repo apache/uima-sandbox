@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.examples.tagger.HMMTagger;
 import org.apache.uima.examples.tagger.Viterbi;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.test.junit_extension.JUnitExtension;
 import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.XMLParser;
@@ -210,7 +212,12 @@ public class TaggerTest extends TestCase {
   }
 
   /**
-   * Run tagger on Moby Dick and compare result to pre-computed XCAS.
+   * Run tagger on Moby Dick and compare result to pre-computed XCAS. This test case is a bit
+   * brittle. First of all, it requires the uimaj-core project as a neighbor, otherwise it won't
+   * find moby.txt, the test input.  Secondly, the reference output is only a list of POS tags.
+   * This is so the file doesn't get so big.  Finally, if anything changes, even improvements, this
+   * test will most likely fail and will need to be updated.  There's an unused method below that
+   * can be used to write a new set of POS tags when the old ones become obsolete.
    */
   public void testMobyDick() {
     try {
@@ -218,8 +225,16 @@ public class TaggerTest extends TestCase {
       XMLInputSource xmlInputSource = new XMLInputSource("desc/HmmTaggerAggregate.xml");
       AnalysisEngine taggerEngine = UIMAFramework.produceAnalysisEngine(xmlParser
           .parseResourceSpecifier(xmlInputSource));
-      String text = FileUtils.file2String(
-          new File("../uimaj-core/src/test/resources/data/moby.txt"), "utf-8");
+      String text = null;
+      try {
+        text = FileUtils.file2String(new File("../uimaj-core/src/test/resources/data/moby.txt"),
+            "utf-8");
+      } catch (FileNotFoundException e) {
+        System.err
+            .println("Warning: this test case runs only if uimaj-core is a sister project to the tagger project; otherwise, the test input data is not available.");
+        System.err.println("Skipping test");
+        return;
+      }
       JCas cas = taggerEngine.newJCas();
       cas.setDocumentText(text);
       taggerEngine.process(cas);
@@ -245,7 +260,7 @@ public class TaggerTest extends TestCase {
     }
     return tags;
   }
-  
+
   private List<String> getCurrentTagList(JCas cas) {
     List<String> tagList = new ArrayList<String>();
     AnnotationIndex tokenIndex = cas.getAnnotationIndex(TokenAnnotation.type);
