@@ -66,6 +66,9 @@
             <resource>
                 <directory>desc</directory>
             </resource>
+            <resource>
+                <directory>resources</directory>
+            </resource>
 		</resources>
 
 		<plugins>

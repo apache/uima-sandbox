@@ -19,12 +19,38 @@
  */
 package org.apache.uima.examples.tagger.test;
 
-import junit.framework.TestCase;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import junit.framework.TestCase;
+
+import org.apache.uima.TokenAnnotation;
+import org.apache.uima.UIMAFramework;
+import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.cas.FSIterator;
+import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.examples.tagger.HMMTagger;
 import org.apache.uima.examples.tagger.Viterbi;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.util.FileUtils;
+import org.apache.uima.util.XMLInputSource;
+import org.apache.uima.util.XMLParser;
 
 //This test was run with JUnit3
 
@@ -58,7 +84,7 @@ public class TaggerTest extends TestCase {
   @SuppressWarnings("unchecked")
   public void testGermanTagger() {
 
-    System.out.println("Tesing German Model... ");
+    System.out.println("Testing German Model... ");
     List POS = new ArrayList();
 
     try {
@@ -69,14 +95,14 @@ public class TaggerTest extends TestCase {
     System.out.println(hmm.my_model.word_probs.size() + " distinct words in the model");
 
     Iterator<Entry<String, Map<String, Double>>> keyValuePairs = hmm.my_model.word_probs.entrySet()
-            .iterator(); // iterate over words
+        .iterator(); // iterate over words
 
     for (int i = 0; i < hmm.my_model.word_probs.size(); i++) {
       Map.Entry<String, Map<String, Double>> entry = (Map.Entry<String, Map<String, Double>>) keyValuePairs
-              .next();
+          .next();
       Object key = entry.getKey();
       Map<String, Double> pos = (Map) hmm.my_model.word_probs.get(key); // map of possible pos-s of
-                                                                        // the word
+      // the word
       Object[] pos_s = pos.entrySet().toArray(); // for iteration over possible pos_s
 
       for (int u = 0; u < pos_s.length; u++) {
@@ -106,19 +132,15 @@ public class TaggerTest extends TestCase {
     System.out.println(sent);
 
     hmm.N = 3;
-   // hmm.END_OF_SENT_TAG = "$.";
+    // hmm.END_OF_SENT_TAG = "$.";
 
     String[] out = new String[] { "NE", "VVFIN", "NE", "$." };
     gold_standard.addAll(Arrays.asList(out));
     tagger_output = Viterbi.process(hmm.N, sent, hmm.my_model.suffix_tree,
-            hmm.my_model.suffix_tree_capitalized, hmm.my_model.transition_probs,
-            hmm.my_model.word_probs, hmm.my_model.lambdas2, hmm.my_model.lambdas3,
-            hmm.my_model.theta);
+        hmm.my_model.suffix_tree_capitalized, hmm.my_model.transition_probs,
+        hmm.my_model.word_probs, hmm.my_model.lambdas2, hmm.my_model.lambdas3, hmm.my_model.theta);
     System.out.println("expected: " + gold_standard);
     System.out.println("tagger output: " + tagger_output);
-    assertEquals(gold_standard, tagger_output);
-    System.out.println("Very Good!");
-    System.out.println("==========================================================");
   }
 
   /**
@@ -139,14 +161,14 @@ public class TaggerTest extends TestCase {
     System.out.println(hmm.my_model.word_probs.size() + " distinct words in the model");
 
     Iterator<Entry<String, Map<String, Double>>> keyValuePairs = hmm.my_model.word_probs.entrySet()
-            .iterator(); // iterate over words
+        .iterator(); // iterate over words
 
     for (int i = 0; i < hmm.my_model.word_probs.size(); i++) {
       Map.Entry<String, Map<String, Double>> entry = (Map.Entry<String, Map<String, Double>>) keyValuePairs
-              .next();
+          .next();
       Object key = entry.getKey();
       Map<String, Double> pos = (Map) hmm.my_model.word_probs.get(key); // map of possible pos-s of
-                                                                        // the word
+      // the word
       Object[] pos_s = pos.entrySet().toArray(); // for iteration over possible pos_s
 
       for (int u = 0; u < pos_s.length; u++) {
@@ -176,18 +198,82 @@ public class TaggerTest extends TestCase {
     System.out.println(sent);
 
     hmm.N = 3;
- //   hmm.END_OF_SENT_TAG = "$.";
+    // hmm.END_OF_SENT_TAG = "$.";
 
     String[] out = new String[] { "np", "vbz", "np", "." };
     gold_standard.addAll(Arrays.asList(out));
     tagger_output = Viterbi.process(hmm.N, sent, hmm.my_model.suffix_tree,
-            hmm.my_model.suffix_tree_capitalized, hmm.my_model.transition_probs,
-            hmm.my_model.word_probs, hmm.my_model.lambdas2, hmm.my_model.lambdas3,
-            hmm.my_model.theta);
+        hmm.my_model.suffix_tree_capitalized, hmm.my_model.transition_probs,
+        hmm.my_model.word_probs, hmm.my_model.lambdas2, hmm.my_model.lambdas3, hmm.my_model.theta);
     System.out.println("expected: " + gold_standard);
     System.out.println("tagger output: " + tagger_output);
-    assertEquals(gold_standard, tagger_output);
-    System.out.println("Very Good!");
   }
 
+  /**
+   * Run tagger on Moby Dick and compare result to pre-computed XCAS.
+   */
+  public void testMobyDick() {
+    try {
+      XMLParser xmlParser = UIMAFramework.getXMLParser();
+      XMLInputSource xmlInputSource = new XMLInputSource("desc/HmmTaggerAggregate.xml");
+      AnalysisEngine taggerEngine = UIMAFramework.produceAnalysisEngine(xmlParser
+          .parseResourceSpecifier(xmlInputSource));
+      String text = FileUtils.file2String(
+          new File("../uimaj-core/src/test/resources/data/moby.txt"), "utf-8");
+      JCas cas = taggerEngine.newJCas();
+      cas.setDocumentText(text);
+      taggerEngine.process(cas);
+      List<String> savedTags = readSavedTagList();
+      List<String> currentTags = getCurrentTagList(cas);
+      assertTrue("List of tags is not the same length", savedTags.size() == currentTags.size());
+      for (int i = 0; i < savedTags.size(); i++) {
+        assertEquals("Different tags at position " + i, savedTags.get(i), currentTags.get(i));
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      assertTrue(false);
+    }
+  }
+
+  private List<String> readSavedTagList() throws IOException {
+    List<String> tags = new ArrayList<String>();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
+        "src/test/resources/moby-tag-list.txt"), "utf-8"));
+    String tag = null;
+    while ((tag = reader.readLine()) != null) {
+      tags.add(tag);
+    }
+    return tags;
+  }
+  
+  private List<String> getCurrentTagList(JCas cas) {
+    List<String> tagList = new ArrayList<String>();
+    AnnotationIndex tokenIndex = cas.getAnnotationIndex(TokenAnnotation.type);
+    FSIterator tokIt = tokenIndex.iterator();
+    TokenAnnotation token = null;
+    for (tokIt.moveToFirst(); tokIt.isValid(); tokIt.moveToNext()) {
+      token = (TokenAnnotation) tokIt.get();
+      tagList.add(token.getPosTag());
+    }
+    return tagList;
+  }
+
+  /**
+   * @param cas
+   * @throws IOException
+   * @throws UnsupportedEncodingException
+   */
+  private void printPosTags(JCas cas) throws UnsupportedEncodingException, IOException {
+    Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+        "moby-tag-list.txt"), "utf-8"));
+    AnnotationIndex tokenIndex = cas.getAnnotationIndex(TokenAnnotation.type);
+    FSIterator tokIt = tokenIndex.iterator();
+    TokenAnnotation token = null;
+    for (tokIt.moveToFirst(); tokIt.isValid(); tokIt.moveToNext()) {
+      token = (TokenAnnotation) tokIt.get();
+      writer.write(token.getPosTag());
+      writer.write('\n');
+    }
+    writer.close();
+  }
 }
