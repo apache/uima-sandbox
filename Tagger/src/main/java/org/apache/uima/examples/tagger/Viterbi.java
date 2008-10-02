@@ -33,10 +33,6 @@ import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
  */
 public class Viterbi {
 
-  static NGram ngram;
-
-  static NGram ngram2;
-
   @SuppressWarnings("unchecked")
   public static Map<String, List> init_probs(Map<String, Double> pos_s) {
     Map<String, List> init_probs = new HashMap<String, List>();
@@ -83,6 +79,10 @@ public class Viterbi {
       Map<String, Map<String, Double>> suffix_tree_cap, Map<NGram, Double> transition_probs,
       Map<String, Map<String, Double>> word_probs, double[] lambdas2, double[] lambdas3,
       double theta) {
+
+    NGram ngram = null;
+
+    NGram ngram2 = null;
 
     // here we add something like an "end-of-sentence" tag at the beginning of the first sentence,
     // to get probabilities for a certain tag to be at the beginning of the sentence.
@@ -286,6 +286,12 @@ public class Viterbi {
 
         Iterator keyValuePairs = all.entrySet().iterator();
 
+        NGram nextNgram = new NGram(key_next);
+        double nextNgramTransProb = 0.0;
+        if (transition_probs.containsKey(nextNgram)) {
+          nextNgramTransProb = transition_probs.get(nextNgram);
+        }
+
         /** ********************************************************************************** */
         /*
          * calculates for the given next token which of the possible paths to the current token are
@@ -350,8 +356,8 @@ public class Viterbi {
             double lambda2 = lambdas2[1];
 
             ppp = (transition_probs.containsKey(ngram)) ? ((lambda2 * transition_probs.get(ngram)) + (lambda1 * transition_probs
-                .get(new NGram(key_next))))
-                : (lambda1 * transition_probs.get(new NGram(key_next)));
+                .get(nextNgram)))
+                : (lambda1 * nextNgramTransProb);
             pp = Math.log(value_next) + Math.log(ppp); // P(t|w) * P(t1,t2,t3)
           } else if (N == 3) {
             double lambda1 = lambdas3[0];
@@ -360,19 +366,14 @@ public class Viterbi {
 
             if (transition_probs.containsKey(ngram)) {
 
-              // The following commented-out expression used to throw the occasional NPE, probably
-              // because transition_probs.get(ngram2) is null. Make sure this does not happen. Not
-              // sure this is the correct way to fix it, though.  Test cases still go through...
               double transProbNgram2 = (transition_probs.containsKey(ngram2) ? transition_probs
                   .get(ngram2) : 0.0);
-              ppp = (lambda3 * transition_probs.get(ngram))
-                  + (lambda2 * transProbNgram2)
-                  + (lambda1 * transition_probs.get(new NGram(key_next)));
+              ppp = (lambda3 * transition_probs.get(ngram)) + (lambda2 * transProbNgram2)
+                  + (lambda1 * nextNgramTransProb);
             } else {
               // System.out.println(ngram2);
               ppp = (transition_probs.containsKey(ngram2)) ? ((lambda2 * transition_probs
-                  .get(ngram2)) + (lambda1 * transition_probs.get(new NGram(key_next))))
-                  : (lambda1 * transition_probs.get(new NGram(key_next)));
+                  .get(ngram2)) + (lambda1 * nextNgramTransProb)) : (lambda1 * nextNgramTransProb);
             }
             pp = Math.log(value_next) + Math.log(ppp);
           }
@@ -381,8 +382,8 @@ public class Viterbi {
             double lambda2 = lambdas2[1];
 
             ppp = (transition_probs.containsKey(ngram)) ? ((lambda2 * transition_probs.get(ngram)) + (lambda1 * transition_probs
-                .get(new NGram(key_next))))
-                : (lambda1 * transition_probs.get(new NGram(key_next)));
+                .get(nextNgram)))
+                : (lambda1 * transition_probs.get(nextNgram));
             pp = Math.log(value_next) + Math.log(ppp);
           }
 
