@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--==================================================================================-->
  <!-- Generated from                                                                                  -->
- <!-- file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/deploy/defaultingPrimAeMultInstance.xml -->
- <!-- 19 March, 2008, 3:16:01 P.M.                                                                           -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/defaultingPrimAEMultInstance.xml -->
+ <!-- 6 October, 2008, 4:40:00 P.M.                                                                      -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -76,7 +76,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="RoomNumberAnnotatorQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex2/RoomNumberAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex2/RoomNumberAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

@@ -89,6 +89,18 @@ public class Dd2SpringTest extends TestCase{
   protected void tearDown() {
     
   }
+  
+  public void testDd2Spring_deployAggrUsingRmtTempQ() throws Exception {
+    checkDd2Spring("Deploy_AggregateUsingRemoteTempQueue.xml");
+  }
+
+  public void testDd2Spring_concurRemoteConsumers() throws Exception {
+    checkDd2Spring("aggrRmtConcurrentReply.xml");
+  }
+
+  public void testVmBkrBad() throws Exception {
+    checkDd2Spring("vmBkrBad.xml");
+  }
 
   public void testDd2Spring_inputQueueScaleout3() throws Exception {
     checkDd2Spring("iq3.xml");
@@ -110,9 +122,6 @@ public class Dd2SpringTest extends TestCase{
     checkDd2Spring("iq1AE.xml");
   }
 
-  public void testDd2Spring_concurRemoteConsumers() throws Exception {
-    checkDd2Spring("aggrRmtConcurrentReply.xml");
-  }
 
   public void testDd2Spring_multiLevelAsyncDefaulting() throws Exception {
     checkDd2Spring("Deploy_MeetingFinder.xml");

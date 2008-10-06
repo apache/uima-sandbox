@@ -1,25 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--==================================================================================-->
- <!-- Generated from                                                                                 -->
- <!-- file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/deploy/Deploy_MeetingFinder.xml -->
- <!-- 11 April, 2008, 4:59:54 A.M.                                                                   -->
+ <!-- Generated from                                                                             -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/Deploy_MeetingFinder.xml -->
+ <!-- 6 October, 2008, 4:02:05 P.M.                                                              -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-
-   <!-- connection factory for co-located things -->
-   <bean id="controllerJmsFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-         depends-on="brokerDeployerService">
-      <property name="brokerURL" value="vm://localhost"/>
-      <property name="prefetchPolicy" ref="prefetchPolicy"/>
-   </bean>
-
-   <!-- Deploys a co-located broker  -->
-   <bean id="brokerDeployerService"
-         class="org.apache.uima.adapter.jms.activemq.BrokerDeployer">
-      <constructor-arg index="0" value="1048576000"/>
-   </bean>
 
    <!-- Factory for specific external queue broker:  -->
    <!--            tcp://localhost:61616             -->
@@ -53,7 +40,7 @@
    <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
       <property name="queuePrefetch" value="0"/>
    </bean>
-
+ 
    <!--=================================-->
    <!--    E r r o r   D e t a i l s    -->
    <!--=================================-->
@@ -97,7 +84,7 @@
       <property name="action" value="terminate"/>
    </bean>
 
-
+ 
    <!--input queue for service-->
    <bean id="top_level_input_queue_service_1"
          class="org.apache.activemq.command.ActiveMQQueue">
@@ -114,7 +101,7 @@
       </constructor-arg>
       <constructor-arg index="1" value="MeetingFinderQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/MeetingFinderAggregate.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/MeetingFinderAggregate.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="delegate_map_MeetingFinderQueue_1"/>
@@ -125,12 +112,12 @@
       <property name="flowControllerDescriptor"
                 value="*importByName:org.apache.uima.flow.FixedFlowController"/>
    </bean>
-
+ 
    <!--===================================================-->
    <!--   M E S S A G E    H A N D L E R: aggregate_input -->
    <!--  for controller: asAggr_ctlr_MeetingFinderQueue_1 -->
    <!--===================================================-->
-
+   
    <bean id="aggregate_input_metaMsgHandler_MeetingFinderQueue_1"
          class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
       <constructor-arg index="0" value="MetadataRequestHandler"/>
@@ -145,43 +132,8 @@
       <property name="controller" ref="asAggr_ctlr_MeetingFinderQueue_1"/>
    </bean>
 
-   <!--====================================================-->
-   <!--   M E S S A G E    H A N D L E R: aggregate_return -->
-   <!--  for controller: asAggr_ctlr_MeetingFinderQueue_1  -->
-   <!--====================================================-->
-
-   <bean id="aggregate_return_metaMsgHandler_MeetingFinderQueue_1"
-         class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
-      <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="asAggr_ctlr_MeetingFinderQueue_1"/>
-      <property name="delegate"
-                ref="aggregate_return_processRequestHandler_MeetingFinderQueue_1"/>
-   </bean>
-
-   <bean id="aggregate_return_processRequestHandler_MeetingFinderQueue_1"
-         class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
-      <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="asAggr_ctlr_MeetingFinderQueue_1"/>
-      <property name="delegate"
-                ref="aggregate_return_processResponseHandler_MeetingFinderQueue_1"/>
-   </bean>
-
-   <bean id="aggregate_return_processResponseHandler_MeetingFinderQueue_1"
-         class="org.apache.uima.aae.handler.input.ProcessResponseHandler">
-      <constructor-arg index="0" value="ProcessResponseHandler"/>
-      <property name="controller" ref="asAggr_ctlr_MeetingFinderQueue_1"/>
-      <property name="delegate"
-                ref="aggregate_return_response_metaMsgHandler_MeetingFinderQueue_1"/>
-   </bean>
-
-   <bean id="aggregate_return_response_metaMsgHandler_MeetingFinderQueue_1"
-         class="org.apache.uima.aae.handler.input.MetadataResponseHandler_impl">
-      <constructor-arg index="0" value="MetadataResponseHandler"/>
-      <property name="controller" ref="asAggr_ctlr_MeetingFinderQueue_1"/>
-   </bean>
-
    <!-- Create the endpoints + output channels, one per delegate -->
-
+   
 
    <!-- ==================================== -->
    <!--           CollectionReader           -->
@@ -200,6 +152,8 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="concurrentRequestConsumers" value="1"/>
+      <property name="concurrentReplyConsumers" value="1"/>
    </bean>
 
    <!-- ==================================== -->
@@ -219,6 +173,8 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="100000"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="concurrentRequestConsumers" value="1"/>
+      <property name="concurrentReplyConsumers" value="1"/>
    </bean>
 
    <!-- ==================================== -->
@@ -238,6 +194,8 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="concurrentRequestConsumers" value="1"/>
+      <property name="concurrentReplyConsumers" value="1"/>
    </bean>
 
    <!-- ==================================== -->
@@ -256,6 +214,8 @@
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="concurrentRequestConsumers" value="1"/>
+      <property name="concurrentReplyConsumers" value="1"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -308,42 +268,6 @@
       <property name="messageSelector" value="Command=2001"/>
    </bean>
 
-   <!-- return queue for async aggregate -->
-   <bean id="asynAggr_retQ_MeetingFinderQueue_1"
-         class="org.apache.activemq.command.ActiveMQQueue">
-      <constructor-arg index="0" value="asynAggr_retQ_MeetingFinderQueue_1"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <!-- JMS msg listener for return queue for: -->
-   <!--   asynAggr_retQ_MeetingFinderQueue_1   -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <bean id="asAggr_return_q_listenerID_MeetingFinderQueue_1"
-         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
-      <property name="messageHandler"
-                ref="aggregate_return_metaMsgHandler_MeetingFinderQueue_1"/>
-      <property name="endpointName" value="asynAggr_retQ_MeetingFinderQueue_1"/>
-      <property name="controller" ref="asAggr_ctlr_MeetingFinderQueue_1"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <!-- JMS msg listener container for return queue for: -->
-   <!--        asynAggr_retQ_MeetingFinderQueue_1        -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <bean id="asAggr_return_msgLsnrCntnr_MeetingFinderQueue_1"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    return Queue    -->
-     <property name="destination" ref="asynAggr_retQ_MeetingFinderQueue_1"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="asAggr_return_q_listenerID_MeetingFinderQueue_1"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-   </bean>
-
    <!-- ================================== -->
    <!-- OutputChannel - for flows out of   -->
    <!-- this component, both to delegates  -->
@@ -378,7 +302,7 @@
       </constructor-arg>
    </bean>
 
-
+ 
    <!--========================-->
    <!-- Delegate ErrorHandlers -->
    <!--========================-->
@@ -448,7 +372,7 @@
       </constructor-arg>
    </bean>
 
-
+ 
    <!--=======================-->
    <!--  Error Handler Chain  -->
    <!--=======================-->
@@ -462,14 +386,6 @@
          </list>
       </constructor-arg>
    </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!--   Internal Input Queue for   -->
-   <!--       CollectionReader       -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="inQ_CollectionReader_1.1" class="org.apache.activemq.command.ActiveMQQueue">
-      <constructor-arg index="0" value="inQ_CollectionReader_1.1"/>
-   </bean>
    <!--===============================================-->
    <!-- Primitive or non-Async Aggr: CollectionReader -->
    <!--===============================================-->
@@ -481,7 +397,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="CollectionReader"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/FileSystemCollectionReader.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/FileSystemCollectionReader.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -496,107 +412,6 @@
 
      <!-- CAS Multiplier initial heap size -->
      <constructor-arg index="8" value="2000000"/>
-      <property name="outputChannel" ref="outChnl_CollectionReader_1.1"/>
-   </bean>
-
-   <!-- ThreadPool Task Executor -->
-   <bean id="pooling_CollectionReader_1.1"
-         class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-      <property name="corePoolSize" value="1"/>
-      <property name="maxPoolSize" value="1"/>
-      <property name="queueCapacity" value="1"/>
-   </bean>
-
-   <!--======================================================-->
-   <!--   M E S S A G E    H A N D L E R: primitive          -->
-   <!--  for controller: primitive_ctlr_CollectionReader_1.1 -->
-   <!--======================================================-->
-
-   <bean id="primitive_metaMsgHandler_CollectionReader_1.1"
-         class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
-      <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_CollectionReader_1.1"/>
-      <property name="delegate" ref="primitive_processRequestHandler_CollectionReader_1.1"/>
-   </bean>
-
-   <bean id="primitive_processRequestHandler_CollectionReader_1.1"
-         class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
-      <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_CollectionReader_1.1"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener for input queue for:  -->
-   <!--        inQ_CollectionReader_1.1        -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_q_listenerID_CollectionReader_1.1"
-         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
-      <property name="messageHandler" ref="primitive_metaMsgHandler_CollectionReader_1.1"/>
-      <property name="endpointName" value="inQ_CollectionReader_1.1"/>
-      <property name="controller" ref="primitive_ctlr_CollectionReader_1.1"/>
-      <property name="listenerContainer"
-                ref="primitive_input_msgLsnrCntnr_CollectionReader_1.1"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener container for input queue for:  -->
-   <!--             inQ_CollectionReader_1.1             -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_CollectionReader_1.1"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Connect to pooling task executor for primitive -->
-     <property name="taskExecutor" ref="pooling_CollectionReader_1.1"/>
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_CollectionReader_1.1"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_CollectionReader_1.1"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2000 OR Command=2002"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- GetMeta JMS msg listener container for input queue for:  -->
-   <!--                 inQ_CollectionReader_1.1                 -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_CollectionReader_1.1_getMeta"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_CollectionReader_1.1"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_CollectionReader_1.1"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2001"/>
-   </bean>
-
-   <!-- ================================== -->
-   <!-- OutputChannel - for flows out of   -->
-   <!-- this component, both to delegates  -->
-   <!--  (if aggr) and back up to sender   -->
-   <!-- ================================== -->
-   <bean id="outChnl_CollectionReader_1.1"
-         class="org.apache.uima.adapter.jms.activemq.JmsOutputChannel"
-         init-method="initialize">
-      <property name="serviceInputEndpoint" value="inQ_CollectionReader_1.1"/>
-      <property name="controller" ref="primitive_ctlr_CollectionReader_1.1"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!--   Internal Input Queue for   -->
-   <!--       TokenAndSentence       -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="inQ_TokenAndSentence_1.2" class="org.apache.activemq.command.ActiveMQQueue">
-      <constructor-arg index="0" value="inQ_TokenAndSentence_1.2"/>
    </bean>
    <!--===============================================-->
    <!-- Primitive or non-Async Aggr: TokenAndSentence -->
@@ -609,7 +424,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="TokenAndSentence"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/SimpleTokenAndSentenceAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/SimpleTokenAndSentenceAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -618,107 +433,6 @@
 
      <!-- scaleout number of instances -->
      <constructor-arg index="6" value="1"/>
-      <property name="outputChannel" ref="outChnl_TokenAndSentence_1.2"/>
-   </bean>
-
-   <!-- ThreadPool Task Executor -->
-   <bean id="pooling_TokenAndSentence_1.2"
-         class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-      <property name="corePoolSize" value="1"/>
-      <property name="maxPoolSize" value="1"/>
-      <property name="queueCapacity" value="1"/>
-   </bean>
-
-   <!--======================================================-->
-   <!--   M E S S A G E    H A N D L E R: primitive          -->
-   <!--  for controller: primitive_ctlr_TokenAndSentence_1.2 -->
-   <!--======================================================-->
-
-   <bean id="primitive_metaMsgHandler_TokenAndSentence_1.2"
-         class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
-      <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_TokenAndSentence_1.2"/>
-      <property name="delegate" ref="primitive_processRequestHandler_TokenAndSentence_1.2"/>
-   </bean>
-
-   <bean id="primitive_processRequestHandler_TokenAndSentence_1.2"
-         class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
-      <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_TokenAndSentence_1.2"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener for input queue for:  -->
-   <!--        inQ_TokenAndSentence_1.2        -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_q_listenerID_TokenAndSentence_1.2"
-         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
-      <property name="messageHandler" ref="primitive_metaMsgHandler_TokenAndSentence_1.2"/>
-      <property name="endpointName" value="inQ_TokenAndSentence_1.2"/>
-      <property name="controller" ref="primitive_ctlr_TokenAndSentence_1.2"/>
-      <property name="listenerContainer"
-                ref="primitive_input_msgLsnrCntnr_TokenAndSentence_1.2"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener container for input queue for:  -->
-   <!--             inQ_TokenAndSentence_1.2             -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_TokenAndSentence_1.2"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Connect to pooling task executor for primitive -->
-     <property name="taskExecutor" ref="pooling_TokenAndSentence_1.2"/>
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_TokenAndSentence_1.2"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_TokenAndSentence_1.2"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2000 OR Command=2002"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- GetMeta JMS msg listener container for input queue for:  -->
-   <!--                 inQ_TokenAndSentence_1.2                 -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_TokenAndSentence_1.2_getMeta"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_TokenAndSentence_1.2"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_TokenAndSentence_1.2"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2001"/>
-   </bean>
-
-   <!-- ================================== -->
-   <!-- OutputChannel - for flows out of   -->
-   <!-- this component, both to delegates  -->
-   <!--  (if aggr) and back up to sender   -->
-   <!-- ================================== -->
-   <bean id="outChnl_TokenAndSentence_1.2"
-         class="org.apache.uima.adapter.jms.activemq.JmsOutputChannel"
-         init-method="initialize">
-      <property name="serviceInputEndpoint" value="inQ_TokenAndSentence_1.2"/>
-      <property name="controller" ref="primitive_ctlr_TokenAndSentence_1.2"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!--   Internal Input Queue for   -->
-   <!--       MeetingDetector        -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="inQ_MeetingDetector_1.3" class="org.apache.activemq.command.ActiveMQQueue">
-      <constructor-arg index="0" value="inQ_MeetingDetector_1.3"/>
    </bean>
    <!--==============================================-->
    <!-- Primitive or non-Async Aggr: MeetingDetector -->
@@ -731,7 +445,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="MeetingDetector"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/MeetingDetectorTAE.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/MeetingDetectorTAE.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -740,106 +454,6 @@
 
      <!-- scaleout number of instances -->
      <constructor-arg index="6" value="1"/>
-      <property name="outputChannel" ref="outChnl_MeetingDetector_1.3"/>
-   </bean>
-
-   <!-- ThreadPool Task Executor -->
-   <bean id="pooling_MeetingDetector_1.3"
-         class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-      <property name="corePoolSize" value="1"/>
-      <property name="maxPoolSize" value="1"/>
-      <property name="queueCapacity" value="1"/>
-   </bean>
-
-   <!--=====================================================-->
-   <!--   M E S S A G E    H A N D L E R: primitive         -->
-   <!--  for controller: primitive_ctlr_MeetingDetector_1.3 -->
-   <!--=====================================================-->
-
-   <bean id="primitive_metaMsgHandler_MeetingDetector_1.3"
-         class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
-      <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_MeetingDetector_1.3"/>
-      <property name="delegate" ref="primitive_processRequestHandler_MeetingDetector_1.3"/>
-   </bean>
-
-   <bean id="primitive_processRequestHandler_MeetingDetector_1.3"
-         class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
-      <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_MeetingDetector_1.3"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener for input queue for:  -->
-   <!--        inQ_MeetingDetector_1.3         -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_q_listenerID_MeetingDetector_1.3"
-         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
-      <property name="messageHandler" ref="primitive_metaMsgHandler_MeetingDetector_1.3"/>
-      <property name="endpointName" value="inQ_MeetingDetector_1.3"/>
-      <property name="controller" ref="primitive_ctlr_MeetingDetector_1.3"/>
-      <property name="listenerContainer" ref="primitive_input_msgLsnrCntnr_MeetingDetector_1.3"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener container for input queue for:  -->
-   <!--             inQ_MeetingDetector_1.3              -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_MeetingDetector_1.3"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Connect to pooling task executor for primitive -->
-     <property name="taskExecutor" ref="pooling_MeetingDetector_1.3"/>
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_MeetingDetector_1.3"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_MeetingDetector_1.3"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2000 OR Command=2002"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- GetMeta JMS msg listener container for input queue for:  -->
-   <!--                 inQ_MeetingDetector_1.3                  -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_MeetingDetector_1.3_getMeta"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_MeetingDetector_1.3"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_MeetingDetector_1.3"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2001"/>
-   </bean>
-
-   <!-- ================================== -->
-   <!-- OutputChannel - for flows out of   -->
-   <!-- this component, both to delegates  -->
-   <!--  (if aggr) and back up to sender   -->
-   <!-- ================================== -->
-   <bean id="outChnl_MeetingDetector_1.3"
-         class="org.apache.uima.adapter.jms.activemq.JmsOutputChannel"
-         init-method="initialize">
-      <property name="serviceInputEndpoint" value="inQ_MeetingDetector_1.3"/>
-      <property name="controller" ref="primitive_ctlr_MeetingDetector_1.3"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!--   Internal Input Queue for   -->
-   <!--         CasConsumer          -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="inQ_CasConsumer_1.4" class="org.apache.activemq.command.ActiveMQQueue">
-      <constructor-arg index="0" value="inQ_CasConsumer_1.4"/>
    </bean>
    <!--==========================================-->
    <!-- Primitive or non-Async Aggr: CasConsumer -->
@@ -852,7 +466,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="CasConsumer"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/XmiWriterCasConsumer.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/meetingFinder/XmiWriterCasConsumer.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -861,97 +475,5 @@
 
      <!-- scaleout number of instances -->
      <constructor-arg index="6" value="1"/>
-      <property name="outputChannel" ref="outChnl_CasConsumer_1.4"/>
-   </bean>
-
-   <!-- ThreadPool Task Executor -->
-   <bean id="pooling_CasConsumer_1.4"
-         class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-      <property name="corePoolSize" value="1"/>
-      <property name="maxPoolSize" value="1"/>
-      <property name="queueCapacity" value="1"/>
-   </bean>
-
-   <!--=================================================-->
-   <!--   M E S S A G E    H A N D L E R: primitive     -->
-   <!--  for controller: primitive_ctlr_CasConsumer_1.4 -->
-   <!--=================================================-->
-
-   <bean id="primitive_metaMsgHandler_CasConsumer_1.4"
-         class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
-      <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_CasConsumer_1.4"/>
-      <property name="delegate" ref="primitive_processRequestHandler_CasConsumer_1.4"/>
-   </bean>
-
-   <bean id="primitive_processRequestHandler_CasConsumer_1.4"
-         class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
-      <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="primitive_ctlr_CasConsumer_1.4"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener for input queue for:  -->
-   <!--          inQ_CasConsumer_1.4           -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_q_listenerID_CasConsumer_1.4"
-         class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
-      <property name="messageHandler" ref="primitive_metaMsgHandler_CasConsumer_1.4"/>
-      <property name="endpointName" value="inQ_CasConsumer_1.4"/>
-      <property name="controller" ref="primitive_ctlr_CasConsumer_1.4"/>
-      <property name="listenerContainer" ref="primitive_input_msgLsnrCntnr_CasConsumer_1.4"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- JMS msg listener container for input queue for:  -->
-   <!--               inQ_CasConsumer_1.4                -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_CasConsumer_1.4"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Connect to pooling task executor for primitive -->
-     <property name="taskExecutor" ref="pooling_CasConsumer_1.4"/>
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_CasConsumer_1.4"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_CasConsumer_1.4"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2000 OR Command=2002"/>
-   </bean>
-
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <!-- GetMeta JMS msg listener container for input queue for:  -->
-   <!--                   inQ_CasConsumer_1.4                    -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="primitive_input_msgLsnrCntnr_CasConsumer_1.4_getMeta"
-         class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
-
-     <!-- Define number of JMS Consumers -->
-     <property name="concurrentConsumers" value="1"/>
-
-     <!--    input Queue     -->
-     <property name="destination" ref="inQ_CasConsumer_1.4"/>
-
-     <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="primitive_input_q_listenerID_CasConsumer_1.4"/>
-      <property name="connectionFactory" ref="controllerJmsFactory"/>
-      <property name="messageSelector" value="Command=2001"/>
-   </bean>
-
-   <!-- ================================== -->
-   <!-- OutputChannel - for flows out of   -->
-   <!-- this component, both to delegates  -->
-   <!--  (if aggr) and back up to sender   -->
-   <!-- ================================== -->
-   <bean id="outChnl_CasConsumer_1.4"
-         class="org.apache.uima.adapter.jms.activemq.JmsOutputChannel"
-         init-method="initialize">
-      <property name="serviceInputEndpoint" value="inQ_CasConsumer_1.4"/>
-      <property name="controller" ref="primitive_ctlr_CasConsumer_1.4"/>
    </bean>
 </beans>

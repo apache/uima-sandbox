@@ -219,6 +219,7 @@
   <!--           Top level match                                  -->       
   <!--============================================================--> 
   <xsl:template match="u:analysisEngineDeploymentDescription">
+    <!--xsl:message select="'debugging - verify version'"/-->
     <xsl:sequence select="f:generateBlockComment(
       ('Generated from', $document-uri, format-dateTime(current-dateTime(), '[D1] [MNn], [Y], [h]:[m]:[s] [PN]')), 1)"/>
     <xsl:apply-templates select="$ddd/u:analysisEngineDeploymentDescription/u:deployment"/> 
@@ -326,9 +327,8 @@
       </xsl:choose>
     </xsl:variable>
     
-    
     <!--xsl:message select="concat('Flow controller for ', $aeNameUnique, ' is ', $flowControllerPath)"/-->
-    
+    <!-- removed lazy init: lazy-init="{if (parent::u:service) then 'true' else 'false'}" -->
     <bean id="{$ctlrID}"
       class="org.apache.uima.aae.controller.AggregateAnalysisEngineController_impl"
       init-method="initialize">
@@ -348,23 +348,37 @@
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="{$delegateMapID}"/>
       
-      <property name="outputChannel" ref="{f:getOutputChannelID(.)}"/>
+      <!-- output channels needed if top level component - to return values to invoker
+           or if one or more delegates is remote - to send to the remote -->
+      <xsl:if test="parent::u:service or u:delegates/u:remoteAnalysisEngine">
+        <property name="outputChannel" ref="{f:getOutputChannelID(.)}"/>
+      </xsl:if>  
       <property name="serviceEndpointName" value="{$input_q_ID}"/>
       
       <property name="controllerBeanName" value="{$ctlrID}"/>
       <property name="errorHandlerChain" ref="{f:getErrorHandlerChainID(.)}"/>
       <property name="flowControllerDescriptor" value="{$flowControllerPath}"/>
     </bean>
+  
+    <!-- only generate aggregate input message handlers for top level - 
+         others using internal queuing mechanisms -->
+    <xsl:if test="parent::u:service">  
+      <xsl:call-template name="generateMsgHandlerChain">
+        <xsl:with-param name="aeNode" select="."/>
+        <xsl:with-param name="kind" select="'aggregate_input'"/>
+      </xsl:call-template>
+    </xsl:if>
     
-    <xsl:call-template name="generateMsgHandlerChain">
-      <xsl:with-param name="aeNode" select="."/>
-      <xsl:with-param name="kind" select="'aggregate_input'"/>
-    </xsl:call-template>
+    <!-- only generate return message handlers if one or more of the 
+         delegates are remote 
+         All remotes share this one message handler chain -->
     
-    <xsl:call-template name="generateMsgHandlerChain">
-      <xsl:with-param name="aeNode" select="."/>
-      <xsl:with-param name="kind" select="'aggregate_return'"/>
-    </xsl:call-template>
+    <xsl:if test="u:delegates/u:remoteAnalysisEngine">
+      <xsl:call-template name="generateMsgHandlerChain">
+        <xsl:with-param name="aeNode" select="."/>
+        <xsl:with-param name="kind" select="'aggregate_return'"/>
+      </xsl:call-template>
+    </xsl:if>
     
     <xsl:sequence
       select="f:generateLineComment('Create the endpoints + output channels, one per delegate', 3)"/>
@@ -465,6 +479,19 @@
         <xsl:if test="$remoteAnalysisEngine">
           <property name="tempReplyDestination" value="true"/>
         </xsl:if>
+        
+        <xsl:if test="not($remoteAnalysisEngine)">
+          <xsl:choose>
+            <xsl:when test="$aeDelegate[@async eq 'true']">
+              <property name="concurrentRequestConsumers" value="{$aeDelegate/@inputQueueScaleout}"/>    
+            </xsl:when>
+            <xsl:otherwise>
+              <property name="concurrentRequestConsumers" value="{$aeDelegate/u:scaleout/@numberOfInstances}"/>
+            </xsl:otherwise>
+          </xsl:choose> 
+          
+          <property name="concurrentReplyConsumers" value="{$aeDelegate/@internalReplyQueueScaleout}"/>
+        </xsl:if>
         <!--
           <xsl:variable name="msgListenerContainerID" 
              select="concat('asAggr_return_msgLsnrCntnr_', $aeNameUnique,
@@ -476,20 +503,24 @@
      
     </xsl:for-each>
          
-    <xsl:call-template name="generateInputChannel">
-      <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/>
-      <xsl:with-param name="q_ID" select="$input_q_ID"/>
-      <xsl:with-param name="q_endpointName" select="$input_q_ID"/>
-      <xsl:with-param name="queueFactoryID" select="$inputQueueFactoryID"/>
-      <xsl:with-param name="inputOrReturn" select="'input'"/>
-      <xsl:with-param name="kind" select="'asAggr'"/>
-      <!-- used as 1st part of ctlr name -->
-      <xsl:with-param name="msgHandlerChainID"
-        select="f:getMetaMsgHandlerID(., 'aggregate_input')"/>
-      <xsl:with-param name="nbrConcurrentConsumers" select="string(@inputQueueScaleout)"/>
-      <xsl:with-param name="remote" select="()"/>
-      <xsl:with-param name="poolingTaskExecutor" select="()"/>
-    </xsl:call-template>
+    <!-- only generate input channels (and listeners) for top level - 
+         others using internal queuing mechanisms -->
+    <xsl:if test="parent::u:service"> 
+      <xsl:call-template name="generateInputChannel">
+        <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/>
+        <xsl:with-param name="q_ID" select="$input_q_ID"/>
+        <xsl:with-param name="q_endpointName" select="$input_q_ID"/>
+        <xsl:with-param name="queueFactoryID" select="$inputQueueFactoryID"/>
+        <xsl:with-param name="inputOrReturn" select="'input'"/>
+        <xsl:with-param name="kind" select="'asAggr'"/>
+        <!-- used as 1st part of ctlr name -->
+        <xsl:with-param name="msgHandlerChainID"
+          select="f:getMetaMsgHandlerID(., 'aggregate_input')"/>
+        <xsl:with-param name="nbrConcurrentConsumers" select="string(@inputQueueScaleout)"/>
+        <xsl:with-param name="remote" select="()"/>
+        <xsl:with-param name="poolingTaskExecutor" select="()"/>
+      </xsl:call-template>
+    </xsl:if>
     
     <xsl:variable name="return_q_ID" select="f:getLocalReturnQueueEndpointID(.)"/>
     
@@ -497,31 +528,34 @@
       the test "starts-with(@brokerURL, '/')" would seem always to be false 
       The net effect is that the return queue for async aggr is always generated -->
     
-    <xsl:if
-      test="u:delegates/u:analysisEngine or
-                  u:delegates/u:remoteAnalysisEngine/u:inputQueue[not(starts-with(@brokerURL, '/'))]">
-      
-      <xsl:sequence
+    <!-- test changed: no common return input channel and listeners are used
+         anymore - they were used only for co-located delegates, which now
+         use an internal mechanism -->
+    
+    
+      <!-- removed with change to JavaQ for local Q -->
+      <!-- other reply queues (for remotes) are "remote" -->     
+      <!--xsl:sequence
         select="f:generateLineComment('return queue for async aggregate', 3)"/>
       <bean id="{$return_q_ID}" class="org.apache.activemq.command.ActiveMQQueue">
         <constructor-arg index="0" value="{$return_q_ID}"/>
-      </bean>
+      </bean-->
       
-      <xsl:call-template name="generateInputChannel">
+      <!--xsl:call-template name="generateInputChannel">
         <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/>
         <xsl:with-param name="q_ID" select="$return_q_ID"/>
         <xsl:with-param name="q_endpointName" select="$return_q_ID"/>        
         <xsl:with-param name="queueFactoryID" select="'controllerJmsFactory'"/>
         <xsl:with-param name="inputOrReturn" select="'return'"/>
-        <xsl:with-param name="kind" select="'asAggr'"/>
+        <xsl:with-param name="kind" select="'asAggr'"/-->
         <!-- used as 1st part of ctlr name -->
-        <xsl:with-param name="msgHandlerChainID"
+        <!--xsl:with-param name="msgHandlerChainID"
           select="f:getMetaMsgHandlerID($analysisEngine, 'aggregate_return')"/>
         <xsl:with-param name="nbrConcurrentConsumers" select="string(@internalReplyQueueScaleout)"/>
         <xsl:with-param name="remote" select="()"/>
         <xsl:with-param name="poolingTaskExecutor" select="()"/>
-      </xsl:call-template>
-    </xsl:if>
+      </xsl:call-template-->
+   
     
     <!-- we iterate over all the delegates in order to have the right value for position() -->
     <xsl:for-each select="u:delegates/*">
@@ -554,7 +588,7 @@
           <xsl:with-param name="kind" select="'asAggr'"/>
           <!-- used as 1st part of ctlr name -->
           <xsl:with-param name="msgHandlerChainID"
-            select="f:getMetaMsgHandlerID($analysisEngine, 'aggregate_return')"/>
+            select="f:getProcessResponseHandlerID($analysisEngine, 'aggregate_return')"/>
           <xsl:with-param name="nbrConcurrentConsumers" 
             select="@remoteReplyQueueScaleout"/>  
           <xsl:with-param name="remote" select="."/>
@@ -568,13 +602,19 @@
                               else f:getInternalInputQueueName(.)"/>
     <!--xsl:message select="'*** origin_q_name: '"/>
     <xsl:message select="$origin_q_name"/-->
-    
-    <xsl:call-template name="generateOutputChannel">
-      <xsl:with-param name="aeNode" select="."/>
-      <xsl:with-param name="origin_q_name" select="$origin_q_name"/>
-      <xsl:with-param name="return_q_ID" select="$return_q_ID"/>
-      <xsl:with-param name="kind" select="'asAggr'"/>
-    </xsl:call-template>
+ 
+    <!-- skip generating output channel for internal reply queues 
+         because internal reply queues no longer used 
+         Still need this for returning values from top level component to invoker, or
+         for sending value to remotes -->
+    <xsl:if test="parent::u:service or u:delegates/u:remoteAnalysisEngine">       
+      <xsl:call-template name="generateOutputChannel">
+        <xsl:with-param name="aeNode" select="."/>
+        <xsl:with-param name="origin_q_name" select="$origin_q_name"/>
+        <xsl:with-param name="return_q_ID" select="$return_q_ID"/>
+        <xsl:with-param name="kind" select="'asAggr'"/>
+      </xsl:call-template>
+    </xsl:if>
     
     <xsl:sequence select="f:generateLineComment('map for delegate keys', 3)"/>
     <bean id="{$delegateMapID}" class="java.util.HashMap" singleton="true">
@@ -663,7 +703,8 @@
             
           </bean>
         </xsl:when>
-        <xsl:otherwise>     
+        <xsl:otherwise>  
+          <!-- removed lazy init: lazy-init="{if (parent::u:service) then 'true' else 'false'}" -->   
           <bean id="{$ctlrID}"
             class="org.apache.uima.aae.controller.PrimitiveAnalysisEngineController_impl"
             init-method="initialize">
@@ -698,7 +739,9 @@
               <constructor-arg index="8" value="{u:casMultiplier/@initialFsHeapSize}"/>
             </xsl:if>
             
-            <property name="outputChannel" ref="{f:getOutputChannelID(.)}"/>
+            <xsl:if test="parent::u:service">
+              <property name="outputChannel" ref="{f:getOutputChannelID(.)}"/>
+            </xsl:if>  
             <xsl:if test="parent::u:service">
               <property name="errorHandlerChain" ref="{f:getErrorHandlerChainID(.)}"/>         
             </xsl:if>
@@ -707,39 +750,49 @@
       </xsl:choose>
     </xsl:if>
     
-      <!-- next logic is true for lower levels in an aggregate -->
+      <!-- next logic is true for lower levels in an aggregate as well as top level not CPP -->
     <xsl:if test="not(../../u:service[@i:isTopLvlCpp eq 'yes'])">    
       <xsl:variable name="poolingTaskExecutorID" select="f:getPoolingTaskExecutorID(.)"/>
       <!--xsl:variable name="scaleoutPlus" select=
         "if (parent::u:service and u:casMultiplier) then
            number(u:scaleout/@numberOfInstances) + 1 else
            number(u:scaleout/@numberOfInstances) + 0"/-->
-      
-      <xsl:sequence select="f:generateLineComment('ThreadPool Task Executor',3)"/>    
-      <bean id="{$poolingTaskExecutorID}" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="{u:scaleout/@numberOfInstances}" />
-        <property name="maxPoolSize" value="{u:scaleout/@numberOfInstances}" />
-        <property name="queueCapacity" value="{u:scaleout/@numberOfInstances}" />
-      </bean>
-      
-      <xsl:call-template name="generateMsgHandlerChain">
-        <xsl:with-param name="aeNode" select="."/>
-        <xsl:with-param name="kind" select="'primitive'"/>
-      </xsl:call-template>
+  
+      <!-- removed when java q added for local  -->
+      <!-- only generate ThreadPoolTaskExecutor for top level primitives -->
+      <xsl:if test="parent::u:service">            
+        <xsl:sequence select="f:generateLineComment('ThreadPool Task Executor',3)"/>    
+        <bean id="{$poolingTaskExecutorID}" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+          <property name="corePoolSize" value="{u:scaleout/@numberOfInstances}" />
+          <property name="maxPoolSize" value="{u:scaleout/@numberOfInstances}" />
+          <property name="queueCapacity" value="{u:scaleout/@numberOfInstances}" />
+        </bean>
+      </xsl:if>
      
-      <xsl:call-template name="generateInputChannel">
-        <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/> 
-        <xsl:with-param name="q_ID" select="$input_q_ID"/>
-        <xsl:with-param name="q_endpointName" select="$input_q_ID"/>      
-        <xsl:with-param name="queueFactoryID" select="$inputQueueFactoryID"/>
-        <xsl:with-param name="inputOrReturn" select="'input'"/>
-        <xsl:with-param name="kind" select="'primitive'"/>  <!-- used in ctrl id name -->
-        <xsl:with-param name="msgHandlerChainID" select="f:getMetaMsgHandlerID(., 'primitive')"/>
-        <xsl:with-param name="nbrConcurrentConsumers" select="u:scaleout/@numberOfInstances"/> 
-        <xsl:with-param name="remote" select="()"/>
-        <xsl:with-param name="poolingTaskExecutor" select="$poolingTaskExecutorID"/>     
-      </xsl:call-template>
-   
+      <!-- only generate input message handlers and input channels for top level - 
+           others using internal queuing mechanisms -->
+      <xsl:if test="parent::u:service">       
+        <xsl:call-template name="generateMsgHandlerChain">
+          <xsl:with-param name="aeNode" select="."/>
+          <xsl:with-param name="kind" select="'primitive'"/>
+        </xsl:call-template>
+
+     
+        <xsl:call-template name="generateInputChannel">
+          <xsl:with-param name="aeNameUnique" select="$aeNameUnique"/> 
+          <xsl:with-param name="q_ID" select="$input_q_ID"/>
+          <xsl:with-param name="q_endpointName" select="$input_q_ID"/>      
+          <xsl:with-param name="queueFactoryID" select="$inputQueueFactoryID"/>
+          <xsl:with-param name="inputOrReturn" select="'input'"/>
+          <xsl:with-param name="kind" select="'primitive'"/>  <!-- used in ctrl id name -->
+          <xsl:with-param name="msgHandlerChainID" select="f:getMetaMsgHandlerID(., 'primitive')"/>
+          <xsl:with-param name="nbrConcurrentConsumers" select="u:scaleout/@numberOfInstances"/> 
+          <xsl:with-param name="remote" select="()"/>
+          <xsl:with-param name="poolingTaskExecutor" select="$poolingTaskExecutorID"/>     
+        </xsl:call-template>
+ 
+      </xsl:if>    
+      
       <!-- next to be commented out due to design change summer 2008 -->
       <!--xsl:if test="parent::u:service and u:casMultiplier">
         <xsl:call-template name="generateCMSyncInputChannel">
@@ -761,13 +814,16 @@
                                 else f:getInternalInputQueueName(.)"/>
       <!--xsl:message select="'*** origin_q_name: '"/>
       <xsl:message select="$origin_q_name"/-->
-     
-      <xsl:call-template name="generateOutputChannel">
-        <xsl:with-param name="aeNode" select="."/>
-        <xsl:with-param name="origin_q_name" select="$origin_q_name"/>
-        <xsl:with-param name="kind" select="'primitive'"/>
-      </xsl:call-template>
-  
+
+      <!-- skip generating output channel for internal reply queues 
+           because internal reply queues no longer used -->
+      <xsl:if test="parent::u:service">                  
+        <xsl:call-template name="generateOutputChannel">
+          <xsl:with-param name="aeNode" select="."/>
+          <xsl:with-param name="origin_q_name" select="$origin_q_name"/>
+          <xsl:with-param name="kind" select="'primitive'"/>
+        </xsl:call-template>
+      </xsl:if>
       
       <!-- next call is called for all primitives, but only does something
            for top level primitives -->
@@ -943,6 +999,7 @@
       select="concat($kind, '_', $inputOrReturn, '_msgLsnrCntnr_', $aeNameUnique,
              if ($remote) then concat('_', $remote/@key) else '')"/>    
 
+  
     <xsl:sequence select="f:generateLineComment((
       '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
  concat('JMS msg listener for ', $inputOrReturn, ' queue for:'),
@@ -959,6 +1016,7 @@
       </xsl:if>
     </bean>
 
+      
     <xsl:sequence select="f:generateLineComment((
       '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
    concat('JMS msg listener container for ', $inputOrReturn, ' queue for:'),
@@ -995,7 +1053,7 @@
         <property name="messageSelector" value="Command=2000 OR Command=2002" /> <!-- Process or CPC request -->
       </xsl:if>
     </bean>
-    
+     
     <xsl:if test="$remote[self::u:remoteAnalysisEngine]">
       <xsl:sequence select="f:generateLineComment((
         '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
@@ -1137,30 +1195,35 @@
        concat(' for controller: ', f:getControllerID($aeNode))), 3)"/>
        
      <xsl:sequence select="concat($nl,'   ')"/>
-     <bean id="{f:getMetaMsgHandlerID($aeNode, $kind)}"
-       class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
-      <!-- Define handlers name -->
-      <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="{f:getControllerID($aeNode)}"/>
-      <!-- Link to the next handler in the chain -->
-      <property name="delegate" ref="{f:getProcessRequestHandlerID($aeNode, $kind)}"/>
-    </bean>
-
-    <xsl:sequence select="$nl2"/>
-    <bean id="{f:getProcessRequestHandlerID($aeNode, $kind)}" class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl" >
-      <!-- Define handlers name -->
-      <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="{f:getControllerID($aeNode)}" />
-      <!-- Link to the next handler in the chain -->
-      <xsl:if test="$kind eq 'aggregate_return'">
-        <property name="delegate" ref="{f:getProcessResponseHandlerID($aeNode, $kind)}" />
-      </xsl:if>
-    </bean>
-
+    
+     <!-- either generate "return" msg handlers or "receiving requests" msg handlers -->
+     <xsl:if test="$kind ne 'aggregate_return'"> 
+       <bean id="{f:getMetaMsgHandlerID($aeNode, $kind)}"
+         class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
+        <!-- Define handlers name -->
+        <constructor-arg index="0" value="MetadataRequestHandler"/>
+        <property name="controller" ref="{f:getControllerID($aeNode)}"/>
+        <!-- Link to the next handler in the chain -->
+        <property name="delegate" ref="{f:getProcessRequestHandlerID($aeNode, $kind)}"/>
+      </bean>
+  
+      <xsl:sequence select="$nl2"/>
+      <bean id="{f:getProcessRequestHandlerID($aeNode, $kind)}" class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl" >
+        <!-- Define handlers name -->
+        <constructor-arg index="0" value="ProcessRequestHandler"/>
+        <property name="controller" ref="{f:getControllerID($aeNode)}" />
+        <!-- Link to the next handler in the chain -->
+        <!--xsl:if test="$kind eq 'aggregate_return'">
+          <property name="delegate" ref="{f:getProcessResponseHandlerID($aeNode, $kind)}" />
+        </xsl:if-->
+      </bean>
+    </xsl:if>
+    
     <xsl:if test="$kind eq 'aggregate_return'">
       
       <xsl:sequence select="$nl2"/>
-      <bean id="{f:getProcessResponseHandlerID($aeNode, $kind)}" class="org.apache.uima.aae.handler.input.ProcessResponseHandler" >
+      <bean id="{f:getProcessResponseHandlerID($aeNode, 'aggregate_return')}" 
+        class="org.apache.uima.aae.handler.input.ProcessResponseHandler" >
        <!-- Define handlers name -->
         <constructor-arg index="0" value="ProcessResponseHandler"/>
         <property name="controller" ref="{f:getControllerID($aeNode)}" />
@@ -1173,6 +1236,16 @@
        <!-- Define handlers name -->
         <constructor-arg index="0" value="MetadataResponseHandler"/>
         <property name="controller" ref="{f:getControllerID($aeNode)}" />
+        <property name="delegate" ref="{f:getProcessRequestHandlerID($aeNode, $kind)}" />
+      </bean> 
+
+      <xsl:sequence select="$nl2"/>
+      <!-- the reason there is a ProcessRequest handler in the return queue is because
+           this is how Cas Multiplier things are handled -->
+      <bean id="{f:getProcessRequestHandlerID($aeNode, $kind)}" class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl" >
+        <!-- Define handlers name -->
+        <constructor-arg index="0" value="ProcessRequestHandler"/>
+        <property name="controller" ref="{f:getControllerID($aeNode)}" />
       </bean> 
 
     </xsl:if>
@@ -1182,14 +1255,17 @@
   <!--           Standard Beans                                  =-->       
   <!--============================================================--> 
   <xsl:template name="generateStandardBeans">
+
+    
     <!-- need an internal broker if any of the following are true -->
     <!--   A service is async = true (implies aggregate)
     or The service specifies its input queue as "vm:..."
     -->
-    
+
+    <!-- only generate for inputq = localhost.  async=true handled with Java queue -->
+    <!-- removed: boolean(u:service/u:analysisEngine[@async eq 'true']) or  -->    
     <xsl:if
-      test="boolean(u:service/u:analysisEngine[@async eq 'true']) or
-                  boolean(u:service/u:inputQueue[@brokerURL='vm://localhost'])">
+      test="boolean(u:service/u:inputQueue[@brokerURL='vm://localhost'])">
       
       <xsl:sequence select="f:generateLineComment('connection factory for co-located things',3)"/>
       <bean id="controllerJmsFactory"
@@ -1200,7 +1276,8 @@
       </bean>
     </xsl:if>
     
-    <xsl:if test="u:service/u:analysisEngine[@async eq 'true']">
+    <!-- no longer for async=true, only for inputq = localhost -->
+    <xsl:if test="boolean(u:service/u:inputQueue[@brokerURL='vm://localhost'])">
       <xsl:sequence select="f:generateLineComment('Deploys a co-located broker',3)"/>
       <bean id="brokerDeployerService" class="org.apache.uima.adapter.jms.activemq.BrokerDeployer">
         <constructor-arg index="0" value="{1000 * 1024 * 1024}"/>
@@ -1270,6 +1347,8 @@
     <xsl:for-each select="u:analysisEngine">
       
       <xsl:variable name="iqn" select="f:getInternalInputQueueName(.)"/>
+      
+      <!-- no longer generate internal input queues - switched to using Java queues
       <xsl:sequence select="f:generateLineComment((
         '~~~~~~~~~~~~~~~~~~~~~~~~~~~',
         'Internal Input Queue for',
@@ -1279,6 +1358,7 @@
             class="org.apache.activemq.command.ActiveMQQueue">
          <constructor-arg index="0" value="{$iqn}"/>
       </bean>
+      -->
       
       <xsl:apply-templates  select=".">
         <xsl:with-param tunnel="yes" name="input_q_ID" select="$iqn"/>
@@ -1603,8 +1683,12 @@
          'has delegate?', if (u:delegates) then 'true' else 'false',
          'async is:', $async), .)"/-->
     
+    
     <xsl:variable name="internalReplyQueueScaleout" as="xs:string">
-      <xsl:choose>
+      <!-- next choose commentted out because it disallowed internal reply q scaleout
+           for primitives - but this could be needed for primitives which are
+           CAS multipliers -->
+      <!--xsl:choose>
         <xsl:when test="(string($async) = 'false') and @internalReplyQueueScaleout">
           <xsl:sequence select="f:msgWithLineNumber('WARN',
               ('deployment descriptor for analysisEngine:', $key,
@@ -1613,10 +1697,10 @@
               .)"/>
           <xsl:value-of select="'1'"/>
         </xsl:when>
-        <xsl:otherwise>
+        <xsl:otherwise-->
           <xsl:sequence select="if (@internalReplyQueueScaleout) then @internalReplyQueueScaleout else '1'"/>
-        </xsl:otherwise>
-      </xsl:choose>
+        <!--/xsl:otherwise>
+      </xsl:choose-->
     </xsl:variable>
 
     <xsl:variable name="inputQueueScaleout" as="xs:string">
@@ -1625,7 +1709,8 @@
           <xsl:sequence select="f:msgWithLineNumber('WARN',
               ('deployment descriptor for analysisEngine:', $key,
                'specifies', concat('inputQueueScaleout=&quot;', string(@inputQueueScaleout),
-               '&quot;, this is ignored for async=&quot;false&quot; analysisEngine specifications.')),
+               '&quot;, this is ignored for async=&quot;false&quot; analysisEngine specifications.'),
+               'Use the scaleout numberOfInstances=xx element instead for this, for primitives.'),
               .)"/>
           <xsl:value-of select="'1'"/>
         </xsl:when>
