@@ -313,7 +313,9 @@ public abstract class HandlerBase implements Handler
 				{
 					if ( delegateServicePerformance != null )
 					{
-						delegateServicePerformance.incrementAnalysisTime(timeInProcessCAS);
+           delegateServicePerformance.incrementAnalysisTime(timeInProcessCAS);
+            //  The remote delegate returns the actual analysis time not the delta
+//					  delegateServicePerformance.setAnalysisTime(timeInProcessCAS);
 					}
 				}
 				else 
@@ -328,7 +330,8 @@ public abstract class HandlerBase implements Handler
 					// Update processing time for this CAS
 					if ( inputCasStats != null )
 					{
-						inputCasStats.incrementAnalysisTime(timeInProcessCAS);
+//            inputCasStats.setAnalysisTime(timeInProcessCAS);
+            inputCasStats.incrementAnalysisTime(timeInProcessCAS);
 					}
 				}
 			}

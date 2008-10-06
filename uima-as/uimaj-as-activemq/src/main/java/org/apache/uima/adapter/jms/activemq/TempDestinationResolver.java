@@ -48,11 +48,11 @@ public class TempDestinationResolver implements DestinationResolver
 			if ( destination == null )
 			{
 				destination = session.createTemporaryQueue();
+        System.out.println(">>> Created New Temp Queue:"+destination+" Listener Hash:"+listener.hashCode());
 				if ( listener != null )
 				{
 					listener.setDestination(destination);
 				}
-				System.out.println(">>> Created New Temp Queue:"+destination+" Listener Hash:"+listener.hashCode());
 			}
 		}
 		return destination;

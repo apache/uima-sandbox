@@ -138,6 +138,17 @@ public class ServicePerformance implements ServicePerformanceMBean
 		}
 	}
 
+	/**
+	 * Adjust the analysis time. This method is called when a reply is received from a remote
+	 * delegate. Each reply message containing a CAS include the current actual analysis time
+	 * This is not a delta, its the running analysis time.
+	 * 
+	 * @param anAnalysisTime
+	 */
+	public synchronized void setAnalysisTime( long anAnalysisTime )
+	{
+	  analysisTime = anAnalysisTime;
+	}
 	public void incrementAnalysisTime( long anAnalysisTime )
 	{
 		synchronized(sem)
@@ -172,7 +183,17 @@ public class ServicePerformance implements ServicePerformanceMBean
 	
 	public long getRawAnalysisTime()
 	{
-		return analysisTime;
+    if ( controller != null )
+    {
+      return controller.getAnalysisTime();
+    }
+    else
+    {
+      synchronized( sem )
+      {
+        return analysisTime;
+      }
+    }
 	}
 
 	public long getNumberOfCASesProcessed()

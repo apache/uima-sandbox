@@ -105,6 +105,10 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	
 	private long idleTime=0;
 	
+	private int concurrentRequestConsumers = 1;
+	
+	private int concurrentReplyConsumers = 1;
+	
 	//	This is supplied by the remote client. It needs to be
 	//	echoed back to the client. 
 	private String endpointServer = null;
@@ -562,5 +566,22 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	public String getEndpointServer() {
 		return endpointServer;
 	}
+	
+  public void setConcurrentRequestConsumers(int aConsumerCount) {
+    concurrentRequestConsumers = aConsumerCount;
+  }
+  
+  public int getConcurrentRequestConsumers() {
+    return concurrentRequestConsumers;
+  }
 
+  public void setConcurrentReplyConsumers(int aConsumerCount)  {
+    concurrentReplyConsumers = aConsumerCount;
+    
+  }
+  
+  public int getConcurrentReplyConsumers() {
+    return concurrentReplyConsumers;
+  }
+  
 }

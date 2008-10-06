@@ -203,10 +203,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			int concurrentConsumerCountOnReplies = getConcurrentConsumerCount(ctx);
 			// Configure and initialize vm transport in the top level aggregate.
 			// The aggregate will initialize all delegates with the vm transport.
-			if ( System.getProperty("UseVmTransport") != null )
-			{
-	      ((AggregateAnalysisEngineController) cntlr).initializeVMTransport(concurrentConsumerCountOnReplies);
-			}
+      ((AggregateAnalysisEngineController) cntlr).initializeVMTransport(concurrentConsumerCountOnReplies);
 			// Complete initialization of the aggregate by sending
 			// getMeta requests to
 			// all remote delegates (if any). Collocated delegates

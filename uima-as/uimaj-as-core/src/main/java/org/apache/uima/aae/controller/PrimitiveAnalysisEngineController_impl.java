@@ -237,7 +237,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			getServicePerformance().incrementAnalysisTime(super.getCpuTime()-start);
 
 			
-	    if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+	    if ( !anEndpoint.isRemote())
 	    {
 	        UimaMessage message = 
 	          getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
@@ -409,8 +409,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 					}
 	        //  Increment number of CASes processed by this service
 	        sequence++;
-				}
-		      if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+			  }
+		      if ( !anEndpoint.isRemote())
 		      {
 		          UimaMessage message = 
 		            getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
@@ -444,7 +444,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			
 			// Store total time spent processing this input CAS
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
-      if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+      if ( !anEndpoint.isRemote())
       {
           inputCASReturned = true;
           UimaMessage message = 
@@ -630,7 +630,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		{
 			serviceInfo = new PrimitiveServiceInfo();
 		}
-		if ( getInputChannel() != null )
+		if ( isTopLevelComponent() && getInputChannel() != null )
 		{
 			serviceInfo.setInputQueueName(getInputChannel().getServiceInfo().getInputQueueName());
 			serviceInfo.setBrokerURL(getInputChannel().getServiceInfo().getBrokerURL());

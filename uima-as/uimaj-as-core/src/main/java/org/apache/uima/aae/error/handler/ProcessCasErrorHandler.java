@@ -109,7 +109,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		{
 			try
 			{
-			   if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null )
+			   if ( !anEndpoint.isRemote())
 			   {
 			      anEndpoint.setReplyEndpoint(true);
 			      UimaTransport vmTransport = aController.getTransport(aController.getName()) ;//anEndpoint.getEndpoint());

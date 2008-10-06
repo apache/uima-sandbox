@@ -39,6 +39,7 @@ import org.apache.uima.cas.Marker;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.AllowPreexistingFS;
 import org.apache.uima.cas.impl.OutOfTypeSystemData;
+import org.apache.uima.cas.impl.Serialization;
 import org.apache.uima.cas.impl.XCASDeserializer;
 import org.apache.uima.cas.impl.XCASSerializer;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
@@ -167,17 +168,6 @@ public class UimaSerializer
 			writer.close();
 		}
 	}
-/*
-	public static  String serializeCasToXmi(CAS cas, XmiSerializationSharedData serSharedData) throws IOException, SAXException
-	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		XmiCasSerializer.serialize(cas, null, baos, false, serSharedData);
-		
-		baos.close();
-		String xmiStr = new String(baos.toByteArray(), "UTF-8"); 
-		return xmiStr;
-	}
-*/
 	
 	/** Utility method for deserializing a CAS from an XMI String */
 	public static void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
@@ -187,31 +177,11 @@ public class UimaSerializer
 		
 		Reader reader = new StringReader(anXmlStr);
 		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-	    XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
+    XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
 	    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint);
 	    xmlReader.setContentHandler(handler);
 	    xmlReader.parse(new InputSource(reader));
 
-	    
-	    
-	    
-	    
-	    /*		
-		byte[] bytes = xmlStr.getBytes("UTF-8"); // this assumes the encoding
-													// is UTF-8, which is the
-													// default output encoding
-													// of the XmiCasSerializer
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-		try
-		{
-			XmiCasDeserializer.deserialize(bais, cas, lenient, sharedData, mergePoint);
-		}
-		finally
-		{
-			bais.close();
-		}
-*/
-		
 	}
 
 	public static void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
@@ -225,8 +195,7 @@ public class UimaSerializer
 	    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint, allow);
 	    xmlReader.setContentHandler(handler); 
 	    xmlReader.parse(new InputSource(reader));
+	}
 
-
-}
 	
 }	

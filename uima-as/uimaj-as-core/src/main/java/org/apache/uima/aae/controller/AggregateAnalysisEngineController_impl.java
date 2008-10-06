@@ -20,7 +20,6 @@
 package org.apache.uima.aae.controller;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -298,7 +297,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		FlowContainer flow = lookupFlow(aCasReferenceId);
 			if ( flow != null )
 			{
-				//flow.aborted();
 				synchronized( flowMap )
 				{
 					flowMap.remove(aCasReferenceId);
@@ -401,10 +399,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "processCollectionCompleteReplyFromDelegate", 
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_recvd_cpc_reply__FINE", new Object[] { key });
 			
-			
-			if (sendReply && allDelegatesCompletedCollection() && getClientEndpoint() != null)
+			Endpoint cEndpoint = null;
+			if (sendReply && allDelegatesCompletedCollection() && (( cEndpoint = getClientEndpoint()) != null) )
 			{
-				sendCpcReply();
+				sendCpcReply(cEndpoint);
 			}
 		}
 		catch ( Exception e)
@@ -412,7 +410,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			throw new AsynchAEException(e);
 		}
 	}
-	private void sendCpcReply() throws Exception
+	private void sendCpcReply(Endpoint aClientEndpoint) throws Exception
 	{
 		Iterator destIterator = destinationMap.keySet().iterator();
 		while(destIterator.hasNext())
@@ -431,20 +429,22 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		logStats(getComponentName(),servicePerformance);
 		
 		endProcess(AsynchAEMessage.Process);
-
-    if ( !getClientEndpoint().isRemote() && System.getProperty("UseVmTransport") != null)
+		if ( aClientEndpoint == null )
+		{
+		  aClientEndpoint = getClientEndpoint();
+		}
+    if ( !aClientEndpoint.isRemote())
     {
         UimaMessage message = 
-          getTransport(getClientEndpoint().getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
+          getTransport(aClientEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
         //  Send reply back to the client. Use internal (non-jms) transport
         getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
     }
     else
     {
-      getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, getClientEndpoint());
+      getOutputChannel().sendReply(AsynchAEMessage.CollectionProcessComplete, aClientEndpoint);
     }
 		
-		clientEndpoint = null;
 		clearStats();
 	}
 	/**
@@ -533,7 +533,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		{
 			try
 			{
-				sendCpcReply();
+				sendCpcReply(null);
 			}
 			catch(Exception e)
 			{
@@ -550,7 +550,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				if (endpoint != null )
 				{
 				  
-			    if ( !endpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+			    if ( !endpoint.isRemote())
 			    {
 			      try
 			      {
@@ -1033,28 +1033,18 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	      delegateEndpoints[i].initialize();
 	      delegateEndpoints[i].setController(this);
 	      
-	      // Dispatch GetMeta to the collocated component
-	      if ( System.getProperty("UseVmTransport") != null)
-	      {
-	        delegateEndpoints[i].setWaitingForResponse(true);
-	        try
-	        {
-	          UimaMessage message = 
-	            getTransport(delegateEndpoints[i].getEndpoint()).produceMessage(AsynchAEMessage.GetMeta,AsynchAEMessage.Request,getName());
-
-	          getTransport(delegateEndpoints[i].getEndpoint()).getUimaMessageDispatcher().dispatch(message);
-	        }
-	        catch( Exception e)
-	        {
-	          throw new AsynchAEException(e);
-	        }
-	      }
-	      else
-	      {
-	        ((AggregateAnalysisEngineController) this).dispatchMetadataRequest(delegateEndpoints[i]);
-	      }
-	      
-			}
+        delegateEndpoints[i].setWaitingForResponse(true);
+        try
+        {
+          UimaMessage message = 
+            getTransport(delegateEndpoints[i].getEndpoint()).produceMessage(AsynchAEMessage.GetMeta,AsynchAEMessage.Request,getName());
+          getTransport(delegateEndpoints[i].getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+        }
+        catch( Exception e)
+        {
+          throw new AsynchAEException(e);
+        }
+      }
 		}
 	}
 
@@ -1289,13 +1279,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		else
 		{
 		  endpoint = getReplyEndpoint( cacheEntry );
-/*
-		  endpoint = getMessageOrigin(cacheEntry.getCasReferenceId());
-			if ( endpoint == null && cacheEntry.getInputCasReferenceId() != null)
-			{
-			  endpoint = getMessageOrigin(cacheEntry.getInputCasReferenceId());
-			}
-*/	
 			dropFlow(cacheEntry.getCasReferenceId(), false);
 		}
 		if ( endpoint != null )
@@ -1330,21 +1313,20 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					      cmOutstandingCASes.put(cacheEntry.getCasReferenceId(),cacheEntry.getCasReferenceId());
 	            }
 						}
-				    if ( !endpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+				    if ( !endpoint.isRemote() )
 				    {
 				      sendVMMessage(AsynchAEMessage.Request, endpoint, cacheEntry);
 				    }
 				    else
 				    {
 	            // Send response to a given endpoint
-	            //getOutputChannel().sendReply(cacheEntry.getCas(), cacheEntry.getInputCasReferenceId(), aCasReferenceId, endpoint, cacheEntry.getCasSequence());
 	            getOutputChannel().sendReply(cacheEntry, endpoint);
 
 				    }
 					}
 					else
 					{
-            if ( !endpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+            if ( !endpoint.isRemote())
             {
               sendVMMessage(AsynchAEMessage.Response, endpoint, cacheEntry);
             }
@@ -1485,7 +1467,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	private void dispatch(String aCasReferenceId, Endpoint anEndpoint) throws AsynchAEException
 	{
-    if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+    if ( !anEndpoint.isRemote() )
     {
       try
       {
@@ -1606,11 +1588,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 		}
 
-//		if (destinationToKeyMap.containsKey(anEndpointName))
-//		{
-//			return (String) destinationToKeyMap.get(anEndpointName);
-//		}
-
 		return key;
 	}
 
@@ -1664,6 +1641,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     }
     public void mergeTypeSystem(String aTypeSystem, String fromDestination, String fromServer) throws AsynchAEException
 	{
+      
 		try
 		{
 			Set keys = destinationMap.keySet();
@@ -2044,13 +2022,19 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		if ( serviceInfo == null )
 		{
 			serviceInfo = new AggregateServiceInfo(isCasMultiplier());
-			if ( getInputChannel() != null )
+			// if this is a top level service and the input channel not yet initialized
+			// block in getInputChannel() on the latch
+			if ( isTopLevelComponent() && getInputChannel() != null )
 			{
-				serviceInfo.setInputQueueName(getInputChannel().getName());
-				serviceInfo.setBrokerURL(getInputChannel().getServerUri());
-				serviceInfo.setDeploymentDescriptor("");
-
+	      serviceInfo.setInputQueueName(getInputChannel().getName());
+	      serviceInfo.setBrokerURL(getInputChannel().getServerUri());
 			}
+			else
+			{
+	      serviceInfo.setInputQueueName(getName());
+	      serviceInfo.setBrokerURL("vm://localhost");
+			}
+			serviceInfo.setDeploymentDescriptor("");
 			serviceInfo.setState("Running");
 		}
 		return serviceInfo;
@@ -2154,7 +2138,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	 * Force all collocated delegates to perform any post-initialization steps.
 	 */
 	public void onInitialize()
-    {
+  {
 		//	For each collocated delegate
 		for( int i=0; i < childControllerList.size(); i++ )
 		{
@@ -2163,6 +2147,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			//	notify the delegate 
 			delegateController.onInitialize();
 		}
-    }
+  }
 	
 }

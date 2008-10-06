@@ -42,12 +42,14 @@ import org.apache.activemq.advisory.ConsumerEvent;
 import org.apache.activemq.advisory.ConsumerListener;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.InvalidMessageException;
 import org.apache.uima.aae.error.ServiceShutdownException;
+import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.util.Level;
 import org.springframework.util.Assert;
@@ -78,11 +80,11 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 
 	private Map connectionMap;
 
-	private boolean retryEnabled;
+	private volatile boolean retryEnabled;
 
 	private AnalysisEngineController controller = null;
 
-	private boolean connectionAborted = false;
+	private volatile boolean connectionAborted = false;
 
 	private long connectionCreationTimestamp = 0L;
 
@@ -162,12 +164,24 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_activemq_open__FINE",
 	                new Object[] { endpoint, serverUri });
-
+//			PooledConnectionFactory factory = new PooledConnectionFactory(brokerUri);
+//			factory.setMaximumActive(20);
 			ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUri);
+
+			factory.setDispatchAsync(true);
+      factory.setUseAsyncSend(true);
+  
+      factory.setCopyMessageOnSend(false);
+/*
+			factory.setDispatchAsync(true);
+			factory.setOptimizeAcknowledge(true);
+			factory.setUseAsyncSend(true);
+			factory.setUseCompression(false);
 			factory.setCopyMessageOnSend(false);
+	*/
 			conn = factory.createConnection();
 			connectionCreationTimestamp = System.nanoTime();
-			producerSession = conn.createSession(false, 0);
+			producerSession = conn.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
 			if ( isReplyEndpoint && delegateEndpoint.getDestination() != null )
 			{
 				producer = producerSession.createProducer(null); 
@@ -307,10 +321,13 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			try
 			{
 				retryCount--;
+/*				
 				if (!((ActiveMQSession) producerSession).isRunning())
 				{
 					open();
 				}
+*/
+				
 				if (aTextMessage == null)
 				{
 					return producerSession.createTextMessage();
@@ -418,7 +435,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		}
 	}
 
-	public boolean send(Message aMessage, boolean startTimer) 
+	public boolean send(final Message aMessage, boolean startTimer) 
 	{
 		String destinationName = "";
 
@@ -440,14 +457,28 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 					if ( isReplyEndpoint && delegateEndpoint.getDestination() != null  )
 					{
 						destinationName = ((ActiveMQDestination)delegateEndpoint.getDestination()).getPhysicalName();
-						producer.send((Destination)delegateEndpoint.getDestination(), aMessage);
+						if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
+						{
+	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
+						}
+						synchronized(producer)
+						{
+              producer.send((Destination)delegateEndpoint.getDestination(), aMessage);
+						}
 					}
 					else
 					{
 						destinationName = ((ActiveMQQueue) producer.getDestination()).getPhysicalName();
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
-						producer.send(aMessage);
+            if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
+            {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
+            }
+            synchronized(producer)
+            {
+              producer.send(aMessage);
+            }
 					}
+					
 				if (startTimer)
 				{
 					startTimer(connectionCreationTimestamp);
@@ -457,12 +488,16 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			}
 			catch ( Exception e)
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_not_ableto_send_msg_INFO", new Object[] { controller.getComponentName(), destinationName, i+1, 10 });
 				lastException = e;
 				//	If the controller has been stopped no need to send messages
 				if ( controller.isStopped())
 				{
 					return true;
+				}
+				else
+				{
+	        e.printStackTrace();
+	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_not_ableto_send_msg_INFO", new Object[] { controller.getComponentName(), destinationName, i+1, 10 });
 				}
 			}
 			try

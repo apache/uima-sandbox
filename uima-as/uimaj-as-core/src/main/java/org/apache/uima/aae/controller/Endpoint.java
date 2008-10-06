@@ -140,4 +140,12 @@ public interface Endpoint
 	public void setEndpointServer( String anEndpointServer );
 	
 	public String getEndpointServer();
+	
+  public void setConcurrentRequestConsumers(int aConsumerCount);
+  
+  public int getConcurrentRequestConsumers();
+
+  public void setConcurrentReplyConsumers(int aConsumerCount);
+  
+  public int getConcurrentReplyConsumers();
 }

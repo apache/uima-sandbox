@@ -146,21 +146,21 @@ implements AnalysisEngineController, EventSubscriber
 	
 	private JmxManagement jmxManagement = null;
 	
-	protected boolean stopped = false;
+	protected volatile boolean stopped = false;
 	
 	protected String delegateKey = null;
 	
 	protected List unregisteredDelegateList = new ArrayList();
 	
-	protected boolean allDelegatesAreRemote = false;
+	protected volatile boolean allDelegatesAreRemote = false;
 	
 	protected List controllerListeners = new ArrayList();
 	
-	protected boolean serviceInitialized = false;
+	protected volatile boolean serviceInitialized = false;
 	
 	protected ConcurrentHashMap perCasStatistics = new ConcurrentHashMap();
 
-	private boolean casMultiplier = false;
+	private volatile boolean casMultiplier = false;
 	
 	protected Object syncObject = new Object();
 	
@@ -171,7 +171,7 @@ implements AnalysisEngineController, EventSubscriber
 	
 	private Object waitmux = new Object();
 	
-	private boolean waitingForCAS = false;
+	private volatile boolean waitingForCAS = false;
 	
 	private long startTime = System.nanoTime();
 	
@@ -292,7 +292,7 @@ implements AnalysisEngineController, EventSubscriber
 			}
 		}
 		paramsMap.put(AnalysisEngine.PARAM_MBEAN_NAME_PREFIX, jmxManagement.getJmxDomain()); 
-		if ( isTopLevelComponent() && System.getProperty("UseVmTransport") != null )
+		if ( isTopLevelComponent())
 		{
 		  System.out.println("Top Level Service:"+getComponentName()+ " Configured to Use Java VM Transport For Internal Messaging");
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
@@ -358,7 +358,7 @@ implements AnalysisEngineController, EventSubscriber
 			jmxManagement.registerMBean(inProcessCache, on);
 		}
 		initializeServiceStats();
-		
+
 	}
   public UimaTransport getTransport(String aKey) throws Exception
   {
@@ -391,11 +391,6 @@ implements AnalysisEngineController, EventSubscriber
 	  */
 	 public void initializeVMTransport(int parentControllerReplyConsumerCount) throws Exception
 	 {
-	   //  Check if internal messaging is enabled by checking system properties.
-	   if ( System.getProperty("UseVmTransport") == null)
-	   {
-	     return;
-	   }
 	   //  If this controller is an Aggregate Controller, force delegates to initialize
 	   //  their internal transports.
 	   if ( this instanceof AggregateAnalysisEngineController )
@@ -415,12 +410,27 @@ implements AnalysisEngineController, EventSubscriber
 	   if ( parentController != null )
      {
        UimaAsContext uimaAsContext = new UimaAsContext();
-       InputChannel ic = getInputChannel(endpointName);
-       int serviceRequestConsumerCount = ic.getConcurrentConsumerCount();
+       if ( !registeredWithJMXServer )
+       {
+         registeredWithJMXServer = true;
+         registerServiceWithJMX(jmxContext, false);
+       }
+       // Determine how many consumer threads to create. First though use the parent Aggregate Controller
+       // to lookup this delegate key. Next fetch the delegate endpoint which contains 
+       // concurrentConsumers property.
+       String key = ((AggregateAnalysisEngineController)parentController).lookUpDelegateKey(getName());
+       int concurrentRequestConsumers = 1;
+       int concurrentReplyConsumers = 1;
+       if ( key != null )
+       {
+         Endpoint e = ((AggregateAnalysisEngineController)parentController).lookUpEndpoint(key, false);
+         concurrentRequestConsumers = e.getConcurrentRequestConsumers();
+         concurrentReplyConsumers = e.getConcurrentReplyConsumers();
+       }
        
-       System.out.println("Controller:"+getComponentName()+" Starting Request Listener With "+serviceRequestConsumerCount+" Concurrent Consumers. Reply Listener Configured With "+parentControllerReplyConsumerCount+" Concurrent Consumers");
+       System.out.println("Controller:"+getComponentName()+" Starting Request Listener With "+concurrentRequestConsumers+" Concurrent Consumers. Reply Listener Configured With "+concurrentReplyConsumers+" Concurrent Consumers");
        
-       uimaAsContext.setConcurrentConsumerCount(serviceRequestConsumerCount);
+       uimaAsContext.setConcurrentConsumerCount(concurrentRequestConsumers);
        uimaAsContext.put("EndpointName", endpointName);
 
        UimaTransport vmTransport = getTransport(uimaAsContext);
@@ -431,7 +441,9 @@ implements AnalysisEngineController, EventSubscriber
        // Creates parent controller dispatcher for this delegate. The dispatcher is wired
        // with this delegate's listener.
        UimaAsContext uimaAsContext2 = new UimaAsContext();
-       uimaAsContext2.setConcurrentConsumerCount(parentControllerReplyConsumerCount);
+       // Set up as many reply threads as there are threads to process requests
+       uimaAsContext2.setConcurrentConsumerCount(concurrentReplyConsumers);
+//       uimaAsContext2.setConcurrentConsumerCount(parentControllerReplyConsumerCount);
        uimaAsContext2.put("EndpointName", endpointName);
        UimaTransport parentVmTransport = parentController.getTransport(uimaAsContext2, endpointName);
        parentVmTransport.produceUimaMessageDispatcher(this, vmTransport);
@@ -614,8 +626,18 @@ implements AnalysisEngineController, EventSubscriber
 		
 		registerWithAgent(servicePerformance, name );
 		servicePerformance.setIdleTime(System.nanoTime());
-		
-		ServiceInfo serviceInfo = getInputChannel().getServiceInfo();
+    ServiceInfo serviceInfo = null;
+		if ( remote )
+		{
+	    serviceInfo = getInputChannel().getServiceInfo();
+		}
+		else
+		{
+      serviceInfo = new ServiceInfo();
+      serviceInfo.setBrokerURL(getBrokerURL());
+      serviceInfo.setInputQueueName(getName());
+      serviceInfo.setState("Active");
+		}
 		ServiceInfo pServiceInfo = null;
 
 		if ( this instanceof PrimitiveAnalysisEngineController )
@@ -1475,7 +1497,13 @@ implements AnalysisEngineController, EventSubscriber
 				}
 			}
 		}
+		/*
+		 * Commented this block. It generates ShutdownException which causes problems
+		 * The shutdown of services happens ad hoc and not orderly. This whole logic
+		 * needs to be revisited.
+		 * 
 		//	Send an exception to the client if this is a top level service
+		 */ 
 		if (getOutputChannel() != null && isTopLevelComponent() )
 		{
 			Endpoint clientEndpoint = null;
@@ -1494,16 +1522,15 @@ implements AnalysisEngineController, EventSubscriber
 				}
 			}
 		}
-		//	Stop output channel
-		getOutputChannel().stop();
 		
-		adminContext = null;
 		if ( !isTopLevelComponent() )
 		{
 			adminContext = null;
 		}
 		else
 		{
+	    //  Stop output channel
+	    getOutputChannel().stop();
 			try
 			{
 				//	Remove all MBeans registered by this service
@@ -2262,7 +2289,7 @@ implements AnalysisEngineController, EventSubscriber
 	      if ( metadata != null )
 	      {
 	        
-	        if ( !anEndpoint.isRemote() && System.getProperty("UseVmTransport") != null)
+	        if ( !anEndpoint.isRemote())
 	        {
 	          ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	          try

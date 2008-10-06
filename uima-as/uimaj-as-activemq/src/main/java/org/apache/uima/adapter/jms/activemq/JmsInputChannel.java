@@ -87,8 +87,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	
 	private ServiceInfo serviceInfo = null;
 	
-	private boolean stopped = false;
-	private boolean	channelRegistered = false;
+	private volatile boolean stopped = false;
+	private volatile boolean	channelRegistered = false;
 	
 	private List listenerContainerList = new ArrayList();
 	
@@ -531,29 +531,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		{
 			//	Wrap JMS Message in MessageContext
 			messageContext = new JmsMessageContext( aMessage, endpointName );
-			if ( jmsSession == null )
-			{
-				jmsSession = aJmsSession;
-				sessionAckMode = jmsSession.getAcknowledgeMode();
-				if ( sessionAckMode == Session.AUTO_ACKNOWLEDGE)
-				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
-			                "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_ack_mode__CONFIG",
-			                new Object[] { endpointName, "AUTO_ACKNOWLEDGE" });
-				}
-				else if ( sessionAckMode == Session.CLIENT_ACKNOWLEDGE)
-				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
-			                "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_ack_mode__CONFIG",
-			                new Object[] { endpointName, "CLIENT_ACKNOWLEDGE" });
-				}
-				else 
-				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
-			                "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_ack_mode__CONFIG",
-			                new Object[] { endpointName, sessionAckMode });
-				}
-			}
 			if ( aMessage.getStringProperty(AsynchAEMessage.CasReference) == null )
 			{
 				casRefId = "CasReferenceId Not In Message";

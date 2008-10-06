@@ -51,7 +51,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
   private static final char FS = System.getProperty("file.separator").charAt(0);
 	protected String text = "IBM today elevated five employees to the title of IBM Fellow\n -- its most prestigious technical honor.\n The company also presented more than $2.8 million in cash awards to employees whose technical innovation have yielded exceptional value to the company and its customers.\nIBM conferred the accolades and awards at its 2003 Corporate Technical Recognition Event (CTRE) in Scottsdale, Ariz. CTRE is a 40-year tradition at IBM, established to recognize exceptional technical employees and reward them for extraordinary achievements and contributions to the company's technology leadership.\n Our technical employees are among the best and brightest innovators in the world.\n They share a passion for excellence that defines their work and permeates the products and services IBM delivers to its customers, said Nick Donofrio, senior vice president, technology and manufacturing for IBM.\n CTRE provides the means for us to honor those who have distinguished themselves as exceptional leaders among their peers.\nAmong the special honorees at the 2003 CTRE are five employees who earned the coveted distinction of IBM Fellow:- David Ferrucci aka Dave, Grady Booch, chief scientist of Rational Software, IBM Software Group.\n Recognized internationally for his innovative work on software architecture, modeling, and software engineering process. \nMr. Booch is one of the original authors of the Unified Modeling Language (UML), the industry-standard language of blueprints for software-intensive systems.- Dr. Donald Chamberlin, researcher, IBM Almaden Research Center. An expert in relational database languages, Dr. Chamberlin is co- inventor of SQL, the language that energized the relational database market. He has also";
 	protected String doubleByteText = null;
-	protected boolean unexpectedException = false;
+	protected volatile boolean unexpectedException = false;
 	private static final boolean SEND_CAS_ASYNCHRONOUSLY = true;
 
 	protected static final int CPC_LATCH = 1;
@@ -328,7 +328,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	{
 		Thread t1 = null;
 		Thread t2 = null;
-
+		serviceShutdownException = false;
+		unexpectedException = false;
+		
 		if (appCtx == null)
 		{
 			appCtx = buildContext(aBrokerURI, aTopLevelServiceQueueName, 0);
@@ -372,6 +374,10 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 
 						// Send CPC
 						aUimaEeEngine.collectionProcessingComplete();
+					}
+					else
+					{
+            System.out.println(">>>>>>>>>>>>>>>> Not Sending CPC Due To Exception [serviceShutdownException="+serviceShutdownException+"] [isStopped="+isStopped+"] [unexpectedException="+unexpectedException+"]");
 					}
 				}
 
@@ -566,10 +572,6 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 			}
 			else if (processCountLatch != null)
 			{
-			  
-			  
-			  
-			  
 				if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
 				{
 				unexpectedException = true;
@@ -669,20 +671,40 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	{
 		if (aStatus != null && aStatus.isException())
 		{
-			System.out.println(" Received CPC Reply Containing Exception");
+		  
+		  List list = aStatus.getExceptions();
+      boolean expectedException = false;
+      for( int i=0; i < list.size(); i++)
+      {
+        Exception e = (Exception)list.get(i);
+        if ( e instanceof ServiceShutdownException || 
+           (e.getCause() != null && e.getCause() instanceof ServiceShutdownException ))
+        {
+          serviceShutdownException = true;
+        }
+        else if ( ignoreException( e.getClass()))
+        {
+          expectedException = true;
+        }
+        if ( !expectedException && !expectingServiceShutdownException )
+        {
+          e.printStackTrace();
+        }
+      }
+      if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
+      {
+        System.out.println(" Received CPC Reply Containing Exception");
+        System.out.println(" ... when expecting normal CPC reply!");
+        unexpectedException = true;
+      }
 			if (exceptionCountLatch != null)
 			{
 				exceptionCountLatch.countDown();
 			}
-			else
-			{
-				if (cpcLatch != null)
-				{
-					System.out.println(" ... when expecting normal CPC reply!");
-					unexpectedException = true;
-					cpcLatch.countDown();
-				}
-			}
+      if (cpcLatch != null)
+      {
+        cpcLatch.countDown();
+      }
 		}
 		else
 		{

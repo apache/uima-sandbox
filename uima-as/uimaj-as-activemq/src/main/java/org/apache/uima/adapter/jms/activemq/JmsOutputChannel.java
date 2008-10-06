@@ -90,9 +90,21 @@ public class JmsOutputChannel implements OutputChannel
 	
 	private String serviceProtocolList ="";
 
-	private boolean aborting = false;
+	private volatile boolean aborting = false;
 	
 	private Destination freeCASTempQueue;
+
+  private String hostIP = null;
+
+  public JmsOutputChannel()
+  {
+    try
+    {
+      hostIP = InetAddress.getLocalHost().getHostAddress();
+    }
+    catch ( Exception e) {  /* silently deal with this error */ }
+
+  }
 	/**
 	 * Sets the ActiveMQ Broker URI 
 	 */
@@ -1066,7 +1078,11 @@ public class JmsOutputChannel implements OutputChannel
 				
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
-				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
+
+//				long t = getAnalysisEngineController().getServicePerformance().getRawAnalysisTime();
+//				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, t);
+        aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
+				
 				long iT =getAnalysisEngineController().getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
 				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, iT );
 				String lookupKey = getAnalysisEngineController().getName();
@@ -1170,12 +1186,6 @@ public class JmsOutputChannel implements OutputChannel
 		if (anEndpoint.isRemote())
 		{
 			aMessage.setStringProperty(UIMAMessage.ServerURI, getServerURI());
-			String hostIP = null;
-			try
-			{
-				hostIP = InetAddress.getLocalHost().getHostAddress();
-			}
-			catch ( Exception e) {  /* silently deal with this error */ }
 			if ( hostIP != null )
 			{
 				aMessage.setStringProperty(AsynchAEMessage.ServerIP,hostIP);
@@ -1301,6 +1311,7 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				return;
 			}
+			
 			//	Get the connection object for a given endpoint
 			JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
 			//	Create empty JMS Text Message
@@ -1386,12 +1397,10 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				startConnectionTimer = false;
 			}
-			
 			// ----------------------------------------------------
 			//	Send Request Messsage to the Endpoint
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startConnectionTimer);
-
 //			if ( getAnalysisEngineController().isTopLevelComponent() )
 //			{
 //				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
