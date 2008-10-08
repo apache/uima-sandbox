@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--================================================================================-->
- <!-- Generated from                                                                 -->
- <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/vmBkrBad.xml -->
- <!-- 6 October, 2008, 3:20:01 P.M.                                                  -->
- <!--================================================================================-->
+<!--==================================================================================-->
+ <!-- Generated from                                                                         -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/remoteSerializer.xml -->
+ <!-- 8 October, 2008, 1:11:23 P.M.                                                          -->
+ <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
@@ -13,6 +13,14 @@
    <bean id="qBroker_tcp_c__ss_localhost_c_61616"
          class="org.apache.activemq.ActiveMQConnectionFactory">
       <property name="brokerURL" value="tcp://localhost:61616"/>
+      <property name="prefetchPolicy" ref="prefetchPolicy"/>
+   </bean>
+
+   <!-- Factory for specific external queue broker:  -->
+   <!--           tcp://some.remote:12345            -->
+   <bean id="qBroker_tcp_c__ss_some.remote_c_12345"
+         class="org.apache.activemq.ActiveMQConnectionFactory">
+      <property name="brokerURL" value="tcp://some.remote:12345"/>
       <property name="prefetchPolicy" ref="prefetchPolicy"/>
    </bean>
 
@@ -181,20 +189,20 @@
    <bean id="endpt_DateTime_1.2" class="org.apache.uima.aae.controller.Endpoint_impl">
 
      <!--     Broker URI     -->
-     <property name="serverURI" value=""/>
+     <property name="serverURI" value="tcp://some.remote:12345"/>
 
      <!-- Delegate key name or remote queue name -->
-     <property name="endpoint" value=""/>
+     <property name="endpoint" value="iq1"/>
 
      <!-- Queue name used for replies, on the remote broker  -->
      <property name="replyToEndpoint"
-                value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.34.805b199f85:11cd396016e:-7ffe"/>
+                value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_192.168.1.101-43f473da:11cdd7105e3:-8000"/>
 
      <!--      Timeouts      -->
      <property name="metadataRequestTimeout" value="60000"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
-      <property name="serializer" value="xmi"/>
+      <property name="serializer" value="binary"/>
       <property name="tempReplyDestination" value="true"/>
    </bean>
 
@@ -277,7 +285,7 @@
    <bean id="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime"
          class="org.apache.activemq.command.ActiveMQQueue">
       <constructor-arg index="0"
-                       value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.34.805b199f85:11cd396016e:-7ffe"/>
+                       value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_192.168.1.101-43f473da:11cdd7105e3:-8000"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -311,7 +319,7 @@
      <!-- POJO to delegate JMS Messages to -->
      <property name="messageListener"
                 ref="asAggr_return_q_listenerID_RoomNumberAnnotatorQueue_1_DateTime"/>
-      <property name="connectionFactory" ref="qBroker_"/>
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -321,7 +329,7 @@
    <bean id="destinationResolver_RoomNumberAnnotatorQueue_1_DateTime"
          class="org.apache.uima.adapter.jms.activemq.TempDestinationResolver"
          singleton="false">
-      <property name="connectionFactory" ref="qBroker_"/>
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345"/>
    </bean>
 
    <!-- ================================== -->

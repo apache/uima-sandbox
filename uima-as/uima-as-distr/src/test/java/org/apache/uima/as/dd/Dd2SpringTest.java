@@ -90,6 +90,10 @@ public class Dd2SpringTest extends TestCase{
     
   }
   
+  public void testDd2Spring_remoteSerializer() throws Exception {
+    checkDd2Spring("remoteSerializer.xml");
+  }  
+  
   public void testDd2Spring_deployAggrUsingRmtTempQ() throws Exception {
     checkDd2Spring("Deploy_AggregateUsingRemoteTempQueue.xml");
   }

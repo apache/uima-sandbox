@@ -473,7 +473,7 @@
                 /u:asyncAggregateErrorConfiguration/u:collectionProcessCompleteErrors/@timeout}"/>
         <xsl:if test="$remoteAnalysisEngine">
           <property name="serializer"
-            value="{$remoteAnalysisEngine/serializer/@method}"/>
+            value="{$remoteAnalysisEngine/u:serializer/@method}"/>
         </xsl:if>
         
         <xsl:if test="$remoteAnalysisEngine">
