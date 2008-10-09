@@ -30,6 +30,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -154,17 +155,21 @@ implements UimaAsynchronousEngine, MessageListener
 
 	protected MessageConsumer consumer = null;
 
+	protected String serializationStrategy = "xmi";
+	
 	protected UimaASClientInfoMBean clientSideJmxStats =
 		new UimaASClientInfo();
 	
 	protected List pendingMessageList = new ArrayList();
 	protected volatile boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
-	abstract protected TextMessage createTextMessage() throws Exception;
-	abstract protected void setMetaRequestMessage(TextMessage msg) throws Exception;
-	abstract protected void setCASMessage(String casReferenceId, CAS aCAS, TextMessage msg) throws Exception;
-	abstract protected void setCASMessage(String casReferenceId, String aSerializedCAS, TextMessage msg) throws Exception;
-	abstract public void setCPCMessage(TextMessage msg) throws Exception;
+  abstract protected TextMessage createTextMessage() throws Exception;
+  abstract protected BytesMessage createBytesMessage() throws Exception;
+	abstract protected void setMetaRequestMessage(Message msg) throws Exception;
+	abstract protected void setCASMessage(String casReferenceId, CAS aCAS,Message msg) throws Exception;
+  abstract protected void setCASMessage(String casReferenceId, String aSerializedCAS, Message msg) throws Exception;
+  abstract protected void setCASMessage(String casReferenceId, byte[] aSerializedCAS, Message msg) throws Exception;
+	abstract public void setCPCMessage(Message msg) throws Exception;
 	abstract public void initialize(Map anApplicationContext) throws ResourceInitializationException;
 	abstract protected void cleanup() throws Exception;
 	abstract public String deploy(String[] aDeploymentDescriptorList, Map anApplicationContext) throws Exception;
@@ -175,7 +180,14 @@ implements UimaAsynchronousEngine, MessageListener
 	    listeners.add(aListener);
 	}
 
+	public String getSerializationStrategy()
+	{
+	  return serializationStrategy;
+	}
 	
+  protected void setSerializationStrategy(String aSerializationStrategy) {
+    serializationStrategy = aSerializationStrategy;
+  }
 	/**
 	 * Serializes a given CAS. 
 	 * 
@@ -530,10 +542,28 @@ implements UimaAsynchronousEngine, MessageListener
 
 			PendingMessage msg = new PendingMessage(AsynchAEMessage.Process);
 			long t1 = System.nanoTime();
-			XmiSerializationSharedData serSharedData = new XmiSerializationSharedData();
-			String serializedCAS = serializeCAS(aCAS, serSharedData);
-			requestToCache.setSerializationTime(System.nanoTime()-t1);
-			msg.put( AsynchAEMessage.CAS, serializedCAS);
+			if ( serializationStrategy.equals("xmi")) {
+	      XmiSerializationSharedData serSharedData = new XmiSerializationSharedData();
+	      String serializedCAS = serializeCAS(aCAS, serSharedData);
+	      msg.put( AsynchAEMessage.CAS, serializedCAS);
+	      if (remoteService)
+	      {
+	        requestToCache.setCAS(aCAS);
+	        //  Store the serialized CAS in case the timeout occurs and need to send the 
+	        //  the offending CAS to listeners for reporting
+	        requestToCache.setCAS(serializedCAS);
+	        requestToCache.setXmiSerializationSharedData(serSharedData);
+	      }
+			} else {
+        byte[] serializedCAS = UimaSerializer.serializeCasToBinary(aCAS);
+        msg.put( AsynchAEMessage.CAS, serializedCAS);
+        if (remoteService)
+        {
+          requestToCache.setCAS(aCAS);
+        }
+			}
+			  
+      requestToCache.setSerializationTime(System.nanoTime()-t1);
 			msg.put( AsynchAEMessage.CasReference, casReferenceId);
 			requestToCache.setIsRemote(remoteService);
 			requestToCache.setEndpoint(getEndPointName());
@@ -541,14 +571,6 @@ implements UimaAsynchronousEngine, MessageListener
 			requestToCache.setThreadId(Thread.currentThread().getId());
             requestToCache.clearTimeoutException();
 
-			if (remoteService)
-			{
-				requestToCache.setCAS(aCAS);
-				//	Store the serialized CAS in case the timeout occurs and need to send the 
-				//	the offending CAS to listeners for reporting
-				requestToCache.setCAS(serializedCAS);
-				requestToCache.setXmiSerializationSharedData(serSharedData);
-			}
 
 			clientCache.put(casReferenceId, requestToCache);
 
@@ -793,9 +815,11 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			return;
 		}
-		
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_process_reply_FINEST",
-				new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference), message.toString()+((TextMessage) message).getText() });
+		if ( message instanceof TextMessage ) {
+	    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_process_reply_FINEST",
+	            new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference), message.toString()+((TextMessage) message).getText() });
+		}
+		  
 
 		//	Fetch entry from the client cache for a cas id returned from the service
 		//	The client cache maintains an entry for every outstanding CAS sent to the
@@ -885,7 +909,19 @@ implements UimaAsynchronousEngine, MessageListener
 				} 
 			}
 		}
-		CAS cas = deserializeCAS(((TextMessage) message).getText(), SHADOW_CAS_POOL );
+		CAS cas =  null;
+		if ( message instanceof TextMessage )
+		{
+	    cas = deserializeCAS(((TextMessage) message).getText(), SHADOW_CAS_POOL );
+		} 
+		else
+		{
+      long bodyLength = ((BytesMessage) message).getBodyLength();
+      byte[] serializedCas = new byte[(int)bodyLength];
+      ((BytesMessage) message).readBytes(serializedCas);
+      cas = deserializeCAS(serializedCas, SHADOW_CAS_POOL);
+
+		}
 		completeProcessingReply(cas, casReferenceId, payload, true, message, inputCasCachedRequest, null);
 	}
 
@@ -911,6 +947,10 @@ implements UimaAsynchronousEngine, MessageListener
 			clientSideJmxStats.incrementProcessErrorCount();
 		}
 		Exception exception = retrieveExceptionFormMessage(message);
+		
+		
+		exception.printStackTrace();
+		
 		receivedCpcReply = true; // change state as if the CPC reply came in. This is done to prevent a hang on CPC request 
 		synchronized(endOfCollectionMonitor)
 		{
@@ -946,7 +986,7 @@ implements UimaAsynchronousEngine, MessageListener
 	private void completeProcessingReply( CAS cas, String casReferenceId, int payload, boolean doNotify, Message message, ClientRequest cachedRequest, ProcessTrace pt  )
 	throws Exception
 	{
-		if (AsynchAEMessage.XMIPayload == payload || AsynchAEMessage.CASRefID == payload)
+		if (AsynchAEMessage.XMIPayload == payload || AsynchAEMessage.BinaryPayload == payload || AsynchAEMessage.CASRefID == payload)
 		{
 			if ( pt == null )
 			{
@@ -1122,6 +1162,12 @@ implements UimaAsynchronousEngine, MessageListener
 		return aCAS;
 	}
 
+  private CAS deserialize(byte[] binaryData, ClientRequest cachedRequest) throws Exception
+  {
+    CAS cas = cachedRequest.getCAS();
+    UimaSerializer.deserializeCasFromBinary(binaryData, cas);
+    return cas;
+  }
 	
 	protected CAS deserializeCAS(String aSerializedCAS, ClientRequest cachedRequest) throws Exception
 	{
@@ -1129,7 +1175,20 @@ implements UimaAsynchronousEngine, MessageListener
 		return deserialize(aSerializedCAS, cas);
 	}
 
-	protected CAS deserializeCAS(String aSerializedCAS, ClientRequest cachedRequest, boolean deltaCas) throws Exception
+  protected CAS deserializeCAS(byte[] aSerializedCAS, ClientRequest cachedRequest) throws Exception
+  {
+    CAS cas = cachedRequest.getCAS();
+    UimaSerializer.deserializeCasFromBinary(aSerializedCAS, cas);
+    return cas;
+  }
+
+  protected CAS deserializeCAS(byte[] aSerializedCAS, CAS aCas) throws Exception
+  {
+    UimaSerializer.deserializeCasFromBinary(aSerializedCAS, aCas);
+    return aCas;
+  }
+
+  protected CAS deserializeCAS(String aSerializedCAS, ClientRequest cachedRequest, boolean deltaCas) throws Exception
 	{
 		CAS cas = cachedRequest.getCAS();
 		return deserialize(aSerializedCAS, cas, cachedRequest.getXmiSerializationSharedData(), deltaCas);
@@ -1139,6 +1198,13 @@ implements UimaAsynchronousEngine, MessageListener
 		CAS cas = asynchManager.getNewCas(aCasPoolName);
 		return deserialize(aSerializedCAS, cas);
 	}
+  protected CAS deserializeCAS(byte[] aSerializedCAS, String aCasPoolName ) throws Exception
+  {
+    CAS cas = asynchManager.getNewCas(aCasPoolName);
+    UimaSerializer.deserializeCasFromBinary(aSerializedCAS, cas);
+    return cas;
+  }
+
 	/**
 	 * Listener method receiving JMS Messages from the response queue.
 	 * 
@@ -1272,7 +1338,15 @@ implements UimaAsynchronousEngine, MessageListener
 			if (message.propertyExists(AsynchAEMessage.SentDeltaCas)) {
 				deltaCas = message.getBooleanProperty(AsynchAEMessage.SentDeltaCas);
 			}
-			CAS cas = deserializeCAS(((TextMessage) message).getText(), cachedRequest, deltaCas);
+			CAS cas = null;
+			if ( message instanceof TextMessage ) {
+	      cas = deserializeCAS(((TextMessage) message).getText(), cachedRequest, deltaCas);
+			} else {
+			  long bodyLength = ((BytesMessage) message).getBodyLength();
+			  byte[] serializedCas = new byte[(int)bodyLength];
+			  ((BytesMessage) message).readBytes(serializedCas);
+		    cas = deserializeCAS(serializedCas, cachedRequest);
+			}
 			cachedRequest.setDeserializationTime(System.nanoTime() - t1);
 			completeProcessingReply( cas, casReferenceId, payload, doNotify,  message, cachedRequest, pt);
 		}
@@ -1426,6 +1500,11 @@ implements UimaAsynchronousEngine, MessageListener
 		private long processErrorCount;
 		
 		private XmiSerializationSharedData sharedData;
+
+    private byte[] binaryCas = null;
+    
+    private volatile boolean isBinaryCas = false;
+
 		
 		public long getMetaTimeoutErrorCount() {
 			return metaTimeoutErrorCount;
@@ -1553,6 +1632,11 @@ implements UimaAsynchronousEngine, MessageListener
 			serializedCAS = aSerializedCAS;
 			isSerializedCAS = true;
 		}
+		
+		public void setBinaryCAS(byte[] aBinaryCas) {
+		  binaryCas = aBinaryCas;
+		  isBinaryCas = true;
+		}
 
 		public void startTimer()
 		{
@@ -1585,7 +1669,11 @@ implements UimaAsynchronousEngine, MessageListener
 						{
 							if (isRemote)
 							{
-								cas = deserializeCAS(serializedCAS, _clientReqRef);
+							  if ( isBinaryCas ) {
+							    cas = deserialize(binaryCas, _clientReqRef);
+							  } else {
+	                cas = deserializeCAS(serializedCAS, _clientReqRef);
+							  }
 							}
 							else
 							{

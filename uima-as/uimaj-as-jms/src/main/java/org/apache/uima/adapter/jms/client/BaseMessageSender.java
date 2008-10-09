@@ -206,7 +206,14 @@ public abstract class BaseMessageSender implements Runnable,
 
 			try {
 				//	Request JMS Message from the concrete implementation
-				TextMessage message = createTextMessage();
+			  Message message = null;
+			  if ( engine.getSerializationStrategy().equals("xmi")) {
+			    message = createTextMessage();
+			  } else {
+          message = createBytesMessage();
+			  }
+				 
+			  
 				initializeMessage( pm, message );
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST,
 						CLASS_NAME.getName(), "run",
@@ -266,7 +273,7 @@ public abstract class BaseMessageSender implements Runnable,
 		}
 		
 	}
-	private void initializeMessage( PendingMessage aPm, TextMessage anOutgoingMessage)
+	private void initializeMessage( PendingMessage aPm, Message anOutgoingMessage)
 	throws Exception
 	{
 		//	Populate message properties based on outgoing message type
@@ -280,9 +287,16 @@ public abstract class BaseMessageSender implements Runnable,
 		case AsynchAEMessage.Process:
 			String casReferenceId =
 				(String)aPm.get(AsynchAEMessage.CasReference);
-			String serializedCAS = 
-				(String) aPm.get(AsynchAEMessage.CAS);
-			engine.setCASMessage(casReferenceId, serializedCAS, anOutgoingMessage);
+			if ( engine.getSerializationStrategy().equals("xmi")) {
+	      String serializedCAS = 
+	        (String) aPm.get(AsynchAEMessage.CAS);
+	      engine.setCASMessage(casReferenceId, serializedCAS, anOutgoingMessage);
+			} else {
+		     byte[] serializedCAS = 
+		        (byte[]) aPm.get(AsynchAEMessage.CAS);
+		      engine.setCASMessage(casReferenceId, serializedCAS, anOutgoingMessage);
+
+			}
 			//	Message Expiration for Process is added in the main run() loop
 			//	right before the message is dispatched to the AS Service
 			break;

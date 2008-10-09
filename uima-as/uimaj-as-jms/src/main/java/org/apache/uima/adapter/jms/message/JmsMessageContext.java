@@ -58,6 +58,13 @@ public class JmsMessageContext implements MessageContext
 		message = aMessage;
 		try
 		{
+		  if ( aMessage instanceof BytesMessage )
+		  {
+		    endpoint.setSerializer("binary");
+		  } else if ( aMessage instanceof TextMessage ) {
+        endpoint.setSerializer("xmi");
+		  }
+		    
 			String msgFrom = (String)aMessage.getStringProperty(AsynchAEMessage.MessageFrom); 
 			if ( msgFrom != null )
 			{
