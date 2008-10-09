@@ -148,4 +148,7 @@ public interface Endpoint
   public void setConcurrentReplyConsumers(int aConsumerCount);
   
   public int getConcurrentReplyConsumers();
+  
+  public void setSerializer( String aSerializer );
+ 
 }

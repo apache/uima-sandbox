@@ -81,9 +81,10 @@ public interface UimaAsynchronousEngine
 	public static final String GetMetaTimeout = "GetMetaTimeout";
 	public static final String DD2SpringXsltFilePath = "DD2SpringXsltFilePath";
 	public static final String SaxonClasspath = "SaxonClasspath";
-	public static final String UimaEeDebug = "-uimaEeDebug";
+  public static final String UimaEeDebug = "-uimaEeDebug";
+  public static final String SerializationStrategy = "SerializationStrategy";
 
-	
+		
 	/**
 	 * Initializes UIMA asynchronous client using configuration parameters provided in a Map object. It creates a
 	 * connection to a service queue managed by a Broker as specified in the parameters. A temporary reply 
@@ -254,5 +255,13 @@ public interface UimaAsynchronousEngine
 	   */
 	  public void undeploy( String aSpringContainerId ) throws Exception;
 
+	  /**
+	   * Returns serialization strategy for the remote service. All CASes will
+	   * be serialized according to the specified serialization. Either xmi or binary
+	   * 
+	   *   
+	   * @return String type of serialization for CASes
+	   */
+	  public String getSerializationStrategy() ;
 }
 

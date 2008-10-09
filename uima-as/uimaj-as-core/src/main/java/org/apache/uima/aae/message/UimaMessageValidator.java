@@ -127,7 +127,7 @@ public class UimaMessageValidator {
     if (aMessage.containsProperty(AsynchAEMessage.Payload)) {
       int payload = aMessage.getIntProperty(AsynchAEMessage.Payload);
       if (payload != AsynchAEMessage.XMIPayload && payload != AsynchAEMessage.CASRefID
-              && payload != AsynchAEMessage.Exception && payload != AsynchAEMessage.Metadata) {
+          && payload != AsynchAEMessage.BinaryPayload  && payload != AsynchAEMessage.Exception && payload != AsynchAEMessage.Metadata) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validPayload",
                 UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_payload_in_message__INFO",
                 new Object[] { payload, endpointName });
@@ -224,6 +224,8 @@ public class UimaMessageValidator {
       switch (aValueToDecode) {
         case AsynchAEMessage.XMIPayload:
           return "XMIPayload";
+        case AsynchAEMessage.BinaryPayload:
+          return "BinaryPayload";
         case AsynchAEMessage.CASRefID:
           return "CASRefID";
         case AsynchAEMessage.Metadata:

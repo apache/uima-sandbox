@@ -61,7 +61,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 
 	private String descriptor;
 
-	private String serializer;
+	private String serializer="xmi";
 
 	private boolean finalEndpoint;
 	
@@ -232,7 +232,9 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	}
 	public void setSerializer(String serializer)
 	{
-		this.serializer = serializer;
+	  if ( serializer != null && serializer.trim().length() > 0 ) {
+      this.serializer = serializer;
+	  }
 	}
 
 	public int getMetadataRequestTimeout()

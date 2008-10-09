@@ -58,7 +58,7 @@ public interface AsynchAEMessage
 	public static final int Exception= 1003;
 	public static final int XCASPayload = 1004;
 	public static final int None = 1005;
-	
+	public static final int BinaryPayload = 1006;
 	
 
 	

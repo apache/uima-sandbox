@@ -146,7 +146,7 @@ public class ProcessResponseHandler extends HandlerBase
 
 	}
 
-	private synchronized void handleProcessResponseWithXMI(MessageContext aMessageContext, String aDelegateKey)
+	private synchronized void handleProcessResponseFromRemoteDelegate(MessageContext aMessageContext, String aDelegateKey)
 	{
 		CAS cas = null;
 		String casReferenceId = null;
@@ -250,12 +250,18 @@ public class ProcessResponseHandler extends HandlerBase
 			}
 			else // general case
 			{
-			  //	Processing a reply from a standard, non-parallel delegate
-			  if (aMessageContext.getMessageBooleanProperty(AsynchAEMessage.SentDeltaCas)) {
-			    int highWaterMark = cacheEntry.getHighWaterMark();
-			    deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.allow);
-			  } else {
-			    deserialize(xmi, cas, casReferenceId);
+			  String serializationStrategy = endpointWithTimer.getSerializer();
+			  if ( serializationStrategy.equals("binary")) {
+			   byte[] binaryData = aMessageContext.getByteMessage();
+			   UimaSerializer.deserializeCasFromBinary(binaryData, cas);
+			  }  else {
+	        //  Processing a reply from a standard, non-parallel delegate
+	        if (aMessageContext.getMessageBooleanProperty(AsynchAEMessage.SentDeltaCas)) {
+	          int highWaterMark = cacheEntry.getHighWaterMark();
+	          deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.allow);
+	        } else {
+	          deserialize(xmi, cas, casReferenceId);
+	        }
 			  }
 			}
 			
@@ -327,15 +333,18 @@ public class ProcessResponseHandler extends HandlerBase
 	**/
 	private void deserialize( String xmi, CAS cas, String casReferenceId ) throws Exception
 	{
+	  CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
 		//	Processing the reply from a standard, non-parallel delegate
 		XmiSerializationSharedData deserSharedData;
-		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
+		deserSharedData = entry.getDeserSharedData();
 		if (deserSharedData == null) {
 			deserSharedData = new XmiSerializationSharedData();
-			getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).setXmiSerializationData(deserSharedData);
+			entry.setXmiSerializationData(deserSharedData);
 		}
 		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 	}
+	
+	
 	private synchronized void handleProcessResponseWithCASReference(MessageContext aMessageContext )
 	{
 		String casReferenceId = null;
@@ -601,9 +610,9 @@ public class ProcessResponseHandler extends HandlerBase
 					resetErrorCounts(key);
 				}
 			}
-			else if (AsynchAEMessage.XMIPayload == payload)
+			else if (AsynchAEMessage.XMIPayload == payload || AsynchAEMessage.BinaryPayload == payload)
 			{
-				handleProcessResponseWithXMI(messageContext, key);
+			  handleProcessResponseFromRemoteDelegate(messageContext, key);
 				if ( key != null )
 				{
 					resetErrorCounts(key);

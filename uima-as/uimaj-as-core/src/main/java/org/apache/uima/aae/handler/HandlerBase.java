@@ -21,6 +21,7 @@ package org.apache.uima.aae.handler;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
+import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
@@ -374,6 +375,11 @@ public abstract class HandlerBase implements Handler
 				aggregateDelegateStats( aMessageContext, aCasReferenceId );
 			}			
 	}
+  protected void deserialize( byte[] data, CAS cas ) 
+  throws Exception
+  {
+    UimaSerializer.deserializeCasFromBinary(data, cas);
+  }
 
 
 }

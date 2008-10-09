@@ -196,6 +196,50 @@ public class UimaSerializer
 	    xmlReader.setContentHandler(handler); 
 	    xmlReader.parse(new InputSource(reader));
 	}
+  /** Utility method for deserializing a CAS from a binary */
+  public static void deserializeCasFromBinary(byte[] binarySource, CAS aCAS) throws Exception
+  {
+    ByteArrayInputStream fis = null;
+    try
+    {
+      fis =  new ByteArrayInputStream(binarySource);
+      Serialization.deserializeCAS(aCAS, fis);
+    }
+    catch( Exception e)
+    {
+      throw e;
+    }
+    finally
+    {
+      if ( fis != null )
+      {
+        fis.close();
+      }
+    }
+  }
+
+  public static byte[] serializeCasToBinary(CAS aCAS) throws Exception
+  {
+    ByteArrayOutputStream fos = null;
+    try
+    {
+      fos = new ByteArrayOutputStream();
+      Serialization.serializeCAS(aCAS, fos);
+      return fos.toByteArray();
+    }
+    catch( Exception e)
+    {
+      throw e;
+    }
+    finally
+    {
+      if ( fos != null)
+      {
+        fos.close();
+      }
+    }
+  }
+
 
 	
 }	

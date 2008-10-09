@@ -132,8 +132,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		long inTime = System.nanoTime();
 		boolean casRegistered = false;
 
-		//	Fetch serialized CAS from the message
-		String xmi = aMessageContext.getStringMessage();
 		
 		//	Time how long we wait on Cas Pool to fetch a new CAS
 		long t1 = getController().getCpuTime();
@@ -142,8 +140,9 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		//	fetch the CAS from a shadow CAS pool. Otherwise, fetch the CAS
 		//	from the service CAS Pool.
 		// ************************************************************************* 
+    Endpoint endpoint = aMessageContext.getEndpoint();
 
-		CAS cas = getCAS(aMessageContext.propertyExists(AsynchAEMessage.CasSequence), shadowCasPoolKey, aMessageContext.getEndpoint().getEndpoint());
+		CAS cas = getCAS(aMessageContext.propertyExists(AsynchAEMessage.CasSequence), shadowCasPoolKey,endpoint.getEndpoint());
 		long timeWaitingForCAS = getController().getCpuTime() - t1;
 		//	Check if we are still running
 		if ( getController().isStopped() )
@@ -153,11 +152,45 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			return null;
 		}
 		// ************************************************************************* 
-		//	Deserialize the CAS from the message
+		//	Deserialize CAS from the message
 		// ************************************************************************* 
-	    t1 = getController().getCpuTime();
-		XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+	  t1 = getController().getCpuTime();
+	  String serializationStrategy = endpoint.getSerializer();
+	  XmiSerializationSharedData deserSharedData = null;
+	  CacheEntry entry = null;
+	  if ( serializationStrategy.equals("xmi"))
+	  {
+	    //  Fetch serialized CAS from the message
+	    String xmi = aMessageContext.getStringMessage();
+	    deserSharedData = new XmiSerializationSharedData();
+	    UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+	    // *************************************************************************
+	    // Check and set up for Delta CAS reply
+	    // *************************************************************************
+	    boolean acceptsDeltaCas = false;
+	    Marker marker = null;
+	    if (aMessageContext.propertyExists(AsynchAEMessage.AcceptsDeltaCas)) {
+	        acceptsDeltaCas = aMessageContext.getMessageBooleanProperty(AsynchAEMessage.AcceptsDeltaCas);
+	        if (acceptsDeltaCas ) {
+	         marker = cas.createMarker();
+	        }
+	    }
+	    // ************************************************************************* 
+	    //  Register the CAS with a local cache
+	    // ************************************************************************* 
+	    //CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
+	    entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId, marker, acceptsDeltaCas);
+	  }
+	  else if ( serializationStrategy.equals("binary"))
+	  {
+	    // ************************************************************************* 
+	    //  Register the CAS with a local cache
+	    // ************************************************************************* 
+	    //CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
+	    byte[] binarySource = aMessageContext.getByteMessage();
+	    UimaSerializer.deserializeCasFromBinary(binarySource, cas);
+	    entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId );
+	  }
 		long timeToDeserializeCAS = getController().getCpuTime() - t1;
 		getController().incrementDeserializationTime(timeToDeserializeCAS);
 		LongNumericStatistic statistic;
@@ -169,23 +202,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				"handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialize_cas_time_FINE",
 				new Object[] { timeToDeserializeCAS / 1000 });
 		
-		// *************************************************************************
-		// Check and set up for Delta CAS reply
-		// *************************************************************************
-		boolean acceptsDeltaCas = false;
-		Marker marker = null;
-		if (aMessageContext.propertyExists(AsynchAEMessage.AcceptsDeltaCas)) {
-	      acceptsDeltaCas = aMessageContext.getMessageBooleanProperty(AsynchAEMessage.AcceptsDeltaCas);
-	      if (acceptsDeltaCas ) {
-	    	 marker = cas.createMarker();
-	      }
-		}
-		
-		// ************************************************************************* 
-		//	Register the CAS with a local cache
-		// ************************************************************************* 
-		//CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
-		CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId, marker, acceptsDeltaCas);
 
 		//	Update Stats
 		ServicePerformance casStats = getController().getCasStatistics(casReferenceId);
@@ -269,12 +285,12 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	 * @param aMessageContext - contains a message from UIMA-AS Client
 	 * @throws AsynchAEException
 	 */
-	private void handleProcessRequestWithXMI(MessageContext aMessageContext) throws AsynchAEException
+	private void handleProcessRequestFromRemoteDelegate(MessageContext aMessageContext) throws AsynchAEException
 	{
 		CacheEntry entry = null;
 		String casReferenceId = null;
 		//	Check if there is a cargo in the message
-		if ( aMessageContext.getStringMessage() == null )
+		if ( aMessageContext.getMessageIntProperty(AsynchAEMessage.Payload)== AsynchAEMessage.XMIPayload && aMessageContext.getStringMessage() == null )
 		{
 			return; // No XMI just return
 		}
@@ -767,14 +783,14 @@ public class ProcessRequestHandler_impl extends HandlerBase
 
 					handleProcessRequestWithCASReference(messageContext);
 				}
-				else if (AsynchAEMessage.XMIPayload == payload)
+				else if (AsynchAEMessage.XMIPayload == payload || AsynchAEMessage.BinaryPayload == payload)
 				{
 					//	Fetch id of the CAS from the message. 
 					if ( getCasReferenceId(messageContext) == null )
 					{
 						return; // 	Invalid message. Nothing to do
 					}
-					handleProcessRequestWithXMI(messageContext);
+					handleProcessRequestFromRemoteDelegate(messageContext);
 				}
 				else if (AsynchAEMessage.XCASPayload == payload)
 				{

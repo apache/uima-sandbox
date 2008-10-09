@@ -359,6 +359,29 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		initializeServiceStats();
 
+		
+		//  Show Serialization Strategy of each remote delegate
+    if ( this instanceof AggregateAnalysisEngineController )
+    {
+      Set set = aDestinationMap.entrySet();
+      for( Iterator it = set.iterator(); it.hasNext();)
+      {
+        Map.Entry entry = (Map.Entry)it.next();
+        Endpoint endpoint = (Endpoint)entry.getValue();
+        if ( endpoint != null && endpoint.isRemote() )
+        {
+          String key = ((AggregateAnalysisEngineController)this).lookUpDelegateKey(endpoint.getEndpoint());
+          System.out.println(">>> Controller:"+getComponentName()+" Configured To Serialize CASes To Remote Delegate:"+key+" Using "+endpoint.getSerializer()+" Serialization");
+          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                    "C'tor", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_remote_delegate_serialization_INFO",
+                    new Object[] { getComponentName(), key, endpoint.getSerializer()});
+          }
+        }
+      }
+    }
+		
+		
 	}
   public UimaTransport getTransport(String aKey) throws Exception
   {
