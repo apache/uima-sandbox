@@ -23,8 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
@@ -34,6 +36,7 @@ import javax.management.ObjectName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
+import org.apache.activemq.command.ActiveMQBytesMessage;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.uima.UIMAFramework;
@@ -95,6 +98,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	{
 		return 	new ActiveMQTextMessage();
 	}
+  protected BytesMessage createBytesMessage() throws ResourceInitializationException
+  {
+    return  new ActiveMQBytesMessage();
+  }
 
 	/**
 	 * Called at the end of collectionProcessingComplete - WAS closes receiving
@@ -118,7 +125,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			throw new ResourceProcessException(e);
 		}
 	}
-	protected void setMetaRequestMessage(TextMessage msg) throws Exception
+	protected void setMetaRequestMessage(Message msg) throws Exception
 	{
 		msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
 
@@ -126,16 +133,18 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
 		msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.GetMeta);
 		msg.setJMSReplyTo(consumerDestination);
-		((ActiveMQTextMessage) msg).setText("");
+		if ( msg instanceof TextMessage ) {
+	    ((ActiveMQTextMessage) msg).setText("");
+		}
 	}
 	/**
 	 * Initialize JMS Message with properties relevant to Process CAS request.
 	 */
-	protected void setCASMessage(String aCasReferenceId, CAS aCAS, TextMessage msg) throws ResourceProcessException
+	protected void setCASMessage(String aCasReferenceId, CAS aCAS, Message msg) throws ResourceProcessException
 	{
 		try{
-			setCommonProperties(aCasReferenceId, msg);
-			msg.setText(serializeCAS(aCAS));
+			setCommonProperties(aCasReferenceId, msg, "xmi");
+			((TextMessage)msg).setText(serializeCAS(aCAS));
 		}
 		catch (Exception e)
 		{
@@ -143,18 +152,30 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		}
 	}
 	
-	protected void setCASMessage(String aCasReferenceId, String aSerializedCAS, TextMessage msg) throws ResourceProcessException
+	protected void setCASMessage(String aCasReferenceId, String aSerializedCAS, Message msg) throws ResourceProcessException
 	{
 		try{
-			setCommonProperties(aCasReferenceId, msg);
-			msg.setText(aSerializedCAS);
+			setCommonProperties(aCasReferenceId, msg, "xmi");
+			((TextMessage)msg).setText(aSerializedCAS);
 		}
 		catch (Exception e)
 		{
 			throw new ResourceProcessException(e);
 		}
 	}
-    protected void setCommonProperties( String aCasReferenceId, TextMessage msg) throws ResourceProcessException
+  protected void setCASMessage(String aCasReferenceId, byte[] aSerializedCAS, Message msg) throws ResourceProcessException
+  {
+    try{
+      setCommonProperties(aCasReferenceId, msg, "binary");
+      ((BytesMessage)msg).writeBytes(aSerializedCAS);
+    }
+    catch (Exception e)
+    {
+      throw new ResourceProcessException(e);
+    }
+  }
+
+  protected void setCommonProperties( String aCasReferenceId, Message msg, String aSerializationStrategy) throws ResourceProcessException
     {
 		try{
 			msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
@@ -163,7 +184,13 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request);
 			msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.Process);
 			msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
-			msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload);
+			
+			if ( aSerializationStrategy.equals("binary")) {
+	      msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.BinaryPayload);
+			} else if ( aSerializationStrategy.equals("xmi")) {
+        msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload);
+			}
+
 			msg.setBooleanProperty(AsynchAEMessage.AcceptsDeltaCas, true);
 			msg.setJMSReplyTo(consumerDestination);
 			
@@ -230,7 +257,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		}
 	}
 
-	public void setCPCMessage(TextMessage msg) throws Exception
+	public void setCPCMessage(Message msg) throws Exception
 	{
 		msg.setStringProperty(AsynchAEMessage.MessageFrom, consumerDestination.getQueueName());
 		msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
@@ -239,7 +266,9 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None);
 		msg.setBooleanProperty(AsynchAEMessage.RemoveEndpoint, true);
 		msg.setJMSReplyTo(consumerDestination);
-		msg.setText("");
+    if ( msg instanceof TextMessage ) {
+      ((TextMessage)msg).setText("");
+    }
 	}
 	protected Connection getConnection( String aBrokerURI ) throws Exception
 	{
@@ -422,6 +451,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		{
 			applicationName = (String) anApplicationContext.get(UimaAsynchronousEngine.ApplicationName);
 		}
+    if (anApplicationContext.containsKey(UimaAsynchronousEngine.SerializationStrategy))
+    {
+      super.serializationStrategy = (String) anApplicationContext.get(UimaAsynchronousEngine.SerializationStrategy);
+    }
 
 		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_init_uimaee_client__CONFIG", new Object[] { brokerURI, 0, casPoolSize, processTimeout, metadataTimeout, cpcTimeout });
 
@@ -479,7 +512,9 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		{
 			throw new ResourceInitializationException(e);
 		}
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_as_initialized_CONFIG", new Object[] { "" });
+		if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_as_initialized__INFO", new Object[] { super.serializationStrategy });
+		}
 
 	}
 	/**

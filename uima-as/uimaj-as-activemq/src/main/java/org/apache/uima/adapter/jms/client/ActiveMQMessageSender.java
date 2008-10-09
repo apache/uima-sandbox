@@ -20,6 +20,7 @@ package org.apache.uima.adapter.jms.client;
 
 import java.util.List;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -103,6 +104,14 @@ public class ActiveMQMessageSender extends BaseMessageSender {
     	}
 	  return session.createTextMessage();
 	}
+  public BytesMessage createBytesMessage() throws Exception
+  {
+      if ( session == null )
+      {
+        throw new JMSException("Unable To Create JMS BytesMessage. Reason: JMS Session Not Initialized");
+      }
+    return session.createBytesMessage();
+  }
 	/**
 	 * Cleanup any jms resources used by the worker thread
 	 */

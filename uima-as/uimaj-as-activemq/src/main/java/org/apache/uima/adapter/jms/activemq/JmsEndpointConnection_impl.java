@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -357,6 +358,37 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		}
 		throw new AsynchAEException(new InvalidMessageException("Unable to produce Message Object"));
 	}
+  public BytesMessage produceByteMessage() throws AsynchAEException
+  {
+    Assert.notNull(producerSession);
+    boolean done = false;
+    int retryCount = 4;
+    while (retryCount > 0)
+    {
+      try
+      {
+        retryCount--;
+        return producerSession.createBytesMessage();
+      }
+      catch ( javax.jms.IllegalStateException e)
+      {
+        try
+        {
+          open();
+        }
+        catch ( ServiceShutdownException ex)
+        {
+          ex.printStackTrace();
+        }
+
+      }
+      catch ( Exception e)
+      {
+        throw new AsynchAEException(e);
+      }
+    }
+    throw new AsynchAEException(new InvalidMessageException("Unable to produce BytesMessage Object"));
+  }
 
 	public ObjectMessage produceObjectMessage() throws AsynchAEException
 	{

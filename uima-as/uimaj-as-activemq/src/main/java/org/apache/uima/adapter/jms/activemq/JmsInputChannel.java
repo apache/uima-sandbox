@@ -282,7 +282,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		{
 			int payload = aMessage.getIntProperty(AsynchAEMessage.Payload);
 			if ( payload != AsynchAEMessage.XMIPayload && 
-				 payload != AsynchAEMessage.CASRefID &&
+	         payload != AsynchAEMessage.BinaryPayload &&
+	         payload != AsynchAEMessage.CASRefID &&
 				 payload != AsynchAEMessage.Exception &&
 				 payload != AsynchAEMessage.Metadata 
 				)
@@ -414,6 +415,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			{
 			case AsynchAEMessage.XMIPayload:
 				return "XMIPayload";
+      case AsynchAEMessage.BinaryPayload:
+        return "BinaryPayload";
 			case AsynchAEMessage.CASRefID:
 				return "CASRefID";
 			case AsynchAEMessage.Metadata:
