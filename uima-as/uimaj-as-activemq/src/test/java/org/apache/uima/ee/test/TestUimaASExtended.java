@@ -324,6 +324,31 @@ public class TestUimaASExtended extends BaseTestSupport
     
   }
     
+  /**
+   * Tests the shutdown due to a failure in the Flow Controller when initializing AND have delegates to disable
+   * (Jira issue UIMA-1171)
+   * 
+   * @throws Exception
+   */
+  public void testTerminateOnFlowControllerExceptionOnInitializationWithDisabledDelegates() throws Exception {
+    System.out.println("-------------- testTerminateOnFlowControllerExceptionOnInitializationWithDisabledDelegates -----");
+    
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    String containerId = null;
+    try {
+        containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFlowControllerExceptionOnInitialization.xml");
+      fail("Expected ResourceInitializationException. Instead, the Aggregate Deployed Successfully");
+    } catch (ResourceInitializationException e) {
+      System.out.println("\nExpected Initialization Exception was received - cause: "+e.getCause());
+    } catch (Exception e) {
+      fail("Expected ResourceInitializationException. Instead Got:" + e.getClass());
+    }
+    finally
+    {
+    	eeUimaEngine.undeploy(containerId);
+    }
+  }
+    
 	/**
 	 * Deploys a Primitive Uima EE service and sends 5 CASes to it.
 	 * 
