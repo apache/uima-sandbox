@@ -48,7 +48,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
 {
 	private static final Class CLASS_NAME = ProcessRequestHandler_impl.class;
 	private Object mux = new Object();
-	
+  private UimaSerializer uimaSerializer = new UimaSerializer();
+
 	public ProcessRequestHandler_impl(String aName)
 	{
 		super(aName);
@@ -163,7 +164,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	    //  Fetch serialized CAS from the message
 	    String xmi = aMessageContext.getStringMessage();
 	    deserSharedData = new XmiSerializationSharedData();
-	    UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+//      UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+      uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 	    // *************************************************************************
 	    // Check and set up for Delta CAS reply
 	    // *************************************************************************
@@ -188,7 +190,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	    // ************************************************************************* 
 	    //CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
 	    byte[] binarySource = aMessageContext.getByteMessage();
-	    UimaSerializer.deserializeCasFromBinary(binarySource, cas);
+//      UimaSerializer.deserializeCasFromBinary(binarySource, cas);
+      uimaSerializer.deserializeCasFromBinary(binarySource, cas);
 	    entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId );
 	  }
 		long timeToDeserializeCAS = getController().getCpuTime() - t1;
@@ -659,7 +662,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
 
 				XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
-				UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+//        UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+        uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 				
 				if (casReferenceId == null)
 				{

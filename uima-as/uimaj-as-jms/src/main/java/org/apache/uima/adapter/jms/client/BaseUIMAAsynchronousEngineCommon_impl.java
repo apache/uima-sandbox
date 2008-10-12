@@ -160,6 +160,8 @@ implements UimaAsynchronousEngine, MessageListener
 	protected UimaASClientInfoMBean clientSideJmxStats =
 		new UimaASClientInfo();
 	
+  private UimaSerializer uimaSerializer = new UimaSerializer();
+
 	protected List pendingMessageList = new ArrayList();
 	protected volatile boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
@@ -198,14 +200,14 @@ implements UimaAsynchronousEngine, MessageListener
 	 */
 	protected String serializeCAS(CAS aCAS,  XmiSerializationSharedData serSharedData) throws Exception
 	{
-		return UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
+		return uimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 
 	}
 	
 	protected String serializeCAS(CAS aCAS) throws Exception
 	{
 		XmiSerializationSharedData serSharedData  = new XmiSerializationSharedData();
-		return UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
+		return uimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 	}
 
 	public void removeStatusCallbackListener(UimaASStatusCallbackListener aListener)
@@ -299,7 +301,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 
 		running = false;
-		
+		uimaSerializer.reset();
 		try
 		{
 			//	Unblock threads
@@ -555,7 +557,7 @@ implements UimaAsynchronousEngine, MessageListener
 	        requestToCache.setXmiSerializationSharedData(serSharedData);
 	      }
 			} else {
-        byte[] serializedCAS = UimaSerializer.serializeCasToBinary(aCAS);
+        byte[] serializedCAS = uimaSerializer.serializeCasToBinary(aCAS);
         msg.put( AsynchAEMessage.CAS, serializedCAS);
         if (remoteService)
         {
@@ -1148,16 +1150,16 @@ implements UimaAsynchronousEngine, MessageListener
 	private CAS deserialize(String aSerializedCAS, CAS aCAS ) throws Exception
 	{
 		XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
-		UimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, -1);
+    uimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, -1);
 		return aCAS;
 	}
 	
 	private CAS deserialize(String aSerializedCAS, CAS aCAS, XmiSerializationSharedData deserSharedData, boolean deltaCas ) throws Exception
 	{
 		if (deltaCas) {
-		  UimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, deserSharedData.getMaxXmiId(), AllowPreexistingFS.allow);
+      uimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, deserSharedData.getMaxXmiId(), AllowPreexistingFS.allow);
 		} else {
-		  UimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, -1);
+      uimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, -1);
 		}
 		return aCAS;
 	}
@@ -1165,7 +1167,7 @@ implements UimaAsynchronousEngine, MessageListener
   private CAS deserialize(byte[] binaryData, ClientRequest cachedRequest) throws Exception
   {
     CAS cas = cachedRequest.getCAS();
-    UimaSerializer.deserializeCasFromBinary(binaryData, cas);
+    uimaSerializer.deserializeCasFromBinary(binaryData, cas);
     return cas;
   }
 	
@@ -1178,13 +1180,13 @@ implements UimaAsynchronousEngine, MessageListener
   protected CAS deserializeCAS(byte[] aSerializedCAS, ClientRequest cachedRequest) throws Exception
   {
     CAS cas = cachedRequest.getCAS();
-    UimaSerializer.deserializeCasFromBinary(aSerializedCAS, cas);
+    uimaSerializer.deserializeCasFromBinary(aSerializedCAS, cas);
     return cas;
   }
 
   protected CAS deserializeCAS(byte[] aSerializedCAS, CAS aCas) throws Exception
   {
-    UimaSerializer.deserializeCasFromBinary(aSerializedCAS, aCas);
+    uimaSerializer.deserializeCasFromBinary(aSerializedCAS, aCas);
     return aCas;
   }
 
@@ -1201,7 +1203,7 @@ implements UimaAsynchronousEngine, MessageListener
   protected CAS deserializeCAS(byte[] aSerializedCAS, String aCasPoolName ) throws Exception
   {
     CAS cas = asynchManager.getNewCas(aCasPoolName);
-    UimaSerializer.deserializeCasFromBinary(aSerializedCAS, cas);
+    uimaSerializer.deserializeCasFromBinary(aSerializedCAS, cas);
     return cas;
   }
 

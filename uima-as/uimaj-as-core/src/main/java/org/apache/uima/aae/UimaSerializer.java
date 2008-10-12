@@ -27,6 +27,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,6 +55,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 public class UimaSerializer
 {
+  
+  private ConcurrentHashMap xmlReaderMap = new ConcurrentHashMap();
+  private Object mux = new Object();
 	/**
 	 * Serializes XCas into CAS
 	 * 
@@ -61,7 +65,7 @@ public class UimaSerializer
 	 * @param aCas
 	 * @throws Exception
 	 */
-	public static OutOfTypeSystemData deSerialiazeFromXCAS(String anXcas, CAS aCas) throws Exception
+	public OutOfTypeSystemData deSerialiazeFromXCAS(String anXcas, CAS aCas) throws Exception
 	{
 		OutOfTypeSystemData otsd = new OutOfTypeSystemData();
 		TypeSystem typesToLoad2 = aCas.getTypeSystem();
@@ -88,7 +92,7 @@ public class UimaSerializer
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static void serializeToXCAS(OutputStream stream, CAS aCAS, String encoding, TypeSystem typeSystem, OutOfTypeSystemData otsd) throws IOException, SAXException
+	public void serializeToXCAS(OutputStream stream, CAS aCAS, String encoding, TypeSystem typeSystem, OutOfTypeSystemData otsd) throws IOException, SAXException
 	{
 
 		if (typeSystem == null)
@@ -110,7 +114,7 @@ public class UimaSerializer
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static void serializeToXMI(OutputStream stream, CAS aCAS, String encoding, TypeSystem typeSystem, OutOfTypeSystemData otsd) throws IOException, SAXException
+	public void serializeToXMI(OutputStream stream, CAS aCAS, String encoding, TypeSystem typeSystem, OutOfTypeSystemData otsd) throws IOException, SAXException
 	{
 
 		if (typeSystem == null)
@@ -129,7 +133,7 @@ public class UimaSerializer
 	/**
 	 * Utility method for serializing a CAS to an XMI String
 	 */
-	public static String serializeCasToXmi(CAS aCAS, XmiSerializationSharedData serSharedData) throws Exception
+	public String serializeCasToXmi(CAS aCAS, XmiSerializationSharedData serSharedData) throws Exception
 	{
 		Writer writer = new StringWriter();
 		try
@@ -149,7 +153,7 @@ public class UimaSerializer
 		}
 	}
 	
-	public static String serializeCasToXmi(CAS aCAS, XmiSerializationSharedData serSharedData, Marker aMarker) throws Exception
+	public String serializeCasToXmi(CAS aCAS, XmiSerializationSharedData serSharedData, Marker aMarker) throws Exception
 	{
 		Writer writer = new StringWriter();
 		try
@@ -170,34 +174,50 @@ public class UimaSerializer
 	}
 	
 	/** Utility method for deserializing a CAS from an XMI String */
-	public static void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
+	public void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
 			boolean aLenient, int aMergePoint) 
 	throws FactoryConfigurationError, ParserConfigurationException, SAXException, IOException
 	{
 		
-		Reader reader = new StringReader(anXmlStr);
-		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+    XMLReader xmlReader = null;
+    //  Create a new instance of a XMLReader if one doesnt exist in the
+    //  global map. Each thread reuses its own instance.
+    synchronized( mux ) {
+      if ( !xmlReaderMap.containsKey(Thread.currentThread().getId())) {
+        xmlReader = XMLReaderFactory.createXMLReader();
+        xmlReaderMap.put(Thread.currentThread().getId(), xmlReader);
+      } else {
+        xmlReader = (XMLReader) xmlReaderMap.get(Thread.currentThread().getId());
+      }
+    }
+    Reader reader = new StringReader(anXmlStr);
     XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
-	    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint);
-	    xmlReader.setContentHandler(handler);
-	    xmlReader.parse(new InputSource(reader));
-
+    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint);
+    xmlReader.setContentHandler(handler);
+    xmlReader.parse(new InputSource(reader));
 	}
 
-	public static void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
+	public void deserializeCasFromXmi(String anXmlStr, CAS aCAS, XmiSerializationSharedData aSharedData, 
 			boolean aLenient, int aMergePoint, AllowPreexistingFS allow) 
 	throws FactoryConfigurationError, ParserConfigurationException, SAXException, IOException
 	{
-		
-		Reader reader = new StringReader(anXmlStr);
-		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-	    XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
-	    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint, allow);
-	    xmlReader.setContentHandler(handler); 
-	    xmlReader.parse(new InputSource(reader));
+    XMLReader xmlReader = null;
+    synchronized( mux ) {
+      if ( !xmlReaderMap.containsKey(Thread.currentThread().getId())) {
+        xmlReader = XMLReaderFactory.createXMLReader();
+        xmlReaderMap.put(Thread.currentThread().getId(), xmlReader);
+      } else {
+        xmlReader = (XMLReader) xmlReaderMap.get(Thread.currentThread().getId());
+      }
+    }
+    Reader reader = new StringReader(anXmlStr);
+    XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
+    ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint, allow);
+    xmlReader.setContentHandler(handler); 
+    xmlReader.parse(new InputSource(reader));
 	}
   /** Utility method for deserializing a CAS from a binary */
-  public static void deserializeCasFromBinary(byte[] binarySource, CAS aCAS) throws Exception
+  public void deserializeCasFromBinary(byte[] binarySource, CAS aCAS) throws Exception
   {
     ByteArrayInputStream fis = null;
     try
@@ -218,7 +238,7 @@ public class UimaSerializer
     }
   }
 
-  public static byte[] serializeCasToBinary(CAS aCAS) throws Exception
+  public byte[] serializeCasToBinary(CAS aCAS) throws Exception
   {
     ByteArrayOutputStream fos = null;
     try
@@ -239,7 +259,9 @@ public class UimaSerializer
       }
     }
   }
-
-
-	
+  
+  public void reset() {
+    xmlReaderMap.clear();
+  }
 }	
+

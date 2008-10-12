@@ -304,23 +304,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			// Checkout an instance of AE from the pool
 			ae = aeInstancePool.checkout();
 			
-			if ( ae == null )
-			{
-				//	This block just logs the CAS that cannot be processed 
-				try
-				{
-				  XmiSerializationSharedData serSharedData = new XmiSerializationSharedData();
-				  String  serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
-				  UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_cas__FINEST", new Object[] { serializedCas });
-		        }
-				catch( Exception e )
-				{
-					//	ignore exceptions. This block just logs the CAS
-				}
-				  UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dropping_cas_dueto_no_ae__WARNING", new Object[] { getComponentName(), aCasReferenceId});
-				
-				return;
-			}
 			//	Get input CAS entry from the InProcess cache
 			CacheEntry inputCASEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 

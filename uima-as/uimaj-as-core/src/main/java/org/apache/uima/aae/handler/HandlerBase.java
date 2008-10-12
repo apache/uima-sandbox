@@ -375,11 +375,5 @@ public abstract class HandlerBase implements Handler
 				aggregateDelegateStats( aMessageContext, aCasReferenceId );
 			}			
 	}
-  protected void deserialize( byte[] data, CAS cas ) 
-  throws Exception
-  {
-    UimaSerializer.deserializeCasFromBinary(data, cas);
-  }
-
 
 }

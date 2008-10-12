@@ -96,6 +96,7 @@ public class JmsOutputChannel implements OutputChannel
 	private Destination freeCASTempQueue;
 
   private String hostIP = null;
+  private UimaSerializer uimaSerializer = new UimaSerializer();
 
   public JmsOutputChannel()
   {
@@ -205,10 +206,10 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				serSharedData = cacheEntry.getDeserSharedData();
 				if (cacheEntry.acceptsDeltaCas())  {
-			      serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData, cacheEntry.getMarker());
+          serializedCas = uimaSerializer.serializeCasToXmi(aCAS, serSharedData, cacheEntry.getMarker());
 			      cacheEntry.setSentDeltaCas(true);
 				} else {
-				  serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
+          serializedCas = uimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 				  cacheEntry.setSentDeltaCas(false);
 				}
 			}
@@ -219,7 +220,7 @@ public class JmsOutputChannel implements OutputChannel
 					serSharedData = new XmiSerializationSharedData();
 					cacheEntry.setXmiSerializationData(serSharedData);
 				}
-			    serializedCas = UimaSerializer.serializeCasToXmi(aCAS, serSharedData);
+        serializedCas = uimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 			    int maxOutgoingXmiId = serSharedData.getMaxXmiId();				
 				//	Save High Water Mark in case a merge is needed
 			    getAnalysisEngineController().
@@ -235,7 +236,7 @@ public class JmsOutputChannel implements OutputChannel
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			try
 			{
-				UimaSerializer.serializeToXCAS(bos, aCAS, null, null, null);
+        uimaSerializer.serializeToXCAS(bos, aCAS, null, null, null);
 				serializedCas = bos.toString();
 			}
 			catch ( Exception e)
@@ -1030,7 +1031,7 @@ public class JmsOutputChannel implements OutputChannel
         //  Serialize CAS for remote Delegates
         String serializer = anEndpoint.getSerializer();
         if ( serializer.equals("binary")) {
-          serializedCAS = UimaSerializer.serializeCasToBinary(cas);
+          serializedCAS = uimaSerializer.serializeCasToBinary(cas);
         } else {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                   "getBinaryCas", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_serializer__WARNING",
@@ -1109,7 +1110,7 @@ public class JmsOutputChannel implements OutputChannel
       ServicePerformance casStats = getAnalysisEngineController().getCasStatistics(aCasReferenceId);
         CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
         long t1 = getAnalysisEngineController().getCpuTime();
-        serializedCAS = UimaSerializer.serializeCasToBinary(cas);
+        serializedCAS = uimaSerializer.serializeCasToBinary(cas);
         long timeToSerializeCas = getAnalysisEngineController().getCpuTime()-t1;
         
         getAnalysisEngineController().incrementSerializationTime(timeToSerializeCas);

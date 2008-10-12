@@ -55,7 +55,8 @@ public class ProcessResponseHandler extends HandlerBase
 	private static final Class CLASS_NAME = ProcessResponseHandler.class;
 
 	private Object monitor = new Object();
-
+  private UimaSerializer uimaSerializer = new UimaSerializer();
+  
 	public ProcessResponseHandler(String aName)
 	{
 		super(aName);
@@ -253,7 +254,8 @@ public class ProcessResponseHandler extends HandlerBase
 			  String serializationStrategy = endpointWithTimer.getSerializer();
 			  if ( serializationStrategy.equals("binary")) {
 			   byte[] binaryData = aMessageContext.getByteMessage();
-			   UimaSerializer.deserializeCasFromBinary(binaryData, cas);
+//         UimaSerializer.deserializeCasFromBinary(binaryData, cas);
+         uimaSerializer.deserializeCasFromBinary(binaryData, cas);
 			  }  else {
 	        //  Processing a reply from a standard, non-parallel delegate
 	        if (aMessageContext.getMessageBooleanProperty(AsynchAEMessage.SentDeltaCas)) {
@@ -321,7 +323,8 @@ public class ProcessResponseHandler extends HandlerBase
 	{
 		XmiSerializationSharedData deserSharedData;
 		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, allow);
+//    UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, allow);
+    uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, allow);
 	}
 	/**
 	private void deserialize( String xmi, CAS cas, String casReferenceId, int highWaterMark ) throws Exception
@@ -341,7 +344,8 @@ public class ProcessResponseHandler extends HandlerBase
 			deserSharedData = new XmiSerializationSharedData();
 			entry.setXmiSerializationData(deserSharedData);
 		}
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+//    UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
+    uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 	}
 	
 	
