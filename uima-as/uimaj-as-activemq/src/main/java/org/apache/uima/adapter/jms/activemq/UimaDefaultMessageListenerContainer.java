@@ -23,19 +23,21 @@ import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
+import javax.jms.TemporaryQueue;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
-import org.apache.uima.aae.controller.Endpoint_impl;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.Threshold;
 import org.apache.uima.aae.error.handler.GetMetaErrorHandler;
@@ -51,14 +53,16 @@ implements ExceptionListener
 	private static final Class CLASS_NAME = UimaDefaultMessageListenerContainer.class;
 	private String destinationName="";
 	private Endpoint endpoint;
-	private boolean freeCasQueueListener;
+	private volatile boolean freeCasQueueListener;
 	private AnalysisEngineController controller;
-	private int retryCount = 2;
+	private volatile boolean failed = false;
+	private Object mux = new Object();
 	
 	public UimaDefaultMessageListenerContainer()
 	{
 		super();
-		setRecoveryInterval(60000);
+    setRecoveryInterval(5);
+//    setRecoveryInterval(60000);
 		setAcceptMessagesWhileStopping(false);
 		setExceptionListener(this);
 	}
@@ -71,6 +75,11 @@ implements ExceptionListener
 	{
 		controller = aController;
 	}
+	/**
+	 * 
+	 * @param t
+	 * @return
+	 */
 	private boolean disableListener( Throwable t)
 	{
 		System.out.println(t.toString());
@@ -79,119 +88,202 @@ implements ExceptionListener
 			return true;
 		return false;
 	}
+	/**
+	 * Stops this Listener
+	 */
+	private synchronized void handleListenerFailure() {
+    try {
+      if ( controller instanceof AggregateAnalysisEngineController ) {
+        String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(endpoint.getEndpoint());
+        if ( endpoint.getDestination() != null ) {
+          InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(endpoint.getDestination().toString());
+          iC.destroyListener(endpoint.getDestination().toString(), delegateKey);
+        } else {
+          InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(endpoint.getEndpoint());
+          iC.destroyListener(endpoint.getEndpoint(), delegateKey);
+        }
+      }
+    } catch( Exception e) {
+      e.printStackTrace();
+    }
+  }
+	/**
+	 * Handles failure on a temp queue
+	 * @param t
+	 */
+  private void handleTempQueueFailure(Throwable t) {
+    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+            "handleTempQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+            new Object[] {  endpoint.getDestination(), getBrokerUrl(), t });
+    // Check if the failure is due to the failed connection. Spring (and ActiveMQ) dont seem to provide 
+    // the cause. Just the top level IllegalStateException with a text message. This is what we need to
+    //  check for.
+    if ( t instanceof javax.jms.IllegalStateException && t.getMessage().equals("The Consumer is closed")) {
+      if ( controller != null && controller instanceof AggregateAnalysisEngineController ) {
+        String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(endpoint.getEndpoint());
+        try {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+                  "handleTempQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_listener_INFO",
+                  new Object[] {  controller.getComponentName(), endpoint.getDestination(),delegateKey });
+          // Stop current listener 
+          handleListenerFailure();
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+                  "handleTempQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopped_listener_INFO",
+                  new Object[] {  controller.getComponentName(), endpoint.getDestination() });
+        } catch ( Exception e ) {
+          e.printStackTrace();
+        }
+      }
+    } else if ( disableListener(t)) {
+      handleQueueFailure(t);
+//      terminate(t);
+    }
+  }
+  
+  private ErrorHandler fetchGetMetaErrorHandler() {
+    ErrorHandler handler = null;
+    Iterator it = controller.getErrorHandlerChain().iterator();
+    //  Find the error handler for GetMeta in the Error Handler List provided in the 
+    //  deployment descriptor
+    while ( it.hasNext() )
+    {
+      handler = (ErrorHandler)it.next();
+      if ( handler instanceof GetMetaErrorHandler )
+      {
+        return handler;
+      }
+    }
+    return null;
+  }
+  /**
+   * Handles failures on non-temp queues
+   * @param t
+   */
+  private void handleQueueFailure(Throwable t) {
+    final String endpointName = 
+      (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
+    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+            "handleQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+            new Object[] {  endpointName, getBrokerUrl(), t });
+    boolean terminate = true;
+    //  Check if the failure is severe enough to disable this listener. Whether or not this listener is actully
+    //  disabled depends on the action associated with GetMeta Error Handler. If GetMeta Error Handler is
+    //  configured to terminate the service on failure, this listener will be terminated and the entire service
+    //  will be stopped.
+    if (  disableListener(t) ) {
+      endpoint.setReplyDestinationFailed();
+      //  If this is a listener attached to the Aggregate Controller, use GetMeta Error
+      //  Thresholds defined to determine what to do next after failure. Either terminate
+      //  the service or disable the delegate with which this listener is associated with
+      if ( controller != null && controller instanceof AggregateAnalysisEngineController )
+      {
+        ErrorHandler handler = fetchGetMetaErrorHandler();
+        //  Fetch a Map containing thresholds for GetMeta for each delegate. 
+        Map thresholds = handler.getEndpointThresholdMap(); 
+        //  Lookup delegate's key using delegate's endpoint name
+        String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(endpoint.getEndpoint());
+        //  If the delegate has a threshold defined on GetMeta apply Action defined 
+        if ( delegateKey != null && thresholds.containsKey(delegateKey))
+        {
+          //  Fetch the Threshold object containing error configuration
+          Threshold threshold = (Threshold) thresholds.get(delegateKey);
+          //  Check if the delegate needs to be disabled
+          if (threshold.getAction().equalsIgnoreCase(ErrorHandler.DISABLE)) {
+            //  The disable delegate method takes a list of delegates
+            List list = new ArrayList();
+            //  Add the delegate to disable to the list
+            list.add(delegateKey);
+            try {
+              System.out.println(">>>> Controller:"+controller.getComponentName()+" Disabling Listener On Queue:"+endpoint.getEndpoint()+". Component's "+delegateKey+" Broker:"+getBrokerUrl()+" is Invalid");
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+                          "handleQueueFailure", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disabled_delegate_bad_broker__INFO",
+                          new Object[] {  controller.getComponentName(), delegateKey, getBrokerUrl() });
+              //  Remove the delegate from the routing table. 
+              ((AggregateAnalysisEngineController) controller).disableDelegates(list);
+              terminate = false; //just disable the delegate and continue
+            } catch (Exception e) {
+              e.printStackTrace();
+              terminate = true;
+            }
+          }
+        }
+      }
+    }
+    System.out.println("****** Unable To Connect Listener To Broker:"+getBrokerUrl());
+    System.out.println("****** Closing Listener on Queue:"+endpoint.getEndpoint());
+    setRecoveryInterval(0);
+    
+    //  Spin a shutdown thread to terminate listener. 
+    new Thread() {
+      public void run()
+      {
+        try
+        {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                      "handleQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_disable_listener__WARNING",
+                      new Object[] {  endpointName, getBrokerUrl() });
+          
+          shutdown();
+        }
+        catch( Exception e) { e.printStackTrace();}
+      }
+    }.start();
+
+    if ( terminate )
+    {
+      terminate(t);
+    }
+
+  }
+  /**
+	 * This method is called by Spring when a listener fails
+	 */
 	protected void handleListenerSetupFailure( Throwable t, boolean alreadyHandled )
 	{
-		if ( !(t instanceof javax.jms.IllegalStateException ) )
-		{
-			t.printStackTrace();
-			final String endpointName = 
-				(getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
-				
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-	                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
-	                new Object[] {  endpointName, getBrokerUrl(), t });
+	  // If controller is stopping not need to recover the connection
+	  if ( controller != null && controller.isStopped()) {
+	    return;
+	  }
+	  t.printStackTrace();
 
-			boolean terminate = true;
-			if (  disableListener(t) )
-			{
-				if ( endpoint != null )
-				{
-					endpoint.setReplyDestinationFailed();
-					//	If this is a listener attached to the Aggregate Controller, use GetMeta Error
-					//	Thresholds defined to determine what to do next after failure. Either terminate
-					//	the service or disable the delegate with which this listener is associated with
-					if ( controller != null && controller instanceof AggregateAnalysisEngineController )
-					{
-						ErrorHandler handler = null;
-						Iterator it = controller.getErrorHandlerChain().iterator();
-						//	Find the error handler for GetMeta in the Error Handler List provided in the 
-						//	deployment descriptor
-						while ( it.hasNext() )
-						{
-							handler = (ErrorHandler)it.next();
-							if ( handler instanceof GetMetaErrorHandler )
-							{
-								break;
-							}
-						}
-						//	Fetch a Map containing thresholds for GetMeta for each delegate. 
-						java.util.Map thresholds = handler.getEndpointThresholdMap(); 
-						//	Lookup delegate's key using delegate's endpoint name
-						String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(endpoint.getEndpoint());
-						//	If the delegate has a threshold defined on GetMeta apply Action defined 
-						if ( delegateKey != null && thresholds.containsKey(delegateKey))
-						{
-							//	Fetcg the Threshold object containing error configuration
-							Threshold threshold = (Threshold) thresholds.get(delegateKey);
-							//	Check if the delegate needs to be disabled
-							if (threshold.getAction().equalsIgnoreCase(ErrorHandler.DISABLE)) {
-								//	The disable delegate method takes a list of delegates
-								List list = new ArrayList();
-								//	Add the delegate to disable to the list
-								list.add(delegateKey);
-								try {
-									System.out.println(">>>> Controller:"+controller.getComponentName()+" Disabling Listener On Queue:"+endpoint.getEndpoint()+". Component's "+delegateKey+" Broker:"+getBrokerUrl()+" is Invalid");
-									UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
-							                "handleListenerSetupFailure", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disabled_delegate_bad_broker__INFO",
-							                new Object[] {  controller.getComponentName(), delegateKey, getBrokerUrl() });
-									//	Remove the delegate from the routing table. 
-									((AggregateAnalysisEngineController) controller).disableDelegates(list);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-								terminate = false; //just disable the delegate and continue
-							}
-						}
-					}
-				}
-
-				System.out.println("****** Unable To Connect Listener To Broker:"+getBrokerUrl());
-				if ( endpoint != null )
-				{
-					System.out.println("****** Closing Listener on Queue:"+endpoint.getEndpoint());
-				}
-				setRecoveryInterval(0);
-				
-				//	Spin a shutdown thread to terminate listener. 
-				new Thread() {
-					public void run()
-					{
-						try
-						{
-							UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-					                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_disable_listener__WARNING",
-					                new Object[] {  endpointName, getBrokerUrl() });
-							
-							shutdown();
-						}
-						catch( Exception e) { e.printStackTrace();}
-					}
-				}.start();
-
-				if ( terminate )
-				{
-					// ****************************************
-					//	terminate the service
-					// ****************************************
-					System.out.println(">>>> Terminating Controller:"+controller.getComponentName()+" Unable To Initialize Listener Due to Invalid Broker URL:"+getBrokerUrl());
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-			                "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_terminate_service_dueto_bad_broker__WARNING",
-			                new Object[] {  controller.getComponentName(), getBrokerUrl() });
-					controller.stop();
-					controller.notifyListenersWithInitializationStatus(new ResourceInitializationException(t));
-				}
-			}
-			else
-			{
-				super.handleListenerSetupFailure(t, false);
-			}
-		}
-		
-		
+	  
+	  if ( endpoint == null ) {
+	    
+      super.handleListenerSetupFailure(t, false);
+      terminate(t);
+      return;
+	  }
+ 
+	  synchronized( mux ) {
+	      if ( !failed ) {
+	        // Check if this listener is attached to a temp queue. If so, this is a listener
+	        // on a reply queue. Handle temp queue listener failure differently than an
+	        // input queue listener. 
+	        if ( endpoint.isTempReplyDestination()) {
+	          handleTempQueueFailure(t);
+	        } else {
+	          // Handle non-temp queue failure
+	          handleQueueFailure(t);
+	        }
+	      }
+	      failed = true;
+	    }
 	}
 
+	private void terminate(Throwable t) {
+    // ****************************************
+    //  terminate the service
+    // ****************************************
+    System.out.println(">>>> Terminating Controller:"+controller.getComponentName()+" Unable To Initialize Listener Due to Invalid Broker URL:"+getBrokerUrl());
+    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                "terminate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_terminate_service_dueto_bad_broker__WARNING",
+                new Object[] {  controller.getComponentName(), getBrokerUrl() });
+    controller.stop();
+    controller.notifyListenersWithInitializationStatus(new ResourceInitializationException(t));
+	}
 	protected void handleListenerException( Throwable t )
 	{
+      t.printStackTrace();
       String endpointName = 
         (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
       
@@ -277,6 +369,13 @@ implements ExceptionListener
 		if ( endpoint != null)
 		{
 			endpoint.setDestination(aDestination);
+			if ( aDestination instanceof TemporaryQueue ) {
+			  endpoint.setTempReplyDestination(true);
+			  System.out.println("Resolver Plugged In a Temp Queue:"+aDestination);
+			  if ( getMessageListener() != null && getMessageListener() instanceof InputChannel ) {
+			    ((JmsInputChannel)getMessageListener()).setListenerContainer(this);
+			  }
+			}
 			endpoint.setServerURI(getBrokerUrl());
 		}
 	}
@@ -287,7 +386,8 @@ implements ExceptionListener
 
 	public void onException(JMSException arg0)
 	{
-       String endpointName = 
+	  arg0.printStackTrace();
+    String endpointName = 
       (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
     
     UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),

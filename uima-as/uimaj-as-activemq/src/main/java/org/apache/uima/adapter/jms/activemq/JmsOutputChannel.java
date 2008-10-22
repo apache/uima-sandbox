@@ -559,8 +559,6 @@ public class JmsOutputChannel implements OutputChannel
 	                        "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_serialized_cas__FINEST",
 	                        new Object[] { getAnalysisEngineController().getComponentName(), anEndpoint.getEndpoint(),aCasReferenceId,serializedCAS  });
 	        }
-	        
-	        
 	        //  Send process request to remote delegate and start timeout timer
 	        sendCasToRemoteEndpoint(true, serializedCAS, null, aCasReferenceId, anEndpoint, true, 0);
 			  } else {

@@ -45,6 +45,8 @@ import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.InputChannel;
+import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.AsynchAEException;
@@ -53,6 +55,7 @@ import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.util.Level;
+import org.springframework.jms.JmsException;
 import org.springframework.util.Assert;
 
 public class JmsEndpointConnection_impl implements ConsumerListener
@@ -92,6 +95,10 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	private Object semaphore = new Object();
 
 	private boolean isReplyEndpoint;
+	
+	private volatile boolean  failed = false;
+	
+	private Object recoveryMux = new Object();
 	
 	public JmsEndpointConnection_impl(Map aConnectionMap, Endpoint anEndpoint)
 	{
@@ -218,6 +225,9 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		}
 		catch ( Exception e)
 		{
+      if ( e instanceof JMSException ) {
+        handleJmsException( (JMSException)e );
+      }
 			throw new AsynchAEException(e);
 		}
 		
@@ -471,83 +481,133 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	{
 		String destinationName = "";
 
-		Exception lastException = null;
-		// Send a message to the destination. Retry 10 times if unable to send.
-		// After 10 tries give up and throw exception
-		for (int i = 0; i < 10; i++)
+		try
 		{
-			try
-			{
-				stopTimer();
+			  stopTimer();
 
-					if (conn == null || producerSession == null || !((ActiveMQSession) producerSession).isRunning())
-					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_open_connection_to_endpoint__FINE", new Object[] { getEndpoint() });
-						openChannel();
+				if ( failed || conn == null || producerSession == null || !((ActiveMQSession) producerSession).isRunning())
+				{
+					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_open_connection_to_endpoint__FINE", new Object[] { getEndpoint() });
+					openChannel();
+					// The connection has been successful. Now check if we need to create a new listener
+					// and a temp queue to receive replies. A new listener will be created only if the
+					// endpoint for the delegate is marked as FAILED. This will be the case if the listener
+					// on the reply queue for the endpoint has failed.
+					synchronized( recoveryMux ) {
+	          if ( controller instanceof AggregateAnalysisEngineController ) {
+	            // Using the queue name lookup the delegate key
+	            String key = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(delegateEndpoint.getEndpoint());
+	            if ( key != null && destination != null && !isReplyEndpoint ) {
+	              // The aggregate has a master list of endpoints which are typically cloned during processing
+	              // This object uses a copy of the master. When a listener fails, the status of the master
+	              // endpoint is changed. To check the status, fetch the master endpoint, check its status
+	              // and if marked as FAILED, create a new listener, a new temp queue and override this
+	              // object endpoint copy destination property. It *IS* a new replyTo temp queue.
+	              Endpoint masterEndpoint = ((AggregateAnalysisEngineController)controller).lookUpEndpoint(key, false);
+	              if ( masterEndpoint.getStatus() == Endpoint.FAILED ) {
+	                // Create a new Listener Object to receive replies
+	                createListener(key);
+	                destination = (Destination)masterEndpoint.getDestination();
+	                delegateEndpoint.setDestination(destination);              
+	                // Override the reply destination. A new listener has been created along with a new temp queue for replies.
+	                aMessage.setJMSReplyTo(destination);
+	              }
+	            }
+	          }
 					}
-					//	Send a reply to a queue provided by the client
-					if ( isReplyEndpoint && delegateEndpoint.getDestination() != null  )
+				}
+				//	Send a reply to a queue provided by the client
+				if ( isReplyEndpoint && delegateEndpoint.getDestination() != null  )
+				{
+					destinationName = ((ActiveMQDestination)delegateEndpoint.getDestination()).getPhysicalName();
+					if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
 					{
-						destinationName = ((ActiveMQDestination)delegateEndpoint.getDestination()).getPhysicalName();
-						if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
-						{
-	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
-						}
-						synchronized(producer)
-						{
-              producer.send((Destination)delegateEndpoint.getDestination(), aMessage);
-						}
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
 					}
-					else
+					synchronized(producer)
 					{
-						destinationName = ((ActiveMQQueue) producer.getDestination()).getPhysicalName();
-            if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
-            {
-              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
-            }
-            synchronized(producer)
-            {
-              producer.send(aMessage);
-            }
+             producer.send((Destination)delegateEndpoint.getDestination(), aMessage);
 					}
+				}
+				else
+				{
+					destinationName = ((ActiveMQQueue) producer.getDestination()).getPhysicalName();
+           if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
+           {
+             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
+           }
+           synchronized(producer)
+           {
+             producer.send(aMessage);
+           }
+				}
 					
 				if (startTimer)
 				{
 					startTimer(connectionCreationTimestamp);
 				}
-				lastException = null;
+				return true;
+		}
+		catch ( Exception e)
+		{
+			//	If the controller has been stopped no need to send messages
+			if ( controller.isStopped())
+			{
 				return true;
 			}
-			catch ( Exception e)
+			else
 			{
-				lastException = e;
-				//	If the controller has been stopped no need to send messages
-				if ( controller.isStopped())
-				{
-					return true;
-				}
-				else
-				{
-	        e.printStackTrace();
-	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_not_ableto_send_msg_INFO", new Object[] { controller.getComponentName(), destinationName, i+1, 10 });
-				}
+			  if ( e instanceof JMSException ) {
+			    handleJmsException( (JMSException)e );
+			  }
+			    
+			  e.printStackTrace();
+	       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] { controller.getComponentName(), e});
 			}
-			try
-			{
-				wait(50);
-			}
-			catch ( Exception ex)
-			{
-			}
-		}
-		if ( lastException != null )
-		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] { controller.getComponentName(), lastException});
 		}
 		stopTimer();
 		return false;
 	}
 
+	/**
+	 * This method is called during recovery of failed connection. It is only called if the endpoint
+	 * associated with a given delegate is marked as FAILED. It is marked that way when a listener
+	 * attached to the reply queue fails. This method creates a new listener and a new temp queue.
+	 * 
+	 * @param delegateKey
+	 * @throws Exception
+	 */
+	private void createListener(String delegateKey) throws Exception {
+    if ( controller instanceof AggregateAnalysisEngineController ) {
+      //  Fetch an InputChannel that handles messages for a given delegate
+      InputChannel iC = controller.getReplyInputChannel(delegateKey);
+      //  Create a new Listener, new Temp Queue and associate the listener with the Input Channel
+      iC.createListener(delegateKey);
+    }
+	}
+
+	private synchronized void handleJmsException( JMSException ex) {
+	    if ( failed ) {
+	      return;   // Already marked failed
+	    }
+	    failed = true;
+/*	  
+	    try {
+	    if ( controller instanceof AggregateAnalysisEngineController ) {
+        String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(delegateEndpoint.getEndpoint());
+	      if ( delegateEndpoint.getDestination() != null ) {
+	        InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(delegateEndpoint.getDestination().toString());
+	        iC.destroyListener(delegateEndpoint.getDestination().toString(), delegateKey);
+	      } else {
+	        InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(delegateEndpoint.getEndpoint());
+	        iC.destroyListener(delegateEndpoint.getEndpoint(), delegateKey);
+	      }
+	    }
+	  } catch( Exception e) {
+	    e.printStackTrace();
+	  }
+*/	  
+	}
 	public void onConsumerEvent(ConsumerEvent arg0)
 	{
 		if (controller != null)

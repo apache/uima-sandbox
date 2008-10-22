@@ -22,22 +22,21 @@ package org.apache.uima.adapter.jms.activemq;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import mx4j.tools.adaptor.http.GetAttributeCommandProcessor;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.controller.Endpoint_impl;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.error.InvalidMessageException;
 import org.apache.uima.aae.handler.Handler;
@@ -93,6 +92,9 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	private List listenerContainerList = new ArrayList();
 	
 	private Object mux = new Object();
+	
+	private ConcurrentHashMap<String, UimaDefaultMessageListenerContainer> failedListenerMap = 
+	  new ConcurrentHashMap<String, UimaDefaultMessageListenerContainer>();
 	
 	public AnalysisEngineController getController()
 	{
@@ -236,7 +238,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			if ( command != AsynchAEMessage.Process && 
 				 command != AsynchAEMessage.GetMeta && 
 				 command != AsynchAEMessage.ReleaseCAS && 
-				 command != AsynchAEMessage.Stop && 
+         command != AsynchAEMessage.Stop && 
+         command != AsynchAEMessage.Ping && 
 				 command != AsynchAEMessage.CollectionProcessComplete )
 			{
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
@@ -270,7 +273,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			int command = aMessage.getIntProperty(AsynchAEMessage.Command);
 			if ( command == AsynchAEMessage.GetMeta ||
 				 command == AsynchAEMessage.CollectionProcessComplete ||
-				 command == AsynchAEMessage.Stop ||
+         command == AsynchAEMessage.Stop ||
+         command == AsynchAEMessage.Ping ||
 				 command == AsynchAEMessage.ReleaseCAS)
 			{
 				//	Payload not included in GetMeta Request
@@ -316,7 +320,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			//	Shutting down 
 			return true;
 		}
-		if ( command == AsynchAEMessage.Process && msgType == AsynchAEMessage.Response )
+		if ( command == AsynchAEMessage.Process && msgType == AsynchAEMessage.Response  )
 		{
 			String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
 			if (!getController().getInProcessCache().entryExists(casReferenceId))
@@ -404,8 +408,10 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				return "CollectionProcessComplete";
 			case AsynchAEMessage.ReleaseCAS:
 				return "ReleaseCAS";
-			case AsynchAEMessage.Stop:
-				return "Stop";
+      case AsynchAEMessage.Stop:
+        return "Stop";
+      case AsynchAEMessage.Ping:
+        return "Ping";
 			}
 			
 		}
@@ -706,7 +712,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	public String getInputQueueName()
 	{
 		if ( messageListener != null )
-			return messageListener.getDestinationName();//getEndpointName();
+		  if ( messageListener.getDestination() != null ) {
+		    return messageListener.getDestination().toString();
+		  } else {
+	      return messageListener.getDestinationName();//getEndpointName();
+		  }
 		else
 		{
 			return "";
@@ -776,5 +786,104 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
   public int getConcurrentConsumerCount()
   {
     return messageListener.getConcurrentConsumers();
+  }
+
+  public void createListener( String aDelegateKey ) throws Exception {
+    
+    UimaDefaultMessageListenerContainer failedListener =
+      failedListenerMap.get(aDelegateKey);
+    UimaDefaultMessageListenerContainer newListener = 
+      new UimaDefaultMessageListenerContainer();
+    newListener.setConnectionFactory(failedListener.getConnectionFactory());
+    newListener.setMessageListener(this);
+    newListener.setController(getController());
+    
+    TempDestinationResolver resolver = new TempDestinationResolver();
+    resolver.setConnectionFactory((ActiveMQConnectionFactory)failedListener.getConnectionFactory());
+    newListener.setDestinationResolver(resolver);
+
+    org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor executor = new org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(failedListener.getConcurrentConsumers());
+    executor.setMaxPoolSize(failedListener.getMaxConcurrentConsumers());
+    executor.setQueueCapacity(failedListener.getMaxConcurrentConsumers());
+    executor.initialize();
+
+    newListener.setTaskExecutor(executor);
+    newListener.initialize();
+    newListener.start();
+    //  Wait until the resolver plugs in the destination
+    while (newListener.getDestination() == null) {
+      synchronized( newListener ) {
+        
+        System.out.println(".... Waiting For Destination ...");
+        newListener.wait(100);
+      }
+    }
+    newListener.afterPropertiesSet();
+    //  Get the endpoint object for a given delegate key from the Aggregate
+    Endpoint endpoint = ((AggregateAnalysisEngineController)getController()).lookUpEndpoint(aDelegateKey, false);
+    endpoint.setStatus(Endpoint.OK);
+    //  Override the reply destination. 
+    endpoint.setDestination(newListener.getDestination());
+    Object clone = ((Endpoint_impl) endpoint).clone();
+    newListener.setTargetEndpoint((Endpoint)clone);
+  }
+  
+  private UimaDefaultMessageListenerContainer getListenerForEndpoint( String anEndpointName ) {
+    for( int i=0; i < listenerContainerList.size(); i++ ) {
+      UimaDefaultMessageListenerContainer mListener = 
+        (UimaDefaultMessageListenerContainer) listenerContainerList.get(i);
+      if ( mListener.getDestination() != null && mListener.getDestination().toString().equals( anEndpointName)) {
+        return mListener;
+      }
+    }
+    return null;
+  }
+  public void destroyListener( String anEndpointName, String aDelegateKey ) {
+    final UimaDefaultMessageListenerContainer mListener = 
+      getListenerForEndpoint(anEndpointName);
+    if ( mListener == null ) {
+      System.out.println("--- Listener For Endpoint: "+aDelegateKey+" Not Found");
+      return;
+    }
+    
+    try {
+//      if ( messageListener.getDestination().toString().equals( anEndpointName)) {
+        System.out.println("++++ Stopping Listener ...");
+        mListener.stop();
+        System.out.println("++++ Destroying Listener ...");
+        new Thread() {
+          public void run() {
+            mListener.destroy();
+          }
+        };
+        while( mListener.isRunning());      
+        System.out.println("++++ Listener on Queue:"+anEndpointName+" Has Been Stopped...");
+        Endpoint endpoint = ((AggregateAnalysisEngineController)getController()).lookUpEndpoint(aDelegateKey, false);
+        endpoint.setStatus(Endpoint.FAILED);
+        if ( mListener.getConnectionFactory() != null) {
+          if ( getController() instanceof AggregateAnalysisEngineController ) {
+            if ( !failedListenerMap.containsKey(aDelegateKey )) {
+              failedListenerMap.put( aDelegateKey, mListener);
+              listenerContainerList.remove(mListener);
+              System.out.println("++++ Saving Connection Factory");
+            }
+          }
+        }
+      //}
+    } catch( Exception e) {
+      e.printStackTrace();
+    }
+  }
+  public boolean isFailed(String aDelegateKey) {
+    return failedListenerMap.containsKey(aDelegateKey);
+  }
+  public boolean isListenerForDestination( String anEndpointName) {
+    UimaDefaultMessageListenerContainer mListener = 
+      getListenerForEndpoint(anEndpointName);
+    if ( mListener == null ) {
+      return false;
+    }
+    return true;
   }
 }
