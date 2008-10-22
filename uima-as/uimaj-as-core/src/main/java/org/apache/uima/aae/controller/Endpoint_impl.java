@@ -113,6 +113,11 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	//	echoed back to the client. 
 	private String endpointServer = null;
 	
+	private int status;
+	
+	public Endpoint_impl() {
+	  status = Endpoint.OK;
+	}
 	public int getCommand()
 	{
 		return command;
@@ -494,7 +499,9 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	public void setIsCasMultiplier(boolean trueORfalse)
 	{
 		isCasMultiplier = trueORfalse;
-		getServiceInfo().setCASMultiplier();
+		if ( isCasMultiplier ) {
+	    getServiceInfo().setCASMultiplier();
+		}
 	}
 	public void setShadowCasPoolSize( int aPoolSize )
 	{
@@ -585,5 +592,12 @@ public class Endpoint_impl implements Endpoint, Cloneable
   public int getConcurrentReplyConsumers() {
     return concurrentReplyConsumers;
   }
+  public void setStatus( int aStatus) {
+    status = aStatus;
+  }
   
+  public int getStatus() {
+    return status;
+  }
+
 }

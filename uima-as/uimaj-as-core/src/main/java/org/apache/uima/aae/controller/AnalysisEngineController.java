@@ -197,4 +197,6 @@ public interface AnalysisEngineController extends ControllerLifecycle
   public UimaTransport getTransport(String aKey) throws Exception;
 
   public void initializeVMTransport(int parentControllerReplyConsumerCount) throws Exception;
+
+  public InputChannel getReplyInputChannel(String aDelegateKey);
 }

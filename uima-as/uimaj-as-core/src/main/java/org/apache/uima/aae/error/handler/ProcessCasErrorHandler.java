@@ -35,6 +35,7 @@ import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.ErrorHandlerBase;
 import org.apache.uima.aae.error.ExpiredMessageException;
 import org.apache.uima.aae.error.InvalidMessageException;
+import org.apache.uima.aae.error.MessageTimeoutException;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.Threshold;
 import org.apache.uima.aae.error.UimaEEServiceException;
@@ -451,7 +452,10 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			{
 				try
 				{
-					sendExceptionToClient( t, casReferenceId, endpoint, aController );
+				  //  Dont send TimeoutExceptions to client
+				  if ( deliverExceptionToClient(t) ) {
+				    sendExceptionToClient( t, casReferenceId, endpoint, aController );
+				  }
 				}
 				catch( Exception e) 
 				{
@@ -501,7 +505,9 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		{
 			try
 			{
-				sendExceptionToClient( t, casReferenceId, endpoint, aController );
+        if ( deliverExceptionToClient(t) ) {
+          sendExceptionToClient( t, casReferenceId, endpoint, aController );
+        }
 			}
 			catch( Exception e) 
 			{
@@ -542,5 +548,11 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		
 		return true;
 	}
-
+	private boolean deliverExceptionToClient( Throwable t) {
+    //  Dont send TimeOutExceptions to client
+	  if ( t instanceof UimaEEServiceException && t.getCause() != null && t.getCause() instanceof MessageTimeoutException) {
+      return false;
+    }
+    return true;
+	}
 }

@@ -880,7 +880,10 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		if ( !inputChannelMap.containsKey(anInputChannel.getInputQueueName()))
 		{
-			inputChannelMap.put(anInputChannel.getInputQueueName(), anInputChannel);
+      inputChannelMap.put(anInputChannel.getInputQueueName(), anInputChannel);
+      if ( inputChannelList.contains(anInputChannel)) {
+        inputChannelList.add(anInputChannel);
+      }
 		}
 	}
 	public InputChannel getInputChannel()
@@ -1769,14 +1772,25 @@ implements AnalysisEngineController, EventSubscriber
 		
 		for( int i=0; inputChannelList != null && i < inputChannelList.size(); i++ )
 		{
-			if ( ((InputChannel)inputChannelList.get(i)).getInputQueueName().equals( anEndpointName) )
-			{
-				return (InputChannel)inputChannelList.get(i);
-			}
+		  InputChannel iC = (InputChannel)inputChannelList.get(i);
+		  if ( iC.isListenerForDestination( anEndpointName)) {
+        return (InputChannel)inputChannelList.get(i);
+		  }
 		}
 		return null;
 	}
 	 
+	public InputChannel getReplyInputChannel( String aDelegateKey ) {
+    for( int i=0; inputChannelList != null && i < inputChannelList.size(); i++ )
+    {
+      if ( ((InputChannel)inputChannelList.get(i)).isFailed(aDelegateKey) )
+      {
+        return (InputChannel)inputChannelList.get(i);
+      }
+    }
+    return null;
+	  
+	}
 	/**
 	 * Callback method called the InProcessCache becomes empty meaning ALL CASes are processed.
 	 * The callback is only active when the the top level component is in the process of shutting 

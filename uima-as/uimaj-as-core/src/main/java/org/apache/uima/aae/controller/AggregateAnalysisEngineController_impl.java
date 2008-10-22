@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager;
 import org.apache.uima.aae.InProcessCache;
+import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
@@ -1023,6 +1024,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 						delegateStatMap.put( key, delegateStatsArray);					
 					}
+					// If the service has stopped dont bother doing anything else. The service
+					// may have been stopped because listener connection could not be established.
+					if ( isStopped() ) {
+					  return;
+					}
+					
 					dispatchMetadataRequest(delegateEndpoints[i]);
 				}
 			}
@@ -1502,14 +1509,26 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	public void retryProcessCASRequest(String aCasReferenceId, Endpoint anEndpoint, boolean addEndpointToCache) throws AsynchAEException
 	{
 		Endpoint endpoint = null;
-		if ( getInProcessCache().getEndpoint(anEndpoint.getEndpoint(), aCasReferenceId) != null)
+    String key = lookUpDelegateKey(anEndpoint.getEndpoint());
+
+    if ( getInProcessCache().getEndpoint(anEndpoint.getEndpoint(), aCasReferenceId) != null)
 		{
 			endpoint = getInProcessCache().getEndpoint(anEndpoint.getEndpoint(), aCasReferenceId);
+      Endpoint masterEndpoint = lookUpEndpoint(key, true);
+      //  check if the master endpoint destination has changed. This can be a case when
+      //  a new temp queue is created when the previous temp queue is destroyed due to
+      //  a broken connection.
+      if ( masterEndpoint.getDestination() != null ) {
+        //  Make sure that we use the current destination for replies
+        if (! masterEndpoint.getDestination().toString().equals( endpoint.getDestination().toString())) {
+          //  Override the endopoint reply-to destination with the master destination
+          endpoint.setDestination(masterEndpoint.getDestination());
+        }
+      }
 		}
 		else
 		{
 			endpoint = anEndpoint;
-			String key = lookUpDelegateKey(anEndpoint.getEndpoint());
 			endpoint = lookUpEndpoint(key, true);
 			getInProcessCache().addEndpoint(endpoint, aCasReferenceId);
 		}
@@ -1785,8 +1804,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			getCasManagerWrapper().initialize("AggregateContext");
 			aggregateMetadata.setTypeSystem(getCasManagerWrapper().getMetadata().getTypeSystem());
 			aggregateMetadata.setTypePriorities(getCasManagerWrapper().getMetadata().getTypePriorities());
+			
 			aggregateMetadata.setFsIndexCollection(getCasManagerWrapper().getMetadata().getFsIndexCollection());
-
 		}
 		
         flowControllerContainer = 
@@ -1804,6 +1823,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				flowControllerContainer.removeAnalysisEngines(disabledDelegateList);
 			}
 		}
+		
 		//	Before processing CASes, send notifications to all collocated delegates to
 		//	complete initialization. Currently this call forces all collocated Cas Multiplier delegates
 		//	to initialize their internal Cas Pools. CM Cas Pool is lazily initialized on 
@@ -1817,7 +1837,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		// the controller before it is initialized.
 		latch.openLatch(getName(), isTopLevelComponent(), true);
 		initialized = true;
-		
 		//  Notify client listener that the initialization of the controller was successfull
 		notifyListenersWithInitializationStatus(null);
 	}

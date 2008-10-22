@@ -573,6 +573,15 @@ public class ProcessResponseHandler extends HandlerBase
 		getController().getMonitor().resetCountingStatistic(aDelegate, Monitor.ProcessErrorCount);
 		getController().getMonitor().resetCountingStatistic(aDelegate, Monitor.ProcessErrorRetryCount);
 	}
+	
+	private void handlePingReply( MessageContext aMessageContext ) {
+	  try {
+	    
+	  } catch ( Exception e) {
+	    e.printStackTrace();
+	  }
+	}
+	
 	public  void handle(Object anObjectToHandle) throws AsynchAEException
 	{
 		super.validate(anObjectToHandle);
@@ -642,6 +651,10 @@ public class ProcessResponseHandler extends HandlerBase
 			{
 				handleACK(messageContext);
 			}
+      else if (AsynchAEMessage.None == payload && AsynchAEMessage.Ping == command)
+      {
+        handlePingReply(messageContext);
+      }
 
 			else
 			{

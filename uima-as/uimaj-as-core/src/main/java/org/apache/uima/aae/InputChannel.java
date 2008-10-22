@@ -32,4 +32,9 @@ public interface InputChannel extends Channel
 	public ServiceInfo getServiceInfo();
 	public boolean isStopped();
   public int getConcurrentConsumerCount();
+  public void destroyListener( String anEndpointName, String aDelegateKey );
+  public void createListener( String aDelegateKey ) throws Exception;
+  public boolean isFailed(String aDelegateKey);
+  public boolean isListenerForDestination( String anEndpointName);
+
 }

@@ -88,7 +88,7 @@ public class UimaMessageValidator {
       int command = aMessage.getIntProperty(AsynchAEMessage.Command);
       if (command != AsynchAEMessage.Process && command != AsynchAEMessage.GetMeta
               && command != AsynchAEMessage.ReleaseCAS && command != AsynchAEMessage.Stop
-              && command != AsynchAEMessage.CollectionProcessComplete) {
+              && command != AsynchAEMessage.Ping && command != AsynchAEMessage.CollectionProcessComplete) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validCommand",
                 UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_command_in_message__INFO",
                 new Object[] { command, endpointName });
@@ -118,6 +118,7 @@ public class UimaMessageValidator {
       int command = aMessage.getIntProperty(AsynchAEMessage.Command);
       if (command == AsynchAEMessage.GetMeta
               || command == AsynchAEMessage.CollectionProcessComplete
+              || command == AsynchAEMessage.Ping
               || command == AsynchAEMessage.Stop || command == AsynchAEMessage.ReleaseCAS) {
         //  Payload not included in GetMeta Request
         return true;
@@ -218,6 +219,8 @@ public class UimaMessageValidator {
           return "ReleaseCAS";
         case AsynchAEMessage.Stop:
           return "Stop";
+        case AsynchAEMessage.Ping:
+          return "Ping";
       }
 
     } else if (AsynchAEMessage.Payload.equals(aTypeToDecode)) {

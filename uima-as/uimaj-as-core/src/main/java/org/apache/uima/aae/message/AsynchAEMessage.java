@@ -69,7 +69,8 @@ public interface AsynchAEMessage
 	public static final int Terminate = 2003;
 	public static final int ACK = 2004;
 	public static final int ReleaseCAS = 2005;
-	public static final int Stop = 2006;
+  public static final int Stop = 2006;
+  public static final int Ping = 2007;
 	
 	
 	public static final String MessageType = "MessageType";

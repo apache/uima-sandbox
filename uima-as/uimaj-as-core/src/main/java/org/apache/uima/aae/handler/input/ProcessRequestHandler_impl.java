@@ -729,6 +729,14 @@ public class ProcessRequestHandler_impl extends HandlerBase
                 new Object[] { getController().getName(), casReferenceId });
 		getController().releaseNextCas(casReferenceId); 
 	}
+	private void handlePingRequest(MessageContext aMessageContext) {
+	  try {
+	    getController().getOutputChannel().sendReply(AsynchAEMessage.Ping, aMessageContext.getEndpoint());
+	  } catch ( Exception e) {
+	    e.printStackTrace();
+	  }
+	  
+	}
 	
 	private void handleStopRequest(MessageContext aMessageContext)
 	{
@@ -813,10 +821,14 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				{
 					handleReleaseCASRequest(messageContext);
 				}
-				else if ( AsynchAEMessage.None == payload && AsynchAEMessage.Stop == command)
-				{
-					handleStopRequest(messageContext);
-				}
+        else if ( AsynchAEMessage.None == payload && AsynchAEMessage.Stop == command)
+        {
+          handleStopRequest(messageContext);
+        }
+        else if ( AsynchAEMessage.None == payload && AsynchAEMessage.Ping == command)
+        {
+          handlePingRequest(messageContext);
+        }
 				// Handled Request
 				return;
 			}

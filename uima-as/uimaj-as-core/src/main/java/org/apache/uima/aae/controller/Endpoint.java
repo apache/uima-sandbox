@@ -24,6 +24,9 @@ import org.apache.uima.aae.jmx.ServiceInfo;
 
 public interface Endpoint
 {
+  public static final int OK = 1;
+  public static final int FAILED = 2;
+  
 	public int getMetadataRequestTimeout();
 	public void setController( AnalysisEngineController aController);
 	public void startCheckpointTimer();
@@ -151,4 +154,7 @@ public interface Endpoint
   
   public void setSerializer( String aSerializer );
  
+  public void setStatus( int aStatus);
+  
+  public int getStatus();
 }

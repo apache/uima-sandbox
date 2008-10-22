@@ -19,7 +19,6 @@
 
 package org.apache.uima.aae.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,17 +26,16 @@ import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager;
 import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.UIMAEE_Constants;
-import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
+import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.jmx.JmxManagement;
 import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
 import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
-import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.spi.transport.UimaMessage;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -46,7 +44,6 @@ import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.CASImpl;
 import org.apache.uima.cas.impl.OutOfTypeSystemData;
-import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.resource.metadata.impl.ConfigurationParameter_impl;
 import org.apache.uima.util.Level;
@@ -128,17 +125,25 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			}
 			
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_primitive_ctrl_init_info__CONFIG", new Object[] { analysisEnginePoolSize });
-			//	Instantiate and initialize UIMA analytics
-			for (int i = 0; i < analysisEnginePoolSize; i++)
-			{
-				AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(resourceSpecifier, paramsMap);
-				aeList.add(ae);
-				
-				//	Cache metadata once
-				if (i == 0)
-				{
-					analysisEngineMetadata = ae.getAnalysisEngineMetaData();
-				}
+
+			try {
+	      //  Instantiate and initialize UIMA analytics
+	      for (int i = 0; i < analysisEnginePoolSize; i++)
+	      {
+	        AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(resourceSpecifier, paramsMap);
+	        aeList.add(ae);
+	        
+	        //  Cache metadata once
+	        if (i == 0)
+	        {
+	          analysisEngineMetadata = ae.getAnalysisEngineMetaData();
+	        }
+	      }
+			} catch ( Exception ex1 ) {
+		     if ( isStopped()  ) {
+		        System.out.println(">>>>>>>>> Service Has Stopped ....");
+		        throw new AsynchAEException(new ServiceShutdownException());
+		      }
 			}
 			if ( serviceInfo == null )
 			{
@@ -148,40 +153,40 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			serviceInfo.setAnalysisEngineInstanceCount(analysisEnginePoolSize);
 			aeInstancePool.intialize(aeList);
 
-			
-			getMonitor().setThresholds(getErrorHandlerChain().getThresholds());
-			// Initialize Cas Manager
-			if (getCasManagerWrapper() != null)
-			{
-				try
-				{
-					if (getCasManagerWrapper().isInitialized())
-					{
-						getCasManagerWrapper().addMetadata(getAnalysisEngineMetadata());
-						if (isTopLevelComponent())
-						{
-							getCasManagerWrapper().initialize("PrimitiveAEService");
-							CAS cas = getCasManagerWrapper().getNewCas("PrimitiveAEService");
-							cas.release();
-						}
-					}
+      if ( !isStopped()  ) {
+        getMonitor().setThresholds(getErrorHandlerChain().getThresholds());
+        // Initialize Cas Manager
+        if (getCasManagerWrapper() != null)
+        {
+          try
+          {
+            if (getCasManagerWrapper().isInitialized())
+            {
+              getCasManagerWrapper().addMetadata(getAnalysisEngineMetadata());
+              if (isTopLevelComponent())
+              {
+                getCasManagerWrapper().initialize("PrimitiveAEService");
+                CAS cas = getCasManagerWrapper().getNewCas("PrimitiveAEService");
+                cas.release();
+              }
+            }
 
-					// All internal components of this Primitive have been initialized. Open the latch
-					// so that this service can start processing requests.
-					latch.openLatch(getName(), isTopLevelComponent(), true);
-					
-				}
-				catch ( Exception e)
-				{
-					e.printStackTrace();
-					throw new AsynchAEException(e);
-				}
-			}
-			else
-			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_manager_wrapper_notdefined__CONFIG", new Object[] {});
-			}
-
+            // All internal components of this Primitive have been initialized. Open the latch
+            // so that this service can start processing requests.
+            latch.openLatch(getName(), isTopLevelComponent(), true);
+            
+          }
+          catch ( Exception e)
+          {
+            e.printStackTrace();
+            throw new AsynchAEException(e);
+          }
+        }
+        else
+        {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_manager_wrapper_notdefined__CONFIG", new Object[] {});
+        }
+      }
 		}
 		catch ( AsynchAEException e)
 		{
@@ -629,6 +634,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	
 	public void stop()
 	{
+	  System.out.println(">>>>> Stopping Controller:"+getComponentName());
 		super.stop();
 		stopInputChannel();
 		if ( aeInstancePool != null )
@@ -648,6 +654,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			aeList.clear();
 			aeList = null;
 		}
+    System.out.println(">>>>> Done Stopping Controller:"+getComponentName());
 	}
 	
 }
