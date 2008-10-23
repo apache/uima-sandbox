@@ -278,8 +278,8 @@ implements ExceptionListener
     UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
                 "terminate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_terminate_service_dueto_bad_broker__WARNING",
                 new Object[] {  controller.getComponentName(), getBrokerUrl() });
-    controller.stop();
     controller.notifyListenersWithInitializationStatus(new ResourceInitializationException(t));
+    controller.stop();
 	}
 	protected void handleListenerException( Throwable t )
 	{
