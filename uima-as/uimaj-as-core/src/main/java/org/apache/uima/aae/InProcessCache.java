@@ -655,6 +655,14 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private boolean sentDeltaCas = false;
 
+		//  list containing delegates that must be called sequentially. This list
+		//  is added to the cache if there are collocated delegates in a parallel
+		//  step. Only remote delegates can be part of the parallel step. Any 
+		//  collocated delegates are removed from the parallel step added to the
+		//  list. The delegates in this list will be called sequentially when
+		//  all delegates in parallel step respond.
+		private List delayedSingleStepList = null;
+		
 		protected CacheEntry(CAS aCas, String aCasReferenceId, MessageContext aMessageAccessor, OutOfTypeSystemData aotsd)
 		{
 			this(aCas, aCasReferenceId, aMessageAccessor);
@@ -1037,6 +1045,13 @@ public class InProcessCache implements InProcessCacheMBean
 			return this.marker;
 		}
 
+		public void setDelayedSingleStepList( List aList) {
+		  delayedSingleStepList = aList;
+		}
+		
+		public List getDelayedSingleStepList() {
+		  return delayedSingleStepList;
+		}
 	}	
 
 

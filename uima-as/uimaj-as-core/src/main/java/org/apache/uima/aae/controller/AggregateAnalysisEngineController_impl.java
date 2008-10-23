@@ -62,6 +62,7 @@ import org.apache.uima.flow.FinalStep;
 import org.apache.uima.flow.ParallelStep;
 import org.apache.uima.flow.SimpleStep;
 import org.apache.uima.flow.Step;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.resource.metadata.ResourceMetaData;
 import org.apache.uima.util.Level;
@@ -607,6 +608,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 
 	}
+	
+	public void handleInitializationError(Exception ex) {
+    // Any problems in completeInitialization() is a reason to stop
+    notifyListenersWithInitializationStatus(ex);
+    super.stop();
+	}
 
 	public void disableDelegates(List aDelegateList) throws AsynchAEException
 	{
@@ -663,7 +670,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 			if (!initialized && allTypeSystemsMerged() )
 			{
-				completeInitialization();
+			  try {
+	        completeInitialization();
+			  } catch ( ResourceInitializationException ex) {
+			    handleInitializationError(ex);
+			    return;
+			  }
 			}
 		}
 		catch ( Exception e)
@@ -810,8 +822,51 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	 * This is a process method that is executed for CASes not created by a Multiplier in this aggregate.
 	 * 
 	 */
-	public void process(CAS aCAS, String aCasReferenceId)// throws AnalysisEngineProcessException, AsynchAEException
+	public void process(CAS aCAS, String aCasReferenceId)
 	{
+	  boolean handlingDelayedStep = false;
+	  // First check if there are outstanding steps to be called before consulting the Flow Controller.
+	  // This could be the case if a previous step was a parallel step and it contained collocated
+	  // delegates.
+    if ( !isStopped() ) {
+      try {
+        CacheEntry entry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+        // if we are here entry is not null. The above throws an exception if an entry is not
+        //  found in the cache. First check if there is a delayedSingleStepList in the cache.
+        //  If there is one, it means that a parallel step contained collocated delegate(s)
+        //  The parallel step may only contain remote delegates. All collocated delegates
+        //  were removed from the parallel step and added to the delayedSingleStepList in
+        //  parallelStep() method.
+        List delayedSingleStepList = entry.getDelayedSingleStepList(); 
+        if ( delayedSingleStepList != null && delayedSingleStepList.size() > 0)
+        {
+          handlingDelayedStep = true;
+          //  Reset number of parallel delegates back to one. This is done only if the previous step 
+          //  was a parallel step.
+          synchronized(parallelStepMux)
+          {
+            if ( entry.getNumberOfParallelDelegates() > 1)
+            {
+              entry.setNumberOfParallelDelegates(1);
+            }
+          }
+          //  Remove a delegate endpoint from the single step list cached in the CAS entry
+          Endpoint endpoint = (Endpoint_impl) entry.getDelayedSingleStepList().remove(0);
+          //  send the CAS to a collocated delegate from the delayed single step list.
+          dispatchProcessRequest(aCasReferenceId, endpoint, true);
+        }
+      } catch ( Exception e) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });        
+        e.printStackTrace();
+      }
+      finally {
+        //  If just handled the delayed step, return as there is nothing else to do
+        if ( handlingDelayedStep ) {
+          return; 
+        }
+      }
+    }
+	  
 		FlowContainer flow = null;
 		try
 		{
@@ -935,24 +990,69 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		{
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "parallelStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_parallel_step__FINE",
-	                new Object[] {getName(), aCasReferenceId });
+	                new Object[] {getComponentName(), aCasReferenceId });
 			Collection keyList = aStep.getAnalysisEngineKeys();
 			String[] analysisEngineKeys = new String[keyList.size()];
-			keyList.toArray(analysisEngineKeys);
-			CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-			synchronized(parallelStepMux)
-			{
-				cacheEntry.resetDelegateResponded();
-				cacheEntry.setNumberOfParallelDelegates(analysisEngineKeys.length);
-			}
-
-			Endpoint[] endpoints = new Endpoint_impl[analysisEngineKeys.length];
-			for (int i = 0; i < analysisEngineKeys.length; i++)
-			{
-				endpoints[i] = lookUpEndpoint(analysisEngineKeys[i], true);
-				endpoints[i].setController(this);
-			}
-			dispatchProcessRequest(aCasReferenceId, endpoints, true);
+      keyList.toArray(analysisEngineKeys);
+			List parallelDelegateList = new ArrayList();
+      List singleStepDelegateList = null;
+      //  Only remote delegates can be in a parallel step. Iterate over the 
+      //  delegates in parallel step and assign each to a different list based on location.
+      //  Remote delegates are assigned to parallelDelegateList, whereas co-located
+      //  delegates are assigned to singleStepDelegateList. Those delegates
+      //  assigned to the singleStepDelegateList will be executed sequentially
+      //  once all parallel delegates respond.
+      for (int i = 0; i < analysisEngineKeys.length; i++)
+      {
+        //  Fetch an endpoint corresponding to a given delegate key
+        Endpoint endpoint = lookUpEndpoint(analysisEngineKeys[i], true);
+        endpoint.setController(this);
+        //  Assign delegate to appropriate list
+        if ( endpoint.isRemote() ) {
+          parallelDelegateList.add(endpoint);
+        } else {
+          if ( singleStepDelegateList == null ) {
+            singleStepDelegateList = new ArrayList();
+          }
+          singleStepDelegateList.add(endpoint);
+          if ( UIMAFramework.getLogger().isLoggable(Level.FINE)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                    "parallelStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_move_to_single_step_list__FINE",
+                    new Object[] {getComponentName(), analysisEngineKeys[i], aCasReferenceId });
+          }
+        }
+      }
+      //  Fetch cache entry for a given CAS id
+      CacheEntry cacheEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+      //  Add all co-located delegates to the cache. These delegates will be called 
+      //  sequentially once all parallel delegates respond
+      if ( singleStepDelegateList != null ) {
+        //  Add a list containing single step delegates to the cache
+        //  These delegates will be called sequentially when all parallel
+        //  delegates respond.
+        cacheEntry.setDelayedSingleStepList(singleStepDelegateList);
+      }
+      //  Check if there are any delegates in the parallel step. It is possible that
+      //  all of the delegates were co-located and thus the parallel delegate list
+      //  is empty.
+      if ( parallelDelegateList.size() > 0 ) {
+        //  Create endpoint array to contain as many slots as there are parallel delegates
+        Endpoint[] endpoints = new Endpoint_impl[parallelDelegateList.size()];
+        //  Copy parallel delegate endpoints to the array
+        parallelDelegateList.toArray(endpoints);
+        synchronized(parallelStepMux)
+        {
+          cacheEntry.resetDelegateResponded();
+          //  Set number of delegates in the parallel step
+          cacheEntry.setNumberOfParallelDelegates(endpoints.length);
+        }
+        //  Dispatch CAS to remote parallel delegates
+        dispatchProcessRequest(aCasReferenceId, endpoints, true);
+      } else {
+        //  All delegates in a parallel step are co-located. Send the CAS 
+        //  to the first delegate in the single step list.
+        process( null, aCasReferenceId);
+      }
 		}
 		catch ( Exception e)
 		{
@@ -961,7 +1061,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			map.put(AsynchAEMessage.CasReference, aCasReferenceId);
 			handleError(map, e);
 		}
-			
 	}
 
 	public void sendRequestForMetadataToRemoteDelegates() throws AsynchAEException
@@ -1409,13 +1508,16 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		catch( Exception e)
 		{
 			//	Any error here is automatic termination
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "executeFlowStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
 			try
 			{
 				getInProcessCache().destroy();
 				handleAction(ErrorHandler.TERMINATE, null, null);
 			}
-			catch( Exception ex){ex.printStackTrace();}
+			catch( Exception ex) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "executeFlowStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+			  ex.printStackTrace();
+			}
 			return;
 		}
 
@@ -1428,19 +1530,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			}
 			else if (step instanceof ParallelStep)
 			{
-
-				Collection keyList = ((ParallelStep) step).getAnalysisEngineKeys();
-				String[] analysisEngineKeys = new String[keyList.size()];
-				keyList.toArray(analysisEngineKeys);
-
-				String aeKeys = "";
-				Iterator it = keyList.iterator();
-				while (it.hasNext())
-				{
-					aeKeys += "::" + (String) it.next();
-
-				}
-
 				parallelStep((ParallelStep) step, aCasReferenceId);
 			}
 			else if (step instanceof FinalStep)
@@ -1775,7 +1864,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						}
 						if ( !isStopped() )
 						{
-							completeInitialization();
+						  try {
+	              completeInitialization();
+						  } catch ( ResourceInitializationException ex) {
+			          handleInitializationError(ex);
+			          return;
+						  }
 						}
 					}
 				}

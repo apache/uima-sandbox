@@ -190,6 +190,7 @@ implements AnalysisEngineController, EventSubscriber
   protected ConcurrentHashMap<String, UimaMessageListener> messageListeners
   = new ConcurrentHashMap<String, UimaMessageListener>();
   
+  private Exception initException = null;
 //	protected UimaTransport transport = new VmTransport();
 	
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
@@ -1833,9 +1834,11 @@ implements AnalysisEngineController, EventSubscriber
 	   */
 	  public void addControllerCallbackListener(ControllerCallbackListener aListener)
 	  {
+	      
 		    controllerListeners.add(aListener); 
-		    if ( serviceInitialized )
-		    {
+		    if ( initException != null ) {
+		      notifyListenersWithInitializationStatus(initException);
+		    } else if ( serviceInitialized )  {
           notifyListenersWithInitializationStatus(null);
 		    }
 	  }
@@ -1853,7 +1856,8 @@ implements AnalysisEngineController, EventSubscriber
 
 	  public void notifyListenersWithInitializationStatus(Exception e)
 	  {
-      if ( controllerListeners.isEmpty())
+	    initException = e;
+	    if ( controllerListeners.isEmpty())
       {
         return;
       }
