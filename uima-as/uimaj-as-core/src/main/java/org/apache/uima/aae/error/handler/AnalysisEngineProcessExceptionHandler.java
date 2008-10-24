@@ -55,10 +55,11 @@ public class AnalysisEngineProcessExceptionHandler extends ErrorHandlerBase impl
 			}
 			String endpointName = getEndpointName(aController, anErrorContext);
 			t.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_process_exception__INFO",
 	                new Object[] { endpointName, casReferenceId, t.getLocalizedMessage()  });
-
+      }
 			
 			
 			if (!super.exceedsThreshold(Monitor.ProcessErrorCount, endpointName, aController))

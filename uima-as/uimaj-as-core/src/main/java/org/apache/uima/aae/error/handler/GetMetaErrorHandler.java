@@ -75,9 +75,10 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 			return false;
 		}
 		
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
 				UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", t);
-
+    }
 		Endpoint endpoint = (Endpoint) anErrorContext.get(AsynchAEMessage.Endpoint);
 
 		if ( endpoint != null && aController instanceof AggregateAnalysisEngineController )
@@ -92,9 +93,11 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 	    		if ( terminate(threshold ) )
 	    		{
 	    			System.out.println("!!!!!!!!!!!! Exceeded Threshold Terminating !!!!!!!!!!!!!!");
-	    			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	    	                "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_terminate_service__INFO",
 	    	                new Object[] {aController.getComponentName(), endpoint.getEndpoint()});
+	          }
 	    			aController.terminate();
 	    			aController.notifyListenersWithInitializationStatus((Exception)t);
 	    		}
@@ -106,7 +109,9 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_endpoint_for_getmeta_retry__INFO", new Object[] { aController.getName()});
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_endpoint_for_getmeta_retry__INFO", new Object[] { aController.getName()});
+      }
 		}
 		return true;
 	}

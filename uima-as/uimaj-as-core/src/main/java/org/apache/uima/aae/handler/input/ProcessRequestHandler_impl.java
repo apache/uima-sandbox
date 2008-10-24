@@ -71,9 +71,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		//	*****************************************************************
 		if ( xmi == null )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_message_has_no_cargo__INFO",
 	                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
+      }
 			getController().
 				getOutputChannel().
 					sendReply(new InvalidMessageException("No XMI data in message"), casReferenceId, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
@@ -89,33 +91,40 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		//	produced the CAS. Each CM will have its own Shadow Cas Pool
 		if ( fetchCASFromShadowCasPool )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                "getCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_request_cas_cm__FINE",
 	                new Object[] {  shadowCasPoolKey });
+      }
 			//	Aggregate time spent waiting for a CAS in the shadow cas pool
 			((AggregateAnalysisEngineController)getController()).getDelegateServicePerformance(shadowCasPoolKey).beginWaitOnShadowCASPool();
 			cas = getController().getCasManagerWrapper().getNewCas(shadowCasPoolKey);
 			((AggregateAnalysisEngineController)getController()).getDelegateServicePerformance(shadowCasPoolKey).endWaitOnShadowCASPool();
 			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "getCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_request_cas_granted_cm__FINE",
 	                new Object[] { shadowCasPoolKey });
+      }
 		}
 	    else
 	    {
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                "getCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_request_cas__FINE",
 	                new Object[] {  casReceivedFrom });
-
+        }
 			//	Aggregate time spent waiting for a CAS in the service cas pool
 			getController().getServicePerformance().beginWaitOnCASPool();
 			
 			cas = getController().getCasManagerWrapper().getNewCas();
 			getController().getServicePerformance().endWaitOnCASPool();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "getCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_request_cas_granted__FINE",
 	                new Object[] { casReceivedFrom });
-	    }
+      }
+	  }
 		return cas;
 	}
 	/**
@@ -201,10 +210,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		{
 			statistic.increment(timeToDeserializeCAS);
 		}
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				"handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialize_cas_time_FINE",
 				new Object[] { timeToDeserializeCAS / 1000 });
-		
+    }
 
 		//	Update Stats
 		ServicePerformance casStats = getController().getCasStatistics(casReferenceId);
@@ -261,9 +271,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		{
 			cacheStats( casReferenceId, timeWaitingForCAS, timeToDeserializeCAS);
 		}
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialized_cas_ready_to_process_FINE",
                 new Object[] { aMessageContext.getEndpoint().getEndpoint() });
+    }
 		cacheProcessCommandInClientEndpoint();
 		return entry;
 	}
@@ -271,10 +283,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	{
 		if ( !aMessageContext.propertyExists(AsynchAEMessage.CasReference) )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_message_has_cas_refid__INFO",
 	                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
-			
+      }
 			getController().
 				getOutputChannel().
 					sendReply(new InvalidMessageException("No Cas Reference Id Received From Delegate In message"), null, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
@@ -403,17 +416,20 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			}
 			else
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                "handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_duplicate_request__INFO",
 		                new Object[] { casReferenceId});
+        }
 			}
 		}
 		catch ( Exception e)
 		{
 			e.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleProcessRequestWithXMI", 
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleProcessRequestWithXMI", 
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
-
+      }
 			ErrorContext errorContext = new ErrorContext();
 			errorContext.add(AsynchAEMessage.Endpoint, aMessageContext.getEndpoint());
 			errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
@@ -448,9 +464,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 
 				if ( casMultiplierEndpoint == null )
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 			                "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_endpoint_for_reply__INFO",
 			                new Object[] { casReferenceId });
+          }
 					return;
 				}
         //  Get the id of the parent Cas
@@ -501,37 +519,45 @@ public class ProcessRequestHandler_impl extends HandlerBase
               if ( endp == null )
               {
                 System.out.println("Endpoint Not Found For Cas Id:"+inputCasReferenceId);
-                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+                  UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                         "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_msg_origin_not_found__INFO",
                         new Object[] { getController().getComponentName(), inputCasReferenceId });
+                }
               }
               else
               {
                 ((AggregateAnalysisEngineController)getController()).addMessageOrigin(casReferenceId, endp);
-                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+                if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+                  UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
                         "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_msg_origin_added__FINEST",
                         new Object[] { getController().getComponentName(), casReferenceId, newCASProducedBy });
+                }
               }
 	          }
 	          catch( Exception e)
 	          {
 	            e.printStackTrace();
-	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleProcessRequestWithCASReference", 
+              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleProcessRequestWithCASReference", 
 	                    UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
-
+              }
 	          }
 	        }
 	        else
 	        {
-            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_input_cas_invalid__INFO",
                     new Object[] { getController().getComponentName(), newCASProducedBy, casReferenceId });
+            }
 	        }
 				}
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_new_cas__FINE",
 		                new Object[] { casReferenceId, newCASProducedBy });
-
+        }
 				aMessageContext.getEndpoint().setEndpoint(casMultiplierEndpoint.getEndpoint());
 				aMessageContext.getEndpoint().setServerURI(casMultiplierEndpoint.getServerURI());
 			}
@@ -548,10 +574,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			long arrivalTime = System.nanoTime();
 			getController().saveTime(arrivalTime, casReferenceId, getController().getName());//aMessageContext.getEndpointName());
 
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_analyzing_cas__FINE",
 		                new Object[] { casReferenceId});
-
+      }
 			//	Save Process command in the client endpoint.
 			cacheProcessCommandInClientEndpoint();
 
@@ -641,9 +668,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				//	*****************************************************************
 				if ( xmi == null )
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 			                "handleProcessRequestWithXCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_message_has_no_cargo__INFO",
 			                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
+          }            
 					getController().
 						getOutputChannel().
 							sendReply(new InvalidMessageException("No XMI data in message"), casReferenceId, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
@@ -651,16 +680,18 @@ public class ProcessRequestHandler_impl extends HandlerBase
 					return;
 				}
 				
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "handleProcessRequestWithXCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_request_cas__FINE",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
-				
+        }
 				CAS cas = getController().getCasManagerWrapper().getNewCas();
 
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "handleProcessRequestWithXCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_request_cas_granted__FINE",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
-
+        }
 				XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
 //        UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
         uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
@@ -677,19 +708,22 @@ public class ProcessRequestHandler_impl extends HandlerBase
 						getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
 					}
 				}
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "handleProcessRequestWithXCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialized_cas_ready_to_process_FINE",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
-
+        }
 				cacheProcessCommandInClientEndpoint();
 
 				invokeProcess(cas, inputCasReferenceId, casReferenceId, aMessageContext, newCASProducedBy);
 			}
 			else
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                "handleProcessRequestWithXCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_duplicate_request__INFO",
 		                new Object[] { casReferenceId});
+        }
 			}
         	
 		}
@@ -724,9 +758,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	private void handleReleaseCASRequest(MessageContext aMessageContext) throws AsynchAEException
 	{
 		String casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "handleReleaseCASRequest", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
                 new Object[] { getController().getName(), casReferenceId });
+    }
 		getController().releaseNextCas(casReferenceId); 
 	}
 	private void handlePingRequest(MessageContext aMessageContext) {

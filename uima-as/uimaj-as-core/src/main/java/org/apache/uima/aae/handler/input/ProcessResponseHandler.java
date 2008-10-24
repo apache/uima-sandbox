@@ -71,10 +71,11 @@ public class ProcessResponseHandler extends HandlerBase
 	{
 		if (aMessageContext != null && aMessageContext.getEndpoint() != null)
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "cancelTimer", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cancel_timer__FINE",
 	                new Object[] { aMessageContext.getEndpoint().getEndpoint(), aCasReferenceId });
-
+      }
 			// Retrieve the endpoint from the cache using endpoint name
 			// and casRefereceId
 			if ( aCasReferenceId == null && 
@@ -100,9 +101,11 @@ public class ProcessResponseHandler extends HandlerBase
 				}
 				else
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 			                "cancelTimer", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_endpoint_not_found__INFO",
 			                new Object[] { aMessageContext.getEndpoint().getEndpoint(), aCasReferenceId });
+          }
 				}
 			}
 		}
@@ -159,9 +162,11 @@ public class ProcessResponseHandler extends HandlerBase
 
 			if ( endpointWithTimer == null )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 		                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_endpoint__WARNING",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId});
+        }
 				return;
 			}
 			
@@ -200,10 +205,11 @@ public class ProcessResponseHandler extends HandlerBase
 			cacheEntry.setReplyReceived();
 			cas = cacheEntry.getCas();  
 			int totalNumberOfParallelDelegatesProcessingCas = cacheEntry.getNumberOfParallelDelegates();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_number_parallel_delegates_FINE",
 	                new Object[] { totalNumberOfParallelDelegatesProcessingCas});
-
+      }
 			if (cas == null)
 			{
 				throw new AsynchAEException(Thread.currentThread().getName()+"-Cache Does not contain a CAS. Cas Reference Id::"+casReferenceId);
@@ -228,25 +234,20 @@ public class ProcessResponseHandler extends HandlerBase
 					//	Check if this a secondary reply in a parallel step. If it is the first reply, deserialize the CAS
 					//	using a standard approach. There is no merge to be done yet. Otherwise, we need to
 					//	merge the CAS with previous results.
-					//if ( cacheEntry.howManyDelegatesResponded() > 0 )
-					//{
-						// process secondary reply from a parallel step
+					// process secondary reply from a parallel step
 					//Use Delta CAS deserialization
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_delegate_responded_count_FINEST",
 			                new Object[] { cacheEntry.howManyDelegatesResponded(), casReferenceId});
-				
-						int highWaterMark = cacheEntry.getHighWaterMark();
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+          }
+					int highWaterMark = cacheEntry.getHighWaterMark();
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_high_water_mark_FINEST",
 			                new Object[] { highWaterMark, casReferenceId });
-						deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.disallow);
-					//}
-					//else
-					//{
-						//	first reply from a parallel step
-					//	deserialize(xmi, cas, casReferenceId);
-					//}
+          }
+					deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.disallow);
 				}
 			}
 			else // general case
@@ -379,9 +380,11 @@ public class ProcessResponseHandler extends HandlerBase
 			}
 			else
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                "handleProcessResponseWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_not_in_cache__INFO",
 		                new Object[] { getController().getName(), casReferenceId, aMessageContext.getEndpoint().getEndpoint() });
+        }
 				throw new AsynchAEException("CAS with Reference Id:" + casReferenceId + " Not Found in CasManager's CAS Cache");
 			}
 		}
@@ -473,10 +476,11 @@ public class ProcessResponseHandler extends HandlerBase
 	}
 	private synchronized void handleProcessResponseWithException(MessageContext aMessageContext, String delegateKey)
 	{
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "handleProcessResponseWithException", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_handling_exception_from_delegate_FINE",
                 new Object[] { getController().getName(), aMessageContext.getEndpoint().getEndpoint() });
-
+    }
 		boolean isCpCError = false;
 		String casReferenceId = null;
 

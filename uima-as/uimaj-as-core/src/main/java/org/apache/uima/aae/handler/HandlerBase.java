@@ -149,17 +149,20 @@ public abstract class HandlerBase implements Handler
 		int messageType = aMessageContext.getMessageIntProperty(AsynchAEMessage.MessageType);
 		if ( hasDelegateHandler() )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "delegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dispatch_msg_to_handler__FINE",
 	                new Object[] { messageType, aMessageContext.getEndpoint().getEndpoint(), getDelegate().getName()  });
-			
+      }
 			getDelegate().handle(aMessageContext);
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "delegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_handler_for_message__FINE",
 	                new Object[] { messageType, aMessageContext.getEndpoint().getEndpoint()  });
+      }
 		}
 	}
 	public HandlerBase(String aName )
@@ -357,17 +360,19 @@ public abstract class HandlerBase implements Handler
 			long totalTimeInComms = currentTime - (departureTime - timeInService);
 
 			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "computeStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_roundtrip_time__FINE",
 	                new Object[] { aCasReferenceId, aMessageContext.getEndpoint(),(double) roundTrip / (double) 1000000 });
 
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "computeStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_time_spent_in_delegate__FINE",
 	                new Object[] { aCasReferenceId, (double) timeInService / (double) 1000000, aMessageContext.getEndpoint() });
 
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "computeStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_time_spent_in_comms__FINE",
 	                new Object[] { aCasReferenceId, (double) totalTimeInComms / (double) 1000000, aMessageContext.getEndpoint() });
+      }
 		}
 		
 			if ( getController() instanceof AggregateAnalysisEngineController )

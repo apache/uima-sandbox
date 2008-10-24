@@ -118,7 +118,9 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 				}
 			}
 		}
-		UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, items);
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+      UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, items);
+    }
 	}
 
 	private String format( double value)

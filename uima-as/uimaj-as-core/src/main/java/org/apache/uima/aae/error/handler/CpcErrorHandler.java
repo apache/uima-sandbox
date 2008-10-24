@@ -59,9 +59,10 @@ public class CpcErrorHandler  extends ErrorHandlerBase implements ErrorHandler
 		{
 			return false;
 		}
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
 				UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", t);
-
+    }
 		Endpoint endpoint = (Endpoint) anErrorContext.get(AsynchAEMessage.Endpoint);
 		if ( endpoint != null )
 		{
@@ -84,8 +85,10 @@ public class CpcErrorHandler  extends ErrorHandlerBase implements ErrorHandler
 			}
 			catch( Exception e)
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
 						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
+        }
 			}
 
 			if ( threshold != null && threshold.getAction().equalsIgnoreCase(ErrorHandler.TERMINATE ))
@@ -94,12 +97,16 @@ public class CpcErrorHandler  extends ErrorHandlerBase implements ErrorHandler
 	    	}
 	    	else if ( threshold == null )
 	    	{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_threshold_for_endpoint__CONFIG", new Object[] { aController.getName(), "Collection Processing Complete",  aController.getName() });
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_threshold_for_endpoint__CONFIG", new Object[] { aController.getName(), "Collection Processing Complete",  aController.getName() });
+	         }
 	    	}
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_endpoint_for_getmeta_retry__INFO", new Object[] { aController.getName()});
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_endpoint_for_getmeta_retry__INFO", new Object[] { aController.getName()});
+      }
 		}
 		return true;
 	}

@@ -54,7 +54,9 @@ private static final Class CLASS_NAME = UnknownDestinationHandler.class;
 			{
 				casReferenceId = (String) anErrorContext.get(AsynchAEMessage.CasReference);
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_handling_bad_destination__INFO", new Object[] { null, casReferenceId });
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_handling_bad_destination__INFO", new Object[] { null, casReferenceId });
+      }
 
 			return true;
 		}

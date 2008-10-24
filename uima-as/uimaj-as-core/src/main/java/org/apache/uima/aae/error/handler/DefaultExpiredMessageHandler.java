@@ -76,10 +76,11 @@ public class DefaultExpiredMessageHandler extends ErrorHandlerBase implements Er
 					// Handler handle this situation
 				}
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_expired_message__INFO",
 	                new Object[] { endpointName, casReferenceId  });
-
+      }
 			return true;
 		}
 		return false;

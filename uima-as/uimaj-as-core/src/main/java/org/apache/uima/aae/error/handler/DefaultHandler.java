@@ -74,9 +74,10 @@ public class DefaultHandler extends ErrorHandlerBase implements ErrorHandler
 		String key = null;
 		try
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", t);
-			
+      }
 			endpoint = getDestination(aController, anErrorContext);
 			casReferenceId = (String)anErrorContext.get( AsynchAEMessage.CasReference);
 
@@ -96,15 +97,19 @@ public class DefaultHandler extends ErrorHandlerBase implements ErrorHandler
 			}
 			else if ( endpoint == null)
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", 
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", 
 						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_endpoint__INFO", new Object[] { aController.getName() });
+        }
 			}
 		}
 		catch( Exception e)
 		{
 			e.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
+      }
 		}
 		finally
 		{
@@ -133,8 +138,10 @@ public class DefaultHandler extends ErrorHandlerBase implements ErrorHandler
 			catch( Exception e)
 			{
 				e.printStackTrace();
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
 						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
+        }
 			}
 		}
 		return true;

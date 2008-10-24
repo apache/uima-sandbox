@@ -76,9 +76,11 @@ public class UimaVmMessageListener implements UimaMessageListener {
 
       if (UimaMessageValidator.isValidMessage(aMessage, controller)) {
         MessageContext msgContext = aMessage.toMessageContext(controller.getName());
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "onMessage",
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "onMessage",
                 UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_new_msg_recvd__FINEST",
                 new Object[] { controller.getComponentName(), aMessage.toString() });
+        }
         if (!concurrentThreads.containsKey(Thread.currentThread().getId())) {
           Thread.currentThread().setName(
                   Thread.currentThread().getName() + "::" + controller.getComponentName());
@@ -99,9 +101,11 @@ public class UimaVmMessageListener implements UimaMessageListener {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(),
               "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
               "UIMAEE_exception__WARNING", new Object[] { e });
+      }
     } finally {
       // Call the end checkpoint for non-aggregates. For primitives the CAS has been fully processed
       // if we are here

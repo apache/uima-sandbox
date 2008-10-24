@@ -63,11 +63,15 @@ public class BasicUimaJmxMonitorListener implements JmxMonitorListener {
 			//	Log metrics including shadow CAS pool metric for remote CAS multiplier. Filter out the top level service
 			if ( serviceMetrics.isCasMultiplier() && serviceMetrics.isServiceRemote() && !serviceMetrics.isTopLevelService() )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_service_idle_time_shadow_cas_pool_INFO", new Object[] { format(sampleTime/1000000),padName(serviceMetrics.getServiceName()),serviceMetrics.isCasMultiplier(), serviceMetrics.isServiceRemote(),format(serviceMetrics.getIdleTime()),  serviceMetrics.getProcessCount(), serviceMetrics.getInputQueueDepth(), serviceMetrics.getReplyQueueDepth(),format(serviceMetrics.getShadowCasPoolWaitTime()) , format(serviceMetrics.getAnalysisTime()), serviceMetrics.getProcessThreadCount(), serviceMetrics.getCmFreeCasInstanceCount()});
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_service_idle_time_shadow_cas_pool_INFO", new Object[] { format(sampleTime/1000000),padName(serviceMetrics.getServiceName()),serviceMetrics.isCasMultiplier(), serviceMetrics.isServiceRemote(),format(serviceMetrics.getIdleTime()),  serviceMetrics.getProcessCount(), serviceMetrics.getInputQueueDepth(), serviceMetrics.getReplyQueueDepth(),format(serviceMetrics.getShadowCasPoolWaitTime()) , format(serviceMetrics.getAnalysisTime()), serviceMetrics.getProcessThreadCount(), serviceMetrics.getCmFreeCasInstanceCount()});
+        }
 			}
 			else
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_service_idle_time_cas_pool_INFO", new Object[] { format(sampleTime/1000000),padName(serviceMetrics.getServiceName()),serviceMetrics.isCasMultiplier(), serviceMetrics.isServiceRemote(),format(serviceMetrics.getIdleTime()),  serviceMetrics.getProcessCount(), serviceMetrics.getInputQueueDepth(),serviceMetrics.getReplyQueueDepth(), format(serviceMetrics.getCasPoolWaitTime()) , format(serviceMetrics.getAnalysisTime()), serviceMetrics.getProcessThreadCount(), serviceMetrics.getCmFreeCasInstanceCount()});
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_service_idle_time_cas_pool_INFO", new Object[] { format(sampleTime/1000000),padName(serviceMetrics.getServiceName()),serviceMetrics.isCasMultiplier(), serviceMetrics.isServiceRemote(),format(serviceMetrics.getIdleTime()),  serviceMetrics.getProcessCount(), serviceMetrics.getInputQueueDepth(),serviceMetrics.getReplyQueueDepth(), format(serviceMetrics.getCasPoolWaitTime()) , format(serviceMetrics.getAnalysisTime()), serviceMetrics.getProcessThreadCount(), serviceMetrics.getCmFreeCasInstanceCount()});
+        }
 			}
 		}
 		//	Log group delimiter to make it easier to see metrics for this interval 
@@ -75,7 +79,9 @@ public class BasicUimaJmxMonitorListener implements JmxMonitorListener {
 	}
 
 	public void onNewSamplingInterval() 	{
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_marker_INFO", new Object[] { });
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_marker_INFO", new Object[] { });
+    }
 	}
 	private String format( double value)
 	{

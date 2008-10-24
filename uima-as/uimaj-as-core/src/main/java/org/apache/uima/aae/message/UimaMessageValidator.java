@@ -34,15 +34,19 @@ public class UimaMessageValidator {
     if (aMessage.containsProperty(AsynchAEMessage.MessageType)) {
       int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
       if (msgType != AsynchAEMessage.Response && msgType != AsynchAEMessage.Request) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                 "validMessageType", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
                 "UIMAJMS_invalid_msgtype_in_message__INFO", new Object[] { msgType, endpointName });
+        }
         return false;
       }
     } else {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
               "validMessageType", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
               "UIMAJMS_msgtype_notin_message__INFO", new Object[] { endpointName });
+      }
       return false;
     }
 
@@ -89,15 +93,19 @@ public class UimaMessageValidator {
       if (command != AsynchAEMessage.Process && command != AsynchAEMessage.GetMeta
               && command != AsynchAEMessage.ReleaseCAS && command != AsynchAEMessage.Stop
               && command != AsynchAEMessage.Ping && command != AsynchAEMessage.CollectionProcessComplete) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validCommand",
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validCommand",
                 UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_command_in_message__INFO",
                 new Object[] { command, endpointName });
+        }
         return false;
       }
     } else {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validCommand",
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validCommand",
               UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_command_notin_message__INFO",
               new Object[] { endpointName });
+      }
       return false;
     }
 
@@ -129,16 +137,19 @@ public class UimaMessageValidator {
       int payload = aMessage.getIntProperty(AsynchAEMessage.Payload);
       if (payload != AsynchAEMessage.XMIPayload && payload != AsynchAEMessage.CASRefID
           && payload != AsynchAEMessage.BinaryPayload  && payload != AsynchAEMessage.Exception && payload != AsynchAEMessage.Metadata) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validPayload",
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validPayload",
                 UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_payload_in_message__INFO",
                 new Object[] { payload, endpointName });
-
+        }
         return false;
       }
     } else {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validPayload",
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "validPayload",
               UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_payload_notin_message__INFO",
               new Object[] { endpointName });
+      }
       return false;
     }
 
@@ -156,7 +167,8 @@ public class UimaMessageValidator {
     if (command == AsynchAEMessage.Process && msgType == AsynchAEMessage.Response) {
       String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
       if (!entryExists) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(
                 Level.FINE,
                 CLASS_NAME.getName(),
                 "isStaleMessage",
@@ -164,6 +176,7 @@ public class UimaMessageValidator {
                 "UIMAJMS_stale_message__FINE",
                 new Object[] { endpointName, casReferenceId,
                     aMessage.getStringProperty(AsynchAEMessage.MessageFrom) });
+        }
         return true;
       }
     }

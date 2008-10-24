@@ -127,7 +127,9 @@ implements AnalysisEngineInstancePool
 		{
 			AnalysisEngine ae = (AnalysisEngine) aeInstanceMap.get((String)aeInstanceIterator.next());
 			ae.destroy();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "abort", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_destroying_ae__INFO", new Object[] { ae.getAnalysisEngineMetaData().getName(), i });
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "abort", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_destroying_ae__INFO", new Object[] { ae.getAnalysisEngineMetaData().getName(), i });
+      }
 			i++;
 		}
 		aeInstanceMap.clear();

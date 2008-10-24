@@ -342,21 +342,27 @@ public class Endpoint_impl implements Endpoint, Cloneable
 				{
 					if ( AsynchAEMessage.Process == cmd  )
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
 				                "TimerTask.run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_timeout_no_reply__INFO",
 				                new Object[] {  endpoint, aTimeToWait, casReferenceId });
+		         }
 					}
 					else if ( AsynchAEMessage.GetMeta == cmd )
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
 				                "TimerTask.run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_meta_timeout_no_reply__INFO",
 				                new Object[] {  endpoint, aTimeToWait });
+		         }
 					}
 					else
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
 				                "TimerTask.run", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_timeout_no_reply__INFO",
 				                new Object[] {  endpoint, aTimeToWait });
+		         }
 
 					}
 					

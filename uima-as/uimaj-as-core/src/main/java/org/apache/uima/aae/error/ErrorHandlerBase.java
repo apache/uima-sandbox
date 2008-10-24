@@ -249,7 +249,9 @@ public abstract class ErrorHandlerBase
 				{
 					anEndpoint.cancelTimer();
 					e.printStackTrace();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "retryLastCommand", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "retryLastCommand", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+          }
 				}
 			}
 			else
@@ -288,7 +290,9 @@ public abstract class ErrorHandlerBase
 		}
 		catch ( Exception e)
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "continueOnError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e); //new Object[] { e });
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "continueOnError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e); //new Object[] { e });
+      }
 
 		}
 		return false;

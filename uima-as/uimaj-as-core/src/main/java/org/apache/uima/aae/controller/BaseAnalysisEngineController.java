@@ -255,10 +255,11 @@ implements AnalysisEngineController, EventSubscriber
 			endpointName = endpoint.getEndpoint();
 		}
 
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                 "BaseAnalysisEngineController", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_service_id_INFO",
                 new Object[] { endpointName });
-		
+    }
 		resourceSpecifier = UimaClassFactory.produceResourceSpecifier(aDescriptor);
 
 		
@@ -296,10 +297,11 @@ implements AnalysisEngineController, EventSubscriber
 		if ( isTopLevelComponent())
 		{
 		  System.out.println("Top Level Service:"+getComponentName()+ " Configured to Use Java VM Transport For Internal Messaging");
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
               "C'tor", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_using_vm_transport_INFO",
               new Object[] { getComponentName() });
-		  
+      }
 		}
 
 		//	Top level component?
@@ -318,9 +320,11 @@ implements AnalysisEngineController, EventSubscriber
 				{
 					System.out.println(getName()+"-Initializing CAS Pool for Context:"+getUimaContextAdmin().getQualifiedContextName());
 					System.out.println(getComponentName()+"-CasMultiplier Cas Pool Size="+aComponentCasPoolSize+" Cas Initialial Heap Size:"+anInitialCasHeapSize);
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                    "C'tor", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_multiplier_cas_pool_config_INFO",
 		                    new Object[] { getComponentName(), aComponentCasPoolSize, anInitialCasHeapSize });
+	         }
 					initializeComponentCasPool(aComponentCasPoolSize, anInitialCasHeapSize);
 				}
 			}
@@ -634,9 +638,11 @@ implements AnalysisEngineController, EventSubscriber
 		catch( Exception e)
 		{
 			//	Log and move on
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
                     "setListenerContainer", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
                     new Object[] { e });
+      }
 		}
 	}
 	protected void registerServiceWithJMX(String key_value_list, boolean remote) 
@@ -730,10 +736,11 @@ implements AnalysisEngineController, EventSubscriber
 			cm.setInitialCasHeapSize(anInitialCasHeapSize);
 			cm.setPoolSize(getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize);
 			System.out.println("Component:"+getComponentName()+" Cas Pool:"+getUimaContextAdmin().getQualifiedContextName()+" Size:"+aComponentCasPoolSize+" Cas Heap Size:"+anInitialCasHeapSize/4 +" cells");
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "initializeComponentCasPool", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_pool_config_INFO",
 	                new Object[] { getComponentName(), getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize, anInitialCasHeapSize/4});
-			
+      }
 		}
 
 	}
@@ -955,9 +962,11 @@ implements AnalysisEngineController, EventSubscriber
 					}
 					
 					((AggregateAnalysisEngineController)this).disableDelegates(list);
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disabled_delegate_INFO",
 		                new Object[] { getComponentName(), key });
+	         }
 				}
 		}
 		else if ( ErrorHandler.CONTINUE.equalsIgnoreCase(anAction) )
@@ -996,10 +1005,11 @@ implements AnalysisEngineController, EventSubscriber
 	}
 	protected void plugInDefaultErrorHandlerChain()
 	{
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
                 "plugInDefaultErrorHandlerChain", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_add_default_eh__CONFIG",
                 new Object[] { getComponentName() });
-
+    }
 		List errorHandlerList = new ArrayList();
 		errorHandlerList.add(new ProcessCasErrorHandler());
 		errorHandlerChain = new ErrorHandlerChain(errorHandlerList);
@@ -1022,50 +1032,60 @@ implements AnalysisEngineController, EventSubscriber
 	}
 	public void dropCAS(String aCasReferenceId, boolean deleteCacheEntry)
 	{
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dropping_cas__FINE",
                 new Object[] {aCasReferenceId, getName() });
-				if ( inProcessCache.entryExists(aCasReferenceId))
-				{
-					CAS cas = inProcessCache.getCasByReference(aCasReferenceId);
-					if (deleteCacheEntry)
-					{
-						inProcessCache.remove(aCasReferenceId);
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    }
+    if ( inProcessCache.entryExists(aCasReferenceId))
+		{
+			CAS cas = inProcessCache.getCasByReference(aCasReferenceId);
+			if (deleteCacheEntry)
+			{
+				inProcessCache.remove(aCasReferenceId);
+		
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removed_cache_entry__FINE",
 				                new Object[] {aCasReferenceId, getComponentName() });
-					}
-					if ( cas != null )
-					{
-						int casHashCode = cas.hashCode();
-						dropCAS(cas);
+        }
+			}
+			if ( cas != null )
+			{
+				int casHashCode = cas.hashCode();
+				dropCAS(cas);
 						
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_released_cas__FINE",
 				                new Object[] {aCasReferenceId, getComponentName(), casHashCode });
-					}
-					else
-					{
+        }
+			}
+			else
+			{
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_unable_to_release_cas__WARNING",
 				                new Object[] {aCasReferenceId, getComponentName() });
-						
-					}
-					inProcessCache.dumpContents(getComponentName());
+        }
 			}
-			//	Remove stats from the map maintaining CAS specific stats
-			if ( perCasStatistics.containsKey(aCasReferenceId))
-			{
-				perCasStatistics.remove(aCasReferenceId);
-			}
+			inProcessCache.dumpContents(getComponentName());
+		}
+		//	Remove stats from the map maintaining CAS specific stats
+		if ( perCasStatistics.containsKey(aCasReferenceId))
+		{
+			perCasStatistics.remove(aCasReferenceId);
+		}
 	}
 
 	public synchronized void saveTime(long aTime, String aCasReferenceId, String anEndpointName)
 	{
 		String key = aCasReferenceId + anEndpointName;
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "saveTime", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_save_time__FINE",
                 new Object[] {aTime, aCasReferenceId, getComponentName(), anEndpointName, key  });
+    }
 		statsMap.put(key, Long.valueOf(aTime));
 	}
 
@@ -1075,9 +1095,11 @@ implements AnalysisEngineController, EventSubscriber
 		
 		if (statsMap.containsKey(key))
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "getTime", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_get_time__FINE",
 	                new Object[] {aCasReferenceId, getComponentName(), anEndpointName, key  });
+      }
 			long time = ((Long) statsMap.get(key)).longValue();
 			
 			
@@ -1089,9 +1111,11 @@ implements AnalysisEngineController, EventSubscriber
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "getTime", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_time_not_found__FINE",
 	                new Object[] {aCasReferenceId, getName(), anEndpointName, key  });
+      }
 		}
 		return 0;
 	}
@@ -1282,7 +1306,8 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		if ( aServicePerformance != null )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "logStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_primitive_stats__INFO", 
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "logStats", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dump_primitive_stats__INFO", 
 						new Object[] {getComponentName(), aDelegateKey, 
 									   aServicePerformance.getNumberOfCASesProcessed(), 
 									   aServicePerformance.getCasDeserializationTime(), 
@@ -1292,6 +1317,7 @@ implements AnalysisEngineController, EventSubscriber
 				   	   				   aServicePerformance.getMaxDeserializationTime(), 
 				   	   				   aServicePerformance.getMaxAnalysisTime(),
 									   aServicePerformance.getIdleTime() });
+      }
 		}
 	}
 	
@@ -1497,7 +1523,9 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			setStopped();
 		}
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop__INFO", new Object[] { getComponentName() });
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop__INFO", new Object[] { getComponentName() });
+    }
 		if ( this instanceof PrimitiveAnalysisEngineController )
 		{
 			getControllerLatch().release();
@@ -1518,7 +1546,9 @@ implements AnalysisEngineController, EventSubscriber
 					AnalysisEngineController childController = 
 						(AnalysisEngineController)((AggregateAnalysisEngineController_impl)this).getChildControllerList().get(i);
 					
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop_delegate__INFO", new Object[] { getComponentName(), childController.getComponentName() });
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop_delegate__INFO", new Object[] { getComponentName(), childController.getComponentName() });
+	         }
 					childController.stop();
 					childController.getControllerLatch().release();
 				}
@@ -1543,9 +1573,11 @@ implements AnalysisEngineController, EventSubscriber
 				catch( Exception e)
 				{
 					e.printStackTrace();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 		                    "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
 		                    new Object[] { e });
+	         }
 				}
 			}
 		}
@@ -1618,7 +1650,9 @@ implements AnalysisEngineController, EventSubscriber
 	 */
 	public void terminate()
 	{
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "terminate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_process_termiate_event__INFO", new Object[] { getComponentName() });
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "terminate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_process_termiate_event__INFO", new Object[] { getComponentName() });
+    }
 		if ( !isTopLevelComponent() )
 		{
 			((BaseAnalysisEngineController)parentController).terminate();
@@ -1697,7 +1731,9 @@ implements AnalysisEngineController, EventSubscriber
 			}
 			catch( Exception e)
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "terminate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_unable_to_stop_inputchannel__INFO", new Object[] { getComponentName(), endpointName });
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "terminate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_unable_to_stop_inputchannel__INFO", new Object[] { getComponentName(), endpointName });
+        }
 			}
 		}
 	}
@@ -1739,11 +1775,15 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				if ( iC != null )
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stopInputChannels", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_unable_to_stop_inputchannel__INFO", new Object[] { getComponentName(), iC.getInputQueueName() });
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stopInputChannels", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_unable_to_stop_inputchannel__INFO", new Object[] { getComponentName(), iC.getInputQueueName() });
+	         }
 				}
 				else
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "stopInputChannels", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "stopInputChannels", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
+	         }
 				}
 			}
 		}
@@ -1895,10 +1935,11 @@ implements AnalysisEngineController, EventSubscriber
 			//	Check if the CAS is in the list of outstanding CASes and also exists in the cache
 			if ( cmOutstandingCASes.size() > 0 && cmOutstandingCASes.containsKey(casReferenceId) && getInProcessCache().entryExists(casReferenceId))
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
 		                new Object[] { getComponentName(), casReferenceId });
-
+        }
 				CacheEntry cacheEntry = null;
 				
 				try
@@ -1928,9 +1969,11 @@ implements AnalysisEngineController, EventSubscriber
 					//	to the CM.
 					if ( freeCasEndpoint != null )
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_sending_fcq_req__FINE",
 				                new Object[] { getComponentName(), casReferenceId, cacheEntry.getCasMultiplierKey(), freeCasEndpoint.getDestination() });
+		         }
 						freeCasEndpoint.setReplyEndpoint(true);
 						getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, casReferenceId, freeCasEndpoint);
 					}
@@ -1984,9 +2027,11 @@ implements AnalysisEngineController, EventSubscriber
 				catch( Exception e)
 				{
 					e.printStackTrace();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 			                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
 			                new Object[] { e});
+	         }
 				}
 			}
 		}

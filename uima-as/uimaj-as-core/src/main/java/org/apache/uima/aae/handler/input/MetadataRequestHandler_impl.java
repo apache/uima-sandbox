@@ -60,10 +60,11 @@ public class MetadataRequestHandler_impl extends HandlerBase
 						endpoint.setCommand( AsynchAEMessage.GetMeta);
 						getController().cacheClientEndpoint(endpoint);
 					}
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_handling_metadata_request__FINEST",
 			                new Object[] { endpoint.getEndpoint() });
-
+          }
 					getController().getControllerLatch().waitUntilInitialized();
 					//	Check to see if the controller hasnt been aborted while we were waiting on the latch
 					if ( !getController().isStopped())
@@ -75,17 +76,20 @@ public class MetadataRequestHandler_impl extends HandlerBase
 				{
 					if ( super.hasDelegateHandler() )
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 				                "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_msg_for_next_handler__FINEST",
 				                new Object[] { messageType });
+            }
 						super.getDelegate().handle(anObjectToHandle);
 					}
 					else
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				                "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_handler_for_message__FINE",
 				                new Object[] { messageType });
-						
+            }
 					}
 				}
 			}
@@ -97,9 +101,11 @@ public class MetadataRequestHandler_impl extends HandlerBase
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_context_object__INFO",
 	                new Object[] {getController().getName(), anObjectToHandle.getClass().getName() });
+      }
 		}
 	}
 

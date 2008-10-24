@@ -251,9 +251,10 @@ public class InProcessCache implements InProcessCacheMBean
 				}
 				sb.append("\n");
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                "dumpContents", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_cache_entry_key__FINEST",
 	                new Object[] { aControllerName, count, sb.toString() });
+     
 			sb.setLength(0);
 		}
 		else if ( UIMAFramework.getLogger().isLoggable(Level.FINE) )
@@ -285,17 +286,23 @@ public class InProcessCache implements InProcessCacheMBean
 		if (aCasReferenceId != null && cache.containsKey(aCasReferenceId))
 		{
 			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "remove", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_remove_cache_entry_for_cas__FINE", new Object[] { aCasReferenceId });
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "remove", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_remove_cache_entry_for_cas__FINE", new Object[] { aCasReferenceId });
+      }
 			cache.remove(aCasReferenceId);
 			this.notifyAll();
 		}
 		else if ( aCasReferenceId == null )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "remove", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_is_null_remove_from_cache_failed__FINE");
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "remove", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_is_null_remove_from_cache_failed__FINE");
+      }
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "remove", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_is_invalid_remove_from_cache_failed__FINE", new Object[] { aCasReferenceId });
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "remove", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_is_invalid_remove_from_cache_failed__FINE", new Object[] { aCasReferenceId });
+      }
 		}
 		if ( isEmpty() && callbackListeners.size() > 0 )
 		{
@@ -520,10 +527,11 @@ public class InProcessCache implements InProcessCacheMBean
 			CacheEntry entry = (CacheEntry)cache.get(key);
 			if ( entry != null && entry.getInputCasReferenceId() != null && entry.getInputCasReferenceId().equals(aCasReferenceId))
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "hasNoSubordinates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cache_entry_exists___FINE",
 		                new Object[] { entry.getCasReferenceId(), entry.getInputCasReferenceId() });
-
+        }
 				return false;
 			}
 		}

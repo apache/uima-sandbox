@@ -40,9 +40,10 @@ public class DefaultDelegateErrorHandler extends ErrorHandlerBase implements Err
 		if ( t instanceof UimaEEServiceException)
 		{
 			t.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { t });
-
+      }
 			if ( anErrorContext.containsKey(AsynchAEMessage.Endpoint) )
 			{
 				Endpoint endpoint = (Endpoint)anErrorContext.get(AsynchAEMessage.Endpoint);

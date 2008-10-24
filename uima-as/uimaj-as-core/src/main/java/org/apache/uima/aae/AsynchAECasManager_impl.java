@@ -89,9 +89,11 @@ public class AsynchAECasManager_impl implements AsynchAECasManager {
   public void initialize(int aCasPoolSize, String aContextName,
           Properties aPerformanceTuningSettings) throws Exception {
  
-    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
             "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
             "UIMAEE_primary_cas_pool_init__CONFIG", new Object[] { aCasPoolSize, aContextName });
+    }
     // Create CAS Pool for incoming messages
     casManager.defineCasPool(aContextName, aCasPoolSize, aPerformanceTuningSettings);
     contextName = aContextName;

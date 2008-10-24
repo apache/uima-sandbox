@@ -97,10 +97,11 @@ public class MetadataResponseHandler_impl extends HandlerBase
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_context_object__INFO",
 	                new Object[] {getController().getName(), anObjectToHandle.getClass().getName() });
-			
+      }
 		}
 	}
 
