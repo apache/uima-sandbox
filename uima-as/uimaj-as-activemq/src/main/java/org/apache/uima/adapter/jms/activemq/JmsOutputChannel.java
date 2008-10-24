@@ -155,9 +155,11 @@ public class JmsOutputChannel implements OutputChannel
 	{
 		if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connector_list__FINE",
                     new Object[] { System.getProperty("ActiveMQConnectors") });
+      }
 			//	Aggregate controller set this System property at startup in
 			//  org.apache.uima.adapter.jms.service.UIMA_Service.startInternalBroker()
 			serviceProtocolList = System.getProperty("ActiveMQConnectors");
@@ -171,9 +173,11 @@ public class JmsOutputChannel implements OutputChannel
 		catch( Exception e) 
 		{
 			e.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
                     "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING",
                     new Object[] { JmsConstants.threadName(), e });
+      }
 		}
 		
 	}
@@ -199,9 +203,11 @@ public class JmsOutputChannel implements OutputChannel
 				getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 				 
 			XmiSerializationSharedData serSharedData;
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "serializeCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_serialize_cas__FINE",
                     new Object[] {aCasReferenceId});
+      }
 			if ( isReply )
 			{
 				serSharedData = cacheEntry.getDeserSharedData();
@@ -324,65 +330,78 @@ public class JmsOutputChannel implements OutputChannel
 			destination = ((ActiveMQDestination)anEndpoint.getDestination()).getPhysicalName();
 		    key = destination;
 		}
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_acquiring_connection_to_endpoint__FINE",
                 new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
-//        new Object[] { getAnalysisEngineController().getComponentName(), anEndpoint.getEndpoint(), anEndpoint.getServerURI() });
+    }
 		
 		//	check the cache first
 		if ( !connectionMap.containsKey(key) )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_create_new_connection__FINE",
                     new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
-		
+	    }
 			endpointConnection = new JmsEndpointConnection_impl(connectionMap, anEndpoint); //.getServerURI(), anEndpoint.getEndpoint(),anEndpoint.remove());
 			if ( System.getProperty(JmsConstants.SessionTimeoutOverride) != null)
 			{
 				try
 				{
 					int overrideTimeoutValue = 
-						Integer.parseInt(System.getProperty(JmsConstants.SessionTimeoutOverride));
+					Integer.parseInt(System.getProperty(JmsConstants.SessionTimeoutOverride));
 					endpointConnection.setInactivityTimeout(overrideTimeoutValue);  // If the connection is not used within this interval it will be removed
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+			    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+			      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_override_connection_timeout__FINE",
 		                    new Object[] { analysisEngineController, overrideTimeoutValue, destination, anEndpoint.getServerURI() });
+			    }
 				}
 				catch( NumberFormatException e) { /* ignore. use the default */ }
 			}
 			else
 			{
 				endpointConnection.setInactivityTimeout(INACTIVITY_TIMEOUT);  // If the connection is not used within this interval it will be removed
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_timeout__FINE",
 	                    new Object[] { analysisEngineController, INACTIVITY_TIMEOUT, destination, anEndpoint.getServerURI() });
+		    }
 			}
 			endpointConnection.setAnalysisEngineController(getAnalysisEngineController());
 			//	Connection is not in the cache, create a new connection, initialize it and cache it
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_open_new_connection_to_endpoint__FINE",
                     new Object[] { destination, anEndpoint.getServerURI() });
+	    }
 			endpointConnection.open();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_opened_to_endpoint__FINE",
                     new Object[] { getAnalysisEngineController().getComponentName(),destination, anEndpoint.getServerURI() });
-
+	    }
 			//	Cache the connection for future use. If not used, connections expire after 50000 millis 
 			connectionMap.put( key, endpointConnection);
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_reusing_existing_connection__FINE",
                     new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
+	    }
 			//	Retrieve connection from the connection cache
 			endpointConnection = (JmsEndpointConnection_impl)connectionMap.get(key);
 			// check the state of the connection and re-open it if necessary
 			if ( endpointConnection != null && !endpointConnection.isOpen() )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_closed_reopening_endpoint__FINE",
 	                    new Object[] { destination });
+		    }
 				endpointConnection.open();
 			}
 		}
@@ -414,24 +433,30 @@ public class JmsOutputChannel implements OutputChannel
 			endpointConnection.send(tm, true);
 			if ( aCommand == AsynchAEMessage.ReleaseCAS )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
 						JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_release_cas_req__FINE", new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint(),aCasReferenceId });
+		    }
 			}
 				
 		}
 		catch( JMSException e)
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
+	    }
 		}
 		catch( ServiceShutdownException e)
 		{
 			e.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_shutdown__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
+	    }
 		}
 		catch ( Exception e)
 		{
@@ -484,14 +509,18 @@ public class JmsOutputChannel implements OutputChannel
 			
 			if ( aCommand == AsynchAEMessage.CollectionProcessComplete )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
 						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_send_cpc_req__FINE", new Object[] { anEndpoint.getEndpoint() });
+		    }
 			}
 			else if ( aCommand == AsynchAEMessage.ReleaseCAS )
 			{
-	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_releasecas_request__endpoint__FINEST",
 	                    new Object[] {getAnalysisEngineController().getName(), endpointConnection.getEndpoint()});
+		    }
 			}
 			else if ( aCommand == AsynchAEMessage.GetMeta )
 			{
@@ -521,9 +550,11 @@ public class JmsOutputChannel implements OutputChannel
 			}
 			else 
 			{
-	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_metadata_request__endpoint__FINEST",
 	                    new Object[] { endpointConnection.getEndpoint(), endpointConnection.getServerUri() });
+		    }
 			}
 		}
 		catch ( Exception e)
@@ -543,10 +574,11 @@ public class JmsOutputChannel implements OutputChannel
 	public void sendRequest( String aCasReferenceId, Endpoint anEndpoint) throws AsynchAEException
 	{
 		
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "sendRequest", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE",
                 new Object[] { anEndpoint.getEndpoint() });
-
+    }
 		try
 		{
 			if (anEndpoint.isRemote())
@@ -669,9 +701,11 @@ public class JmsOutputChannel implements OutputChannel
 			}
 			else
 			{
-	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_reply_with_sequence__FINE",
 	                    new Object[] { anEndpoint.getEndpoint(), aNewCasReferenceId, sequence });
+		    }
 				sendCasToCollocatedDelegate(false, anInputCasReferenceId, aNewCasReferenceId, anEndpoint, false, sequence);
 			}
 		}
@@ -710,25 +744,26 @@ public class JmsOutputChannel implements OutputChannel
 			}
 			else
 			{
-	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_reply_with_sequence__FINE",
 	                    new Object[] { anEndpoint.getEndpoint(), entry.getCasReferenceId(), entry.getCasSequence() });
-
-	            if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController && getAnalysisEngineController().isCasMultiplier() )
-	            {
-	              if ( ((AggregateAnalysisEngineController)getAnalysisEngineController()).getMessageOrigin(entry.getInputCasReferenceId()) != null)
-	              {
-	                sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
-	              }
-	              else
-	              {
-	                sendCasToCollocatedDelegate(false, entry.getCasReferenceId(), null, anEndpoint, false, 0);
-	              }
-	            }
-	            else
-	            {
-                sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
-	            }
+		    }
+	      if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController && getAnalysisEngineController().isCasMultiplier() )
+	      {
+	         if ( ((AggregateAnalysisEngineController)getAnalysisEngineController()).getMessageOrigin(entry.getInputCasReferenceId()) != null)
+	         {
+	           sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
+	         }
+	         else
+	         {
+	           sendCasToCollocatedDelegate(false, entry.getCasReferenceId(), null, anEndpoint, false, 0);
+	         }
+	      }
+	      else
+	      {
+           sendCasToCollocatedDelegate(false, entry.getInputCasReferenceId(), entry.getCasReferenceId(), anEndpoint, false, entry.getCasSequence());
+	      }
 			}
 		}
 		catch( ServiceShutdownException e)
@@ -766,17 +801,20 @@ public class JmsOutputChannel implements OutputChannel
 			
 			endpointConnection.send(tm, false); 
 			addIdleTime(tm);
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cpc_reply_sent__FINE",
                     new Object[] { getAnalysisEngineController().getComponentName(), anEndpoint.getEndpoint()});
+	    }
 		}
 		catch( JMSException e)
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
                     new Object[] { e});
-			
+	    }
 		}
 
 		catch( ServiceShutdownException e)
@@ -810,14 +848,13 @@ public class JmsOutputChannel implements OutputChannel
 		anEndpoint.setReplyEndpoint(true);
 		try
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_replyto_endpoint__FINE",
                     new Object[] { anEndpoint.getEndpoint(), aCasReferenceId });
+	    }
 			if ( anEndpoint.isRemote() )
 			{
-//				String serializedCAS = getSerializedCas(true, aCasReferenceId, anEndpoint, false);
-//				sendCasToRemoteEndpoint(false, serializedCAS, null, aCasReferenceId, anEndpoint, false, 0);
-
         if ( anEndpoint.getSerializer().equals("xmi")) {
           //  Serializes CAS and releases it back to CAS Pool
           String serializedCAS = getSerializedCas(true, aCasReferenceId, anEndpoint, false);
@@ -903,10 +940,11 @@ public class JmsOutputChannel implements OutputChannel
 				om.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 			}
 			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_exception__FINE",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint() });
-
+      }
 			//	Dispatch Message to destination
 			endpointConnection.send(om, false);
 			addIdleTime(om);
@@ -914,9 +952,11 @@ public class JmsOutputChannel implements OutputChannel
 		catch( JMSException e)
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
+      }
 		}
 		catch( ServiceShutdownException e)
 		{
@@ -924,9 +964,11 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		catch (AsynchAEException e)
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
+      }
 		}
 		catch (Exception e)
 		{
@@ -955,10 +997,11 @@ public class JmsOutputChannel implements OutputChannel
 			JmsEndpointConnection_impl endpointConnection = 
 				getEndpointConnection(anEndpoint);
 			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_produce_txt_msg__FINE",
                     new Object[] { });
-			
+      }
 			TextMessage tm = endpointConnection.produceTextMessage("");
 
 			
@@ -967,9 +1010,11 @@ public class JmsOutputChannel implements OutputChannel
 			// CasManager with its parent
 			if ( serialize )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+	      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_serializing_meta__FINE",
 	                    new Object[] { });
+	      }
 				//	Serialize metadata
 				aProcessingResourceMetadata.toXML(bos);
 				tm.setText(bos.toString());
@@ -979,19 +1024,22 @@ public class JmsOutputChannel implements OutputChannel
 
 			populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.GetMeta);
 			
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_metadata_reply__endpoint__FINEST",
                     new Object[] { serviceInputEndpoint, anEndpoint.getEndpoint() });
+      }
 			endpointConnection.send(tm, false);
 		}
 		catch( JMSException e)
 		{
 			e.printStackTrace();
 			//	Unable to establish connection to the endpoint. Log it and continue
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
-			
+      }
 		}
 
 		catch( ServiceShutdownException e)
@@ -1031,9 +1079,11 @@ public class JmsOutputChannel implements OutputChannel
         if ( serializer.equals("binary")) {
           serializedCAS = uimaSerializer.serializeCasToBinary(cas);
         } else {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                   "getBinaryCas", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_serializer__WARNING",
                   new Object[] { getAnalysisEngineController().getName(),serializer, anEndpoint.getEndpoint()});
+          }
           throw new UimaEEServiceException("Invalid Serializer:"+serializer+" For Endpoint:"+anEndpoint.getEndpoint());
         }
         long timeToSerializeCas = getAnalysisEngineController().getCpuTime()-t1;
@@ -1197,19 +1247,17 @@ public class JmsOutputChannel implements OutputChannel
 				
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
 				aTextMessage.setLongProperty(AsynchAEMessage.TimeToDeserializeCAS, casStats.getRawCasDeserializationTime());
-
-//				long t = getAnalysisEngineController().getServicePerformance().getRawAnalysisTime();
-//				aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, t);
         aTextMessage.setLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
-				
 				long iT =getAnalysisEngineController().getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
 				aTextMessage.setLongProperty(AsynchAEMessage.IdleTime, iT );
 				String lookupKey = getAnalysisEngineController().getName();
 				long arrivalTime = getAnalysisEngineController().getTime( aCasReferenceId, lookupKey); //serviceInputEndpoint);
 				long timeInService = getAnalysisEngineController().getCpuTime()-arrivalTime;
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+	      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 	                    "populateStats", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_timein_service__FINEST",
 	                    new Object[] { serviceInputEndpoint, (double)timeInService/(double)1000000 });
+	      }
 			}
 		}	
 	}
@@ -1278,9 +1326,11 @@ public class JmsOutputChannel implements OutputChannel
 					aMessage.setStringProperty(UIMAMessage.ServerURI, protocol);
 				}
 
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "populateHeaderWithRequestContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
 	                    new Object[] {getAnalysisEngineController().getComponentName(), anEndpoint.getServerURI(), anEndpoint.getEndpoint()});
+        }
 			}
 			else // collocated
 			{
@@ -1339,10 +1389,11 @@ public class JmsOutputChannel implements OutputChannel
 				{
 					protocol = extractURLWithProtocol(serviceProtocolList, "http");
 				}
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "populateHeaderWithContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_remote_FINE",
 	                    new Object[] {protocol, anEndpoint.getEndpoint()});
-
+        }
 				aMessage.setStringProperty(UIMAMessage.ServerURI, protocol);
 			}
 			else
@@ -1404,10 +1455,11 @@ public class JmsOutputChannel implements OutputChannel
 						getMessageAccessorByReference(aCasReferenceId).
 							getRawMessage()).acknowledge();
 
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "ackMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_ack_msg__FINE",
 	                new Object[] { aCasReferenceId  });
-			
+      }
 		}
 
 	}
@@ -1470,11 +1522,6 @@ public class JmsOutputChannel implements OutputChannel
 				tm.setLongProperty(AsynchAEMessage.CasSequence, sequence);
 				isRequest = true;
 				//	Add the name of the FreeCas Queue
-//				if ( secondaryInputEndpoint != null )
-//				{
-//					tm.setStringProperty(AsynchAEMessage.MessageFrom, secondaryInputEndpoint);
-//				}
-				
 				if ( freeCASTempQueue != null )
 				{
 					//	Attach a temp queue to the outgoing message. This a queue where
@@ -1501,10 +1548,11 @@ public class JmsOutputChannel implements OutputChannel
 				//	for response is provided in configuration for the endpoint
 				anEndpoint.startProcessRequestTimer(aCasReferenceId);
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
                     new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-
+      }
 			//	By default start a timer associated with a connection to the endpoint. Once a connection is established with an
 			//	endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
 			//	the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
@@ -1520,10 +1568,6 @@ public class JmsOutputChannel implements OutputChannel
 			//	Send Request Messsage to the Endpoint
 			// ----------------------------------------------------
 			endpointConnection.send(tm, startConnectionTimer);
-//			if ( getAnalysisEngineController().isTopLevelComponent() )
-//			{
-//				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
-//			}
 			if ( !isRequest )
 			{
 				addIdleTime(tm);
@@ -1532,10 +1576,11 @@ public class JmsOutputChannel implements OutputChannel
 		catch( JMSException e)
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendCasToRemoteDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
-			
+      }			
 		}
 
 		catch( ServiceShutdownException e)
@@ -1621,10 +1666,11 @@ public class JmsOutputChannel implements OutputChannel
         //  for response is provided in configuration for the endpoint
         anEndpoint.startProcessRequestTimer(aCasReferenceId);
       }
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
                     new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-
+      }
       //  By default start a timer associated with a connection to the endpoint. Once a connection is established with an
       //  endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
       //  the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
@@ -1640,10 +1686,6 @@ public class JmsOutputChannel implements OutputChannel
       //  Send Request Messsage to the Endpoint
       // ----------------------------------------------------
       endpointConnection.send(tm, startConnectionTimer);
-//      if ( getAnalysisEngineController().isTopLevelComponent() )
-//      {
-//        getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
-//      }
       if ( !isRequest )
       {
         addIdleTime(tm);
@@ -1652,10 +1694,11 @@ public class JmsOutputChannel implements OutputChannel
     catch( JMSException e)
     {
       //  Unable to establish connection to the endpoint. Logit and continue
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendCasToRemoteDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
-      
+      }
     }
 
     catch( ServiceShutdownException e)
@@ -1748,10 +1791,11 @@ public class JmsOutputChannel implements OutputChannel
 				//	for response is provided in configuration for the endpoint
 				anEndpoint.startProcessRequestTimer(entry.getCasReferenceId());
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
                     new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-
+      }
 			//	By default start a timer associated with a connection to the endpoint. Once a connection is established with an
 			//	endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
 			//	the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
@@ -1781,10 +1825,11 @@ public class JmsOutputChannel implements OutputChannel
 		catch( JMSException e)
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendCasToRemoteDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
-			
+      }
 		}
 
 		catch( ServiceShutdownException e)
@@ -1869,10 +1914,11 @@ public class JmsOutputChannel implements OutputChannel
         //  for response is provided in configuration for the endpoint
         anEndpoint.startProcessRequestTimer(entry.getCasReferenceId());
       }
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
                     new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-
+      }
       //  By default start a timer associated with a connection to the endpoint. Once a connection is established with an
       //  endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
       //  the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
@@ -1898,10 +1944,11 @@ public class JmsOutputChannel implements OutputChannel
     catch( JMSException e)
     {
       //  Unable to establish connection to the endpoint. Logit and continue
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendCasToRemoteDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
-      
+      }
     }
 
     catch( ServiceShutdownException e)
@@ -1976,9 +2023,11 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				id2Log = aNewCasReferenceId;
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "sendCasToCollocatedDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service__FINE",
                     new Object[] {anEndpoint.getEndpoint(), id2Log});
+      }
 			//	Get the connection object for a given endpoint
 			JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
 			//	Create empty JMS Text Message
@@ -2061,10 +2110,11 @@ public class JmsOutputChannel implements OutputChannel
 		catch( JMSException e)
 		{
 			//	Unable to establish connection to the endpoint. Logit and continue
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendCasToCollocatedDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
-			
+      }
 		}
 		catch( ServiceShutdownException e)
 		{
@@ -2119,14 +2169,18 @@ public class JmsOutputChannel implements OutputChannel
 				{
 					endpointConnection = (JmsEndpointConnection_impl)value;
 					endpointConnection.abort();
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+		      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+		        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                    "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_forced_endpoint_close__INFO",
 		                    new Object[] {getAnalysisEngineController().getName(),endpointConnection.getEndpoint(), endpointConnection.getServerUri() });
+		      }
 				}
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_output_channel_aborted__INFO",
 	                new Object[] {getAnalysisEngineController().getName()});
+      }
 		}
 		catch( Exception e)
 		{

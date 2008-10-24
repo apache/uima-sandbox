@@ -112,9 +112,11 @@ implements ExceptionListener
 	 * @param t
 	 */
   private void handleTempQueueFailure(Throwable t) {
-    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
             "handleTempQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
             new Object[] {  endpoint.getDestination(), getBrokerUrl(), t });
+    }
     // Check if the failure is due to the failed connection. Spring (and ActiveMQ) dont seem to provide 
     // the cause. Just the top level IllegalStateException with a text message. This is what we need to
     //  check for.
@@ -122,15 +124,19 @@ implements ExceptionListener
       if ( controller != null && controller instanceof AggregateAnalysisEngineController ) {
         String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(endpoint.getEndpoint());
         try {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
                   "handleTempQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_listener_INFO",
                   new Object[] {  controller.getComponentName(), endpoint.getDestination(),delegateKey });
+          }
           // Stop current listener 
           handleListenerFailure();
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
                   "handleTempQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopped_listener_INFO",
                   new Object[] {  controller.getComponentName(), endpoint.getDestination() });
-        } catch ( Exception e ) {
+          }
+         } catch ( Exception e ) {
           e.printStackTrace();
         }
       }
@@ -162,9 +168,11 @@ implements ExceptionListener
   private void handleQueueFailure(Throwable t) {
     final String endpointName = 
       (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
-    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
             "handleQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
             new Object[] {  endpointName, getBrokerUrl(), t });
+    }
     boolean terminate = true;
     //  Check if the failure is severe enough to disable this listener. Whether or not this listener is actully
     //  disabled depends on the action associated with GetMeta Error Handler. If GetMeta Error Handler is
@@ -195,9 +203,11 @@ implements ExceptionListener
             list.add(delegateKey);
             try {
               System.out.println(">>>> Controller:"+controller.getComponentName()+" Disabling Listener On Queue:"+endpoint.getEndpoint()+". Component's "+delegateKey+" Broker:"+getBrokerUrl()+" is Invalid");
-              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+              if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
                           "handleQueueFailure", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disabled_delegate_bad_broker__INFO",
                           new Object[] {  controller.getComponentName(), delegateKey, getBrokerUrl() });
+              }
               //  Remove the delegate from the routing table. 
               ((AggregateAnalysisEngineController) controller).disableDelegates(list);
               terminate = false; //just disable the delegate and continue
@@ -219,10 +229,11 @@ implements ExceptionListener
       {
         try
         {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
                       "handleQueueFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_disable_listener__WARNING",
                       new Object[] {  endpointName, getBrokerUrl() });
-          
+          }
           shutdown();
         }
         catch( Exception e) { e.printStackTrace();}
@@ -275,9 +286,11 @@ implements ExceptionListener
     //  terminate the service
     // ****************************************
     System.out.println(">>>> Terminating Controller:"+controller.getComponentName()+" Unable To Initialize Listener Due to Invalid Broker URL:"+getBrokerUrl());
-    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
                 "terminate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_terminate_service_dueto_bad_broker__WARNING",
                 new Object[] {  controller.getComponentName(), getBrokerUrl() });
+    }
     controller.notifyListenersWithInitializationStatus(new ResourceInitializationException(t));
     controller.stop();
 	}
@@ -287,9 +300,11 @@ implements ExceptionListener
       String endpointName = 
         (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
       
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
                 "handleListenerException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
                 new Object[] {  endpointName, getBrokerUrl(), t });
+      }
 			super.handleListenerException(t);
 		
 	}
@@ -318,9 +333,11 @@ implements ExceptionListener
 		catch( Exception e)
 		{
 			e.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+	    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
 	                "afterPropertiesSet", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING",
 	                new Object[] {Thread.currentThread().getId(), e});
+	    }
 		}
 	}
 	
@@ -357,10 +374,11 @@ implements ExceptionListener
 		}
 		catch( Exception e)
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+	    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
 	                "closeConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING",
 	                new Object[] {Thread.currentThread().getId(), e});
-			
+	    }
 		}
 	}
 	public void setDestination( Destination aDestination )
@@ -390,9 +408,11 @@ implements ExceptionListener
     String endpointName = 
       (getDestination() == null) ? "" : ((ActiveMQDestination)getDestination()).getPhysicalName(); 
     
-    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
               "onException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
               new Object[] {  endpointName, getBrokerUrl(), arg0});
+    }
 	}
 
 	public void setTargetEndpoint( Endpoint anEndpoint )

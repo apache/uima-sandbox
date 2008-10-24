@@ -45,26 +45,7 @@ public class UimaEeExceptionListener implements ExceptionListener, ApplicationLi
 	{
 		if ( anEvent instanceof UimaEEShutdownTriggerEvent)
 		{
-System.out.println("Reaper Received Shutdown Request");
-/*
-	AnalysisEngineController targetController =
-				((UimaEEShutdownTriggerEvent)anEvent).getTargetController();
-			
-			if ( targetController != null && targetController.isTopLevelComponent() )
-			{
-				targetController.terminate();
-				InProcessCache inProcessCache = targetController.getInProcessCache();
-				if ( !inProcessCache.isEmpty() )
-				{
-					inProcessCache.registerCallbackWhenCacheEmpty(targetController.getEventListener());
-				}
-				else
-				{
-					//	Callback to notify that the cache is empty
-					targetController.getEventListener().onCacheEmpty();
-				}
-			}
-*/			
+		  System.out.println("Reaper Received Shutdown Request");
 		}
 		else
 		{

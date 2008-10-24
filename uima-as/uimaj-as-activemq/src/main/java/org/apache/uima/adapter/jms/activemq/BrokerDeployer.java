@@ -83,15 +83,12 @@ public class BrokerDeployer implements ApplicationListener
 		if (maxBrokerMemory > 0 )
 		{
 			System.out.println("Configuring Internal Broker With Max Memory Of:"+maxBrokerMemory);
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
                     "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_broker_memory__CONFIG",
                     new Object[] {maxBrokerMemory});
-//			service.getMemoryManager().setLimit(maxBrokerMemory);
+      }
 		}
-//		usageListener = new UimaEEBrokerMemoryUsageListener();
-
-//		service.getMemoryManager().addUsageListener( usageListener ); //new UimaEEBrokerMemoryUsageListener());
-		
 		String[] connectors = service.getNetworkConnectorURIs();
 		if ( connectors != null  )
 		{
@@ -137,9 +134,11 @@ public class BrokerDeployer implements ApplicationListener
 				System.setProperty("com.sun.management.jmxremote.port", String.valueOf(startPort)); 
 
 				System.out.println("JMX Console connect URI:  service:jmx:rmi:///jndi/rmi://localhost:"+startPort+"/jmxrmi");
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
 	                    "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jmx_uri__CONFIG",
 	                    new Object[] {"service:jmx:rmi:///jndi/rmi://localhost:"+startPort+"/jmxrmi" });
+        }
 			}
 
 			brokerURI = generateInternalURI("tcp", 18810, true, false);
@@ -165,19 +164,22 @@ public class BrokerDeployer implements ApplicationListener
 				
 			}
 			System.out.println("Adding TCP Connector:"+tcpConnector.getConnectUri());
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
                     "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_adding_connector__CONFIG",
                     new Object[] {"Adding TCP Connector",tcpConnector.getConnectUri() });
-
+      }
 			connectorList = tcpConnector.getName();
 			if ( System.getProperty("StompSupport") != null )
 			{
 				String stompURI = generateInternalURI("stomp", 61613, false, false);
 				connector = service.addConnector(stompURI);
 				System.out.println("Adding STOMP Connector:"+connector.getConnectUri());
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
 	                    "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_adding_connector__CONFIG",
 	                    new Object[] {"Adding STOMP Connector",connector.getConnectUri() });
+        }
 				connectorList += ","+connector.getName();
 			}
 			if ( System.getProperty("HTTP") != null )
@@ -187,18 +189,21 @@ public class BrokerDeployer implements ApplicationListener
 				String httpURI = generateInternalURI("http", p, false, true);
 				httpConnector = service.addConnector(httpURI);
 				System.out.println("Adding HTTP Connector:"+httpConnector.getConnectUri());
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
 	                    "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_adding_connector__CONFIG",
 	                    new Object[] {"Adding HTTP Connector",httpConnector.getConnectUri() });
-
+        }
 				connectorList += ","+httpConnector.getName();
 			}
 			service.start();
 			System.setProperty("ActiveMQConnectors", connectorList);
 			System.out.println("Broker Service Started - URL:"+service.getVmConnectorURI());
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
                     "startInternalBroker", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_broker_started__CONFIG",
                     new Object[] {service.getVmConnectorURI() });
+      }
 		}
 			
 		// Allow the connectors some time to start
@@ -259,10 +264,11 @@ public class BrokerDeployer implements ApplicationListener
 			try
 			{
 				ssocket = new ServerSocket(openPort);
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
 	                    "generateInternalURI", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_port_available__CONFIG",
 	                    new Object[] {openPort });
-				
+        }
 				String uri = aProtocol+"://"+ssocket.getInetAddress().getLocalHost().getCanonicalHostName()+":"+openPort;
 				success = true;
 				if ( cacheURL )
@@ -274,9 +280,11 @@ public class BrokerDeployer implements ApplicationListener
 			}
 			catch( BindException e)
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
 	                    "generateInternalURI", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_port_not_available__CONFIG",
 	                    new Object[] {openPort });
+        }
 				if ( oneTry )
 				{
 					System.out.println("Given port:"+openPort+" is not available for "+aProtocol);
@@ -287,9 +295,11 @@ public class BrokerDeployer implements ApplicationListener
 			catch( Exception e)
 			{
 				e.printStackTrace();
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 	                    "generateInternalURI", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING",
 	                    new Object[] {JmsConstants.threadName(), e });
+        }
 				if ( oneTry )
 				{
 					throw e;
@@ -372,13 +382,17 @@ public class BrokerDeployer implements ApplicationListener
 	{
 		if ( anEvent instanceof ContextClosedEvent)
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "onApplicationEvent", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_terminated__INFO",
 	                new Object[] {(( ContextClosedEvent)anEvent).getApplicationContext().getDisplayName()});
+      }
 			stop();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "onApplicationEvent", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_broker_stopped__INFO",
 	                new Object[] {brokerURI});
+      }
 		}
 	}
 

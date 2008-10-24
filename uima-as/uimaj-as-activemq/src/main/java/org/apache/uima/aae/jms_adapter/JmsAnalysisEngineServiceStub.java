@@ -146,7 +146,9 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
 //      System.out.println("destroy methjdssdx");
       uimaEEEngine.stop();
     } catch (Exception e) {
-      UIMAFramework.getLogger().log(Level.WARNING, e.getMessage(), e);
+      if (UIMAFramework.getLogger().isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger().log(Level.WARNING, e.getMessage(), e);
+      }
     }
   }
 

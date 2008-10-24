@@ -127,10 +127,12 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 	public void setEndpointName( String anEndpointName )
 	{
 		endpointName = anEndpointName;
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                 "setEndpointName", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_service_listening__INFO",
                 new Object[] { anEndpointName });
-		
+      
+    }		
 	}
 	
 	/**
@@ -149,18 +151,22 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
 			if ( msgType != AsynchAEMessage.Response && msgType != AsynchAEMessage.Request )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                    "validMessageType", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_msgtype_in_message__INFO",
 	                    new Object[] { msgType, endpointName });
+		    }
 				return false;
 				
 			}
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "validMessageType", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msgtype_notin_message__INFO",
                     new Object[] { endpointName });
+	    }
 			return false;
 		}
 
@@ -242,17 +248,21 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
          command != AsynchAEMessage.Ping && 
 				 command != AsynchAEMessage.CollectionProcessComplete )
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                    "validCommand", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_command_in_message__INFO",
 	                    new Object[] { command, endpointName });
+		    }
 				return false;
 			}
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "validCommand", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_command_notin_message__INFO",
                     new Object[] { endpointName });
+	    }
 			return false;
 		}
 
@@ -292,19 +302,22 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				 payload != AsynchAEMessage.Metadata 
 				)
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                    "validPayload", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_payload_in_message__INFO",
 	                    new Object[] { payload, endpointName });
-				
+		    }
 				
 				return false;
 			}
 		}
 		else
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "validPayload", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_payload_notin_message__INFO",
                     new Object[] { endpointName });
+	    }
 			return false;
 		}
 
@@ -325,9 +338,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
 			if (!getController().getInProcessCache().entryExists(casReferenceId))
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                    "isStaleMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stale_message__FINE",
 	                    new Object[] { endpointName, casReferenceId, aMessage.getStringProperty(AsynchAEMessage.MessageFrom) });
+		    }
 				return true;
 			}
 		}
@@ -530,9 +545,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		}
 		
 
-		UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_msg__FINE",
                 new Object[] { eN });
+    }
 		JmsMessageContext messageContext = null;
 
 		int requestType = 0;
@@ -574,16 +591,19 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				{
 					if ( msgSentFromIP != null )
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+				    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+				      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 			                    "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_new_message_with_ip__FINE",
 			                    new Object[] { controller.getComponentName(), msgFrom, msgSentFromIP, messageType, command, casRefId });
-						
+				    }						
 					}
 					else
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 			                    "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_recvd_new_message__FINE",
 			                    new Object[] { controller.getComponentName(), msgFrom, messageType, command, casRefId });
+            }
 					}
 				}
 				else
@@ -614,9 +634,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 					getController().beginProcess(requestType);
 				}
 
-	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
                 "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_new_msg_in__FINEST",
                 new Object[] { getController().getComponentName(), msgFrom, command, messageType, casRefId });
+        }
 				if ( handler != null )
 				{
 					handler.handle( messageContext );
@@ -634,9 +656,10 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		catch( Throwable t)
 		{
 			t.printStackTrace();
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
                     "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", t);
-
+      }
 			controller.getErrorHandlerChain().handle(t, HandlerBase.populateErrorContext( messageContext ), controller);			
 		}
 		finally
@@ -646,9 +669,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			{
 				getController().endProcess(requestType);
 			}
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_processed__FINE",
                     new Object[] { getController().getComponentName(), casRefId });
+      }
 		}
 	}
 	
@@ -697,10 +722,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			}
 			catch( Exception e)
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
 	                    "ackMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING",
 	                    new Object[] { Thread.currentThread().getName(), e });
-
+        }
 			}
 		}
 	}
@@ -758,9 +784,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				String eName = mL.getEndpointName();
 				if ( eName != null )
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                    "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_jms_transport__INFO",
 		                    new Object[] { eName /* mL.getEndpointName()*/ /*endpointName */});
+          }
 				}
 				mL.closeConnection();
 				mL.stop();
@@ -769,9 +797,11 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			{
 				if ( getController() != null )
 				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                    "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_transport_not_stopped__INFO",
 		                    new Object[] { getController().getComponentName() });
+          }
 				}
 			}
 		}

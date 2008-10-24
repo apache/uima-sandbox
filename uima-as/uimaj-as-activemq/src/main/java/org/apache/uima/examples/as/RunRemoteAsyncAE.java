@@ -237,6 +237,7 @@ public class RunRemoteAsyncAE {
     appCtx.put(UimaAsynchronousEngine.CasPoolSize, casPoolSize);
     appCtx.put(UIMAFramework.CAS_INITIAL_HEAP_SIZE, new Integer(fsHeapSize/4).toString());
 
+    appCtx.put(UimaAsynchronousEngine.SerializationStrategy, "binary");
     //initialize
     uimaEEEngine.initialize(appCtx);
 

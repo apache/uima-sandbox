@@ -58,7 +58,9 @@ implements UimaEEAdminContext, ApplicationListener
 			}
 			catch( Exception e) 
 			{
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "UimaEEAdminSpringContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] {  e });
+		    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "UimaEEAdminSpringContext", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] {  e });
+		    }
 			}
 		}
 	}
@@ -140,9 +142,11 @@ implements UimaEEAdminContext, ApplicationListener
 					String eName = listenerContainer.getEndpointName();
 					if ( eName != null )
 					{
-						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
+				    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+				      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
 				                "spinThreadForListenerShutdown.run()", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stop_listener__INFO",
 				                new Object[] { eName  });
+				    }
 					}
 				}
 				catch( Exception e) { e.printStackTrace();}
