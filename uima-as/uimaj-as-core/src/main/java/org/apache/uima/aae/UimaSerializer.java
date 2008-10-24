@@ -259,6 +259,28 @@ public class UimaSerializer
       }
     }
   }
+
+  public byte[] serializeCasToBinary(CAS aCAS, Marker aMark) throws Exception
+  {
+    ByteArrayOutputStream fos = null;
+    try
+    {
+      fos = new ByteArrayOutputStream();
+      Serialization.serializeCAS(aCAS, fos, aMark);
+      return fos.toByteArray();
+    }
+    catch( Exception e)
+    {
+      throw e;
+    }
+    finally
+    {
+      if ( fos != null)
+      {
+        fos.close();
+      }
+    }
+  }
   
   public void reset() {
     xmlReaderMap.clear();

@@ -175,22 +175,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	    deserSharedData = new XmiSerializationSharedData();
 //      UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
       uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
-	    // *************************************************************************
-	    // Check and set up for Delta CAS reply
-	    // *************************************************************************
-	    boolean acceptsDeltaCas = false;
-	    Marker marker = null;
-	    if (aMessageContext.propertyExists(AsynchAEMessage.AcceptsDeltaCas)) {
-	        acceptsDeltaCas = aMessageContext.getMessageBooleanProperty(AsynchAEMessage.AcceptsDeltaCas);
-	        if (acceptsDeltaCas ) {
-	         marker = cas.createMarker();
-	        }
-	    }
-	    // ************************************************************************* 
-	    //  Register the CAS with a local cache
-	    // ************************************************************************* 
-	    //CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
-	    entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId, marker, acceptsDeltaCas);
 	  }
 	  else if ( serializationStrategy.equals("binary"))
 	  {
@@ -201,9 +185,26 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	    byte[] binarySource = aMessageContext.getByteMessage();
 //      UimaSerializer.deserializeCasFromBinary(binarySource, cas);
       uimaSerializer.deserializeCasFromBinary(binarySource, cas);
-	    entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId );
 	  }
-		long timeToDeserializeCAS = getController().getCpuTime() - t1;
+
+    // *************************************************************************
+    // Check and set up for Delta CAS reply
+    // *************************************************************************
+    boolean acceptsDeltaCas = false;
+    Marker marker = null;
+    if (aMessageContext.propertyExists(AsynchAEMessage.AcceptsDeltaCas)) {
+        acceptsDeltaCas = aMessageContext.getMessageBooleanProperty(AsynchAEMessage.AcceptsDeltaCas);
+        if (acceptsDeltaCas ) {
+         marker = cas.createMarker();
+        }
+    }
+    // ************************************************************************* 
+    //  Register the CAS with a local cache
+    // ************************************************************************* 
+    //CacheEntry entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId);
+    entry = getController().getInProcessCache().register(cas, aMessageContext, deserSharedData, casReferenceId, marker, acceptsDeltaCas);
+
+    long timeToDeserializeCAS = getController().getCpuTime() - t1;
 		getController().incrementDeserializationTime(timeToDeserializeCAS);
 		LongNumericStatistic statistic;
 		if ( (statistic = getController().getMonitor().getLongNumericStatistic("",Monitor.TotalDeserializeTime)) != null )
