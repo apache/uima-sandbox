@@ -48,10 +48,11 @@ public class InvalidJMSMessageHandler extends ErrorHandlerBase implements ErrorH
 	{
 		if (t instanceof InvalidMessageException )
 		{
-			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                "handleError", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_invalid_jms_message__INFO",
 	                new Object[] {});
-
+      }
 			if ( anErrorContext.containsKey(UIMAMessage.RawMsg ))
 			{
 				
