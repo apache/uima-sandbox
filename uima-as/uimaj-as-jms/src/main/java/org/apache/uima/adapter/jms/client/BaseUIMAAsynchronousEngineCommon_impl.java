@@ -823,9 +823,18 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			payload = ((Integer) message.getIntProperty(AsynchAEMessage.Payload)).intValue();
 		}
-		if (AsynchAEMessage.Exception == payload)
+    //  Fetch entry from the client cache for a cas id returned from the service
+    //  The client cache maintains an entry for every outstanding CAS sent to the
+    //  service.
+    ClientRequest cachedRequest = null;
+    
+    if ( casReferenceId != null ) {
+      cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
+    }
+
+    if (AsynchAEMessage.Exception == payload)
 		{
-			handleException(message, true);
+			handleException(message, cachedRequest, true);
 			return;
 		}
 		//	If the Cas Reference id not in the message check if the message contains an
@@ -840,10 +849,6 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		  
 
-		//	Fetch entry from the client cache for a cas id returned from the service
-		//	The client cache maintains an entry for every outstanding CAS sent to the
-		//	service.
-		ClientRequest cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
 		if ( cachedRequest != null )
 		{
 			//	Store the total latency for this CAS. The departure time is set right before the CAS
@@ -965,7 +970,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		return false;
 	}
-	private void handleException( Message message, boolean doNotify )
+	private void handleException( Message message, ClientRequest cachedRequest, boolean doNotify )
 	throws Exception
 	{
 		if ( !isShutdownException(message))
@@ -986,30 +991,51 @@ implements UimaAsynchronousEngine, MessageListener
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_exception_msg_INFO",
 				new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference), exception });
     }
-		if ( doNotify )
-		{
-			ProcessTrace pt = new ProcessTrace_impl();
-			UimaASProcessStatusImpl status = null; //  new UimaASProcessStatusImpl(pt);
-			String casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
-			if ( casReferenceId != null && casReferenceId.trim().length() > 0)
-			{
-				//	Add Cas reference Id to enable matching replies with requests
-				status = new UimaASProcessStatusImpl(pt, casReferenceId);
-			}
-			else
-			{
-				status = new UimaASProcessStatusImpl(pt);
-			}
-			status.addEventStatus("Process", "Failed", exception);
-			notifyListeners(null, status, AsynchAEMessage.Process);
-			//	 Done here
-			return;
-		}
-		else
-		{
-			throw new ResourceProcessException(exception);
-		}
-
+    String casReferenceId = null;
+    try {
+      if ( doNotify )
+      {
+        ProcessTrace pt = new ProcessTrace_impl();
+        UimaASProcessStatusImpl status = null; //  new UimaASProcessStatusImpl(pt);
+        casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
+        if ( casReferenceId != null && casReferenceId.trim().length() > 0)
+        {
+          //  Add Cas reference Id to enable matching replies with requests
+          status = new UimaASProcessStatusImpl(pt, casReferenceId);
+        }
+        else
+        {
+          status = new UimaASProcessStatusImpl(pt);
+        }
+        status.addEventStatus("Process", "Failed", exception);
+        notifyListeners(null, status, AsynchAEMessage.Process);
+        //   Done here
+        return;
+      }
+      else
+      {
+        throw new ResourceProcessException(exception);
+      }
+    } catch ( Exception e) {
+      throw e;
+    }
+    finally {
+      //  Dont release the CAS if the application uses synchronous API
+      if ( cachedRequest != null && 
+           !cachedRequest.isSynchronousInvocation() && 
+           cachedRequest.getCAS() != null )
+      {
+         cachedRequest.getCAS().release();
+      }
+      removeFromCache(casReferenceId);
+      if (howManyRecvd == howManySent)
+      {
+        synchronized (cpcGate)
+        {
+          cpcGate.notifyAll();
+        }
+      }
+    }
 	}
 	private void completeProcessingReply( CAS cas, String casReferenceId, int payload, boolean doNotify, Message message, ClientRequest cachedRequest, ProcessTrace pt  )
 	throws Exception
