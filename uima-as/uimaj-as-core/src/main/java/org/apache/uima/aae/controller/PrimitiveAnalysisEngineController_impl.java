@@ -146,6 +146,12 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		        System.out.println(">>>>>>>>> Service Has Stopped ....");
 		        throw new AsynchAEException(new ServiceShutdownException());
 		      }
+		     ex1.printStackTrace();
+		     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+		        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { ex1 });
+		     }
+         latch.openLatch(getName(), isTopLevelComponent(), true);
+		     throw new AsynchAEException(ex1);
 			}
 			if ( serviceInfo == null )
 			{
