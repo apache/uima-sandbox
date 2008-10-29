@@ -1312,7 +1312,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	      else 
 	      {
 	        
-	        if ( cacheEntry.isSubordinate() )
+	        if ( cacheEntry.isSubordinate() && isTopLevelComponent())
 	        {
 	            cacheEntry.setWaitingForRelease(true);
           }
