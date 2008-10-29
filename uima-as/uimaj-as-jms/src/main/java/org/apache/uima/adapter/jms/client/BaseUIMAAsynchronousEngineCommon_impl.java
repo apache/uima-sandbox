@@ -270,6 +270,7 @@ implements UimaAsynchronousEngine, MessageListener
       }
 			synchronized( pendingMessageList )
 			{
+			  receivedCpcReply = false;
 				pendingMessageList.add(msg);
 				pendingMessageList.notifyAll();
 			}
