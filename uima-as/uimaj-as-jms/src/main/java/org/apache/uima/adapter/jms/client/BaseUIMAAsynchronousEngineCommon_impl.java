@@ -1009,7 +1009,13 @@ implements UimaAsynchronousEngine, MessageListener
           status = new UimaASProcessStatusImpl(pt);
         }
         status.addEventStatus("Process", "Failed", exception);
-        notifyListeners(null, status, AsynchAEMessage.Process);
+        if ( cachedRequest != null && 
+                !cachedRequest.isSynchronousInvocation() && 
+                cachedRequest.getCAS() != null ) {
+          notifyListeners(cachedRequest.getCAS(), status, AsynchAEMessage.Process);
+        } else {
+          notifyListeners(null, status, AsynchAEMessage.Process);
+        }
         //   Done here
         return;
       }
