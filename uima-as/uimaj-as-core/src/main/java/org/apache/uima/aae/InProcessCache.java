@@ -425,11 +425,11 @@ public class InProcessCache implements InProcessCacheMBean
 	public void addEndpoint( Endpoint anEndpoint, String aCasReferenceId)
 	{
 		CacheEntry casRefEntry = getEntry(aCasReferenceId);
-		casRefEntry.addEndpoint(anEndpoint);
-		
-		
+		if ( !casRefEntry.getEndpointMap().containsKey(anEndpoint.getEndpoint())) {
+	    casRefEntry.addEndpoint(anEndpoint);
+		}
 	}
-
+	
 	public Endpoint getEndpoint(String anEndpointName, String aCasReferenceId)
 	{
 		CacheEntry casRefEntry = getEntry(aCasReferenceId);

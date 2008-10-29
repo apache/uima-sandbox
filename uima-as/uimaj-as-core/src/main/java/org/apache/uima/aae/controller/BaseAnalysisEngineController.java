@@ -948,11 +948,13 @@ implements AnalysisEngineController, EventSubscriber
 
 				if ( anEndpoint != null )
 				{
+				  Endpoint endpoint = null;
 					List list = new ArrayList();
 					String key = "";
-					if ( ((AggregateAnalysisEngineController)this).lookUpEndpoint(anEndpoint, false) == null )
+					if ( (endpoint = ((AggregateAnalysisEngineController)this).lookUpEndpoint(anEndpoint, false)) == null )
 					{
 						key = ((AggregateAnalysisEngineController)this).lookUpDelegateKey(anEndpoint);
+						endpoint = ((AggregateAnalysisEngineController)this).lookUpEndpoint(key, false);
 						list.add(key);
 					}
 					else
@@ -960,8 +962,29 @@ implements AnalysisEngineController, EventSubscriber
 						key = anEndpoint;
 						list.add(anEndpoint);
 					}
-					
-					((AggregateAnalysisEngineController)this).disableDelegates(list);
+          ((AggregateAnalysisEngineController)this).disableDelegates(list);
+
+          if ( endpoint != null ) {
+	          try {
+	            // Fetch all Cas entries currently awaiting reply from the delegate that was just
+	            // disabled. In case the delegate was in a parallel step, we need to adjust the
+	            // the number of responses received to account for the failed delegate. This 
+	            // enables the processing to continue.
+	            CacheEntry[] entries = getInProcessCache().getCacheEntriesForEndpoint(endpoint.getEndpoint());
+	            if ( entries != null ) {
+	              for ( int i=0; i < entries.length; i++ ) {
+	                // Check if this is a parallel step
+	                int parallelDelegateCount = entries[i].getNumberOfParallelDelegates();
+	                // Check if all delegated responded
+	                if ( parallelDelegateCount > 1 && entries[i].howManyDelegatesResponded() < parallelDelegateCount) {
+	                  // increment responders 
+	                  entries[i].incrementHowManyDelegatesResponded();
+	                }
+	              }
+	            }
+	          } catch( Exception e) {
+	          }
+					}
 	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
 	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 		                "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disabled_delegate_INFO",

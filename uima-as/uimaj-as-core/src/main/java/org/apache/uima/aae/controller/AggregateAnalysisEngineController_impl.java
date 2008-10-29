@@ -627,6 +627,26 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     super.stop();
 	}
 
+	private void stopListener( String key, Endpoint endpoint ) throws Exception {
+    //  Stop the Listener on endpoint that has been disabled
+    InputChannel iC = null;
+    String destName = null;
+    if ( endpoint.getDestination() != null ) {
+      System.out.println("Controller:"+getComponentName()+"-Stopping Listener Thread on Endpoint:"+endpoint.getDestination());          
+      destName = endpoint.getDestination().toString();
+      iC =  getInputChannel(destName);
+    } else {
+       System.out.println("Controller:"+getComponentName()+"-Stopping Listener Thread on Endpoint:"+endpoint.getReplyToEndpoint());          
+        destName = endpoint.getReplyToEndpoint();
+       iC = getInputChannel(destName);
+    }
+    if ( iC != null ) {
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stopListener", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stopping_listener__INFO", new Object[] { getComponentName(),  destName, key });
+      }
+      iC.destroyListener(destName, key);
+    }
+	}
 	public void disableDelegates(List aDelegateList) throws AsynchAEException
 	{
 		try
@@ -635,35 +655,31 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			while (it.hasNext())
 			{
 				String key = (String) it.next();
-				System.out.println("Controller:"+getName()+ " Disabling Delegate:"+key+" Due to Excessive Errors");
+        Endpoint endpoint = lookUpEndpoint(key, false);
+				//  if the the current delegate is remote, destroy its listener
+        if ( endpoint != null && endpoint.isRemote() )
+				{
+          stopListener( key, endpoint);
+				}
+        System.out.println("Controller:"+getComponentName()+ " Disabling Delegate:"+key+" Due to Excessive Errors");
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "disableDelegates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removing_endpoint_from_map__INFO", new Object[] { getName(), key });
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "disableDelegates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removing_endpoint_from_map__INFO", new Object[] { getComponentName(), key });
         }
-				//	Change state of the delegate
-				ServiceInfo sf = getDelegateServiceInfo( key );
-				if ( sf != null )
-				{
-					sf.setState("Disabled");
-				}
-				Endpoint endpoint = lookUpEndpoint(key, false);
-				synchronized( destinationMap )
-				{
-					destinationMap.remove(key);
-				}
-				synchronized( disabledDelegateList )
-				{
-					disabledDelegateList.add(key);
-				}
-				if ( endpoint != null && 
-				     endpoint.isRemote() && 
-				     getUimaEEAdminContext() != null && 
-				     endpoint.getReplyToEndpoint() != null &&
-				     endpoint.getReplyToEndpoint().trim().length() > 0)
-				{
-					System.out.println("Controller:"+getComponentName()+"-Stopping Listener Thread on Endpoint:"+endpoint.getReplyToEndpoint());					
-					//	Stop the Listener on endpoint that has been disabled
-					getUimaEEAdminContext().stopListener(endpoint.getReplyToEndpoint());
-				}
+        //  Change state of the delegate
+        ServiceInfo sf = getDelegateServiceInfo( key );
+        if ( sf != null )
+        {
+          sf.setState("Disabled");
+        }
+        synchronized( destinationMap )
+        {
+          destinationMap.remove(key);
+        }
+        synchronized( disabledDelegateList )
+        {
+          disabledDelegateList.add(key);
+        }
+
 			}
 			if (flowControllerContainer != null)
 			{
@@ -676,7 +692,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				catch( Exception ex)
 				{
-					//ex.printStackTrace();
 	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
 	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "disableDelegates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { ex });
 	         }
@@ -1297,7 +1312,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	      else 
 	      {
 	        
-	        if ( cacheEntry.isSubordinate())
+	        if ( cacheEntry.isSubordinate() )
 	        {
 	            cacheEntry.setWaitingForRelease(true);
           }
