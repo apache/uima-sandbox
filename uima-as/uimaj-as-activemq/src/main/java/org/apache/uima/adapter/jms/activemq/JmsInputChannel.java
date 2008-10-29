@@ -869,17 +869,25 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
     }
     return null;
   }
-  public void destroyListener( String anEndpointName, String aDelegateKey ) {
+  public synchronized void destroyListener( String anEndpointName, String aDelegateKey ) {
     final UimaDefaultMessageListenerContainer mListener = 
       getListenerForEndpoint(anEndpointName);
     if ( mListener == null ) {
       System.out.println("--- Listener For Endpoint: "+aDelegateKey+" Not Found");
       return;
     }
+    if ( !mListener.isRunning() ) {
+      return; // Already Stopped
+    }
     
     try {
-//      if ( messageListener.getDestination().toString().equals( anEndpointName)) {
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) && mListener.getDestination() != null) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                    "destroyListener", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stop_listener__INFO",
+                    new Object[] { mListener.getDestination().toString() });
+        }
         System.out.println("++++ Stopping Listener ...");
+        mListener.closeConnection();
         mListener.stop();
         System.out.println("++++ Destroying Listener ...");
         new Thread() {
@@ -888,7 +896,12 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
           }
         };
         while( mListener.isRunning());      
-        System.out.println("++++ Listener on Queue:"+anEndpointName+" Has Been Stopped...");
+        System.out.println("Thread:"+Thread.currentThread().getId()+"++++ Listener on Queue:"+anEndpointName+" Has Been Stopped...");
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) && mListener.getDestination() != null) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                    "destroyListener", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopped_listener_INFO",
+                    new Object[] {controller.getComponentName(), mListener.getDestination().toString() });
+        }
         Endpoint endpoint = ((AggregateAnalysisEngineController)getController()).lookUpEndpoint(aDelegateKey, false);
         endpoint.setStatus(Endpoint.FAILED);
         if ( mListener.getConnectionFactory() != null) {
@@ -896,7 +909,6 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
             if ( !failedListenerMap.containsKey(aDelegateKey )) {
               failedListenerMap.put( aDelegateKey, mListener);
               listenerContainerList.remove(mListener);
-              System.out.println("++++ Saving Connection Factory");
             }
           }
         }

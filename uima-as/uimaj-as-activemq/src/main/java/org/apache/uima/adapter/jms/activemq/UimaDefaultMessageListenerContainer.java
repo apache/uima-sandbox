@@ -369,6 +369,7 @@ implements ExceptionListener
 		try
 		{
 			setRecoveryInterval(0);
+			setAcceptMessagesWhileStopping(false);
 			setAutoStartup(false);
 			getSharedConnection().close();
 		}
