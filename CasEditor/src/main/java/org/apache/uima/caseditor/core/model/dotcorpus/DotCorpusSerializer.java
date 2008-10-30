@@ -29,6 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.editor.AnnotationStyle;
 import org.apache.uima.util.XMLSerializer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;

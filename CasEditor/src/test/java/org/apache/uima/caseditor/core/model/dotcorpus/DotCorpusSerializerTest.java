@@ -26,7 +26,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import org.apache.uima.caseditor.core.model.dotcorpus.AnnotationStyle.Style;
+import org.apache.uima.caseditor.editor.AnnotationStyle;
+import org.apache.uima.caseditor.editor.AnnotationStyle.Style;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 

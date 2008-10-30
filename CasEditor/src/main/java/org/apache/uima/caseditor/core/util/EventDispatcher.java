@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The EventDispatcher routs received events to the registered handler objects.
+ * The EventDispatcher routes received events to the registered handler objects.
  *
  * @param <K>
  *          the key type

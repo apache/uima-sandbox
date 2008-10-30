@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core.util;
+package org.apache.uima.caseditor.editor.util;
 
 import java.util.Random;
 

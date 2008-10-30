@@ -28,7 +28,7 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
-import org.apache.uima.caseditor.core.model.dotcorpus.EditorAnnotationStatus;
+import org.apache.uima.caseditor.editor.EditorAnnotationStatus;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;

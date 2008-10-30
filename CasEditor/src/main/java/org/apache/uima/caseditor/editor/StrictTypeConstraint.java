@@ -17,48 +17,34 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core;
+package org.apache.uima.caseditor.editor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import org.apache.uima.cas.FSConstraint;
+import org.apache.uima.cas.FSMatchConstraint;
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.Type;
 
 /**
- * TODO: add javadoc here
+ * Matches all annoations of an added type.
  */
-public abstract class AbstractDocumentListener implements IDocumentListener {
+public class StrictTypeConstraint implements FSConstraint, FSMatchConstraint {
+  private static final long serialVersionUID = 1;
+
+  private Type mMatch;
 
   /**
-   * Forwards the call.
+   * Initializes the current instance.
+   *
+   * @param match
    */
-  public void added(FeatureStructure newAnnotation) {
-    Collection<FeatureStructure> structures = new ArrayList<FeatureStructure>(1);
-
-    structures.add(newAnnotation);
-
-    added(structures);
+  public StrictTypeConstraint(Type match) {
+    mMatch = match;
   }
 
   /**
-   * Forwards the call.
+   * Chekcs if the given {@link FeatureStructure} matchs this constraint.
    */
-  public void removed(FeatureStructure deletedAnnotation) {
-    Collection<FeatureStructure> structures = new ArrayList<FeatureStructure>(1);
-
-    structures.add(deletedAnnotation);
-
-    removed(structures);
-  }
-
-  /**
-   * Forwards the call.
-   */
-  public void updated(FeatureStructure annotation) {
-    Collection<FeatureStructure> structures = new ArrayList<FeatureStructure>(1);
-
-    structures.add(annotation);
-
-    updated(structures);
+  public boolean match(FeatureStructure candidateFS) {
+    return candidateFS.getType().getName().equals(mMatch.getName());
   }
 }

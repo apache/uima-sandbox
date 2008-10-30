@@ -23,8 +23,8 @@ package org.apache.uima.caseditor.editor.action;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.editor.AnnotationSelection;
+import org.apache.uima.caseditor.editor.IDocument;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core.model.dotcorpus;
+package org.apache.uima.caseditor.editor;
 
 import java.awt.Color;
 

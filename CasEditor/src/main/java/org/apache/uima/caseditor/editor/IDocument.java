@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core;
+package org.apache.uima.caseditor.editor;
 
 import java.util.Collection;
 import java.util.Map;
@@ -27,7 +27,6 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.core.model.DocumentElement;
-import org.apache.uima.caseditor.core.util.Span;
 import org.eclipse.core.runtime.CoreException;
 
 /**

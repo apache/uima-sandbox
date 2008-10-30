@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core.uima;
+package org.apache.uima.caseditor.editor;
 
 import java.util.Comparator;
 
@@ -28,7 +28,7 @@ import org.apache.uima.cas.text.AnnotationFS;
  */
 public class AnnotationComparator implements Comparator<AnnotationFS> {
   /**
-   * Compares the given annoations a and b. This implementations only compares the begin index.
+   * Compares the given annotations a and b. This implementations only compares the begin index.
    */
   public int compare(AnnotationFS a, AnnotationFS b) {
     return a.getBegin() - b.getBegin();

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core;
+package org.apache.uima.caseditor.editor;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +31,6 @@ import java.util.TreeSet;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.caseditor.core.util.Span;
 import org.apache.uima.caseditor.core.util.UimaUtil;
 
 /**

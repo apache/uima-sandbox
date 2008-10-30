@@ -28,7 +28,7 @@ import java.util.Set;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
-import org.apache.uima.caseditor.core.model.dotcorpus.EditorAnnotationStatus;
+import org.apache.uima.caseditor.editor.EditorAnnotationStatus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;

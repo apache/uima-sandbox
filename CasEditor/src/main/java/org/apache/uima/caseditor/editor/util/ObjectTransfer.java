@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.editor.util;
 
 import java.util.Arrays;
 
-import org.apache.uima.caseditor.core.util.IDGenerator;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
 

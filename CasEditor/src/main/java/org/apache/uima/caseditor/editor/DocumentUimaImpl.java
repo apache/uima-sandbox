@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core.uima;
+package org.apache.uima.caseditor.editor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,11 +45,9 @@ import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.CasEditorPlugin;
-import org.apache.uima.caseditor.core.AbstractDocument;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.DocumentFormat;
 import org.apache.uima.caseditor.core.model.NlpProject;
-import org.apache.uima.caseditor.core.util.Span;
 import org.apache.uima.util.XMLSerializer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;

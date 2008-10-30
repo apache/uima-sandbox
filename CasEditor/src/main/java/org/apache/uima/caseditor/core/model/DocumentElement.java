@@ -25,9 +25,9 @@ import java.io.InputStream;
 import java.lang.ref.SoftReference;
 
 import org.apache.uima.caseditor.CasEditorPlugin;
-import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
-import org.apache.uima.caseditor.core.uima.DocumentUimaImpl;
+import org.apache.uima.caseditor.editor.DocumentUimaImpl;
+import org.apache.uima.caseditor.editor.IDocument;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;

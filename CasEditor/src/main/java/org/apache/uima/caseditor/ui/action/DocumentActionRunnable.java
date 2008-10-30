@@ -27,9 +27,9 @@ import java.util.Map;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.caseditor.CasEditorPlugin;
-import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
+import org.apache.uima.caseditor.editor.IDocument;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;

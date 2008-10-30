@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core;
+package org.apache.uima.caseditor.editor;
 
 import java.util.ArrayList;
 import java.util.Collection;

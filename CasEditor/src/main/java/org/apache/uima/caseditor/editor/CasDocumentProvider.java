@@ -42,7 +42,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDocumentProvider;
 
 /**
- * Provides the {@link org.apache.uima.caseditor.core.IDocument} for
+ * Provides the {@link org.apache.uima.caseditor.editor.IDocument} for
  * the {@link AnnotationEditor}.
  */
 public class CasDocumentProvider extends AbstractDocumentProvider {
@@ -60,7 +60,7 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 	protected IAnnotationModel createAnnotationModel(Object element) throws CoreException {
 		return new IAnnotationModel() {
 
-			private org.apache.uima.caseditor.core.IDocument mDocument;
+			private org.apache.uima.caseditor.editor.IDocument mDocument;
 
 			public void addAnnotation(Annotation annotation, Position position) {
 			}
@@ -69,7 +69,7 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 			}
 
 			public void connect(IDocument document) {
-				mDocument = (org.apache.uima.caseditor.core.IDocument) document;
+				mDocument = (org.apache.uima.caseditor.editor.IDocument) document;
 			}
 
 			public void disconnect(IDocument document) {
@@ -128,7 +128,7 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 			if (nlpElement instanceof DocumentElement) {
 
 				try {
-					org.apache.uima.caseditor.core.IDocument workingCopy =
+					org.apache.uima.caseditor.editor.IDocument workingCopy =
 						((DocumentElement) nlpElement).getDocument(true);
 
 					AnnotationDocument document = new AnnotationDocument();
@@ -166,8 +166,8 @@ public class CasDocumentProvider extends AbstractDocumentProvider {
 	protected void doSaveDocument(IProgressMonitor monitor, Object element, IDocument document, boolean overwrite) throws CoreException {
 		fireElementStateChanging(element);
 
-		org.apache.uima.caseditor.core.IDocument casDocument =
-			(org.apache.uima.caseditor.core.IDocument) document;
+		org.apache.uima.caseditor.editor.IDocument casDocument =
+			(org.apache.uima.caseditor.editor.IDocument) document;
 
 		try {
 			casDocument.save();

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core.util;
+package org.apache.uima.caseditor.editor;
 
 /**
  * This class usually specifies an continus are of text. This area has an start and end index. The

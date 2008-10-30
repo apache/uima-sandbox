@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.uima.caseditor.core.util;
+package org.apache.uima.caseditor.editor;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Feature;

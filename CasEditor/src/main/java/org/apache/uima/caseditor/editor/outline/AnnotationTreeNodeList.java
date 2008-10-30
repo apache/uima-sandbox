@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
+import org.apache.uima.caseditor.editor.IDocument;
 
 /**
  * The {@link AnnotationTreeNodeList} class can build a tree of

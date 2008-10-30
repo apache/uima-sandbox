@@ -21,7 +21,7 @@ package org.apache.uima.caseditor.editor.outline;
 
 
 import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.caseditor.core.uima.AnnotationComparator;
+import org.apache.uima.caseditor.editor.AnnotationComparator;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;

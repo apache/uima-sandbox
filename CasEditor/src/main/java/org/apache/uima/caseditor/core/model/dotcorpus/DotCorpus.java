@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.uima.cas.Type;
+import org.apache.uima.caseditor.editor.AnnotationStyle;
 
 /**
  * This class contains all project specific configuration parameters. Note: Use DotCorpusSerialzer

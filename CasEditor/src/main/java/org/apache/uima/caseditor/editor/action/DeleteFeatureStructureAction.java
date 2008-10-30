@@ -20,8 +20,8 @@
 package org.apache.uima.caseditor.editor.action;
 
 
-import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.editor.FeatureStructureSelection;
+import org.apache.uima.caseditor.editor.IDocument;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 

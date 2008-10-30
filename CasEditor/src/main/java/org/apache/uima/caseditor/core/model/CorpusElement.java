@@ -22,8 +22,8 @@ package org.apache.uima.caseditor.core.model;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.apache.uima.caseditor.core.IDocument;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
+import org.apache.uima.caseditor.editor.IDocument;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
