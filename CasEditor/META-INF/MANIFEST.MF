@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.core.filesystem,
  com.ibm.icu,
- org.junit4;resolution:=optional
+ org.junit4;resolution:=optional,
+ org.apache.uima.caseditor.editor;bundle-version="2.3.0"
 Eclipse-RegisterBuddy: org.apache.uima.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-LazyStart: true
@@ -28,14 +29,6 @@ Export-Package: org.apache.uima.caseditor,
  org.apache.uima.caseditor.core.model.dotcorpus,
  org.apache.uima.caseditor.core.uima,
  org.apache.uima.caseditor.core.util,
- org.apache.uima.caseditor.editor,
- org.apache.uima.caseditor.editor.action,
- org.apache.uima.caseditor.editor.annotation,
- org.apache.uima.caseditor.editor.context,
- org.apache.uima.caseditor.editor.editview,
- org.apache.uima.caseditor.editor.editview.validator,
- org.apache.uima.caseditor.editor.fsview,
- org.apache.uima.caseditor.editor.outline,
  org.apache.uima.caseditor.ui,
  org.apache.uima.caseditor.ui.action,
  org.apache.uima.caseditor.ui.corpusview,

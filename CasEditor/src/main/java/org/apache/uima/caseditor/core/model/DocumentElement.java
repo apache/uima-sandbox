@@ -24,8 +24,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 
+import org.apache.uima.cas.CAS;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
+import org.apache.uima.caseditor.editor.DocumentFormat;
 import org.apache.uima.caseditor.editor.DocumentUimaImpl;
 import org.apache.uima.caseditor.editor.IDocument;
 import org.eclipse.core.resources.IFile;
@@ -125,8 +127,11 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
     		throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID,
     	              0, "Unkown file extension!", null));
     	}
-
-    	document  = new DocumentUimaImpl(project, this, in, format);
+    	
+    	// TODO: check if this is correct this way
+    	CAS cas = project.getTypesystemElement().getCAS();
+    	
+    	document  = new DocumentUimaImpl(cas, in, format);
 
     	mWorkingCopy = new SoftReference<DocumentUimaImpl>(document);
     }

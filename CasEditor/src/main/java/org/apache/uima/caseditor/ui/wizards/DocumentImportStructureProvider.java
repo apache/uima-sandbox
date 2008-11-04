@@ -38,7 +38,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XCASSerializer;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.caseditor.core.TaeError;
-import org.apache.uima.caseditor.core.model.DocumentFormat;
+import org.apache.uima.caseditor.editor.DocumentFormat;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.util.CasCreationUtils;

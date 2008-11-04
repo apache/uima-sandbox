@@ -120,11 +120,15 @@ abstract class DocumentActionRunnable implements IRunnableWithProgress {
     monitor.subTask("Initializing");
 
     initialize();
-
+    
+    // TODO:
+    // Now we have to ask the document provider to
+    // do this kind of document element mapping
     Map<DocumentElement, AnnotationEditor> editorMap = new HashMap<DocumentElement, AnnotationEditor>();
 
     for (AnnotationEditor annotationEditor : getAnnotationEditors()) {
-      editorMap.put(annotationEditor.getDocument().getDocumentElement(), annotationEditor);
+    	// TODO: fix it
+      // editorMap.put(annotationEditor.getDocument().getDocumentElement(), annotationEditor);
     }
 
     monitor.subTask("Processing documents, please wait!");
