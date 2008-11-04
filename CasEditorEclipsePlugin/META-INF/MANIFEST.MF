@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CasEditor Plugin
+Bundle-SymbolicName: org.apache.uima.caseditor.editor;singleton:=true
+Bundle-Version: 2.3
+Bundle-ClassPath: ./caseditor.jar;./target/classes
+Bundle-Activator: org.apache.uima.caseditor.editor.CasEditorPlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.core.runtime,
+ org.apache.uima.runtime;bundle-version="2.2.2",
+ org.eclipse.jface.text;bundle-version="3.4.0",
+ org.eclipse.ui.workbench.texteditor;bundle-version="3.4.0",
+ org.eclipse.ui.views;bundle-version="3.3.0",
+ org.eclipse.core.resources;bundle-version="3.4.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.apache.uima.caseditor.editor,
+ org.apache.uima.caseditor.editor.action,
+ org.apache.uima.caseditor.editor.annotation,
+ org.apache.uima.caseditor.editor.context,
+ org.apache.uima.caseditor.editor.contextmenu,
+ org.apache.uima.caseditor.editor.editview,
+ org.apache.uima.caseditor.editor.editview.validator,
+ org.apache.uima.caseditor.editor.fsview,
+ org.apache.uima.caseditor.editor.outline,
+ org.apache.uima.caseditor.editor.util
