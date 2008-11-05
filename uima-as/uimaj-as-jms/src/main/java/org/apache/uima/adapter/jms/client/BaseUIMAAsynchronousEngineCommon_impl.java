@@ -384,6 +384,7 @@ implements UimaAsynchronousEngine, MessageListener
 			throw new ResourceInitializationException();
 		}
 		CAS cas = null;
+		long startTime = System.nanoTime();
 		if (remoteService)
 		{
 			cas = asynchManager.getNewCas("ApplicationCasPoolContext");
@@ -392,8 +393,11 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			cas = asynchManager.getNewCas();
 		}
+		long waitingTime = System.nanoTime() - startTime;
+		clientSideJmxStats.incrementTotalTimeWaitingForCas( waitingTime );
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "getCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_new_cas_FINEST", new Object[] {});
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "getCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_new_cas_FINEST", 
+    		  new Object[] {"Time Waiting for CAS", (double)waitingTime / (double)1000000});
     }
 		return cas;
 	}
