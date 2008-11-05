@@ -34,15 +34,18 @@ public class UimaASClientInfo implements
 	private long serializationTime;
 	private long deserializationTime;
 	private long totalCasesProcessed;
+	private long totalCasesRequested;
 	private long totalProcessTime;
 	private long totalTimeWaitingForReply;
 	private long totalResponseLatencyTime;
+	private long totalTimeWaitingForCas;
 	private long maxSerializationTime;
 	private long maxDeserializationTime;
 	private long maxIdleTime;
 	private long maxProcessTime;
 	private long maxTimeWaitingForReply;
 	private long maxResponseLatencyTime;
+	private long maxTimeWaitingForCas;
 	private String endpointName;
 	private int replyWindowSize;
 	private int casPoolSize;
@@ -57,15 +60,18 @@ public class UimaASClientInfo implements
 		serializationTime=0;
 		deserializationTime=0;
 		totalCasesProcessed=0;
+		totalCasesRequested=0;
 		totalProcessTime=0;
 		totalTimeWaitingForReply=0;
 		totalResponseLatencyTime=0;
+		totalTimeWaitingForCas=0;
 		maxSerializationTime=0;
 		maxDeserializationTime=0;
 		maxIdleTime=0;
 		maxProcessTime=0;
 		maxTimeWaitingForReply=0;
 		maxResponseLatencyTime=0;
+		maxTimeWaitingForCas=0;
 		_metaTimeoutErrorCount=0;
 		_processTimeoutErrorCount=0;
 		_processErrorCount=0;
@@ -198,7 +204,13 @@ public class UimaASClientInfo implements
     			format(((double)totalResponseLatencyTime/(double)totalCasesProcessed)/(double)1000000) 
     			: "0.0";
     }
-    	
+
+    public synchronized String getAverageTimeWaitingForCas() {
+    	return ( totalCasesRequested > 0 ) ? 
+    			format(((double)totalTimeWaitingForCas/(double)totalCasesRequested)/(double)1000000) 
+    			: "0.0";
+    }
+    
 	public synchronized String getMaxDeserializationTime() {
 		return format((double)maxDeserializationTime/(double)1000000);
 	}
@@ -223,6 +235,10 @@ public class UimaASClientInfo implements
     	return format((double)maxResponseLatencyTime/(double)1000000);
     }
 
+    public synchronized String getMaxTimeWaitingForCas() {
+    	return format((double)maxTimeWaitingForCas/(double)1000000);
+    }
+    
 	public synchronized String getTotalDeserializationTime() {
 		return format((double)deserializationTime/(double)1000000);
 	}
@@ -234,6 +250,10 @@ public class UimaASClientInfo implements
 	public synchronized long getTotalNumberOfCasesProcessed() {
 		return totalCasesProcessed;
 	}
+
+    public synchronized long getTotalNumberOfCasesRequested() {
+    	return totalCasesRequested;
+    }
 
 	public synchronized String getTotalSerializationTime() {
 		return format((double)serializationTime/(double)1000000);
@@ -251,6 +271,10 @@ public class UimaASClientInfo implements
     	return format((double)totalResponseLatencyTime/(double)1000000);
     }
 
+    public synchronized String getTotalTimeWaitingForCas() {
+    	return format((double)totalTimeWaitingForCas/(double)1000000);
+    }
+    
 	public void setApplicationName(String anApplicationName) {
 		applicationName = anApplicationName;
 	}
@@ -305,5 +329,12 @@ public class UimaASClientInfo implements
     	}
     	totalResponseLatencyTime += aResponseLatencyTime;
     }
-
+    public synchronized void incrementTotalTimeWaitingForCas( long aTimeWaitingForCas ) {
+    	totalCasesRequested++;
+    	if ( maxTimeWaitingForCas < aTimeWaitingForCas )
+    	{
+    		maxTimeWaitingForCas = aTimeWaitingForCas;
+    	}
+    	totalTimeWaitingForCas += aTimeWaitingForCas;
+    }
 }

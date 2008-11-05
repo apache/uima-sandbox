@@ -40,34 +40,39 @@ public interface UimaASClientInfoMBean {
 	public void incrementTotalTimeToProcess( long aTotalTimeToProcess );
 	public String getTotalTimeToProcess();
 	public String getAverageTimeToProcessCas();
+    public String getMaxProcessTime();
 	
 	public void incrementTotalSerializationTime( long aTotalSerializationTime );
 	public String getTotalSerializationTime();
 	public String getAverageSerializationTime();
+    public String getMaxSerializationTime();
 	
 	public void incrementTotalDeserializationTime( long aTotalDeserializationTime );
 	public String getTotalDeserializationTime();
 	public String getAverageDeserializationTime();
+    public String getMaxDeserializationTime();
 	
 	public void incrementTotalIdleTime( long aTotalIdleTime );
 	public String getTotalIdleTime();
 	public String getAverageIdleTime();
+    public String getMaxIdleTime();
 
     public void incrementTotalTimeWaitingForReply( long aTimeWaitingForReply );
     public String getTotalTimeWaitingForReply();
     public String getAverageTimeWaitingForReply();
+    public String getMaxTimeWaitingForReply();
     
     public void incrementTotalResponseLatencyTime( long aResponseLatencyTime );
     public String getTotalResponseLatencyTime();
     public String getAverageResponseLatencyTime();
-    
-    public String getMaxProcessTime();
-    public String getMaxSerializationTime();
-    public String getMaxDeserializationTime();
-    public String getMaxIdleTime();
     public String getMaxResponseLatencyTime();
-    public String getMaxTimeWaitingForReply();
-
+    
+    public void incrementTotalTimeWaitingForCas( long aTimeWaitingForCas );
+    public long getTotalNumberOfCasesRequested();
+    public String getTotalTimeWaitingForCas();
+    public String getAverageTimeWaitingForCas();
+    public String getMaxTimeWaitingForCas();
+ 
     public long getMetaTimeoutErrorCount();
     public void incrementMetaTimeoutErrorCount();
     
