@@ -97,6 +97,8 @@ public class JmsOutputChannel implements OutputChannel
 
   private String hostIP = null;
   private UimaSerializer uimaSerializer = new UimaSerializer();
+  //  By default every message will have expiration time added
+  private volatile boolean addTimeToLive = true;
 
   public JmsOutputChannel()
   {
@@ -105,6 +107,11 @@ public class JmsOutputChannel implements OutputChannel
       hostIP = InetAddress.getLocalHost().getHostAddress();
     }
     catch ( Exception e) {  /* silently deal with this error */ }
+    //  Check the environment for existence of NoTTL tag. If present,
+    //  the deployer of the service wants to avoid message expiration.
+    if ( System.getProperty("NoTTL") != null) {
+      addTimeToLive = false;
+    }
 
   }
 	/**
@@ -1292,7 +1299,12 @@ public class JmsOutputChannel implements OutputChannel
 		//TODO override default based on system property
 		aMessage.setBooleanProperty(AsynchAEMessage.AcceptsDeltaCas, true); 
 		long timeout = getCommandTimeoutValue(anEndpoint, aCommand);
-		if ( timeout > 0 )
+    //  If the timeout is defined in the Deployment Descriptor and
+    //  the service is configured to use time to live (TTL), add
+    //  JMS message expiration time. The TTL is by default always
+    //  added to the message. To override this add "-DNoTTL" to the 
+    //  command line.
+    if ( timeout > 0 && addTimeToLive )
 		{
 			aMessage.setJMSExpiration(timeout);
 		}
