@@ -69,15 +69,11 @@ public class MetadataResponseHandler_impl extends HandlerBase
 						String fromServer = null;
 						if ( ((MessageContext)anObjectToHandle).propertyExists(AsynchAEMessage.EndpointServer))
 						{
-							
 							fromServer =((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.EndpointServer); 
-
 						}
-						else if ( ((MessageContext)anObjectToHandle).propertyExists(UIMAMessage.ServerURI)) 
-						{
-							fromServer = ((MessageContext)anObjectToHandle).getMessageStringProperty(UIMAMessage.ServerURI);
-						}
-						((AggregateAnalysisEngineController) getController()).mergeTypeSystem(analysisEngineMetadata, fromEndpoint, fromServer);
+						// If old service does not echo back the external broker name then the queue name must be unique. 
+						// The ServerURI set by the service may be its local name for the broker, e.g. tcp://localhost:61616
+ 						((AggregateAnalysisEngineController) getController()).mergeTypeSystem(analysisEngineMetadata, fromEndpoint, fromServer);
 					}
 				}
 				else

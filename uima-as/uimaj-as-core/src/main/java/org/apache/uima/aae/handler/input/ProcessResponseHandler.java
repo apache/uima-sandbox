@@ -605,15 +605,11 @@ public class ProcessResponseHandler extends HandlerBase
 				if ( ((Endpoint)messageContext.getEndpoint()).isRemote() )
 				{
 					if ( ((MessageContext)anObjectToHandle).propertyExists(AsynchAEMessage.EndpointServer))
-					{
-						
+					{						
 						fromServer =((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.EndpointServer); 
-
 					}
-					else if ( ((MessageContext)anObjectToHandle).propertyExists(UIMAMessage.ServerURI)) 
-					{
-						fromServer = ((MessageContext)anObjectToHandle).getMessageStringProperty(UIMAMessage.ServerURI);
-					}
+					// If old service does not echo back the external broker name then the queue name must be unique. 
+					// Can't use the ServerURI set by the service as it may be its local name for the broker, e.g. tcp://localhost:61616
 				}
 
 				key = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(delegate, fromServer);

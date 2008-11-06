@@ -1813,27 +1813,16 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       
 		try
 		{
-			Set keys = destinationMap.keySet();
-			Iterator it = keys.iterator();
-			Endpoint_impl endpoint = null;
-			String key = null;
-			//	Find an endpoint for the GetMeta reply. To succeed, match the endpoint (queue) name
-			//	as well as the server URI. We allow endpoints managed by different servers to have
-			//	the same queue name.
-			//	iterate over all endpoints until a match [queue,server] is found.
-			while( it.hasNext())
-			{
-				key = (String)it.next();
-				Endpoint_impl endp = (Endpoint_impl) destinationMap.get(key);
-
-				if ( endp.getServerURI() != null && endp.getServerURI().equalsIgnoreCase(fromServer) && endp.getEndpoint().equalsIgnoreCase(fromDestination))
-				{
-					endpoint = endp;
-					break;
-				}
-				
-			}
-
+      // Find the endpoint for this service, given its input queue name and broker URI.
+      // We now allow endpoints managed by different servers to have the same queue name.
+      // But if the external name of the broker is unknown (i.e. an old 2.2.2 service)
+      // then use just the queue name, i.e. queue names must be unique for 2.2.2
+      Endpoint_impl endpoint = null;
+      String key = lookUpDelegateKey(fromDestination, fromServer);
+      if (key != null) {
+        endpoint = (Endpoint_impl) destinationMap.get(key);
+      }
+	
 			if (endpoint == null)
 			{
 				// Log invalid reply and move on
