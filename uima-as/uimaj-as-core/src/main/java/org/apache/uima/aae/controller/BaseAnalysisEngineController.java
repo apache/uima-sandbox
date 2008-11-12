@@ -46,6 +46,7 @@ import org.apache.uima.aae.UimaAsContext;
 import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.UimaEEAdminContext;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
+import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
@@ -101,7 +102,7 @@ implements AnalysisEngineController, EventSubscriber
 
 	private InProcessCache inProcessCache;
 
-	private AnalysisEngineController parentController;
+	protected AnalysisEngineController parentController;
 
 	private String endpointName;
 
@@ -191,8 +192,15 @@ implements AnalysisEngineController, EventSubscriber
   = new ConcurrentHashMap<String, UimaMessageListener>();
   
   private Exception initException = null;
-//	protected UimaTransport transport = new VmTransport();
 	
+  // Local cache for this controller only. This cache stores state of 
+  // each CAS. The actual CAS is still stored in the global cache. The
+  // local cache is used to determine when each CAS can be removed as
+  // it reaches the final step. Global cache is not a good place to
+  // store this information if there are collocated (delegate) controllers
+  // A CAS state change made by one controller may effect another controller. 
+  protected LocalCache localCache;
+
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -211,7 +219,8 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		casManager = aCasManager;
 		inProcessCache = anInProcessCache;
-		
+    localCache = new LocalCache(this);
+
 		parentController = aParentController;
 		componentCasPoolSize = aComponentCasPoolSize;
 		
@@ -973,12 +982,13 @@ implements AnalysisEngineController, EventSubscriber
 	            CacheEntry[] entries = getInProcessCache().getCacheEntriesForEndpoint(endpoint.getEndpoint());
 	            if ( entries != null ) {
 	              for ( int i=0; i < entries.length; i++ ) {
+	                CasStateEntry cse = localCache.lookupEntry(entries[i].getCasReferenceId());
 	                // Check if this is a parallel step
-	                int parallelDelegateCount = entries[i].getNumberOfParallelDelegates();
+                  int parallelDelegateCount = cse.getNumberOfParallelDelegates();
 	                // Check if all delegated responded
-	                if ( parallelDelegateCount > 1 && entries[i].howManyDelegatesResponded() < parallelDelegateCount) {
+	                if ( parallelDelegateCount > 1 && cse.howManyDelegatesResponded() < parallelDelegateCount) {
 	                  // increment responders 
-	                  entries[i].incrementHowManyDelegatesResponded();
+	                  cse.incrementHowManyDelegatesResponded();
 	                }
 	              }
 	            }
@@ -1058,7 +1068,7 @@ implements AnalysisEngineController, EventSubscriber
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dropping_cas__FINE",
-                new Object[] {aCasReferenceId, getName() });
+                new Object[] {aCasReferenceId, getComponentName() });
     }
     if ( inProcessCache.entryExists(aCasReferenceId))
 		{
@@ -1066,7 +1076,9 @@ implements AnalysisEngineController, EventSubscriber
 			if (deleteCacheEntry)
 			{
 				inProcessCache.remove(aCasReferenceId);
-		
+		    if ( localCache.containsKey(aCasReferenceId)) {
+	        localCache.remove(aCasReferenceId);
+		    }
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				                "dropCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_removed_cache_entry__FINE",
@@ -1963,10 +1975,14 @@ implements AnalysisEngineController, EventSubscriber
 		                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
 		                new Object[] { getComponentName(), casReferenceId });
         }
-				CacheEntry cacheEntry = null;
+        CacheEntry cacheEntry = null;
+        CasStateEntry casStateEntry = null;
 				
 				try
 				{
+				  if ( this instanceof AggregateAnalysisEngineController ) {
+	          casStateEntry = ((AggregateAnalysisEngineController)this).getLocalCache().lookupEntry(casReferenceId);
+				  }
 					cacheEntry = getInProcessCache().getCacheEntryForCAS(casReferenceId);
 				}
 				catch( AsynchAEException e)
@@ -1981,6 +1997,10 @@ implements AnalysisEngineController, EventSubscriber
 					{
 						//	Release the CAS and remove a corresponding entry from the InProcess cache.
 						dropCAS(casReferenceId, true);
+	          if ( this instanceof AggregateAnalysisEngineController ) {
+	            ((AggregateAnalysisEngineController)this).getLocalCache().remove(casReferenceId);
+	          }
+						
 						//  Remove the Cas from the outstanding CAS list. The id of the Cas was
 						//	added to this list by the Cas Multiplier before the Cas was sent to 
 						//	to the client. 
@@ -2008,6 +2028,9 @@ implements AnalysisEngineController, EventSubscriber
 						{
 							//	Fetch the parent CAS from the InProcess Cache
 							cacheEntry = getInProcessCache().getCacheEntryForCAS(parentCasReferenceId);
+							if ( this instanceof AggregateAnalysisEngineController ) {
+	              casStateEntry = ((AggregateAnalysisEngineController)this).getLocalCache().lookupEntry(parentCasReferenceId);
+							}
 						}
 						catch( AsynchAEException e)
 						{
@@ -2024,14 +2047,19 @@ implements AnalysisEngineController, EventSubscriber
 							//	in its flow. 
 							synchronized( finalStepMux )
 							{
-								casHasNoSubordinates = getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId());
-								casPendingReply = cacheEntry.isPendingReply();
+		            if ( this instanceof AggregateAnalysisEngineController ) {
+	                casHasNoSubordinates = casStateEntry.getSubordinateCasInPlayCount() == 0;
+	                casPendingReply = casStateEntry.isPendingReply();
+		            } else {
+	                casHasNoSubordinates = getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId());
+	                casPendingReply = cacheEntry.isPendingReply();
+		            }
 							}
 							if (  casPendingReply && casHasNoSubordinates )
 							{
 								if ( this instanceof AggregateAnalysisEngineController )
 								{
-									((AggregateAnalysisEngineController)this).finalStep( cacheEntry.getFinalStep(), parentCasReferenceId);
+                  ((AggregateAnalysisEngineController)this).finalStep( casStateEntry.getFinalStep(), parentCasReferenceId);
 								}
 								else // PrimitiveAnalysisEngineController 
 								{
@@ -2439,5 +2467,7 @@ implements AnalysisEngineController, EventSubscriber
 	    }
 	  }
 
-		
+	  public LocalCache getLocalCache() {
+	    return localCache;
+	  }
 }

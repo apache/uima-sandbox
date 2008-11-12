@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.uima.UimaContext;
+import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.jmx.AggregateServiceInfo;
@@ -84,8 +85,6 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 	
 	public String getLastDelegateKeyFromFlow(String anInputCasReferenceId);
 
-//	public boolean sendRequestToReleaseCas();
-	
 	public void registerChildController( AnalysisEngineController aChildController, String aDelegateKey) throws Exception;
 
 	public void saveStatsFromService( String aServiceEndpointName, Map aServiceStats);
@@ -96,11 +95,11 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 
 	public ServicePerformance getDelegateServicePerformance( String aDelegateKey );
 
-    public PrimitiveServiceInfo getDelegateServiceInfo( String aDelegateKey );
+  public PrimitiveServiceInfo getDelegateServiceInfo( String aDelegateKey );
 
-    public ServiceErrors getDelegateServiceErrors( String aDelegateKey );
+  public ServiceErrors getDelegateServiceErrors( String aDelegateKey );
 
-    public void stopTimers();
+  public void stopTimers();
 	
 	public boolean requestForMetaSentToRemotes();
 	
@@ -110,7 +109,6 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 
 	public ServicePerformance getServicePerformance(String aDelegateKey );
 
-//	public boolean decrementCasSubordinateCount( CacheEntry aParentCasCacheEntry );
-	
 	public void finalStep( FinalStep aStep, String aCasReferenceId);
+	
 }

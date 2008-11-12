@@ -31,6 +31,7 @@ import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
+import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ExpiredMessageException;
@@ -202,9 +203,16 @@ public class ProcessResponseHandler extends HandlerBase
 
 			//	Fetch entry from the cache for a given Cas Id. The entry contains a CAS that will be used during deserialization 
 			CacheEntry cacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
-			cacheEntry.setReplyReceived();
+			
+      CasStateEntry casStateEntry = 
+        ((AggregateAnalysisEngineController)getController()).
+            getLocalCache().lookupEntry(casReferenceId);
+      if ( casStateEntry != null ) {
+        casStateEntry.setReplyReceived();
+      }
+			
 			cas = cacheEntry.getCas();  
-			int totalNumberOfParallelDelegatesProcessingCas = cacheEntry.getNumberOfParallelDelegates();
+			int totalNumberOfParallelDelegatesProcessingCas = casStateEntry.getNumberOfParallelDelegates();
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_number_parallel_delegates_FINE",
@@ -239,7 +247,7 @@ public class ProcessResponseHandler extends HandlerBase
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
 			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_delegate_responded_count_FINEST",
-			                new Object[] { cacheEntry.howManyDelegatesResponded(), casReferenceId});
+			                new Object[] { casStateEntry.howManyDelegatesResponded(), casReferenceId});
           }
 					int highWaterMark = cacheEntry.getHighWaterMark();
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
@@ -268,9 +276,9 @@ public class ProcessResponseHandler extends HandlerBase
 			  }
 			}
 			
-			if ( cacheEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 )
+			if ( casStateEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 )
 			{
-				cacheEntry.incrementHowManyDelegatesResponded();
+				casStateEntry.incrementHowManyDelegatesResponded();
 			}
 		
 			long timeToDeserializeCAS = getController().getCpuTime() - t1;
@@ -297,9 +305,9 @@ public class ProcessResponseHandler extends HandlerBase
 			// one delegate processes the CAS at the same. Otherwise, check if all delegates responded before passing CAS on to the Flow Controller.
 			// The idea is that all delegates processing one CAS concurrently must respond, before the CAS is allowed to move on to the next step.
 			// HowManyDelegatesResponded is incremented every time a parallel delegate sends response.
-			if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( cacheEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) )
+			if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) )
 			{
-				cacheEntry.resetDelegateResponded();
+				casStateEntry.resetDelegateResponded();
 				super.invokeProcess(cas, casReferenceId, null, aMessageContext, null);
 			}
 
@@ -359,7 +367,13 @@ public class ProcessResponseHandler extends HandlerBase
 		{
 			casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
 			cacheEntry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
-			cacheEntry.setReplyReceived();
+      CasStateEntry casStateEntry = 
+        ((AggregateAnalysisEngineController)getController()).
+            getLocalCache().lookupEntry(casReferenceId);
+      if ( casStateEntry != null ) {
+        casStateEntry.setReplyReceived();
+      }
+			
 			CAS cas = cacheEntry.getCas();
 			String endpointName = aMessageContext.getEndpoint().getEndpoint();
 			String delegateKey = ((AggregateAnalysisEngineController)getController()).

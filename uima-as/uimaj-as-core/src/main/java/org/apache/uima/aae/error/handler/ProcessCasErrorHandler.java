@@ -29,6 +29,7 @@ import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
@@ -36,16 +37,13 @@ import org.apache.uima.aae.error.ErrorHandlerBase;
 import org.apache.uima.aae.error.ExpiredMessageException;
 import org.apache.uima.aae.error.InvalidMessageException;
 import org.apache.uima.aae.error.MessageTimeoutException;
-import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.Threshold;
 import org.apache.uima.aae.error.UimaEEServiceException;
 import org.apache.uima.aae.jmx.ServiceErrors;
-import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.spi.transport.UimaMessage;
 import org.apache.uima.aae.spi.transport.UimaTransport;
-import org.apache.uima.aae.spi.transport.vm.VmTransport;
 import org.apache.uima.util.Level;
 
 public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHandler
@@ -183,7 +181,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 	}
 	public boolean handleError(Throwable t, ErrorContext anErrorContext, AnalysisEngineController aController)
 	{
-		CacheEntry parentCasCacheEntry = null;
+    org.apache.uima.aae.controller.LocalCache.CasStateEntry parentCasStateEntry = null;
 		
 		if ( !isHandlerForError(anErrorContext, AsynchAEMessage.Process))
 		{
@@ -336,7 +334,6 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 						{
 							ServiceErrors serviceErrs = 
 								((AggregateAnalysisEngineController)aController).getDelegateServiceErrors(key);
-//							ServiceErrors serviceErrs = ((AggregateAnalysisEngineController)aController).getServiceErrors(key);
 							if (serviceErrs != null )
 							{
 								serviceErrs.incrementProcessErrors();
@@ -373,21 +370,23 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			Endpoint endpt = (Endpoint) anErrorContext.get(AsynchAEMessage.Endpoint);
 			if ( endpt != null )
 			{
-        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "handleError", 
-						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception_while_sending_reply_to_client__FINE", new Object[] { aController.getComponentName(), endpt.getEndpoint(), casReferenceId });
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "handleError", 
+						UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_process_exception__INFO", new Object[] { aController.getComponentName(), endpt.getEndpoint(), casReferenceId });
         }
 			}
 		}
 		
 		int totalNumberOfParallelDelegatesProcessingCas = 1; // default
 		CacheEntry cacheEntry = null;
+		CasStateEntry casStateEntry = null;
 		try
 		{
+		  casStateEntry = aController.getLocalCache().lookupEntry(casReferenceId);
 			cacheEntry = aController.getInProcessCache().getCacheEntryForCAS(casReferenceId);
 			if ( cacheEntry != null )
 			{
-				totalNumberOfParallelDelegatesProcessingCas = cacheEntry.getNumberOfParallelDelegates();
+				totalNumberOfParallelDelegatesProcessingCas = casStateEntry.getNumberOfParallelDelegates();
 			}
 
 		}
@@ -397,9 +396,9 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		//	If the error occured during parallel step, treat the exception as response from the delegate
 		//	When all responses from delegates are accounted for we allow the CAS to move on to the next
 		//	step in the flow
-		if ( cacheEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 && ( cacheEntry.howManyDelegatesResponded() < totalNumberOfParallelDelegatesProcessingCas))
+		if ( casStateEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 && ( casStateEntry.howManyDelegatesResponded() < totalNumberOfParallelDelegatesProcessingCas))
 		{
-			cacheEntry.incrementHowManyDelegatesResponded();
+			casStateEntry.incrementHowManyDelegatesResponded();
 		}
 
 		if (aController instanceof AggregateAnalysisEngineController && t instanceof Exception)
@@ -424,28 +423,29 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			if ( !anErrorContext.containsKey(AsynchAEMessage.SkipSubordinateCountUpdate)) 
 			{
 				//	Check if the CAS is a subordinate (has parent CAS).
-				if ( cacheEntry != null && cacheEntry.isSubordinate())
+				if ( casStateEntry != null && casStateEntry.isSubordinate())
 				{
-					String parentCasReferenceId = cacheEntry.getInputCasReferenceId();
+					String parentCasReferenceId = casStateEntry.getInputCasReferenceId();
 					if ( parentCasReferenceId != null )
 					{
 						try
 						{
-							parentCasCacheEntry = aController.getInProcessCache().
-																getCacheEntryForCAS(parentCasReferenceId);
-							synchronized( parentCasCacheEntry )
-							{
-								parentCasCacheEntry.decrementSubordinateCasInPlayCount();
-								if ( parentCasCacheEntry.getSubordinateCasInPlayCount() == 0 &&
-									 parentCasCacheEntry.isPendingReply())
-								{
-									//	Complete processing of the Input CAS
-									if ( flowControllerContinueFlag ==  false )
-									{
-										aController.process(parentCasCacheEntry.getCas(), parentCasCacheEntry.getCasReferenceId());
-									}
-								}
-							}
+              CacheEntry parentCasCacheEntry = aController.getInProcessCache().
+                getCacheEntryForCAS(parentCasReferenceId);
+						  parentCasStateEntry = aController.getLocalCache().lookupEntry(parentCasReferenceId);
+              synchronized( parentCasStateEntry )
+              {
+                if ( parentCasStateEntry.getSubordinateCasInPlayCount() == 0 && parentCasStateEntry.isPendingReply())
+                {
+                  //  Complete processing of the Input CAS
+                  if ( flowControllerContinueFlag ==  false )
+                  {
+                    aController.process(parentCasCacheEntry.getCas(), parentCasCacheEntry.getCasReferenceId());
+                  }
+                } else {
+                  parentCasStateEntry.decrementSubordinateCasInPlayCount();
+                }
+              }
 						}
 						catch( Exception ex)
 						{
@@ -459,7 +459,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			
 			if ( threshold != null && flowControllerContinueFlag )
 			{
-				if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( cacheEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) )
+				if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) )
 				{
 					aController.process(aController.getInProcessCache().getCasByReference(casReferenceId), casReferenceId);
 				}
@@ -551,10 +551,10 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			}			
 			if ( casReferenceId != null && aController instanceof AggregateAnalysisEngineController )
 			{
-				if ( parentCasCacheEntry != null && parentCasCacheEntry.getSubordinateCasInPlayCount() == 0 &&
-						 parentCasCacheEntry.isPendingReply())
+				if ( parentCasStateEntry != null && parentCasStateEntry.getSubordinateCasInPlayCount() == 0 &&
+						 parentCasStateEntry.isPendingReply())
 					{
-					((AggregateAnalysisEngineController)aController).finalStep(parentCasCacheEntry.getFinalStep(), parentCasCacheEntry.getCasReferenceId());
+					((AggregateAnalysisEngineController)aController).finalStep(parentCasStateEntry.getFinalStep(), parentCasStateEntry.getCasReferenceId());
 					}
 				//	Cleanup state information from local caches
 				((AggregateAnalysisEngineController)aController).dropFlow(casReferenceId, true);

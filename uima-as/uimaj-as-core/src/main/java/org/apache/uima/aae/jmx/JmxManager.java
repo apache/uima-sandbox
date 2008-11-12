@@ -131,7 +131,7 @@ public class JmxManager implements JmxManagement
 		return true;
 	}
 
-	public void unregisterMBean(ObjectName anMBeanToUnregister)
+	public synchronized void unregisterMBean(ObjectName anMBeanToUnregister)
 	{
 		if ( !isInitialized())
 		{
@@ -146,7 +146,6 @@ public class JmxManager implements JmxManagement
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 			UIMAFramework.getLogger().logrb(Level.WARNING, JmxMBeanAgent.class.getName(), "registerMBean", LOG_RESOURCE_BUNDLE, "UIMA_JMX_failed_to_register_mbean__WARNING", e);
 		}
 

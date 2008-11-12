@@ -27,6 +27,7 @@ import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.Endpoint_impl;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
+import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.InvalidMessageException;
@@ -333,7 +334,14 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				//	Fetch an ID of the parent CAS
 				inputCasReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.InputCasReference);
 				//	Fetch Cache entry for the parent CAS
-				CacheEntry inputCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(inputCasReferenceId);
+        CacheEntry inputCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(inputCasReferenceId);
+        CasStateEntry casStateEntry = null;
+
+        if ( getController() instanceof AggregateAnalysisEngineController ) {
+          casStateEntry = ((AggregateAnalysisEngineController)getController()).
+              getLocalCache().lookupEntry(inputCasReferenceId);
+          casStateEntry.incrementSubordinateCasInPlayCount();
+        }
 
 				computeStats(aMessageContext, inputCasReferenceId);
 
@@ -382,7 +390,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				//	the aggregate until all of its subordinate CASes are 
 				//	fully processed. Only then, the aggregate can return
 				// it back to the client
-        inputCasCacheEntry.incrementSubordinateCasInPlayCount();
 			}
 			else if ( getController().isTopLevelComponent() && getController() instanceof AggregateAnalysisEngineController )
 			{

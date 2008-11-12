@@ -63,47 +63,6 @@ public class ErrorHandlerChain extends LinkedList
 				ErrorHandler handler = ((ErrorHandler)iterator.next());
 				errorHandled = handler.handleError( cause, anErrorContext, aController );
 			}
-/*			
-			String casReferenceId = (String)anErrorContext.get( AsynchAEMessage.CasReference);
-			if ( casReferenceId != null && aController instanceof AggregateAnalysisEngineController )
-			{
-				Endpoint endpoint = (Endpoint)anErrorContext.get(AsynchAEMessage.Endpoint);
-				try
-				{
-					boolean continueOnError = false;
-					if ( endpoint != null && endpoint.getEndpoint() != null )
-					{
-						continueOnError = ((AggregateAnalysisEngineController)aController).
-							continueOnError(casReferenceId, endpoint.getEndpoint(), (Exception)cause);
-					}
-					CacheEntry entry = null;
-					try
-					{
-						entry = aController.getInProcessCache().getCacheEntryForCAS(casReferenceId);
-					}
-					catch( AsynchAEException e) {}
-                    CAS cas = null;
-					//	Make sure that the ErrorHandler did not drop the cache entry and the CAS
-					if ( continueOnError && entry != null && (( cas = entry.getCas()) != null ) )
-					{
-						((AggregateAnalysisEngineController)aController).process(cas, casReferenceId);
-					}
-					else
-					{
-						if ( entry != null )
-						{
-							aController.dropCAS(casReferenceId, true);
-						}
-					}
-				}
-				catch( Exception e)
-				{
-					//	Any Exception Occuring here will be handled by the default Error Handler which 
-					//	should be the last in the chain
-					((ErrorHandler)getLast()).handleError(e, anErrorContext, aController);
-				}
-			}
-*/			
 		}
 	}
 

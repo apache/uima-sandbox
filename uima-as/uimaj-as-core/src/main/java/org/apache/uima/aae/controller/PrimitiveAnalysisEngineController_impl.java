@@ -27,6 +27,7 @@ import org.apache.uima.aae.AsynchAECasManager;
 import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
+import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
@@ -247,6 +248,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	{
 		AnalysisEngine ae = null;
 		long start = super.getCpuTime();
+		localCache.dumpContents();
 		try
 		{
 			ae = aeInstancePool.checkout();
@@ -313,13 +315,15 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		return ( aCasReferenceId.equals(abortedCASReferenceId));
 	}
 	
-	public void process(CAS aCAS, String aCasReferenceId, Endpoint anEndpoint)// throws AnalysisEngineProcessException, AsynchAEException
+	public void process(CAS aCAS, String aCasReferenceId, Endpoint anEndpoint)
 	{
 		
 		if ( stopped )
 		{
 			return;
 		}
+		//  Create a new entry in the local cache for the input CAS
+    CasStateEntry parentCasStateEntry = getLocalCache().createCasStateEntry(aCasReferenceId);
 		
 		boolean inputCASReturned = false;
 		boolean processingFailed = false;
@@ -333,7 +337,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			
 			//	Get input CAS entry from the InProcess cache
 			CacheEntry inputCASEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
-
 			long time = super.getCpuTime();
 			long totalProcessTime = 0;  // stored total time spent producing ALL CASes
 			
@@ -398,6 +401,24 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				OutOfTypeSystemData otsd = getInProcessCache().getOutOfTypeSystemData(aCasReferenceId);
 				MessageContext mContext = getInProcessCache().getMessageAccessorByReference(aCasReferenceId);
 				CacheEntry newEntry = getInProcessCache().register( casProduced, mContext, otsd);
+				//  if this Cas Multiplier is not Top Level service, add new Cas Id to the private
+				//  cache of the parent aggregate controller. The Aggregate needs to know about
+				//  all CASes it has in play that were generated from the input CAS.
+				CasStateEntry childCasStateEntry = null;
+				if ( !isTopLevelComponent() ) {
+				  //  Create CAS state entry in the aggregate's local cache
+				  childCasStateEntry = parentController.getLocalCache().createCasStateEntry(newEntry.getCasReferenceId());
+				  //  Fetch the parent CAS state entry from the aggregate's local cache. We need to increment
+				  //  number of child CASes associated with it.
+				  parentCasStateEntry = parentController.getLocalCache().lookupEntry(aCasReferenceId);
+				} else {
+          childCasStateEntry = getLocalCache().createCasStateEntry(newEntry.getCasReferenceId());
+          parentCasStateEntry = getLocalCache().lookupEntry(aCasReferenceId);
+				}
+				//  Associate parent CAS (input CAS) with the new CAS.
+        childCasStateEntry.setInputCasReferenceId(aCasReferenceId);
+        //  Increment number of child CASes generated from the input CAS
+        parentCasStateEntry.incrementSubordinateCasInPlayCount();
 				//	Associate input CAS with the new CAS
 				newEntry.setInputCasReferenceId(aCasReferenceId);
 				newEntry.setCasSequence(sequence);
@@ -410,7 +431,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				//	this CAS back to its pool
 				synchronized(syncObject)
 				{
-          inputCASEntry.incrementSubordinateCasInPlayCount();
 					if ( isTopLevelComponent() )
 					{
 						//	Add the id of the generated CAS to the map holding outstanding CASes. This
@@ -422,8 +442,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	        //  Increment number of CASes processed by this service
 	        sequence++;
 			  }
-		      if ( !anEndpoint.isRemote())
-		      {
+	      if ( !anEndpoint.isRemote())
+	      {
 		          UimaMessage message = 
 		            getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
               message.addStringProperty(AsynchAEMessage.CasReference, newEntry.getCasReferenceId());
@@ -439,12 +459,14 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
               message.addLongProperty(AsynchAEMessage.IdleTime, iT );
               
 		          getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
-		      }
-		      else
-		      {
+	      }
+	      else
+	      {
 	          //  Send generated CAS to the client
 	          getOutputChannel().sendReply(newEntry, anEndpoint);
-		      }
+	      }
+        //  Remove the new CAS state entry from the local cache
+        localCache.remove(newEntry.getCasReferenceId());
 				
 				//	Remove Stats from the global Map associated with the new CAS
 				//	These stats for this CAS were added to the response message
@@ -492,7 +514,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
               //  The client will send Free CAS Notifications to release CASes produced here. When the
               //  last child CAS is freed, the input CAS is allowed to be returned to the client.
               inputCASEntry.setPendingReply(true);
-            }
+           }
          }
          if ( sendReply )
          {
@@ -546,6 +568,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				{
 					//	Remove input CAS cache entry if the CAS has been sent to the client
 					dropCAS(aCasReferenceId, true);
+					localCache.dumpContents();
 				}
 			}
 		}

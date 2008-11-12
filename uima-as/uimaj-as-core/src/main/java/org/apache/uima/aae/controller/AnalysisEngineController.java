@@ -199,4 +199,6 @@ public interface AnalysisEngineController extends ControllerLifecycle
   public void initializeVMTransport(int parentControllerReplyConsumerCount) throws Exception;
 
   public InputChannel getReplyInputChannel(String aDelegateKey);
+  
+  public LocalCache getLocalCache();
 }

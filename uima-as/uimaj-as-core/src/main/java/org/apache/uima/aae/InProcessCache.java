@@ -227,6 +227,7 @@ public class InProcessCache implements InProcessCacheMBean
 	public synchronized void dumpContents(String aControllerName)
 	{
 		int count=0;
+/*		
 		if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 		{
 			Iterator it = cache.keySet().iterator();
@@ -245,10 +246,12 @@ public class InProcessCache implements InProcessCacheMBean
 				{
 					sb.append(key+ " *** Input CAS. Number Of Child CASes In Play:"+entry.getSubordinateCasInPlayCount());
 				}
-				if ( entry.isWaitingForRelease() )
-				{
-					sb.append(" <<< Reached Final State in Controller:"+aControllerName);
-				}
+				
+//				if ( entry.isWaitingForRelease() )
+	//			{
+		//			sb.append(" <<< Reached Final State in Controller:"+aControllerName);
+			//	}
+				
 				sb.append("\n");
 			}
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
@@ -268,10 +271,12 @@ public class InProcessCache implements InProcessCacheMBean
 				String key = (String) it.next();
 				CacheEntry entry = (CacheEntry)cache.get(key);
 				count++;
-				if ( entry.isWaitingForRelease() )
-				{
-					inFinalState++;
-				}
+				
+				//if ( entry.isWaitingForRelease() )
+				//{
+					//inFinalState++;
+				//}
+				
 			}
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "dumpContents", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_abbrev_cache_stats___FINE",
@@ -279,6 +284,7 @@ public class InProcessCache implements InProcessCacheMBean
 		
 			
 		}
+*/		
 	}
 	
 	public synchronized void remove(String aCasReferenceId)
@@ -507,17 +513,6 @@ public class InProcessCache implements InProcessCacheMBean
 		cache.put(aCasReferenceId, entry);
 		return entry;
 	}
-	public int getNumberOfParallelDelegates(String aCasReferenceId)
-	throws AsynchAEException
-	{
-		CacheEntry casRefEntry = getEntry(aCasReferenceId);
-		if ( casRefEntry == null )
-		{
-			throw new AsynchAEException("Cas Not Found In CasManager Cache. CasReferenceId::"+aCasReferenceId+" is Invalid");
-		}
-		return casRefEntry.getNumberOfParallelDelegates();
-	}
- 
 	public boolean hasNoSubordinates(String aCasReferenceId)
 	{
 		Iterator it = cache.keySet().iterator();
@@ -552,18 +547,6 @@ public class InProcessCache implements InProcessCacheMBean
 		CacheEntry parentEntry = getCacheEntryForCAS(anEntry.getInputCasReferenceId());
 		return getTopAncestorEndpoint(parentEntry);
 	}
-	
-	public void setNumberOfParallelDelegates(int aParallelDelegateCount, String aCasReferenceId)
-	throws AsynchAEException
-	{
-		CacheEntry casRefEntry = getEntry(aCasReferenceId);
-		if ( casRefEntry == null )
-		{
-			throw new AsynchAEException("Cas Not Found In CasManager Cache. CasReferenceId::"+aCasReferenceId+" is Invalid");
-		}
-		casRefEntry.setNumberOfParallelDelegates(aParallelDelegateCount);
-	}
-	
 	public synchronized CacheEntry getCacheEntryForCAS( String aCasReferenceId )
 	throws AsynchAEException
 	{
@@ -639,30 +622,15 @@ public class InProcessCache implements InProcessCacheMBean
 
 		private boolean pendingReply = false;
 		
-		private boolean subordinateCAS = false;
-
-		private int subordinateCasInPlayCount = 0;
-		
-		private boolean replyReceived = false;
-		
-		private int state = 0;
-		
 		private long sequence = 0;
 		
 		private Endpoint freeCasEndpoint;
-		
-		private FinalStep step;
-		
-		private boolean waitingForRealease;
-		
-		private Object childCountMux = new Object();
 		
 		private Marker marker = null;
 		
 		private boolean acceptsDeltaCas = false;
 		
 		private boolean sentDeltaCas = false;
-
 		//  list containing delegates that must be called sequentially. This list
 		//  is added to the cache if there are collocated delegates in a parallel
 		//  step. Only remote delegates can be part of the parallel step. Any 
@@ -728,7 +696,6 @@ public class InProcessCache implements InProcessCacheMBean
 		public void setInputCasReferenceId(String anInputCasReferenceId)
 		{
 			inputCasReferenceId = anInputCasReferenceId;
-			subordinateCAS = true;
 		}
 		
 		public void setStat( DelegateStats aStat)
@@ -777,7 +744,7 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			return timeToSerializeCAS;
 		}
-
+/*
 		public synchronized void incrementHowManyDelegatesResponded()
 		{
 			howManyDelegatesResponded++;
@@ -800,7 +767,7 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			return numberOfParallelDelegates;
 		}
-		
+	*/	
 		public Endpoint getMessageOrigin()
 		{
 			//Endpoint ep = (Endpoint)originStack.pop();
@@ -948,59 +915,12 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			return totalTimeToProcessCAS;
 		}
+		    
 		public boolean isPendingReply() {
 			return pendingReply;
 		}
 		public void setPendingReply(boolean pendingReply) {
 			this.pendingReply = pendingReply;
-		}
-		public boolean isSubordinate()
-		{
-			return subordinateCAS;
-		}
-		
-		public int getSubordinateCasInPlayCount()
-		{
-      synchronized( childCountMux )
-      {
-        return subordinateCasInPlayCount;
-      }
-		}
-		
-		public void incrementSubordinateCasInPlayCount()
-		{
-      synchronized( childCountMux )
-      {
-        subordinateCasInPlayCount++;
-      }
-		}
-		public int decrementSubordinateCasInPlayCount()
-		{
-		  synchronized( childCountMux )
-		  {
-	      if ( subordinateCasInPlayCount > 0)
-	      {
-	        subordinateCasInPlayCount--;
-	      }
-	      return subordinateCasInPlayCount;
-		  }
-		}
-		public void setReplyReceived()
-		{
-			replyReceived = true;
-		}
-		public boolean isReplyReceived()
-		{
-			return replyReceived;
-		}
-		public int getState()
-		{
-			return state;
-		}
-		
-		public void setState( int aState )
-		{
-			state = aState;
 		}
 		public long getCasSequence()
 		{
@@ -1020,23 +940,6 @@ public class InProcessCache implements InProcessCacheMBean
 			return freeCasEndpoint;
 		}
 		
-		public void setFinalStep( FinalStep step )
-		{
-			this.step = step;
-		}
-		public FinalStep getFinalStep()
-		{
-			return step;
-		}
-		public void setWaitingForRelease(boolean flag)
-		{
-			waitingForRealease = flag;
-		}
-		
-		public boolean isWaitingForRelease()
-		{
-			return waitingForRealease;
-		}
 		public boolean acceptsDeltaCas() {
 			return this.acceptsDeltaCas;
 		}
@@ -1060,6 +963,7 @@ public class InProcessCache implements InProcessCacheMBean
 		public List getDelayedSingleStepList() {
 		  return delayedSingleStepList;
 		}
+    
 	}	
 
 

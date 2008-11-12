@@ -26,6 +26,7 @@ public interface Endpoint
 {
   public static final int OK = 1;
   public static final int FAILED = 2;
+  public static final int DISABLED = 3;
   
 	public int getMetadataRequestTimeout();
 	public void setController( AnalysisEngineController aController);
