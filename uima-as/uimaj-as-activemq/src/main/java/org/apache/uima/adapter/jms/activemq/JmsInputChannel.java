@@ -902,13 +902,15 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
                     "destroyListener", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopped_listener_INFO",
                     new Object[] {controller.getComponentName(), mListener.getDestination().toString() });
         }
-        Endpoint endpoint = ((AggregateAnalysisEngineController)getController()).lookUpEndpoint(aDelegateKey, false);
-        endpoint.setStatus(Endpoint.FAILED);
-        if ( mListener.getConnectionFactory() != null) {
-          if ( getController() instanceof AggregateAnalysisEngineController ) {
-            if ( !failedListenerMap.containsKey(aDelegateKey )) {
-              failedListenerMap.put( aDelegateKey, mListener);
-              listenerContainerList.remove(mListener);
+        if ( getController() != null ) {
+          Endpoint endpoint = ((AggregateAnalysisEngineController)getController()).lookUpEndpoint(aDelegateKey, false);
+          endpoint.setStatus(Endpoint.FAILED);
+          if ( mListener.getConnectionFactory() != null) {
+            if ( getController() instanceof AggregateAnalysisEngineController ) {
+              if ( !failedListenerMap.containsKey(aDelegateKey )) {
+                failedListenerMap.put( aDelegateKey, mListener);
+                listenerContainerList.remove(mListener);
+              }
             }
           }
         }

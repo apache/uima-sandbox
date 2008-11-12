@@ -49,6 +49,7 @@ import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
+import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ServiceShutdownException;
@@ -1593,7 +1594,7 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		catch( JMSException e)
 		{
-			//	Unable to establish connection to the endpoint. Logit and continue
+			//	Unable to establish connection to the endpoint. Log it and continue
       if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                     "sendCasToRemoteDelegate", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_unable_to_connect__INFO",
@@ -1739,13 +1740,14 @@ public class JmsOutputChannel implements OutputChannel
 	private void sendCasToRemoteEndpoint( boolean isRequest, String aSerializedCAS, CacheEntry entry,  Endpoint anEndpoint, boolean startTimer ) 
 	throws AsynchAEException, ServiceShutdownException
 	{
-		
+		CasStateEntry casStateEntry = null;
 		try
 		{
 			if ( aborting )
 			{
 				return;
 			}
+			casStateEntry = getAnalysisEngineController().getLocalCache().lookupEntry(entry.getCasReferenceId());
 			//	Get the connection object for a given endpoint
 			JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
 			//	Create empty JMS Text Message
@@ -1772,7 +1774,7 @@ public class JmsOutputChannel implements OutputChannel
 				tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
 			}
 			//	The following is true when the analytic is a CAS Multiplier
-			if ( entry.isSubordinate() && !isRequest )
+			if ( casStateEntry.isSubordinate() && !isRequest )
 			{
 				//	Override MessageType set in the populateHeaderWithContext above.
 				//	Make the reply message look like a request. This message will contain a new CAS 
@@ -1869,6 +1871,7 @@ public class JmsOutputChannel implements OutputChannel
   private void sendCasToRemoteEndpoint( boolean isRequest, byte[] aSerializedCAS, CacheEntry entry,  Endpoint anEndpoint, boolean startTimer ) 
   throws AsynchAEException, ServiceShutdownException
   {
+    CasStateEntry casStateEntry = null;
     
     try
     {
@@ -1876,6 +1879,7 @@ public class JmsOutputChannel implements OutputChannel
       {
         return;
       }
+      casStateEntry = getAnalysisEngineController().getLocalCache().lookupEntry(entry.getCasReferenceId());
       //  Get the connection object for a given endpoint
       JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
       //  Create empty JMS Text Message
@@ -1895,7 +1899,7 @@ public class JmsOutputChannel implements OutputChannel
 //        tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
       }
       //  The following is true when the analytic is a CAS Multiplier
-      if ( entry.isSubordinate() && !isRequest )
+      if ( casStateEntry.isSubordinate() && !isRequest )
       {
         //  Override MessageType set in the populateHeaderWithContext above.
         //  Make the reply message look like a request. This message will contain a new CAS 
@@ -1992,9 +1996,10 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			return null;
 		}
+    CasStateEntry casStateEntry = getAnalysisEngineController().getLocalCache().lookupEntry(casReferenceId);
 		
 		CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(casReferenceId); 
-		if ( entry.isSubordinate() )
+		if ( casStateEntry.isSubordinate() )
 		{
 			//	Recurse until the top CAS reference Id is found
 			return getTopParentCasReferenceId(entry.getInputCasReferenceId());

@@ -603,26 +603,26 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	}
 
 	private synchronized void handleJmsException( JMSException ex) {
-	    if ( failed ) {
-	      return;   // Already marked failed
-	    }
-	    failed = true;
-/*	  
-	    try {
-	    if ( controller instanceof AggregateAnalysisEngineController ) {
-        String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(delegateEndpoint.getEndpoint());
-	      if ( delegateEndpoint.getDestination() != null ) {
-	        InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(delegateEndpoint.getDestination().toString());
-	        iC.destroyListener(delegateEndpoint.getDestination().toString(), delegateKey);
-	      } else {
-	        InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(delegateEndpoint.getEndpoint());
-	        iC.destroyListener(delegateEndpoint.getEndpoint(), delegateKey);
-	      }
-	    }
-	  } catch( Exception e) {
-	    e.printStackTrace();
-	  }
-*/	  
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+      //  Check if the exception is due to deleted queue. ActiveMQ does not identify
+      //  this condition in the cause, so we need to parse the exception message and
+      //  compare against "Cannot publish to a deleted Destination" text. If match is
+      //  found, extract the name of the deleted queue from the exception and log it.
+      if ( ex.getMessage() != null && ex.getMessage().startsWith("Cannot publish to a deleted Destination")) {
+        String destName = endpointName;
+        int startPos = ex.getMessage().indexOf(':');
+        if ( startPos > 0 ) {
+          destName = ex.getMessage().substring(startPos);
+        }
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                "handleJmsException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_failed_deleted_queue_INFO",
+                new Object[] { controller.getName(), destName});
+      }
+    }
+    if ( failed ) {
+      return;   // Already marked failed
+    }
+    failed = true;
 	}
 	public void onConsumerEvent(ConsumerEvent arg0)
 	{
