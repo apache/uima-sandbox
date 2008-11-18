@@ -19,10 +19,6 @@
 
 package org.apache.uima.aae.handler.input;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
@@ -41,11 +37,8 @@ import org.apache.uima.aae.handler.HandlerBase;
 import org.apache.uima.aae.jmx.ServicePerformance;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
-import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.aae.monitor.Monitor;
-import org.apache.uima.aae.monitor.statistics.DelegateStats;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
-import org.apache.uima.aae.monitor.statistics.TimerStats;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.AllowPreexistingFS;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
@@ -55,7 +48,6 @@ public class ProcessResponseHandler extends HandlerBase
 {
 	private static final Class CLASS_NAME = ProcessResponseHandler.class;
 
-	private Object monitor = new Object();
   private UimaSerializer uimaSerializer = new UimaSerializer();
   
 	public ProcessResponseHandler(String aName)
@@ -229,102 +221,90 @@ public class ProcessResponseHandler extends HandlerBase
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId, xmi });
 			}
 			long t1 = getController().getCpuTime();
-			/* --------------------- */
-			/** DESERIALIZE THE CAS. */ 
-			/* --------------------- */
-			
-			//	check if the CAS is part of the Parallel Step
-			if (totalNumberOfParallelDelegatesProcessingCas > 1 )
-			{
-				//	Synchronized because replies are merged into the same CAS.
-				synchronized (monitor)
-				{
-					//	Check if this a secondary reply in a parallel step. If it is the first reply, deserialize the CAS
-					//	using a standard approach. There is no merge to be done yet. Otherwise, we need to
-					//	merge the CAS with previous results.
-					// process secondary reply from a parallel step
-					//Use Delta CAS deserialization
+      /* --------------------- */
+      /** DESERIALIZE THE CAS. */
+      /* --------------------- */
+
+      // check if the CAS is part of the Parallel Step
+      if (totalNumberOfParallelDelegatesProcessingCas > 1) {
+        // Synchronized because replies are merged into the same CAS.
+        synchronized (cas) {
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_delegate_responded_count_FINEST",
-			                new Object[] { casStateEntry.howManyDelegatesResponded(), casReferenceId});
+                    "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                    "UIMAEE_delegate_responded_count_FINEST",
+                    new Object[] { casStateEntry.howManyDelegatesResponded(), casReferenceId });
           }
-					int highWaterMark = cacheEntry.getHighWaterMark();
-          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-			                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_high_water_mark_FINEST",
-			                new Object[] { highWaterMark, casReferenceId });
+          // If a delta CAS, merge it while checking that no pre-existing FSs are modified.
+          if (aMessageContext.getMessageBooleanProperty(AsynchAEMessage.SentDeltaCas)) {
+            int highWaterMark = cacheEntry.getHighWaterMark();
+            deserialize(xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.disallow);
+          } else {
+            // If not a delta CAS (old service), take all of first reply, and merge in the new
+            // entries in the later replies. Ignoring pre-existing FS for 2.2.2 compatibility
+            if (casStateEntry.howManyDelegatesResponded() == 0) {
+              deserialize(xmi, cas, casReferenceId);
+            } else { // process secondary reply from a parallel step
+              int highWaterMark = cacheEntry.getHighWaterMark();
+              deserialize(xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.ignore);
+            }
           }
-					deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.disallow);
-				}
-			}
-			else // general case
-			{
-			  String serializationStrategy = endpointWithTimer.getSerializer();
-			  if ( serializationStrategy.equals("binary")) {
-			   byte[] binaryData = aMessageContext.getByteMessage();
-//         UimaSerializer.deserializeCasFromBinary(binaryData, cas);
-         uimaSerializer.deserializeCasFromBinary(binaryData, cas);
-			  }  else {
-	        //  Processing a reply from a standard, non-parallel delegate
-	        if (aMessageContext.getMessageBooleanProperty(AsynchAEMessage.SentDeltaCas)) {
-	          int highWaterMark = cacheEntry.getHighWaterMark();
-	          deserialize( xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.allow);
-	        } else {
-	          deserialize(xmi, cas, casReferenceId);
-	        }
-			  }
-			}
-			
-			if ( casStateEntry != null && totalNumberOfParallelDelegatesProcessingCas > 1 )
-			{
-				casStateEntry.incrementHowManyDelegatesResponded();
-			}
-		
-			long timeToDeserializeCAS = getController().getCpuTime() - t1;
+          casStateEntry.incrementHowManyDelegatesResponded();
+        }
+      } else { // Processing a reply from a non-parallel delegate (binary or delta xmi or xmi)
+        String serializationStrategy = endpointWithTimer.getSerializer();
+        if (serializationStrategy.equals("binary")) {
+          byte[] binaryData = aMessageContext.getByteMessage();
+          uimaSerializer.deserializeCasFromBinary(binaryData, cas);
+        } else {
+          if (aMessageContext.getMessageBooleanProperty(AsynchAEMessage.SentDeltaCas)) {
+            int highWaterMark = cacheEntry.getHighWaterMark();
+            deserialize(xmi, cas, casReferenceId, highWaterMark, AllowPreexistingFS.allow);
+          } else {
+            deserialize(xmi, cas, casReferenceId);
+          }
+        }
+      }
 
-            getController().
-            	getServicePerformance().
-            		incrementCasDeserializationTime(timeToDeserializeCAS);
+      long timeToDeserializeCAS = getController().getCpuTime() - t1;
 
-            ServicePerformance casStats =
-            	getController().getCasStatistics(casReferenceId);
-			casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
-			LongNumericStatistic statistic;
-			if ( (statistic = getController().getMonitor().getLongNumericStatistic("",Monitor.TotalDeserializeTime)) != null )
-			{
-				statistic.increment(timeToDeserializeCAS);
-			}
+      getController().getServicePerformance().incrementCasDeserializationTime(timeToDeserializeCAS);
 
-			computeStats(aMessageContext, casReferenceId);
+      ServicePerformance casStats = getController().getCasStatistics(casReferenceId);
+      casStats.incrementCasDeserializationTime(timeToDeserializeCAS);
+      LongNumericStatistic statistic;
+      if ((statistic = getController().getMonitor().getLongNumericStatistic("",
+              Monitor.TotalDeserializeTime)) != null) {
+        statistic.increment(timeToDeserializeCAS);
+      }
 
-			cancelTimer(aMessageContext, casReferenceId, true);
+      computeStats(aMessageContext, casReferenceId);
 
-			// Send CAS for processing when all delegates reply
-			// totalNumberOfParallelDelegatesProcessingCas indicates how many delegates are processing CAS in parallel. Default is 1, meaning only
-			// one delegate processes the CAS at the same. Otherwise, check if all delegates responded before passing CAS on to the Flow Controller.
-			// The idea is that all delegates processing one CAS concurrently must respond, before the CAS is allowed to move on to the next step.
-			// HowManyDelegatesResponded is incremented every time a parallel delegate sends response.
-			if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) )
-			{
-				casStateEntry.resetDelegateResponded();
-				super.invokeProcess(cas, casReferenceId, null, aMessageContext, null);
-			}
+      cancelTimer(aMessageContext, casReferenceId, true);
 
-		}
-		catch ( Exception e)
-		{
-			e.printStackTrace();
-			ErrorContext errorContext = new ErrorContext();
-			errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
-			errorContext.add(AsynchAEMessage.CasReference, casReferenceId );
-			errorContext.add(AsynchAEMessage.Endpoint, aMessageContext.getEndpoint());
-			getController().getErrorHandlerChain().handle(e, errorContext, getController());
-		}
-		finally
-		{
-			incrementDelegateProcessCount(aMessageContext);
-		}
+      // Send CAS for processing when all delegates reply
+      // totalNumberOfParallelDelegatesProcessingCas indicates how many delegates are processing CAS
+      // in parallel. Default is 1, meaning only one delegate processes the CAS at the same.
+      // Otherwise, check if all delegates responded before passing CAS on to the Flow Controller.
+      // The idea is that all delegates processing one CAS concurrently must respond, before the CAS
+      // is allowed to move on to the next step.
+      // HowManyDelegatesResponded is incremented every time a parallel delegate sends response.
+      if (totalNumberOfParallelDelegatesProcessingCas == 1
+              || (casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas)) {
+        casStateEntry.resetDelegateResponded();
+        super.invokeProcess(cas, casReferenceId, null, aMessageContext, null);
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      ErrorContext errorContext = new ErrorContext();
+      errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+      errorContext.add(AsynchAEMessage.CasReference, casReferenceId);
+      errorContext.add(AsynchAEMessage.Endpoint, aMessageContext.getEndpoint());
+      getController().getErrorHandlerChain().handle(e, errorContext, getController());
+    } finally {
+      incrementDelegateProcessCount(aMessageContext);
+    }
 
 	}
 	
