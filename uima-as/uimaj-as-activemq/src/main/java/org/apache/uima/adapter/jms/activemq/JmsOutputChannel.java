@@ -1085,7 +1085,7 @@ public class JmsOutputChannel implements OutputChannel
         //  Serialize CAS for remote Delegates
         String serializer = anEndpoint.getSerializer();
         if ( serializer.equals("binary")) {
-          if (entry.acceptsDeltaCas())  {
+          if (entry.acceptsDeltaCas() && isReply)  {
             serializedCAS = uimaSerializer.serializeCasToBinary(cas, entry.getMarker());
             entry.setSentDeltaCas(true);
           } else {
