@@ -299,7 +299,7 @@ public class JmsOutputChannel implements OutputChannel
 	    // test sending a message to reply endpoint. This tests existence of
 	    // a temp queue. If the client has been shutdown, this will fail
 	    // with an exception.
-	    endpointConnection.send(tm, false);
+	    endpointConnection.send(tm, 0, false);
 	  }
 	}
 	/**
@@ -438,7 +438,7 @@ public class JmsOutputChannel implements OutputChannel
 			populateHeaderWithRequestContext(tm, anEndpoint, aCommand);
 			
 			// Only used to send a Stop or ReleaseCas request so probably no need to start a connection timer ?
-			endpointConnection.send(tm, true);
+			endpointConnection.send(tm, 0, true);
 			if ( aCommand == AsynchAEMessage.ReleaseCAS )
 			{
 		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
@@ -509,7 +509,7 @@ public class JmsOutputChannel implements OutputChannel
 			}
 			
 			
-			if ( endpointConnection.send(tm, startTimer) != true )
+			if ( endpointConnection.send(tm, 0, startTimer) != true )
 			{
 				throw new ServiceNotFoundException();
 			}
@@ -807,7 +807,7 @@ public class JmsOutputChannel implements OutputChannel
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
 			populateHeaderWithResponseContext(tm, anEndpoint, aCommand);
 			
-			endpointConnection.send(tm, false); 
+			endpointConnection.send(tm, 0, false); 
 			addIdleTime(tm);
 	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
@@ -954,7 +954,7 @@ public class JmsOutputChannel implements OutputChannel
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint() });
       }
 			//	Dispatch Message to destination
-			endpointConnection.send(om, false);
+			endpointConnection.send(om, 0, false);
 			addIdleTime(om);
 		}
 		catch( JMSException e)
@@ -996,7 +996,7 @@ public class JmsOutputChannel implements OutputChannel
 		{
 			return;
 		}
-		
+		long msgSize = 0;
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		try
 		{
@@ -1026,6 +1026,7 @@ public class JmsOutputChannel implements OutputChannel
 				//	Serialize metadata
 				aProcessingResourceMetadata.toXML(bos);
 				tm.setText(bos.toString());
+				msgSize = bos.toString().length();
 			}
 						
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.Metadata);
@@ -1037,7 +1038,7 @@ public class JmsOutputChannel implements OutputChannel
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_metadata_reply__endpoint__FINEST",
                     new Object[] { serviceInputEndpoint, anEndpoint.getEndpoint() });
       }
-			endpointConnection.send(tm, false);
+			endpointConnection.send(tm, msgSize, false);
 		}
 		catch( JMSException e)
 		{
@@ -1142,7 +1143,6 @@ public class JmsOutputChannel implements OutputChannel
 				}
 				serializedCAS = serializeCAS(isReply, cas, aCasReferenceId, serializer);
 				long timeToSerializeCas = getAnalysisEngineController().getCpuTime()-t1;
-				
 				getAnalysisEngineController().incrementSerializationTime(timeToSerializeCas);
 				
 				entry.incrementTimeToSerializeCAS(timeToSerializeCas);
@@ -1494,7 +1494,7 @@ public class JmsOutputChannel implements OutputChannel
 	private void sendCasToRemoteEndpoint( boolean isRequest, String aSerializedCAS, String anInputCasReferenceId, String aCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence) 
 	throws AsynchAEException, ServiceShutdownException
 	{
-		
+		long msgSize = 0;
 		try
 		{
 			if ( aborting )
@@ -1512,7 +1512,9 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				getAnalysisEngineController().getInProcessCache().saveSerializedCAS(aCasReferenceId, aSerializedCAS);
 			}
-
+			if ( aSerializedCAS != null ) {
+			  msgSize = aSerializedCAS.length();
+			}
 			tm.setText(aSerializedCAS);
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload); 
 			//	Add Cas Reference Id to the outgoing JMS Header
@@ -1586,7 +1588,7 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			//	Send Request Messsage to the Endpoint
 			// ----------------------------------------------------
-			endpointConnection.send(tm, startConnectionTimer);
+			endpointConnection.send(tm, msgSize, startConnectionTimer);
 			if ( !isRequest )
 			{
 				addIdleTime(tm);
@@ -1620,14 +1622,16 @@ public class JmsOutputChannel implements OutputChannel
   private void sendCasToRemoteEndpoint( boolean isRequest, byte[] aSerializedCAS, String anInputCasReferenceId, String aCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence) 
   throws AsynchAEException, ServiceShutdownException
   {
-    
+    long msgSize = 0;
     try
     {
       if ( aborting )
       {
         return;
       }
-      
+      if ( aSerializedCAS != null ) {
+        msgSize = aSerializedCAS.length;
+      }
       //  Get the connection object for a given endpoint
       JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
       //  Create empty JMS Text Message
@@ -1704,7 +1708,7 @@ public class JmsOutputChannel implements OutputChannel
       // ----------------------------------------------------
       //  Send Request Messsage to the Endpoint
       // ----------------------------------------------------
-      endpointConnection.send(tm, startConnectionTimer);
+      endpointConnection.send(tm, msgSize, startConnectionTimer);
       if ( !isRequest )
       {
         addIdleTime(tm);
@@ -1741,6 +1745,7 @@ public class JmsOutputChannel implements OutputChannel
 	throws AsynchAEException, ServiceShutdownException
 	{
 		CasStateEntry casStateEntry = null;
+		long msgSize=0;
 		try
 		{
 			if ( aborting )
@@ -1758,6 +1763,9 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				getAnalysisEngineController().getInProcessCache().saveSerializedCAS(entry.getCasReferenceId(), aSerializedCAS);
 			}
+      if ( aSerializedCAS != null ) {
+        msgSize = aSerializedCAS.length();
+      }
 
 			tm.setText(aSerializedCAS);
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload); 
@@ -1831,7 +1839,7 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			//	Send Request Messsage to the Endpoint
 			// ----------------------------------------------------
-			endpointConnection.send(tm, startConnectionTimer);
+			endpointConnection.send(tm, msgSize, startConnectionTimer);
 
 //			if ( getAnalysisEngineController().isTopLevelComponent() )
 //			{
@@ -1872,7 +1880,7 @@ public class JmsOutputChannel implements OutputChannel
   throws AsynchAEException, ServiceShutdownException
   {
     CasStateEntry casStateEntry = null;
-    
+    long msgSize=0;
     try
     {
       if ( aborting )
@@ -1882,6 +1890,11 @@ public class JmsOutputChannel implements OutputChannel
       casStateEntry = getAnalysisEngineController().getLocalCache().lookupEntry(entry.getCasReferenceId());
       //  Get the connection object for a given endpoint
       JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
+      
+      if ( aSerializedCAS != null ) {
+        msgSize = aSerializedCAS.length;
+      }
+      
       //  Create empty JMS Text Message
       BytesMessage tm = endpointConnection.produceByteMessage();
       tm.writeBytes(aSerializedCAS);
@@ -1956,7 +1969,7 @@ public class JmsOutputChannel implements OutputChannel
       // ----------------------------------------------------
       //  Send Request Messsage to the Endpoint
       // ----------------------------------------------------
-      endpointConnection.send(tm, startConnectionTimer);
+      endpointConnection.send(tm, msgSize, startConnectionTimer);
 
       if ( !isRequest )
       {
@@ -2123,7 +2136,7 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			//	Send Request Messsage to Delegate
 			// ----------------------------------------------------
-			endpointConnection.send(tm, startTimer);
+			endpointConnection.send(tm, 0, startTimer);
 			if ( !isRequest )
 			{
 				addIdleTime(tm);

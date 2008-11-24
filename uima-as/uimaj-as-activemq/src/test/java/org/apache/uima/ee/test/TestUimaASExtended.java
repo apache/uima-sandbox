@@ -719,18 +719,18 @@ public class TestUimaASExtended extends BaseTestSupport
     runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
   }
 
-  public void testProcessParallelFlowWithDelegateDisable() throws Exception
-  {
-    System.out.println("-------------- testProcessParallelFlowWithDelegateDisable -------------");
-    //  Create Uima EE Client
-    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-    UIMAFramework.getLogger().setLevel(Level.FINE);
-    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
-    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
-    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlowDisableOnDelegateFailure.xml");
-    addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
-    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
-  }
+//  public void testProcessParallelFlowWithDelegateDisable() throws Exception
+//  {
+//    System.out.println("-------------- testProcessParallelFlowWithDelegateDisable -------------");
+//    //  Create Uima EE Client
+//    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+//    UIMAFramework.getLogger().setLevel(Level.FINE);
+//    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
+//    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
+//    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlowDisableOnDelegateFailure.xml");
+//    addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
+//    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
+//  }
 
 	public void testPrimitiveShutdownOnTooManyErrors() throws Exception
 	{

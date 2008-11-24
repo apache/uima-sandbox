@@ -489,7 +489,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		}
 	}
 
-	public boolean send(final Message aMessage, boolean startTimer) 
+	public boolean send(final Message aMessage, long msgSize, boolean startTimer) 
 	{
 		String destinationName = "";
 
@@ -530,6 +530,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	          }
 					}
 				}
+
 				//	Send a reply to a queue provided by the client
 				if ( isReplyEndpoint && delegateEndpoint.getDestination() != null  )
 				{
@@ -538,6 +539,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 					{
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
 					}
+          logMessageSize(aMessage, msgSize, destinationName);
 					synchronized(producer)
 					{
              producer.send((Destination)delegateEndpoint.getDestination(), aMessage);
@@ -550,12 +552,12 @@ public class JmsEndpointConnection_impl implements ConsumerListener
            {
              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_msg_to_endpoint__FINE", new Object[] {destinationName });
            }
+           logMessageSize(aMessage, msgSize, destinationName);
            synchronized(producer)
            {
              producer.send(aMessage);
            }
 				}
-					
 				if (startTimer)
 				{
 					startTimer(connectionCreationTimestamp);
@@ -585,6 +587,21 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		return false;
 	}
 
+	private void logMessageSize( Message aMessage, long msgSize, String destinationName ) {
+    if ( UIMAFramework.getLogger().isLoggable(Level.FINE)) {
+      boolean isReply = false;
+      if ( isReplyEndpoint  ) {
+        isReply = true;
+      }
+      String type="Text";
+      if ( aMessage instanceof BytesMessage ) {
+        type = "Binary";
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "logMessageSize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_size__FINE", new Object[] { controller.getComponentName(), isReply==true?"Reply":"Request", "Binary", destinationName,msgSize});
+      } else if ( aMessage instanceof TextMessage ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "logMessageSize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_size__FINE", new Object[] { controller.getComponentName(), isReply==true?"Reply":"Request", "XMI", destinationName,msgSize});
+      }
+    }
+	}
 	/**
 	 * This method is called during recovery of failed connection. It is only called if the endpoint
 	 * associated with a given delegate is marked as FAILED. It is marked that way when a listener
