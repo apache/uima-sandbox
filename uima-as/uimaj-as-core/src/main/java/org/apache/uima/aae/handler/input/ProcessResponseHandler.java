@@ -143,7 +143,7 @@ public class ProcessResponseHandler extends HandlerBase
 
 	}
 
-	private synchronized void handleProcessResponseFromRemoteDelegate(MessageContext aMessageContext, String aDelegateKey)
+	private void handleProcessResponseFromRemoteDelegate(MessageContext aMessageContext, String aDelegateKey)
 	{
 		CAS cas = null;
 		String casReferenceId = null;
@@ -265,7 +265,6 @@ public class ProcessResponseHandler extends HandlerBase
           }
         }
       }
-
       long timeToDeserializeCAS = getController().getCpuTime() - t1;
 
       getController().getServicePerformance().incrementCasDeserializationTime(timeToDeserializeCAS);
@@ -338,7 +337,7 @@ public class ProcessResponseHandler extends HandlerBase
 	}
 	
 	
-	private synchronized void handleProcessResponseWithCASReference(MessageContext aMessageContext )
+	private void handleProcessResponseWithCASReference(MessageContext aMessageContext )
 	{
 		String casReferenceId = null;
 		CacheEntry cacheEntry = null;

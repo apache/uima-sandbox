@@ -73,7 +73,6 @@ public class UimaVmMessageListener implements UimaMessageListener {
     int requestType = 0;
     try {
       latch.await();
-
       if (UimaMessageValidator.isValidMessage(aMessage, controller)) {
         MessageContext msgContext = aMessage.toMessageContext(controller.getName());
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
@@ -83,7 +82,7 @@ public class UimaVmMessageListener implements UimaMessageListener {
         }
         if (!concurrentThreads.containsKey(Thread.currentThread().getId())) {
           Thread.currentThread().setName(
-                  Thread.currentThread().getName() + "::" + controller.getComponentName());
+                  Thread.currentThread().getName() + "::" + controller.getComponentName()+ "::"+Thread.currentThread().getId());
           // Store the thread identifier in the map. The value stored is not important. All
           // we want is to save the fact that the thread name has been changed. And we only
           // want to change it once

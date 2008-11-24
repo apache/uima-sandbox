@@ -316,7 +316,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		}
 
 		//	Dont increment errors for destinations that are clients of this service.
-		if ( !aController.isStopped() && (isRequest || !isEndpointTheClient ) )
+		if ( key != null && !aController.isStopped() && (isRequest || !isEndpointTheClient ) )
 		{
 			synchronized( monitor )
 			{

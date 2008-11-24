@@ -480,7 +480,6 @@ implements AnalysisEngineController, EventSubscriber
        UimaAsContext uimaAsContext2 = new UimaAsContext();
        // Set up as many reply threads as there are threads to process requests
        uimaAsContext2.setConcurrentConsumerCount(concurrentReplyConsumers);
-//       uimaAsContext2.setConcurrentConsumerCount(parentControllerReplyConsumerCount);
        uimaAsContext2.put("EndpointName", endpointName);
        UimaTransport parentVmTransport = parentController.getTransport(uimaAsContext2, endpointName);
        parentVmTransport.produceUimaMessageDispatcher(this, vmTransport);
@@ -489,7 +488,6 @@ implements AnalysisEngineController, EventSubscriber
        parentListener.initialize(uimaAsContext2);
        // Creates delegate's dispatcher. It is wired to send replies to the parent's listener.
        vmTransport.produceUimaMessageDispatcher(parentController,parentVmTransport);
-       //transports.put(parentController.getName(), parentVmTransport);
      }
 
 	 }
@@ -683,12 +681,6 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			pServiceInfo = ((PrimitiveAnalysisEngineController)this).getServiceInfo();
 			servicePerformance.setProcessThreadCount(((PrimitiveAnalysisEngineController)this).getServiceInfo().getAnalysisEngineInstanceCount());
-			//	If this is a Cas Multiplier, add the key to the JMX MBean.
-			//	This will help the JMX Monitor to fetch the CM Cas Pool MBean
-			if ( isCasMultiplier() )
-			{
-				pServiceInfo.setServiceKey(getUimaContextAdmin().getQualifiedContextName());
-			}
 		}
 		else
 		{
@@ -696,6 +688,14 @@ implements AnalysisEngineController, EventSubscriber
 				((AggregateAnalysisEngineController)this).getServiceInfo();
 			pServiceInfo.setAggregate(true);
 		}
+    //  If this is a Cas Multiplier, add the key to the JMX MBean.
+    //  This will help the JMX Monitor to fetch the CM Cas Pool MBean
+    if ( isCasMultiplier() )
+    {
+      pServiceInfo.setServiceKey(getUimaContextAdmin().getQualifiedContextName());
+    }
+
+		
 		if ( pServiceInfo != null )
 		{
 			name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+serviceInfo.getLabel();
@@ -1997,10 +1997,6 @@ implements AnalysisEngineController, EventSubscriber
 					{
 						//	Release the CAS and remove a corresponding entry from the InProcess cache.
 						dropCAS(casReferenceId, true);
-	          if ( this instanceof AggregateAnalysisEngineController ) {
-	            ((AggregateAnalysisEngineController)this).getLocalCache().remove(casReferenceId);
-	          }
-						
 						//  Remove the Cas from the outstanding CAS list. The id of the Cas was
 						//	added to this list by the Cas Multiplier before the Cas was sent to 
 						//	to the client. 
@@ -2048,7 +2044,10 @@ implements AnalysisEngineController, EventSubscriber
 							synchronized( finalStepMux )
 							{
 		            if ( this instanceof AggregateAnalysisEngineController ) {
-	                casHasNoSubordinates = casStateEntry.getSubordinateCasInPlayCount() == 0;
+		              //  Decrement number of children for this CAS since we just released one above.
+		              casStateEntry.decrementSubordinateCasInPlayCount();
+
+		              casHasNoSubordinates = casStateEntry.getSubordinateCasInPlayCount() == 0;
 	                casPendingReply = casStateEntry.isPendingReply();
 		            } else {
 	                casHasNoSubordinates = getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId());
@@ -2275,50 +2274,50 @@ implements AnalysisEngineController, EventSubscriber
 		 */
 		public long getAnalysisTime()
 		{
-			Set<Long> set = threadStateMap.keySet();
-			Iterator<Long> it = set.iterator();
-			long totalCpuProcessTime = 0;
-			//	Iterate over all processing threads
-			while( it.hasNext())
-			{
-				long threadId = it.next();
-				synchronized( mux )
-				{
-					//	Fetch the next thread's stats
-					AnalysisThreadState threadState = threadStateMap.get(threadId);
-					//	If an Aggregate service, sum up the CPU times of all collocated
-					//	delegates.
-					if ( this instanceof AggregateAnalysisEngineController_impl )
-					{
-						//	Get a list of all colocated delegate controllers from the Aggregate
-						List<AnalysisEngineController> delegateControllerList = 
-							((AggregateAnalysisEngineController_impl)this).childControllerList; 							
-						//	Iterate over all colocated delegates
-						for( int i=0; i < delegateControllerList.size(); i++)
-						{	
-							//	Get the next delegate's controller
-							AnalysisEngineController delegateController =
-								(AnalysisEngineController)delegateControllerList.get(i);
-							if ( delegateController != null && !delegateController.isStopped())
-							{
-								//	get the CPU time for all processing threads in the current controller
-								totalCpuProcessTime += delegateController.getAnalysisTime();
-							}
-						}
-					}
-					else  // Primitive Controller
-					{
-						//	Get the CPU time of a thread with a given ID
-						totalCpuProcessTime += getCpuTime(threadId);
-					}
-					//	Subtract serialization and deserialization times from the total CPU used
-					if ( totalCpuProcessTime > 0 )
-					{
-						totalCpuProcessTime -= threadState.getDeserializationTime();
-						totalCpuProcessTime -= threadState.getSerializationTime();
-					}
-				}
-			}
+      long totalCpuProcessTime = 0;
+      synchronized( mux )
+      {
+        Set<Long> set = threadStateMap.keySet();
+        Iterator<Long> it = set.iterator();
+        //  Iterate over all processing threads
+        while( it.hasNext())
+        {
+          long threadId = it.next();
+            //  Fetch the next thread's stats
+            AnalysisThreadState threadState = threadStateMap.get(threadId);
+            //  If an Aggregate service, sum up the CPU times of all collocated
+            //  delegates.
+            if ( this instanceof AggregateAnalysisEngineController_impl )
+            {
+              //  Get a list of all colocated delegate controllers from the Aggregate
+              List<AnalysisEngineController> delegateControllerList = 
+                ((AggregateAnalysisEngineController_impl)this).childControllerList;               
+              //  Iterate over all colocated delegates
+              for( int i=0; i < delegateControllerList.size(); i++)
+              { 
+                //  Get the next delegate's controller
+                AnalysisEngineController delegateController =
+                  (AnalysisEngineController)delegateControllerList.get(i);
+                if ( delegateController != null && !delegateController.isStopped())
+                {
+                  //  get the CPU time for all processing threads in the current controller
+                  totalCpuProcessTime += delegateController.getAnalysisTime();
+                }
+              }
+            }
+            else  // Primitive Controller
+            {
+              //  Get the CPU time of a thread with a given ID
+              totalCpuProcessTime += getCpuTime(threadId);
+            }
+            //  Subtract serialization and deserialization times from the total CPU used
+            if ( totalCpuProcessTime > 0 )
+            {
+              totalCpuProcessTime -= threadState.getDeserializationTime();
+              totalCpuProcessTime -= threadState.getSerializationTime();
+            }
+        }
+      }
 			return totalCpuProcessTime;
 		}
 		/**

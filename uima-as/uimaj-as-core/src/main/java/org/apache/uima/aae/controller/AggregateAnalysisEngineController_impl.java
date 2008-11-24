@@ -921,45 +921,45 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		{
 			if (aCasReferenceId != null)
 			{
-				try
-				{
-					//	Check if a Flow object has been previously generated for the Cas.
-					if (flowMap.containsKey(aCasReferenceId))
-					{
-		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { aCasReferenceId });
-		         }
-						synchronized( flowMap)
-						{
-							flow = (FlowContainer) flowMap.get(aCasReferenceId);
-						}
-					}
-					else
-					{
-		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_new_flow_object__FINEST", new Object[] { aCasReferenceId });
-		         }
-						synchronized( flowControllerContainer )
-						{
-							flow = flowControllerContainer.computeFlow(aCAS);
-						}
-						// Save the Flow Object in a cache. Flow exists in the cache
-						// 	until the CAS is fully processed or it is
-						// explicitly deleted when processing of this CAS cannot
-						// continue
-						synchronized( flowMap )
-						{
-							flowMap.put(aCasReferenceId, flow);
-						}
-	          // Check if the local cache already contains an entry for the Cas id.
-	          // A colocated Cas Multiplier may have already registered this CAS 
-	          // in the parent's controller
-	          if ( localCache.lookupEntry(aCasReferenceId) == null ) {
-	            //  Add this Cas Id to the local cache. Every input CAS goes through here
-	            localCache.createCasStateEntry(aCasReferenceId);
-	          }
-					}
-				}
+        try
+        {
+          //  Check if a Flow object has been previously generated for the Cas.
+          if (flowMap.containsKey(aCasReferenceId))
+          {
+             if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+               UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { aCasReferenceId });
+             }
+            synchronized( flowMap)
+            {
+              flow = (FlowContainer) flowMap.get(aCasReferenceId);
+            }
+          }
+          else
+          {
+             if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+               UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_new_flow_object__FINEST", new Object[] { aCasReferenceId });
+             }
+            synchronized( flowControllerContainer )
+            {
+              flow = flowControllerContainer.computeFlow(aCAS);
+            }
+            // Save the Flow Object in a cache. Flow exists in the cache
+            //  until the CAS is fully processed or it is
+            // explicitly deleted when processing of this CAS cannot
+            // continue
+            synchronized( flowMap )
+            {
+              flowMap.put(aCasReferenceId, flow);
+            }
+            // Check if the local cache already contains an entry for the Cas id.
+            // A colocated Cas Multiplier may have already registered this CAS 
+            // in the parent's controller
+            if ( localCache.lookupEntry(aCasReferenceId) == null ) {
+              //  Add this Cas Id to the local cache. Every input CAS goes through here
+              localCache.createCasStateEntry(aCasReferenceId);
+            }
+          }
+        }
 				catch( Exception ex)
 				{
 					//	Any error here is automatic termination
@@ -1167,7 +1167,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						ServiceInfo serviceInfo = endpoint.getServiceInfo();
 						PrimitiveServiceInfo pServiceInfo = new PrimitiveServiceInfo();
 						pServiceInfo.setBrokerURL(serviceInfo.getBrokerURL());
-						pServiceInfo.setInputQueueName(serviceInfo.getInputQueueName());
+            pServiceInfo.setInputQueueName(serviceInfo.getInputQueueName());
+            if ( endpoint.getDestination() != null ) {
+              pServiceInfo.setReplyQueueName(endpoint.getDestination().toString());
+            }
 						pServiceInfo.setState(serviceInfo.getState());
 						pServiceInfo.setAnalysisEngineInstanceCount(1);
 						
@@ -1265,6 +1268,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			endpoint = getInProcessCache().getEndpoint(null, aCasReferenceId);
 			
 			boolean sendReplyToClient = false;
+			boolean doSendReplyToClient = false;
 			
 			synchronized( super.finalStepMux)
 			{
@@ -1297,8 +1301,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
           freeCasEndpoint = cacheEntry.getFreeCasEndpoint();
           //  Lookup parent CAS in the local cache 
           parentCasStateEntry = localCache.lookupEntry(casStateEntry.getInputCasReferenceId());
-          parentCasStateEntry.decrementSubordinateCasInPlayCount();
-          casStateEntryDecremented = true;
+
           // Decrement this Cas parent child count if this is a top controller
         }
 	      //  If the CAS was generated by this component but the Flow Controller wants to drop it OR this component
@@ -1320,7 +1323,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	          }
 	          //  Drop the CAS and remove cache entry for it
 	          dropCAS(aCasReferenceId, true);
-	          localCache.remove(aCasReferenceId);
 	          casDropped = true;
 
             //  If debug level=FINEST dump the entire cache
@@ -1336,22 +1338,35 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	      } 
 	      else 
 	      {
-	        
-	        if ( casStateEntry.isSubordinate() && isTopLevelComponent())
-	        {
-	            casStateEntry.setWaitingForRelease(true);
+          if ( casStateEntry.isSubordinate() && isTopLevelComponent()) {
+            //  Change the state of the CAS entry to indicate that this CAS will await
+            //  explicit Release request from the client. Until the Request to Release
+            //  is received, the CAS will be parked in the Cache.
+            casStateEntry.setWaitingForRelease(true);
+          } else if ( parentCasStateEntry != null ){
+            
+            parentCasStateEntry.decrementSubordinateCasInPlayCount();
+            casStateEntryDecremented = true;
           }
-	        //  Send a reply to the Client. If the CAS is an input CAS it will be dropped
-	        cEndpoint = replyToClient( cacheEntry, casStateEntry );
-          localCache.remove(aCasReferenceId);
-          //  If debug level=FINEST dump the entire cache
-          localCache.dumpContents();
-	        if ( cEndpoint != null )
-	        {
-	          replySentToClient = true;
-	        }
+          doSendReplyToClient = true;
 	      }
 				
+			}  // synchronized
+			
+			if ( doSendReplyToClient ) {
+        //  Send a reply to the Client. If the CAS is an input CAS it will be dropped
+        cEndpoint = replyToClient( cacheEntry, casStateEntry );
+        if ( !endpoint.isRemote() ) {
+          // Remove entry from the local cache for this CAS. If the client
+          // is remote the entry was removed in replyToClient()
+          localCache.remove(aCasReferenceId);
+        }
+        //  If debug level=FINEST dump the entire cache
+        localCache.dumpContents();
+        if ( cEndpoint != null )
+        {
+          replySentToClient = true;
+        }
 			}
 
       if ( isSubordinate && releaseParentCas(casDropped, cEndpoint, parentCasStateEntry) )
@@ -1545,7 +1560,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 			}
 			//	Drop the CAS only if the client is remote and the CAS is an input CAS. 
-			//  If this CAS has a parent the client will send Realease CAS notification to release the CAS.
+			//  If this CAS has a parent the client will send Release CAS notification to release the CAS.
 			if ( endpoint.isRemote() && !casStateEntry.isSubordinate())
 			{
 				dropCAS(casStateEntry.getCasReferenceId(), true);
@@ -1558,7 +1573,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		else
 		{
-		  System.out.println("!!!!!!!!!!!!!!! Controller:"+getComponentName()+" Origin Endpoint Not Found For Cas:"+casStateEntry.getCasReferenceId()+" Or Its Parent Cas:"+casStateEntry.getInputCasReferenceId());
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), 
+          "replyToClient", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_client_endpoint_not_found__INFO", new Object[] { getComponentName(), casStateEntry.getCasReferenceId() });
+      }
+		  
 		}
 		return endpoint;
 	}
@@ -1671,8 +1690,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
         UimaMessage message = 
           getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
         message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
-          //  Send reply back to the client. Use internal (non-jms) transport
-         getTransport(anEndpoint.getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+        getTransport(anEndpoint.getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+
       }
       catch( Exception e)
       {

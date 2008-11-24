@@ -324,6 +324,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 		//  Create a new entry in the local cache for the input CAS
     CasStateEntry parentCasStateEntry = getLocalCache().createCasStateEntry(aCasReferenceId);
+    long totalProcessTime = 0;  // stored total time spent producing ALL CASes
 		
 		boolean inputCASReturned = false;
 		boolean processingFailed = false;
@@ -338,7 +339,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			//	Get input CAS entry from the InProcess cache
 			CacheEntry inputCASEntry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 			long time = super.getCpuTime();
-			long totalProcessTime = 0;  // stored total time spent producing ALL CASes
 			
 			CasIterator casIterator = ae.processAndOutputNewCASes(aCAS);
 			
@@ -457,7 +457,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
               message.addLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
               long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
               message.addLongProperty(AsynchAEMessage.IdleTime, iT );
-              
 		          getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
 	      }
 	      else
@@ -465,14 +464,19 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	          //  Send generated CAS to the client
 	          getOutputChannel().sendReply(newEntry, anEndpoint);
 	      }
-        //  Remove the new CAS state entry from the local cache
-        localCache.remove(newEntry.getCasReferenceId());
+        // Remove the new CAS state entry from the local cache if this a top level primitive.
+	      // If not top level, the client (an Aggregate) will remove this entry when this new
+	      // generated CAS reaches Final State.
+	      if ( isTopLevelComponent() ) {
+	        localCache.remove(newEntry.getCasReferenceId());
+	      }
 				
 				//	Remove Stats from the global Map associated with the new CAS
 				//	These stats for this CAS were added to the response message
 				//	and are no longer needed
 				dropCasStatistics(newEntry.getCasReferenceId());
-			}
+			} // while
+			
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (super.getCpuTime() - time) / (double) 1000000 });
       }
@@ -522,6 +526,10 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
            getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
          }
 			}
+      //  Remove input CAS state entry from the local cache
+      if ( !isTopLevelComponent() ) {
+        localCache.remove(aCasReferenceId);
+      }
 		}
 		catch ( Throwable e)
 		{

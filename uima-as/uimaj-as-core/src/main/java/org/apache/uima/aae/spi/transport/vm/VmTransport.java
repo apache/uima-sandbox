@@ -124,10 +124,9 @@ public class VmTransport implements UimaTransport {
       int concurrentConsumerCount = context.getConcurrentConsumerCount();
       // Create a ThreadPoolExecutor with as many threads as needed. The pool has 
       // a fixed number of threads that never expire and are never passivated.
-      executor = new ThreadPoolExecutor(1, concurrentConsumerCount, Long.MAX_VALUE,
+      executor = new ThreadPoolExecutor(concurrentConsumerCount, concurrentConsumerCount, Long.MAX_VALUE,
               TimeUnit.NANOSECONDS, workQueue);
-      // executor.prestartAllCoreThreads();
-
+      executor.prestartAllCoreThreads();
     }
     return executor;
   }
