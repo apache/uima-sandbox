@@ -1591,7 +1591,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       message.addLongProperty(AsynchAEMessage.CasSequence, cacheEntry.getCasSequence());
     }
     message.addStringProperty(AsynchAEMessage.CasReference, cacheEntry.getCasReferenceId());
-    message.addStringProperty(AsynchAEMessage.InputCasReference, cacheEntry.getInputCasReferenceId());
+    if ( cacheEntry.getInputCasReferenceId() != null ) {
+      message.addStringProperty(AsynchAEMessage.InputCasReference, cacheEntry.getInputCasReferenceId());
+    }
     ServicePerformance casStats = getCasStatistics(cacheEntry.getCasReferenceId());
     
     message.addLongProperty(AsynchAEMessage.TimeToSerializeCAS, casStats.getRawCasSerializationTime());
