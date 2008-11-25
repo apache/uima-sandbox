@@ -45,7 +45,7 @@
 	                  <serializer method="xmi"/>
                       <asyncAggregateErrorConfiguration>
                             <getMetadataErrors maxRetries="0" timeout="4000" errorAction="terminate" />
-                            <processCasErrors maxRetries="0" thresholdCount="1" thresholdAction="disable" continueOnRetryFailure="true"/>
+                            <processCasErrors maxRetries="0" timeout="4000" thresholdCount="1" thresholdAction="disable" continueOnRetryFailure="true"/>
                       </asyncAggregateErrorConfiguration>
           </remoteAnalysisEngine>
 
