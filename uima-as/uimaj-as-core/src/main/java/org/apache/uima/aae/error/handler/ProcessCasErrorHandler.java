@@ -547,7 +547,9 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			//	Only top level component can Drop the CAS. 
 			if ( aController.isTopLevelComponent() )
 			{
-				aController.takeAction( ErrorHandler.DROPCAS, key, anErrorContext);
+        if (totalNumberOfParallelDelegatesProcessingCas == 1 || ( casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) ){
+          aController.takeAction( ErrorHandler.DROPCAS, key, anErrorContext);
+        }
 			}			
 			if ( casReferenceId != null && aController instanceof AggregateAnalysisEngineController )
 			{

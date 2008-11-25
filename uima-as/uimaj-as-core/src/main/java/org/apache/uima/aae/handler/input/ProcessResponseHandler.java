@@ -157,7 +157,7 @@ public class ProcessResponseHandler extends HandlerBase
 			{
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-		                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_endpoint__WARNING",
+		                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_endpoint__WARNING",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId});
         }
 				return;
@@ -207,7 +207,7 @@ public class ProcessResponseHandler extends HandlerBase
 			int totalNumberOfParallelDelegatesProcessingCas = casStateEntry.getNumberOfParallelDelegates();
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-	                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_number_parallel_delegates_FINE",
+	                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_number_parallel_delegates_FINE",
 	                new Object[] { totalNumberOfParallelDelegatesProcessingCas});
       }
 			if (cas == null)
@@ -217,7 +217,7 @@ public class ProcessResponseHandler extends HandlerBase
 			if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 			{
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-		                "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_rcvd_reply_FINEST",
+		                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_rcvd_reply_FINEST",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId, xmi });
 			}
 			long t1 = getController().getCpuTime();
@@ -231,7 +231,7 @@ public class ProcessResponseHandler extends HandlerBase
         synchronized (cas) {
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-                    "handleProcessResponseWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                    "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
                     "UIMAEE_delegate_responded_count_FINEST",
                     new Object[] { casStateEntry.howManyDelegatesResponded(), casReferenceId });
           }
@@ -295,6 +295,31 @@ public class ProcessResponseHandler extends HandlerBase
       }
 
     } catch (Exception e) {
+      //  Check if the exception was thrown by the Cache while looking up
+      //  the CAS. It may be the case if in the parallel step one thread
+      //  drops the CAS in the Error Handling while another thread processes
+      //  reply from another delegate in the Parallel Step. A race condition
+      //  may occur here. If one thread drops the CAS due to excessive exceptions
+      //  and Flow Controller is configured to drop the CAS, the other thread
+      //  should not be allowed to move the CAS to process()method. The second
+      //  thread will find the CAS missing in the cache and the logic below
+      //  just logs the stale CAS and returns and doesnt attempt to handle 
+      //  the missing CAS exception.
+      if ( e instanceof AsynchAEException &&
+           e.getMessage() != null && e.getMessage().startsWith("Cas Not Found")) {
+        String key = "N/A";
+        if ( endpointWithTimer != null ) {
+          key = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(endpointWithTimer.getEndpoint());
+        }
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                "UIMAEE_stale_reply__INFO",
+                new Object[] { getController().getComponentName(), key, casReferenceId });
+        }
+        // The reply came late. The CAS was removed from the cache. 
+        return; 
+      }
       e.printStackTrace();
       ErrorContext errorContext = new ErrorContext();
       errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
