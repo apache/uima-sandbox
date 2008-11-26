@@ -179,6 +179,8 @@ public class ProcessResponseHandler extends HandlerBase
 				handleUnexpectedMessage(casReferenceId, aMessageContext.getEndpoint());
 				return;
 			}
+      cancelTimer(aMessageContext, casReferenceId, true);
+
 			//	Increment number of CASes processed by this delegate
 			if ( aDelegateKey != null)
 			{
@@ -279,7 +281,7 @@ public class ProcessResponseHandler extends HandlerBase
 
       computeStats(aMessageContext, casReferenceId);
 
-      cancelTimer(aMessageContext, casReferenceId, true);
+//      cancelTimer(aMessageContext, casReferenceId, true);
 
       // Send CAS for processing when all delegates reply
       // totalNumberOfParallelDelegatesProcessingCas indicates how many delegates are processing CAS
@@ -289,8 +291,9 @@ public class ProcessResponseHandler extends HandlerBase
       // is allowed to move on to the next step.
       // HowManyDelegatesResponded is incremented every time a parallel delegate sends response.
       if (totalNumberOfParallelDelegatesProcessingCas == 1
-              || (casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas)) {
-        casStateEntry.resetDelegateResponded();
+              || receivedAllResponsesFromParallelDelegates( casStateEntry, totalNumberOfParallelDelegatesProcessingCas)) {
+//              || (casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas)) {
+//        casStateEntry.resetDelegateResponded();
         super.invokeProcess(cas, casReferenceId, null, aMessageContext, null);
       }
 
@@ -331,7 +334,13 @@ public class ProcessResponseHandler extends HandlerBase
     }
 
 	}
-	
+	private synchronized boolean receivedAllResponsesFromParallelDelegates( CasStateEntry aCasStateEntry, int totalNumberOfParallelDelegatesProcessingCas){
+	  if ( aCasStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas) {
+      aCasStateEntry.resetDelegateResponded();
+	    return true;
+	  }
+	  return false;
+	}
 	private void deserialize( String xmi, CAS cas, String casReferenceId, int highWaterMark, AllowPreexistingFS allow ) throws Exception
 	{
 		XmiSerializationSharedData deserSharedData;
