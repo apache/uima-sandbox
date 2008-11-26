@@ -25,12 +25,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.TemporaryQueue;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQPrefetchPolicy;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.InputChannel;
@@ -358,6 +360,44 @@ implements ExceptionListener
 	{
 		return ((ActiveMQConnectionFactory)super.getConnectionFactory()).getBrokerURL();
 	}
+	/**
+	 * Overrides specified Connection Factory. Need to append maxInactivityDuration=0 to the 
+	 * broker URL. The Connection Factory is immutable thus we need to intercept the one
+	 * provided in the deployment descriptor and create a new one with rewritten Broker URL. 
+	 * We will inject the prefetch policy to the new CF based on what is found in the CF
+	 * in the deployment descriptor.
+	 */
+	public void setConnectionFactory(ConnectionFactory connectionFactory) {
+	  if ( connectionFactory instanceof ActiveMQConnectionFactory) {
+	    String brokerURL = ((ActiveMQConnectionFactory)connectionFactory).getBrokerURL();
+	    if ( brokerURL != null ) {
+	      if ( brokerURL.indexOf("?wireFormat.maxInactivityDuration") > 0) {
+	        // maxInactivityDuration already specified
+	        System.out.println(">>> Injecting Listener Connection Factory With Broker URL:"+brokerURL);
+	        super.setConnectionFactory(connectionFactory);
+	        return;
+	      }
+	      // Turns off inactivity Monitoring on the connection
+	      brokerURL += "?wireFormat.maxInactivityDuration=0";
+//        String newBrokerURL = "failover://("+brokerURL+"?wireFormat.maxInactivityDuration=0)";
+	      // Save the Prefetch Policy provided in the given CF
+	      ActiveMQPrefetchPolicy prefetch = ((ActiveMQConnectionFactory)connectionFactory).getPrefetchPolicy();
+	      // Instantiate new CF with a new Broker URL and inject the Prefetch Policy
+	      ActiveMQConnectionFactory acf = new ActiveMQConnectionFactory(brokerURL);
+	      System.out.println(">>> Injecting Listener Connection Factory With Broker URL:"+brokerURL);
+	      if ( prefetch != null ) {
+	        acf.setPrefetchPolicy(prefetch);
+	      }
+	      // Inject new Connection Factory
+	      super.setConnectionFactory(acf);
+	    } else {
+	      // brokerURL = null is handled in the dd2spring
+	    }
+	  } else {
+	    super.setConnectionFactory(connectionFactory);
+	  }
+	}
+	
 	
 	public void setDestinationResolver( DestinationResolver resolver )
 	{
