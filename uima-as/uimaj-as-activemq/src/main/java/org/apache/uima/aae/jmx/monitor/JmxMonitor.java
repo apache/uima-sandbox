@@ -123,6 +123,20 @@ public class JmxMonitor implements Runnable {
 	{
 		return maxNameLength;
 	}
+
+	private CasPoolManagementImplMBean getServiceCasPoolMBean(String labelToMatch, Set<ObjectName> names) {
+	  for( ObjectName name: names) {
+      //  Check if the current name is the Service Performance MBean
+      if ( name.toString().endsWith(labelToMatch) ) {
+        return (CasPoolManagementImplMBean)MBeanServerInvocationHandler.newProxyInstance(mbsc, name,CasPoolManagementImplMBean.class, true);        
+      }
+	  }
+	  return null;  // not found
+	}
+	
+	
+	
+	
 	/**
 	 * Connects to a remote JMX server identified by given <code>remoteServerURI</code>.
 	 * Creates proxies for all UIMA AS ServicePerformance MBeans found in the JMX server registry.
@@ -206,9 +220,23 @@ public class JmxMonitor implements Runnable {
 				//	Create a proxy object to the Service Info MBean
 				ServiceInfoMBean infoMBeanProxy = getServiceInfoMBean(names, key);
 				key = key.substring(key.indexOf(",name=")+",name=".length());
-				
+				//  Create a proxy to the service CasPool object.
+				CasPoolManagementImplMBean casPoolMBeanProxy = null;
+
+				if ( infoMBeanProxy.isTopLevel() ){
+	        if ( infoMBeanProxy.isAggregate() ) {
+	          casPoolMBeanProxy = getServiceCasPoolMBean("AggregateContext", names);
+	        } else  {
+	          casPoolMBeanProxy = getServiceCasPoolMBean("PrimitiveAEService", names);
+	        }
+				}
 				//	Create a Map entry containing MBeans
-				StatEntry entry = new StatEntry(perfMBeanProxy, infoMBeanProxy);
+				StatEntry entry = null;
+				if ( casPoolMBeanProxy != null ) {
+          entry = new StatEntry(perfMBeanProxy, infoMBeanProxy, casPoolMBeanProxy);
+				} else {
+	        entry = new StatEntry(perfMBeanProxy, infoMBeanProxy);
+				}
 				
 				String location = "Collocated";
 				//	If a service is co-located in the same JVM fetch the service queue proxy 
@@ -217,6 +245,7 @@ public class JmxMonitor implements Runnable {
 
 					if ( infoMBeanProxy.isCASMultiplier())
 					{
+		        //  Create a proxy to the Cas Multiplier CasPool object.
 						CasPoolManagementImplMBean casPoolMBean = getCasPoolMBean(names, infoMBeanProxy.getServiceKey());
 						if ( casPoolMBean != null )
 						{
@@ -352,7 +381,7 @@ public class JmxMonitor implements Runnable {
         //  Fetch previous metrics for service identified by 'name'
         StatEntry entry = stats.get(name);
         ServiceInfoMBean serviceInfo = entry.getServiceInfoMBeanProxy();
-
+        CasPoolManagementImplMBean getServiceCasPoolMBeanProxy = entry.getServiceCasPoolMBeanProxy();
         boolean isRemote = serviceInfo.getBrokerURL().startsWith("tcp:");
         boolean topLevel = serviceInfo.isTopLevel();
 
@@ -425,6 +454,10 @@ public class JmxMonitor implements Runnable {
         serviceMetrics.setProcessThreadCount(entry.getServicePerformanceMBeanProxy().getProcessThreadCount());
         serviceMetrics.setAnalysisTime(deltaAnalysisTime);
         serviceMetrics.setCmFreeCasInstanceCount(cmFreeCasInstanceCount);
+        //  The service cas pool proxy is only valid for aggregates and top level primitives
+        if ( getServiceCasPoolMBeanProxy != null ) {
+          serviceMetrics.setSvcFreeCasInstanceCount(getServiceCasPoolMBeanProxy.getAvailableInstances());
+        }
         //  populate shadow CAS pool metric for remote CAS multiplier. Filter out the top level service
         if ( entry.getServiceInfoMBeanProxy().isCASMultiplier() && isRemote && !topLevel )
         {
@@ -573,6 +606,7 @@ public class JmxMonitor implements Runnable {
 		QueueViewMBean replyQueueInfo;
     UimaVmQueueMBean vmReplyQueueInfo;
 		CasPoolManagementImplMBean casPoolMBeanProxy;
+		CasPoolManagementImplMBean serviceCasPoolMBeanProxy;
 		String name="";
 		boolean isVmQueue = true;
 		
@@ -584,14 +618,23 @@ public class JmxMonitor implements Runnable {
 		
 		double analysisTime = 0.0;
 		
-		public StatEntry( ServicePerformanceMBean perfBean, ServiceInfoMBean infoBean)
+    public StatEntry( ServicePerformanceMBean perfBean, ServiceInfoMBean infoBean)
+		{
+		  this( perfBean, infoBean, null);
+		}
+		public StatEntry( ServicePerformanceMBean perfBean, ServiceInfoMBean infoBean, CasPoolManagementImplMBean casPoolMBeanProxy)
 		{
 			servicePerformanceMBeanProxy = perfBean;
+			serviceCasPoolMBeanProxy = casPoolMBeanProxy;
 			serviceInfoMBeanProxy = infoBean;
 			if ( !infoBean.getBrokerURL().startsWith("Embedded Broker")) {
 	      isVmQueue = false;   // This is JMS queue
 			}
 		}
+		public CasPoolManagementImplMBean getServiceCasPoolMBeanProxy() {
+		  return serviceCasPoolMBeanProxy;
+		}
+		
 		public void setInputQueueInfo( QueueViewMBean queueView)
 		{
 			inputQueueInfo = queueView;
