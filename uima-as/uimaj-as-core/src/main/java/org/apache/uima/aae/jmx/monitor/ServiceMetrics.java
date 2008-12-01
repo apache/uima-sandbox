@@ -36,6 +36,8 @@ public class ServiceMetrics {
 	private int processThreadCount;
 	private double analysisTime;
 	private int cmFreeCasInstanceCount;
+	private int svcFreeCasInstanceCount;
+	
 	public boolean isTopLevelService() {
 		return topLevelService;
 	}
@@ -132,6 +134,12 @@ public class ServiceMetrics {
 	public void setCmFreeCasInstanceCount(int cmFreeCasInstanceCount) {
 		this.cmFreeCasInstanceCount = cmFreeCasInstanceCount;
 	}
+  public int getSvcFreeCasInstanceCount() {
+    return svcFreeCasInstanceCount;
+  }
+  public void setSvcFreeCasInstanceCount(int svcFreeCasInstanceCount) {
+    this.svcFreeCasInstanceCount = svcFreeCasInstanceCount;
+  }
 
 	
 }

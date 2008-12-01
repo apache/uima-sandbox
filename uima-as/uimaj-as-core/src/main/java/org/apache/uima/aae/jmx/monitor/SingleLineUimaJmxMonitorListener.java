@@ -87,7 +87,10 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 					items = items + "\t" + srvName + "-CPW";
 				}
 				if (serviceMetrics.isCasMultiplier() && !serviceMetrics.isServiceRemote() ) {
-					items = items + "\t" + srvName + "-FreeCP";
+					items = items + "\t" + srvName + "-CmFreeCP";
+				}
+				if ( serviceMetrics.isTopLevelService() ) {
+          items = items + "\t" + srvName + "-SvcFreeCP";
 				}
 			}
 			UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, items);
@@ -117,6 +120,10 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 					items = items + "\t" + serviceMetrics.getCmFreeCasInstanceCount();
 				}
 			}
+      if ( serviceMetrics.isTopLevelService() ) {
+        items = items + "\t" + serviceMetrics.getSvcFreeCasInstanceCount();
+      }
+
 		}
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
       UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, items);
