@@ -38,8 +38,8 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.activemq.broker.jmx.QueueViewMBean;
 import org.apache.uima.aae.jmx.ServiceInfoMBean;
 import org.apache.uima.aae.jmx.ServicePerformanceMBean;
+import org.apache.uima.aae.spi.transport.vm.UimaVmQueueMBean;
 import org.apache.uima.util.impl.CasPoolManagementImplMBean;
-
 
 /**
  *	Collects metrics from UIMA-AS Service MBeans at defined intervals and
@@ -65,7 +65,7 @@ public class JmxMonitor implements Runnable {
     private ThreadMXBean threads = null;
     private RuntimeMXBean runtime = null;
     private OperatingSystemMXBean os = null;
-    
+  private int serviceCount = 0;  
 	/**
 	 * Creates a connection to an MBean Server identified by <code>remoteServerURI</code>
 	 * 
@@ -138,7 +138,13 @@ public class JmxMonitor implements Runnable {
 	{
 		interval = samplingInterval;
 		//	Connect to the remote JMX Server
-		mbsc = getServerConnection(remoteServerURI);
+		try {
+	    mbsc = getServerConnection(remoteServerURI);
+		} catch( Exception e) {
+		  System.out.println("Unable to Connect To Jmx Server. URL:"+remoteServerURI);
+		  throw e;
+		}
+    System.out.println(">>> Connected To Jmx Server. URL:"+remoteServerURI);
 		//	Fetch remote JVM's MXBeans
 		ObjectName runtimeObjName = new  ObjectName(ManagementFactory.RUNTIME_MXBEAN_NAME);
 		ObjectName threadObjName = new ObjectName(ManagementFactory.THREAD_MXBEAN_NAME);
@@ -168,6 +174,8 @@ public class JmxMonitor implements Runnable {
 		String key = "";
 		if ( verbose )
 			System.out.println("\nFound UIMA AS Services Managed by JMX Server:"+remoteServerURI);
+		
+		
 		//	Find all Service Performance MBeans
 		for (ObjectName name : names) {
 			
@@ -217,11 +225,15 @@ public class JmxMonitor implements Runnable {
 					}
 					
 					//	Create a proxy to the service queue MBean
-					QueueViewMBean queueProxy = getQueueMBean(mbsc, infoMBeanProxy.getInputQueueName(), uimaServiceQueuePattern);
-					if (queueProxy != null )
-					{
+          UimaVmQueueMBean queueProxy = getQueueMBean(mbsc, infoMBeanProxy.getInputQueueName());
+					if (queueProxy != null ) {
 						entry.setInputQueueInfo(queueProxy);
 					}
+          UimaVmQueueMBean replyQueueProxy = getQueueMBean(mbsc, infoMBeanProxy.getReplyQueueName());
+          if (replyQueueProxy != null ) {
+            entry.setReplyQueueInfo(replyQueueProxy);
+          }
+					
 				}
 				else
 				{
@@ -244,7 +256,7 @@ public class JmxMonitor implements Runnable {
 					}
 					else
 					{
-						System.out.println("Unable to find Queue:"+infoMBeanProxy.getInputQueueName()+" In JMX Registry:"+remoteJMX);
+						System.out.println("Unable to find Input Queue:"+infoMBeanProxy.getInputQueueName()+" In JMX Registry:"+remoteJMX);
 					}
 					QueueViewMBean replyQueueProxy = null;
 					if ( infoMBeanProxy.isAggregate())
@@ -262,19 +274,23 @@ public class JmxMonitor implements Runnable {
 					}
 					else
 					{
-						System.out.println("Unable to find Queue:"+infoMBeanProxy.getReplyQueueName()+" In JMX Registry:"+remoteJMX);
+						System.out.println("Unable to find Reply Queue:"+infoMBeanProxy.getReplyQueueName()+" In JMX Registry:"+remoteJMX);
 					}
-
-				
 				}
 				if ( verbose )
 					System.out.println("\nUIMA AS Service:"+key+"[>>> "+location+" <<<]\n\tService Broker:"+infoMBeanProxy.getBrokerURL()+"\n\tQueue Name:"+infoMBeanProxy.getInputQueueName());
-
+				serviceCount++;
 				stats.put(name, entry);
 
 			}
+			
 		}
+		
 	}
+	protected int getServiceCount() {
+	  return serviceCount;
+	}
+	
 	/**
 	 * Returns a proxy object to an UIMA-AS Service Info MBean identified by a <code>key</code>
 	 * 
@@ -318,7 +334,125 @@ public class JmxMonitor implements Runnable {
 		}		
 		return null;
 	}
+	private UimaVmQueueMBean getQueueMBean(MBeanServerConnection server, String aPattern) throws Exception
+  {
+    ObjectName name = new ObjectName( aPattern );
+    System.out.println("Creating Proxy for Queue:"+name.toString());
+    return (UimaVmQueueMBean)MBeanServerInvocationHandler.newProxyInstance(server, name, UimaVmQueueMBean.class, true);
+  }
 	
+	protected ServiceMetrics[] collectStats(boolean initial, long uptime) {
+    int cmFreeCasInstanceCount = 0;
+    ServiceMetrics[] metrics = new ServiceMetrics[servicePerformanceNames.size()];
+    int index = 0;
+
+    //  iterate over all Performance MBeans to retrieve current metrics
+    for (ObjectName name : servicePerformanceNames) {
+      try  {
+        //  Fetch previous metrics for service identified by 'name'
+        StatEntry entry = stats.get(name);
+        ServiceInfoMBean serviceInfo = entry.getServiceInfoMBeanProxy();
+
+        boolean isRemote = serviceInfo.getBrokerURL().startsWith("tcp:");
+        boolean topLevel = serviceInfo.isTopLevel();
+
+        
+        //  Get the current reading from MBeans 
+        double idleTime = entry.getServicePerformanceMBeanProxy().getIdleTime();
+        double casPoolWaitTime = entry.getServicePerformanceMBeanProxy().getCasPoolWaitTime();
+        double shadowCasPoolWaitTime = entry.getServicePerformanceMBeanProxy().getShadowCasPoolWaitTime();
+        double analysisTime = entry.getServicePerformanceMBeanProxy().getAnalysisTime();
+        long processCount = entry.getServicePerformanceMBeanProxy().getNumberOfCASesProcessed();
+        QueueViewMBean inputQueueInfo = entry.getInputQueueInfo();
+        QueueViewMBean replyQueueInfo = entry.getReplyQueueInfo();
+        
+        if ( serviceInfo.isCASMultiplier() && !isRemote && entry.getCasPoolMBean() != null) {
+          cmFreeCasInstanceCount = entry.getCasPoolMBean().getAvailableInstances();
+        }
+        long inputQueueDepth = -1;
+        UimaVmQueueMBean vmInputQueueInfo = null;
+
+        // if the service is colocated, get the bean object for the internal (non-jms) queue 
+        if ( entry.isVmQueue ) {
+          vmInputQueueInfo = entry.getVmInputQueueInfo();
+          if ( vmInputQueueInfo != null ) {
+            inputQueueDepth = vmInputQueueInfo.getQueueSize();
+          }  
+        } else {
+          // service is top level and uses JMS queue
+          inputQueueInfo = entry.getInputQueueInfo();
+          if ( inputQueueInfo != null ) {
+            inputQueueDepth = inputQueueInfo.getQueueSize();
+          }
+        }
+        long replyQueueDepth = -1; // -1 means not available
+        UimaVmQueueMBean vmReplyQueueInfo = null;
+        if ( entry.isVmQueue ) {
+          vmReplyQueueInfo = entry.getVmReplyQueueInfo();
+          if ( vmReplyQueueInfo != null ) {
+            replyQueueDepth = vmReplyQueueInfo.getQueueSize();
+          }
+        } else {
+          replyQueueInfo = entry.getReplyQueueInfo();
+          if ( replyQueueInfo != null ) {
+            replyQueueDepth = replyQueueInfo.getQueueSize();
+          }
+        }
+        //  compute the delta idle time by subtracting previously reported idle time from the
+        //  current idle time
+        double deltaIdleTime = 0;
+        if ( initial == false )
+        {
+          deltaIdleTime = idleTime - entry.getIdleTime();
+        }
+        
+        double deltaAnalysisTime = 0;
+        if ( analysisTime > 0 )
+        {
+          deltaAnalysisTime = analysisTime - entry.getAnalysisTime();
+        }
+        
+        ServiceMetrics serviceMetrics = new ServiceMetrics();
+        serviceMetrics.setCasMultiplier(entry.getServiceInfoMBeanProxy().isCASMultiplier());
+        serviceMetrics.setServiceRemote(isRemote);
+        serviceMetrics.setTopLevelService(topLevel);
+        serviceMetrics.setTimestamp(uptime/1000000);
+        serviceMetrics.setIdleTime(deltaIdleTime);
+        serviceMetrics.setServiceName(name.getKeyProperty("name"));
+        serviceMetrics.setProcessCount(processCount-entry.getLastCASCount());
+        serviceMetrics.setInputQueueDepth(inputQueueDepth);
+        serviceMetrics.setReplyQueueDepth(replyQueueDepth);
+        serviceMetrics.setProcessThreadCount(entry.getServicePerformanceMBeanProxy().getProcessThreadCount());
+        serviceMetrics.setAnalysisTime(deltaAnalysisTime);
+        serviceMetrics.setCmFreeCasInstanceCount(cmFreeCasInstanceCount);
+        //  populate shadow CAS pool metric for remote CAS multiplier. Filter out the top level service
+        if ( entry.getServiceInfoMBeanProxy().isCASMultiplier() && isRemote && !topLevel )
+        {
+          serviceMetrics.setShadowCasPoolWaitTime(shadowCasPoolWaitTime-entry.getTotalSCPWaitTime());
+          entry.setSCPWaitTime(shadowCasPoolWaitTime);
+        }
+        else
+        {
+          //  populate CAS pool metric 
+          serviceMetrics.setCasPoolWaitTime(casPoolWaitTime-entry.getTotalCPWaitTime());
+          entry.setCPWaitTime(casPoolWaitTime);
+        }
+        //  Add metrics collected from the service to the array of metrics
+        //  in the current sampling (interval). The metrics array will 
+        //  be provided to all listeners plugged into this monitor.
+        metrics[index++] = serviceMetrics;
+        //  Save current metrics for the next delta
+        entry.setIdleTime(idleTime);
+        entry.incrementCASCount(processCount);
+        entry.incrementAnalysisTime(analysisTime);
+        
+      } catch( Exception e) {
+        e.printStackTrace();
+      }
+    
+    } // for
+    return metrics;
+	}
 	/**
 	 * Retrieves metrics from UIMA-AS MBeans at defined interval. 
 	 * 
@@ -327,101 +461,19 @@ public class JmxMonitor implements Runnable {
 	{
 		running = true;
 		boolean initial = true;
-		long totalCpuTime=0;
 		while( running )
 		{
 			long sampleStart = System.nanoTime();
 			long uptime = sampleStart - startTime;
-			int cmFreeCasInstanceCount = 0;
-			ServiceMetrics[] metrics = new ServiceMetrics[servicePerformanceNames.size()];
-			int index = 0;
-			//	iterate over all Performance MBeans to retrieve current metrics
-			for (ObjectName name : servicePerformanceNames) {
-				try
-				{
-					//	Fetch previous metrics for service identified by 'name'
-					StatEntry entry = stats.get(name);
-					ServiceInfoMBean serviceInfo = entry.getServiceInfoMBeanProxy();
-
-					boolean isRemote = serviceInfo.getBrokerURL().startsWith("tcp:");
-					boolean topLevel = serviceInfo.isTopLevel();
-
-					
-					//	Get the current reading from MBeans 
-					double idleTime = entry.getServicePerformanceMBeanProxy().getIdleTime();
-					double casPoolWaitTime = entry.getServicePerformanceMBeanProxy().getCasPoolWaitTime();
-					double shadowCasPoolWaitTime = entry.getServicePerformanceMBeanProxy().getShadowCasPoolWaitTime();
-					double analysisTime = entry.getServicePerformanceMBeanProxy().getAnalysisTime();
-					long processCount = entry.getServicePerformanceMBeanProxy().getNumberOfCASesProcessed();
-					QueueViewMBean inputQueueInfo = entry.getInputQueueInfo();
-					QueueViewMBean replyQueueInfo = entry.getReplyQueueInfo();
-					
-					if ( serviceInfo.isCASMultiplier() && !isRemote && entry.getCasPoolMBean() != null)
-					{
-						cmFreeCasInstanceCount = entry.getCasPoolMBean().getAvailableInstances();
-					}
-					long inputQueueDepth = -1;
-					if ( inputQueueInfo != null )
-					{
-						inputQueueDepth = inputQueueInfo.getQueueSize();
-					}
-					long replyQueueDepth = -1;
-					if ( replyQueueInfo != null )
-					{
-						replyQueueDepth = replyQueueInfo.getQueueSize();
-					}
-					//	compute the delta idle time by subtracting previously reported idle time from the
-					//	current idle time
-					double deltaIdleTime = 0;
-					if ( initial == false )
-					{
-						deltaIdleTime = idleTime - entry.getIdleTime();
-					}
-					
-					double deltaAnalysisTime = 0;
-					if ( analysisTime > 0 )
-					{
-						deltaAnalysisTime = analysisTime - entry.getAnalysisTime();
-					}
-					
-					ServiceMetrics serviceMetrics = new ServiceMetrics();
-					serviceMetrics.setCasMultiplier(entry.getServiceInfoMBeanProxy().isCASMultiplier());
-					serviceMetrics.setServiceRemote(isRemote);
-					serviceMetrics.setTopLevelService(topLevel);
-					serviceMetrics.setTimestamp(uptime/1000000);
-					serviceMetrics.setIdleTime(deltaIdleTime);
-					serviceMetrics.setServiceName(name.getKeyProperty("name"));
-					serviceMetrics.setProcessCount(processCount-entry.getLastCASCount());
-					serviceMetrics.setInputQueueDepth(inputQueueDepth);
-					serviceMetrics.setReplyQueueDepth(replyQueueDepth);
-					serviceMetrics.setProcessThreadCount(entry.getServicePerformanceMBeanProxy().getProcessThreadCount());
-					serviceMetrics.setAnalysisTime(deltaAnalysisTime);
-					serviceMetrics.setCmFreeCasInstanceCount(cmFreeCasInstanceCount);
-					//	populate shadow CAS pool metric for remote CAS multiplier. Filter out the top level service
-					if ( entry.getServiceInfoMBeanProxy().isCASMultiplier() && isRemote && !topLevel )
-					{
-						serviceMetrics.setShadowCasPoolWaitTime(shadowCasPoolWaitTime-entry.getTotalSCPWaitTime());
-						entry.setSCPWaitTime(shadowCasPoolWaitTime);
-					}
-					else
-					{
-						//	populate CAS pool metric 
-						serviceMetrics.setCasPoolWaitTime(casPoolWaitTime-entry.getTotalCPWaitTime());
-						entry.setCPWaitTime(casPoolWaitTime);
-					}
-					//	Add metrics collected from the service to the array of metrics
-					//	in the current sampling (interval). The metrics array will 
-					//	be provided to all listeners plugged into this monitor.
-					metrics[index++] = serviceMetrics;
-					//	Save current metrics for the next delta
-					entry.setIdleTime(idleTime);
-					entry.incrementCASCount(processCount);
-					entry.incrementAnalysisTime(analysisTime);
-				}
-				catch( Exception e){e.printStackTrace();}
-			} // for
+			try {
+	      if ( mbsc != null  ) {
+	        mbsc.getMBeanCount();  // test the server
+	      }
+			} catch ( Exception e) {
+			  e.printStackTrace();
+			}
+			ServiceMetrics[] metrics = collectStats(initial, uptime);
 			initial = false;
-			
 			//	Notify listeners with current metrics collected from MBeans
 			notifyListeners(uptime, metrics);
 
@@ -517,9 +569,12 @@ public class JmxMonitor implements Runnable {
 		ServicePerformanceMBean servicePerformanceMBeanProxy;
 		ServiceInfoMBean serviceInfoMBeanProxy;
 		QueueViewMBean inputQueueInfo;
+		UimaVmQueueMBean vmInputQueueInfo;
 		QueueViewMBean replyQueueInfo;
+    UimaVmQueueMBean vmReplyQueueInfo;
 		CasPoolManagementImplMBean casPoolMBeanProxy;
 		String name="";
+		boolean isVmQueue = true;
 		
 		double lastIdleTime = 0;
 		double waitTimeOnCMGetNext = 0;
@@ -533,26 +588,45 @@ public class JmxMonitor implements Runnable {
 		{
 			servicePerformanceMBeanProxy = perfBean;
 			serviceInfoMBeanProxy = infoBean;
+			if ( !infoBean.getBrokerURL().startsWith("Embedded Broker")) {
+	      isVmQueue = false;   // This is JMS queue
+			}
 		}
 		public void setInputQueueInfo( QueueViewMBean queueView)
 		{
 			inputQueueInfo = queueView;
 		}
 		
+    public void setInputQueueInfo( UimaVmQueueMBean queueView)
+    {
+      vmInputQueueInfo = queueView;
+    }
 		public QueueViewMBean getInputQueueInfo()
 		{
 			return inputQueueInfo;
 		}
+    public UimaVmQueueMBean getVmInputQueueInfo()
+    {
+      return vmInputQueueInfo;
+    }
 		
 		public void setReplyQueueInfo( QueueViewMBean queueView)
 		{
 			replyQueueInfo = queueView;
 		}
+		public void setReplyQueueInfo( UimaVmQueueMBean queueView)
+    {
+		  vmReplyQueueInfo = queueView;
+    }
 		
 		public QueueViewMBean getReplyQueueInfo()
 		{
 			return replyQueueInfo;
 		}
+    public UimaVmQueueMBean getVmReplyQueueInfo()
+    {
+      return vmReplyQueueInfo;
+    }
 		public void setCasPoolMBean( CasPoolManagementImplMBean anMBean) 
 		{
 			casPoolMBeanProxy = anMBean;
@@ -628,4 +702,8 @@ public class JmxMonitor implements Runnable {
 			analysisTime =+ anAnalysisTime;
 		}
 	}
+	
+	
+	
+	
 }
