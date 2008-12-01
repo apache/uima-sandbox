@@ -51,7 +51,9 @@ public class VmTransport implements UimaTransport {
 
   private ThreadPoolExecutor executor = null;
 
-  private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+  //  Create a queue for work items. The queue has a JMX wrapper to expose the 
+  //  size.
+  private BlockingQueue<Runnable> workQueue = null;
 
   private VmTransport vmConnector;
 
@@ -122,6 +124,7 @@ public class VmTransport implements UimaTransport {
   protected ThreadPoolExecutor getExecutorInstance() {
     if (executor == null) {
       int concurrentConsumerCount = context.getConcurrentConsumerCount();
+      workQueue = new UimaVmQueue(concurrentConsumerCount);
       // Create a ThreadPoolExecutor with as many threads as needed. The pool has 
       // a fixed number of threads that never expire and are never passivated.
       executor = new ThreadPoolExecutor(concurrentConsumerCount, concurrentConsumerCount, Long.MAX_VALUE,
@@ -131,6 +134,16 @@ public class VmTransport implements UimaTransport {
     return executor;
   }
 
+  public void registerWithJMX(AnalysisEngineController aController, String queueKind /* ReplyQueue or InputQueue */) {
+    try {
+      ((UimaVmQueue)workQueue).setConsumerCount(context.getConcurrentConsumerCount());
+      aController.registerVmQueueWithJMX(workQueue, queueKind);
+    } catch( Exception e) {
+      e.printStackTrace();
+    }
+
+
+  }
   public UimaMessageDispatcher getMessageDispatcher() throws UimaSpiException {
     return dispatcher;
   }

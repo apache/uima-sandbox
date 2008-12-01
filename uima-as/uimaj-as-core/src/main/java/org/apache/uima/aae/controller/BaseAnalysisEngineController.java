@@ -488,6 +488,10 @@ implements AnalysisEngineController, EventSubscriber
        parentListener.initialize(uimaAsContext2);
        // Creates delegate's dispatcher. It is wired to send replies to the parent's listener.
        vmTransport.produceUimaMessageDispatcher(parentController,parentVmTransport);
+       // Register input queue with JMX. This is an internal (non-jms) queue where clients
+       // send requests to this service.
+       vmTransport.registerWithJMX(this, "VmInputQueue");
+       parentVmTransport.registerWithJMX( this, "VmReplyQueue");
      }
 
 	 }
@@ -651,6 +655,17 @@ implements AnalysisEngineController, EventSubscriber
                     new Object[] { e });
       }
 		}
+	}
+	public void registerVmQueueWithJMX( Object o, String aName ) throws Exception {
+	  String jmxName = getManagementInterface().getJmxDomain()
+            +jmxContext+",name="+getComponentName()+"_"+aName;
+	  registerWithAgent( o, jmxName);
+	  
+	  if ( "VmReplyQueue".equals( aName )) {
+	    getServiceInfo().setReplyQueueName(jmxName);
+	  } else {
+	    getServiceInfo().setInputQueueName(jmxName);
+	  }
 	}
 	protected void registerServiceWithJMX(String key_value_list, boolean remote) 
 	{

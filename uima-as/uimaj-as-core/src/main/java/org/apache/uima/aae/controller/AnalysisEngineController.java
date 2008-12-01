@@ -201,4 +201,5 @@ public interface AnalysisEngineController extends ControllerLifecycle
   public InputChannel getReplyInputChannel(String aDelegateKey);
   
   public LocalCache getLocalCache();
+  public void registerVmQueueWithJMX( Object o, String aName ) throws Exception; 
 }

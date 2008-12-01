@@ -90,4 +90,5 @@ public interface UimaTransport {
   public UimaVmMessage produceMessage();
 
   public UimaVmMessage produceMessage(int aCommand, int aMessageType, String aMessageFrom);
+  public void registerWithJMX(AnalysisEngineController aController, String queueKind);
 }
