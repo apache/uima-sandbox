@@ -83,10 +83,10 @@ paths in the examples based on the actual UIMA_HOME directory path.
 
 2.4 Setting up Eclipse
 
-Eclipse users should install the UIMA Eclipse Plugins and UIMA Examples Project using the "manual"
-install procedure described in Chapter 3 of the Apache UIMA Overview and Setup guide 
-(docs/pdf/overview_and_setup.pdf). The manual procedure is required to pick up capability to
-work with UIMA AS deployment descriptors.
+Eclipse users should install the UIMA Eclipse Plugins and UIMA Examples Project using the 
+procedure described in Chapter 3 of the Apache UIMA Overview and Setup guide,
+which you can find online at http://incubator.apache.org/uima; click on Documentation ->
+HTML Online Version -> Overview and Setup -> 3. Eclipse IDE setup for UIMA. 
 
 However, since UIMA AS requires Java 5, you must be sure to set up your uimaj-examples Eclipse
 project to use a version 5 (or later) JRE, and you must set your compiler compliance level to 5.0.  To do
