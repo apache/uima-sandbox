@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -37,17 +39,22 @@ import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.UIMAEE_Constants;
+import org.apache.uima.aae.UimaAsThreadFactory;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.Threshold;
 import org.apache.uima.aae.error.handler.GetMetaErrorHandler;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
 
 public class UimaDefaultMessageListenerContainer extends DefaultMessageListenerContainer
 implements ExceptionListener
@@ -59,14 +66,21 @@ implements ExceptionListener
 	private AnalysisEngineController controller;
 	private volatile boolean failed = false;
 	private Object mux = new Object();
-	
+	private UimaDefaultMessageListenerContainer __listenerRef;
+	private TaskExecutor taskExecutor = null;	
+	private ConnectionFactory connectionFactory = null;
+	private Object mux2 = new Object();
+  private ThreadGroup threadGroup = null;
+  private ThreadFactory tf = null; 
 	public UimaDefaultMessageListenerContainer()
 	{
 		super();
+		__listenerRef = this;
     setRecoveryInterval(5);
-//    setRecoveryInterval(60000);
 		setAcceptMessagesWhileStopping(false);
 		setExceptionListener(this);
+    threadGroup = new ThreadGroup("ListenerThreadGroup_"+Thread.currentThread().getThreadGroup().getName());
+
 	}
 	public UimaDefaultMessageListenerContainer(boolean freeCasQueueListener)
 	{
@@ -311,38 +325,130 @@ implements ExceptionListener
 		
 	}
 
-	public void afterPropertiesSet()
-	{
-		super.afterPropertiesSet();
-		try
-		{
-			System.setProperty("BrokerURI", ((ActiveMQConnectionFactory)super.getConnectionFactory()).getBrokerURL());
-
-			Destination destination = super.getDestination();
-			if (destination != null && destination instanceof ActiveMQDestination )
-			{
-				destinationName = ((ActiveMQDestination)destination).getPhysicalName();
-			}
-			if ( getMessageListener() instanceof JmsInputChannel )
-			{
-				((JmsInputChannel)getMessageListener()).setListenerContainer(this);
-			}
-			else if ( getMessageListener() instanceof ModifiableListener)
-			{
-				((ModifiableListener)getMessageListener()).setListener(this);
-			}
-		}
-		catch( Exception e)
-		{
-			e.printStackTrace();
-	    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
-	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-	                "afterPropertiesSet", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING",
-	                new Object[] {Thread.currentThread().getId(), e});
-	    }
-		}
+	private void allPropertiesSet() {
+	  super.afterPropertiesSet();
+	}
+	private void injectConnectionFactory() {
+	  while( connectionFactory == null ) {
+	    try {
+	      Thread.sleep(50);
+	    } catch (Exception e){}
+	  }
+	  String brokerURL = ((ActiveMQConnectionFactory)connectionFactory).getBrokerURL();
+    System.out.println(">>> Injecting Listener Connection Factory With Broker URL:" + brokerURL);
+	  super.setConnectionFactory(connectionFactory);
+	}
+	private void injectTaskExecutor() {
+	  super.setTaskExecutor(taskExecutor);
+	}
+	private boolean isGetMetaListener() {
+	  return getMessageSelector() != null && __listenerRef.getMessageSelector().equals( "Command=2001");
+	}
+	private boolean isActiveMQDestination() {
+	  return getDestination() != null && getDestination() instanceof ActiveMQDestination;
 	}
 	
+	public void initializeContainer() {
+    try {
+
+      injectConnectionFactory();
+      initializeTaskExecutor();
+      injectTaskExecutor();
+      super.initialize();
+    } catch( Exception e) {
+      e.printStackTrace();
+    }
+	}
+	/**
+	 * Called by Spring and some Uima AS components when all properties have been set.
+	 * This method spins a thread in which the listener is initialized. 
+	 */
+	public void afterPropertiesSet()
+	{
+	  Thread t = new Thread() {
+	    public void run() {
+        Destination destination = __listenerRef.getDestination();
+	      try {
+	        // Wait until the connection factory is injected by Spring
+	        while (connectionFactory == null) {
+	          try {
+	            Thread.sleep(50);
+	          } catch ( InterruptedException ex) {}
+	        }
+	        boolean done = false;
+	        //  Wait for controller to be injected by Uima AS
+          if (isActiveMQDestination() && !isGetMetaListener()
+                  && !((ActiveMQDestination) destination).isTemporary()) {
+            System.out.println("Waiting For Controller. Destination::" + destination
+                    + " Listener Instance:" + __listenerRef.hashCode());
+            //  Add self to InputChannel
+            connectWithInputChannel();
+            //  Wait for InputChannel to plug in a controller
+            done = true;
+            while (controller == null)
+              try {
+                Thread.sleep(50);
+              } catch ( InterruptedException ex) {}
+              ;
+          }
+          //  Plug in connection Factory to Spring's Listener
+          __listenerRef.injectConnectionFactory();
+          //  Initialize the TaskExecutor. This call injects a custom Thread Pool into the
+          //  TaskExecutor provided in the spring xml. The custom thread pool initializes
+          //  an instance of AE in a dedicated thread
+          initializeTaskExecutor();
+          //  Plug in TaskExecutor to Spring's Listener
+          __listenerRef.injectTaskExecutor();
+          //  Notify Spring Listener that all properties are ready
+          __listenerRef.allPropertiesSet();
+          System.setProperty("BrokerURI", ((ActiveMQConnectionFactory) connectionFactory)
+                  .getBrokerURL());
+          if (isActiveMQDestination()) {
+            destinationName = ((ActiveMQDestination) destination).getPhysicalName();
+          }
+          if ( !done ) {
+            connectWithInputChannel();
+            done = true;
+//            if (getMessageListener() instanceof JmsInputChannel) {
+//              ((JmsInputChannel) getMessageListener()).setListenerContainer(__listenerRef);
+//            } else if (getMessageListener() instanceof ModifiableListener) {
+//              ((ModifiableListener) getMessageListener()).setListener(__listenerRef);
+//            }
+          }
+          
+          
+          
+          
+          
+	      } catch ( Exception e ) {
+	        e.printStackTrace();
+	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+	                "afterPropertiesSet", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+	                new Object[] { destination, getBrokerUrl(), e });
+	      }
+	    }
+	  };
+	  t.start();
+	}
+	/**
+	 * Inject instance of this listener into the InputChannel
+	 * 
+	 * @throws Exception
+	 */
+	private void connectWithInputChannel() throws Exception {
+    if (getMessageListener() instanceof JmsInputChannel) {
+      //  Wait until InputChannel has a valid controller. The controller will be plug in
+      //  by Spring on a different thread
+      while( (((JmsInputChannel) getMessageListener()).getController()) == null ) {
+        try {
+          Thread.currentThread().sleep(50);
+        } catch ( Exception e) {}
+      }
+      ((JmsInputChannel) getMessageListener()).setListenerContainer(__listenerRef);
+    } else if (getMessageListener() instanceof ModifiableListener) {
+      ((ModifiableListener) getMessageListener()).setListener(__listenerRef);
+    }
+	}
 	public String getDestinationName()
 	{
 		
@@ -358,7 +464,7 @@ implements ExceptionListener
 	}
 	public String getBrokerUrl()
 	{
-		return ((ActiveMQConnectionFactory)super.getConnectionFactory()).getBrokerURL();
+    return ((ActiveMQConnectionFactory)connectionFactory).getBrokerURL();
 	}
 	/**
 	 * Overrides specified Connection Factory. Need to append maxInactivityDuration=0 to the 
@@ -367,35 +473,37 @@ implements ExceptionListener
 	 * We will inject the prefetch policy to the new CF based on what is found in the CF
 	 * in the deployment descriptor.
 	 */
-	public void setConnectionFactory(ConnectionFactory connectionFactory) {
-	  if ( connectionFactory instanceof ActiveMQConnectionFactory) {
-	    String brokerURL = ((ActiveMQConnectionFactory)connectionFactory).getBrokerURL();
-	    if ( brokerURL != null ) {
-	      if ( brokerURL.indexOf("?wireFormat.maxInactivityDuration") > 0) {
-	        // maxInactivityDuration already specified
-	        System.out.println(">>> Injecting Listener Connection Factory With Broker URL:"+brokerURL);
-	        super.setConnectionFactory(connectionFactory);
-	        return;
-	      }
-	      // Turns off inactivity Monitoring on the connection
-	      brokerURL += "?wireFormat.maxInactivityDuration=0";
-//        String newBrokerURL = "failover://("+brokerURL+"?wireFormat.maxInactivityDuration=0)";
-	      // Save the Prefetch Policy provided in the given CF
-	      ActiveMQPrefetchPolicy prefetch = ((ActiveMQConnectionFactory)connectionFactory).getPrefetchPolicy();
-	      // Instantiate new CF with a new Broker URL and inject the Prefetch Policy
-	      ActiveMQConnectionFactory acf = new ActiveMQConnectionFactory(brokerURL);
-	      System.out.println(">>> Injecting Listener Connection Factory With Broker URL:"+brokerURL);
-	      if ( prefetch != null ) {
-	        acf.setPrefetchPolicy(prefetch);
-	      }
-	      // Inject new Connection Factory
-	      super.setConnectionFactory(acf);
-	    } else {
-	      // brokerURL = null is handled in the dd2spring
-	    }
-	  } else {
-	    super.setConnectionFactory(connectionFactory);
-	  }
+	public void setConnectionFactory(ConnectionFactory aConnectionFactory) {
+	  connectionFactory = aConnectionFactory;
+    if (connectionFactory instanceof ActiveMQConnectionFactory) {
+      String brokerURL = ((ActiveMQConnectionFactory) connectionFactory).getBrokerURL();
+      if (brokerURL != null) {
+        if (brokerURL.indexOf("?wireFormat.maxInactivityDuration") > 0) {
+          // maxInactivityDuration already specified
+          if ( isFreeCasQueueListener() ) {
+            super.setConnectionFactory(connectionFactory);
+          }
+          return;
+        }
+        // Turns off inactivity Monitoring on the connection
+        brokerURL += "?wireFormat.maxInactivityDuration=0";
+        // String newBrokerURL = "failover://("+brokerURL+"?wireFormat.maxInactivityDuration=0)";
+        // Save the Prefetch Policy provided in the given CF
+        ActiveMQPrefetchPolicy prefetch = ((ActiveMQConnectionFactory) connectionFactory)
+                .getPrefetchPolicy();
+        // Instantiate new CF with a new Broker URL and inject the Prefetch Policy
+        ActiveMQConnectionFactory acf = new ActiveMQConnectionFactory(brokerURL);
+        if (prefetch != null) {
+          acf.setPrefetchPolicy(prefetch);
+        }
+        connectionFactory = acf;
+      } else {
+        // brokerURL = null is handled in the dd2spring
+      }
+    } 
+    if ( isFreeCasQueueListener() ) {
+      super.setConnectionFactory(connectionFactory);
+    }
 	}
 	
 	
@@ -464,4 +572,83 @@ implements ExceptionListener
 	{
 		return freeCasQueueListener;
 	}
+  protected void setModifiedTaskExecutor( TaskExecutor taskExecutor) {
+    super.setTaskExecutor(taskExecutor);
+    System.out.println("Injected Updated Task Executor Into Listener For Destination:"+getDestination());
+  }
+  /**
+   * Called when the object goes out of scope. Main task in this method is to list 
+   * all threads and wait until they terminate. 
+   * 
+   */
+  public void destroy() {
+    super.destroy();
+    if ( taskExecutor != null && taskExecutor instanceof ThreadPoolTaskExecutor) {
+      ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().shutdown();
+      try {
+        ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+      } catch ( Exception e){}
+    }
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST) ) {
+      threadGroup.getParent().list();
+    }
+
+    //  Spin a thread that will wait until all threads complete. This is needed to avoid
+    //  memory leak caused by the fact that we did not wait to collect the threads
+    //  
+    Thread threadGroupDestroyer = new Thread(threadGroup.getParent().getParent(),"threadGroupDestroyer") {
+        public void run() {
+          
+          while (threadGroup.activeCount() > 0) {
+            try {
+              Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+          }
+          threadGroup.destroy();
+          try {
+            System.out.println(">>>>>>>>>>>> Listener:"+getDestinationName()+" Thread Group Destroyed");
+          } catch( Exception e) {}   // Ignore 
+        }
+      };
+      threadGroupDestroyer.start();
+  }
+  /**
+   * Called by Spring to inject TaskExecutor
+   */
+  public void setTaskExecutor( TaskExecutor aTaskExecutor) {
+    taskExecutor = aTaskExecutor;
+  }
+  /**
+   * This method initializes ThreadPoolExecutor with a custom ThreadPool. 
+   * Each thread produced by the ThreadPool is used to first initialize
+   * an instance of the AE before the thread is added to the pool. From 
+   * this point on, a thread used to initialize the AE will also be used
+   * to call this AE's process() method.
+   *   
+   * @throws Exception
+   */
+  private void initializeTaskExecutor() throws Exception {
+    //  TaskExecutor is only used with primitives
+    if (controller instanceof PrimitiveAnalysisEngineController) {
+      //  in case the taskExecutor is not plugged in yet, wait until one 
+      //  becomes available. The TaskExecutor is plugged in by Spring
+      synchronized( mux2 ) {
+        while( taskExecutor == null ) {
+          mux2.wait(20);
+        }
+      }
+      //  Create a Custom Thread Factory. Provide it with an instance of
+      //  PrimitiveController so that every thread can call it to initialize
+      //  the next available instance of a AE.
+      tf = new UimaAsThreadFactory(threadGroup, (PrimitiveAnalysisEngineController) controller);
+      //   This ThreadExecutor will use custom thread factory instead of defult one
+      ((ThreadPoolTaskExecutor) taskExecutor).setThreadFactory(tf);
+      //  Initialize the thread pool
+      ((ThreadPoolTaskExecutor) taskExecutor).initialize();
+      //  Make sure all threads are started. This forces each thread to call
+      //  PrimitiveController to initialize the next instance of AE
+      ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().prestartAllCoreThreads();
+    }
+  }
 }

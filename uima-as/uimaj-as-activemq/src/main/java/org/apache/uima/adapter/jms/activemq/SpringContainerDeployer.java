@@ -50,6 +50,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	private Object serviceMonitor = new Object();
 	private ConcurrentHashMap springContainerRegistry=null;
 	private FileSystemXmlApplicationContext context = null;
+	private Object mux = new Object();
 	public SpringContainerDeployer(){
 	}
 
@@ -61,24 +62,24 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 		DestinationResolver resolver = new TempDestinationResolver();
 		UimaDefaultMessageListenerContainer connector = 
 			new UimaDefaultMessageListenerContainer(true);
-		
 		connector.setConnectionFactory(cf);
 		connector.setConcurrentConsumers(1);
 		connector.setDestinationResolver(resolver);
-		connector.initialize();
-		connector.start();
-	
-		while( connector.getListenerEndpoint() == null )
-		{
-			synchronized(connector)
-			{
-				try
-				{
-					connector.wait(50);
-				}
-				catch( InterruptedException e) {}
-			}
+
+		connector.initializeContainer();
+		synchronized( mux) {
+	    while( connector.getListenerEndpoint() == null )
+	    {
+	        try
+	        {
+	          mux.wait(50);
+	        }
+	        catch( InterruptedException e) {}
+	    }
+		  
 		}
+//    connector.afterPropertiesSet();
+		connector.start();
 		return connector;
 	}
 	private ActiveMQConnectionFactory getTopLevelQueueConnectionFactory( ApplicationContext ctx  )
@@ -92,7 +93,11 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			if ( inputChannel.getName().startsWith("top_level_input_queue_service") &&
 				 inputChannel instanceof JmsInputChannel )
 			{
-				factory = ((JmsInputChannel)inputChannel).getConnectionFactory();
+			  while ( (factory = ((JmsInputChannel)inputChannel).getConnectionFactory()) == null ) {
+			    try {
+			      Thread.currentThread().sleep(50);
+			    } catch( Exception e){}
+			  }
 				break;
 			}
 		} 
@@ -148,9 +153,10 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 		//	notifications.
 		if ( cntlr.isCasMultiplier() )
 		{
-			
+
 			ActiveMQConnectionFactory cf = getTopLevelQueueConnectionFactory( ctx );
 			//	Create a listener and a temp queue for Free CAS notifications. 
+
 			UimaDefaultMessageListenerContainer connector =	produceListenerConnector(cf);
 			System.out.println(">>>> Cas Multiplier Controller:"+cntlr.getComponentName()+" Activated Listener to Receive Free CAS Notifications - Temp Queue Name:"+connector.getEndpointName());
 			//	Direct all messages to the InputChannel 
@@ -399,6 +405,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	}
 
 	public void notifyOnTermination(String message) {
+	  System.out.println("-------------------> Container Terminated");
 	}
 
 	public FileSystemXmlApplicationContext getSpringContext()
