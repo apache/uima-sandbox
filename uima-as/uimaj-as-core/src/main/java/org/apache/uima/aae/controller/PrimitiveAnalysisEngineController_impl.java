@@ -129,9 +129,9 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	    throw new ResourceInitializationException(e);
 	  }
 
-    AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(rSpecifier, paramsMap);
-    System.out.println(">>>>> Controller:"+getComponentName()+" Completed Initialization of New AE Instance In Thread::"+Thread.currentThread().getId()+" AE Instance Hashcode:"+ae.hashCode());
     synchronized( mux ) {
+      AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(rSpecifier, paramsMap);
+      System.out.println(">>>>> Controller:"+getComponentName()+" Completed Initialization of New AE Instance In Thread::"+Thread.currentThread().getId()+" AE Instance Hashcode:"+ae.hashCode());
       if ( aeInstancePool == null ) {
         aeInstancePool = new AnalysisEngineInstancePoolWithThreadAffinity(analysisEnginePoolSize);
       }
