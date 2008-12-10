@@ -21,6 +21,7 @@ package org.apache.uima.aae.controller;
 
 import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
 import org.apache.uima.aae.jmx.ServiceInfo;
+import org.apache.uima.resource.ResourceInitializationException;
 
 
 public interface PrimitiveAnalysisEngineController extends AnalysisEngineController
@@ -29,4 +30,6 @@ public interface PrimitiveAnalysisEngineController extends AnalysisEngineControl
 	public PrimitiveServiceInfo getServiceInfo();
 	public void addAbortedCasReferenceId( String aCasReferenceId );
 	public int getAEInstanceCount();
+	public void initializeAnalysisEngine() throws ResourceInitializationException;
+	public boolean threadAssignedToAE();
 }

@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -201,6 +202,8 @@ implements AnalysisEngineController, EventSubscriber
   // A CAS state change made by one controller may effect another controller. 
   protected LocalCache localCache;
 
+  protected String aeDescriptor; 
+  
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -220,7 +223,7 @@ implements AnalysisEngineController, EventSubscriber
 		casManager = aCasManager;
 		inProcessCache = anInProcessCache;
     localCache = new LocalCache(this);
-
+    aeDescriptor = aDescriptor;
 		parentController = aParentController;
 		componentCasPoolSize = aComponentCasPoolSize;
 		
@@ -397,6 +400,10 @@ implements AnalysisEngineController, EventSubscriber
 		
 		
 	}
+	
+	public AnalysisEngineController getParentController() {
+    return parentController;
+	}
   public UimaTransport getTransport(String aKey) throws Exception
   {
     return getTransport( null, aKey);
@@ -405,7 +412,11 @@ implements AnalysisEngineController, EventSubscriber
 	 public UimaTransport getTransport(UimaAsContext asContext)
 	 throws Exception
 	 {
-	   return getTransport(asContext, getName());
+	   String endpointName = getName();
+	   if ( !isTopLevelComponent() ) {
+	     endpointName = parentController.getName();
+	   }
+     return getTransport(asContext, endpointName);
 	 }
 
 	 public UimaTransport getTransport(UimaAsContext asContext, String aKey)
@@ -413,7 +424,7 @@ implements AnalysisEngineController, EventSubscriber
    {
      UimaTransport transport = null;
      if ( !transports.containsKey(aKey)) {
-       transport = new VmTransport(asContext);
+       transport = new VmTransport(asContext, this);
        transports.put( aKey, transport);
      }
      else {
@@ -469,11 +480,13 @@ implements AnalysisEngineController, EventSubscriber
        
        uimaAsContext.setConcurrentConsumerCount(concurrentRequestConsumers);
        uimaAsContext.put("EndpointName", endpointName);
-
+       
        UimaTransport vmTransport = getTransport(uimaAsContext);
        // Creates delegate Listener for receiving requests from the parent
-       UimaMessageListener messageListener = vmTransport.produceUimaMessageListener(this);
+       UimaMessageListener messageListener = vmTransport.produceUimaMessageListener();
+       // Plug in message handlers
        messageListener.initialize(uimaAsContext);
+       // Store the listener
        messageListeners.put(getName(), messageListener);
        // Creates parent controller dispatcher for this delegate. The dispatcher is wired
        // with this delegate's listener.
@@ -482,12 +495,14 @@ implements AnalysisEngineController, EventSubscriber
        uimaAsContext2.setConcurrentConsumerCount(concurrentReplyConsumers);
        uimaAsContext2.put("EndpointName", endpointName);
        UimaTransport parentVmTransport = parentController.getTransport(uimaAsContext2, endpointName);
-       parentVmTransport.produceUimaMessageDispatcher(this, vmTransport);
+
+       parentVmTransport.produceUimaMessageDispatcher(vmTransport);
        // Creates parent listener for receiving replies from this delegate. 
-       UimaMessageListener parentListener = parentVmTransport.produceUimaMessageListener(parentController);
+       UimaMessageListener parentListener = parentVmTransport.produceUimaMessageListener();
+       // Plug in message handlers
        parentListener.initialize(uimaAsContext2);
        // Creates delegate's dispatcher. It is wired to send replies to the parent's listener.
-       vmTransport.produceUimaMessageDispatcher(parentController,parentVmTransport);
+       vmTransport.produceUimaMessageDispatcher(parentVmTransport);
        // Register input queue with JMX. This is an internal (non-jms) queue where clients
        // send requests to this service.
        vmTransport.registerWithJMX(this, "VmInputQueue");
@@ -1563,6 +1578,19 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		stopped = true;
 	}
+	
+	protected void stopTransportLayer() {
+	  if ( transports.size() > 0 ) {
+	    Set<Entry<String, UimaTransport>> set = transports.entrySet();
+	    for( Entry<String, UimaTransport> entry: set ) {
+	      UimaTransport transport = entry.getValue();
+	      try {
+	        transport.stopIt();
+	        System.out.println(">>> Controller:"+getComponentName()+" Stopped Transport For:"+entry.getKey());
+	      } catch ( Exception e) {e.printStackTrace();}
+	    }
+	  }
+	}
 	/**
 	 * Stops input channel(s) and initiates a shutdown of all delegates ( if this is an aggregate ). At the end
 	 * sends an Exception to the client and closes an output channel.
@@ -1603,6 +1631,7 @@ implements AnalysisEngineController, EventSubscriber
 					childController.getControllerLatch().release();
 				}
 			}
+			stopTransportLayer();
 		}
 		/*
 		 * Commented this block. It generates ShutdownException which causes problems
@@ -2445,11 +2474,14 @@ implements AnalysisEngineController, EventSubscriber
 	          ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	          try
 	          {
+	            
+	            UimaTransport transport = null;
+              transport = getTransport(anEndpoint.getEndpoint());
 	            UimaMessage message = 
-	              getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.GetMeta,AsynchAEMessage.Response,getName());
+	              transport.produceMessage(AsynchAEMessage.GetMeta,AsynchAEMessage.Response,getName());
 	            metadata.toXML(bos);
 	            message.addStringCargo(bos.toString());
-	            getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+              transport.getUimaMessageDispatcher(anEndpoint.getEndpoint()).dispatch(message);
 	          }
 	          catch(Exception e)
 	          {

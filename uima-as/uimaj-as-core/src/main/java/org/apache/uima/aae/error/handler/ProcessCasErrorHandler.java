@@ -111,7 +111,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			   if ( !anEndpoint.isRemote())
 			   {
 			      anEndpoint.setReplyEndpoint(true);
-			      UimaTransport vmTransport = aController.getTransport(aController.getName()) ;//anEndpoint.getEndpoint());
+            UimaTransport vmTransport = aController.getTransport(anEndpoint.getEndpoint()) ;
 		        UimaMessage message = 
 		          vmTransport.produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Response,aController.getName());
 		        message.addIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.Exception); 
@@ -138,7 +138,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		        {
               message.addObjectProperty(AsynchAEMessage.Cargo, wrapper);
 		        }
-		        vmTransport.getUimaMessageDispatcher().dispatch( message );
+		        vmTransport.getUimaMessageDispatcher(anEndpoint.getEndpoint()).dispatch( message );
 			   }
 			   else
 			   {

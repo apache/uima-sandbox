@@ -26,6 +26,7 @@ import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager;
 import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.UIMAEE_Constants;
+import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
@@ -39,14 +40,19 @@ import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.MessageContext;
 import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.spi.transport.UimaMessage;
+import org.apache.uima.aae.spi.transport.UimaTransport;
 import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.CasIterator;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.CASImpl;
 import org.apache.uima.cas.impl.OutOfTypeSystemData;
+import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.resource.metadata.impl.ConfigurationParameter_impl;
+import org.apache.uima.util.InvalidXMLException;
 import org.apache.uima.util.Level;
 
 public class PrimitiveAnalysisEngineController_impl 
@@ -70,7 +76,9 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	
 	private String abortedCASReferenceId = null;
 	
+	private Object mux = new Object();
 	
+  private Object mux2 = new Object();
 	public PrimitiveAnalysisEngineController_impl(String anEndpointName, String anAnalysisEngineDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, int aWorkQueueSize, int anAnalysisEnginePoolSize) throws Exception
 	{
 		this(null, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, 0);
@@ -110,57 +118,82 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	{
 		return analysisEnginePoolSize;
 	}
-	public void initialize() throws AsynchAEException
+	
+	public void initializeAnalysisEngine() throws ResourceInitializationException {
+	  ResourceSpecifier rSpecifier = null;
+	  // Parse the descriptor in the calling thread.
+	  try {
+	    rSpecifier = UimaClassFactory.produceResourceSpecifier(super.aeDescriptor);
+	  } catch ( Exception e) {
+	    e.printStackTrace();
+	    throw new ResourceInitializationException(e);
+	  }
+
+    AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(rSpecifier, paramsMap);
+    System.out.println(">>>>> Controller:"+getComponentName()+" Completed Initialization of New AE Instance In Thread::"+Thread.currentThread().getId()+" AE Instance Hashcode:"+ae.hashCode());
+    synchronized( mux ) {
+      if ( aeInstancePool == null ) {
+        aeInstancePool = new AnalysisEngineInstancePoolWithThreadAffinity(analysisEnginePoolSize);
+      }
+      try {
+        aeInstancePool.checkin(ae);
+      } catch( Exception e) {
+        throw new ResourceInitializationException(e);
+      }
+      assignServiceMetadata();
+      if ( aeInstancePool.size() == analysisEnginePoolSize ) {
+        try {
+          System.out.println("Controller:"+getComponentName()+ " All AE Instances Have Been Instantiated. Completing Initialization");
+          postInitialize();
+        } catch ( Exception e) {
+          e.printStackTrace();
+          throw new ResourceInitializationException(e);
+        }
+      }
+    }
+	}
+  public boolean threadAssignedToAE() {
+    if ( aeInstancePool == null ) {
+      return false;
+    }
+
+    return aeInstancePool.exists();
+  }
+
+	private void assignServiceMetadata() {
+    if ( analysisEngineMetadata == null ) {
+      AnalysisEngineDescription specifier = (AnalysisEngineDescription) super.getResourceSpecifier();
+      analysisEngineMetadata = specifier.getAnalysisEngineMetaData();
+    }
+	}
+	public void initialize() throws AsynchAEException {
+	}
+	/**
+	 * This method is called after all AE instances initialize. It is called once.
+	 * It initializes service Cas Pool, notifies the deployer that initialization
+	 * completed and finally loweres a semaphore allowing messages to be processed. 
+	 * 
+	 * @throws AsynchAEException
+	 */
+	private void postInitialize() throws AsynchAEException
 	{
 		try
 		{
-
 			if (errorHandlerChain == null)
 			{
 				super.plugInDefaultErrorHandlerChain();
 			}
-
-			if ( aeInstancePool == null )
-			{
-				aeInstancePool = new AnalysisEngineInstancePoolWithThreadAffinity(analysisEnginePoolSize);
-			}
-			
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_primitive_ctrl_init_info__CONFIG", new Object[] { analysisEnginePoolSize });
       }
 
-			try {
-	      //  Instantiate and initialize UIMA analytics
-	      for (int i = 0; i < analysisEnginePoolSize; i++)
-	      {
-	        AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(resourceSpecifier, paramsMap);
-	        aeList.add(ae);
-	        
-	        //  Cache metadata once
-	        if (i == 0)
-	        {
-	          analysisEngineMetadata = ae.getAnalysisEngineMetaData();
-	        }
-	      }
-			} catch ( Exception ex1 ) {
-		     if ( isStopped()  ) {
-		        System.out.println(">>>>>>>>> Service Has Stopped ....");
-		        throw new AsynchAEException(new ServiceShutdownException());
-		      }
-		     ex1.printStackTrace();
-		     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
-		        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { ex1 });
-		     }
-         latch.openLatch(getName(), isTopLevelComponent(), true);
-		     throw new AsynchAEException(ex1);
-			}
+      assignServiceMetadata();
 			if ( serviceInfo == null )
 			{
 				serviceInfo = new PrimitiveServiceInfo(isCasMultiplier());
 			}
 
 			serviceInfo.setAnalysisEngineInstanceCount(analysisEnginePoolSize);
-			aeInstancePool.intialize(aeList);
 
       if ( !isStopped()  ) {
         getMonitor().setThresholds(getErrorHandlerChain().getThresholds());
@@ -177,7 +210,11 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
                 getCasManagerWrapper().initialize("PrimitiveAEService");
                 CAS cas = getCasManagerWrapper().getNewCas("PrimitiveAEService");
                 cas.release();
+                System.out.println("++++ Controller::"+getComponentName()+" Initialized its Cas Pool");
               }
+            }
+            if ( isTopLevelComponent() ) {
+              super.notifyListenersWithInitializationStatus(null);
             }
 
             // All internal components of this Primitive have been initialized. Open the latch
@@ -227,19 +264,19 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
   	 * an aggregate. The parent aggregate calls this method when all type systems have been 
   	 * merged.
   	 */
-    public void onInitialize()
+    public synchronized void onInitialize()
     {
-		//	Component's Cas Pool is registered lazily, when the process() is called for
-		//	the first time. For monitoring purposes, we need the comoponent's Cas Pool 
-		//	MBeans to register during initialization of the service. For a Cas Multiplier 
+      //	Component's Cas Pool is registered lazily, when the process() is called for
+      //	the first time. For monitoring purposes, we need the comoponent's Cas Pool 
+      //	MBeans to register during initialization of the service. For a Cas Multiplier 
     	//  force creation of the Cas Pool and registration of a Cas Pool with the JMX Server. 
     	//  Just get the CAS and release it back to the component's Cas Pool.
-		if ( isCasMultiplier() && !isTopLevelComponent() )
-		{
-			System.out.println(Thread.currentThread().getId()+" >>>>>> CAS Multiplier::"+getComponentName()+" Initializing its Cas Pool");
-			CAS cas = (CAS)getUimaContext().getEmptyCas(CAS.class);
-			cas.release();
-		}
+      if ( isCasMultiplier() && !isTopLevelComponent() )
+      {
+        System.out.println(Thread.currentThread().getId()+" >>>>>> CAS Multiplier::"+getComponentName()+" Initializing its Cas Pool");
+        CAS cas = (CAS)getUimaContext().getEmptyCas(CAS.class);
+        cas.release();
+      }
     }
 	/**
 	 * 
@@ -260,14 +297,12 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "collectionProcessComplete", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cpc_all_cases_processed__FINEST", new Object[] { getComponentName() });
       }
 			getServicePerformance().incrementAnalysisTime(super.getCpuTime()-start);
-
-			
 	    if ( !anEndpoint.isRemote())
 	    {
-	        UimaMessage message = 
-	          getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
+	        UimaTransport transport = getTransport(anEndpoint.getEndpoint());
+	        UimaMessage message = transport.produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
 	        //  Send CPC completion reply back to the client. Use internal (non-jms) transport
-	        getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+	        transport.getUimaMessageDispatcher(anEndpoint.getEndpoint()).dispatch(message);
 	    }
 	    else
 	    {
@@ -444,8 +479,9 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			  }
 	      if ( !anEndpoint.isRemote())
 	      {
+	            UimaTransport transport = getTransport(anEndpoint.getEndpoint());
 		          UimaMessage message = 
-		            getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
+		            transport.produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
               message.addStringProperty(AsynchAEMessage.CasReference, newEntry.getCasReferenceId());
               message.addStringProperty(AsynchAEMessage.InputCasReference, aCasReferenceId);
               message.addLongProperty(AsynchAEMessage.CasSequence, sequence);
@@ -457,7 +493,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
               message.addLongProperty(AsynchAEMessage.TimeInProcessCAS, casStats.getRawAnalysisTime());
               long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
               message.addLongProperty(AsynchAEMessage.IdleTime, iT );
-		          getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+		          transport.getUimaMessageDispatcher(anEndpoint.getEndpoint()).dispatch(message);
 	      }
 	      else
 	      {
@@ -487,8 +523,10 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
       if ( !anEndpoint.isRemote())
       {
           inputCASReturned = true;
+          UimaTransport transport = getTransport(anEndpoint.getEndpoint());
+          
           UimaMessage message = 
-                getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Response,getName());
+                transport.produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Response,getName());
           message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
           ServicePerformance casStats =
                 getCasStatistics(aCasReferenceId);
@@ -499,7 +537,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
           long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
           message.addLongProperty(AsynchAEMessage.IdleTime, iT );
           //  Send reply back to the client. Use internal (non-jms) transport
-          getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+          transport.getUimaMessageDispatcher(anEndpoint.getEndpoint()).dispatch(message);
       }
       else
       {
@@ -533,6 +571,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		}
 		catch ( Throwable e)
 		{
+		  e.printStackTrace();
 			processingFailed = true;
 			ErrorContext errorContext = new ErrorContext();
 			errorContext.add(AsynchAEMessage.CasReference, aCasReferenceId);
@@ -702,6 +741,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			try
 			{
 				aeInstancePool.destroy();
+	      stopTransportLayer();
 			}
 			catch( Exception e){ e.printStackTrace();}
 		}

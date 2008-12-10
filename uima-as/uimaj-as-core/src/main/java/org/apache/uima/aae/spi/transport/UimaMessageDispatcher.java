@@ -21,4 +21,6 @@ package org.apache.uima.aae.spi.transport;
 public interface UimaMessageDispatcher {
 
   public void dispatch(UimaMessage aMessage);
+  
+  public void stop();
 }

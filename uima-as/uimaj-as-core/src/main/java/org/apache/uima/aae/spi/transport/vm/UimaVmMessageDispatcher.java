@@ -76,5 +76,10 @@ public class UimaVmMessageDispatcher implements UimaMessageDispatcher {
       }
     });
   }
-
+  public void stop() {
+    if ( executor != null ) {
+      executor.purge();
+      executor.shutdownNow();
+    }
+  }
 }

@@ -55,4 +55,12 @@ public interface AnalysisEngineInstancePool
 	 * @throws Exception
 	 */
 	public void destroy() throws Exception;
+	
+	/**
+	 * Checks if the current Thread is assigned to an AE instance
+	 * @return
+	 */ 
+	public boolean exists();
+	 
+	public int size();
 }

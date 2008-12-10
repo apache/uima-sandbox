@@ -202,4 +202,7 @@ public interface AnalysisEngineController extends ControllerLifecycle
   
   public LocalCache getLocalCache();
   public void registerVmQueueWithJMX( Object o, String aName ) throws Exception; 
+  
+  public AnalysisEngineController getParentController();
+
 }

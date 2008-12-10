@@ -21,14 +21,20 @@ package org.apache.uima.aae.spi.transport.vm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.uima.aae.UimaAsContext;
+import org.apache.uima.aae.UimaAsThreadFactory;
+import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.BaseAnalysisEngineController;
+import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.error.UimaSpiException;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
@@ -51,6 +57,7 @@ public class VmTransport implements UimaTransport {
 
   private ThreadPoolExecutor executor = null;
 
+  private ThreadGroup threadGroup = null;
   //  Create a queue for work items. The queue has a JMX wrapper to expose the 
   //  size.
   private BlockingQueue<Runnable> workQueue = null;
@@ -66,24 +73,17 @@ public class VmTransport implements UimaTransport {
   private UimaAsContext context;
 
   public VmTransport(UimaAsContext aContext) {
+    this( aContext, null);
+  }
+  public VmTransport(UimaAsContext aContext, AnalysisEngineController aController) {
     context = aContext;
+    controller = aController;
+    threadGroup = new ThreadGroup("VmThreadGroup_"+controller.getComponentName());
   }
 
   public void addSpiListener(SpiListener listener) {
     spiListeners.add(listener);
   }
-
-  public void initialize(UimaTransport connector, AnalysisEngineController aController)
-          throws UimaSpiException {
-    vmConnector = (VmTransport) connector;
-    executor = vmConnector.getExecutorInstance();
-    controller = aController;
-  }
-
-  public void initialize(AnalysisEngineController aController) throws UimaSpiException {
-    controller = aController;
-  }
-
   public UimaVmMessage produceMessage() {
     return new UimaVmMessage();
   }
@@ -114,11 +114,19 @@ public class VmTransport implements UimaTransport {
   }
 
   public void stopIt() throws UimaSpiException {
-    executor.shutdown();
-    try {
-      executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-    } catch (InterruptedException e) {
+    executor.purge();
+    executor.shutdownNow();
+    
+    Set <Entry<String, UimaVmMessageDispatcher>> set = dispatchers.entrySet();
+    for( Entry<String, UimaVmMessageDispatcher> entry: set) {
+      UimaVmMessageDispatcher dispatcher = entry.getValue();
+      dispatcher.stop();
     }
+  }
+  public void destroy() {
+    try {
+      stopIt();
+    } catch ( Exception e) { e.printStackTrace();}
   }
 
   protected ThreadPoolExecutor getExecutorInstance() {
@@ -129,7 +137,11 @@ public class VmTransport implements UimaTransport {
       // a fixed number of threads that never expire and are never passivated.
       executor = new ThreadPoolExecutor(concurrentConsumerCount, concurrentConsumerCount, Long.MAX_VALUE,
               TimeUnit.NANOSECONDS, workQueue);
-      executor.prestartAllCoreThreads();
+      if ( controller instanceof PrimitiveAnalysisEngineController ) {
+        ThreadFactory tf = new UimaAsThreadFactory(threadGroup, (PrimitiveAnalysisEngineController)controller);
+        executor.setThreadFactory(tf);
+        executor.prestartAllCoreThreads();
+      }
     }
     return executor;
   }
@@ -152,9 +164,9 @@ public class VmTransport implements UimaTransport {
     return listener;
   }
 
-  public UimaMessageListener produceUimaMessageListener(AnalysisEngineController aController)
+  public UimaMessageListener produceUimaMessageListener()
           throws UimaSpiException {
-    listener = new UimaVmMessageListener(aController);
+    listener = new UimaVmMessageListener(controller);
     return listener;
   }
 
@@ -165,30 +177,22 @@ public class VmTransport implements UimaTransport {
   public UimaMessageDispatcher getUimaMessageDispatcher(String aKey) throws UimaSpiException {
     return dispatchers.get(aKey);
   }
-
-  public UimaVmMessageDispatcher produceUimaMessageDispatcher() throws UimaSpiException {
-    return produceUimaMessageDispatcher(controller, null);
-  }
-
-  public UimaVmMessageDispatcher produceUimaMessageDispatcher(UimaTransport aTransport)
-          throws UimaSpiException {
-    return produceUimaMessageDispatcher(controller, aTransport);
-  }
-
-  public UimaVmMessageDispatcher produceUimaMessageDispatcher(AnalysisEngineController aController,
-          UimaTransport aTransport) throws UimaSpiException {
+  public UimaVmMessageDispatcher produceUimaMessageDispatcher(UimaTransport aTransport) throws UimaSpiException {
     UimaVmMessageDispatcher dispatcher = null;
-    controller = aController;
-    if (aTransport != null) {
-      dispatcher = new UimaVmMessageDispatcher(((VmTransport) aTransport).getExecutorInstance(),
-              ((VmTransport) aTransport).getUimaMessageListener(), (String) context
-                      .get("EndpointName"));
-    } else {
-      dispatcher = new UimaVmMessageDispatcher(executor, ((VmTransport) aTransport)
-              .getUimaMessageListener(), (String) context.get("EndpointName"));
+    String endpointName = (String) context.get("EndpointName");
+    if (!controller.isTopLevelComponent() ) {
+      endpointName = controller.getParentController().getName();
     }
-
-    dispatchers.put(aController.getName(), dispatcher);
+    dispatcher = new UimaVmMessageDispatcher(((VmTransport) aTransport).getExecutorInstance(),
+            ((VmTransport) aTransport).getUimaMessageListener(), endpointName);
+    if ( controller instanceof AggregateAnalysisEngineController ||
+            ((VmTransport) aTransport).controller instanceof AggregateAnalysisEngineController   
+       ) {
+      //  Store the dispatcher under delegate's name
+      dispatchers.put(((VmTransport) aTransport).controller.getName(), dispatcher);
+    } else {
+      dispatchers.put(controller.getName(), dispatcher);
+    }
     return dispatcher;
   }
 

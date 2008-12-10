@@ -53,6 +53,7 @@ import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.aae.monitor.statistics.Statistic;
 import org.apache.uima.aae.spi.transport.UimaMessage;
+import org.apache.uima.aae.spi.transport.UimaTransport;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.analysis_engine.asb.impl.FlowContainer;
@@ -446,10 +447,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
     if ( !aClientEndpoint.isRemote())
     {
+        UimaTransport transport = getTransport(aClientEndpoint.getEndpoint());
         UimaMessage message = 
-          getTransport(aClientEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
+          transport.produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Response,getName());
         //  Send reply back to the client. Use internal (non-jms) transport
-        getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+        transport.getUimaMessageDispatcher(aClientEndpoint.getEndpoint()).dispatch(message);
     }
     else
     {
@@ -571,10 +573,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			    {
 			      try
 			      {
+			        UimaTransport transport = getTransport(endpoint.getEndpoint());
 			        UimaMessage message = 
-			          getTransport(endpoint.getEndpoint()).produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Request,getName());
+			          transport.produceMessage(AsynchAEMessage.CollectionProcessComplete,AsynchAEMessage.Request,getName());
 			          //  Send reply back to the client. Use internal (non-jms) transport
-			         getTransport(endpoint.getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+			         transport.getUimaMessageDispatcher(endpoint.getEndpoint()).dispatch(message);
 			      }
 			      catch( Exception e)
 			      {
@@ -748,7 +751,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			if (flowMap.containsKey(aCasReferenceId))
 			{
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "lookupFlow", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { aCasReferenceId });
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "lookupFlow", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { getComponentName(), aCasReferenceId });
         }
 				return (FlowContainer) flowMap.get(aCasReferenceId);
 			}
@@ -779,7 +782,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_lookup_flow__FINE",
-	                new Object[] {getName(), anInputCasReferenceId });
+	                new Object[] {getComponentName(), anInputCasReferenceId });
       }
 			try
 			{
@@ -789,12 +792,17 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					if (flowMap.containsKey(anInputCasReferenceId))
 					{
 		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { anInputCasReferenceId });
+		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { getComponentName(), anInputCasReferenceId });
 		         }
 						// Retrieve an input CAS Flow object from the flow cache. This Flow object will be used to compute
 						// subordinate Flow for the new CAS.
 						flow = (FlowContainer) flowMap.get(anInputCasReferenceId);
+            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieved_flow_object_ok__FINEST", new Object[] { getComponentName(), anInputCasReferenceId });
+            }
+
 					}
+					
 				}
 
 				if (flow != null)
@@ -803,7 +811,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 			                "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_lookup_flow_ok__FINE",
-			                new Object[] {getName(), aNewCasReferenceId,  newCASProducedBy, anInputCasReferenceId, });
+			                new Object[] {getComponentName(), aNewCasReferenceId,  newCASProducedBy, anInputCasReferenceId, });
 	         }
 					// Compute subordinate Flow from the Flow associated with the
 					// input CAS.
@@ -811,6 +819,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					{
 						flow = flow.newCasProduced(aCAS, newCASProducedBy);
 					}
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                     "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_new_flow_ok__FINE",
+                     new Object[] {getComponentName(), aNewCasReferenceId,  newCASProducedBy, anInputCasReferenceId, });
+          }
 					// Check if the local cache already contains an entry for the Cas id.
 					// A colocated Cas Multiplier may have already registered this CAS 
 					// in the parent's controller
@@ -850,6 +863,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				handleAction(ErrorHandler.TERMINATE, null, null);
 				return;
 			}
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+                 "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_executing_step__FINEST",
+                 new Object[] {getComponentName(), aNewCasReferenceId,  newCASProducedBy, anInputCasReferenceId, });
+      }
 
 			// Continue with Steps. The CAS has been produced by the CAS Multiplier
 			executeFlowStep(flow, aNewCasReferenceId, true);
@@ -927,11 +945,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
           if (flowMap.containsKey(aCasReferenceId))
           {
              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-               UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { aCasReferenceId });
+               UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { getComponentName(), aCasReferenceId });
              }
             synchronized( flowMap)
             {
               flow = (FlowContainer) flowMap.get(aCasReferenceId);
+            }
+            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieved_flow_object_ok__FINEST", new Object[] { getComponentName(), aCasReferenceId });
             }
           }
           else
@@ -972,6 +993,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				if ( !isStopped() )
 				{
+		      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+		        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
+		                 "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_executing_step_input_cas__FINEST",
+		                 new Object[] {getComponentName(), aCasReferenceId });
+		      }
+
 					// Execute a step in the flow. false means that this CAS has not
 					// been produced by CAS Multiplier
 					executeFlowStep(flow, aCasReferenceId, false);
@@ -1030,7 +1057,13 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				{
 					// Start a timer for this request. The amount of time to wait
 					// for response is provided in configuration for this endpoint
+	        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "simpleStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_next_step_dispatch__FINEST", new Object[] { getComponentName(), aCasReferenceId, analysisEngineKey });
+	        }
 					dispatchProcessRequest(aCasReferenceId, endpoint, true);
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "simpleStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_next_step_dispatch_completed__FINEST", new Object[] { getComponentName(), aCasReferenceId, analysisEngineKey });
+          }
 				}
 			}
 		}
@@ -1215,7 +1248,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
         {
           UimaMessage message = 
             getTransport(delegateEndpoints[i].getEndpoint()).produceMessage(AsynchAEMessage.GetMeta,AsynchAEMessage.Request,getName());
-          getTransport(delegateEndpoints[i].getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+          UimaTransport transport = getTransport(delegateEndpoints[i].getEndpoint());
+          transport.getUimaMessageDispatcher(delegateEndpoints[i].getEndpoint()).dispatch(message);
         }
         catch( Exception e)
         {
@@ -1585,7 +1619,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
   {
     //  If the CAS was produced by this aggregate send the request message to the client
     //  Otherwise send the response message.
-    UimaMessage message = getTransport(endpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,messageType,getName());
+    UimaTransport transport = getTransport(endpoint.getEndpoint());
+    UimaMessage message = transport.produceMessage(AsynchAEMessage.Process,messageType,getName());
     if ( cacheEntry.getCasProducerAggregateName() != null && cacheEntry.getCasProducerAggregateName().equals(getComponentName()))
     {
       message.addLongProperty(AsynchAEMessage.CasSequence, cacheEntry.getCasSequence());
@@ -1602,7 +1637,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     long iT = getIdleTimeBetweenProcessCalls(AsynchAEMessage.Process); 
     message.addLongProperty(AsynchAEMessage.IdleTime, iT );
     //  Send reply back to the client. Use internal (non-jms) transport
-    getTransport(getName()).getUimaMessageDispatcher().dispatch(message);
+    transport.getUimaMessageDispatcher(endpoint.getEndpoint()).dispatch(message);
   }
 	private Endpoint getReplyEndpoint(CacheEntry cacheEntry) throws Exception
 	{
@@ -1644,6 +1679,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			return;
 		}
 
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "executeFlowStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_step__FINEST", new Object[] { getComponentName(), aCasReferenceId });
+    }
 		
 		try
 		{
@@ -1671,6 +1709,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				finalStep((FinalStep) step, aCasReferenceId);
 			}
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "executeFlowStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_step__FINEST", new Object[] { getComponentName(), aCasReferenceId });
+	    }
 
 		}
 		catch ( Exception e)
@@ -1689,10 +1730,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     {
       try
       {
+        UimaTransport transport = getTransport(anEndpoint.getEndpoint());
         UimaMessage message = 
-          getTransport(anEndpoint.getEndpoint()).produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
+          transport.produceMessage(AsynchAEMessage.Process,AsynchAEMessage.Request,getName());
         message.addStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
-        getTransport(anEndpoint.getEndpoint()).getUimaMessageDispatcher().dispatch(message);
+        transport.getUimaMessageDispatcher(anEndpoint.getEndpoint()).dispatch(message);
 
       }
       catch( Exception e)

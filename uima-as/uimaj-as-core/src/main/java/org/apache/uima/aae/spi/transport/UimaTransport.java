@@ -26,19 +26,6 @@ import org.apache.uima.aae.spi.transport.vm.UimaVmMessage;
 public interface UimaTransport {
 
   /**
-   * This method initializes the SPI.
-   * 
-   * @param aContext -
-   *          common context used for initization
-   * @throws UimaSpiException -
-   *           any problems while initializing the SPI
-   */
-  public void initialize(AnalysisEngineController aController) throws UimaSpiException;
-
-  public void initialize(UimaTransport aTransport, AnalysisEngineController aController)
-          throws UimaSpiException;
-
-  /**
    * This method registers a given {@link SpiListener} instance with the SPI. The SPI will call all
    * registered listeners when the initialization is completed, when the start is completed, and
    * when the stop is completed.
@@ -79,13 +66,10 @@ public interface UimaTransport {
   public UimaMessageDispatcher getUimaMessageDispatcher(String aDelegateKey)
           throws UimaSpiException;
 
-  public UimaMessageListener produceUimaMessageListener(AnalysisEngineController aController)
+  public UimaMessageListener produceUimaMessageListener()
           throws UimaSpiException;
 
-  public UimaMessageDispatcher produceUimaMessageDispatcher() throws UimaSpiException;
-
-  public UimaMessageDispatcher produceUimaMessageDispatcher(AnalysisEngineController aController,
-          UimaTransport aTransport) throws UimaSpiException;
+  public UimaMessageDispatcher produceUimaMessageDispatcher(UimaTransport aTransport) throws UimaSpiException;
 
   public UimaVmMessage produceMessage();
 
