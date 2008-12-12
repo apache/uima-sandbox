@@ -152,7 +152,7 @@ under the License.
         <include>org.mortbay.jetty:jetty-util</include> 
         <include>org.mortbay.jetty:servlet-api-2.5</include>
         <include>xmlpull:xmlpull</include> <!-- need for uima-as -->
-        <include>xstream:xstream</include> <!-- need for uima-as -->
+        <include>com.thoughtworks.xstream:xstream</include> <!-- need for uima-as -->
         <include>org.apache.derby:derby</include>
         <include>org.apache.xbean:xbean-spring</include>
         <include>commons-beanutils:commons-beanutils</include>
