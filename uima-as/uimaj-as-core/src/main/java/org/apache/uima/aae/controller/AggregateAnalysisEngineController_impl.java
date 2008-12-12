@@ -1986,18 +1986,21 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				//	If getMeta request not yet sent, send meta request to all remote delegate
 				//	Special case when all delegates are remote is handled in the setInputChannel
 
-				if ( requestForMetaSentToRemotes == false && !allDelegatesAreRemote )
-				{
-					String unregisteredDelegateKey = null;
-					for ( int i=0; i < unregisteredDelegateList.size(); i++ )
-					{
-						unregisteredDelegateKey = (String) unregisteredDelegateList.get(i);
-						if ( unregisteredDelegateKey.equals( key ))
-						{
-							unregisteredDelegateList.remove(i);
-						}
-					}
-				}
+        synchronized (unregisteredDelegateList) {
+          //TODO can't find where this list is checked. Is it still used???
+          if ( requestForMetaSentToRemotes == false && !allDelegatesAreRemote )
+          {
+            String unregisteredDelegateKey = null;
+            for ( int i=0; i < unregisteredDelegateList.size(); i++ )
+            {
+              unregisteredDelegateKey = (String) unregisteredDelegateList.get(i);
+              if ( unregisteredDelegateKey.equals( key ))
+              {
+                unregisteredDelegateList.remove(i);
+              }
+            }
+          }
+        }
 
 				
 				//  

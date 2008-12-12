@@ -232,19 +232,21 @@ implements AnalysisEngineController, EventSubscriber
 			//	Populate a list of un-registered co-located delegates. A delegate will be taken off the un-registered list
 			//	when it calls its parent registerChildController() method.
 			Set set = aDestinationMap.entrySet();
-			for( Iterator it = set.iterator(); it.hasNext();)
-			{
-				Map.Entry entry = (Map.Entry)it.next();
-				Endpoint endpoint = (Endpoint)entry.getValue();
-				if ( endpoint != null && !endpoint.isRemote() )
-				{
-					unregisteredDelegateList.add(entry.getKey());
-				}
-			}
-			if ( unregisteredDelegateList.size() == 0 ) // All delegates are remote
-			{
-				allDelegatesAreRemote = true;
-			}
+      synchronized (unregisteredDelegateList) {
+        for( Iterator it = set.iterator(); it.hasNext();)
+        {
+          Map.Entry entry = (Map.Entry)it.next();
+          Endpoint endpoint = (Endpoint)entry.getValue();
+          if ( endpoint != null && !endpoint.isRemote() )
+          {
+            unregisteredDelegateList.add(entry.getKey());
+          }
+        }
+        if ( unregisteredDelegateList.size() == 0 ) // All delegates are remote
+        {
+          allDelegatesAreRemote = true;
+        }
+      }
 		}
 
 		
@@ -1706,10 +1708,13 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			timeSnapshotMap.clear();
 		}
-		if ( unregisteredDelegateList != null )
-		{
-			unregisteredDelegateList.clear();
-		}
+    synchronized (unregisteredDelegateList) {
+      //TODO any reason this list needs to be cleared on Stop???
+      if ( unregisteredDelegateList != null )
+      {
+        unregisteredDelegateList.clear();
+      }
+    }
 		if ( casManager != null )
 		{
 			casManager = null;
