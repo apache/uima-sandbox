@@ -68,7 +68,6 @@ public class TestUimaASBasic extends BaseTestSupport
 	public void testBrokerLifecycle() 
 	{
 		System.out.println("-------------- testBrokerLifecycle -------------");
-		System.out.println("UIMA_HOME="+System.getenv("UIMA_HOME")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"dd2spring.xsl");
 	}
 	/**
 	 * Tests handling of multiple calls to initialize(). A subsequent call to
