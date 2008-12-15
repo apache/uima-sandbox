@@ -51,17 +51,22 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>apache-activemq</artifactId>
 			<version>4.1.1</version>
-			<!-- exclusions>
-                    <exclusion>
+			<exclusions>        
+        <exclusion>
+          <!-- exclude xstream 1.1.2 because it is broken 
+               xstream 1.2.2 (the fixed version) is included in another pom -->
+          <groupId>xstream</groupId>
+          <artifactId>xstream</artifactId>
+        </exclusion>
+                    <!--exclusion>
                         <groupId>org.apache.activemq</groupId>
                         <artifactId>activeio-core</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.xbean</groupId>
                         <artifactId>xbean-spring</artifactId>
-                    </exclusion>
-
-           </exclusions -->
+                    </exclusion-->
+      </exclusions>
 		</dependency> 
 		
 		<dependency>
