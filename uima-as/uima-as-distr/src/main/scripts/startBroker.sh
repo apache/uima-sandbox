@@ -17,8 +17,7 @@
 #   specific language governing permissions and limitations
 #   under the License.
 
-if [ "$UIMA_HOME" == "" ]
-then
+if [ "$UIMA_HOME" = "" ]; then
   echo UIMA_HOME environment variable is not set
   exit 1
 fi
@@ -45,4 +44,4 @@ if [ ! -f $ACTIVEMQ_BASE/conf/activemq-nojournal.xml ] ; then
   cp $UIMA_HOME/config/log4j.properties $ACTIVEMQ_BASE/conf/
 fi
 
-. $ACTIVEMQ_HOME/bin/activemq xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml
+$ACTIVEMQ_HOME/bin/activemq xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml
