@@ -2304,7 +2304,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			if ( isTopLevelComponent() && getInputChannel() != null )
 			{
 	      serviceInfo.setInputQueueName(getInputChannel().getName());
-	      serviceInfo.setBrokerURL(getInputChannel().getServerUri());
+        serviceInfo.setBrokerURL(super.getBrokerURL());
 			}
 			else
 			{

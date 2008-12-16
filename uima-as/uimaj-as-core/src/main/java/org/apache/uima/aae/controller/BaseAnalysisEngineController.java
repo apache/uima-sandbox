@@ -1506,6 +1506,12 @@ implements AnalysisEngineController, EventSubscriber
 	}
 	public String getBrokerURL()
 	{
+      // Wait until the connection factory is injected by Spring
+      while ( System.getProperty("BrokerURI") == null) {
+        try {
+          Thread.sleep(50);
+        } catch ( InterruptedException ex) {}
+      }
 		return System.getProperty("BrokerURI");
 	}
 	public String getInputQueue()

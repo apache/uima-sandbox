@@ -720,7 +720,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		if ( isTopLevelComponent() && getInputChannel() != null )
 		{
 			serviceInfo.setInputQueueName(getInputChannel().getServiceInfo().getInputQueueName());
-			serviceInfo.setBrokerURL(getInputChannel().getServiceInfo().getBrokerURL());
+			serviceInfo.setBrokerURL(super.getBrokerURL());
 		}
 		
 		serviceInfo.setState("Running");
