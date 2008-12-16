@@ -375,6 +375,8 @@ implements ExceptionListener
 	            Thread.sleep(50);
 	          } catch ( InterruptedException ex) {}
 	        }
+          System.setProperty("BrokerURI", ((ActiveMQConnectionFactory) connectionFactory)
+                  .getBrokerURL());
 	        boolean done = false;
 	        //  Wait for controller to be injected by Uima AS
           if (isActiveMQDestination() && !isGetMetaListener()
@@ -401,8 +403,6 @@ implements ExceptionListener
           __listenerRef.injectTaskExecutor();
           //  Notify Spring Listener that all properties are ready
           __listenerRef.allPropertiesSet();
-          System.setProperty("BrokerURI", ((ActiveMQConnectionFactory) connectionFactory)
-                  .getBrokerURL());
           if (isActiveMQDestination()) {
             destinationName = ((ActiveMQDestination) destination).getPhysicalName();
           }
