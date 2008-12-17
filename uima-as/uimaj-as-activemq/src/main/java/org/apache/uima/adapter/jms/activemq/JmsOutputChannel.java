@@ -746,7 +746,10 @@ public class JmsOutputChannel implements OutputChannel
 	        sendCasToRemoteEndpoint(false, serializedCAS, entry, anEndpoint, false);
 			  } else {
 			    byte[] binaryCas = getBinaryCas(true, entry.getCasReferenceId(), anEndpoint, anEndpoint.isRetryEnabled());
-          sendCasToRemoteEndpoint(false, binaryCas, entry, anEndpoint, false);
+			    if ( binaryCas == null ) {
+			      return;
+			    }
+			    sendCasToRemoteEndpoint(false, binaryCas, entry, anEndpoint, false);
 			  }
 			    
 			}
@@ -863,13 +866,22 @@ public class JmsOutputChannel implements OutputChannel
 	    }
 			if ( anEndpoint.isRemote() )
 			{
+			  CacheEntry entry = null;
+			  try {
+          entry =  getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
+			    
+			  } catch ( Exception e ) {
+			    return;
+			  }
         if ( anEndpoint.getSerializer().equals("xmi")) {
           //  Serializes CAS and releases it back to CAS Pool
           String serializedCAS = getSerializedCas(true, aCasReferenceId, anEndpoint, false);
           sendCasToRemoteEndpoint(false, serializedCAS, null, aCasReferenceId, anEndpoint, false, 0);
         } else {
-          CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
           byte[] binaryCas = getBinaryCas(true, entry.getCasReferenceId(), anEndpoint, anEndpoint.isRetryEnabled());
+          if ( binaryCas == null ) {
+            return;
+          }
           sendCasToRemoteEndpoint(false, binaryCas, entry, anEndpoint, false);
         }
           
@@ -1085,6 +1097,9 @@ public class JmsOutputChannel implements OutputChannel
         long t1 = getAnalysisEngineController().getCpuTime();
         //  Serialize CAS for remote Delegates
         String serializer = anEndpoint.getSerializer();
+        if ( cas == null || entry == null ) {
+          return null;
+        }
         if ( serializer.equals("binary")) {
           if (entry.acceptsDeltaCas() && isReply)  {
             serializedCAS = uimaSerializer.serializeCasToBinary(cas, entry.getMarker());
@@ -1910,6 +1925,9 @@ public class JmsOutputChannel implements OutputChannel
       {
         populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
 //        tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
+      }
+      if ( casStateEntry == null ) {
+        return;
       }
       //  The following is true when the analytic is a CAS Multiplier
       if ( casStateEntry.isSubordinate() && !isRequest )
