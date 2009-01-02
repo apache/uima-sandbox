@@ -63,7 +63,7 @@ public class AEService_Impl extends MetaDataObject_impl implements AEService, AE
 
   protected String brokerURL = null;
   
-  protected int prefetch = 1;
+  protected int prefetch = 0; // default to 0
 
   protected AEDeploymentMetaData analysisEngineDeploymentMetaData;
 

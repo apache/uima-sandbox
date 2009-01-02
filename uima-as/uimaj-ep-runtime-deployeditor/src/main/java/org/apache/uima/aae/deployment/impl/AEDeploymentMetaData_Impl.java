@@ -95,7 +95,7 @@ AEDeploymentConstants, AEDeploymentMetaData {
 
   protected boolean casMultiplier = false;
 
-  protected int casMultiplierPoolSize = 0; // required - DEFAULT_CAS_MULTIPLIER_POOL_SIZE;
+  protected int casMultiplierPoolSize = DEFAULT_CAS_MULTIPLIER_POOL_SIZE;
 
   protected int initialFsHeapSize = DEFAULT_CAS_INITIAL_HEAP_SIZE;
 
@@ -567,7 +567,8 @@ AEDeploymentConstants, AEDeploymentMetaData {
     }
 
     // <casMultiplier poolSize="5" initialFsHeapSize="200000" /> <!-- req | omit-->
-    if (AEDeploymentDescription_Impl.isCASMultiplier(getResourceSpecifier())) {
+    // Only for AS primitive CAS Multiplier
+    if (!isAsync() && AEDeploymentDescription_Impl.isCASMultiplier(getResourceSpecifier())) {
       if (getCasMultiplierPoolSize() != UNDEFINED_INT) {
         attrs.addAttribute("", AEDeploymentConstants.TAG_ATTR_POOL_SIZE,
                 AEDeploymentConstants.TAG_ATTR_POOL_SIZE, null, "" + getCasMultiplierPoolSize());
