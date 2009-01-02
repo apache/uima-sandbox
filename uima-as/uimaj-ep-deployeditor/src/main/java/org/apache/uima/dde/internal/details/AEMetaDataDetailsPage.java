@@ -209,6 +209,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
           changeToAsyncAggregate(false);
         }
       } else if (e.getSource() == scaleout) {
+        // Update the number of instances
         // Trace.err("scaleout: " + scaleout.getSelection());
         updateScaleOut(scaleout.getSelection());
 
@@ -458,6 +459,7 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
     hover.install(labelReplyQueueForCoLocated);
 
     // <casMultiplier poolSize="5"/> <!-- optional -->
+    // Only for AS primitive CAS Multiplier
     casMultiplierLabel = toolkit.createLabel(compositeCoLocatedSetting,
             Messages.DDE_AEMetaDataDetails_PoolSizeOfCM);
     casMultiplier = FormSection2.createLabelAndSpinner(toolkit, compositeCoLocatedSetting,
@@ -602,7 +604,8 @@ public class AEMetaDataDetailsPage extends AbstractFormPart implements IDetailsP
         AnalysisEngineDescription aed = (AnalysisEngineDescription) rs;
 
         // Is CAs Multiplier ?
-        if (AETreeBuilder.isCASMultiplier(aed)) {
+        // Only for AS primitive CAS Multiplier
+        if (!obj.isAsync() && AETreeBuilder.isCASMultiplier(aed)) {
           // Trace.err("CASMultiplier pool size: " + obj.getCasMultiplierPoolSize());
           casMultiplierLabel.setVisible(true);
           casMultiplier.setVisible(true);
