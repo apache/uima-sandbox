@@ -146,6 +146,8 @@ public class OverviewPage extends AbstractHeaderPage {
   private Spinner initialFsHeapSize;
 
   private Spinner casPoolSize;
+  
+  private Spinner prefetch;
 
   private Text topDescriptorField;
 
@@ -194,8 +196,14 @@ public class OverviewPage extends AbstractHeaderPage {
  
   // Used by AEMetaDataDetailsPage
   public void setCasPoolSize (int number) {
-    casPoolSize.setSelection(number); // Update control
-    aeDeploymentDescription.setCasPoolSize(number); // Update descriptor
+    try {
+      if (!aeDeploymentDescription.getAeService().getAnalysisEngineDeploymentMetaData().isAsync()) {
+        casPoolSize.setSelection(number); // Update control
+        aeDeploymentDescription.setCasPoolSize(number); // Update descriptor
+      }
+    } catch (InvalidXMLException e) {
+      e.printStackTrace();
+    }
   }
   
   /** ********************************************************************** */
@@ -308,6 +316,9 @@ public class OverviewPage extends AbstractHeaderPage {
 
       } else if (event.getSource() == initialFsHeapSize) {
         aeDeploymentDescription.setInitialFsHeapSize(initialFsHeapSize.getSelection());
+
+      } else if (event.getSource() == prefetch) {
+        aeService.setPrefetch(prefetch.getSelection());
 
       } else if (event.getSource() == customButton) {
         // Customization of C++
@@ -660,12 +671,12 @@ public class OverviewPage extends AbstractHeaderPage {
     decorationEndPoint.setDescription("The name for the queue cannot be empty");
     endPointDecoField.addFieldDecoration(decorationEndPoint, SWT.LEFT | SWT.TOP, false);    
     
-    // <casPool numberOfCASes="3"/> <!-- optional -->
-//    prefetch = FormSection2.createLabelAndSpinner(toolkit, sectionClient,
-//            "Number of requests that might be prefetched:", SWT.BORDER, 1, 
-//            Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
-//    prefetch.setSelection(aeService.getPrefetch());
-//    prefetch.addSelectionListener(asynAggregateListener);
+    // <..  prefetch=="0" /> <!-- optional -->
+    prefetch = FormSection2.createLabelAndSpinner(toolkit, topComposite,
+            "Number of requests that might be prefetched:", SWT.BORDER, 0, 
+            Integer.MAX_VALUE, false, FormSection2.MAX_DECORATION_WIDTH);
+    prefetch.setSelection(aeService.getPrefetch());
+    prefetch.addSelectionListener(selectionListener);
 
     // <casPool numberOfCASes="3"/> <!-- optional -->
     casPoolSize = FormSection2.createLabelAndSpinner(toolkit, topComposite,
@@ -1043,6 +1054,7 @@ public class OverviewPage extends AbstractHeaderPage {
     brokerUrl.setText(aeService.getBrokerURL());
     endPoint.setText(aeService.getEndPoint());
     
+    prefetch.setSelection(aeService.getPrefetch());
     casPoolSize.setSelection(aeDeploymentDescription.getCasPoolSize());
     initialFsHeapSize.setSelection(aeDeploymentDescription.getInitialFsHeapSize());
     
