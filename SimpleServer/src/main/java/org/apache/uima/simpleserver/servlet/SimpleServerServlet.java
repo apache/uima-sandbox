@@ -55,7 +55,9 @@ public class SimpleServerServlet extends HttpServlet {
 
   public Service server = null;
 
-  private boolean initializationSuccessful = false;
+  // If UIMA-AS is included as an ADD-ON to SimpleServer and UIMA-AS servlet 
+  // is invoked, UIMA-AS servlet will set this flag
+  protected boolean initializationSuccessful = false;
 
   private Logger logger = Logger.getAnonymousLogger();
 
@@ -241,6 +243,8 @@ public class SimpleServerServlet extends HttpServlet {
     this.initializationSuccessful = true;
   }
 
+  // If UIMA-AS is included as an ADD-ON to SimpleServer and UIMA-AS servlet 
+  // is invoked, UIMA-AS servlet will override this method
   protected boolean initServer() {
     File resultSpec = null;
     String resultSpecParamValue = getInitParameter("ResultSpecFile");

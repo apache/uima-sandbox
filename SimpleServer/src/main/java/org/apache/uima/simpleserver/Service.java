@@ -72,13 +72,13 @@ public class Service {
 
   private AnalysisEngine ae = null;
 
-  private CAS cas = null;
+  protected CAS cas = null;
 
-  private ServerSpec serviceSpec = null;
+  protected ServerSpec serviceSpec = null;
 
-  private ResultExtractor resultExtractor = null;
+  protected ResultExtractor resultExtractor = null;
 
-  private volatile boolean initialized = false;
+  protected volatile boolean initialized = false;
 
   /**
    * Default constructor.
@@ -147,7 +147,7 @@ public class Service {
     configure(serviceSpecFile);
   }
 
-  private void configure(File serviceSpecFile) throws IOException, SimpleServerException,
+  protected void configure(File serviceSpecFile) throws IOException, SimpleServerException,
       XmlException {
     if (serviceSpecFile == null) {
       this.serviceSpec = ConfigFactory.newServerSpec(noDescriptionProvided, noDescriptionProvided,
@@ -159,7 +159,7 @@ public class Service {
     this.initialized = true;
   }
 
-  private final void logInitializationError() {
+  protected final void logInitializationError() {
     // TODO: log which service could not be initialized!!!!!!!!!!!!!!!!!
     SimpleServerException e = new SimpleServerException(
         SimpleServerException.service_state_exception, new Object[] {});
@@ -242,6 +242,8 @@ public class Service {
   /**
    * Calls the services analysis engine on the input text, filters and produces the result.
    */
+  // If UIMA-AS is included as an ADD-ON to SimpleServer and UIMA-AS servlet 
+  // is invoked, UIMA-AS (UimaAsService) will override this method
   public synchronized Result process(String text, String lang) {
     // Check that service has been initialized.
     if (!this.initialized) {
