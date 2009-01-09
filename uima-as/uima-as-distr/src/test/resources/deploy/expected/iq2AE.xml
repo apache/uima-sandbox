@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--=============================================================================-->
- <!-- Generated from                                                              -->
- <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/iq2AE.xml -->
- <!-- 6 October, 2008, 4:43:28 P.M.                                               -->
- <!--=============================================================================-->
+<!--===================================================================-->
+ <!-- Generated from                                                    -->
+ <!-- file:/C:/apache/uima-as-distr/src/test/resources/deploy/iq2AE.xml -->
+ <!-- 9 January, 2009, 1:46:00 P.M.                                     -->
+ <!--===================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
@@ -14,6 +14,14 @@
          class="org.apache.activemq.ActiveMQConnectionFactory">
       <property name="brokerURL" value="tcp://localhost:61616"/>
       <property name="prefetchPolicy" ref="prefetchPolicy"/>
+   </bean>
+
+   <!-- Factory for specific external queue broker:  -->
+   <!--            tcp://localhost:61616             -->
+   <bean id="qBroker_tcp_c__ss_localhost_c_61616-reply"
+         class="org.apache.activemq.ActiveMQConnectionFactory">
+      <property name="brokerURL" value="tcp://localhost:61616"/>
+      <property name="prefetchPolicy" ref="prefetchPolicy-reply"/>
    </bean>
 
    <!-- Creates an instance of the ResourceManager -->
@@ -39,6 +47,9 @@
    <!-- Create prefetch policy -->
    <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
       <property name="queuePrefetch" value="0"/>
+   </bean>
+   <bean id="prefetchPolicy-reply" class="org.apache.activemq.ActiveMQPrefetchPolicy">
+      <property name="queuePrefetch" value="1"/>
    </bean>
  
    <!--=================================-->
@@ -76,7 +87,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="RoomNumberAnnotatorQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex2/RoomNumberAnnotator.xml"/>
+                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex2/RoomNumberAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

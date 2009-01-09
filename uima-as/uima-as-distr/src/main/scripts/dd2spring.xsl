@@ -1039,16 +1039,18 @@
           <property name="destinationResolver" ref="{f:getDestinationResolverID($aeNameUnique, $remote/@key)}"/>
           <property name="destinationName" value="" />
           <property name="targetEndpoint" ref="{$q_endpointName}" />
+          <xsl:sequence select="f:generateLineComment('POJO to delegate JMS Messages to', 5)"/>
+          <property name="messageListener" ref="{$q_listenerID}"/>
+          <property name="connectionFactory" ref="{$queueFactoryID}-reply"/>
         </xsl:when>
         <xsl:otherwise>
           <property name="destination" ref="{$q_ID}"/>      
+          <xsl:sequence select="f:generateLineComment('POJO to delegate JMS Messages to', 5)"/>
+          <property name="messageListener" ref="{$q_listenerID}"/>
+          <property name="connectionFactory" ref="{$queueFactoryID}"/>
         </xsl:otherwise>
       </xsl:choose>
            
-      <xsl:sequence select="f:generateLineComment('POJO to delegate JMS Messages to', 5)"/>
-      <property name="messageListener" ref="{$q_listenerID}"/>
-      
-      <property name="connectionFactory" ref="{$queueFactoryID}"/>
       <xsl:if test="$inputOrReturn eq 'input'">
         <property name="messageSelector" value="Command=2000 OR Command=2002" /> <!-- Process or CPC request -->
       </xsl:if>
@@ -1063,7 +1065,7 @@
       <bean id="{f:getDestinationResolverID($aeNameUnique, $remote/@key)}"
         class="org.apache.uima.adapter.jms.activemq.TempDestinationResolver"
         singleton="false">
-        <property name="connectionFactory" ref="{$queueFactoryID}"/>
+        <property name="connectionFactory" ref="{$queueFactoryID}-reply"/>
       </bean>
     </xsl:if>
 
@@ -1303,6 +1305,18 @@
         <property name="prefetchPolicy" ref="prefetchPolicy"/>
       </bean>
     </xsl:for-each>
+    
+    <!-- all input queues except the vm://localBroker one -->
+    <xsl:for-each select="$uniqueInputQueueBrokers/u:inputQueue">
+      <xsl:sequence select="f:generateLineComment(
+        ('Factory for specific external queue broker:',
+         @brokerURL),3)"/>
+      <bean id="{f:getQbrokerID(.)}-reply"
+        class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="{@brokerURL}"/>
+        <property name="prefetchPolicy" ref="prefetchPolicy-reply"/>
+      </bean>
+    </xsl:for-each>
         
               <!-- Creates an instance of the ResourceManager -->
    <xsl:sequence select="f:generateLineComment('Creates an instance of the ResourceManager',3)"/>
@@ -1332,6 +1346,11 @@
     <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
       <property name="queuePrefetch" 
         value="{u:service/u:inputQueue/@prefetch}"/>
+    </bean>
+    
+    <bean id="prefetchPolicy-reply" class="org.apache.activemq.ActiveMQPrefetchPolicy">
+      <property name="queuePrefetch" 
+        value="1"/>
     </bean>
     
     <xsl:call-template name="generateErrorConfigDetails"/>

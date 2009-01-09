@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--==================================================================================-->
  <!-- Generated from                                                                                  -->
- <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/Deploy_AggregateUsingRemoteTempQueue.xml -->
- <!-- 6 October, 2008, 11:40:34 A.M.                                                                             -->
+ <!-- file:/C:/apache/uima-as-distr/src/test/resources/deploy/Deploy_AggregateUsingRemoteTempQueue.xml -->
+ <!-- 9 January, 2009, 1:45:50 P.M.                                                                    -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -14,6 +14,14 @@
          class="org.apache.activemq.ActiveMQConnectionFactory">
       <property name="brokerURL" value="tcp://localhost:8118"/>
       <property name="prefetchPolicy" ref="prefetchPolicy"/>
+   </bean>
+
+   <!-- Factory for specific external queue broker:  -->
+   <!--             tcp://localhost:8118             -->
+   <bean id="qBroker_tcp_c__ss_localhost_c_8118-reply"
+         class="org.apache.activemq.ActiveMQConnectionFactory">
+      <property name="brokerURL" value="tcp://localhost:8118"/>
+      <property name="prefetchPolicy" ref="prefetchPolicy-reply"/>
    </bean>
 
    <!-- Creates an instance of the ResourceManager -->
@@ -40,7 +48,10 @@
    <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
       <property name="queuePrefetch" value="1"/>
    </bean>
-
+   <bean id="prefetchPolicy-reply" class="org.apache.activemq.ActiveMQPrefetchPolicy">
+      <property name="queuePrefetch" value="1"/>
+   </bean>
+ 
    <!--=================================-->
    <!--    E r r o r   D e t a i l s    -->
    <!--=================================-->
@@ -91,7 +102,7 @@
       <property name="action" value="disable"/>
    </bean>
 
-
+ 
    <!--input queue for service-->
    <bean id="top_level_input_queue_service_1"
          class="org.apache.activemq.command.ActiveMQQueue">
@@ -108,7 +119,7 @@
       </constructor-arg>
       <constructor-arg index="1" value="TopLevelTaeQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/SimpleTestAggregate.xml"/>
+                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/SimpleTestAggregate.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="delegate_map_TopLevelTaeQueue_1"/>
@@ -119,12 +130,12 @@
       <property name="flowControllerDescriptor"
                 value="*importByName:org.apache.uima.flow.FixedFlowController"/>
    </bean>
-
+ 
    <!--===================================================-->
    <!--   M E S S A G E    H A N D L E R: aggregate_input -->
    <!--  for controller: asAggr_ctlr_TopLevelTaeQueue_1   -->
    <!--===================================================-->
-
+   
    <bean id="aggregate_input_metaMsgHandler_TopLevelTaeQueue_1"
          class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
       <constructor-arg index="0" value="MetadataRequestHandler"/>
@@ -137,13 +148,13 @@
       <constructor-arg index="0" value="ProcessRequestHandler"/>
       <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
    </bean>
-
+ 
    <!--====================================================-->
    <!--   M E S S A G E    H A N D L E R: aggregate_return -->
    <!--  for controller: asAggr_ctlr_TopLevelTaeQueue_1    -->
    <!--====================================================-->
-
-
+   
+    
 
 <bean id="aggregate_return_processResponseHandler_TopLevelTaeQueue_1"
          class="org.apache.uima.aae.handler.input.ProcessResponseHandler">
@@ -167,7 +178,7 @@
    </bean>
 
    <!-- Create the endpoints + output channels, one per delegate -->
-
+   
 
    <!-- ==================================== -->
    <!--            TestMultiplier            -->
@@ -204,7 +215,7 @@
 
      <!-- Queue name used for replies, on the remote broker  -->
      <property name="replyToEndpoint"
-                value="rmtRtrnQ_TopLevelTaeQueue_1_NoOp_9.2.34.805fa77f87:11cd2d127c1:-8000"/>
+                value="rmtRtrnQ_TopLevelTaeQueue_1_NoOp_9.2.35.129-630eb1f5:11ebcb6eade:-8000"/>
 
      <!--      Timeouts      -->
      <property name="metadataRequestTimeout" value="4000"/>
@@ -269,7 +280,7 @@
    <bean id="rmtRtrnQ_TopLevelTaeQueue_1_NoOp"
          class="org.apache.activemq.command.ActiveMQQueue">
       <constructor-arg index="0"
-                       value="rmtRtrnQ_TopLevelTaeQueue_1_NoOp_9.2.34.805fa77f87:11cd2d127c1:-8000"/>
+                       value="rmtRtrnQ_TopLevelTaeQueue_1_NoOp_9.2.35.129-630eb1f5:11ebcb6eade:-8000"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -301,7 +312,7 @@
 
      <!-- POJO to delegate JMS Messages to -->
      <property name="messageListener" ref="asAggr_return_q_listenerID_TopLevelTaeQueue_1_NoOp"/>
-      <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118"/>
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118-reply"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -311,7 +322,7 @@
    <bean id="destinationResolver_TopLevelTaeQueue_1_NoOp"
          class="org.apache.uima.adapter.jms.activemq.TempDestinationResolver"
          singleton="false">
-      <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118"/>
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118-reply"/>
    </bean>
 
    <!-- ================================== -->
@@ -341,7 +352,7 @@
       </constructor-arg>
    </bean>
 
-
+ 
    <!--========================-->
    <!-- Delegate ErrorHandlers -->
    <!--========================-->
@@ -393,7 +404,7 @@
       </constructor-arg>
    </bean>
 
-
+ 
    <!--=======================-->
    <!--  Error Handler Chain  -->
    <!--=======================-->
@@ -418,7 +429,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="TestMultiplier"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/../multiplier/SimpleCasGenerator.xml"/>
+                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/../multiplier/SimpleCasGenerator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--==================================================================================-->
- <!-- Generated from                                                                             -->
- <!-- file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/deploy/envVar/envVarCPP1.xml -->
- <!-- 2 November, 2007, 3:01:04 P.M.                                                             -->
- <!--==================================================================================-->
+<!--===============================================================================-->
+ <!-- Generated from                                                                -->
+ <!-- file:/C:/apache/uima-as-distr/src/test/resources/deploy/envVar/envVarCPP1.xml -->
+ <!-- 9 January, 2009, 1:45:14 P.M.                                                 -->
+ <!--===============================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
@@ -18,7 +18,7 @@
 
      <!-- path to top level descriptor -->
      <constructor-arg index="0"
-                       value="file:/C:/a/Eclipse/3.3/apache/uima-as-distr/src/test/resources/deploy/envVar/cppDescr.xml"/>
+                       value="file:/C:/apache/uima-as-distr/src/test/resources/deploy/envVar/cppDescr.xml"/>
 
      <!--    input q name    -->
      <constructor-arg index="1" value="MeetingDetectorTaeQueue"/>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--===========================================================================-->
- <!-- Generated from                                                            -->
- <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/iq3.xml -->
- <!-- 6 October, 2008, 3:23:08 P.M.                                             -->
- <!--===========================================================================-->
+<!--=================================================================-->
+ <!-- Generated from                                                  -->
+ <!-- file:/C:/apache/uima-as-distr/src/test/resources/deploy/iq3.xml -->
+ <!-- 9 January, 2009, 1:46:10 P.M.                                   -->
+ <!--=================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
@@ -22,6 +22,22 @@
          class="org.apache.activemq.ActiveMQConnectionFactory">
       <property name="brokerURL" value="tcp://some.remote:12345"/>
       <property name="prefetchPolicy" ref="prefetchPolicy"/>
+   </bean>
+
+   <!-- Factory for specific external queue broker:  -->
+   <!--            tcp://localhost:61616             -->
+   <bean id="qBroker_tcp_c__ss_localhost_c_61616-reply"
+         class="org.apache.activemq.ActiveMQConnectionFactory">
+      <property name="brokerURL" value="tcp://localhost:61616"/>
+      <property name="prefetchPolicy" ref="prefetchPolicy-reply"/>
+   </bean>
+
+   <!-- Factory for specific external queue broker:  -->
+   <!--           tcp://some.remote:12345            -->
+   <bean id="qBroker_tcp_c__ss_some.remote_c_12345-reply"
+         class="org.apache.activemq.ActiveMQConnectionFactory">
+      <property name="brokerURL" value="tcp://some.remote:12345"/>
+      <property name="prefetchPolicy" ref="prefetchPolicy-reply"/>
    </bean>
 
    <!-- Creates an instance of the ResourceManager -->
@@ -47,6 +63,9 @@
    <!-- Create prefetch policy -->
    <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
       <property name="queuePrefetch" value="0"/>
+   </bean>
+   <bean id="prefetchPolicy-reply" class="org.apache.activemq.ActiveMQPrefetchPolicy">
+      <property name="queuePrefetch" value="1"/>
    </bean>
  
    <!--=================================-->
@@ -110,7 +129,7 @@
       </constructor-arg>
       <constructor-arg index="1" value="MeetingDetectorTaeQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/cas_multiplier/SegmenterAndTokenizerAE.xml"/>
+                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/cas_multiplier/SegmenterAndTokenizerAE.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="delegate_map_MeetingDetectorTaeQueue_1"/>
@@ -187,7 +206,7 @@
 
      <!-- Queue name used for replies, on the remote broker  -->
      <property name="replyToEndpoint"
-                value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.34.805b199f85:11cd396016e:-7ffd"/>
+                value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.35.129c7de6a2:11ebcb7397b:-8000"/>
       <property name="shadowCasPoolSize" value="7"/>
       <property name="initialFsHeapSize" value="999"/>
 
@@ -278,7 +297,7 @@
    <bean id="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter"
          class="org.apache.activemq.command.ActiveMQQueue">
       <constructor-arg index="0"
-                       value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.34.805b199f85:11cd396016e:-7ffd"/>
+                       value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.35.129c7de6a2:11ebcb7397b:-8000"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -312,7 +331,7 @@
      <!-- POJO to delegate JMS Messages to -->
      <property name="messageListener"
                 ref="asAggr_return_q_listenerID_MeetingDetectorTaeQueue_1_Segmenter"/>
-      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345"/>
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345-reply"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -322,7 +341,7 @@
    <bean id="destinationResolver_MeetingDetectorTaeQueue_1_Segmenter"
          class="org.apache.uima.adapter.jms.activemq.TempDestinationResolver"
          singleton="false">
-      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345"/>
+      <property name="connectionFactory" ref="qBroker_tcp_c__ss_some.remote_c_12345-reply"/>
    </bean>
 
    <!-- ================================== -->
@@ -430,7 +449,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="Tokenizer"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/cas_multiplier/../analysis_engine/SimpleTokenAndSentenceAnnotator.xml"/>
+                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/cas_multiplier/../analysis_engine/SimpleTokenAndSentenceAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
