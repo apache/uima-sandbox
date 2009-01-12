@@ -50,6 +50,7 @@ import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ServiceShutdownException;
@@ -481,7 +482,8 @@ public class JmsOutputChannel implements OutputChannel
 	 */
 	public void sendRequest(int aCommand, Endpoint anEndpoint)
 	{
-		try
+	  Delegate delegate = null;
+	  try
 		{
 			JmsEndpointConnection_impl endpointConnection = 
 				getEndpointConnection(anEndpoint);
@@ -507,14 +509,6 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				startTimer = true;
 			}
-			
-			
-			if ( endpointConnection.send(tm, 0, startTimer) != true )
-			{
-				throw new ServiceNotFoundException();
-			}
-			
-			
 			if ( aCommand == AsynchAEMessage.CollectionProcessComplete )
 			{
 		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
@@ -545,6 +539,10 @@ public class JmsOutputChannel implements OutputChannel
 							serviceInfo.setReplyQueueName(replyQueueName);
 							serviceInfo.setServiceKey(delegateKey);
 						}
+						delegate = lookupDelegate(delegateKey);
+						if ( delegate.getGetMetaTimeout() > 0 ) {
+	            delegate.startGetMetaRequestTimer();
+						}
 					}
 				}
 				else if ( !anEndpoint.isRemote())
@@ -564,12 +562,17 @@ public class JmsOutputChannel implements OutputChannel
 	                    new Object[] { endpointConnection.getEndpoint(), endpointConnection.getServerUri() });
 		    }
 			}
+      if ( endpointConnection.send(tm, 0, startTimer) != true )
+      {
+        throw new ServiceNotFoundException();
+      }
+      
 		}
 		catch ( Exception e)
 		{
-			if ( anEndpoint != null && aCommand == AsynchAEMessage.GetMeta )
+      if ( delegate != null && aCommand == AsynchAEMessage.GetMeta )
 			{
-				anEndpoint.cancelTimer();
+			  delegate.cancelDelegateTimer();
 			}
 			// Handle the error
 			ErrorContext errorContext = new ErrorContext();
@@ -1322,7 +1325,15 @@ public class JmsOutputChannel implements OutputChannel
     //  command line.
     if ( timeout > 0 && addTimeToLive )
 		{
-			aMessage.setJMSExpiration(timeout);
+      Delegate delegate = lookupDelegate(anEndpoint.getDelegateKey());
+			long ttl = timeout;
+			// How many CASes are in the list of CASes pending reply for this delegate
+			int currentOutstandingCasListSize = delegate.getCasPendingReplyListSize();
+			if ( currentOutstandingCasListSize > 0 ) {
+			  // increase the time-to-live
+			  ttl *= currentOutstandingCasListSize;
+			}
+      aMessage.setJMSExpiration(ttl);
 		}
 		if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController )
 		{
@@ -1534,7 +1545,9 @@ public class JmsOutputChannel implements OutputChannel
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.XMIPayload); 
 			//	Add Cas Reference Id to the outgoing JMS Header
 			tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
-			//	Add common properties to the JMS Header
+
+			CacheEntry entry = this.getCacheEntry(aCasReferenceId);
+		//	Add common properties to the JMS Header
 			if ( isRequest == true )
 			{
 				populateHeaderWithRequestContext(tm, anEndpoint, AsynchAEMessage.Process); 
@@ -1542,7 +1555,6 @@ public class JmsOutputChannel implements OutputChannel
 			else
 			{
 				populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
-				CacheEntry entry = this.getCacheEntry(aCasReferenceId);
 				tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
 			}
 			//	The following is true when the analytic is a CAS Multiplier
@@ -1566,12 +1578,11 @@ public class JmsOutputChannel implements OutputChannel
 				}
 				if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
 				{
-					CacheEntry cacheEntry = getCacheEntry(aCasReferenceId);
-					if ( cacheEntry != null )
+					if ( entry != null )
 					{
 						UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 			                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service_detail__FINE",
-			                    new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), aCasReferenceId, anInputCasReferenceId, cacheEntry.getInputCasReferenceId() });
+			                    new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), aCasReferenceId, anInputCasReferenceId, entry.getInputCasReferenceId() });
 					}
 				}
 			}
@@ -1603,11 +1614,20 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			//	Send Request Messsage to the Endpoint
 			// ----------------------------------------------------
-			endpointConnection.send(tm, msgSize, startConnectionTimer);
-			if ( !isRequest )
-			{
-				addIdleTime(tm);
-			}
+      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
+      //  the send to eliminate a race condition where the reply is received (on different
+      //  thread) *before* the CAS is added to the list.
+      if ( isRequest ) {
+        // Add CAS to the list of CASes pending reply
+        addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+      } else {
+        addIdleTime(tm);
+      }
+      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
+        System.out.println("Send Failed");
+        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+      }
+        
 		}
 		catch( JMSException e)
 		{
@@ -1655,6 +1675,7 @@ public class JmsOutputChannel implements OutputChannel
       tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.BinaryPayload); 
       //  Add Cas Reference Id to the outgoing JMS Header
       tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+      CacheEntry entry = this.getCacheEntry(aCasReferenceId);
       //  Add common properties to the JMS Header
       if ( isRequest == true )
       {
@@ -1663,7 +1684,6 @@ public class JmsOutputChannel implements OutputChannel
       else
       {
         populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
-        CacheEntry entry = this.getCacheEntry(aCasReferenceId);
         tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
       }
       //  The following is true when the analytic is a CAS Multiplier
@@ -1686,12 +1706,12 @@ public class JmsOutputChannel implements OutputChannel
         }
         if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
         {
-          CacheEntry cacheEntry = getCacheEntry(aCasReferenceId);
-          if ( cacheEntry != null )
+//          CacheEntry cacheEntry = getCacheEntry(aCasReferenceId);
+          if ( entry != null )
           {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                           "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_cas_to_collocated_service_detail__FINE",
-                          new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), aCasReferenceId, anInputCasReferenceId, cacheEntry.getInputCasReferenceId() });
+                          new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), aCasReferenceId, anInputCasReferenceId, entry.getInputCasReferenceId() });
           }
         }
       }
@@ -1723,10 +1743,18 @@ public class JmsOutputChannel implements OutputChannel
       // ----------------------------------------------------
       //  Send Request Messsage to the Endpoint
       // ----------------------------------------------------
-      endpointConnection.send(tm, msgSize, startConnectionTimer);
-      if ( !isRequest )
-      {
+      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
+      //  the send to eliminate a race condition where the reply is received (on different
+      //  thread) *before* the CAS is added to the list.
+      if ( isRequest ) {
+        // Add CAS to the list of CASes pending reply
+        addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+      } else {
         addIdleTime(tm);
+      }
+      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
+        System.out.println("Send Failed");
+        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
       }
     }
     catch( JMSException e)
@@ -1854,16 +1882,19 @@ public class JmsOutputChannel implements OutputChannel
 			// ----------------------------------------------------
 			//	Send Request Messsage to the Endpoint
 			// ----------------------------------------------------
-			endpointConnection.send(tm, msgSize, startConnectionTimer);
-
-//			if ( getAnalysisEngineController().isTopLevelComponent() )
-//			{
-//				getAnalysisEngineController().getInProcessCache().dumpContents(getAnalysisEngineController().getComponentName());
-//			}
-			if ( !isRequest )
-			{
-				addIdleTime(tm);
+      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
+      //  the send to eliminate a race condition where the reply is received (on different
+      //  thread) *before* the CAS is added to the list.
+			if ( isRequest ) {
+	      // Add CAS to the list of CASes pending reply
+	      addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+			} else {
+        addIdleTime(tm);
 			}
+      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
+        System.out.println("Send Failed");
+        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+      }
 		}
 		catch( JMSException e)
 		{
@@ -1987,11 +2018,20 @@ public class JmsOutputChannel implements OutputChannel
       // ----------------------------------------------------
       //  Send Request Messsage to the Endpoint
       // ----------------------------------------------------
-      endpointConnection.send(tm, msgSize, startConnectionTimer);
-
-      if ( !isRequest )
-      {
+      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
+      //  the send to eliminate a race condition where the reply is received (on different
+      //  thread) *before* the CAS is added to the list.
+      if ( isRequest ) {
+        // Add CAS to the list of CASes pending reply
+        addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+      } else {
         addIdleTime(tm);
+      }
+      //  Send the message to the delegate. If the send fails, remove the CAS id
+      //  from the delegate's list of CASes pending reply.
+      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
+        System.out.println("Send Failed");
+        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
       }
     }
     catch( JMSException e)
@@ -2018,7 +2058,26 @@ public class JmsOutputChannel implements OutputChannel
     }
     
   }
-	
+	private Delegate lookupDelegate( String aDelegateKey ) {
+    if ( getAnalysisEngineController() instanceof AggregateAnalysisEngineController ) {
+      Delegate delegate = 
+        ((AggregateAnalysisEngineController)getAnalysisEngineController()).lookupDelegate(aDelegateKey);
+      return delegate;             
+    }
+    return null;
+	}
+  private void addCasToOutstandingList(CacheEntry entry, boolean isRequest, String aDelegateKey) {
+    Delegate delegate = null;
+    if ( isRequest && (delegate = lookupDelegate(aDelegateKey)) != null) {
+      delegate.addCasToOutstandingList(entry.getCasReferenceId());             
+    }
+  }
+  private void removeCasFromOutstandingList(CacheEntry entry, boolean isRequest, String aDelegateKey) {
+    Delegate delegate = null;
+    if ( isRequest && (delegate = lookupDelegate(aDelegateKey)) != null) {
+      delegate.removeCasFromOutstandingList(entry.getCasReferenceId());             
+    }
+  }
 	
 	
 	private String getTopParentCasReferenceId( String casReferenceId ) throws Exception

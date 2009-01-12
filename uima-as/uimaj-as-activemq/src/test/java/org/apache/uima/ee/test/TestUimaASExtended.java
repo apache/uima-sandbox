@@ -507,6 +507,28 @@ public class TestUimaASExtended extends BaseTestSupport
     runTest(appCtx, eeUimaEngine, null, null, 1, PROCESS_LATCH);
   }
 
+  /**
+   * Tests Timeout logic
+   * @throws Exception
+   */
+  public void testRemoteDelegateTimeout() throws Exception
+  {
+    System.out.println("-------------- testRemoteDelegateTimeout -------------");
+    System.out.println("The Aggregate sends 2 CASes to the NoOp Annotator which");
+    System.out.println("delays each CAS for 6000ms. The timeout is set to 4000ms");
+    System.out.println("Two CAS retries are expected");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithLongDelayDelegate.xml");
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+    //  The Remote NoOp delays each CAS for 6000ms. The Aggregate sends two CASes so adjust
+    //  client timeout to be just over 12000ms.
+    appCtx.put(UimaAsynchronousEngine.Timeout, 13000 );
+    addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
+    addExceptionToignore(org.apache.uima.aae.error.UimaASProcessCasTimeout.class);
+    
+    runTest(appCtx, eeUimaEngine, null, null, 1, PROCESS_LATCH);
+  }
   public void testDeployAggregateWithCollocatedAggregateService() throws Exception
 	{
     System.out.println("-------------- testDeployAggregateWithCollocatedAggregateService -------------");
