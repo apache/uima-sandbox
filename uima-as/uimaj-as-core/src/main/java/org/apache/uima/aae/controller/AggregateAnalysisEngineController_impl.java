@@ -37,6 +37,8 @@ import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
+import org.apache.uima.aae.delegate.ControllerDelegate;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
@@ -128,6 +130,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		new ConcurrentHashMap();
 	
 	public final Object parallelStepMux = new Object();
+	
+	
 	/**
 	 * 
 	 * @param anEndpointName
@@ -357,6 +361,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				{
 					destinationToKeyMap = new HashMap();
 				}
+				//  Create and initialize a Delegate object for the endpoint
+				Delegate delegate = new ControllerDelegate((String)entry.getKey(), this);
+				delegate.setCasProcessTimeout(endpoint.getProcessRequestTimeout());
+				delegate.setGetMetaTimeout(endpoint.getMetadataRequestTimeout());
+				delegate.setEndpoint(endpoint);
+				//  Add new delegate to the global Delegate list
+				delegates.add(delegate);
+				endpoint.setDelegateKey((String)entry.getKey());
 				destinationToKeyMap.put(endpoint.getEndpoint(), (String)entry.getKey());
 			}
 		}
@@ -1232,8 +1244,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					if ( isStopped() ) {
 					  return;
 					}
-					
-					dispatchMetadataRequest(delegateEndpoints[i]);
+					if ( delegateEndpoints[i].getStatus() == Endpoint.OK ) {
+	          dispatchMetadataRequest(delegateEndpoints[i]);
+					}
 				}
 			}
 			
@@ -2189,7 +2202,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	{
 		anEndpoint.startMetadataRequestTimer();
 		anEndpoint.setController(this);
-		
+		anEndpoint.setWaitingForResponse(true);
 		String key = lookUpDelegateKey(anEndpoint.getEndpoint());
 		if ( !delegateStatMap.containsKey(key))
 		{
@@ -2448,5 +2461,17 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
   public LocalCache getLocalCache() {
     return localCache;
   }
-
+  /**
+   * Return {@link Delegate} object for a given delegate key.
+   * 
+   */
+  public Delegate lookupDelegate( String aDelegateKey ) {
+    
+    for( Delegate delegate: delegates) {
+      if ( delegate.getKey().equals( aDelegateKey ) ) {
+        return delegate;
+      }
+    }
+    return null;
+  }
 }

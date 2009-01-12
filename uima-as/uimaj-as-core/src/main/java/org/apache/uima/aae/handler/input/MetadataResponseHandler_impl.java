@@ -22,6 +22,7 @@ package org.apache.uima.aae.handler.input;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.handler.HandlerBase;
 import org.apache.uima.aae.message.AsynchAEMessage;
@@ -59,13 +60,24 @@ public class MetadataResponseHandler_impl extends HandlerBase
 					//	Metadata Response is only applicable to the Aggregate Controller
 					if (getController() instanceof AggregateAnalysisEngineController)
 					{
-						if (AsynchAEMessage.Exception == payload)
+            String fromEndpoint = ((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.MessageFrom);
+            String delegateKey =
+              ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(fromEndpoint);
+            Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
+            if ( delegate.getEndpoint().isRemote() ) {
+              delegate.cancelDelegateTimer();
+              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, this.getClass().getName(),
+                        "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                        "UIMAEE_cancelled_timer_FINE", new Object[] { getController().getComponentName(), delegateKey });
+              }
+            }
+            if (AsynchAEMessage.Exception == payload)
 						{
 							return;
 						}
 
 						String analysisEngineMetadata = ((MessageContext)anObjectToHandle).getStringMessage();
-						String fromEndpoint = ((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.MessageFrom);
 						String fromServer = null;
 						if ( ((MessageContext)anObjectToHandle).propertyExists(AsynchAEMessage.EndpointServer))
 						{

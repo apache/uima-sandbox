@@ -115,6 +115,8 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	
 	private int status;
 	
+	private String delegateKey;
+	
 	public Endpoint_impl() {
 	  status = Endpoint.OK;
 	}
@@ -316,6 +318,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 
 	private void startTimer(final int aTimeToWait, String aCasReferenceId, int command)
 	{
+	  /*
 		synchronized( monitor )
 		{
 			final String casReferenceId = aCasReferenceId;
@@ -392,7 +395,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 				}
 			}, timeToRun);
 		}
-
+*/
 	}
 	public ServiceInfo getServiceInfo()
 	{
@@ -445,6 +448,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 
 	public void cancelTimer()
 	{
+	  /*
 		synchronized( monitor )
 		{
 			if (timer != null)
@@ -454,6 +458,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 				timer = null;
 			}
 		}
+		*/
 	}
 
 	public boolean isWaitingForResponse()
@@ -606,4 +611,11 @@ public class Endpoint_impl implements Endpoint, Cloneable
     return status;
   }
 
+  public void setDelegateKey( String aDelegateKey ) {
+    delegateKey = aDelegateKey;
+  }
+  
+  public String getDelegateKey() {
+    return delegateKey;
+  }
 }

@@ -238,8 +238,8 @@ public abstract class ErrorHandlerBase
 						break;
 						
 					case AsynchAEMessage.Process:
-						System.out.println("Controller:"+aController.getComponentName()+" >>>>>>>>>> Retrying Process");
 						String casReferenceId = (String) anErrorContext.get(AsynchAEMessage.CasReference);
+            System.out.println("Controller:"+aController.getComponentName()+" >>>>>>>>>> Retrying Process For Cas Id:"+casReferenceId);
 						((AggregateAnalysisEngineController)aController).retryProcessCASRequest(casReferenceId, anEndpoint, true);
 						break;
 					}

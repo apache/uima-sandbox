@@ -28,6 +28,7 @@ import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ExpiredMessageException;
@@ -108,7 +109,6 @@ public class ProcessResponseHandler extends HandlerBase
 	{
 		computeStats(aMessageContext, aCasReferenceId);
 
-		cancelTimer(aMessageContext, aCasReferenceId, true);
 		super.invokeProcess(aCAS, aCasReferenceId, null, aMessageContext, null);
 
 	}
@@ -162,26 +162,21 @@ public class ProcessResponseHandler extends HandlerBase
         }
 				return;
 			}
+      String delegateKey =((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
+      Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
+      
+      boolean casRemovedFromOutstandingList = delegate.removeCasFromOutstandingList(casReferenceId);
 			
-			// Check if this reply message is expected. A message is expected
-			// when it contains a reply for request
-			// that has not been already received nor the timeout for the
-			// request has been handled. This is done
-			// to catch duplicate replies for the same request. If a cache entry
-			// does not exist with a given CAS reference id
-			// it means that the initial request has been canceled and the CAS
-			// has either been processed or dropped. If a duplicate
-			// reply arrives containing CAS that is still being processed in
-			// this aggregate, the endpoint state will show that
-			// it is not waiting for a response.
-			if (!isMessageExpected(casReferenceId, endpointWithTimer))
+			//  Check if this process reply message is expected. A message is expected if the Cas Id 
+      //  in the message matches an entry in the delegate's outstanding list. This list stores
+      //  ids of CASes sent to the remote delegate pending reply.
+			if ( !casRemovedFromOutstandingList ) 
 			{
 				handleUnexpectedMessage(casReferenceId, aMessageContext.getEndpoint());
 				return;
 			}
-      cancelTimer(aMessageContext, casReferenceId, true);
 
-			//	Increment number of CASes processed by this delegate
+      //	Increment number of CASes processed by this delegate
 			if ( aDelegateKey != null)
 			{
 				ServicePerformance delegateServicePerformance =
@@ -548,7 +543,6 @@ public class ProcessResponseHandler extends HandlerBase
 			else
 			{
 				casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
-				cancelTimer(aMessageContext, casReferenceId, false);
 			}
 
 			if ( object != null && (object instanceof Exception || object instanceof Throwable ))

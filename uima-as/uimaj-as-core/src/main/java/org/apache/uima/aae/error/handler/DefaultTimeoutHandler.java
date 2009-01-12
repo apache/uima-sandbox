@@ -61,7 +61,6 @@ public class DefaultTimeoutHandler extends ErrorHandlerBase implements ErrorHand
 								if ( endpoint.isRetryEnabled() && aController instanceof AggregateAnalysisEngineController )
 								{
 									String casReferenceId = (String)anErrorContext.get( AsynchAEMessage.CasReference);
-									//System.out.println(Thread.currentThread().getName() + " DefaultTimeoutHandler sending request to process CAS to endpoint::" + endpoint.getEndpoint()+" CasReferenceId::"+casReferenceId);
 									((AggregateAnalysisEngineController) aController).retryProcessCASRequest(casReferenceId, endpoint, false);
 									return true; // Handled the exception
 								}
@@ -76,28 +75,8 @@ public class DefaultTimeoutHandler extends ErrorHandlerBase implements ErrorHand
 									List list = new ArrayList();
 									list.add(endpoint.getEndpoint());
 									((AggregateAnalysisEngineController)aController).disableDelegates(list);
-									
-									//	The following should be done after consultation with the Flow
-									//((AggregateAnalysisEngineController)aController).dropCAS(casReferenceId, true);
-									
-									
-									
 									return true;
 								}
-								
-								
-								
-								
-								/*
-								CacheEntry cachedEntry =
-									((AggregateAnalysisEngineController) aController).getInProcessCache().getCacheEntryForCAS(casReferenceId);
-								if ( cachedEntry.getNumberOfParallelDelegates() > 1 )
-								{
-									if ( ErrorHandler.CONTINUE.equalsIgnoreCase(action) )
-									{
-									}
-								}
-								*/
 							}
 							
 						}
@@ -109,10 +88,8 @@ public class DefaultTimeoutHandler extends ErrorHandlerBase implements ErrorHand
 					else if (AsynchAEMessage.GetMeta == command)
 					{
 						String key = ((AggregateAnalysisEngineController) aController).lookUpDelegateKey(endpoint.getEndpoint());
-						//System.out.println(Thread.currentThread().getName() + " DefaultTimeoutHandler handles Timeout For GetMetadata ");
 						if (!exceedsThreshold(Monitor.MetadataRequestTimeoutCount, key, aController))
 						{
-							//System.out.println(Thread.currentThread().getName() + " DefaultTimeoutHandler sending request for metadata to endpoint::" + endpoint.getEndpoint());
 							if (aController instanceof AggregateAnalysisEngineController)
 							{
 								((AggregateAnalysisEngineController) aController).retryMetadataRequest(endpoint);
@@ -124,7 +101,6 @@ public class DefaultTimeoutHandler extends ErrorHandlerBase implements ErrorHand
 							String action = getAction(Monitor.MetadataRequestTimeoutCount, key); //endpoint.getEndpoint());
 							if ( action != null )
 							{
-//								System.out.println(Thread.currentThread().getName() + " DefaultTimeoutHandler Exceeded Threshold - Taking Action:::"+action+" endpoint::" + endpoint.getEndpoint());
 							    aController.takeAction(action, endpoint.getEndpoint(), anErrorContext);
 								return true; // Handled the exception
 							}

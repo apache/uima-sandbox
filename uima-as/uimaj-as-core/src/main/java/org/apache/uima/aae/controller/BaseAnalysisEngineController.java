@@ -48,6 +48,7 @@ import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.UimaEEAdminContext;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
@@ -203,7 +204,9 @@ implements AnalysisEngineController, EventSubscriber
   protected LocalCache localCache;
 
   protected String aeDescriptor; 
-  
+  //	List of Delegates
+  protected List<Delegate> delegates = new ArrayList<Delegate>();
+
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);

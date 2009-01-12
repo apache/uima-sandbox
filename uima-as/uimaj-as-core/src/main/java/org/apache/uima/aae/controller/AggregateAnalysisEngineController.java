@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.uima.UimaContext;
 import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.jmx.AggregateServiceInfo;
 import org.apache.uima.aae.jmx.PrimitiveServiceInfo;
@@ -111,4 +112,6 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
 
 	public void finalStep( FinalStep aStep, String aCasReferenceId);
 	
+  public Delegate lookupDelegate( String aDelegateKey );
+
 }

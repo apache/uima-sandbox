@@ -158,4 +158,9 @@ public interface Endpoint
   public void setStatus( int aStatus);
   
   public int getStatus();
+  
+  public void setDelegateKey( String aDelegateKey );
+  
+  public String getDelegateKey();
+
 }

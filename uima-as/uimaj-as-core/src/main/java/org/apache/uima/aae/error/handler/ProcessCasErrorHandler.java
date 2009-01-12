@@ -30,6 +30,7 @@ import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
@@ -289,6 +290,8 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_threshold_for_endpoint__CONFIG", new Object[] { aController.getComponentName(), "Process",  key });
 		         }
 		    	}
+		    	Delegate delegate = ((AggregateAnalysisEngineController)aController).lookupDelegate(key);
+		    	delegate.removeCasFromOutstandingList(casReferenceId);
 			}
 			else
 			{

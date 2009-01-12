@@ -25,6 +25,7 @@ public class ErrorHandlerListenerBase implements ErrorHandlerListener
 {
 	private ErrorHandlerChain handlerChain;
 	
+	
 	public void setErrorHandlerChain( ErrorHandlerChain aChainOfErrorHandlers)
 	{
 		handlerChain = aChainOfErrorHandlers;
@@ -34,5 +35,8 @@ public class ErrorHandlerListenerBase implements ErrorHandlerListener
 		handlerChain.handle( t, anErrorContext, aController);
 	}
 
+  public void onError(Throwable t, ErrorContext anErrorContext)
+  {
+  }
 
 }
