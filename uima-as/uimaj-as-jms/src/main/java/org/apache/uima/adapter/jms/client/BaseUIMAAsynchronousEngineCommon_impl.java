@@ -82,6 +82,7 @@ import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.delegate.Delegate;
 
 public abstract class BaseUIMAAsynchronousEngineCommon_impl 
 implements UimaAsynchronousEngine, MessageListener
@@ -162,6 +163,8 @@ implements UimaAsynchronousEngine, MessageListener
 	
   private UimaSerializer uimaSerializer = new UimaSerializer();
 
+  protected ClientServiceDelegate serviceDelegate = null;
+  
 	protected List pendingMessageList = new ArrayList();
 	protected volatile boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
@@ -513,32 +516,6 @@ implements UimaAsynchronousEngine, MessageListener
 			throw new ResourceProcessException(e);
 		}
 	}
-/*
-	protected void waitUntilReadyToSendMessage(int aCommand)
-	{
-		if (receiveWindow > 0)
-		{
-			if (howManyBeforeReplySeen > 0 && howManyBeforeReplySeen % receiveWindow == 0)
-			{
-				synchronized (gater)
-				{
-					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "waitUntilReadyToSendMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_blocking_on_semaphore_FINEST", new Object[] { "Gater" });
-					try
-					{
-						// This monitor is dedicated to single purpose event.
-						gater.wait();
-					}
-					catch (Exception e)
-					{
-					}
-				}
-				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "waitUntilReadyToSendMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_done_blocking_on_semaphore_FINEST", new Object[] { "Gater" });
-			}
-			howManyBeforeReplySeen++;
-		}
-
-	}
-*/	
 	protected ConcurrentHashMap getCache()
 	{
 		return clientCache;
@@ -596,9 +573,13 @@ implements UimaAsynchronousEngine, MessageListener
 
 			if (processTimeout > 0)
 			{
-				requestToCache.startTimer();
+				//requestToCache.startTimer();
+				//  Adds CAS Id to the list of CAS pending reply. It starts timer
+			  //  if the list is empty
 			}
-			synchronized( pendingMessageList )
+      serviceDelegate.addCasToOutstandingList(casReferenceId);
+
+      synchronized( pendingMessageList )
 			{
 				pendingMessageList.add(msg);
 				pendingMessageList.notifyAll();
@@ -848,6 +829,11 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			return;
 		}
+    if ( serviceDelegate.getCasProcessTimeout() > 0) {
+      serviceDelegate.cancelDelegateTimer();
+    }
+		
+		serviceDelegate.removeCasFromOutstandingList(casReferenceId);
 		if ( message instanceof TextMessage && UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
 	    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_process_reply_FINEST",
 	            new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference), message.toString()+((TextMessage) message).getText() });
@@ -861,12 +847,11 @@ implements UimaAsynchronousEngine, MessageListener
 			cachedRequest.setTimeWaitingForReply(System.nanoTime() - cachedRequest.getCASDepartureTime());
 			
 			//	Cancel the timer
-			try
-			{
-				cancelTimer(casReferenceId);
-			}
-			catch( Exception e) {}
-
+//			try
+//			{
+//				cancelTimer(casReferenceId);
+//			}
+//			catch( Exception e) {}
 			//	If the CAS was sent from a synchronous API sendAndReceive(), wake up the thread that
 			//	sent the CAS and process the reply
 			if ( cachedRequest.isSynchronousInvocation() )
@@ -1039,6 +1024,7 @@ implements UimaAsynchronousEngine, MessageListener
          cachedRequest.getCAS().release();
       }
       removeFromCache(casReferenceId);
+      serviceDelegate.removeCasFromOutstandingList(casReferenceId);
       if (howManyRecvd == howManySent)
       {
         synchronized (cpcGate)
@@ -1225,14 +1211,14 @@ implements UimaAsynchronousEngine, MessageListener
 			clientCache.remove(aCasReferenceId);
 		}
 	}
-	private CAS deserialize(String aSerializedCAS, CAS aCAS ) throws Exception
+	protected CAS deserialize(String aSerializedCAS, CAS aCAS ) throws Exception
 	{
 		XmiSerializationSharedData deserSharedData = new XmiSerializationSharedData();
     uimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, -1);
 		return aCAS;
 	}
 	
-	private CAS deserialize(String aSerializedCAS, CAS aCAS, XmiSerializationSharedData deserSharedData, boolean deltaCas ) throws Exception
+	protected CAS deserialize(String aSerializedCAS, CAS aCAS, XmiSerializationSharedData deserSharedData, boolean deltaCas ) throws Exception
 	{
 		if (deltaCas) {
       uimaSerializer.deserializeCasFromXmi(aSerializedCAS, aCAS, deserSharedData, true, deserSharedData.getMaxXmiId(), AllowPreexistingFS.allow);
@@ -1242,7 +1228,7 @@ implements UimaAsynchronousEngine, MessageListener
 		return aCAS;
 	}
 
-  private CAS deserialize(byte[] binaryData, ClientRequest cachedRequest) throws Exception
+  protected CAS deserialize(byte[] binaryData, ClientRequest cachedRequest) throws Exception
   {
     CAS cas = cachedRequest.getCAS();
     uimaSerializer.deserializeCasFromBinary(binaryData, cas);
@@ -1523,7 +1509,7 @@ implements UimaAsynchronousEngine, MessageListener
 			  notifyListeners(aCAS, status, AsynchAEMessage.Process);
 		  }
 		  cachedRequest.removeEntry(casReferenceId);
-
+		  serviceDelegate.removeCasFromOutstandingList(casReferenceId);
 		  synchronized (gater) 
 		  {
 			  if (howManyBeforeReplySeen > 0) 
@@ -1532,6 +1518,13 @@ implements UimaAsynchronousEngine, MessageListener
 			  }
 			  gater.notifyAll();
 			  howManyRecvd++; // increment global counter to enable CPC request to be sent when howManySent = howManyRecvd
+	      if (howManyRecvd == howManySent)
+	      {
+	        synchronized (cpcGate)
+	        {
+	          cpcGate.notifyAll();
+	        }
+	      }
 		  }
 		  break;
 		}  // case
@@ -1713,7 +1706,9 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			isRemote = aRemote;
 		}
-
+		public boolean isRemote() {
+		  return isRemote;
+		}
 		public void setCAS(CAS aCAS)
 		{
 			cas = aCAS;
@@ -1733,7 +1728,15 @@ implements UimaAsynchronousEngine, MessageListener
 		  binaryCas = aBinaryCas;
 		  isBinaryCas = true;
 		}
-
+		public boolean isBinaryCAS() {
+		  return isBinaryCas;
+		}
+		public byte[] getBinaryCAS() {
+		  return binaryCas;
+		}
+		public String getXmiCAS() {
+		  return serializedCAS;
+		}
 		public void startTimer()
 		{
 			Date timeToRun = null; 
