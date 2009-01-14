@@ -371,8 +371,18 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
                      }
                      // set start match position for the next match to the
                      // current end match position
-                     pos = matcher.end();
-
+                     if (matcher.end() == pos) {
+                       // Special case: matched the empty string.  If at the end of the input, need
+                       // to break.
+                       if (pos == matchValue.length()) {
+                         break;
+                       }
+                       // Otherwise increment search pos so as not to loop.
+                       ++pos;
+                     } else {
+                       // Default case: match was non-empty.
+                       pos = matcher.end();
+                     }
                   }
                }
                // MatchStrategy - MATCH_COMPLETE
