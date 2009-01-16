@@ -135,12 +135,14 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
       if ( aeInstancePool == null ) {
         aeInstancePool = new AnalysisEngineInstancePoolWithThreadAffinity(analysisEnginePoolSize);
       }
+      if ( analysisEngineMetadata == null ) {
+        analysisEngineMetadata = ae.getAnalysisEngineMetaData();
+      }
       try {
         aeInstancePool.checkin(ae);
       } catch( Exception e) {
         throw new ResourceInitializationException(e);
       }
-      assignServiceMetadata();
       if ( aeInstancePool.size() == analysisEnginePoolSize ) {
         try {
           System.out.println("Controller:"+getComponentName()+ " All AE Instances Have Been Instantiated. Completing Initialization");
@@ -159,13 +161,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 
     return aeInstancePool.exists();
   }
-
-	private void assignServiceMetadata() {
-    if ( analysisEngineMetadata == null ) {
-      AnalysisEngineDescription specifier = (AnalysisEngineDescription) super.getResourceSpecifier();
-      analysisEngineMetadata = specifier.getAnalysisEngineMetaData();
-    }
-	}
 	public void initialize() throws AsynchAEException {
 	}
 	/**
@@ -187,7 +182,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "initialize", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_primitive_ctrl_init_info__CONFIG", new Object[] { analysisEnginePoolSize });
       }
 
-      assignServiceMetadata();
 			if ( serviceInfo == null )
 			{
 				serviceInfo = new PrimitiveServiceInfo(isCasMultiplier());
