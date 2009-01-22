@@ -235,13 +235,12 @@ public abstract class BaseMessageSender implements Runnable,
 						//	configuration. Most JMS Providers create a special dead-letter queue
 						//	where all expired messages are placed. NOTE: In ActiveMQ expired msgs in the DLQ 
 						//	are not auto evicted yet and accumulate taking up memory.
-						
 						long timeoutValue = cacheEntry.getProcessTimeout();
 
 						if ( timeoutValue > 0 )
 						{
-							// Set msg expiration time
-							producer.setTimeToLive(timeoutValue);
+							// Set high time to live value
+              producer.setTimeToLive(10*timeoutValue);
 						}
 						if (  pm.getMessageType() == AsynchAEMessage.Process )
 						{
@@ -261,19 +260,6 @@ public abstract class BaseMessageSender implements Runnable,
 			handleException(e, destination);
 		}
 	}
-	private void setMsgExpiration( PendingMessage aPm, String aCommandTimeoutKey)
-	{
-		if ( producer != null && aPm.containsKey(aCommandTimeoutKey))
-		{
-			long timeToLive = Long.parseLong((String)aPm.get(aCommandTimeoutKey));
-			try
-			{
-				producer.setTimeToLive(timeToLive);
-			}
-			catch( Exception e){}
-		}
-		
-	}
 	private void initializeMessage( PendingMessage aPm, Message anOutgoingMessage)
 	throws Exception
 	{
@@ -282,7 +268,6 @@ public abstract class BaseMessageSender implements Runnable,
 		{
 		case AsynchAEMessage.GetMeta:
 			engine.setMetaRequestMessage(anOutgoingMessage);
-			setMsgExpiration(aPm, UimaAsynchronousEngine.GetMetaTimeout);
 			break;
 			
 		case AsynchAEMessage.Process:
@@ -304,7 +289,6 @@ public abstract class BaseMessageSender implements Runnable,
 			
 		case AsynchAEMessage.CollectionProcessComplete:
 			engine.setCPCMessage(anOutgoingMessage);
-			setMsgExpiration(aPm, UimaAsynchronousEngine.CpcTimeout);
 			break;
 		}
 	}
