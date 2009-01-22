@@ -290,8 +290,12 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, getClass().getName(), "handleError", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_no_threshold_for_endpoint__CONFIG", new Object[] { aController.getComponentName(), "Process",  key });
 		         }
 		    	}
-		    	Delegate delegate = ((AggregateAnalysisEngineController)aController).lookupDelegate(key);
-		    	delegate.removeCasFromOutstandingList(casReferenceId);
+		    	if ( key != null ) {
+		    		//	Received reply from the delegate. Remove the CAS from the 
+		    		//	delegate's list of CASes pending reply
+	          Delegate delegate = ((AggregateAnalysisEngineController)aController).lookupDelegate(key);
+	          delegate.removeCasFromOutstandingList(casReferenceId);
+		    	}
 			}
 			else
 			{
@@ -416,14 +420,22 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			    flowControllerContinueFlag = 
 			      ((AggregateAnalysisEngineController) aController).continueOnError(casReferenceId, key, (Exception) t );
 			  }
-			  catch( Exception exc) {}
+			  catch( Exception exc) 
+			  {
+			    exc.printStackTrace();
+			    
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+							UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", exc);
+          }
+			  }
 			}
 			//	Check if the caller has already decremented number of subordinates. This property is only
 			//	set in the Aggregate's finalStep() method before the CAS is sent back to the client. If
 			//	there was a problem sending the CAS to the client, we dont want to update the counter 
 			//	again. If an exception is reported elsewhere ( not in finalStep()), the default action is
 			//	to decrement the number of subordinates associated with the parent CAS.
-			if ( !anErrorContext.containsKey(AsynchAEMessage.SkipSubordinateCountUpdate)) 
+			if (!flowControllerContinueFlag && !anErrorContext.containsKey(AsynchAEMessage.SkipSubordinateCountUpdate)) 
 			{
 				//	Check if the CAS is a subordinate (has parent CAS).
 				if ( casStateEntry != null && casStateEntry.isSubordinate())

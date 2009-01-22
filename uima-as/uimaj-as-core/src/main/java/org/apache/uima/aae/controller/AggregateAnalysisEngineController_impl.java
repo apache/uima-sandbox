@@ -1777,10 +1777,44 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     }
     else
     {
-      getOutputChannel().sendRequest(aCasReferenceId, anEndpoint);
+    	//	Check delegate's state before sending it a CAS. The delegate
+    	//	may have previously timed out and is in a process of pinging
+    	//	the delegate to check its availability. While the delegate
+    	//	is in this state, delay CASes by placing them on a list of
+    	//	CASes pending dispatch. Once the ping reply is received all
+    	//	delayed CASes will be dispatched to the delegate.
+      if ( !delayCasIfDelegateInTimedOutState( aCasReferenceId, anEndpoint.getEndpoint() ) ) {
+				//	The delegate is in the normal state so send it this CAS
+        getOutputChannel().sendRequest(aCasReferenceId, anEndpoint);
+      }
     }
 	}
-
+	/**
+	 * Checks the state of a delegate to see if it is in TIMEOUT State.
+   * If it is, push the CAS id onto a list of CASes pending dispatch.
+   * The delegate is in a questionable state and the aggregate sends
+   * a ping message to check delegate's availability. If the delegate
+   * responds to the ping, all CASes in the pending dispatch list will
+   * be immediately dispatched.
+  **/
+  public boolean delayCasIfDelegateInTimedOutState( String aCasReferenceId, String aDelegateKey ) throws AsynchAEException {
+    Delegate delegate = lookupDelegate(aDelegateKey);
+    if (delegate != null && delegate.getState() == Delegate.TIMEOUT_STATE ) {
+      // Add CAS id to the list of delayed CASes.
+      int listSize = delegate.addCasToPendingDispatchList(aCasReferenceId);
+      // If the list was empty (before the add), send the GetMeta request
+      // as a PING to see if the delegate service is alive.
+      if ( listSize == 1 ) {
+        delegate.setAwaitingPingReply();
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "delayCasIfDelegateInTimedOutState", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_aggregate_sending_ping__FINE", new Object[] { getComponentName(), delegate.getKey() });
+        }
+        retryMetadataRequest(delegate.getEndpoint());
+      }
+      return true;
+    }
+    return false;  // Cas Not Delayed
+  }
 	private void dispatchProcessRequest(String aCasReferenceId, Endpoint anEndpoint, boolean addEndpointToCache) throws AsynchAEException
 	{
 		if (addEndpointToCache)
@@ -1823,15 +1857,26 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	private void dispatchProcessRequest(String aCasReferenceId, Endpoint[] anEndpointList, boolean addEndpointToCache) throws AsynchAEException
 	{
+	  List<Endpoint> endpointList = new ArrayList<Endpoint>();
 		for (int i = 0; i < anEndpointList.length; i++)
 		{
+		  //  Check if the delegate previously timed out. If so, add the CAS
+		  //  Id to the list pending dispatch. This list holds CASes that are
+		  //  delayed until the service responds to a Ping.
+		  if ( delayCasIfDelegateInTimedOutState(aCasReferenceId, anEndpointList[i].getEndpoint()))  {
+		    //  The CAS was delayed until the delegate responds to a Ping
+		    continue;
+		  } else {
+		    endpointList.add(anEndpointList[i]);
+		  }
 			if (addEndpointToCache)
 			{
 				getInProcessCache().addEndpoint(anEndpointList[i], aCasReferenceId);
 			}
 		}
-
-		getOutputChannel().sendRequest(aCasReferenceId, anEndpointList);
+		Endpoint[] endpoints = new Endpoint[endpointList.size()];
+		endpointList.toArray(endpoints);
+		getOutputChannel().sendRequest(aCasReferenceId, endpoints);
 	}
 
 

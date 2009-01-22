@@ -164,7 +164,6 @@ public class ProcessResponseHandler extends HandlerBase
 			}
       String delegateKey =((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
       Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
-      
       boolean casRemovedFromOutstandingList = delegate.removeCasFromOutstandingList(casReferenceId);
 			
 			//  Check if this process reply message is expected. A message is expected if the Cas Id 

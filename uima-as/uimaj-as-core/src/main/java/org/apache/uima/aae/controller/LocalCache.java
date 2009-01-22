@@ -190,7 +190,9 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
       return replyReceived;
     }
     public synchronized void incrementHowManyDelegatesResponded(){
-      howManyDelegatesResponded++;
+      if ( howManyDelegatesResponded < numberOfParallelDelegates) {
+        howManyDelegatesResponded++;
+      }
     }
     public synchronized int howManyDelegatesResponded(){
       return howManyDelegatesResponded;

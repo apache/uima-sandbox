@@ -66,10 +66,34 @@ public class MetadataResponseHandler_impl extends HandlerBase
             Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
             if ( delegate.getEndpoint().isRemote() ) {
               delegate.cancelDelegateTimer();
+              delegate.setState(Delegate.OK_STATE);
               if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
                 UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, this.getClass().getName(),
                         "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
                         "UIMAEE_cancelled_timer_FINE", new Object[] { getController().getComponentName(), delegateKey });
+              }
+              String casReferenceId = null;
+              //  Check if the GetMeta reply was actually a PING message to check
+              //  delegate's availability. This would be the case if the delegate
+              //  has previously timed out waiting for Process CAS reply.
+              if ( delegate.isAwaitingPingReply() && delegate.getState() == Delegate.OK_STATE) {
+                //  Since this is a reply to a ping we may have delayed some 
+                //  CASes waiting for the ping to come back. Drain the list
+                //  of delayed CASes and send each CAS to the delegate.
+                while ( (casReferenceId = delegate.removeOldestFromPendingDispatchList() ) != null ) {
+                  ((AggregateAnalysisEngineController)getController()).
+                    retryLastCommand(AsynchAEMessage.Process, delegate.getEndpoint(), casReferenceId);
+                }
+                
+                if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+                  UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, this.getClass().getName(),
+                          "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                          "UIMAEE_aggregate_rcvd_ping_reply__FINE", new Object[] { getController().getComponentName(), delegateKey });
+                }
+                //  Reset delegate flag to indicate that the ping reply was received
+                delegate.resetAwaitingPingReply();
+                //  No need to merge typesystem. We've received a reply to a ping
+                return;
               }
             }
             if (AsynchAEMessage.Exception == payload)

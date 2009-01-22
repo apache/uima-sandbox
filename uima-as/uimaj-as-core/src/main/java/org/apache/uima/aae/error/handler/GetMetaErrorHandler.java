@@ -29,6 +29,7 @@ import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.BaseAnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.ErrorHandlerBase;
@@ -83,10 +84,10 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 
 		if ( endpoint != null && aController instanceof AggregateAnalysisEngineController )
 		{
-			Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
+			  Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
 	    	String key = ((AggregateAnalysisEngineController)aController).lookUpDelegateKey(endpoint.getEndpoint());
-	    	//	If threshold is not defined, assume action=terminate
-	    	if (  threshold == null || threshold.getMaxRetries() == 0 || 
+	    	Delegate delegate = ((AggregateAnalysisEngineController)aController).lookupDelegate(key);
+	    	if (  delegate.isAwaitingPingReply() || threshold == null || threshold.getMaxRetries() == 0 || 
 	    			  ( super.retryLastCommand(AsynchAEMessage.GetMeta, endpoint, aController, key, threshold, anErrorContext) == false )	
 	    	        )
 	    	{
@@ -99,7 +100,12 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 	    	                new Object[] {aController.getComponentName(), endpoint.getEndpoint()});
 	          }
 	    			aController.terminate();
-	    			aController.notifyListenersWithInitializationStatus((Exception)t);
+	    			//  Notify if the error occurred during initialization of the service.
+	    			//  If the ping times out, there is no need to notify the listener. We
+	    			//  use getMeta request as a ping to check if the service is running.
+	    			if ( !delegate.isAwaitingPingReply() ) {
+	            aController.notifyListenersWithInitializationStatus((Exception)t);
+	    			}
 	    		}
 	    		else
 	    		{

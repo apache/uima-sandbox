@@ -53,6 +53,7 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ErrorHandler;
 import org.apache.uima.aae.error.ErrorHandlerChain;
+import org.apache.uima.aae.error.MessageTimeoutException;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.handler.ProcessCasErrorHandler;
 import org.apache.uima.aae.jmx.JmxManagement;
@@ -1007,6 +1008,60 @@ implements AnalysisEngineController, EventSubscriber
 						list.add(anEndpoint);
 					}
           ((AggregateAnalysisEngineController)this).disableDelegates(list);
+
+          if ( key != null && key.trim().length() > 0) {
+            //  Delegate has been disabled. Cleanup Delegate's lists. Each Delegate
+            //  maintains a list of CASes pending reply and a different list of CASes
+            //  pending dispatch. The first list contains CASes sent to the delegate.
+            //  When a reply is received from the delegate, the CAS is removed from
+            //  the list. The second list contains CASes that have been delayed
+            //  while the service was in the TIMEDOUT state. These CASes were to 
+            //  be dispatched to the delegate once its state is reset to OK. It is
+            //  reset to OK state when the delegate responds to the client PING
+            //  request. Since we have disabled the delegate, remove ALL CASes from
+            //  both lists and send them through the ErrorHandler one at a time 
+            //  as if these CASes timed out.
+            
+            Delegate delegate = ((AggregateAnalysisEngineController)this).lookupDelegate(key);
+            //  Cancel the delegate timer. No more responses are expected 
+            delegate.cancelDelegateTimer();
+            
+            //  If the delegate has CASes pending reply still, send each CAS
+            //  from the pending list through the error handler with 
+            //  MessageTimeoutException as a cause of error
+            while ( delegate.getCasPendingReplyListSize() > 0 ) {
+              String timedOutCasId = delegate.removeOldestCasFromOutstandingList();
+              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                       "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_force_cas_timeout__INFO",
+                       new Object[] { getComponentName(), key, timedOutCasId, " Pending Reply List" });
+              }
+              
+              ErrorContext errorContext = new ErrorContext();
+              errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+              errorContext.add(AsynchAEMessage.CasReference, timedOutCasId);
+              errorContext.add(AsynchAEMessage.Endpoint, endpoint);
+              getErrorHandlerChain().handle(new MessageTimeoutException(), errorContext, this);
+            }
+            //  If the delegate has CASes pending dispatch, send each CAS
+            //  from the pending dispatch list through the error handler with 
+            //  MessageTimeoutException as a cause of error
+            while ( delegate.getCasPendingDispatchListSize() > 0 ) {
+              String timedOutCasId = delegate.removeOldestFromPendingDispatchList();
+
+              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                       "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_force_cas_timeout__INFO",
+                       new Object[] { getComponentName(), key, timedOutCasId, " Pending Dispatch List" });
+              }
+              
+              ErrorContext errorContext = new ErrorContext();
+              errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+              errorContext.add(AsynchAEMessage.CasReference, timedOutCasId);
+              errorContext.add(AsynchAEMessage.Endpoint, endpoint);
+              getErrorHandlerChain().handle(new MessageTimeoutException(), errorContext, this);
+            }
+          }
 
           if ( endpoint != null ) {
 	          try {
