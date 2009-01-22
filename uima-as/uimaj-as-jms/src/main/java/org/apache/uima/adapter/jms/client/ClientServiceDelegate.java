@@ -63,8 +63,6 @@ public class ClientServiceDelegate extends Delegate {
       if ( e instanceof MessageTimeoutException) {
         switch( command ) {
           case AsynchAEMessage.Process:
-            System.out.println(">>>>> Client Process Timed Out");
-            clientUimaAsEngine.clientSideJmxStats.incrementProcessTimeoutErrorCount();
             casReferenceId = (String)errorContext.get(AsynchAEMessage.CasReference);
             if ( casReferenceId != null ) {
               cachedRequest =(ClientRequest)clientUimaAsEngine.clientCache.get(casReferenceId);
@@ -75,7 +73,16 @@ public class ClientServiceDelegate extends Delegate {
               if (cachedRequest != null && cachedRequest.isRemote()) {
                 cas = cachedRequest.getCAS();
               }
+              if ( isAwaitingPingReply() ) {
+                System.out.println(">>>>> Client Ping Timedout");
+                clientUimaAsEngine.notifyOnTimout(cas, clientUimaAsEngine.getEndPointName(), BaseUIMAAsynchronousEngineCommon_impl.PingTimeout, casReferenceId);
+                System.out.println("Stopping Uima AS Client API. Service Not Responding To a Ping.");
+                clientUimaAsEngine.stop();
+                break;
+              } 
             }
+            clientUimaAsEngine.clientSideJmxStats.incrementProcessTimeoutErrorCount();
+            System.out.println(">>>>> Client Process Timed Out");
             if ( !isAwaitingPingReply()) {
               setAwaitingPingReply();
               System.out.println(">>>>> Client Sending Ping");
