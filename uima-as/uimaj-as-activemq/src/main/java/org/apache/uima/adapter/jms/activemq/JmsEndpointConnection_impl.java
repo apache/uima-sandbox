@@ -49,6 +49,7 @@ import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.InvalidMessageException;
 import org.apache.uima.aae.error.ServiceShutdownException;
@@ -512,6 +513,19 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	            // Using the queue name lookup the delegate key
 	            String key = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(delegateEndpoint.getEndpoint());
 	            if ( key != null && destination != null && !isReplyEndpoint ) {
+	              // For Process Requests check the state of the delegate that is to receive
+	              // the CAS. If the delegate state = TIMEOUT_STATE, push the CAS id onto
+	              // delegate's list of delayed CASes. The state of the delegate was 
+	              // changed to TIMEOUT when a previous CAS timed out.
+	              int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+	              int command = aMessage.getIntProperty(AsynchAEMessage.Command);
+	              if (msgType != AsynchAEMessage.Request && command == AsynchAEMessage.Process ) {
+	                String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
+	                if ( casReferenceId != null && 
+	                     ((AggregateAnalysisEngineController)controller).delayCasIfDelegateInTimedOutState(casReferenceId, delegateEndpoint.getEndpoint()) ) {
+                    return true;
+	                }
+	              }
 	              // The aggregate has a master list of endpoints which are typically cloned during processing
 	              // This object uses a copy of the master. When a listener fails, the status of the master
 	              // endpoint is changed. To check the status, fetch the master endpoint, check its status

@@ -468,6 +468,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
     }
     super.serviceDelegate = new ClientServiceDelegate(endpoint,applicationName,this);
     super.serviceDelegate.setCasProcessTimeout(processTimeout);
+    super.serviceDelegate.setGetMetaTimeout(metadataTimeout);
 		try
 		{
 			jmxManager = new JmxManager("org.apache.uima");

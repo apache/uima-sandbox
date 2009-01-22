@@ -37,6 +37,7 @@ import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.error.ServiceShutdownException;
+import org.apache.uima.aae.error.UimaASPingTimeout;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.cas.CAS;
@@ -240,18 +241,21 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		}
 
 	}
+  protected void runTestWithMultipleThreads(String serviceDeplyDescriptor, String queueName, int howManyCASesPerRunningThread, int howManyRunningThreads, int timeout, int aGetMetaTimeout) throws Exception {
+    runTestWithMultipleThreads(serviceDeplyDescriptor, queueName, howManyCASesPerRunningThread, howManyRunningThreads, timeout, aGetMetaTimeout,false);
+  }
 
-	protected void runTestWithMultipleThreads(String serviceDeplyDescriptor, String queueName, int howManyCASesPerRunningThread, int howManyRunningThreads, int timeout) throws Exception
+	protected void runTestWithMultipleThreads(String serviceDeplyDescriptor, String queueName, int howManyCASesPerRunningThread, int howManyRunningThreads, int timeout, int aGetMetaTimeout, boolean failOnTimeout) throws Exception
 	{
-		String[] containers = new String[1];
 		// Instantiate Uima EE Client
-		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+		final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		// Deploy Uima EE Primitive Service
-		containers[0] = deployService(eeUimaEngine, serviceDeplyDescriptor);// "resources/deployment/Deploy_PersonTitleAnnotator.xml");
+		final String containerId = deployService(eeUimaEngine, serviceDeplyDescriptor);
 		Thread t1 = null;
 		Thread t2 = null;
-		Map appCtx = buildContext(String.valueOf(broker.getMasterConnectorURI()), queueName, timeout); // "PersonTitleAnnotatorQueue"
-																										// );
+    Map appCtx = buildContext(String.valueOf(broker.getMasterConnectorURI()), queueName, timeout);
+    // Set an explicit getMeta (Ping)timeout 
+    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, aGetMetaTimeout );
 
 		initialize(eeUimaEngine, appCtx);
 
@@ -262,6 +266,29 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		// Wait until the CPC Thread is ready.
 		waitOnMonitor(ctrlMonitor);
 
+		if ( failOnTimeout ) {
+	    //  Spin a thread and wait for awhile before killing the remote service.
+	    //  This will cause the client to timeout waiting for a CAS reply and
+	    //  to send a Ping message to test service availability. The Ping times
+	    //  out and causes the client API to stop.
+	    new Thread() {
+	      public void run()
+	      {
+	        Object mux = new Object();
+	        synchronized( mux ) {
+	          try {
+	            mux.wait(5000);
+	            //  Undeploy service container
+	            eeUimaEngine.undeploy(containerId);
+	          } catch (Exception e) {}
+	        }
+	      }
+	    }.start();
+		  
+		}
+		
+		
+		
 		// Spin runner threads and start sending CASes
 		for (int i = 0; i < howManyRunningThreads; i++)
 		{
@@ -642,15 +669,25 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	 */
 	public void initializationComplete(EntityProcessStatus aStatus)
 	{
+	  boolean isPingException;
+	  
 		if (aStatus != null && aStatus.isException())
 		{
 			System.out.println("Initialization Received Reply Containing Exception:");
 			List exceptions = aStatus.getExceptions();
 			for (int i = 0; i < exceptions.size(); i++)
 			{
+			  if ( exceptions.get(i) instanceof UimaASPingTimeout ) {
+			    System.out.println("Client Received PING Timeout. Service Not Available");
+		      if (cpcLatch != null)
+		      {
+		        cpcLatch.countDown();
+		      }
+			    
+			  }
 				if ( !expectingServiceShutdownException )
 				{
-				((Throwable) exceptions.get(i)).printStackTrace();
+				  ((Throwable) exceptions.get(i)).printStackTrace();
 				}
 			}
 			if (exceptionCountLatch != null)

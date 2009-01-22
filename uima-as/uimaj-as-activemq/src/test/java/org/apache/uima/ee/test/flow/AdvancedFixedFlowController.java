@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.uima.aae.error.MessageTimeoutException;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.cas.CAS;
@@ -76,6 +77,8 @@ public class AdvancedFixedFlowController extends CasFlowController_ImplBase {
 
   private static final int ACTION_DROP_IF_NEW_CAS_PRODUCED = 3;
 
+  public static final String EXCEPTIONS_TO_IGNORE = "ExceptionsToIgnore";
+
   private ArrayList mSequence;
 
   private int mActionAfterCasMultiplier;
@@ -84,6 +87,8 @@ public class AdvancedFixedFlowController extends CasFlowController_ImplBase {
   
   private boolean flowError;
 
+  private String[] exceptionsToIgnore;
+  
   public void initialize(FlowControllerContext aContext) throws ResourceInitializationException {
     super.initialize(aContext);
 
@@ -115,6 +120,9 @@ public class AdvancedFixedFlowController extends CasFlowController_ImplBase {
     } else {
       throw new ResourceInitializationException(); // TODO
     }
+    
+    exceptionsToIgnore = (String[])aContext
+      .getConfigParameterValue(EXCEPTIONS_TO_IGNORE);
     
     String[] aeKeysAllowingContinue = (String[])aContext
             .getConfigParameterValue(PARAM_ALLOW_CONTINUE_ON_FAILURE);
@@ -317,17 +325,28 @@ public class AdvancedFixedFlowController extends CasFlowController_ImplBase {
      */
     public boolean continueOnFailure(String failedAeKey, Exception failure) {
       // Check that root cause is an IndexOutOfBounds exception
-      Throwable cause = failure.getCause();
+      Throwable cause = failure.getCause() == null ? failure : failure.getCause();
       while (cause.getCause() != null) {
         cause = cause.getCause();       
       }
-      if (cause.getClass() != IndexOutOfBoundsException.class) {
+      if (cause.getClass() != IndexOutOfBoundsException.class && !ignoreException(cause)) {
         System.out.println("FlowController.continueOnFailure - Invalid cause for delegate failure - expected "
                 + IndexOutOfBoundsException.class + " - received "+ cause.getClass());
         // Throwing an exception here doesn't stop flow!
         flowError = true;
       }
       return mAEsAllowingContinueOnFailure.contains(failedAeKey);
+    }
+    
+    private boolean ignoreException(Throwable failure) {
+      if ( exceptionsToIgnore != null ) {
+        for( String exception: exceptionsToIgnore) {
+          if ( failure.getClass().getName().equals(exception)) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
   }
 }

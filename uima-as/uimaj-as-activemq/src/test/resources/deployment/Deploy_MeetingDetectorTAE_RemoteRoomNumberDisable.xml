@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+
+  <!--
    ***************************************************************
    * Licensed to the Apache Software Foundation (ASF) under one
    * or more contributor license agreements.  See the NOTICE file
@@ -19,35 +20,31 @@
    * under the License.
    ***************************************************************
    -->
+
 <analysisEngineDeploymentDescription xmlns="http://uima.apache.org/resourceSpecifier">
   
-  <name>Top Level TAE</name>
-  <description></description>
+  <name>Meeting Detector TAE</name>
+  <description>Deploys Meeting Detector Aggregate AE that uses remotely deployed RoomNumberAnnotator.</description>
   
   <deployment protocol="jms" provider="activemq">
     <casPool numberOfCASes="5"/>
     <service>
-      <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
+      <inputQueue endpoint="MeetingDetectorTaeQueue" brokerURL="tcp://localhost:8118"/>
       <topDescriptor>
-        <import location="../descriptors/analysis_engine/SimpleTestAggregateWithLongDelayDelegate.xml"/>
+        <import location="../descriptors/tutorial/ex4/MeetingDetectorTAEContinueOnError.xml"/>
       </topDescriptor>
       <analysisEngine>
         <delegates>
-        
-          <analysisEngine key="TestMultiplier">
-	        <casMultiplier poolSize="5"/> 
-          </analysisEngine>
-        
-          <remoteAnalysisEngine key="NoOp">
-	                  <inputQueue endpoint="NoOpAnnotatorQueueLongDelay" brokerURL="tcp://localhost:8118"/> 
-	                  <serializer method="xmi"/>
-                      <asyncAggregateErrorConfiguration>
-						  <getMetadataErrors maxRetries="0" timeout="2000" errorAction="disable"/>
-						  <processCasErrors maxRetries="1" timeout="4000" continueOnRetryFailure="false" thresholdCount="0" thresholdWindow="0" thresholdAction="terminate"/>
-						  <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
-                      </asyncAggregateErrorConfiguration>
+          <remoteAnalysisEngine key="RoomNumber">
+            <inputQueue endpoint="RoomNumberAnnotatorQueue" brokerURL="tcp://localhost:8118"/>
+            <serializer method="xmi"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="1000" errorAction="disable"/>
+              <processCasErrors maxRetries="0" timeout="1000" continueOnRetryFailure="true" thresholdCount="1" thresholdWindow="0" thresholdAction="disable"/>
+              <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+            
           </remoteAnalysisEngine>
-
         </delegates>
       </analysisEngine>
     </service>

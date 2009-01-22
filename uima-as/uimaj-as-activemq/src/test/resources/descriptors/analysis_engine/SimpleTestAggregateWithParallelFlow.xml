@@ -71,6 +71,19 @@
           <parameter>FlowController/AllowContinueOnFailure</parameter>
         </overrides>
       </configurationParameter>
+      
+      <configurationParameter>
+	        <name>ExceptionsToIgnore</name>
+	        <description>Specifies which exceptions to ignore.</description>
+	        <type>String</type>
+	        <multiValued>true</multiValued>
+	        <mandatory>false</mandatory>
+	        <overrides>
+	          <parameter>FlowController/ExceptionsToIgnore</parameter>
+	        </overrides>
+      </configurationParameter>
+      
+      
     </configurationParameters>
     
     <configurationParameterSettings>
@@ -94,6 +107,16 @@
           </array>
         </value>
       </nameValuePair>
+      
+      <nameValuePair>
+	        <name>ExceptionsToIgnore</name>
+	        <value>
+	          <array>
+	            <string>org.apache.uima.aae.error.MessageTimeoutException</string>
+	          </array>
+	        </value>
+      </nameValuePair>
+      
     </configurationParameterSettings>
     
     <flowConstraints>
@@ -103,6 +126,7 @@
         <node>NoOp1</node> 
       </fixedFlow>
     </flowConstraints>
+    
     <capabilities>
       <capability>
         <inputs/>

@@ -363,8 +363,162 @@ public class TestUimaASExtended extends BaseTestSupport
 		//	Deploy Uima EE Primitive Service 
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
 		super.setExpectingServiceShutdown();
-		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 5, PROCESS_LATCH);
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 5, PROCESS_LATCH);
 	}
+
+  /**
+   * Deploys a Primitive Uima EE service and sends 5 CASes to it.
+   * 
+   * @throws Exception
+   */
+  
+  public void testSyncAggregateProcess() throws Exception
+  {
+    System.out.println("-------------- testSyncAggregateProcess -------------");
+    //  Instantiate Uima EE Client
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    //  Deploy Uima EE Primitive Service 
+    deployService(eeUimaEngine, relativePath+"/Deploy_MeetingDetectorAggregate.xml");
+    super.setExpectingServiceShutdown();
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"MeetingDetectorQueue", 5, PROCESS_LATCH);
+  }
+
+  /**
+   * Deploys a Primitive Uima EE service and sends 5 CASes to it.
+   * 
+   * @throws Exception
+   */
+  
+  public void testPrimitiveServiceProcessPingFailure() throws Exception
+  {
+    System.out.println("-------------- testPrimitiveServiceProcessPingFailure -------------");
+    //  Instantiate Uima EE Client
+    final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    //  Deploy Uima EE Primitive Service 
+    final String containerID = deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
+    super.setExpectingServiceShutdown();
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "PersonTitleAnnotatorQueue" );
+    // Set an explicit getMeta (Ping)timeout 
+    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 2000 );
+    // Set an explicit process timeout so to test the ping on timeout
+    appCtx.put(UimaAsynchronousEngine.Timeout, 1000 );
+    //  Spin a thread and wait for awhile before killing the remote service.
+    //  This will cause the client to timeout waiting for a CAS reply and
+    //  to send a Ping message to test service availability. The Ping times
+    //  out and causes the client API to stop.
+    new Thread() {
+      public void run()
+      {
+        Object mux = new Object();
+        synchronized( mux ) {
+          try {
+            mux.wait(500);
+            //  Undeploy service container
+            eeUimaEngine.undeploy(containerID);
+          } catch (Exception e) {}
+        }
+      }
+    }.start();
+    
+    try {
+      //  RuntimeException is expected due to failure
+      runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 500, EXCEPTION_LATCH);
+    } catch( RuntimeException e) {}
+    
+  }
+
+  /**
+   * Tests error handling on delegate timeout. The Delegate is started as remote,
+   * the aggregate initializes and the client starts sending CASes. After a short 
+   * while the client kills the remote delegate. The aggregate receives a CAS
+   * timeout and disables the delegate. A timed out CAS is sent to the next 
+   * delegate in the pipeline. ALL 1000 CASes are returned to the client.
+   * 
+   * @throws Exception
+   */
+  public void testDelegateTimeoutAndDisable() throws Exception
+  {
+    System.out.println("-------------- testDelegateTimeoutAndDisable -------------");
+    //  Instantiate Uima EE Client
+    final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    //  Deploy Uima EE Primitive Service 
+    final String containerID = deployService(eeUimaEngine, relativePath+"/Deploy_RoomNumberAnnotator.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_MeetingDetectorTAE_RemoteRoomNumberDisable.xml");
+    super.setExpectingServiceShutdown();
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "MeetingDetectorTaeQueue" );
+    // Set an explicit getMeta (Ping)timeout 
+    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 2000 );
+    // Set an explicit process timeout so to test the ping on timeout
+    appCtx.put(UimaAsynchronousEngine.Timeout, 1000 );
+    //  Spin a thread and wait for awhile before killing the remote service.
+    //  This will cause the client to timeout waiting for a CAS reply and
+    //  to send a Ping message to test service availability. The Ping times
+    //  out and causes the client API to stop.
+
+    new Thread() {
+      public void run()
+      {
+        Object mux = new Object();
+        synchronized( mux ) {
+          try {
+            mux.wait(300);
+            //  Undeploy service container
+            eeUimaEngine.undeploy(containerID);
+          } catch (Exception e) {}
+        }
+      }
+    }.start();
+    
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"MeetingDetectorTaeQueue", 1000, PROCESS_LATCH);
+   
+  }
+  /**
+   * This test kills a remote Delegate while in the middle of processing 1000 CASes. 
+   * The CAS timeout error handling disables the delegate and forces ALL CASes
+   * from the Pending Reply List to go through Error Handler. The Flow Controller
+   * is configured to continueOnError and CASes that timed out are allowed to 
+   * continue to the next delegate. ALL 1000 CASes are accounted for in the
+   * NoOp Annotator that is last in the flow.  
+   * 
+   * @throws Exception
+   */
+  public void testDisableDelegateOnTimeoutWithCM() throws Exception
+  {
+    System.out.println("-------------- testDisableDelegateOnTimeoutWithCM -------------");
+    //  Instantiate Uima EE Client
+    final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    //  Deploy Uima EE Primitive Service 
+    final String containerID = deployService(eeUimaEngine, relativePath+"/Deploy_RoomNumberAnnotator.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_MeetingDetectorTAEWithCM_RemoteRoomNumberDisable.xml");
+    super.setExpectingServiceShutdown();
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "MeetingDetectorTaeQueue" );
+    // Set an explicit getMeta (Ping)timeout 
+    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 2000 );
+    // Set an explicit process timeout so to test the ping on timeout
+    appCtx.put(UimaAsynchronousEngine.Timeout, 1000 );
+    //  Spin a thread and wait for awhile before killing the remote service.
+    //  This will cause the client to timeout waiting for a CAS reply and
+    //  to send a Ping message to test service availability. The Ping times
+    //  out and causes the client API to stop.
+
+    new Thread() {
+      public void run()
+      {
+        Object mux = new Object();
+        synchronized( mux ) {
+          try {
+            mux.wait(300);
+            //  Undeploy service container
+            eeUimaEngine.undeploy(containerID);
+          } catch (Exception e) {}
+        }
+      }
+    }.start();
+    
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"MeetingDetectorTaeQueue", 1, PROCESS_LATCH);
+   
+  }
+  
 	/**
 	 * Tests Uima EE client ability to test sendAndReceive in multiple/concurrent threads
 	 * It spawns 4 thread each sending 100 CASes to a Primitive Uima EE service
@@ -376,7 +530,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		int howManyCASesPerRunningThread = 100;
 		int howManyRunningThreads = 4;
 		super.setExpectingServiceShutdown();
-		runTestWithMultipleThreads(relativePath+"/Deploy_PersonTitleAnnotator.xml", "PersonTitleAnnotatorQueue", howManyCASesPerRunningThread, howManyRunningThreads, 0 );
+		runTestWithMultipleThreads(relativePath+"/Deploy_PersonTitleAnnotator.xml", "PersonTitleAnnotatorQueue", howManyCASesPerRunningThread, howManyRunningThreads, 0, 0 );
 	}
 	/**
 	 * 
@@ -433,13 +587,12 @@ public class TestUimaASExtended extends BaseTestSupport
 	 */
 	public void testAggregateProcessCallWithLastCM() throws Exception
 	{
-		
-	    System.out.println("-------------- testAggregateProcessCallWithLastCM -------------");
+	  System.out.println("-------------- testAggregateProcessCallWithLastCM -------------");
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		//	Deploy Uima EE Primitive Services each with 6000ms delay in process()
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithLastCM.xml");
 		super.setExpectingServiceShutdown();
-	    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
+		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH, true);
 	}
 
 	/**
@@ -449,15 +602,38 @@ public class TestUimaASExtended extends BaseTestSupport
 	 * 
 	 * @throws Exception
 	 */
+
 	public void testTimeoutInSynchCallProcessWithMultipleThreads() throws Exception
 	{
-	    System.out.println("-------------- testTimeoutInSynchCallProcessWithMultipleThreads -------------");
-		int howManyCASesPerRunningThread = 100;
+	  System.out.println("-------------- testTimeoutInSynchCallProcessWithMultipleThreads -------------");
+		int howManyCASesPerRunningThread = 2;
 		int howManyRunningThreads = 4;
 		super.setExpectingServiceShutdown();
-		runTestWithMultipleThreads(relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml", "NoOpAnnotatorQueueLongDelay", howManyCASesPerRunningThread, howManyRunningThreads, 2000 );
-		
+    int processTimeout = 2000;
+    int getMetaTimeout = 500;
+		runTestWithMultipleThreads(relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml", "NoOpAnnotatorQueueLongDelay", howManyCASesPerRunningThread, howManyRunningThreads, processTimeout, getMetaTimeout );
 	}
+
+  /**
+   * Tests shutdown while running with multiple/concurrent threads
+   * The Annotator throws an exception and the Aggregate error handling is setup to terminate
+   * on the first error.
+   * 
+   * @throws Exception
+   */
+
+  public void testTimeoutFailureInSynchCallProcessWithMultipleThreads() throws Exception
+  {
+    System.out.println("-------------- testTimeoutFailureInSynchCallProcessWithMultipleThreads -------------");
+    int howManyCASesPerRunningThread = 1000;
+    int howManyRunningThreads = 4;
+    super.setExpectingServiceShutdown();
+    int processTimeout = 2000;
+    int getMetaTimeout = 500;
+    runTestWithMultipleThreads(relativePath+"/Deploy_NoOpAnnotator.xml", "NoOpAnnotatorQueue", howManyCASesPerRunningThread, howManyRunningThreads, 2000, 1000, true );
+    
+  }
+	
 	/**
 	 * Tests a parallel flow in the Uima EE aggregate.
 	 * 
@@ -526,9 +702,36 @@ public class TestUimaASExtended extends BaseTestSupport
     appCtx.put(UimaAsynchronousEngine.Timeout, 13000 );
     addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
     addExceptionToignore(org.apache.uima.aae.error.UimaASProcessCasTimeout.class);
-    
+
     runTest(appCtx, eeUimaEngine, null, null, 1, PROCESS_LATCH);
   }
+
+  /**
+   * Tests Timeout logic
+   * @throws Exception
+   */
+  public void testDisableOnRemoteDelegatePingTimeout() throws Exception
+  {
+    System.out.println("-------------- testDisableOnRemoteDelegatePingTimeout -------------");
+    System.out.println("The Aggregate sends 2 CASes to the NoOp Annotator which");
+    System.out.println("delays each CAS for 6000ms. The timeout is set to 4000ms");
+    System.out.println("Two CAS retries are expected");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    String delegateContainerId = deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithLongDelayDelegate.xml");
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+    //  The Remote NoOp delays each CAS for 6000ms. The Aggregate sends two CASes so adjust
+    //  client timeout to be just over 12000ms.
+    appCtx.put(UimaAsynchronousEngine.Timeout, 13000 );
+    addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
+    addExceptionToignore(org.apache.uima.aae.error.UimaASProcessCasTimeout.class);
+    //  Remove container with the remote NoOp delegate so that we can test
+    //  the CAS Process and Ping timeout.
+    eeUimaEngine.undeploy(delegateContainerId);  
+    //  Send the CAS and handle exception
+    runTest(appCtx, eeUimaEngine, null, null, 1, EXCEPTION_LATCH);
+  }
+
   public void testDeployAggregateWithCollocatedAggregateService() throws Exception
 	{
     System.out.println("-------------- testDeployAggregateWithCollocatedAggregateService -------------");
@@ -746,7 +949,6 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testProcessParallelFlowWithDelegateDisable -------------");
     //  Create Uima EE Client
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-    UIMAFramework.getLogger().setLevel(Level.FINE);
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlowDisableOnDelegateFailure.xml");
