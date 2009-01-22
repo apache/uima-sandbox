@@ -416,6 +416,12 @@ public abstract class Delegate {
       return outstandingCasList.remove(0).getCasReferenceId();
     }
   }
+  
+  public String getOldestCasIdFromOutstandingList() {
+    synchronized (outstandingCasListMux) {
+      return outstandingCasList.get(0).getCasReferenceId();
+    }
+  }
   /**
    * Removes {@link DelegateEntry} from the list of CASes pending reply. If the CAS removed was the
    * oldest in the list (first in the list) AND there are other CASes in the list pending reply AND
@@ -549,6 +555,7 @@ public abstract class Delegate {
         cancelDelegateTimer();
         delegate.setState(TIMEOUT_STATE);
         ErrorContext errorContext = new ErrorContext();
+        errorContext.add(AsynchAEMessage.Command, aCommand);
 
         if (AsynchAEMessage.Process == aCommand) {
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
@@ -565,6 +572,16 @@ public abstract class Delegate {
                     "UIMAEE_meta_timeout_no_reply__INFO",
                     new Object[] { delegate.getKey(), timeToWait });
           }
+          //  Check if this is a Ping timeout. If it is and there are CASes on
+          //  the list of CASes pending reply, treat this timeout as Process
+          //  Timeout
+          if ( isAwaitingPingReply() && getCasPendingReplyListSize() > 0) {
+            String casReferenceId = getOldestCasIdFromOutstandingList();
+            errorContext.add(AsynchAEMessage.CasReference, casReferenceId);
+            //  Override the command to make sure this timeout is handled
+            //  by the ProcessCasErrorHandler.
+            errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+          }
         } else if (AsynchAEMessage.CollectionProcessComplete == aCommand) {
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, this.getClass().getName(),
@@ -574,7 +591,6 @@ public abstract class Delegate {
           }
 
         }
-        errorContext.add(AsynchAEMessage.Command, aCommand);
         errorContext.add(AsynchAEMessage.Endpoint, getEndpoint());
         handleError(new MessageTimeoutException(), errorContext);
       }
