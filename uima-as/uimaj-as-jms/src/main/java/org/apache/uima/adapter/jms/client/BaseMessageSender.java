@@ -207,12 +207,14 @@ public abstract class BaseMessageSender implements Runnable,
 			try {
 				//	Request JMS Message from the concrete implementation
 			  Message message = null;
-			  if ( engine.getSerializationStrategy().equals("xmi")) {
-			    message = createTextMessage();
-			  } else {
+			  // Determine if this a CAS Process Request
+			  boolean casProcessRequest = isProcessRequest(pm);
+			  // Only Process request can be serialized as binary
+			  if ( casProcessRequest && engine.getSerializationStrategy().equals("binary") ) {
           message = createBytesMessage();
+			  } else {
+          message = createTextMessage();
 			  }
-				 
 			  
 				initializeMessage( pm, message );
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
@@ -222,7 +224,7 @@ public abstract class BaseMessageSender implements Runnable,
 						"UIMAJMS_sending_msg_to_endpoint__FINEST",
 						new Object[] { UimaMessageValidator.decodeIntToString(AsynchAEMessage.Command, message.getIntProperty(AsynchAEMessage.Command)), UimaMessageValidator.decodeIntToString(AsynchAEMessage.MessageType,message.getIntProperty(AsynchAEMessage.MessageType)), destination });
         }
-				if ( pm.containsKey(AsynchAEMessage.CasReference) )
+				if ( casProcessRequest )
 				{
 					ClientRequest cacheEntry = (ClientRequest)
 					engine.getCache().get(pm.get(AsynchAEMessage.CasReference));
@@ -291,6 +293,9 @@ public abstract class BaseMessageSender implements Runnable,
 			engine.setCPCMessage(anOutgoingMessage);
 			break;
 		}
+	}
+	private boolean isProcessRequest( PendingMessage pm ) {
+    return pm.getMessageType() == AsynchAEMessage.Process;
 	}
 	private void handleException(Exception e, String aDestination) {
 		workerThreadFailed = true;

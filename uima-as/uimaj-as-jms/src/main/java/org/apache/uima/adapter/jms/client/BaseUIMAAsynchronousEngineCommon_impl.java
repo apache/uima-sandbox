@@ -665,9 +665,8 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			ProcessTrace pt = new ProcessTrace_impl();
 			UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
-			Exception exception = retrieveExceptionFormMessage(message);
+			Exception exception = retrieveExceptionFromMessage(message);
 
-//			Exception exception = (Exception) ((ObjectMessage) message).getObject();
 			status.addEventStatus("CpC", "Failed", exception);
 			notifyListeners(null, status, AsynchAEMessage.CollectionProcessComplete);
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
@@ -677,10 +676,12 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		else
 		{
-			//Make the receiving thread to complete
+		  //  After receiving CPC reply there may be cleanup to do. Delegate this
+		  //  to platform specific implementation (ActiveMQ or WAS)
 			cleanup(); //Make the receiving thread to complete
 			synchronized (endOfCollectionMonitor)
 			{
+			  // Notify sleeping thread that the CPC reply was received
 				receivedCpcReply = true;
 				endOfCollectionMonitor.notifyAll();
 			}
@@ -746,7 +747,7 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			ProcessTrace pt = new ProcessTrace_impl();
 			UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt);
-			Exception exception = retrieveExceptionFormMessage(message);
+			Exception exception = retrieveExceptionFromMessage(message);
 			clientSideJmxStats.incrementMetaErrorCount();
 			status.addEventStatus("GetMeta", "Failed", exception);
 			notifyListeners(null, status, AsynchAEMessage.GetMeta);
@@ -764,6 +765,23 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		else
 		{
+		  //  Check serialization supported by the service against client configuration.
+		  //  If the client is configured to use Binary serialization *but* the service
+		  //  doesnt support it, change the client serialization to xmi. Old services will
+		  //  not return in a reply the type of serialization supported which implies "xmi".
+		  //  New services *always* return "binary" as a default serialization. The client
+		  //  however may still want to serialize messages using xmi though. 
+		  if ( !message.propertyExists(AsynchAEMessage.Serialization)) {
+        //  Dealing with an old service here, check if there is a mismatch with the 
+		    //  client configuration. If the client is configured with binary serialization
+		    //  override this and change serialization to "xmi".
+		    if ( getSerializationStrategy().equalsIgnoreCase("binary")) {
+          System.out.println("\n\t***** WARNING: Service Doesn't Support Binary Serialization. Client Defaulting to XMI Serialization\n");
+          //  Override configured serialization
+          setSerializationStrategy("xmi");
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "handleMetadataReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_client_serialization_ovveride__WARNING", new Object[] { });
+        }
+		  }
 			String meta = ((TextMessage) message).getText();
 			ByteArrayInputStream bis = new ByteArrayInputStream(meta.getBytes());
 			XMLInputSource in1 = new XMLInputSource(bis, null);
@@ -832,7 +850,7 @@ implements UimaAsynchronousEngine, MessageListener
 
 		return ( AsynchAEMessage.Exception == payload ? true : false);
 	}
-	private Exception retrieveExceptionFormMessage( Message message) throws Exception
+	private Exception retrieveExceptionFromMessage( Message message) throws Exception
 	{
 		Exception exception = null;
 		if ( message instanceof ObjectMessage && ((ObjectMessage)message).getObject() instanceof Exception )
@@ -1025,7 +1043,7 @@ implements UimaAsynchronousEngine, MessageListener
 
 	private boolean isShutdownException( Message message ) throws Exception
 	{
-		Exception exception = retrieveExceptionFormMessage(message);
+		Exception exception = retrieveExceptionFromMessage(message);
 		if ( exception != null )
 		{
 			if ( exception instanceof ServiceShutdownException || 
@@ -1044,7 +1062,7 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			clientSideJmxStats.incrementProcessErrorCount();
 		}
-		Exception exception = retrieveExceptionFormMessage(message);
+		Exception exception = retrieveExceptionFromMessage(message);
 		
 		
 		exception.printStackTrace();
