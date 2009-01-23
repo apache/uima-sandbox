@@ -215,7 +215,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 				"handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_deserialize_cas_time_FINE",
-				new Object[] { timeToDeserializeCAS / 1000 });
+				new Object[] { (double)timeToDeserializeCAS / 1000000.0});
     }
 
 		//	Update Stats
