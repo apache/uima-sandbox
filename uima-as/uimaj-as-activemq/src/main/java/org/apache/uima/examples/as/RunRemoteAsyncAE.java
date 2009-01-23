@@ -118,7 +118,8 @@ public class RunRemoteAsyncAE {
   private long mStartTime;
 
   private UimaAsynchronousEngine uimaEEEngine = null;
-;
+
+  Map<String,Object> appCtx;
 
   /**
    * Constructor for the class.  Parses command line arguments and sets the values of fields in this instance.
@@ -129,7 +130,7 @@ public class RunRemoteAsyncAE {
    */
   public RunRemoteAsyncAE(String args[]) throws Exception {
     
-    Map<String,Object> appCtx = new HashMap<String,Object>();
+    appCtx = new HashMap<String,Object>();
     appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, System.getenv("UIMA_HOME") + "/bin/dd2spring.xsl");
     appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:" + System.getenv("UIMA_HOME") + "/saxon/saxon8.jar");
   
@@ -152,6 +153,8 @@ public class RunRemoteAsyncAE {
             casPoolSize = Integer.parseInt(args[++i]);
           } else if (args[i].equals("-f")) {
             fsHeapSize = Integer.parseInt(args[++i]);
+          } else if (args[i].equals("-b")) {
+            appCtx.put(UimaAsynchronousEngine.SerializationStrategy, "binary");
           } else if (args[i].equals("-o")) {
             outputDir = new File(args[++i]);
             if (outputDir.exists()) {
@@ -223,7 +226,6 @@ public class RunRemoteAsyncAE {
     uimaEEEngine.addStatusCallbackListener(new StatusCallbackListenerImpl());
 
     //set server URI and Endpoint
-    Map<String,Object> appCtx = new HashMap<String,Object>();
     // Add Broker URI
     appCtx.put(UimaAsynchronousEngine.ServerUri, brokerUrl);
     // Add Queue Name
@@ -237,7 +239,6 @@ public class RunRemoteAsyncAE {
     appCtx.put(UimaAsynchronousEngine.CasPoolSize, casPoolSize);
     appCtx.put(UIMAFramework.CAS_INITIAL_HEAP_SIZE, new Integer(fsHeapSize/4).toString());
 
-    appCtx.put(UimaAsynchronousEngine.SerializationStrategy, "binary");
     //initialize
     uimaEEEngine.initialize(appCtx);
 
@@ -268,6 +269,7 @@ public class RunRemoteAsyncAE {
       "-c  Specifies a CollectionReader descriptor.  The client will read CASes from the CollectionReader" +
       " and send them to the service for processing.  If this option is ommitted, one empty CAS will be" +
       " sent to the service (useful for services containing a CAS Multiplier acting as a collection reader).\n" +
+      "-b  Use binary serialization (default is xmi)\n" +
       "-p  Specifies CAS pool size, which determines the maximum number of requests that can be outstanding.\n" +
       "-f  Specifies the initial FS heap size in bytes of each CAS in the pool.\n" +
       "-o  Specifies an Output Directory.  All CASes received by the client's CallbackListener will be serialized to XMI" +
