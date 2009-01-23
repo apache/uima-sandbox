@@ -22,6 +22,7 @@ package org.apache.uima.aae.handler.input;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
+import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.handler.HandlerBase;
@@ -61,8 +62,28 @@ public class MetadataResponseHandler_impl extends HandlerBase
 					if (getController() instanceof AggregateAnalysisEngineController)
 					{
             String fromEndpoint = ((MessageContext)anObjectToHandle).getMessageStringProperty(AsynchAEMessage.MessageFrom);
+            
             String delegateKey =
               ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(fromEndpoint);
+
+            //  Some delegates may not include supported serialization. If thats the case
+            //  assume XMI as a default serialization for such delegate. Also, check 
+            //  delegate configuration (provided in the deployment descriptor) and 
+            //  make sure that it matches "xmi". If the configuration says "binary" there 
+            //  is a mis-configuration which we handle by overriding the endpoint setting using
+            //  "xmi" as a value for serialization strategy.
+            if ( !((MessageContext)anObjectToHandle).propertyExists(AsynchAEMessage.Serialization)) {
+              Endpoint masterEndpoint = 
+                ((AggregateAnalysisEngineController)getController()).lookUpEndpoint(delegateKey, false);
+              if ( masterEndpoint.getSerializer().equals("binary") ) {
+                System.out.println("\n\t***** WARNING: Delegate:"+delegateKey+" Doesn't Support Binary Serialization. Aggregate:"+getController().getComponentName()+" Defaulting to XMI Serialization For This Delegate\n");
+                //  Override configured serialization
+                masterEndpoint.setSerializer("xmi");
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                        "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                        "UIMAEE_override_serialization__WARNING", new Object[] { getController().getComponentName(), delegateKey });
+              }
+            }
             Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
             if ( delegate.getEndpoint().isRemote() ) {
               delegate.cancelDelegateTimer();
@@ -123,6 +144,7 @@ public class MetadataResponseHandler_impl extends HandlerBase
 			}
 			catch( Exception e)
 			{
+			  e.printStackTrace();
 			  getController().notifyListenersWithInitializationStatus(e);
 				getController().getErrorHandlerChain().handle(e, HandlerBase.populateErrorContext( (MessageContext)anObjectToHandle ), getController());			
 			}

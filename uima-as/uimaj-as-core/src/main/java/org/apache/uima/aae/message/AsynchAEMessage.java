@@ -78,5 +78,9 @@ public interface AsynchAEMessage
 	public static final int Response = 3001;
 	
 	public static final String AcceptsDeltaCas = "AcceptsDeltaCas";
-	public static final String SentDeltaCas = "SentDeltaCas";
+  public static final String SentDeltaCas = "SentDeltaCas";
+  
+  public static final String Serialization = "Serialization";
+  public static final int XmiSerialization = 4000;
+  public static final int BinarySerialization = 4001;
 }
