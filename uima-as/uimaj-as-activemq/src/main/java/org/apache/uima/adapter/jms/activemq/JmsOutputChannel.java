@@ -207,7 +207,6 @@ public class JmsOutputChannel implements OutputChannel
 		
 		if ( isReply || "xmi".equalsIgnoreCase(aSerializerKey ) )
 		{
-
 			CacheEntry cacheEntry = 
 				getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 				 
@@ -1044,7 +1043,9 @@ public class JmsOutputChannel implements OutputChannel
 				msgSize = bos.toString().length();
 			}
 						
-			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.Metadata);
+      tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.Metadata);
+      //  This service supports Binary Serialization
+      tm.setIntProperty(AsynchAEMessage.Serialization, AsynchAEMessage.BinarySerialization);
 
 			populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.GetMeta);
 			
