@@ -62,6 +62,7 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
   public static final String PARAM_BROKER_URL = "brokerUrl";
   public static final String PARAM_ENDPOINT = "endpoint";
   public static final String PARAM_TIMEOUT = "timeout";
+  public static final String PARAM_BIN_SERIALIZTION = "binary_serialization";
   private Object mux = new Object();
   private boolean cpcReceived;
   private UimaAsynchronousEngine uimaEEEngine;
@@ -72,6 +73,7 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
     String brokerUrl = null;
     String endpoint = null;
     int timeout = 0;
+    String binary_serialization = null;
     for (int i = 0; i < parameters.length; i++) {
       if (PARAM_BROKER_URL.equalsIgnoreCase(parameters[i].getName())) {
         brokerUrl = parameters[i].getValue();
@@ -81,6 +83,9 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
       }
       else if (PARAM_TIMEOUT.equalsIgnoreCase(parameters[i].getName())) {
         timeout = Integer.parseInt(parameters[i].getValue());
+      }
+      else if (PARAM_BIN_SERIALIZTION.equalsIgnoreCase(parameters[i].getName())) {
+        binary_serialization = parameters[i].getValue();
       }
     }
     
@@ -92,6 +97,10 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
     if (timeout > 0) {
       System.out.println("setting timeout: " + timeout);
       appCtxt.put(UimaAsynchronousEngine.Timeout, timeout);
+    }
+    if (binary_serialization != null && binary_serialization.equalsIgnoreCase("true")) {
+      System.out.println("Using binary serialization");
+      appCtxt.put(UimaAsynchronousEngine.SerializationStrategy, "binary");
     }
     uimaEEEngine = new BaseUIMAAsynchronousEngine_impl();
     uimaEEEngine.addStatusCallbackListener(this);
