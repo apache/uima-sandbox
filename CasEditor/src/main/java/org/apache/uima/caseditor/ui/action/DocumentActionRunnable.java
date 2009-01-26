@@ -29,7 +29,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
-import org.apache.uima.caseditor.editor.IDocument;
+import org.apache.uima.caseditor.editor.ICasDocument;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -135,7 +135,7 @@ abstract class DocumentActionRunnable implements IRunnableWithProgress {
 
     for (DocumentElement documentElement : documents) {
 
-      final IDocument doc;
+      final ICasDocument doc;
 
       try {
         doc = documentElement.getDocument(false);

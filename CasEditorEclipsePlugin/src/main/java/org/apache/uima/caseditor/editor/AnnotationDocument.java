@@ -34,24 +34,20 @@ import org.eclipse.jface.text.DocumentEvent;
  * The <code>AnnotationDocument</code> adapts the annotation document to the eclipse Document
  * (needed for the editor).
  *
- * Note: Before an instance can be used, the project and document must be set.
+ * Note: Before an instance can be used the  document must be set.
  */
 public class AnnotationDocument extends Document implements ICasDocument {
+	
   private ICasDocument mDocument;
-
-//  private NlpProject mProject;
+  
+  private int lineLengthHint = 80;
 
   public AnnotationDocument() {
   }
 
-//  /**
-//   * Sets the project.
-//   *
-//   * @param project
-//   */
-//  public void setProject(NlpProject project) {
-//    mProject = project;
-//  }
+  public void setLineLengthHint(int lineLengthHint) {
+	  this.lineLengthHint = lineLengthHint;
+  }
 
   /**
    * @param element
@@ -61,15 +57,6 @@ public class AnnotationDocument extends Document implements ICasDocument {
 
     set(getText());
   }
-
-//  /**
-//   * Retrieves the project.
-//   *
-//   * @return the project
-//   */
-//  public NlpProject getProject() {
-//    return mProject;
-//  }
 
   /**
    * Call is forwarded to the set document.
@@ -179,7 +166,10 @@ public class AnnotationDocument extends Document implements ICasDocument {
     fireDocumentChanged();
   }
 
-
+  /**
+   * Called to notify that the whole document has been changed and
+   * must now synchronized.
+   */
   public void changed() {
     mDocument.changed();
 
@@ -235,16 +225,6 @@ public class AnnotationDocument extends Document implements ICasDocument {
     return mDocument.getAnnotation(type, span);
   }
 
-//  /**
-//   * Call is forwarded to the set document.
-//   *
-//   * @param out
-//   * @throws CoreException
-//   */
-//  public void save() throws CoreException {
-//    mDocument.save();
-//  }
-
   /**
    * Notifies listener about a document change.
    */
@@ -255,8 +235,9 @@ public class AnnotationDocument extends Document implements ICasDocument {
   }
 
   /**
-   * Wrap words at next space after lineLengthHint chars in a line. If the line is shorter than
-   * lineLengthHint nothing happens. The space char is replaced with an line feed char.
+   * Wrap words at next space after lineLengthHint chars in a line.
+   * If the line is shorter than lineLengthHint nothing happens.
+   * The space char is replaced with an line feed char.
    *
    * @param textString
    * @param lineLengthHint
@@ -291,8 +272,6 @@ public class AnnotationDocument extends Document implements ICasDocument {
    * @return the text
    */
   public String getText() {
-	  // TODO: fix this
-    int lineLengthHint = 200; //mProject.getDotCorpus().getEditorLineLengthHint();
 
     if (lineLengthHint != 0) {
       return wrapWords(mDocument.getText(), lineLengthHint);
@@ -306,6 +285,7 @@ public class AnnotationDocument extends Document implements ICasDocument {
    *
    * @param start
    * @param end
+   * 
    * @return the text
    */
   public String getText(int start, int end) {
@@ -315,7 +295,7 @@ public class AnnotationDocument extends Document implements ICasDocument {
   /**
    * Call is forwarded to the set document.
    *
-   * @return the TCAS
+   * @return the {@link CAS}
    */
   public CAS getCAS() {
     return mDocument.getCAS();
@@ -330,8 +310,4 @@ public class AnnotationDocument extends Document implements ICasDocument {
   public Type getType(String type) {
     return mDocument.getType(type);
   }
-
-//  public DocumentElement getDocumentElement() {
-//    return mDocument.getDocumentElement();
-//  }
 }

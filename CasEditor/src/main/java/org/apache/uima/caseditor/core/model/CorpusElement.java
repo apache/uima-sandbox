@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
-import org.apache.uima.caseditor.editor.IDocument;
+import org.apache.uima.caseditor.editor.ICasDocument;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
 /**
- * The CorpusElement is a container for {@link IDocument}s.
+ * The CorpusElement is a container for {@link ICasDocument}s.
  *
  * TODO: do not include defective elements!
  */

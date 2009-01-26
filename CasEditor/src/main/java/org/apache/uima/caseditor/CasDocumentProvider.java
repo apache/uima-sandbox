@@ -1,6 +1,7 @@
 package org.apache.uima.caseditor;
 
 import org.apache.uima.cas.Type;
+import org.apache.uima.caseditor.core.TaeError;
 import org.apache.uima.caseditor.core.model.DocumentElement;
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
@@ -29,18 +30,19 @@ public class CasDocumentProvider
 			if (nlpElement instanceof DocumentElement) {
 
 				try {
-					org.apache.uima.caseditor.editor.IDocument workingCopy =
+					org.apache.uima.caseditor.editor.ICasDocument workingCopy =
 						((DocumentElement) nlpElement).getDocument(true);
 
 					AnnotationDocument document = new AnnotationDocument();
-					// TODO: fix it
-					// document.setProject(nlpElement.getNlpProject());
+					
+					document.setLineLengthHint(
+							nlpElement.getNlpProject().getDotCorpus().getEditorLineLengthHint());
 
 					document.setDocument(workingCopy);
 					return document;
 				}
 				catch (CoreException e) {
-					mElementErrorStatus.put(element, new Status(IStatus.ERROR,
+					elementErrorStatus.put(element, new Status(IStatus.ERROR,
 							CasEditorPlugin.ID, IStatus.OK,
 							"There is a problem with the document: " + e.getMessage(), e));
 				}
@@ -57,29 +59,52 @@ public class CasDocumentProvider
 							"Not a cas document!", null);
 				}
 
-				mElementErrorStatus.put(element, status);
+				elementErrorStatus.put(element, status);
 			}
 		}
 
 		return null;
 	}
 
-	@Override
-	protected void doSaveDocument(IProgressMonitor monitor, Object element,
-			IDocument document, boolean overwrite) throws CoreException {
-	}
-	
 	private INlpElement getNlpElement(Object element) {
 		if (element instanceof FileEditorInput) {
 			FileEditorInput fileInput = (FileEditorInput) element;
 			
 			IFile file = fileInput.getFile();
-
+			
 			return CasEditorPlugin.getNlpModel().findMember(file);
 		}
 		
 		return null;
 	}
+	
+	@Override
+	protected void doSaveDocument(IProgressMonitor monitor, Object element,
+			IDocument document, boolean overwrite) throws CoreException {
+		fireElementStateChanging(element);
+		
+		INlpElement nlpElement = getNlpElement(element);
+		
+		DocumentElement documentElement;
+		
+		if (nlpElement instanceof DocumentElement) {
+			documentElement = (DocumentElement) nlpElement;
+		}
+		else {
+			throw new TaeError("nlpElement must be of type DocumentElement!");
+		}
+		
+		try {
+			documentElement.saveDocument();
+		}
+		catch (CoreException e) {
+			fireElementStateChangeFailed(element);
+			throw e;
+		}
+
+		fireElementDirtyStateChanged(element, false);
+	}
+	
 	
 	protected AnnotationStyle getAnnotationStyle(Object element, Type type) {
 		INlpElement nlpElement = getNlpElement(element);
@@ -99,4 +124,6 @@ public class CasDocumentProvider
 		
 		nlpElement.getNlpProject().setEditorAnnotationStatus(editorAnnotationStatus);
 	}
+	
+	// provide line length to editor
 }

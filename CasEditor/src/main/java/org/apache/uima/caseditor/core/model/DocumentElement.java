@@ -29,7 +29,7 @@ import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.editor.DocumentFormat;
 import org.apache.uima.caseditor.editor.DocumentUimaImpl;
-import org.apache.uima.caseditor.editor.IDocument;
+import org.apache.uima.caseditor.editor.ICasDocument;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -99,7 +99,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
    * @throws CoreException
    * @return the working copy
    */
-  public IDocument getDocument(boolean reload) throws CoreException {
+  public ICasDocument getDocument(boolean reload) throws CoreException {
 
     NlpProject project = (NlpProject) mParent.getParent();
 

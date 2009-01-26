@@ -51,7 +51,7 @@ public abstract class CasDocumentProvider extends AbstractDocumentProvider {
 	 *
 	 * The method {@link #getStatus(Object)} can then retrieve and return the status.
 	 */
-	protected Map<Object, IStatus> mElementErrorStatus =
+	protected Map<Object, IStatus> elementErrorStatus =
 			new HashMap<Object, IStatus>();
 
 	@Override
@@ -129,7 +129,7 @@ public abstract class CasDocumentProvider extends AbstractDocumentProvider {
 
 	@Override
 	public IStatus getStatus(Object element) {
-	    IStatus status = mElementErrorStatus.get(element);
+	    IStatus status = elementErrorStatus.get(element);
 
 	    if (status == null) {
 	      status = super.getStatus(element);
