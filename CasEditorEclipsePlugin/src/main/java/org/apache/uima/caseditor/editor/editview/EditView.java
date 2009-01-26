@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.editor.editview;
 
-
 import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.AnnotationEditorView;
@@ -29,39 +28,31 @@ import org.eclipse.ui.IWorkbenchPart;
  * TODO: add javadoc here
  */
 public final class EditView extends AnnotationEditorView {
-  /**
-   * The ID of the feature structure view.
-   */
-  public static final String ID = "org.apache.uima.caseditor.editview";
-  public static final String ID_2 = "org.apache.uima.caseditor.editview2";
+	/**
+	 * The ID of the feature structure view.
+	 */
+	public static final String ID = "org.apache.uima.caseditor.editview";
+	public static final String ID_2 = "org.apache.uima.caseditor.editview2";
 
+	public EditView() {
+		super("The edit view is currently not available.");
+	}
 
-  public EditView() {
-    super("The edit view is currently not available.");
-  }
+	@Override
+	protected PageRec doCreatePage(AnnotationEditor editor) {
 
-  @Override
-  protected PageRec doCreatePage(IWorkbenchPart part) {
+		PageRec result = null;
 
-	// if its not possible to create a result the view
-	// unavailable message is displayed
+		AnnotationDocument document = editor.getDocument();
 
-	PageRec result = null;
+		if (document != null) {
+			EditViewPage page = new EditViewPage(this, document);
+			initPage(page);
+			page.createControl(getPageBook());
 
-    if ((part instanceof AnnotationEditor)) {
-      AnnotationEditor editor = (AnnotationEditor) part;
+			result = new PageRec(editor, page);
+		}
 
-      AnnotationDocument document = editor.getDocument();
-
-      if (document != null) {
-	      EditViewPage page = new EditViewPage(this, document);
-	      initPage(page);
-	      page.createControl(getPageBook());
-
-	      result = new PageRec(part, page);
-      }
-    }
-
-    return result;
-  }
+		return result;
+	}
 }

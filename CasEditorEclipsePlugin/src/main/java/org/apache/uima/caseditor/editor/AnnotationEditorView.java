@@ -19,6 +19,7 @@
 
 package org.apache.uima.caseditor.editor;
 
+import org.apache.uima.cas.CAS;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.IPage;
@@ -26,6 +27,10 @@ import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
 
+/**
+ * Base view for views which show information about the {@link CAS} opened
+ * in the editor.
+ */
 public abstract class AnnotationEditorView extends PageBookView {
 
   private final String editorNotAvailableMessage;
@@ -43,6 +48,20 @@ public abstract class AnnotationEditorView extends PageBookView {
     return page;
   }
 
+  protected abstract PageRec doCreatePage(AnnotationEditor editor);
+  
+  @Override
+	protected final PageRec doCreatePage(IWorkbenchPart part) {
+	  
+	    if ((part instanceof AnnotationEditor)) {
+	        AnnotationEditor editor = (AnnotationEditor) part;
+	        
+	        return doCreatePage(editor);
+	    }
+	    
+		return null;
+	}
+  
   @Override
   protected IWorkbenchPart getBootstrapPart() {
     return getSite().getPage().getActiveEditor();

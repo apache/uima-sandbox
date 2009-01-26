@@ -19,11 +19,9 @@
 
 package org.apache.uima.caseditor.editor.fsview;
 
-
 import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.AnnotationEditorView;
-import org.eclipse.ui.IWorkbenchPart;
 
 /**
  */
@@ -38,28 +36,21 @@ public final class FeatureStructureBrowserView extends AnnotationEditorView {
   }
 
   @Override
-  protected PageRec doCreatePage(IWorkbenchPart part) {
+  protected PageRec doCreatePage(AnnotationEditor editor) {
 
-    // if its not possible to create a result the view
-	// unavailable message is displayed
+		PageRec result = null;
 
-	PageRec result = null;
+		AnnotationDocument document = editor.getDocument();
 
-    if ((part instanceof AnnotationEditor)) {
-      AnnotationEditor editor = (AnnotationEditor) part;
+		if (document != null) {
+			FeatureStructureBrowserViewPage page = new FeatureStructureBrowserViewPage(
+					document);
+			initPage(page);
+			page.createControl(getPageBook());
 
-      AnnotationDocument document = editor.getDocument();
+			result = new PageRec(editor, page);
+		}
 
-      if (document != null) {
-	      FeatureStructureBrowserViewPage page =
-	    	  new FeatureStructureBrowserViewPage(document);
-	      initPage(page);
-	      page.createControl(getPageBook());
-
-	      result = new PageRec(part, page);
-      }
-    }
-
-    return result;
-  }
+		return result;
+	}
 }

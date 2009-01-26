@@ -526,7 +526,7 @@ final class EditViewPage extends Page implements ISelectionListener {
     }
   }
 
-  TreeViewer viewer;
+  private TreeViewer viewer;
 
   private AnnotationDocument document;
 
@@ -565,8 +565,7 @@ final class EditViewPage extends Page implements ISelectionListener {
 
     valueColumn.setLabelProvider(new ValueColumnLabelProvider());
 
-    valueColumn.setEditingSupport(new ValueEditingSupport(viewer)
-    );
+    valueColumn.setEditingSupport(new ValueEditingSupport(viewer));
 
 
     FeatureStructureContentProvider contentProvider =
