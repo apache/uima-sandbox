@@ -31,13 +31,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Message;
-
+import org.apache.uima.aae.error.UimaASProcessCasTimeout;
 import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaASPingTimeout;
+import org.apache.uima.aae.error.UimaASProcessCasTimeout;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.cas.CAS;
@@ -69,6 +70,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	protected long expectedProcessTime = 0;
 	boolean serviceShutdownException = false;
 	List<Class> exceptionsToIgnore = new ArrayList<Class>();
+	private int timeoutCounter = 0;
+	private Object errorCounterMonitor = new Object(); 
+	private BaseUIMAAsynchronousEngine_impl engine;
 	
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
 	{
@@ -251,6 +255,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		// Deploy Uima EE Primitive Service
 		final String containerId = deployService(eeUimaEngine, serviceDeplyDescriptor);
+		
+		engine = eeUimaEngine;
+		
 		Thread t1 = null;
 		Thread t2 = null;
     Map appCtx = buildContext(String.valueOf(broker.getMasterConnectorURI()), queueName, timeout);
@@ -322,6 +329,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
   protected void runCrTest(BaseUIMAAsynchronousEngine_impl aUimaEeEngine, int howMany) throws Exception
   {
     Thread t = null;
+    engine = aUimaEeEngine;
     
     final AtomicBoolean ctrlMonitor = new AtomicBoolean();
     t = spinMonitorThread(ctrlMonitor, howMany, PROCESS_LATCH);
@@ -357,7 +365,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		Thread t2 = null;
 		serviceShutdownException = false;
 		unexpectedException = false;
-		
+    engine = aUimaEeEngine;
+
 		if (appCtx == null)
 		{
 			appCtx = buildContext(aBrokerURI, aTopLevelServiceQueueName, 0);
@@ -442,6 +451,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	{
 		Thread t1 = null;
 		Thread t2 = null;
+    engine = aUimaEeEngine;
 
 		if (appCtx == null)
 		{
@@ -516,6 +526,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	 */
 	protected void sendCAS(BaseUIMAAsynchronousEngine_impl eeUimaEngine, int howMany, boolean sendCasAsynchronously) throws Exception
 	{
+    engine = eeUimaEngine;
 		for (int i = 0; i < howMany; i++)
 		{
 			CAS cas = eeUimaEngine.getCAS();
@@ -527,7 +538,6 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 			{
 				cas.setDocumentText(text);
 			}
-			System.out.println(" Sending CAS");
 			if (sendCasAsynchronously)
 			{
 				eeUimaEngine.sendCAS(cas);
@@ -583,6 +593,19 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 				else if ( ignoreException( e.getClass()))
 				{
 				  expectedException = true;
+				} else if ( e instanceof ResourceProcessException && isProcessTimeout(e) ) {
+				  synchronized(errorCounterMonitor) {
+	          System.out.println("Incrementing ProcessTimeout Counter");
+				    timeoutCounter++;
+				  }
+				} else if ( engine != null && e instanceof UimaASPingTimeout) {
+				  System.out.println(".......... Listener Stopping Uima AS Due to Ping Timeout. Service Not Responding To Ping");
+			    if ( cpcLatch != null)
+			    {
+			      cpcLatch.countDown();
+			    }
+
+				  engine.stop();
 				}
 				if ( !expectedException && !expectingServiceShutdownException )
 				{
@@ -662,6 +685,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 			}
 			incrementCASesProcessed();
 		}
+	}
+	private boolean isProcessTimeout( Exception e) {
+	  return (e.getCause() != null && (e.getCause() instanceof UimaASProcessCasTimeout )); 
 	}
 	/**
 	 * Callback method which is called by Uima EE client when the initialization 
