@@ -83,4 +83,7 @@ public interface AsynchAEMessage
   public static final String Serialization = "Serialization";
   public static final int XmiSerialization = 4000;
   public static final int BinarySerialization = 4001;
+  
+  public static final String ErrorCause = "Cause";
+  public static final int PingTimeout = 5001;
 }

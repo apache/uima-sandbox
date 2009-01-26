@@ -31,6 +31,7 @@ import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.MessageTimeoutException;
+import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.util.Level;
 
@@ -545,6 +546,19 @@ public abstract class Delegate {
    *          - command for which the timer is started
    */
   private void startDelegateTimer(final String aCasReferenceId, final int aCommand) {
+    //  Check if we are awaiting a Ping reply. While awaiting ping reply dont start
+    //  a new timer.
+    if ( isAwaitingPingReply() ) {
+      //  Ping is actually a GetMeta request
+      if ( aCommand == AsynchAEMessage.GetMeta ) {
+        //  Cancel any outstanding timers. A timer for a Ping message is about to
+        //  be started. Another thread may have started a Process timer.
+        cancelDelegateTimer();
+      } else {
+        //  We are waiting for a ping reply, don't start a new timer
+        return;
+      }
+    }
     final long timeToWait = getTimeoutValueForCommand(aCommand);
     Date timeToRun = new Date(System.currentTimeMillis() + timeToWait);
     timer = new Timer("Controller:" + getComponentName() + ":TimerThread-Endpoint_impl:" + endpoint
@@ -581,6 +595,7 @@ public abstract class Delegate {
             //  Override the command to make sure this timeout is handled
             //  by the ProcessCasErrorHandler.
             errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+            errorContext.add(AsynchAEMessage.ErrorCause, AsynchAEMessage.PingTimeout);
           }
         } else if (AsynchAEMessage.CollectionProcessComplete == aCommand) {
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
