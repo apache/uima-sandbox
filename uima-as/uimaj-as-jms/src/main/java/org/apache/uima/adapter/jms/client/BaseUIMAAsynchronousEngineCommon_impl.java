@@ -1490,6 +1490,9 @@ implements UimaAsynchronousEngine, MessageListener
         }
       }
     }
+    if ( abort ) {
+      throw new ResourceProcessException(new RuntimeException("Uima AS Client API Stopping"));
+    }
     try {
       // check if timeout exception
       if (cachedRequest.isTimeoutException()) {
