@@ -25,12 +25,18 @@ import java.util.HashSet;
 import org.apache.uima.cas.Type;
 
 /**
- * TODO: add javadoc here
+ * The {@link EditorAnnotationStatus} are editor settings which are associated with
+ * one project. 
+ *
+ * When a new editor is opened the {@link EditorAnnotationStatus} is used to
+ * initialize it, with that information the editor can show the same information
+ * as the previously opened editor. 
  */
 public class EditorAnnotationStatus {
-  private String mMode;
+	
+  private String mode;
 
-  private Collection<String> mDisplayAnnotations = new HashSet<String>();
+  private Collection<String> displayAnnotations = new HashSet<String>();
 
   /**
    * Initializes a new instance.
@@ -43,12 +49,12 @@ public class EditorAnnotationStatus {
       throw new IllegalArgumentException("Mode must not be null!");
     }
 
-    mMode = mode;
+    this.mode = mode;
 
     if (displayAnnotations != null) {
 
       for (Type type : displayAnnotations) {
-        mDisplayAnnotations.add(type.getName());
+        this.displayAnnotations.add(type.getName());
       }
     }
   }
@@ -59,7 +65,7 @@ public class EditorAnnotationStatus {
    * @return the editor mode
    */
   public String getMode() {
-    return mMode;
+    return mode;
   }
 
   /**
@@ -68,6 +74,6 @@ public class EditorAnnotationStatus {
    * @return the display annotations
    */
   public Collection<String> getDisplayAnnotations() {
-    return mDisplayAnnotations;
+    return displayAnnotations;
   }
 }
