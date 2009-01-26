@@ -174,6 +174,8 @@ implements UimaAsynchronousEngine, MessageListener
   
   private Object stopMux = new Object();
   
+  private Object sendMux = new Object();
+  
 	protected List pendingMessageList = new ArrayList();
 	protected volatile boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
@@ -539,86 +541,101 @@ implements UimaAsynchronousEngine, MessageListener
 	 * Sends a given CAS for analysis to the UIMA EE Service.
 	 * 
 	 */
-	private synchronized String sendCAS(CAS aCAS, ClientRequest requestToCache) throws ResourceProcessException
+	private String sendCAS(CAS aCAS, ClientRequest requestToCache) throws ResourceProcessException
 	{
-		String casReferenceId = requestToCache.getCasReferenceId();
-		try
-		{
-			if (!running)
-			{
-        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "sendCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_not_sending_cas_INFO", new Object[] { "Asynchronous Client is Stopping" });
-        }
-        return null;
-			}
-			PendingMessage msg = new PendingMessage(AsynchAEMessage.Process);
-			long t1 = System.nanoTime();
-			if ( serializationStrategy.equals("xmi")) {
-	      XmiSerializationSharedData serSharedData = new XmiSerializationSharedData();
-	      String serializedCAS = serializeCAS(aCAS, serSharedData);
-	      msg.put( AsynchAEMessage.CAS, serializedCAS);
-	      if (remoteService)
+	  synchronized( sendMux ) {
+	    String casReferenceId = requestToCache.getCasReferenceId();
+	    try
+	    {
+	      if (!running)
 	      {
-	        requestToCache.setCAS(aCAS);
-	        //  Store the serialized CAS in case the timeout occurs and need to send the 
-	        //  the offending CAS to listeners for reporting
-	        requestToCache.setCAS(serializedCAS);
-	        requestToCache.setXmiSerializationSharedData(serSharedData);
+	        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "sendCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_not_sending_cas_INFO", new Object[] { "Asynchronous Client is Stopping" });
+	        }
+	        return null;
 	      }
-			} else {
-        byte[] serializedCAS = uimaSerializer.serializeCasToBinary(aCAS);
-        msg.put( AsynchAEMessage.CAS, serializedCAS);
-        if (remoteService)
-        {
-          requestToCache.setCAS(aCAS);
-        }
-			}
-			  
-      requestToCache.setSerializationTime(System.nanoTime()-t1);
-			msg.put( AsynchAEMessage.CasReference, casReferenceId);
-			requestToCache.setIsRemote(remoteService);
-			requestToCache.setEndpoint(getEndPointName());
-			requestToCache.setProcessTimeout(processTimeout);
-			requestToCache.setThreadId(Thread.currentThread().getId());
-      requestToCache.clearTimeoutException();
 
-			clientCache.put(casReferenceId, requestToCache);
+	      PendingMessage msg = new PendingMessage(AsynchAEMessage.Process);
+	      long t1 = System.nanoTime();
+	      if ( serializationStrategy.equals("xmi")) {
+	        XmiSerializationSharedData serSharedData = new XmiSerializationSharedData();
+	        String serializedCAS = serializeCAS(aCAS, serSharedData);
+	        msg.put( AsynchAEMessage.CAS, serializedCAS);
+	        if (remoteService)
+	        {
+	          requestToCache.setCAS(aCAS);
+	          //  Store the serialized CAS in case the timeout occurs and need to send the 
+	          //  the offending CAS to listeners for reporting
+	          requestToCache.setCAS(serializedCAS);
+	          requestToCache.setXmiSerializationSharedData(serSharedData);
+	        }
+	      } else {
+	        byte[] serializedCAS = uimaSerializer.serializeCasToBinary(aCAS);
+	        msg.put( AsynchAEMessage.CAS, serializedCAS);
+	        if (remoteService)
+	        {
+	          requestToCache.setCAS(aCAS);
+	        }
+	      }
+	        
+	      requestToCache.setSerializationTime(System.nanoTime()-t1);
+	      msg.put( AsynchAEMessage.CasReference, casReferenceId);
+	      requestToCache.setIsRemote(remoteService);
+	      requestToCache.setEndpoint(getEndPointName());
+	      requestToCache.setProcessTimeout(processTimeout);
+	      requestToCache.setThreadId(Thread.currentThread().getId());
+	      requestToCache.clearTimeoutException();
 
-      //  Check delegate's state before sending it a CAS. The delegate
-      //  may have previously timed out and the client is in a process of pinging
-      //  the delegate to check its availability. While the delegate
-      //  is in this state, delay CASes by placing them on a list of
-      //  CASes pending dispatch. Once the ping reply is received all
-      //  delayed CASes will be dispatched to the delegate.
-      if ( !delayCasIfDelegateInTimedOutState( casReferenceId) ) {
-        //  The delegate state is normal, add the CAS Id to the list
-        //  of CASes sent to the delegate.
-        serviceDelegate.addCasToOutstandingList(casReferenceId);
-      } else {
-        //  CAS was added to the list of CASes pending dispatch. The service
-        //  has previously timed out. A Ping message was dispatched to test
-        //  service availability. When the Ping reply is received ALL CASes
-        //  from the list of CASes pending dispatch will be sent to the 
-        //  delegate.
-        return casReferenceId;
-      }
-      synchronized( pendingMessageList )
-			{
-				pendingMessageList.add(msg);
-				pendingMessageList.notifyAll();
-			}
-			
-			synchronized (cpcGate)
-			{
-				howManySent++;
-			}
-		}
-		catch (Exception e)
-		{
-			throw new ResourceProcessException(e);
-		}
-		return casReferenceId;
-
+	      clientCache.put(casReferenceId, requestToCache);
+	      // The sendCAS() method is synchronized no need to synchronize the code 
+	      // below
+	      if ( serviceDelegate.getState() == Delegate.TIMEOUT_STATE && 
+	              !serviceDelegate.isAwaitingPingReply()) {
+	        serviceDelegate.setAwaitingPingReply();
+	        System.out.println("--------------> Client Sending Ping Message");
+	        // Send PING Request to check delegate's availability
+	        sendMetaRequest();
+	        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_client_sending_ping__FINE",
+	            new Object[] { serviceDelegate.getKey() });
+	        }
+	      }
+	      //  Check delegate's state before sending it a CAS. The delegate
+	      //  may have previously timed out and the client is in a process of pinging
+	      //  the delegate to check its availability. While the delegate
+	      //  is in this state, delay CASes by placing them on a list of
+	      //  CASes pending dispatch. Once the ping reply is received all
+	      //  delayed CASes will be dispatched to the delegate.
+	      if ( !delayCasIfDelegateInTimedOutState( casReferenceId) ) {
+	        //  The delegate state is normal, add the CAS Id to the list
+	        //  of CASes sent to the delegate.
+	        serviceDelegate.addCasToOutstandingList(casReferenceId);
+	      } else {
+	        System.out.println("..... Delaying CAS. Awaiting Ping Reply");
+	        //  CAS was added to the list of CASes pending dispatch. The service
+	        //  has previously timed out. A Ping message was dispatched to test
+	        //  service availability. When the Ping reply is received ALL CASes
+	        //  from the list of CASes pending dispatch will be sent to the 
+	        //  delegate.
+	        return casReferenceId;
+	      }
+	      synchronized( pendingMessageList )
+	      {
+	        pendingMessageList.add(msg);
+	        pendingMessageList.notifyAll();
+	      }
+	      
+	      synchronized (cpcGate)
+	      {
+	        howManySent++;
+	      }
+	    }
+	    catch (Exception e)
+	    {
+	      throw new ResourceProcessException(e);
+	    }
+	    return casReferenceId;
+	  }
 	}
 	
   /**
@@ -807,7 +824,6 @@ implements UimaAsynchronousEngine, MessageListener
 			switch( aCommand )
 			{
 			case AsynchAEMessage.GetMeta:
-      case AsynchAEMessage.Ping:
 				statCL.initializationComplete(aStatus);
 				break;
 				
@@ -816,6 +832,7 @@ implements UimaAsynchronousEngine, MessageListener
 				break;
 				
       case AsynchAEMessage.Process:
+      case AsynchAEMessage.Ping:
 				statCL.entityProcessComplete(aCAS, aStatus);
 				break;
 			}
@@ -1451,6 +1468,7 @@ implements UimaAsynchronousEngine, MessageListener
 
     ClientRequest cachedRequest = produceNewClientRequestObject();
     cachedRequest.setSynchronousInvocation();
+    
     // send CAS. This call does not block. Instead we will block the sending thread below.
     casReferenceId = sendCAS(aCAS, cachedRequest);
     if (threadMonitor != null && threadMonitor.getMonitor() != null) {
@@ -1481,6 +1499,10 @@ implements UimaAsynchronousEngine, MessageListener
             //  If there service is in the ok state and the CAS is in the
             //  list of CASes pending dispatch, remove the CAS from the list
             //  and send it to the service.
+            if (cachedRequest.isTimeoutException()) {
+              // Handled below
+              break;
+            }
             if ( running && serviceDelegate.getState() == Delegate.OK_STATE && 
                  serviceDelegate.removeCasFromPendingDispatchList(casReferenceId)) {
               sendCAS(aCAS, cachedRequest);
@@ -1602,7 +1624,6 @@ implements UimaAsynchronousEngine, MessageListener
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "notifyOnTimout", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_process_timeout_INFO", new Object[] { anEndpoint });
       }
 		  ClientRequest cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
-
 		  if ( cachedRequest == null )
 		  {
 		    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {

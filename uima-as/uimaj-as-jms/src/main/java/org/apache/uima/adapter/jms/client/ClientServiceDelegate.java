@@ -73,26 +73,28 @@ public class ClientServiceDelegate extends Delegate {
               if (cachedRequest != null && cachedRequest.isRemote()) {
                 cas = cachedRequest.getCAS();
               }
-              if ( isAwaitingPingReply() ) {
+              boolean isPingTimeout = false;
+              if ( errorContext.containsKey(AsynchAEMessage.ErrorCause)) {
+                isPingTimeout =  
+                  AsynchAEMessage.PingTimeout == 
+                    (Integer)errorContext.get(AsynchAEMessage.ErrorCause);
+              }
+              if ( isPingTimeout && isAwaitingPingReply() ) {
                 System.out.println(">>>>> Client Ping Timedout");
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "handleError", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_client_ping_timed_out__WARNING",
+                        new Object[] { getKey() });
+                
                 clientUimaAsEngine.notifyOnTimout(cas, clientUimaAsEngine.getEndPointName(), BaseUIMAAsynchronousEngineCommon_impl.PingTimeout, casReferenceId);
-                System.out.println("Stopping Uima AS Client API. Service Not Responding To a Ping.");
-                clientUimaAsEngine.stop();
-                break;
-              } 
-            }
-            clientUimaAsEngine.clientSideJmxStats.incrementProcessTimeoutErrorCount();
-            System.out.println(">>>>> Client Process Timed Out");
-            if ( !isAwaitingPingReply()) {
-              setAwaitingPingReply();
-              System.out.println(">>>>> Client Sending Ping");
-              // Send PING Request to check delegate's availability
-              clientUimaAsEngine.sendMetaRequest();
-              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "handleError", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_client_sending_ping__FINE",
-                  new Object[] { getKey() });
+              } else {
+                if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+                  UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleError", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_client_process_timedout__INFO",
+                          new Object[] { getGetMetaTimeout() });
+                }
+                System.out.println(">>>>> Client Process Timed out. Notifying Listeners");
+                clientUimaAsEngine.notifyOnTimout(cas, clientUimaAsEngine.getEndPointName(), BaseUIMAAsynchronousEngineCommon_impl.ProcessTimeout, casReferenceId);
               }
             }
+            clientUimaAsEngine.clientSideJmxStats.incrementProcessTimeoutErrorCount();
             break;
             
           case AsynchAEMessage.GetMeta:
