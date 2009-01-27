@@ -583,22 +583,21 @@ implements ExceptionListener
    */
   public void destroy() {
     super.destroy();
-    if ( taskExecutor != null && taskExecutor instanceof ThreadPoolTaskExecutor) {
-      ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().shutdown();
-      try {
-        ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-      } catch ( Exception e){}
-    }
-    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST) ) {
-      threadGroup.getParent().list();
-    }
-
     //  Spin a thread that will wait until all threads complete. This is needed to avoid
     //  memory leak caused by the fact that we did not wait to collect the threads
     //  
     Thread threadGroupDestroyer = new Thread(threadGroup.getParent().getParent(),"threadGroupDestroyer") {
         public void run() {
-          
+          if ( taskExecutor != null && taskExecutor instanceof ThreadPoolTaskExecutor) {
+            ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().shutdown();
+            try {
+              ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            } catch ( Exception e){}
+          }
+          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST) ) {
+            threadGroup.getParent().list();
+          }
+
           while (threadGroup.activeCount() > 0) {
             try {
               Thread.sleep(100);

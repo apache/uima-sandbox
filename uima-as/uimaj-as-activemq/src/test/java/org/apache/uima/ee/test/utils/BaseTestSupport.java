@@ -43,6 +43,7 @@ import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.EntityProcessStatus;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.ProcessTraceEvent;
@@ -80,7 +81,20 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, "../uima-as-distr/src/main/scripts/dd2spring.xsl".replace('/', FS));
 		appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:../uima-as-distr/src/main/saxon/saxon8.jar".replace('/', FS)); 
 //		appCtx.put(UimaAsynchronousEngine.UimaEeDebug, UimaAsynchronousEngine.UimaEeDebug);
-		String containerId = eeUimaEngine.deploy(aDeploymentDescriptorPath, appCtx);
+		String containerId=null;
+		try {
+		  containerId = eeUimaEngine.deploy(aDeploymentDescriptorPath, appCtx);
+		} catch( ResourceInitializationException e) {
+		  if ( !ignoreException(ResourceInitializationException.class)) {
+		    System.out.println(">>>>>>>>>>> Stopping Client API Due To Initialization Exception");
+		    eeUimaEngine.stop();
+		    throw e;
+		  }
+      System.out.println(">>>>>>>>>>> Exception ---:"+e.getClass().getName());
+		} catch( Exception e) {
+      System.out.println(">>>>>>>>>>> Exception:"+e.getClass().getName());
+      throw e;
+		}
 		return containerId;
 	}
 
@@ -371,7 +385,17 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		{
 			appCtx = buildContext(aBrokerURI, aTopLevelServiceQueueName, 0);
 		}
-		initialize(aUimaEeEngine, appCtx);
+		try {
+	    initialize(aUimaEeEngine, appCtx);
+		} catch ( ResourceInitializationException e) {
+		  if ( ignoreException(ResourceInitializationException.class)) {
+		    return;
+		  } else {
+		    throw e;
+		  }
+		} catch ( Exception e) {
+      throw e;
+		}
 
 		// Wait until the top level service returns its metadata
 		waitUntilInitialized();

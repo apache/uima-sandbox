@@ -20,7 +20,6 @@
 package org.apache.uima.ee.test;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -44,7 +43,6 @@ import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.controller.Endpoint;
-import org.apache.uima.aae.error.MessageTimeoutException;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.JmsOutputChannel;
@@ -62,8 +60,6 @@ import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.XMLInputSource;
-
-import com.thoughtworks.xstream.XStream.InitializationException;
 
 public class TestUimaASExtended extends BaseTestSupport
 {
@@ -311,7 +307,8 @@ public class TestUimaASExtended extends BaseTestSupport
     	containerIds[1] = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFlowControllerExceptionOnInitialization.xml");
       fail("Expected ResourceInitializationException. Instead, the Aggregate Deployed Successfully");
     } catch (ResourceInitializationException e) {
-      System.out.println("\nExpected Initialization Exception was received - cause: "+e.getCause());
+      Exception cause = getCause(e);
+      System.out.println("\nExpected Initialization Exception was received:"+cause);
     } catch (Exception e) {
       fail("Expected ResourceInitializationException. Instead Got:" + e.getClass());
     }
@@ -339,7 +336,8 @@ public class TestUimaASExtended extends BaseTestSupport
         containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFlowControllerExceptionOnInitialization.xml");
       fail("Expected ResourceInitializationException. Instead, the Aggregate Deployed Successfully");
     } catch (ResourceInitializationException e) {
-      System.out.println("\nExpected Initialization Exception was received - cause: "+e.getCause());
+      Exception cause = getCause(e);
+      System.out.println("\nExpected Initialization Exception was received - cause: "+cause);
     } catch (Exception e) {
       fail("Expected ResourceInitializationException. Instead Got:" + e.getClass());
     }
@@ -1197,8 +1195,10 @@ public class TestUimaASExtended extends BaseTestSupport
     }
     catch( ResourceInitializationException e)
     {
-        System.out.println("Expected Initialization Exception was received");
-        eeUimaEngine.stop();
+      Exception cause = getCause(e);
+
+      System.out.println("Expected Initialization Exception was received:"+cause);
+      eeUimaEngine.stop();
     }
 	catch( Exception e)
 	{
@@ -1238,7 +1238,8 @@ public class TestUimaASExtended extends BaseTestSupport
 	}
 	catch( ResourceInitializationException e)
 	{
-	    System.out.println("Expected Initialization Exception was received");
+    Exception cause = getCause(e);
+    System.out.println("Expected Initialization Exception was received:"+cause);
 	}
 	catch( Exception e)
 	{
@@ -1306,7 +1307,8 @@ public class TestUimaASExtended extends BaseTestSupport
 	}
 	catch( ResourceInitializationException e)
 	{
-	    System.out.println("Expected Initialization Exception was received");
+    Exception cause = getCause(e);
+    System.out.println("Expected Initialization Exception was received:"+cause);
 	}
 	catch( Exception e)
 	{
@@ -1344,6 +1346,46 @@ public class TestUimaASExtended extends BaseTestSupport
       fail("Third annotator should not have seen CAS");
     }
   }
+  
+/**
+ * Test use of a JMS Service Adapter.
+ * Invoke from a synchronous aggregate to emulate usage from RunAE or RunCPE.
+ *
+ * @throws Exception
+ */
+  public void testJmsServiceAdapter() throws Exception {
+    System.out.println("-------------- testJmsServiceAdapter -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
+
+  public void testJmsServiceAdapterWithException() throws Exception {
+    System.out.println("-------------- testJmsServiceAdapterWithException -------------");
+	  BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
+  
+  public void testJmsServiceAdapterWithProcessTimeout() throws Exception {
+    System.out.println("-------------- testJmsServiceAdapterWithProcessTimeout -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsServiceLongDelay.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
+
+  public void testJmsServiceAdapterWithGetmetaTimeout() throws Exception {
+    System.out.println("-------------- testJmsServiceAdapterWithGetmetaTimeout -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    addExceptionToignore(ResourceInitializationException.class);
+    deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 1500 );
+    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
 
   public void testDeployAgainAndAgain() throws Exception
 	  {
@@ -1358,7 +1400,13 @@ public class TestUimaASExtended extends BaseTestSupport
 	      runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	    }
 	  }	
-
+  private Exception getCause( Throwable e) {
+    Exception cause = (Exception)e;
+    while ( cause.getCause() != null ) {
+      cause = (Exception)cause.getCause();
+    }
+    return cause;
+  }
 
 	/**
 	 * This tests GetMeta retries. It deploys a simple Aggregate service that contains a collocated 

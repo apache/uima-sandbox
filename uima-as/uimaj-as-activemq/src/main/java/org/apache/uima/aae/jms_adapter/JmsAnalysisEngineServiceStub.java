@@ -62,6 +62,8 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
   public static final String PARAM_BROKER_URL = "brokerUrl";
   public static final String PARAM_ENDPOINT = "endpoint";
   public static final String PARAM_TIMEOUT = "timeout";
+  public static final String PARAM_GETMETA_TIMEOUT = "getmetatimeout";
+  
   public static final String PARAM_BIN_SERIALIZTION = "binary_serialization";
   private Object mux = new Object();
   private boolean cpcReceived;
@@ -73,6 +75,8 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
     String brokerUrl = null;
     String endpoint = null;
     int timeout = 0;
+    int getMetaTimeout = 0;
+    
     String binary_serialization = null;
     for (int i = 0; i < parameters.length; i++) {
       if (PARAM_BROKER_URL.equalsIgnoreCase(parameters[i].getName())) {
@@ -87,6 +91,9 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
       else if (PARAM_BIN_SERIALIZTION.equalsIgnoreCase(parameters[i].getName())) {
         binary_serialization = parameters[i].getValue();
       }
+      else if (PARAM_GETMETA_TIMEOUT.equalsIgnoreCase(parameters[i].getName())) {
+        getMetaTimeout = Integer.parseInt(parameters[i].getValue());
+      }
     }
     
     // initialize UIMA EE Engine
@@ -95,8 +102,12 @@ public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub,
     appCtxt.put(UimaAsynchronousEngine.Endpoint, endpoint);
     appCtxt.put(UimaAsynchronousEngine.CasPoolSize, 0);
     if (timeout > 0) {
-      System.out.println("setting timeout: " + timeout);
+      System.out.println("Setting Process Timeout: " + timeout);
       appCtxt.put(UimaAsynchronousEngine.Timeout, timeout);
+    }
+    if (getMetaTimeout > 0) {
+      System.out.println("Setting GetMeta Timeout: " + getMetaTimeout);
+      appCtxt.put(UimaAsynchronousEngine.GetMetaTimeout, getMetaTimeout);
     }
     if (binary_serialization != null && binary_serialization.equalsIgnoreCase("true")) {
       System.out.println("Using binary serialization");

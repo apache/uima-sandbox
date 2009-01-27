@@ -519,10 +519,12 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		}
 		catch (ResourceInitializationException e)
 		{
-			throw e;
+		  notifyOnInitializationFailure(e);
+		  throw e;
 		}
 		catch (Exception e)
 		{
+      notifyOnInitializationFailure(e);
 			throw new ResourceInitializationException(e);
 		}
 		if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
@@ -610,7 +612,8 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		{
 			if (!springContainerRegistry.containsKey(aSpringContainerId))
 			{
-				throw new InvalidContainerException("Invalid Spring container Id:" + aSpringContainerId + ". Unable to undeploy the Spring container");
+			  return;
+				//throw new InvalidContainerException("Invalid Spring container Id:" + aSpringContainerId + ". Unable to undeploy the Spring container");
 			}
 			// Fetch an administrative context which contains a Spring Container
 			adminContext = (UimaEEAdminSpringContext) springContainerRegistry.get(aSpringContainerId);
@@ -802,7 +805,6 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	    {
 	      serviceMonitor.notifyAll();
 	    }
-	    
 	  }
 
 	  public void notifyOnInitializationSuccess(AnalysisEngineController aController) {
