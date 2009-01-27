@@ -68,6 +68,7 @@ public class UimaAsThreadFactory implements ThreadFactory {
                 
               } catch( Exception e) {
                 e.printStackTrace();
+                return;
             }
             //  Call given Worker (Runnable) run() method and block. This call block until the 
             //  TaskExecutor is terminated. 

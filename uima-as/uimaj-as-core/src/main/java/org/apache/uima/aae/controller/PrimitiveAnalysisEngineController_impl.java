@@ -124,35 +124,35 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	  // Parse the descriptor in the calling thread.
 	  try {
 	    rSpecifier = UimaClassFactory.produceResourceSpecifier(super.aeDescriptor);
+	    synchronized( mux ) {
+	      AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(rSpecifier, paramsMap);
+	      System.out.println(">>>>> Controller:"+getComponentName()+" Completed Initialization of New AE Instance In Thread::"+Thread.currentThread().getId()+" AE Instance Hashcode:"+ae.hashCode());
+	      if ( aeInstancePool == null ) {
+	        aeInstancePool = new AnalysisEngineInstancePoolWithThreadAffinity(analysisEnginePoolSize);
+	      }
+	      if ( analysisEngineMetadata == null ) {
+	        analysisEngineMetadata = ae.getAnalysisEngineMetaData();
+	      }
+        aeInstancePool.checkin(ae);
+	      if ( aeInstancePool.size() == analysisEnginePoolSize ) {
+	        try {
+	          System.out.println("Controller:"+getComponentName()+ " All AE Instances Have Been Instantiated. Completing Initialization");
+	          postInitialize();
+	        } catch ( Exception e) {
+	          e.printStackTrace();
+	          throw new ResourceInitializationException(e);
+	        }
+	      }
+	    }
+
 	  } catch ( Exception e) {
 	    e.printStackTrace();
+      if ( isTopLevelComponent() ) {
+        super.notifyListenersWithInitializationStatus(e);
+      }
 	    throw new ResourceInitializationException(e);
 	  }
 
-    synchronized( mux ) {
-      AnalysisEngine ae =  UIMAFramework.produceAnalysisEngine(rSpecifier, paramsMap);
-      System.out.println(">>>>> Controller:"+getComponentName()+" Completed Initialization of New AE Instance In Thread::"+Thread.currentThread().getId()+" AE Instance Hashcode:"+ae.hashCode());
-      if ( aeInstancePool == null ) {
-        aeInstancePool = new AnalysisEngineInstancePoolWithThreadAffinity(analysisEnginePoolSize);
-      }
-      if ( analysisEngineMetadata == null ) {
-        analysisEngineMetadata = ae.getAnalysisEngineMetaData();
-      }
-      try {
-        aeInstancePool.checkin(ae);
-      } catch( Exception e) {
-        throw new ResourceInitializationException(e);
-      }
-      if ( aeInstancePool.size() == analysisEnginePoolSize ) {
-        try {
-          System.out.println("Controller:"+getComponentName()+ " All AE Instances Have Been Instantiated. Completing Initialization");
-          postInitialize();
-        } catch ( Exception e) {
-          e.printStackTrace();
-          throw new ResourceInitializationException(e);
-        }
-      }
-    }
 	}
   public boolean threadAssignedToAE() {
     if ( aeInstancePool == null ) {
