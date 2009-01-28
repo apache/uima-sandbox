@@ -34,7 +34,9 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.management.ObjectName;
 
+import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQPrefetchPolicy;
 import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.command.ActiveMQBytesMessage;
 import org.apache.activemq.command.ActiveMQDestination;
@@ -278,26 +280,22 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		{
 			ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(aBrokerURI);
 			connection = factory.createConnection();
+			// This only effects Consumer
+			addPrefetch((ActiveMQConnection)connection);
 			connection.start();
 		}
 		return connection;
 	}
 
+	private void addPrefetch(ActiveMQConnection aConnection ) {
+    ActiveMQPrefetchPolicy prefetchPolicy = new ActiveMQPrefetchPolicy();
+    prefetchPolicy.setQueuePrefetch(5);
+    ((ActiveMQConnection)aConnection).setPrefetchPolicy(prefetchPolicy);
+	}
 	private void validateConnection(String aBrokerURI) throws Exception
 	{
-		if (connection == null)
-		{
-			ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(aBrokerURI);
-			System.out.println(">>>>>>>>>>>>> BaseUIMAAsynchronousEngine_impl.validateConnection() Adding policy");
-	        RedeliveryPolicy policy = new RedeliveryPolicy();
-	        policy.setMaximumRedeliveries(1);
-	        policy.setBackOffMultiplier((short) 1);
-	        policy.setInitialRedeliveryDelay(10);
-	        policy.setUseExponentialBackOff(false);
-	        factory.setRedeliveryPolicy(policy);
-
-			connection = factory.createConnection();
-			connection.start();
+		if (connection == null)	{
+			connection = getConnection(aBrokerURI);
 		}
 	}
 	protected Session getSession(String aBrokerURI) throws Exception
