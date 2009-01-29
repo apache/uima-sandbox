@@ -32,6 +32,7 @@
 		<groupId>org.apache.uima</groupId>
 		<artifactId>uimaj-as</artifactId>
 		<version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../uimaj-as</relativePath>
 	</parent>
 	<dependencies>
 		

@@ -30,6 +30,7 @@
     
     <!-- the version of base UIMA this version goes with -->
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../uimaj</relativePath>
     
   </parent>
   <properties>
