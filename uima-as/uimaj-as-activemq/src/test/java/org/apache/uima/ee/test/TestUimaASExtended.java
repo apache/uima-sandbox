@@ -459,7 +459,7 @@ public class TestUimaASExtended extends BaseTestSupport
         Object mux = new Object();
         synchronized( mux ) {
           try {
-            mux.wait(300);
+            mux.wait(500);
             //  Undeploy service container
             eeUimaEngine.undeploy(containerID);
           } catch (Exception e) {}
@@ -818,6 +818,13 @@ public class TestUimaASExtended extends BaseTestSupport
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
+  public void testProcessAggregateWithInnerCMAggregate() throws Exception
+  {
+    System.out.println("-------------- testProcessAggregateWithInnerCMAggregate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_TopAggregateWithInnerAggregateCM.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
 	
 	public void testBlueJDeployment() throws Exception
 	{
