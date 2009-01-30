@@ -29,6 +29,34 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     return null;
   }
   
+  public String lookupInputCasReferenceId(String aCasReferenceId) {
+    String parentCasReferenceId=null;
+    if ( this.containsKey(aCasReferenceId)) {
+      CasStateEntry entry = (CasStateEntry)get(aCasReferenceId);
+      if ( entry.isSubordinate()) {
+        //  recursively call each parent until we get to the top of the 
+        //  Cas hierarchy
+        parentCasReferenceId = lookupInputCasReferenceId(entry.getInputCasReferenceId());
+      } else {
+        return aCasReferenceId;
+      }
+    }
+    return parentCasReferenceId;
+  }
+
+  public String lookupInputCasReferenceId(CasStateEntry entry) {
+    String parentCasReferenceId=null;
+    if ( entry.isSubordinate()) {
+      //  recursively call each parent until we get to the top of the 
+      //  Cas hierarchy
+      parentCasReferenceId = 
+        lookupInputCasReferenceId((CasStateEntry)get(entry.getInputCasReferenceId()));
+    } else {
+      return entry.getCasReferenceId();
+    }
+    return parentCasReferenceId;
+  }
+  
   public synchronized void dumpContents() {
     int count=0;
     if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
