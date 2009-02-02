@@ -22,6 +22,7 @@ package org.apache.uima.adapter.jms.activemq;
 import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.nio.channels.AsynchronousCloseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -1518,6 +1519,39 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		return false;
 	}
+	
+	private void dispatch( Message aMessage,  Endpoint anEndpoint, CacheEntry entry, boolean isRequest, JmsEndpointConnection_impl endpointConnection, long msgSize ) throws Exception {
+	  //  Add stats
+    populateStats(aMessage, anEndpoint, entry.getCasReferenceId(), AsynchAEMessage.Process, isRequest);
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                  "dispatch", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
+                  new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
+    }
+	  //  By default start a timer associated with a connection to the endpoint. Once a connection is established with an
+	  //  endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
+	  //  the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
+	  //  managing sessions. In case when we want the remote delegate to respond to a temporary queue, which is implied
+	  //  by anEndpoint.getDestination != null, we dont start the timer.
+	  boolean startConnectionTimer = isRequest ? false : true;  // connection time is for replies
+	  // ----------------------------------------------------
+	  //  Send Request Messsage to the Endpoint
+	  // ----------------------------------------------------
+	  //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
+	  //  the send to eliminate a race condition where the reply is received (on different
+	  //  thread) *before* the CAS is added to the list.
+	  if ( isRequest ) {
+	    anEndpoint.setWaitingForResponse(true);
+	    // Add CAS to the list of CASes pending reply
+	    addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+	  } else {
+	    addIdleTime(aMessage);
+	  }
+	  if ( endpointConnection.send(aMessage, msgSize, startConnectionTimer) == false ) {
+	    removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
+	  }
+
+	}
 	private void sendCasToRemoteEndpoint( boolean isRequest, String aSerializedCAS, String anInputCasReferenceId, String aCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence) 
 	throws AsynchAEException, ServiceShutdownException
 	{
@@ -1587,48 +1621,7 @@ public class JmsOutputChannel implements OutputChannel
 					}
 				}
 			}
-
-			//	Add stats
-			populateStats(tm, anEndpoint, aCasReferenceId, AsynchAEMessage.Process, isRequest);
-			if ( startTimer)
-			{
-				//	Start a timer for this request. The amount of time to wait
-				//	for response is provided in configuration for the endpoint
-				anEndpoint.startProcessRequestTimer(aCasReferenceId);
-			}
-      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
-                    new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-      }
-			//	By default start a timer associated with a connection to the endpoint. Once a connection is established with an
-			//	endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
-			//	the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
-			//	managing sessions. In case when we want the remote delegate to respond to a temporary queue, which is implied
-			//	by anEndpoint.getDestination != null, we dont start the timer.
-			boolean startConnectionTimer = true;
-			
-			if ( anEndpoint.getDestination() != null || !isRequest )
-			{
-				startConnectionTimer = false;
-			}
-			// ----------------------------------------------------
-			//	Send Request Messsage to the Endpoint
-			// ----------------------------------------------------
-      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
-      //  the send to eliminate a race condition where the reply is received (on different
-      //  thread) *before* the CAS is added to the list.
-      if ( isRequest ) {
-        // Add CAS to the list of CASes pending reply
-        addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-      } else {
-        addIdleTime(tm);
-      }
-      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
-        System.out.println("Send Failed");
-        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-      }
-        
+      dispatch(tm, anEndpoint, entry, isRequest, endpointConnection, msgSize);
 		}
 		catch( JMSException e)
 		{
@@ -1707,7 +1700,6 @@ public class JmsOutputChannel implements OutputChannel
         }
         if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) )
         {
-//          CacheEntry cacheEntry = getCacheEntry(aCasReferenceId);
           if ( entry != null )
           {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
@@ -1716,47 +1708,7 @@ public class JmsOutputChannel implements OutputChannel
           }
         }
       }
-
-      //  Add stats
-      populateStats(tm, anEndpoint, aCasReferenceId, AsynchAEMessage.Process, isRequest);
-      if ( startTimer)
-      {
-        //  Start a timer for this request. The amount of time to wait
-        //  for response is provided in configuration for the endpoint
-        anEndpoint.startProcessRequestTimer(aCasReferenceId);
-      }
-      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
-                    new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-      }
-      //  By default start a timer associated with a connection to the endpoint. Once a connection is established with an
-      //  endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
-      //  the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
-      //  managing sessions. In case when we want the remote delegate to respond to a temporary queue, which is implied
-      //  by anEndpoint.getDestination != null, we dont start the timer.
-      boolean startConnectionTimer = true;
-      
-      if ( anEndpoint.getDestination() != null || !isRequest )
-      {
-        startConnectionTimer = false;
-      }
-      // ----------------------------------------------------
-      //  Send Request Messsage to the Endpoint
-      // ----------------------------------------------------
-      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
-      //  the send to eliminate a race condition where the reply is received (on different
-      //  thread) *before* the CAS is added to the list.
-      if ( isRequest ) {
-        // Add CAS to the list of CASes pending reply
-        addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-      } else {
-        addIdleTime(tm);
-      }
-      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
-        System.out.println("Send Failed");
-        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-      }
+      dispatch(tm, anEndpoint, entry, isRequest, endpointConnection, msgSize);
     }
     catch( JMSException e)
     {
@@ -1855,47 +1807,8 @@ public class JmsOutputChannel implements OutputChannel
 				}
 			}
 
-			//	Add stats
-			populateStats(tm, anEndpoint, entry.getCasReferenceId(), AsynchAEMessage.Process, isRequest);
-			if ( startTimer)
-			{
-				//	Start a timer for this request. The amount of time to wait
-				//	for response is provided in configuration for the endpoint
-				anEndpoint.startProcessRequestTimer(entry.getCasReferenceId());
-			}
-      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
-                    new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-      }
-			//	By default start a timer associated with a connection to the endpoint. Once a connection is established with an
-			//	endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
-			//	the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
-			//	managing sessions. In case when we want the remote delegate to respond to a temporary queue, which is implied
-			//	by anEndpoint.getDestination != null, we dont start the timer.
-			boolean startConnectionTimer = true;
-			
-			if ( anEndpoint.getDestination() != null || !isRequest )
-			{
-				startConnectionTimer = false;
-			}
-			
-			// ----------------------------------------------------
-			//	Send Request Messsage to the Endpoint
-			// ----------------------------------------------------
-      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
-      //  the send to eliminate a race condition where the reply is received (on different
-      //  thread) *before* the CAS is added to the list.
-			if ( isRequest ) {
-	      // Add CAS to the list of CASes pending reply
-	      addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-			} else {
-        addIdleTime(tm);
-			}
-      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
-        System.out.println("Send Failed");
-        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-      }
+      dispatch(tm, anEndpoint, entry, isRequest, endpointConnection, msgSize);
+
 		}
 		catch( JMSException e)
 		{
@@ -1956,7 +1869,6 @@ public class JmsOutputChannel implements OutputChannel
       else
       {
         populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.Process);
-//        tm.setBooleanProperty(AsynchAEMessage.SentDeltaCas, entry.sentDeltaCas());
       }
       if ( casStateEntry == null ) {
         return;
@@ -1990,50 +1902,8 @@ public class JmsOutputChannel implements OutputChannel
                         new Object[] {getAnalysisEngineController().getComponentName(),"Remote", anEndpoint.getEndpoint(), entry.getCasReferenceId(), entry.getInputCasReferenceId(), entry.getInputCasReferenceId() });
         }
       }
-
-      //  Add stats
-      populateStats(tm, anEndpoint, entry.getCasReferenceId(), AsynchAEMessage.Process, isRequest);
-      if ( startTimer)
-      {
-        //  Start a timer for this request. The amount of time to wait
-        //  for response is provided in configuration for the endpoint
-        anEndpoint.startProcessRequestTimer(entry.getCasReferenceId());
-      }
-      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE) ) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "sendCasToRemoteEndpoint", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_sending_new_msg_to_remote_FINE",
-                    new Object[] {getAnalysisEngineController().getName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
-      }
-      //  By default start a timer associated with a connection to the endpoint. Once a connection is established with an
-      //  endpoint it is cached and reused for subsequent messaging. If the connection is not used within a given interval
-      //  the timer silently expires and closes the connection. This mechanism is similar to what Web Server does when
-      //  managing sessions. In case when we want the remote delegate to respond to a temporary queue, which is implied
-      //  by anEndpoint.getDestination != null, we dont start the timer.
-      boolean startConnectionTimer = true;
+      dispatch(tm, anEndpoint, entry, isRequest, endpointConnection, msgSize);
       
-      if ( anEndpoint.getDestination() != null || !isRequest )
-      {
-        startConnectionTimer = false;
-      }
-      
-      // ----------------------------------------------------
-      //  Send Request Messsage to the Endpoint
-      // ----------------------------------------------------
-      //  Add the CAS to the delegate's list of CASes pending reply. Do the add before
-      //  the send to eliminate a race condition where the reply is received (on different
-      //  thread) *before* the CAS is added to the list.
-      if ( isRequest ) {
-        // Add CAS to the list of CASes pending reply
-        addCasToOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-      } else {
-        addIdleTime(tm);
-      }
-      //  Send the message to the delegate. If the send fails, remove the CAS id
-      //  from the delegate's list of CASes pending reply.
-      if ( endpointConnection.send(tm, msgSize, startConnectionTimer) == false ) {
-        System.out.println("Send Failed");
-        removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-      }
     }
     catch( JMSException e)
     {
@@ -2044,7 +1914,6 @@ public class JmsOutputChannel implements OutputChannel
                     new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint()});
       }
     }
-
     catch( ServiceShutdownException e)
     {
       throw e;
