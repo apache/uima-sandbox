@@ -29,7 +29,9 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -44,6 +46,7 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.console.command.StartCommand;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalArgumentException;
 import org.apache.uima.aae.AsynchAECasManager;
@@ -177,7 +180,18 @@ implements UimaAsynchronousEngine, MessageListener
   
   private Object sendMux = new Object();
   
+  private BlockingQueue<CasQueueEntry> threadQueue = 
+    new LinkedBlockingQueue<CasQueueEntry>();
+  
+  private ConcurrentHashMap< Long, CasQueueEntry> threadRegistrar =
+    new ConcurrentHashMap<Long, CasQueueEntry>();
+  
+  private volatile boolean casQueueProducerReady; 
+  
+  private Object casProducerMux = new Object();
+  
 	protected List pendingMessageList = new ArrayList();
+	
 	protected volatile boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
   abstract protected TextMessage createTextMessage() throws Exception;
@@ -191,7 +205,7 @@ implements UimaAsynchronousEngine, MessageListener
 	abstract protected void cleanup() throws Exception;
 	abstract public String deploy(String[] aDeploymentDescriptorList, Map anApplicationContext) throws Exception;
 	abstract protected String deploySpringContainer(String[] springContextFiles) throws ResourceInitializationException;
-  
+	
 	public void addStatusCallbackListener(UimaASStatusCallbackListener aListener)
 	{
 	    listeners.add(aListener);
@@ -308,7 +322,29 @@ implements UimaAsynchronousEngine, MessageListener
 			throw new ResourceProcessException(e);
 		}
 	}
-
+	private void releaseCacheEntries() {
+	  Iterator it = clientCache.keySet().iterator();
+	  while( it.hasNext() ) {
+      ClientRequest entry = clientCache.get((String)it.next());
+	    if ( entry.getCAS() != null ) {
+	      entry.getCAS().release();
+	    }
+	  }
+	}
+	
+	private void clearThreadRegistrar() {
+	  Iterator it = threadRegistrar.keySet().iterator();
+    while( it.hasNext() ) {
+      Long key = (Long)it.next();
+      CasQueueEntry entry = threadRegistrar.get(key);
+      synchronized( entry.getMonitor() ) {
+        entry.signal();
+        entry.getMonitor().notifyAll();
+      }
+   }
+	}
+	
+	
 	public void stop()
 	{
 	  synchronized( stopMux ) {
@@ -321,9 +357,21 @@ implements UimaAsynchronousEngine, MessageListener
 	    }
 
 	    running = false;
+	    
 	    uimaSerializer.reset();
 	    try
 	    {
+	      try {
+	        clearThreadRegistrar();
+	        releaseCacheEntries();
+	      } catch( Exception ex) {
+	        ex.printStackTrace();
+	      }
+	      
+        synchronized( threadQueue ) {
+          threadQueue.notifyAll();
+        }
+
 	      //  Unblock threads
 	      if( threadMonitorMap.size() > 0 )
 	      {
@@ -372,6 +420,8 @@ implements UimaAsynchronousEngine, MessageListener
 	      springContainerRegistry.clear();
 	      listeners.clear();
 	      clientCache.clear();
+	      threadQueue.clear();
+	      threadRegistrar.clear();
 	    }
 	    catch (Exception e)
 	    {
@@ -391,7 +441,74 @@ implements UimaAsynchronousEngine, MessageListener
 	    }
 	  }
 	}
+	/**
+	 * This method spins a thread where CASes are distributed to requesting
+	 * threads in an orderly fashion. CASes are distributed among the 
+	 * threads based on FIFO. Oldest waiting thread receive the CAS first.
+	 * 
+	 */
+	private void serveCASes() {
+    synchronized( casProducerMux ) {
+      if ( casQueueProducerReady ) {
+        return;  // Only one CAS producer thread is needed/allowed
+      }
+      casQueueProducerReady = true;
+    }
+    //  Spin a CAS producer thread 
+    new Thread() {
+      public void run()
+      {
+        //  terminate when the client API is stopped
+        while( running ) {
+          try
+          {
+            //  Remove the oldest CAS request from the queue.
+            //  Every thread requesting a CAS adds an entry to this 
+            //  queue. 
+            CasQueueEntry entry = threadQueue.take();
+            if ( !running ) {
+              return;  // client API has been stopped
+            }
+            CAS cas = null;
+            long startTime = System.nanoTime();
+            //  Wait for a free CAS instance
+            if (remoteService)
+            {
+              cas = asynchManager.getNewCas("ApplicationCasPoolContext");
+            }
+            else
+            {
+              cas = asynchManager.getNewCas();
+            }
+            long waitingTime = System.nanoTime() - startTime;
+            clientSideJmxStats.incrementTotalTimeWaitingForCas( waitingTime );
+            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "getCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_new_cas_FINEST", 
+                  new Object[] {"Time Waiting for CAS", (double)waitingTime / (double)1000000});
+            }
+            if ( running ) { // only if the client is still running handle the new cas
+              //  Associate the CAS with the entry and wake up the Consumer thread
+              entry.setCas(cas);
+              synchronized( entry.getMonitor() ) {
+                entry.signal();
+                entry.getMonitor().notifyAll();
+              }
+            } else {
+              return; // Client is terminating
+            }
+          }
+          catch( Exception e) { e.printStackTrace();}
+        }
+      }
+    }.start();    
+	}
 
+	/**
+	 * Returns a CAS. If multiple threads call this method, the order of each
+	 * request is preserved. The oldest waiting thread receives the CAS. Each
+	 * request for a CAS is queued, and when the CAS becomes available the
+	 * oldest waiting thread will receive it for processing. 
+	 */
 	public CAS getCAS() throws Exception
 	{
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
@@ -404,25 +521,38 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			throw new ResourceInitializationException();
 		}
-		CAS cas = null;
-		long startTime = System.nanoTime();
-		if (remoteService)
-		{
-			cas = asynchManager.getNewCas("ApplicationCasPoolContext");
-		}
-		else
-		{
-			cas = asynchManager.getNewCas();
-		}
-		long waitingTime = System.nanoTime() - startTime;
-		clientSideJmxStats.incrementTotalTimeWaitingForCas( waitingTime );
-    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "getCAS", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_new_cas_FINEST", 
-    		  new Object[] {"Time Waiting for CAS", (double)waitingTime / (double)1000000});
+    //  Spin a thread that fetches CASes from the CAS Pool
+    if ( !casQueueProducerReady ) {
+      serveCASes(); // start CAS producer thread
     }
-		return cas;
+    //  Each thread has an entry in the map. The entry is created in the
+    //  map once and cached.
+    CasQueueEntry entry = getQueueEntry( Thread.currentThread().getId());
+    //  Add this thread entry to the queue of threads waiting for a CAS
+    threadQueue.add(entry);
+    //  Wait until the CAS producer adds the CAS to the CasQueueEntry and
+    //  signals CAS availability.
+    while( running && !entry.signaled() ) {
+      //  Wait until the producer is ready
+      synchronized( entry.getMonitor()) {
+        entry.getMonitor().wait();
+      }
+    }
+    //  This may return null *if* the client is terminating
+    return entry.getCas();
 	}
-
+	
+	private CasQueueEntry getQueueEntry(long aThreadId ) {
+	  CasQueueEntry entry = null;
+	  if ( threadRegistrar.containsKey(aThreadId ) ) {
+	   entry = threadRegistrar.get(aThreadId);
+	   entry.reset();
+	 } else {
+	   entry = new CasQueueEntry();
+	   threadRegistrar.put(aThreadId, entry);
+	 }
+	 return entry;  
+	}
 	
 	protected void reset()
 	{
@@ -430,6 +560,34 @@ implements UimaAsynchronousEngine, MessageListener
 		receivedMetaReply = false;
 	}
 
+	private class CasQueueEntry {
+	  private CAS cas;
+	  private Object monitor = new Object();
+	  private volatile boolean signaled = false;
+    public CAS getCas() {
+      return cas;
+    }
+    public void setCas(CAS cas) {
+      this.cas = cas;
+    }
+    public Object getMonitor() {
+      return monitor;
+    }
+    public void setMonitor(Object monitor) {
+      this.monitor = monitor;
+    }
+    public boolean signaled() {
+      return signaled;
+    }
+    public void signal() {
+      signaled = true;
+    }
+    public void reset() {
+      signaled = false;
+      cas = null;
+    }
+	  
+	}
 	
 	protected void sendMetaRequest() throws Exception
 	{
@@ -506,6 +664,9 @@ implements UimaAsynchronousEngine, MessageListener
 		{
 			throw new ResourceProcessException();
 		}
+    if ( !casQueueProducerReady ) {
+      serveCASes(); // start CAS producer thread
+    }
 		try
 		{
 			CAS cas = null;
