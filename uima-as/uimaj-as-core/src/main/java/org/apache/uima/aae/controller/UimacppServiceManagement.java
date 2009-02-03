@@ -139,7 +139,7 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     }
   }
 
-  public String getQueueBrokerURL() throws IOException {
+  synchronized public String getQueueBrokerURL() throws IOException {
     //System.out.println("QueueBrokerURL");
     /* We are assuming this method gets called first by the
      * MBeanServer. So we send a request to C++ service to get latest stats. */
@@ -151,7 +151,7 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     return queueBrokerURL;
   }
 
-  public String getQueueName() throws IOException {
+  synchronized public String getQueueName() throws IOException {
     //System.out.println("QueueName");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -159,7 +159,7 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     return queueName;
   }
 
-  public String getAEDescriptor() throws IOException {
+  synchronized public String getAEDescriptor() throws IOException {
     //System.out.println("aeDescriptor");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -167,7 +167,7 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     return aeDescriptor;
   }
 
-  public int getAEInstances() throws IOException {
+  synchronized public int getAEInstances() throws IOException {
     //System.out.println("aeInstances");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -176,7 +176,7 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
 
   }
 
-  public long getErrorsGetMeta() throws IOException {
+  synchronized public long getErrorsGetMeta() throws IOException {
     //System.out.println("GETMETAERRORS");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -185,11 +185,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getErrorsProcessCas() throws IOException {
+  synchronized public long getErrorsProcessCas() throws IOException {
     //System.out.println("errorsProcessCas");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -198,11 +198,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getErrorsCPC() throws IOException {
+  synchronized public long getErrorsCPC() throws IOException {
     //System.out.println("errorsCPC");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -211,11 +211,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTotalNumCasProcessed() throws IOException {
+  synchronized public long getTotalNumCasProcessed() throws IOException {
     //System.out.println("TotalNumCasProcessed");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -224,11 +224,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTimingGetMeta() throws IOException {
+  synchronized public long getTimingGetMeta() throws IOException {
     //System.out.println("getTimingGetMeta");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -237,11 +237,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTimingCPC() throws IOException {
+  synchronized public long getTimingCPC() throws IOException {
     //System.out.println("getTimingCPC");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -250,11 +250,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTimingSerialization() throws IOException {
+  synchronized public long getTimingSerialization() throws IOException {
     //System.out.println("getTimingSerialization");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -263,11 +263,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTimingAnnotatorProcess() throws IOException {
+  synchronized public long getTimingAnnotatorProcess() throws IOException {
     //System.out.println("getTimingAnnotatorProcess");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -276,11 +276,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTimingDeserialization() throws IOException {
+  synchronized public long getTimingDeserialization() throws IOException {
     //System.out.println("getTimingDeserialization");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -289,11 +289,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTimingMessageProcessing() throws IOException {
+  synchronized public long getTimingMessageProcessing() throws IOException {
     //System.out.println("getTimingMessageProcessing");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -302,11 +302,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public long getTimingIdle() throws IOException {
+  synchronized public long getTimingIdle() throws IOException {
     //System.out.println("getTimingIdle");
     if ( System.currentTimeMillis() - this.lastRefreshTime > MAX_TIME_VALID ) {
       getStatistics();
@@ -315,11 +315,11 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
     if (v == null) {
       return -1;
     } else {
-      return Integer.parseInt(v);
+      return Long.valueOf(v);
     }
   }
 
-  public void resetStats() throws IOException {
+  synchronized public void resetStats() throws IOException {
     writer.write("RESET");
     writer.flush();
     getStatistics();
@@ -335,7 +335,7 @@ public class UimacppServiceManagement implements UimacppServiceManagementMBean {
 
   }
 
-  public void shutdown() throws IOException {
+  synchronized public void shutdown() throws IOException {
     if (this.socket != null) {
       //System.out.println("UimacppServiceManagement sending shutdown message");
       writer.write("SHUTDOWN");
