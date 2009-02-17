@@ -34,14 +34,14 @@ fi
 
 # If the directory doesn't exist, make it
 if [ ! -d "$ACTIVEMQ_BASE" ] ; then
-  mkdir $ACTIVEMQ_BASE
-  mkdir $ACTIVEMQ_BASE/conf
+  mkdir "$ACTIVEMQ_BASE"
+  mkdir "$ACTIVEMQ_BASE/conf"
 fi
 
 # If the config file isn't there, copy it
-if [ ! -f $ACTIVEMQ_BASE/conf/activemq-nojournal.xml ] ; then
-  cp $UIMA_HOME/config/activemq-nojournal.xml $ACTIVEMQ_BASE/conf/
-  cp $UIMA_HOME/config/log4j.properties $ACTIVEMQ_BASE/conf/
+if [ ! -f "$ACTIVEMQ_BASE/conf/activemq-nojournal.xml" ] ; then
+  cp "$UIMA_HOME/config/activemq-nojournal.xml" "$ACTIVEMQ_BASE/conf/"
+  cp "$UIMA_HOME/config/log4j.properties" "$ACTIVEMQ_BASE/conf/"
 fi
 
-$ACTIVEMQ_HOME/bin/activemq xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml
+"$ACTIVEMQ_HOME/bin/activemq" "xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml"

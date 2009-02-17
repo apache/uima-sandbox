@@ -42,15 +42,15 @@ REM   under the License.
 
 @REM If directory missing create it
 @if not exist "%ACTIVEMQ_BASE%" (
-  mkdir %ACTIVEMQ_BASE%
-  mkdir %ACTIVEMQ_BASE%\conf
+  mkdir "%ACTIVEMQ_BASE%"
+  mkdir "%ACTIVEMQ_BASE%\conf"
 )
 
 @REM If config file not there, copy it
-@if not exist "%ACTIVEMQ_BASE%"\conf\activemq-nojournal.xml (
-  copy "%UIMA_HOME%"\config\log4j.properties %ACTIVEMQ_BASE%\conf
-  copy "%UIMA_HOME%"\config\activemq-nojournal.xml %ACTIVEMQ_BASE%\conf
+@if not exist "%ACTIVEMQ_BASE%\conf\activemq-nojournal.xml" (
+  copy "%UIMA_HOME%\config\log4j.properties" "%ACTIVEMQ_BASE%\conf"
+  copy "%UIMA_HOME%\config\activemq-nojournal.xml" "%ACTIVEMQ_BASE%\conf"
 )
 
-call "%ACTIVEMQ_HOME%\bin\activemq.bat" xbean:file:%ACTIVEMQ_BASE%/conf/activemq-nojournal.xml
+call "%ACTIVEMQ_HOME%\bin\activemq.bat" "xbean:file:%ACTIVEMQ_BASE%/conf/activemq-nojournal.xml"
 :EXIT
