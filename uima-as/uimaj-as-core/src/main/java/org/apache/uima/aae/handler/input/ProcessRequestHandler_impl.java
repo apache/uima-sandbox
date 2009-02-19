@@ -120,6 +120,9 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			
 			cas = getController().getCasManagerWrapper().getNewCas();
 			getController().getServicePerformance().endWaitOnCASPool();
+			ServicePerformance sp = getController().getServicePerformance();
+			sp.incrementCasPoolWaitTime(sp.getTimeWaitingForCAS());
+			
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "getCAS", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_request_cas_granted__FINE",
