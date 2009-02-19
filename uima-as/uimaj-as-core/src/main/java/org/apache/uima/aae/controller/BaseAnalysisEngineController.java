@@ -2422,12 +2422,12 @@ implements AnalysisEngineController, EventSubscriber
             {
               //  Get the CPU time of a thread with a given ID
               totalCpuProcessTime += getCpuTime(threadId);
-            }
-            //  Subtract serialization and deserialization times from the total CPU used
-            if ( totalCpuProcessTime > 0 )
-            {
-              totalCpuProcessTime -= threadState.getDeserializationTime();
-              totalCpuProcessTime -= threadState.getSerializationTime();
+              //  Subtract serialization and deserialization times from the total CPU used
+              if ( totalCpuProcessTime > 0 )
+              {
+                totalCpuProcessTime -= threadState.getDeserializationTime();
+                totalCpuProcessTime -= threadState.getSerializationTime();
+              }
             }
         }
       }
