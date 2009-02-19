@@ -27,6 +27,7 @@ import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
+import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.jmx.ServicePerformance;
@@ -300,9 +301,11 @@ public abstract class HandlerBase implements Handler
 			if (aMessageContext.propertyExists(AsynchAEMessage.TimeWaitingForCAS))
 			{
 				long timeWaitingForCAS = ((Long) aMessageContext.getMessageLongProperty(AsynchAEMessage.TimeWaitingForCAS)).longValue();
-				if ( aMessageContext.getEndpoint().isRemote())
+				if ( timeWaitingForCAS > 0 && aMessageContext.getEndpoint().isRemote())
 				{
 					entry.incrementTimeWaitingForCAS(timeWaitingForCAS);
+					delegateServicePerformance.
+					  incrementCasPoolWaitTime(timeWaitingForCAS-delegateServicePerformance.getRawCasPoolWaitTime());
 					if ( inputCasEntry != null )
 					{
 						inputCasEntry.incrementTimeWaitingForCAS(timeWaitingForCAS);
@@ -317,15 +320,20 @@ public abstract class HandlerBase implements Handler
 				{
 					if ( delegateServicePerformance != null )
 					{
-           delegateServicePerformance.incrementAnalysisTime(timeInProcessCAS);
-            //  The remote delegate returns the actual analysis time not the delta
-//					  delegateServicePerformance.setAnalysisTime(timeInProcessCAS);
+					  // calculate the time spent in analysis. The remote service returns total time
+					  // spent in the analysis. Compute the delta.
+					  long dt = timeInProcessCAS-delegateServicePerformance.getRawAnalysisTime();
+	          // increment total time in analysis 
+					  delegateServicePerformance.incrementAnalysisTime(dt);
+	          getController().getServicePerformance().incrementAnalysisTime(dt);
 					}
 				}
 				else 
 				{
 					getController().getServicePerformance().incrementAnalysisTime(timeInProcessCAS);
 				}
+				casStats.incrementAnalysisTime(timeInProcessCAS);
+				
 				if ( inputCasReferenceId != null )
 				{
 					ServicePerformance inputCasStats = 
@@ -334,10 +342,11 @@ public abstract class HandlerBase implements Handler
 					// Update processing time for this CAS
 					if ( inputCasStats != null )
 					{
-//            inputCasStats.setAnalysisTime(timeInProcessCAS);
             inputCasStats.incrementAnalysisTime(timeInProcessCAS);
 					}
-				}
+				}				
+				
+				
 			}
 		}
 		catch( AsynchAEException e)
