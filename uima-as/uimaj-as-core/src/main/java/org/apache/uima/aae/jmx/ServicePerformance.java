@@ -267,9 +267,20 @@ public class ServicePerformance implements ServicePerformanceMBean
 	{
 		synchronized (sem ) 
 		{
-			return (double)getTimeWaitingForCAS()/(double)1000000;
+		  if ( controller != null ) {
+        return (double)getTimeWaitingForCAS()/(double)1000000;
+	    } else {
+        return (double)casPoolWaitTime/(double)1000000;
+	    }
 		}
 	}
+  public long getRawCasPoolWaitTime()
+  {
+    synchronized (sem ) 
+    {
+      return casPoolWaitTime;
+    }
+  }
 	public double getShadowCasPoolWaitTime()
 	{
 		return ((double)getTimeWaitingForShadowPoolCAS()/(double) 1000000);
