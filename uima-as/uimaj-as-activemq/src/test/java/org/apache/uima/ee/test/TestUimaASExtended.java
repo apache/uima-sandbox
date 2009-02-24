@@ -759,6 +759,30 @@ public class TestUimaASExtended extends BaseTestSupport
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
+	/**
+	 * First CM feeds 100 CASes to a "merger" CM that generates one output CAS for every 5 input.
+	 * Second CM creates unique document text that is checked by the last component.
+	 * The default FC should let 4 childless CASes through, replacing every 5th by its child.
+	 * 
+	 * @throws Exception
+	 */
+	public void testProcessWithAggregateUsingCollocatedMerger() throws Exception
+  {
+    System.out.println("-------------- testProcessWithAggregateUsingRemoteMerger -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithCollocatedMerger.xml");
+    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
+
+	public void testProcessWithAggregateUsingRemoteMerger() throws Exception
+  {
+    System.out.println("-------------- testProcessWithAggregateUsingRemoteMerger -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMerger.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMerger.xml");
+    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
+
 	public void testClientWithAggregateMultiplier() throws Exception
 	{
     System.out.println("-------------- testClientWithAggregateMultiplier -------------");
