@@ -442,7 +442,6 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 				  parentCasStateEntry = parentController.getLocalCache().lookupEntry(aCasReferenceId);
 				} else {
           childCasStateEntry = getLocalCache().createCasStateEntry(newEntry.getCasReferenceId());
-          parentCasStateEntry = getLocalCache().lookupEntry(aCasReferenceId);
 				}
 				//  Associate parent CAS (input CAS) with the new CAS.
         childCasStateEntry.setInputCasReferenceId(aCasReferenceId);
@@ -535,28 +534,16 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
       }
       else
       {
-          boolean sendReply = false;
-          synchronized( cmOutstandingCASes )
-          {
-            if ( cmOutstandingCASes.size() == 0)
-            {
-              inputCASReturned = true;
-              sendReply = true;
-            }
-            else
-            {
-              //  Change the state of the input CAS. Since the input CAS is not returned to the client
-              //  until all children of this CAS has been fully processed we keep the input in the cache.
-              //  The client will send Free CAS Notifications to release CASes produced here. When the
-              //  last child CAS is freed, the input CAS is allowed to be returned to the client.
-              inputCASEntry.setPendingReply(true);
-           }
-         }
-         if ( sendReply )
-         {
-           //  Return an input CAS to the client if there are no outstanding child CASes in play
-           getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
-         }
+        if (parentCasStateEntry.getSubordinateCasInPlayCount()==0) {
+          inputCASReturned = true;
+          getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
+        } else {
+          // Change the state of the input CAS. Since the input CAS is not returned to the client
+          // until all children of this CAS has been fully processed we keep the input in the cache.
+          // The client will send Free CAS Notifications to release CASes produced here. When the
+          // last child CAS is freed, the input CAS is allowed to be returned to the client.
+          inputCASEntry.setPendingReply(true);
+        }
 			}
       //  Remove input CAS state entry from the local cache
       if ( !isTopLevelComponent() ) {
