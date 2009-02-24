@@ -1485,7 +1485,10 @@ implements UimaAsynchronousEngine, MessageListener
 			pt.addEvent("UimaEE", "process", "Idle Time Waiting For CAS", (int)(totalIdletime/1000000), "");
 			clientSideJmxStats.incrementTotalIdleTime(totalIdletime);
 		}
-		
+    if (message.propertyExists(AsynchAEMessage.ServerIP))
+    {
+      pt.addEvent("UimaEE", "process", "Service IP", 0, message.getStringProperty(AsynchAEMessage.ServerIP));
+    }
 
 	}
 	protected void removeFromCache( String aCasReferenceId )
