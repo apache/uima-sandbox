@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>false</primitive>
+  <delegateAnalysisEngineSpecifiers>
+    <delegateAnalysisEngine key="TestMultiplier">
+      <import location="../multiplier/SimpleCasGenerator.xml"/>
+    </delegateAnalysisEngine>
+    <delegateAnalysisEngine key="CheckTextAnnotator">
+      <import location="CheckTextAnnotator.xml"/>
+    </delegateAnalysisEngine>
+    <delegateAnalysisEngine key="TestMerger">
+      <import location="../multiplier/SimpleCasMerger.xml"/>
+    </delegateAnalysisEngine>
+  </delegateAnalysisEngineSpecifiers>
+  <analysisEngineMetaData>
+    <name>Test Aggregate TAE</name>
+    <description>Detects Nothing</description>
+    <configurationParameters searchStrategy="language_fallback">
+      <configurationParameter>
+        <name>NumberToGenerate</name>
+        <description>Approximate number of CASes to create.</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+        <overrides>
+          <parameter>TestMultiplier/NumberToGenerate</parameter>
+          <parameter>CheckTextAnnotator/FinalCount</parameter>
+        </overrides>
+      </configurationParameter>
+      <configurationParameter>
+        <name>NumberToMerge</name>
+        <description>Number of input CASes required for each output CAS.</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+        <overrides>
+          <parameter>TestMerger/NumberToMerge</parameter>
+          <parameter>CheckTextAnnotator/CheckInterval</parameter>
+        </overrides>
+      </configurationParameter>
+      <configurationParameter>
+        <name>TextPrefix</name>
+        <description>Text that must start document text in every N-th CAS</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+        <overrides>
+          <parameter>CheckTextAnnotator/TextPrefix</parameter>
+          <parameter>TestMerger/AnnotatorName</parameter>
+        </overrides>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>NumberToGenerate</name>
+        <value>
+          <integer>100</integer>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>NumberToMerge</name>
+        <value>
+          <integer>5</integer>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>TextPrefix</name>
+        <value>
+          <string>CasMerger</string>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+    <flowConstraints>
+      <fixedFlow>
+        <node>TestMultiplier</node>
+        <node>TestMerger</node>
+        <node>CheckTextAnnotator</node>
+      </fixedFlow>
+    </flowConstraints>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs/>
+        <languagesSupported>
+          <language>en</language>
+        </languagesSupported>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </analysisEngineMetaData>
+</analysisEngineDescription>
