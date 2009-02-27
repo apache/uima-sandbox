@@ -35,7 +35,9 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQMessageConsumer;
+import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.command.ActiveMQDestination;
+import org.apache.activemq.console.command.StartCommand;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.UimaClassFactory;
@@ -141,7 +143,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		//	Deploy Uima EE Primitive Service 
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
 		super.setExpectingServiceShutdown();
-		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 0, EXCEPTION_LATCH);
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 0, EXCEPTION_LATCH);
 	}
 	/**
 	 * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
@@ -159,6 +161,62 @@ public class TestUimaASExtended extends BaseTestSupport
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
 	}
 	/**
+	 * Tests missing broker on service startup. The service listener on input queue recovers from
+	 * this by silently attempting reconnect at 5 second intervals. The test first launches the 
+	 * service, than spins a thread where a new broker is created after 5 seconds, and finally 
+	 * the uima as client is started. The test shows initial connection failure and when the 
+	 * broker becomes available the connection is established and messages begin to flow from the
+	 * client to the service and back. 
+	 * 
+	 * @throws Exception
+	 */
+	 public void testDelayedBrokerWithAggregateService() throws Exception
+	  {
+	    System.out.println("-------------- testDelayedBrokerWithAggregateService -------------");
+	    final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+	    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+	    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorOnSecondaryBroker.xml");
+	    super.setExpectingServiceShutdown();
+	   try {
+	     Thread t = new Thread() {
+	        public void run()
+	        {
+	          BrokerService bs = null;
+	          try {
+	              // at this point the top level service should show a connection error
+	              synchronized( this ) {
+	                this.wait(5000);  // wait for 5 secs
+	              }
+	              // Create a new broker on port 8119
+	              bs = createBroker(8119, false);
+	              bs.start(); 
+	              // Start the uima AS client. It connects to the top level service and sends
+	              // 10 messages
+	              runTest(null,eeUimaEngine,"tcp://localhost:8119","TopLevelTaeQueue", 10, PROCESS_LATCH);
+	            } catch( InterruptedException e ) {
+	            } catch( Exception e) {
+	              e.printStackTrace();
+	              fail(e.getMessage());
+	            }
+	            finally {
+	              if ( bs != null ) {
+	                try {
+	                  bs.stop();
+	                } catch( Exception e) {
+	                  e.printStackTrace();
+	                }
+	              }
+	            }
+	        }
+	      };
+	     t.start();
+	     t.join();
+	   } catch( Exception e) {
+	     e.printStackTrace();
+	   }
+	  }
+	
+	/**
 	 * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
 	 * 
 	 * @throws Exception
@@ -169,6 +227,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateUsingRemoteTempQueue.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 		
 	}
@@ -776,11 +835,11 @@ public class TestUimaASExtended extends BaseTestSupport
 
 	public void testProcessWithAggregateUsingRemoteMerger() throws Exception
   {
-    System.out.println("-------------- testProcessWithAggregateUsingRemoteMerger -------------");
-    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-    deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMerger.xml");
-    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMerger.xml");
-    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+	    System.out.println("-------------- testProcessWithAggregateUsingRemoteMerger -------------");
+	    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+	    deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMerger.xml");
+	    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMerger.xml");
+	    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
   }
 
 	public void testClientWithAggregateMultiplier() throws Exception
