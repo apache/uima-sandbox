@@ -38,7 +38,7 @@ REM   under the License.
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\apache-activemq-4.1.1.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\activemq-optional-4.1.1.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\commons-httpclient-2.0.1.jar
-@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\xstream-1.1.2.jar
+@set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\xstream-1.2.2.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\xmlpull-1.1.3.4d_b4_min.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\jetty-6.0.1.jar
 @set UIMA_CLASSPATH=%UIMA_CLASSPATH%;%UIMA_HOME%\apache-activemq-4.1.1\lib\optional\jetty-util-6.0.1.jar
