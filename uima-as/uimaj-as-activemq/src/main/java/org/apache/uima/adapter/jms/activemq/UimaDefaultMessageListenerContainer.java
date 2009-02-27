@@ -80,7 +80,6 @@ implements ExceptionListener
 		setAcceptMessagesWhileStopping(false);
 		setExceptionListener(this);
     threadGroup = new ThreadGroup("ListenerThreadGroup_"+Thread.currentThread().getThreadGroup().getName());
-
 	}
 	public UimaDefaultMessageListenerContainer(boolean freeCasQueueListener)
 	{
@@ -158,7 +157,6 @@ implements ExceptionListener
       }
     } else if ( disableListener(t)) {
       handleQueueFailure(t);
-//      terminate(t);
     }
   }
   
@@ -271,15 +269,33 @@ implements ExceptionListener
 	  if ( controller != null && controller.isStopped()) {
 	    return;
 	  }
-	  t.printStackTrace();
-
-	  
 	  if ( endpoint == null ) {
-	    
-      super.handleListenerSetupFailure(t, false);
-      terminate(t);
+	    super.handleListenerSetupFailure(t, true);
+      String controllerId = ""; 
+      if (controller != null ) {
+        controllerId = "Uima AS Service:"+controller.getComponentName();
+      }
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                  "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_listener_connection_failure__WARNING",
+                  new Object[] {  controllerId, getBrokerUrl() });
+      }
+      System.out.println(controllerId+" Listener Unable to Connect to Broker:" +getBrokerUrl()+" Retrying ....");
+      // This code executes during initialization of the service. The Endpoint is not yet 
+      // available. The connection to a broker cannot be established. Keep trying until
+      // the broker becomes available.
+      refreshConnectionUntilSuccessful();
+      System.out.println(controllerId+" Listener Established Connection to Broker:" +getBrokerUrl());
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                  "handleListenerSetupFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_listener_connection_recovered__WARNING",
+                  new Object[] {  controllerId, getBrokerUrl() });
+      }
       return;
 	  }
+
+	  // Connection failure that occurs AFTER the service initialized. 
+	  t.printStackTrace();
  
 	  synchronized( mux ) {
 	      if ( !failed ) {
