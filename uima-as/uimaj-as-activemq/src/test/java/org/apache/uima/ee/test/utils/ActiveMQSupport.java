@@ -152,16 +152,19 @@ public class ActiveMQSupport extends TestCase
 		return createConnectionFactory().createConnection();
 	}
 
-	protected BrokerService createBroker() throws Exception
-	{
+	protected BrokerService createBroker() throws Exception {
+	  return createBroker(8118, true);
+	}
+  protected BrokerService createBroker(int port, boolean useJmx) throws Exception {
 		ServerSocket ssocket = null;
-		System.out.println("Creating Broker <<<<<<<<<<<<<<<<");
+		System.out.println(">>>> Starting Broker On Port:"+port);
 		try
 		{
 			ssocket = new ServerSocket();
 			String hostName = ssocket.getInetAddress().getLocalHost().getCanonicalHostName();
-			uri = "tcp://" + hostName + ":8118";
+			uri = "tcp://" + hostName +":"+ port;
 			BrokerService broker = BrokerFactory.createBroker(new URI("broker:()/" + hostName + "?persistent=false"));
+			broker.setUseJmx(useJmx);
 			tcpConnector = broker.addConnector(uri);
 			
 			
