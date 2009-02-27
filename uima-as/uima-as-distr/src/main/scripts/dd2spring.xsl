@@ -1097,7 +1097,8 @@
         <property name="messageListener" ref="{$q_listenerID}"/>
         
         <property name="connectionFactory" ref="{$queueFactoryID}"/>
-        <property name="messageSelector" value="Command=2001" /> <!-- getMeta request -->
+        <!-- jira 1296 : add Command=2006 to include STOP message -->
+        <property name="messageSelector" value="Command=2001 OR Command=2006" /> <!-- getMeta request -->
       </bean>
     </xsl:if>  
 
