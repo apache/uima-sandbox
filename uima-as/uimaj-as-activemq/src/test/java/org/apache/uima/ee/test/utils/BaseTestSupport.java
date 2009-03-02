@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.jms.Message;
 import org.apache.uima.aae.error.UimaASProcessCasTimeout;
 import org.apache.uima.aae.client.UimaASProcessStatus;
+import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
@@ -49,7 +50,8 @@ import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.ProcessTraceEvent;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 
-public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASStatusCallbackListener
+public abstract class BaseTestSupport extends ActiveMQSupport 
+//implements UimaASStatusCallbackListener
 {
   private static final char FS = System.getProperty("file.separator").charAt(0);
 	protected String text = "IBM today elevated five employees to the title of IBM Fellow\n -- its most prestigious technical honor.\n The company also presented more than $2.8 million in cash awards to employees whose technical innovation have yielded exceptional value to the company and its customers.\nIBM conferred the accolades and awards at its 2003 Corporate Technical Recognition Event (CTRE) in Scottsdale, Ariz. CTRE is a 40-year tradition at IBM, established to recognize exceptional technical employees and reward them for extraordinary achievements and contributions to the company's technology leadership.\n Our technical employees are among the best and brightest innovators in the world.\n They share a passion for excellence that defines their work and permeates the products and services IBM delivers to its customers, said Nick Donofrio, senior vice president, technology and manufacturing for IBM.\n CTRE provides the means for us to honor those who have distinguished themselves as exceptional leaders among their peers.\nAmong the special honorees at the 2003 CTRE are five employees who earned the coveted distinction of IBM Fellow:- David Ferrucci aka Dave, Grady Booch, chief scientist of Rational Software, IBM Software Group.\n Recognized internationally for his innovative work on software architecture, modeling, and software engineering process. \nMr. Booch is one of the original authors of the Unified Modeling Language (UML), the industry-standard language of blueprints for software-intensive systems.- Dr. Donald Chamberlin, researcher, IBM Almaden Research Center. An expert in relational database languages, Dr. Chamberlin is co- inventor of SQL, the language that energized the relational database market. He has also";
@@ -74,6 +76,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	private int timeoutCounter = 0;
 	private Object errorCounterMonitor = new Object(); 
 	private BaseUIMAAsynchronousEngine_impl engine;
+	protected UimaAsTestCallbackListener listener = new UimaAsTestCallbackListener();
 	
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
 	{
@@ -121,7 +124,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 	}
 	protected void initialize(BaseUIMAAsynchronousEngine_impl eeUimaEngine, Map<String, Object> appCtx) throws Exception
 	{
-		eeUimaEngine.addStatusCallbackListener(this);
+		eeUimaEngine.addStatusCallbackListener(listener);
 		eeUimaEngine.initialize(appCtx);
 	}
 	protected void setExpectingServiceShutdown()
@@ -582,225 +585,233 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 		System.out.println("Client:::::::::::::: Received:" + responseCounter + " Reply");
 
 	}
-	/**
-	 * Callback method which is called by Uima EE client when a reply to process CAS 
-	 * is received. The reply contains either the CAS or an exception that occurred 
-	 * while processing the CAS.
-	 */
-	public synchronized void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
-	{
-		String casReferenceId="";
-		String parentCasReferenceId="";
-		boolean expectedException = false;
-		if ( aProcessStatus instanceof UimaASProcessStatus )
-		{
-			casReferenceId = 
-				((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
-			parentCasReferenceId = 
-				((UimaASProcessStatus)aProcessStatus).getParentCasReferenceId();
-		}
-		if (aProcessStatus.isException())
-		{
-			if ( !expectingServiceShutdownException )
-				System.out.println(" Process Received Reply Containing Exception.");
-			
-
-			List list = aProcessStatus.getExceptions();
-			for( int i=0; i < list.size(); i++)
-			{
-				Exception e = (Exception)list.get(i);
-				if ( e instanceof ServiceShutdownException || 
-					 (e.getCause() != null && e.getCause() instanceof ServiceShutdownException ))
-				{
-					serviceShutdownException = true;
-				}
-				else if ( ignoreException( e.getClass()))
-				{
-				  expectedException = true;
-				} else if ( e instanceof ResourceProcessException && isProcessTimeout(e) ) {
-				  synchronized(errorCounterMonitor) {
-	          System.out.println("Incrementing ProcessTimeout Counter");
-				    timeoutCounter++;
-				  }
-				} else if ( engine != null && e instanceof UimaASPingTimeout) {
-				  System.out.println(".......... Listener Stopping Uima AS Due to Ping Timeout. Service Not Responding To Ping");
-			    if ( cpcLatch != null)
-			    {
-			      cpcLatch.countDown();
-			    }
-
-				  engine.stop();
-				}
-				if ( !expectedException && !expectingServiceShutdownException )
-				{
-					e.printStackTrace();
-				}
-			}
-			if (exceptionCountLatch != null)
-			{
-				exceptionCountLatch.countDown();
-				if (processCountLatch != null)
-				{
-					processCountLatch.countDown();
-				}
-			}
-			else if (processCountLatch != null)
-			{
-				if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
-				{
-				unexpectedException = true;
-				System.out.println(" ... when expecting normal completion!");
-				}
-				while (processCountLatch.getCount() > 0)
-				{
-					processCountLatch.countDown();
-				}
-			}
-		}
-		else if (processCountLatch != null && aCAS != null)
-		{
-			if ( parentCasReferenceId != null )
-			{
-				System.out.println("Client Received Reply Containing CAS:"+casReferenceId+" The Cas Was Generated From Parent Cas Id:"+parentCasReferenceId);
-			}
-			else
-			{
-				System.out.println("Client Received Reply Containing CAS:"+casReferenceId);
-			}
-			
-			if ( doubleByteText != null )
-			{
-				String returnedText = aCAS.getDocumentText();
-				if ( !doubleByteText.equals(returnedText))
-				{
-					  System.out.println("!!! DocumentText in CAS reply different from that in CAS sent !!!");
-					  System.out.println("This is expected using http connector with vanilla AMQ 5.0 release,");
-					  System.out.println("and the test file DoubleByteText.txt contains double byte chars.");
-					  System.out.println("To fix, use uima-as-distr/src/main/lib/optional/activemq-optional-5.0.0.jar");
-					  unexpectedException = true;
-					  processCountLatch.countDown();
-					  return;
-				}
-			}
-			// test worked, reset use of this text
-			doubleByteText = null;
-			if ( parentCasReferenceId == null)
-			{
-				processCountLatch.countDown();
-			}
-			List eList = aProcessStatus.getProcessTrace().getEventsByComponentName("UimaEE", false);
-			for( int i=0; i < eList.size(); i++)
-			{
-			  ProcessTraceEvent eEvent = (ProcessTraceEvent)eList.get(i);
-			  System.out.println("Received Process Event - "+eEvent.getDescription()+" Duration::"+eEvent.getDuration()+" ms"); // / (float) 1000000);
-			  //	Check if the running test wants to check how long the processing of CAS took
-			  if (  expectedProcessTime > 0 &&
-				    "Total Time In Process CAS".equals(eEvent.getDescription()))
-			  {
-				  //	Check if the expected duration exceeded actual duration for processing
-				  //	a CAS. Allow 50ms difference.
-				  if (eEvent.getDuration() > expectedProcessTime &&  (eEvent.getDuration() % expectedProcessTime ) > 50 ) 
-				  {
-					  System.out.println("!!!!!!!!!!!!! Expected Process CAS Duration of:"+expectedProcessTime+" ms. Instead Process CAS Took:"+eEvent.getDuration());
-					  unexpectedException = true;
-				  }
-			  }
-
-			}
-			incrementCASesProcessed();
-		}
-	}
-	private boolean isProcessTimeout( Exception e) {
-	  return (e.getCause() != null && (e.getCause() instanceof UimaASProcessCasTimeout )); 
-	}
-	/**
-	 * Callback method which is called by Uima EE client when the initialization 
-	 * of the client is completed successfully. 
-	 */
-	public void initializationComplete(EntityProcessStatus aStatus)
-	{
-	  boolean isPingException;
+	
+	protected class UimaAsTestCallbackListener extends UimaAsBaseCallbackListener {
 	  
-		if (aStatus != null && aStatus.isException())
-		{
-			System.out.println("Initialization Received Reply Containing Exception:");
-			List exceptions = aStatus.getExceptions();
-			for (int i = 0; i < exceptions.size(); i++)
-			{
-			  if ( exceptions.get(i) instanceof UimaASPingTimeout ) {
-			    System.out.println("Client Received PING Timeout. Service Not Available");
-		      if (cpcLatch != null)
-		      {
-		        cpcLatch.countDown();
-		      }
-			    
-			  }
-				if ( !expectingServiceShutdownException )
-				{
-				  ((Throwable) exceptions.get(i)).printStackTrace();
-				}
-			}
-			if (exceptionCountLatch != null)
-				exceptionCountLatch.countDown();
-		}
-		synchronized (initializeMonitor)
-		{
-			initialized = true;
-			initializeMonitor.notifyAll();
-		}
-	}
+    public void onBeforeMessageSend(UimaASProcessStatus status) {
+      System.out.println("Received onBeforeMessageSend() Notification With CAS:"+status.getCasReferenceId());
+    }
 
-	/**
-	 * Callback method which is called by Uima EE client when a CPC reply
-	 * is received OR exception occured while processing CPC request.
-	 */
-	public void collectionProcessComplete(EntityProcessStatus aStatus)
-	{
-		if (aStatus != null && aStatus.isException())
-		{
-		  
-		  List list = aStatus.getExceptions();
-      boolean expectedException = false;
-      for( int i=0; i < list.size(); i++)
-      {
-        Exception e = (Exception)list.get(i);
-        if ( e instanceof ServiceShutdownException || 
-           (e.getCause() != null && e.getCause() instanceof ServiceShutdownException ))
-        {
-          serviceShutdownException = true;
-        }
-        else if ( ignoreException( e.getClass()))
-        {
-          expectedException = true;
-        }
-        if ( !expectedException && !expectingServiceShutdownException )
-        {
-          e.printStackTrace();
-        }
-      }
-      if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
-      {
-        System.out.println(" Received CPC Reply Containing Exception");
-        System.out.println(" ... when expecting normal CPC reply!");
-        unexpectedException = true;
-      }
-			if (exceptionCountLatch != null)
-			{
-				exceptionCountLatch.countDown();
-			}
-      if (cpcLatch != null)
-      {
-        cpcLatch.countDown();
-      }
-		}
-		else
-		{
-			System.out.println("Received CPC Reply");
-			if (cpcLatch != null)
-			{
-				cpcLatch.countDown();
-			}
-		}
+	  /**
+	   * Callback method which is called by Uima EE client when a reply to process CAS 
+	   * is received. The reply contains either the CAS or an exception that occurred 
+	   * while processing the CAS.
+	   */
+	  public synchronized void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
+	  {
+	    String casReferenceId="";
+	    String parentCasReferenceId="";
+	    boolean expectedException = false;
+	    if ( aProcessStatus instanceof UimaASProcessStatus )
+	    {
+	      casReferenceId = 
+	        ((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
+	      parentCasReferenceId = 
+	        ((UimaASProcessStatus)aProcessStatus).getParentCasReferenceId();
+	    }
+	    if (aProcessStatus.isException())
+	    {
+	      if ( !expectingServiceShutdownException )
+	        System.out.println(" Process Received Reply Containing Exception.");
+	      
+
+	      List list = aProcessStatus.getExceptions();
+	      for( int i=0; i < list.size(); i++)
+	      {
+	        Exception e = (Exception)list.get(i);
+	        if ( e instanceof ServiceShutdownException || 
+	           (e.getCause() != null && e.getCause() instanceof ServiceShutdownException ))
+	        {
+	          serviceShutdownException = true;
+	        }
+	        else if ( ignoreException( e.getClass()))
+	        {
+	          expectedException = true;
+	        } else if ( e instanceof ResourceProcessException && isProcessTimeout(e) ) {
+	          synchronized(errorCounterMonitor) {
+	            System.out.println("Incrementing ProcessTimeout Counter");
+	            timeoutCounter++;
+	          }
+	        } else if ( engine != null && e instanceof UimaASPingTimeout) {
+	          System.out.println(".......... Listener Stopping Uima AS Due to Ping Timeout. Service Not Responding To Ping");
+	          if ( cpcLatch != null)
+	          {
+	            cpcLatch.countDown();
+	          }
+
+	          engine.stop();
+	        }
+	        if ( !expectedException && !expectingServiceShutdownException )
+	        {
+	          e.printStackTrace();
+	        }
+	      }
+	      if (exceptionCountLatch != null)
+	      {
+	        exceptionCountLatch.countDown();
+	        if (processCountLatch != null)
+	        {
+	          processCountLatch.countDown();
+	        }
+	      }
+	      else if (processCountLatch != null)
+	      {
+	        if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
+	        {
+	        unexpectedException = true;
+	        System.out.println(" ... when expecting normal completion!");
+	        }
+	        while (processCountLatch.getCount() > 0)
+	        {
+	          processCountLatch.countDown();
+	        }
+	      }
+	    }
+	    else if (processCountLatch != null && aCAS != null)
+	    {
+	      if ( parentCasReferenceId != null )
+	      {
+	        System.out.println("Client Received Reply Containing CAS:"+casReferenceId+" The Cas Was Generated From Parent Cas Id:"+parentCasReferenceId);
+	      }
+	      else
+	      {
+	        System.out.println("Client Received Reply Containing CAS:"+casReferenceId);
+	      }
+	      
+	      if ( doubleByteText != null )
+	      {
+	        String returnedText = aCAS.getDocumentText();
+	        if ( !doubleByteText.equals(returnedText))
+	        {
+	            System.out.println("!!! DocumentText in CAS reply different from that in CAS sent !!!");
+	            System.out.println("This is expected using http connector with vanilla AMQ 5.0 release,");
+	            System.out.println("and the test file DoubleByteText.txt contains double byte chars.");
+	            System.out.println("To fix, use uima-as-distr/src/main/lib/optional/activemq-optional-5.0.0.jar");
+	            unexpectedException = true;
+	            processCountLatch.countDown();
+	            return;
+	        }
+	      }
+	      // test worked, reset use of this text
+	      doubleByteText = null;
+	      if ( parentCasReferenceId == null)
+	      {
+	        processCountLatch.countDown();
+	      }
+	      List eList = aProcessStatus.getProcessTrace().getEventsByComponentName("UimaEE", false);
+	      for( int i=0; i < eList.size(); i++)
+	      {
+	        ProcessTraceEvent eEvent = (ProcessTraceEvent)eList.get(i);
+	        System.out.println("Received Process Event - "+eEvent.getDescription()+" Duration::"+eEvent.getDuration()+" ms"); // / (float) 1000000);
+	        //  Check if the running test wants to check how long the processing of CAS took
+	        if (  expectedProcessTime > 0 &&
+	            "Total Time In Process CAS".equals(eEvent.getDescription()))
+	        {
+	          //  Check if the expected duration exceeded actual duration for processing
+	          //  a CAS. Allow 50ms difference.
+	          if (eEvent.getDuration() > expectedProcessTime &&  (eEvent.getDuration() % expectedProcessTime ) > 50 ) 
+	          {
+	            System.out.println("!!!!!!!!!!!!! Expected Process CAS Duration of:"+expectedProcessTime+" ms. Instead Process CAS Took:"+eEvent.getDuration());
+	            unexpectedException = true;
+	          }
+	        }
+
+	      }
+	      incrementCASesProcessed();
+	    }
+	  }
+	  private boolean isProcessTimeout( Exception e) {
+	    return (e.getCause() != null && (e.getCause() instanceof UimaASProcessCasTimeout )); 
+	  }
+	  /**
+	   * Callback method which is called by Uima EE client when the initialization 
+	   * of the client is completed successfully. 
+	   */
+	  public void initializationComplete(EntityProcessStatus aStatus)
+	  {
+	    boolean isPingException;
+	    
+	    if (aStatus != null && aStatus.isException())
+	    {
+	      System.out.println("Initialization Received Reply Containing Exception:");
+	      List exceptions = aStatus.getExceptions();
+	      for (int i = 0; i < exceptions.size(); i++)
+	      {
+	        if ( exceptions.get(i) instanceof UimaASPingTimeout ) {
+	          System.out.println("Client Received PING Timeout. Service Not Available");
+	          if (cpcLatch != null)
+	          {
+	            cpcLatch.countDown();
+	          }
+	          
+	        }
+	        if ( !expectingServiceShutdownException )
+	        {
+	          ((Throwable) exceptions.get(i)).printStackTrace();
+	        }
+	      }
+	      if (exceptionCountLatch != null)
+	        exceptionCountLatch.countDown();
+	    }
+	    synchronized (initializeMonitor)
+	    {
+	      initialized = true;
+	      initializeMonitor.notifyAll();
+	    }
+	  }
+
+	  /**
+	   * Callback method which is called by Uima EE client when a CPC reply
+	   * is received OR exception occured while processing CPC request.
+	   */
+	  public void collectionProcessComplete(EntityProcessStatus aStatus)
+	  {
+	    if (aStatus != null && aStatus.isException())
+	    {
+	      
+	      List list = aStatus.getExceptions();
+	      boolean expectedException = false;
+	      for( int i=0; i < list.size(); i++)
+	      {
+	        Exception e = (Exception)list.get(i);
+	        if ( e instanceof ServiceShutdownException || 
+	           (e.getCause() != null && e.getCause() instanceof ServiceShutdownException ))
+	        {
+	          serviceShutdownException = true;
+	        }
+	        else if ( ignoreException( e.getClass()))
+	        {
+	          expectedException = true;
+	        }
+	        if ( !expectedException && !expectingServiceShutdownException )
+	        {
+	          e.printStackTrace();
+	        }
+	      }
+	      if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
+	      {
+	        System.out.println(" Received CPC Reply Containing Exception");
+	        System.out.println(" ... when expecting normal CPC reply!");
+	        unexpectedException = true;
+	      }
+	      if (exceptionCountLatch != null)
+	      {
+	        exceptionCountLatch.countDown();
+	      }
+	      if (cpcLatch != null)
+	      {
+	        cpcLatch.countDown();
+	      }
+	    }
+	    else
+	    {
+	      System.out.println("Received CPC Reply");
+	      if (cpcLatch != null)
+	      {
+	        cpcLatch.countDown();
+	      }
+	    }
+	  }
 	}
 	/**
 	 * A Runnable class used to test concurrency support in Uima EE client. Each instance of this
@@ -843,7 +854,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport implements UimaASS
 					}
 					finally
 					{
-						entityProcessComplete(cas, status);
+						listener.entityProcessComplete(cas, status);
 						cas.release();
 					}
 				}
