@@ -117,14 +117,15 @@ public interface UimaAsynchronousEngine
 	 * 
 	 * @param aListener - application listener object to add
 	 */
-	public void addStatusCallbackListener(UimaASStatusCallbackListener aListener);
-	
-	/**
+  public void addStatusCallbackListener(UimaAsBaseCallbackListener aListener);
+
+  /**
 	 * Unregisters named application listener. 
 	 * 
 	 * @param aListener - application listener to remove
 	 */
-	public void removeStatusCallbackListener(UimaASStatusCallbackListener aListener);
+  public void removeStatusCallbackListener(UimaAsBaseCallbackListener aListener);
+	
 	
 	/**
 	 * Stops the asynchronous client. Cleans up resources, drops connection to UIMA AS
