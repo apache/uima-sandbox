@@ -29,6 +29,8 @@ import javax.jms.MessageProducer;
 import javax.jms.TextMessage;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.client.UimaASProcessStatus;
+import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UimaMessageValidator;
@@ -37,6 +39,7 @@ import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngineCommon_impl.
 import org.apache.uima.adapter.jms.message.PendingMessage;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.util.Level;
+import org.apache.uima.util.impl.ProcessTrace_impl;
 
 /**
  * Creates a worker thread for sending messages. This is an abstract
@@ -248,8 +251,12 @@ public abstract class BaseMessageSender implements Runnable,
 						{
 							cacheEntry.setCASDepartureTime(System.nanoTime());
 						}
+		        UimaASProcessStatus status = new UimaASProcessStatusImpl(new ProcessTrace_impl(), cacheEntry.getCasReferenceId());
+		        //  Notify engine before sending a message
+		        engine.onBeforeMessageSend(status);
 					}
 				}
+				
 				producer.send(message);
 			} catch (Exception e) {
 				handleException(e, destination);
