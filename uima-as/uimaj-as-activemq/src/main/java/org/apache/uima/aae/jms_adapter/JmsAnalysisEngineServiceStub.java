@@ -43,6 +43,7 @@ import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
+import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.analysis_engine.AnalysisEngineServiceStub;
@@ -57,8 +58,8 @@ import org.apache.uima.resource.ResourceServiceException;
 import org.apache.uima.resource.metadata.ResourceMetaData;
 import org.apache.uima.util.Level;
 
-public class JmsAnalysisEngineServiceStub implements AnalysisEngineServiceStub, 
-  UimaASStatusCallbackListener {
+public class JmsAnalysisEngineServiceStub extends UimaAsBaseCallbackListener implements AnalysisEngineServiceStub
+{
   public static final String PARAM_BROKER_URL = "brokerUrl";
   public static final String PARAM_ENDPOINT = "endpoint";
   public static final String PARAM_TIMEOUT = "timeout";
