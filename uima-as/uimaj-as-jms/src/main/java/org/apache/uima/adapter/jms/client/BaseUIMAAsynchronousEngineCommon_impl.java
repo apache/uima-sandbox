@@ -56,6 +56,7 @@ import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
+import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.InvalidMessageException;
@@ -206,7 +207,7 @@ implements UimaAsynchronousEngine, MessageListener
 	abstract public String deploy(String[] aDeploymentDescriptorList, Map anApplicationContext) throws Exception;
 	abstract protected String deploySpringContainer(String[] springContextFiles) throws ResourceInitializationException;
 	
-	public void addStatusCallbackListener(UimaASStatusCallbackListener aListener)
+	public void addStatusCallbackListener(UimaAsBaseCallbackListener aListener)
 	{
 	    listeners.add(aListener);
 	}
@@ -238,11 +239,17 @@ implements UimaAsynchronousEngine, MessageListener
 		return uimaSerializer.serializeCasToXmi(aCAS, serSharedData);
 	}
 
-	public void removeStatusCallbackListener(UimaASStatusCallbackListener aListener)
+	public void removeStatusCallbackListener(UimaAsBaseCallbackListener aListener)
 	{
 		listeners.remove(aListener);
 	}
-
+	public void onBeforeMessageSend(UimaASProcessStatus status) {
+	   for (int i = 0; listeners != null && i < listeners.size(); i++)
+	   {
+	      UimaAsBaseCallbackListener statCL = (UimaAsBaseCallbackListener) listeners.get(i);
+	      statCL.onBeforeMessageSend(status);
+	   }
+	}
 	public synchronized void setCollectionReader(CollectionReader aCollectionReader) throws ResourceInitializationException
 	{
 		if ( initialized )
@@ -982,7 +989,7 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 		for (int i = 0; listeners != null && i < listeners.size(); i++)
 		{
-			UimaASStatusCallbackListener statCL = (UimaASStatusCallbackListener) listeners.get(i);
+		  UimaAsBaseCallbackListener statCL = (UimaAsBaseCallbackListener) listeners.get(i);
 			switch( aCommand )
 			{
 			case AsynchAEMessage.GetMeta:
@@ -997,6 +1004,7 @@ implements UimaAsynchronousEngine, MessageListener
       case AsynchAEMessage.Ping:
 				statCL.entityProcessComplete(aCAS, aStatus);
 				break;
+
 			}
 
 		}
