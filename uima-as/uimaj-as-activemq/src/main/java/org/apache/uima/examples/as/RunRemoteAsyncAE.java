@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.client.UimaASProcessStatus;
+import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
@@ -306,7 +308,7 @@ public class RunRemoteAsyncAE {
    * 
    * 
    */
-  class StatusCallbackListenerImpl implements UimaASStatusCallbackListener {
+  class StatusCallbackListenerImpl extends UimaAsBaseCallbackListener {
     int entityCount = 0;
 
     long size = 0;
@@ -438,6 +440,10 @@ public class RunRemoteAsyncAE {
         size += docText.length();
       }      
     }
+    public void onBeforeMessageSend(UimaASProcessStatus status) {
+      
+    }
+
   }
 
 }
