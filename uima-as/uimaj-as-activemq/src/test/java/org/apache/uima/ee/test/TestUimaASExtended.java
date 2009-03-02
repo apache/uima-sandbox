@@ -43,6 +43,7 @@ import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
+import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.ServiceShutdownException;
@@ -1590,7 +1591,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		return directory.delete();
 	}
 
-    private class TestListener implements UimaASStatusCallbackListener, Runnable
+    private class TestListener extends UimaAsBaseCallbackListener implements Runnable
     {
     	private String casReferenceId = null;
     	private TestUimaASExtended tester;
@@ -1607,6 +1608,9 @@ public class TestUimaASExtended extends BaseTestSupport
 			// TODO Auto-generated method stub
 			
 		}
+    public void onBeforeMessageSend(UimaASProcessStatus status) {
+      System.out.println("Client Received onBeforeMessageSend Notification with Cas:"+status.getCasReferenceId());
+    }
 
 		public void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus) {
 			if (aProcessStatus.isException())
