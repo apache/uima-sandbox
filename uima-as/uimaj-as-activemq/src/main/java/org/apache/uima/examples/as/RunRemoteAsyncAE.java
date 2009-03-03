@@ -17,25 +17,6 @@
  * under the License.
  */
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.apache.uima.examples.as;
 
 import java.io.File;
@@ -148,6 +129,8 @@ public class RunRemoteAsyncAE {
       if (args[i].startsWith("-")) {
         if (args[i].equals("-log")) {
           logCas = true;
+        } else if (args[i].equals("-b")) {
+          appCtx.put(UimaAsynchronousEngine.SerializationStrategy, "binary");
         } else if (args[i].equals("-i")) {
           ignoreErrors = true;
         } else {
@@ -164,8 +147,6 @@ public class RunRemoteAsyncAE {
             casPoolSize = Integer.parseInt(args[++i]);
           } else if (args[i].equals("-f")) {
             fsHeapSize = Integer.parseInt(args[++i]);
-          } else if (args[i].equals("-b")) {
-            appCtx.put(UimaAsynchronousEngine.SerializationStrategy, "binary");
           } else if (args[i].equals("-o")) {
             outputDir = new File(args[++i]);
             if (outputDir.exists()) {
@@ -302,7 +283,8 @@ public class RunRemoteAsyncAE {
       " is considered an error.  By default the timeout is 60 seconds.\n" +
       "-cpct  Specifies a timeout period in seconds.  When all CAS requests are completed, a collection process complete" +
       " command is sent.  By default there is no timeout for CPC, so the client will wait forever.\n" +
-      "-log Output details on each process request.\n" +
+      "-log Output details on each process request: IP address of service that handled the request,\n" +
+      "     time in ms the CAS was sent, duration in ms from sendCas to receipt.\n" +
       "-i  Causes the client to ignore errors returned from the service.  If not specified, the client" +
       " terminates on the first error (including a timeout if the -t option is specified.\n" +
       "-uimaEeDebug true    This is optional. Leave it out for normal operation. If specified, causes" +
