@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import javax.jms.BytesMessage;
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -42,6 +43,7 @@ import javax.management.ServiceNotFoundException;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.OutputChannel;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
@@ -54,6 +56,7 @@ import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
+import org.apache.uima.aae.error.MessageTimeoutException;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaEEServiceException;
 import org.apache.uima.aae.jmx.ServiceInfo;
@@ -1404,10 +1407,34 @@ public class JmsOutputChannel implements OutputChannel
 	  } else {
 	    addIdleTime(aMessage);
 	  }
-	  if ( endpointConnection.send(aMessage, msgSize, startConnectionTimer) == false ) {
-	    removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
-	  }
 
+	  if ( endpointConnection.send(aMessage, msgSize, startConnectionTimer) == false ) {
+	    if ( isRequest ) {
+	      Delegate delegate = lookupDelegate(anEndpoint.getDelegateKey());
+	      //  Removes the failed CAS from the list of CASes pending reply. This also
+	      //  cancels the timer if this CAS was the oldest pending CAS, and if there
+	      //  are other CASes pending a fresh timer is started.
+	      delegate.removeCasFromOutstandingList(entry.getCasReferenceId());
+				//	Mark this delegate as Failed
+	      delegate.getEndpoint().setStatus(Endpoint.FAILED);
+				//	Destroy listener associated with a reply queue for this delegate
+        InputChannel ic = getAnalysisEngineController().getInputChannel(delegate.getEndpoint().getDestination().toString());
+	      ic.destroyListener(delegate.getEndpoint().getDestination().toString(), anEndpoint.getDelegateKey());
+				//	Setup error context and handle failure in the error handler
+	      ErrorContext errorContext = new ErrorContext();
+	      errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+	      errorContext.add(AsynchAEMessage.CasReference, entry.getCasReferenceId());
+	      errorContext.add(AsynchAEMessage.Endpoint, anEndpoint);
+	      // Failure on send treat as timeout
+	      delegate.handleError(new MessageTimeoutException(), errorContext);
+	    } else {
+	      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	                    "dispatch", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_reply_failed__FINE",
+	                    new Object[] {getAnalysisEngineController().getComponentName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
+	      }
+	    }
+	  }
 	}
 	private void sendCasToRemoteEndpoint( boolean isRequest, String aSerializedCAS, String anInputCasReferenceId, String aCasReferenceId, Endpoint anEndpoint, boolean startTimer, long sequence) 
 	throws AsynchAEException, ServiceShutdownException
