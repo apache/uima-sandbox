@@ -1780,7 +1780,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     	//	is in this state, delay CASes by placing them on a list of
     	//	CASes pending dispatch. Once the ping reply is received all
     	//	delayed CASes will be dispatched to the delegate.
-      if ( !delayCasIfDelegateInTimedOutState( aCasReferenceId, anEndpoint.getEndpoint() ) ) {
+      if ( !delayCasIfDelegateInTimedOutState( aCasReferenceId, anEndpoint.getDelegateKey() ) ) {
 				//	The delegate is in the normal state so send it this CAS
         getOutputChannel().sendRequest(aCasReferenceId, anEndpoint);
       }
@@ -1803,8 +1803,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       // as a PING to see if the delegate service is alive.
       if ( listSize == 1 ) {
         delegate.setAwaitingPingReply();
-        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "delayCasIfDelegateInTimedOutState", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_aggregate_sending_ping__FINE", new Object[] { getComponentName(), delegate.getKey() });
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "delayCasIfDelegateInTimedOutState", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_aggregate_sending_ping__INFO", new Object[] { getComponentName(), delegate.getKey() });
         }
         retryMetadataRequest(delegate.getEndpoint());
       }
@@ -1828,9 +1828,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		Endpoint endpoint = null;
     String key = lookUpDelegateKey(anEndpoint.getEndpoint());
 
-    if ( getInProcessCache().getEndpoint(anEndpoint.getEndpoint(), aCasReferenceId) != null)
+    if ( (endpoint = getInProcessCache().getEndpoint(anEndpoint.getEndpoint(), aCasReferenceId)) != null)
 		{
-			endpoint = getInProcessCache().getEndpoint(anEndpoint.getEndpoint(), aCasReferenceId);
       Endpoint masterEndpoint = lookUpEndpoint(key, true);
       //  check if the master endpoint destination has changed. This can be a case when
       //  a new temp queue is created when the previous temp queue is destroyed due to
@@ -2115,8 +2114,11 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			throw new AsynchAEException(e);
 		}
 	}
-	private void completeInitialization() throws Exception
+	private synchronized void completeInitialization() throws Exception
 	{
+	  if ( initialized ) {
+	    return;
+	  }
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "completeInitialization", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_all_ts_merged__CONFIG");
     }
