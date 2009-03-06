@@ -110,12 +110,18 @@ implements ExceptionListener
     try {
       if ( controller instanceof AggregateAnalysisEngineController ) {
         String delegateKey = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(endpoint.getEndpoint());
+        InputChannel iC = null;
+        String queueName = null;
         if ( endpoint.getDestination() != null ) {
-          InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(endpoint.getDestination().toString());
-          iC.destroyListener(endpoint.getDestination().toString(), delegateKey);
+          queueName = endpoint.getDestination().toString();
         } else {
-          InputChannel iC = ((AggregateAnalysisEngineController)controller).getInputChannel(endpoint.getEndpoint());
-          iC.destroyListener(endpoint.getEndpoint(), delegateKey);
+          queueName = endpoint.getEndpoint();
+        }
+        iC = ((AggregateAnalysisEngineController)controller).getInputChannel(queueName);
+        if ( iC != null ) {
+          iC.destroyListener(queueName, delegateKey);
+        } else {
+          System.out.println(">>> Listener Unable To LookUp InputChannel For Queue:"+queueName);
         }
       }
     } catch( Exception e) {
@@ -494,16 +500,21 @@ implements ExceptionListener
     if (connectionFactory instanceof ActiveMQConnectionFactory) {
       String brokerURL = ((ActiveMQConnectionFactory) connectionFactory).getBrokerURL();
       if (brokerURL != null) {
-        if (brokerURL.indexOf("?wireFormat.maxInactivityDuration") > 0) {
-          // maxInactivityDuration already specified
-          if ( isFreeCasQueueListener() ) {
-            super.setConnectionFactory(connectionFactory);
+        //  http connections should not turn off inactivity timeout. The broker doesnt
+        //  create a temp queue if the inactivity is in the url.
+        //  Check if the url contains inactivity parameter
+        if ( brokerURL.startsWith("http") ) {
+          int indx = 0;
+          if( (indx = brokerURL.indexOf("?wireFormat.maxInactivityDuration")) > 0) {
+            //  strip off the inactivity parameter from the broker url
+            brokerURL = brokerURL.substring(0, indx);
           }
-          return;
+        } else {
+          // Turns off inactivity Monitoring on the connection
+          if( brokerURL.indexOf("?wireFormat.maxInactivityDuration") < 0) {
+            brokerURL += "?wireFormat.maxInactivityDuration=0";
+          }
         }
-        // Turns off inactivity Monitoring on the connection
-        brokerURL += "?wireFormat.maxInactivityDuration=0";
-        // String newBrokerURL = "failover://("+brokerURL+"?wireFormat.maxInactivityDuration=0)";
         // Save the Prefetch Policy provided in the given CF
         ActiveMQPrefetchPolicy prefetch = ((ActiveMQConnectionFactory) connectionFactory)
                 .getPrefetchPolicy();
@@ -517,9 +528,7 @@ implements ExceptionListener
         // brokerURL = null is handled in the dd2spring
       }
     } 
-    if ( isFreeCasQueueListener() ) {
-      super.setConnectionFactory(connectionFactory);
-    }
+    super.setConnectionFactory(connectionFactory);
 	}
 	
 	
