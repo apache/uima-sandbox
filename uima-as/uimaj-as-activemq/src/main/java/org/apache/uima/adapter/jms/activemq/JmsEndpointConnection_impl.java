@@ -497,6 +497,8 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		try
 		{
 			  stopTimer();
+        int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+        int command = aMessage.getIntProperty(AsynchAEMessage.Command);
 
 				if ( failed || conn == null || producerSession == null || !((ActiveMQSession) producerSession).isRunning())
 				{
@@ -517,8 +519,6 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	              // the CAS. If the delegate state = TIMEOUT_STATE, push the CAS id onto
 	              // delegate's list of delayed CASes. The state of the delegate was 
 	              // changed to TIMEOUT when a previous CAS timed out.
-	              int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
-	              int command = aMessage.getIntProperty(AsynchAEMessage.Command);
 	              if (msgType != AsynchAEMessage.Request && command == AsynchAEMessage.Process ) {
 	                String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
 	                if ( casReferenceId != null && 
