@@ -824,12 +824,16 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
       failedListenerMap.get(aDelegateKey);
     UimaDefaultMessageListenerContainer newListener = 
       new UimaDefaultMessageListenerContainer();
-    newListener.setConnectionFactory(failedListener.getConnectionFactory());
+    ActiveMQConnectionFactory f = new ActiveMQConnectionFactory(failedListener.getBrokerUrl());
+    newListener.setConnectionFactory(f);
+//    newListener.setConnectionFactory(failedListener.getConnectionFactory());
     newListener.setMessageListener(this);
     newListener.setController(getController());
     
     TempDestinationResolver resolver = new TempDestinationResolver();
-    resolver.setConnectionFactory((ActiveMQConnectionFactory)failedListener.getConnectionFactory());
+//    resolver.setConnectionFactory((ActiveMQConnectionFactory)failedListener.getConnectionFactory());
+    resolver.setConnectionFactory(f); 
+    resolver.setListener(newListener);
     newListener.setDestinationResolver(resolver);
 
     org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor executor = new org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor();
