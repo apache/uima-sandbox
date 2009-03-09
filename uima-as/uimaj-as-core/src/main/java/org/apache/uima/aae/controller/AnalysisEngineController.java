@@ -204,5 +204,6 @@ public interface AnalysisEngineController extends ControllerLifecycle
   public void registerVmQueueWithJMX( Object o, String aName ) throws Exception; 
   
   public AnalysisEngineController getParentController();
+  public void addAbortedCasReferenceId( String aCasReferenceId );
 
 }
