@@ -105,7 +105,9 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	{
 		connectionMap = aConnectionMap;
 		serverUri = anEndpoint.getServerURI();
-		if ( anEndpoint.isReplyEndpoint() && 
+    isReplyEndpoint = anEndpoint.isReplyEndpoint();
+
+    if ( ( anEndpoint.getCommand() == AsynchAEMessage.Stop || isReplyEndpoint ) && 
 			 anEndpoint.getDestination() != null && 
 			 anEndpoint.getDestination() instanceof ActiveMQDestination )
 		{
@@ -115,7 +117,6 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		{
 			endpoint = anEndpoint.getEndpoint();
 		}
-		isReplyEndpoint = anEndpoint.isReplyEndpoint();
 		anEndpoint.remove();
 		delegateEndpoint = anEndpoint;
 	}
@@ -154,9 +155,6 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		try
 		{
 			String brokerUri = getServerUri();
-			String endpointId = endpoint;
-			
-			
 			
 			//	If replying to http request, reply to a queue managed by this service broker using tcp protocol
 			if ( isReplyEndpoint && brokerUri.startsWith("http") && controller != null && controller.getInputChannel() != null )
@@ -182,17 +180,10 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			factory.setDispatchAsync(true);
       factory.setUseAsyncSend(true);
       factory.setCopyMessageOnSend(false);
-/*
-			factory.setDispatchAsync(true);
-			factory.setOptimizeAcknowledge(true);
-			factory.setUseAsyncSend(true);
-			factory.setUseCompression(false);
-			factory.setCopyMessageOnSend(false);
-	*/
 			conn = factory.createConnection();
 			connectionCreationTimestamp = System.nanoTime();
 			producerSession = conn.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
-			if ( isReplyEndpoint && delegateEndpoint.getDestination() != null )
+			if ( (delegateEndpoint.getCommand() == AsynchAEMessage.Stop || isReplyEndpoint ) && delegateEndpoint.getDestination() != null )
 			{
 				producer = producerSession.createProducer(null); 
 				if ( controller != null )
@@ -546,7 +537,9 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 				}
 
 				//	Send a reply to a queue provided by the client
-				if ( isReplyEndpoint && delegateEndpoint.getDestination() != null  )
+				
+				//  Stop messages and replies are sent to the endpoint provided in the destination object
+				if ( (command == AsynchAEMessage.Stop || isReplyEndpoint) && delegateEndpoint.getDestination() != null  )
 				{
 					destinationName = ((ActiveMQDestination)delegateEndpoint.getDestination()).getPhysicalName();
 					if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
