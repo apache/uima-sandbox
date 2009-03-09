@@ -28,6 +28,7 @@ import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.Endpoint_impl;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.InvalidMessageException;
@@ -339,23 +340,23 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				//	Fetch Cache entry for the parent CAS
         CacheEntry inputCasCacheEntry = getController().getInProcessCache().getCacheEntryForCAS(inputCasReferenceId);
         CasStateEntry casStateEntry = null;
+        // Fetch an endpoint where Free CAS Notification must be sent.
+        // This endpoint is unique per CM instance. Meaning, each 
+        //  instance of CM will have an endpoint where it expects Free CAS
+        // notifications.
+        freeCasEndpoint = aMessageContext.getEndpoint();
+        //  Clone an endpoint where Free Cas Request will be sent
+        freeCasEndpoint = (Endpoint)((Endpoint_impl)freeCasEndpoint).clone();
 
         if ( getController() instanceof AggregateAnalysisEngineController ) {
           casStateEntry = ((AggregateAnalysisEngineController)getController()).
               getLocalCache().lookupEntry(inputCasReferenceId);
           casStateEntry.incrementSubordinateCasInPlayCount();
+          //  Associate Free Cas Notification Endpoint with an input Cas
+          casStateEntry.setFreeCasNotificationEndpoint(freeCasEndpoint);
         }
 
 				computeStats(aMessageContext, inputCasReferenceId);
-
-				
-				// Fetch an endpoint where Free CAS Notification must be sent.
-				// This endpoint is unique per CM instance. Meaning, each 
-				//	instance of CM will have an endpoint where it expects Free CAS
-				// notifications.
-				freeCasEndpoint = aMessageContext.getEndpoint();
-				//	Clone an endpoint where Free Cas Request will be sent
-				freeCasEndpoint = (Endpoint)((Endpoint_impl)freeCasEndpoint).clone();
 				//	Reset the destination
 				aMessageContext.getEndpoint().setDestination(null);
 				//	This CAS came in from a CAS Multiplier. Treat it differently than the
@@ -788,15 +789,11 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	private void handleStopRequest(MessageContext aMessageContext)
 	{
 		System.out.println("###################Controller::"+getController().getComponentName()+" Received <<<STOP>>> Request");
-		if ( getController() instanceof PrimitiveAnalysisEngineController )
-		{
-			try
-			{
-				String casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
-				( (PrimitiveAnalysisEngineController)getController()).addAbortedCasReferenceId(casReferenceId); 
-			}
-			catch( Exception e){}
+		try	{
+		  String casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
+			getController().addAbortedCasReferenceId(casReferenceId); 
 		}
+		catch( Exception e){}
 	}
 	/**
 	 * Main method called by the predecessor handler.  
