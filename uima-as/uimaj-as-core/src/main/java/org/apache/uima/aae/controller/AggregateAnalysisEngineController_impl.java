@@ -905,6 +905,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	  // This could be the case if a previous step was a parallel step and it contained collocated
 	  // delegates.
     if ( !isStopped() ) {
+      if ( abortGeneratingCASes(aCasReferenceId) ) {
+        //  Force delegate Cas Multipliers to Stop generating new CASes
+        super.stopCasMultipliers();
+      }
       try {
         CacheEntry entry = getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
         CasStateEntry casStateEntry = getLocalCache().lookupEntry(aCasReferenceId);
@@ -2483,7 +2487,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		super.stop();
 		cleanUp();
 	}
-	protected List getChildControllerList()
+	public List getChildControllerList()
 	{
 		return childControllerList;
 	}
