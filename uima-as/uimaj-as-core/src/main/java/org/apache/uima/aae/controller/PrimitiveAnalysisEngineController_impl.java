@@ -21,6 +21,7 @@ package org.apache.uima.aae.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager;
@@ -79,6 +80,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	private Object mux = new Object();
 	
   private Object mux2 = new Object();
+  
+  
 	public PrimitiveAnalysisEngineController_impl(String anEndpointName, String anAnalysisEngineDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache, int aWorkQueueSize, int anAnalysisEnginePoolSize) throws Exception
 	{
 		this(null, anEndpointName, anAnalysisEngineDescriptor, aCasManager, anInProcessCache, aWorkQueueSize, anAnalysisEnginePoolSize, 0);
@@ -334,15 +337,17 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 			}
 		}
 	}
-
-	public void addAbortedCasReferenceId( String aCasReferenceId )
-	{
-		abortedCASReferenceId = aCasReferenceId;
-	}
-	private boolean abortGeneratingCASes( String aCasReferenceId )
-	{
-		return ( aCasReferenceId.equals(abortedCASReferenceId));
-	}
+	/**
+	 * This is called when a Stop request is received from a client.
+	 * Add the provided Cas id to the list of aborted CASes. The 
+	 * process() method checks this list to determine if it should
+	 * continue generating children.
+	 * 
+   * @param aCasReferenceId - Id of an input CAS. The client wants to stop
+   * generation of child CASes from this CAS.
+   * 
+   * @return
+	 */
 	
 	public void process(CAS aCAS, String aCasReferenceId, Endpoint anEndpoint)
 	{
@@ -423,6 +428,10 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 							//	as there may potentially be a problem with a Class Loader.
 							//	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 							((CASImpl)aCAS).enableReset(true);
+			        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+			          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stopped_producing_new_cases__INFO", new Object[] { Thread.currentThread().getId(),getComponentName(),aCasReferenceId });
+			        }
+							System.out.println(">>>> Cas Multiplier:"+getComponentName()+" Stopped Generating CASes from Input CAS:"+aCasReferenceId);
 						}
 					}
 					return;
