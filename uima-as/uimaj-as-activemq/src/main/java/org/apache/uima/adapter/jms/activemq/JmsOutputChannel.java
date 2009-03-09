@@ -432,19 +432,18 @@ public class JmsOutputChannel implements OutputChannel
 
 			TextMessage tm = endpointConnection.produceTextMessage("");
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
-			tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 			populateHeaderWithRequestContext(tm, anEndpoint, aCommand);
-			
-			// Only used to send a Stop or ReleaseCas request so probably no need to start a connection timer ?
-			endpointConnection.send(tm, 0, true);
-			if ( aCommand == AsynchAEMessage.ReleaseCAS )
+			if ( aCommand == AsynchAEMessage.ReleaseCAS || aCommand == AsynchAEMessage.Stop)
 			{
+		     tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+
 		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
 						JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_release_cas_req__FINE", new Object[] { getAnalysisEngineController().getName(), anEndpoint.getEndpoint(),aCasReferenceId });
 		    }
 			}
-				
+      // Only used to send a Stop or ReleaseCas request so probably no need to start a connection timer ?
+      endpointConnection.send(tm, 0, true);
 		}
 		catch( JMSException e)
 		{
