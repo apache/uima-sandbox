@@ -161,7 +161,9 @@ public abstract class Delegate {
     }    
   }
 
-  
+  public List<DelegateEntry> getDelegateCasesPendingRepy() {
+    return outstandingCasList;
+  }
   /**
    * Adds a given Cas ID to the list of CASes pending reply. A new timer will be started to handle
    * delegate's timeout if either: 1) the list of CASes pending reply is empty AND delegate timeout
