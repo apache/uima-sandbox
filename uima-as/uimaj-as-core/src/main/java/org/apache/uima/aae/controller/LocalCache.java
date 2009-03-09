@@ -152,7 +152,14 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     private String inputCasReferenceId;
     private int numberOfParallelDelegates = 1;
     private int howManyDelegatesResponded = 0;
+    private Endpoint freeCasNotificationEndpoint;
 
+    public Endpoint getFreeCasNotificationEndpoint() {
+      return freeCasNotificationEndpoint;
+    }
+    public void setFreeCasNotificationEndpoint(Endpoint freeCasNotificationEndpoint) {
+      this.freeCasNotificationEndpoint = freeCasNotificationEndpoint;
+    }
     public CasStateEntry( String aCasReferenceId ) {
       casReferenceId = aCasReferenceId;
     }
