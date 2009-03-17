@@ -351,7 +351,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
         if ( getController() instanceof AggregateAnalysisEngineController ) {
           casStateEntry = ((AggregateAnalysisEngineController)getController()).
               getLocalCache().lookupEntry(inputCasReferenceId);
-          casStateEntry.incrementSubordinateCasInPlayCount();
+
           //  Associate Free Cas Notification Endpoint with an input Cas
           casStateEntry.setFreeCasNotificationEndpoint(freeCasEndpoint);
         }
@@ -389,11 +389,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 						freeCasEndpoint.setServerURI(casMultiplierEndpoint.getServerURI());
 					}
 				}
-				// increment number of CASes produced from an input CAS
-				// The input CAS (parent) will be held by 
-				//	the aggregate until all of its subordinate CASes are 
-				//	fully processed. Only then, the aggregate can return
-				// it back to the client
 			}
 			else if ( getController().isTopLevelComponent() && getController() instanceof AggregateAnalysisEngineController )
 			{
@@ -410,6 +405,25 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			//	should be processed. 
 			if ( !getController().getInProcessCache().entryExists(casReferenceId) )
 			{
+			  CasStateEntry cse = null;
+		    if ( getController().getLocalCache().lookupEntry(casReferenceId) == null ) {
+	         //  Create a new entry in the local cache for the CAS received from the remote
+	        cse = getController().getLocalCache().createCasStateEntry(casReferenceId);
+	        // Check if this CAS is a child
+	        if( aMessageContext.propertyExists(AsynchAEMessage.CasSequence) ) {
+	          cse.setInputCasReferenceId(inputCasReferenceId);
+	        }
+		    } else {
+		      cse = getController().getLocalCache().lookupEntry(casReferenceId);
+		    }
+
+	      if (  getController() instanceof AggregateAnalysisEngineController ) {
+	        String delegateKey =((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
+	        Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
+	        // Save the last delegate handling this CAS
+	        cse.setLastDelegate(delegate);
+	      }
+		    
 				entry = deserializeCASandRegisterWithCache( casReferenceId, freeCasEndpoint, newCASProducedBy, aMessageContext);
 				if ( getController().isStopped() || entry == null || entry.getCas() == null)
 				{
@@ -465,7 +479,12 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			//	This is only used when handling CASes produced by CAS Multiplier
 			String inputCasReferenceId = null;
 			CAS cas = null;
+			CasStateEntry cse = null;
 			String casReferenceId = getCasReferenceId(aMessageContext);
+      if ( (cse = getController().getLocalCache().lookupEntry(casReferenceId)) == null ) {
+        //  Create a new entry in the local cache for the CAS received from the remote
+        cse = getController().getLocalCache().createCasStateEntry(casReferenceId);
+      }
 
 			// Check if this Cas has been sent from a Cas Multiplier. If so, its sequence will be > 0
 			if ( aMessageContext.propertyExists(AsynchAEMessage.CasSequence) )
@@ -485,11 +504,27 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				}
         //  Get the id of the parent Cas
 				inputCasReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.InputCasReference);
+        if ( cse.getInputCasReferenceId() == null ) {
+          cse.setInputCasReferenceId(inputCasReferenceId);
+        }
         	
 				if ( getController() instanceof AggregateAnalysisEngineController )
 				{
+		      String delegateKey =((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
+		      Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
+		      cse.setLastDelegate(delegate);  
+				  try {
 				  //  Save the endpoint of the CM which produced the Cas
 				  getController().getInProcessCache().setCasProducer(casReferenceId, casMultiplierEndpoint.getEndpoint());
+				  } catch( Exception e) {
+	          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+	                      "handleProcessRequestWithCASReference", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
+	                      new Object[] { e });
+	          }
+				    e.printStackTrace();
+				    return;
+				  }
 					// Convert the endpoint to a key
 				  newCASProducedBy = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(casMultiplierEndpoint.getEndpoint());
 					casMultiplierEndpoint.setIsCasMultiplier(true);
