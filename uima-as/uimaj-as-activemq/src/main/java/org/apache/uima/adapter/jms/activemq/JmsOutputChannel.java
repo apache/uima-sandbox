@@ -432,10 +432,10 @@ public class JmsOutputChannel implements OutputChannel
 
 			TextMessage tm = endpointConnection.produceTextMessage("");
 			tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
+			tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 			populateHeaderWithRequestContext(tm, anEndpoint, aCommand);
 			if ( aCommand == AsynchAEMessage.ReleaseCAS || aCommand == AsynchAEMessage.Stop)
 			{
-		     tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 
 		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "sendRequest", 
@@ -1413,7 +1413,7 @@ public class JmsOutputChannel implements OutputChannel
 	      //  Removes the failed CAS from the list of CASes pending reply. This also
 	      //  cancels the timer if this CAS was the oldest pending CAS, and if there
 	      //  are other CASes pending a fresh timer is started.
-	      delegate.removeCasFromOutstandingList(entry.getCasReferenceId());
+	      removeCasFromOutstandingList(entry, isRequest, anEndpoint.getDelegateKey());
 				//	Mark this delegate as Failed
 	      delegate.getEndpoint().setStatus(Endpoint.FAILED);
 				//	Destroy listener associated with a reply queue for this delegate
@@ -1835,8 +1835,7 @@ public class JmsOutputChannel implements OutputChannel
 	
 	private String getTopParentCasReferenceId( String casReferenceId ) throws Exception
 	{
-		if ( !getAnalysisEngineController().getInProcessCache().entryExists(casReferenceId) )
-		{
+    if ( !getAnalysisEngineController().getLocalCache().containsKey(casReferenceId) ) {
 			return null;
 		}
     CasStateEntry casStateEntry = getAnalysisEngineController().getLocalCache().lookupEntry(casReferenceId);
@@ -1845,10 +1844,10 @@ public class JmsOutputChannel implements OutputChannel
 		if ( casStateEntry.isSubordinate() )
 		{
 			//	Recurse until the top CAS reference Id is found
-			return getTopParentCasReferenceId(entry.getInputCasReferenceId());
+      return getTopParentCasReferenceId(casStateEntry.getInputCasReferenceId());
 		}
 		//	Return the top ancestor CAS id
-		return entry.getCasReferenceId();
+    return casStateEntry.getCasReferenceId();
 	}
 	
 	private void addIdleTime( Message aMessage )
