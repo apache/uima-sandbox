@@ -197,6 +197,8 @@ public class ProcessResponseHandler extends HandlerBase
             getLocalCache().lookupEntry(casReferenceId);
       if ( casStateEntry != null ) {
         casStateEntry.setReplyReceived();
+        //  Set the key of the delegate that returned the CAS
+        casStateEntry.setLastDelegate(delegate);
       }
 			
 			cas = cacheEntry.getCas();  
@@ -275,8 +277,6 @@ public class ProcessResponseHandler extends HandlerBase
 
       computeStats(aMessageContext, casReferenceId);
 
-//      cancelTimer(aMessageContext, casReferenceId, true);
-
       // Send CAS for processing when all delegates reply
       // totalNumberOfParallelDelegatesProcessingCas indicates how many delegates are processing CAS
       // in parallel. Default is 1, meaning only one delegate processes the CAS at the same.
@@ -286,8 +286,6 @@ public class ProcessResponseHandler extends HandlerBase
       // HowManyDelegatesResponded is incremented every time a parallel delegate sends response.
       if (totalNumberOfParallelDelegatesProcessingCas == 1
               || receivedAllResponsesFromParallelDelegates( casStateEntry, totalNumberOfParallelDelegatesProcessingCas)) {
-//              || (casStateEntry.howManyDelegatesResponded() == totalNumberOfParallelDelegatesProcessingCas)) {
-//        casStateEntry.resetDelegateResponded();
         super.invokeProcess(cas, casReferenceId, null, aMessageContext, null);
       }
 
@@ -339,17 +337,8 @@ public class ProcessResponseHandler extends HandlerBase
 	{
 		XmiSerializationSharedData deserSharedData;
 		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-//    UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, allow);
     uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark, allow);
 	}
-	/**
-	private void deserialize( String xmi, CAS cas, String casReferenceId, int highWaterMark ) throws Exception
-	{
-		XmiSerializationSharedData deserSharedData;
-		deserSharedData = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId).getDeserSharedData();
-		UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, highWaterMark);
-	}
-	**/
 	private void deserialize( String xmi, CAS cas, String casReferenceId ) throws Exception
 	{
 	  CacheEntry entry = getController().getInProcessCache().getCacheEntryForCAS(casReferenceId);
@@ -360,7 +349,6 @@ public class ProcessResponseHandler extends HandlerBase
 			deserSharedData = new XmiSerializationSharedData();
 			entry.setXmiSerializationData(deserSharedData);
 		}
-//    UimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
     uimaSerializer.deserializeCasFromXmi(xmi, cas, deserSharedData, true, -1);
 	}
 	
@@ -377,24 +365,16 @@ public class ProcessResponseHandler extends HandlerBase
       CasStateEntry casStateEntry = 
         ((AggregateAnalysisEngineController)getController()).
             getLocalCache().lookupEntry(casReferenceId);
-      if ( casStateEntry != null ) {
-        casStateEntry.setReplyReceived();
-      }
 			
 			CAS cas = cacheEntry.getCas();
-			String endpointName = aMessageContext.getEndpoint().getEndpoint();
-			String delegateKey = ((AggregateAnalysisEngineController)getController()).
-									lookUpDelegateKey(endpointName);
-			ServicePerformance delegateServicePerformance = 
-				((AggregateAnalysisEngineController)getController()).
-					getServicePerformance(delegateKey);
-			/*
-			if ( delegateServicePerformance != null )
-			{
-				delegateServicePerformance.incrementNumberOfCASesProcessed();
-			}
-*/
-			//CAS cas = getController().getInProcessCache().getCasByReference(casReferenceId);
+      String delegateKey =((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
+      Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
+      if ( casStateEntry != null ) {
+        casStateEntry.setReplyReceived();
+        casStateEntry.setLastDelegate(delegate);
+      }
+
+			
 			if (cas != null)
 			{
 				cancelTimerAndProcess(aMessageContext, casReferenceId, cas);
