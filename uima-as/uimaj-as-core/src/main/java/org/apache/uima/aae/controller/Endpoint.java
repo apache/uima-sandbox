@@ -163,4 +163,7 @@ public interface Endpoint
   
   public String getDelegateKey();
 
+  public void setProcessParentLast(boolean parentLast);
+  
+  public boolean processParentLast();
 }
