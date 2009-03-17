@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
+import org.apache.uima.aae.InProcessCache.CacheEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.flow.FinalStep;
 import org.apache.uima.util.Level;
 
@@ -86,9 +88,8 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
                   "dumpContents", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_cache_entry_key__FINEST",
                   new Object[] { controller.getComponentName(), count, sb.toString() });
-     
       sb.setLength(0);
-    }
+	  }
     else if ( UIMAFramework.getLogger().isLoggable(Level.FINE) )
     {
       Iterator it = keySet().iterator();
@@ -111,8 +112,8 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     
       
     }
+    
   }
-  
   public synchronized void remove(String aCasReferenceId)
   {
     if (aCasReferenceId != null && containsKey(aCasReferenceId))
@@ -137,7 +138,21 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
       }
     }
   }
-  
+  public CasStateEntry getTopCasAncestor( String casReferenceId ) throws Exception
+  {
+    if ( !containsKey(casReferenceId) ) {
+      return null;
+    }
+    CasStateEntry casStateEntry = lookupEntry(casReferenceId);
+    if ( casStateEntry.isSubordinate() )
+    {
+      //  Recurse until the top CAS reference Id is found
+      return getTopCasAncestor(casStateEntry.getInputCasReferenceId());
+    }
+    //  Return the top ancestor CAS id
+    return casStateEntry;
+  }
+
   public class CasStateEntry {
     
     private String casReferenceId;
@@ -151,6 +166,7 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     private Object childCountMux = new Object();
     private String inputCasReferenceId;
     private int numberOfParallelDelegates = 1;
+    private Delegate lastDelegate = null; 
     private int howManyDelegatesResponded = 0;
     private Endpoint freeCasNotificationEndpoint;
 
@@ -162,6 +178,12 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     }
     public CasStateEntry( String aCasReferenceId ) {
       casReferenceId = aCasReferenceId;
+    }
+    public void setLastDelegate( Delegate aDelegate) {
+      lastDelegate = aDelegate;
+    }
+    public Delegate getLastDelegate() {
+      return lastDelegate;
     }
     public String getCasReferenceId() {
       return casReferenceId;
