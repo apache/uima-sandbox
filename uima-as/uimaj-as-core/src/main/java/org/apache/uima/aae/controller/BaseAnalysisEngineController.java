@@ -2120,102 +2120,15 @@ implements AnalysisEngineController, EventSubscriber
 		                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_release_cas_req__FINE",
 		                new Object[] { getComponentName(), casReferenceId });
         }
-        CacheEntry cacheEntry = null;
-        CasStateEntry casStateEntry = null;
 				
 				try
 				{
-				  if ( this instanceof AggregateAnalysisEngineController ) {
-	          casStateEntry = ((AggregateAnalysisEngineController)this).getLocalCache().lookupEntry(casReferenceId);
-				  }
-					cacheEntry = getInProcessCache().getCacheEntryForCAS(casReferenceId);
-				}
-				catch( AsynchAEException e)
-				{
-					//	The Cas has already been removed. It may have reached the final step
-					//	and all of its children have been processed.
-					return;
-				}
-				try
-				{
-					synchronized( finalStepMux )
-					{
-						//	Release the CAS and remove a corresponding entry from the InProcess cache.
-						dropCAS(casReferenceId, true);
-						//  Remove the Cas from the outstanding CAS list. The id of the Cas was
-						//	added to this list by the Cas Multiplier before the Cas was sent to 
-						//	to the client. 
-						cmOutstandingCASes.remove(casReferenceId);
-					}
-					String parentCasReferenceId = cacheEntry.getInputCasReferenceId(); 
-					Endpoint freeCasEndpoint = cacheEntry.getFreeCasEndpoint();
-					//	If the CAS was created by a remote Cas Multiplier, send a Free CAS Notification
-					//	to the CM.
-					if ( freeCasEndpoint != null )
-					{
-		         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-		           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-				                "releaseNextCas", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_sending_fcq_req__FINE",
-				                new Object[] { getComponentName(), casReferenceId, cacheEntry.getCasMultiplierKey(), freeCasEndpoint.getDestination() });
-		         }
-						freeCasEndpoint.setReplyEndpoint(true);
-						getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, casReferenceId, freeCasEndpoint);
-					}
-					cacheEntry = null;
-					//	Check if the CAS has a parent CAS
-					if ( parentCasReferenceId != null )
-					{
-						try
-						{
-							//	Fetch the parent CAS from the InProcess Cache
-							cacheEntry = getInProcessCache().getCacheEntryForCAS(parentCasReferenceId);
-							if ( this instanceof AggregateAnalysisEngineController ) {
-	              casStateEntry = ((AggregateAnalysisEngineController)this).getLocalCache().lookupEntry(parentCasReferenceId);
-							}
-						}
-						catch( AsynchAEException e)
-						{
-							//	The Cas has already been removed. It may have reached the final step
-							//	and all of its children have been processed.
-							return;
-						}
-						if ( cacheEntry != null  )
-						{
-							boolean casHasNoSubordinates;
-							boolean casPendingReply;
-							
-							//	Check if the parentCAS has any children and if it has already reached the Final State
-							//	in its flow. 
-							synchronized( finalStepMux )
-							{
-		            if ( this instanceof AggregateAnalysisEngineController ) {
-		              //  Decrement number of children for this CAS since we just released one above.
-		              casStateEntry.decrementSubordinateCasInPlayCount();
-
-		              casHasNoSubordinates = casStateEntry.getSubordinateCasInPlayCount() == 0;
-	                casPendingReply = casStateEntry.isPendingReply();
-		            } else {
-	                casHasNoSubordinates = getInProcessCache().hasNoSubordinates(cacheEntry.getCasReferenceId());
-	                casPendingReply = cacheEntry.isPendingReply();
-		            }
-							}
-							if (  casPendingReply && casHasNoSubordinates )
-							{
-								if ( this instanceof AggregateAnalysisEngineController )
-								{
-                  ((AggregateAnalysisEngineController)this).finalStep( casStateEntry.getFinalStep(), parentCasReferenceId);
-								}
-								else // PrimitiveAnalysisEngineController 
-								{
-									//	Return an input CAS to the client. The input CAS is returned
-									//	to the remote client only if all of the child CASes produced
-									//	from the input CAS have been fully processed.
-									getOutputChannel().sendReply(cacheEntry.getCasReferenceId(), cacheEntry.getMessageOrigin());
-									dropCAS(cacheEntry.getCasReferenceId(), true);
-								}
-							}
-						}
-					}
+					//	Release the CAS and remove a corresponding entry from the InProcess cache.
+					dropCAS(casReferenceId, true);
+					//  Remove the Cas from the outstanding CAS list. The id of the Cas was
+		  		//	added to this list by the Cas Multiplier before the Cas was sent to 
+	  			//	to the client. 
+  				cmOutstandingCASes.remove(casReferenceId);
 					//	If debug level=FINEST dump the entire cache
 					getInProcessCache().dumpContents(getComponentName());
 				}
