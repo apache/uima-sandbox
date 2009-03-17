@@ -116,10 +116,21 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	private int status;
 	
 	private String delegateKey;
+	private boolean processParentLast=false;
 	
 	public Endpoint_impl() {
 	  status = Endpoint.OK;
 	}
+	
+  public void setProcessParentLast (boolean parentLast) {
+    processParentLast  = parentLast;
+  }
+  
+  public boolean processParentLast () {
+    return processParentLast ;
+  }
+  
+
 	public int getCommand()
 	{
 		return command;
