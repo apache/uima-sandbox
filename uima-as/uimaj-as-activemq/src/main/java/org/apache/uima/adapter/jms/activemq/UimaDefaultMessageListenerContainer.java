@@ -31,6 +31,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
+import javax.jms.MessageListener;
 import javax.jms.TemporaryQueue;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -72,7 +73,18 @@ implements ExceptionListener
 	private Object mux2 = new Object();
   private ThreadGroup threadGroup = null;
   private ThreadFactory tf = null; 
-	public UimaDefaultMessageListenerContainer()
+	//	stores number of consumer threads
+  private int cc=0;
+  //	stores message listener plugged in by Spring
+  private Object ml=null;
+  //	if cc > 0, a new listener will be injected between
+  //	spring and JmsInputChannel Pojo Listener. This 
+  //	listener purpose is to increment number of children for
+  //	an input CAS. 
+  private ConcurrentMessageListener concurrentListener = null;
+
+  
+  public UimaDefaultMessageListenerContainer()
 	{
 		super();
 		__listenerRef = this;
@@ -381,12 +393,67 @@ implements ExceptionListener
       e.printStackTrace();
     }
 	}
+	/**	Intercept Spring call to increment number of consumer
+   *  threads. If the value > 1, don't propagate to
+   *  Spring. A new listener will be injected and it will
+   *  use provided number of consumer threads.
+   **/
+  public void setConcurrentConsumers(int concurrentConsumers) {
+    cc = concurrentConsumers;
+    if ( this.freeCasQueueListener ) {
+      super.setConcurrentConsumers(concurrentConsumers);
+    }
+  }
+  /** Intercept Spring call to inject application Pojo
+    * listener. Don't propagate the listener up to Spring
+    * just yet. If more than one consumer thread is used, 
+    * a different listener will be injected.
+    **/
+  public void setMessageListener(Object messageListener) {
+    ml = messageListener;
+    if ( this.freeCasQueueListener ) {
+      super.setMessageListener(messageListener);
+    }
+  }
 	/**
 	 * Called by Spring and some Uima AS components when all properties have been set.
 	 * This method spins a thread in which the listener is initialized. 
 	 */
 	public void afterPropertiesSet()
 	{
+	  if ( endpoint != null ) {
+	    // Endpoint has been plagged in from spring xml. This means this is a listener
+	    // for a reply queue. We need to rewire things a bit. First make Spring use
+	    // one thread to make sure we receive messages in order. To fix a race condition
+	    // where a parent CAS is processed first instead of its last child, we need to
+	    // assure that we get the child first. We need to update the counter of the 
+	    // parent CAS to reflect that there is another child. In the race condition that
+	    // was observed, the parent was being processed first in one thread. The parent
+	    // reached the final step and subsequently was dropped. Subsequent to that, a 
+	    // child CAS processed on another thread begun executing and failed since a look
+	    // on its parent resulted in CAS Not Found In Cache Exception.
+      //  Make sure Spring uses one thread
+	    super.setConcurrentConsumers(1);
+	    if ( cc > 1 ) {
+	      try {
+	        concurrentListener = new ConcurrentMessageListener(cc, ml);
+	        super.setMessageListener(concurrentListener);
+	      } catch( Exception e) {
+	        e.printStackTrace();
+	        return;
+	      }
+	    } else {
+	      super.setMessageListener(ml);
+	    }
+	  } else {
+      super.setMessageListener(ml);
+      super.setConcurrentConsumers(cc);
+	  }
+	  
+	  
+	  
+	  
+	  
 	  Thread t = new Thread() {
 	    public void run() {
         Destination destination = __listenerRef.getDestination();
@@ -431,11 +498,9 @@ implements ExceptionListener
           if ( !done ) {
             connectWithInputChannel();
             done = true;
-//            if (getMessageListener() instanceof JmsInputChannel) {
-//              ((JmsInputChannel) getMessageListener()).setListenerContainer(__listenerRef);
-//            } else if (getMessageListener() instanceof ModifiableListener) {
-//              ((ModifiableListener) getMessageListener()).setListener(__listenerRef);
-//            }
+          }
+          if ( concurrentListener != null ) {
+            concurrentListener.setAnalysisEngineController(controller);
           }
           
           
@@ -458,17 +523,20 @@ implements ExceptionListener
 	 * @throws Exception
 	 */
 	private void connectWithInputChannel() throws Exception {
-    if (getMessageListener() instanceof JmsInputChannel) {
+	  Object pojoListener = getPojoListener();
+
+	  
+    if (pojoListener instanceof JmsInputChannel) {
       //  Wait until InputChannel has a valid controller. The controller will be plug in
       //  by Spring on a different thread
-      while( (((JmsInputChannel) getMessageListener()).getController()) == null ) {
+      while( (((JmsInputChannel) pojoListener).getController()) == null ) {
         try {
           Thread.currentThread().sleep(50);
         } catch ( Exception e) {}
       }
-      ((JmsInputChannel) getMessageListener()).setListenerContainer(__listenerRef);
-    } else if (getMessageListener() instanceof ModifiableListener) {
-      ((ModifiableListener) getMessageListener()).setListener(__listenerRef);
+      ((JmsInputChannel) pojoListener).setListenerContainer(__listenerRef);
+    } else if (pojoListener instanceof ModifiableListener) {
+      ((ModifiableListener) pojoListener).setListener(__listenerRef);
     }
 	}
 	public String getDestinationName()
@@ -563,13 +631,27 @@ implements ExceptionListener
 			endpoint.setDestination(aDestination);
 			if ( aDestination instanceof TemporaryQueue ) {
 			  endpoint.setTempReplyDestination(true);
-			  System.out.println("Resolver Plugged In a Temp Queue:"+aDestination);
-			  if ( getMessageListener() != null && getMessageListener() instanceof InputChannel ) {
-			    ((JmsInputChannel)getMessageListener()).setListenerContainer(this);
+			  String serviceName = "";
+			  if ( controller != null ) {
+			    serviceName = ">>>Controller:"+controller.getComponentName();
 			  }
+			  System.out.println(serviceName+" Resolver Plugged In a Temp Queue:"+aDestination);
+			  Object pojoListener = getPojoListener();
+        if ( pojoListener != null && pojoListener instanceof InputChannel ) {
+          ((JmsInputChannel)pojoListener).setListenerContainer(this);
+        }
 			}
 			endpoint.setServerURI(getBrokerUrl());
 		}
+	}
+	private Object getPojoListener() {
+	  Object pojoListener = null;
+	  if ( ml != null ) {
+      pojoListener = ml;
+    } else if ( getMessageListener() != null ){
+      pojoListener= getMessageListener();
+    }
+	  return pojoListener;
 	}
 	public Destination getListenerEndpoint()
 	{
