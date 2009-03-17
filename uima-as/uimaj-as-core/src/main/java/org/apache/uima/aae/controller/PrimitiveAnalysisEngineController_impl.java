@@ -356,8 +356,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		{
 			return;
 		}
-		//  Create a new entry in the local cache for the input CAS
-    CasStateEntry parentCasStateEntry = getLocalCache().createCasStateEntry(aCasReferenceId);
+		CasStateEntry parentCasStateEntry = getLocalCache().lookupEntry(aCasReferenceId);
     long totalProcessTime = 0;  // stored total time spent producing ALL CASes
 		
 		boolean inputCASReturned = false;
@@ -456,7 +455,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
         childCasStateEntry.setInputCasReferenceId(aCasReferenceId);
         //  Increment number of child CASes generated from the input CAS
         parentCasStateEntry.incrementSubordinateCasInPlayCount();
-				//	Associate input CAS with the new CAS
+        
+        //	Associate input CAS with the new CAS
 				newEntry.setInputCasReferenceId(aCasReferenceId);
 				newEntry.setCasSequence(sequence);
 				//	Add to the cache how long it took to process the generated (subordinate) CAS
@@ -519,7 +519,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_completed_analysis__FINEST", new Object[] { Thread.currentThread().getName(), getComponentName(), aCasReferenceId, (double) (super.getCpuTime() - time) / (double) 1000000 });
       }
 			getMonitor().resetCountingStatistic("", Monitor.ProcessErrorCount);
-			
+			// Set total number of children generated from this CAS
 			// Store total time spent processing this input CAS
 			getCasStatistics(aCasReferenceId).incrementAnalysisTime(totalProcessTime);
       if ( !anEndpoint.isRemote())
@@ -543,16 +543,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
       }
       else
       {
-        if (parentCasStateEntry.getSubordinateCasInPlayCount()==0) {
-          inputCASReturned = true;
           getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
-        } else {
-          // Change the state of the input CAS. Since the input CAS is not returned to the client
-          // until all children of this CAS has been fully processed we keep the input in the cache.
-          // The client will send Free CAS Notifications to release CASes produced here. When the
-          // last child CAS is freed, the input CAS is allowed to be returned to the client.
-          inputCASEntry.setPendingReply(true);
-        }
+        inputCASReturned = true;
 			}
       //  Remove input CAS state entry from the local cache
       if ( !isTopLevelComponent() ) {
