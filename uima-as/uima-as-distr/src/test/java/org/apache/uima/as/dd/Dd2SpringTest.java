@@ -89,7 +89,15 @@ public class Dd2SpringTest extends TestCase{
   protected void tearDown() {
     
   }
+
+  public void testDd2Spring_CMAggregateWithCollocatedCM() throws Exception {
+    checkDd2Spring("Deploy_CMAggregateWithCollocatedCM.xml");
+  }
   
+  public void testDd2Spring_complex_inner_CM_colocated() throws Exception {
+    checkDd2Spring("Deploy_ComplexAggregateWithInnerAggregateCM.xml");
+  }
+
   public void testDd2Spring_remoteSerializer() throws Exception {
     checkDd2Spring("remoteSerializer.xml");
   }  
@@ -97,7 +105,7 @@ public class Dd2SpringTest extends TestCase{
   public void testDd2Spring_deployAggrUsingRmtTempQ() throws Exception {
     checkDd2Spring("Deploy_AggregateUsingRemoteTempQueue.xml");
   }
-
+  
   public void testDd2Spring_concurRemoteConsumers() throws Exception {
     checkDd2Spring("aggrRmtConcurrentReply.xml");
   }

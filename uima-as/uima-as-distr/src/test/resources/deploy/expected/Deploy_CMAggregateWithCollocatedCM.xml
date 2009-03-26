@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--==================================================================================-->
  <!-- Generated from                                                                                  -->
- <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/Deploy_AggregateUsingRemoteTempQueue.xml -->
- <!-- 26 March, 2009, 4:18:34 P.M.                                                                               -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/Deploy_CMAggregateWithCollocatedCM.xml -->
+ <!-- 26 March, 2009, 4:03:55 P.M.                                                                             -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -35,7 +35,7 @@
       <constructor-arg index="0" ref="resourceManager"/>
 
      <!-- Defines how many CASes will be in the CAS pool -->
-     <property name="casPoolSize" value="5"/>
+     <property name="casPoolSize" value="3"/>
 
      <!-- Initial heap size for CASes  -->
      <property name="initialFsHeapSize" value="2000000"/>
@@ -46,7 +46,7 @@
 
    <!-- Create prefetch policy -->
    <bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
-      <property name="queuePrefetch" value="1"/>
+      <property name="queuePrefetch" value="0"/>
    </bean>
    <bean id="prefetchPolicy-reply" class="org.apache.activemq.ActiveMQPrefetchPolicy">
       <property name="queuePrefetch" value="1"/>
@@ -55,23 +55,50 @@
    <!--=================================-->
    <!--    E r r o r   D e t a i l s    -->
    <!--=================================-->
-   <bean id="errorConfig__TCnt_0_TWndw_0_Action_"
+   <bean id="errorConfig__TCnt_0_TWndw_0_Action_terminate"
          class="org.apache.uima.aae.error.Threshold"
          singleton="true">
       <property name="threshold" value="0"/>
       <property name="window" value="0"/>
-      <property name="action" value=""/>
+      <property name="action" value="terminate"/>
    </bean>
 
-   <bean id="errorConfig__Action_" class="org.apache.uima.aae.error.Threshold"
+   <bean id="errorConfig__Action_terminate" class="org.apache.uima.aae.error.Threshold"
          singleton="true">
-      <property name="action" value=""/>
+      <property name="action" value="terminate"/>
    </bean>
 
    <bean id="errorConfig__Rtry_0_Action_terminate"
          class="org.apache.uima.aae.error.Threshold"
          singleton="true">
       <property name="maxRetries" value="0"/>
+      <property name="action" value="terminate"/>
+   </bean>
+
+   <bean id="errorConfig__Rtry_0_Continue_false_TCnt_0_TWndw_0_Action_terminate"
+         class="org.apache.uima.aae.error.Threshold"
+         singleton="true">
+      <property name="maxRetries" value="0"/>
+      <property name="continueOnRetryFailure" value="false"/>
+      <property name="threshold" value="0"/>
+      <property name="window" value="0"/>
+      <property name="action" value="terminate"/>
+   </bean>
+
+   <bean id="errorConfig__Rtry_0_Action_disable"
+         class="org.apache.uima.aae.error.Threshold"
+         singleton="true">
+      <property name="maxRetries" value="0"/>
+      <property name="action" value="disable"/>
+   </bean>
+
+   <bean id="errorConfig__Rtry_0_Continue_false_TCnt_1_TWndw_0_Action_terminate"
+         class="org.apache.uima.aae.error.Threshold"
+         singleton="true">
+      <property name="maxRetries" value="0"/>
+      <property name="continueOnRetryFailure" value="false"/>
+      <property name="threshold" value="1"/>
+      <property name="window" value="0"/>
       <property name="action" value="terminate"/>
    </bean>
 
@@ -85,128 +112,129 @@
       <property name="action" value=""/>
    </bean>
 
-   <bean id="errorConfig__Rtry_0_Action_disable"
-         class="org.apache.uima.aae.error.Threshold"
+   <bean id="errorConfig__Action_" class="org.apache.uima.aae.error.Threshold"
          singleton="true">
-      <property name="maxRetries" value="0"/>
-      <property name="action" value="disable"/>
-   </bean>
-
-   <bean id="errorConfig__Rtry_0_Continue_true_TCnt_2_TWndw_0_Action_disable"
-         class="org.apache.uima.aae.error.Threshold"
-         singleton="true">
-      <property name="maxRetries" value="0"/>
-      <property name="continueOnRetryFailure" value="true"/>
-      <property name="threshold" value="2"/>
-      <property name="window" value="0"/>
-      <property name="action" value="disable"/>
+      <property name="action" value=""/>
    </bean>
 
  
    <!--input queue for service-->
    <bean id="top_level_input_queue_service_1"
          class="org.apache.activemq.command.ActiveMQQueue">
-      <constructor-arg index="0" value="TopLevelTaeQueue"/>
+      <constructor-arg index="0" value="InnerAggregateQueue"/>
    </bean>
-   <!--=====================================-->
-   <!-- Async Aggregate: TopLevelTaeQueue_1 -->
-   <!--=====================================-->
-   <bean id="asAggr_ctlr_TopLevelTaeQueue_1"
+ 
+   <!--====================================================-->
+   <!-- Second Input Q needed for top-level CAS Multiplers -->
+   <!-- Used to have the client signal completion          -->
+   <!-- of the processing of a CAS                         -->
+   <!-- generated by the Cas Multiplier                    -->
+   <!--====================================================-->
+   <bean id="top_level_input_queue_service_1__CasSync"
+         class="org.apache.activemq.command.ActiveMQQueue">
+      <constructor-arg index="0" value="InnerAggregateQueue__CasSync"/>
+   </bean>
+   <!--========================================-->
+   <!-- Async Aggregate: InnerAggregateQueue_1 -->
+   <!--========================================-->
+   <bean id="asAggr_ctlr_InnerAggregateQueue_1"
          class="org.apache.uima.aae.controller.AggregateAnalysisEngineController_impl"
          init-method="initialize">
       <constructor-arg index="0">
          <null/>
       </constructor-arg>
-      <constructor-arg index="1" value="TopLevelTaeQueue"/>
+      <constructor-arg index="1" value="InnerAggregateQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/SimpleTestAggregate.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/SimpleTestCMAggregateWithCollocatedCM.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
-      <constructor-arg index="5" ref="delegate_map_TopLevelTaeQueue_1"/>
-      <property name="outputChannel" ref="outChnl_TopLevelTaeQueue_1"/>
+      <constructor-arg index="5" ref="delegate_map_InnerAggregateQueue_1"/>
+      <property name="outputChannel" ref="outChnl_InnerAggregateQueue_1"/>
       <property name="serviceEndpointName" value="top_level_input_queue_service_1"/>
-      <property name="controllerBeanName" value="asAggr_ctlr_TopLevelTaeQueue_1"/>
-      <property name="errorHandlerChain" ref="err_hdlr_chn_TopLevelTaeQueue_1"/>
+      <property name="controllerBeanName" value="asAggr_ctlr_InnerAggregateQueue_1"/>
+      <property name="errorHandlerChain" ref="err_hdlr_chn_InnerAggregateQueue_1"/>
       <property name="flowControllerDescriptor"
                 value="*importByName:org.apache.uima.flow.FixedFlowController"/>
    </bean>
  
-   <!--===================================================-->
-   <!--   M E S S A G E    H A N D L E R: aggregate_input -->
-   <!--  for controller: asAggr_ctlr_TopLevelTaeQueue_1   -->
-   <!--===================================================-->
+   <!--====================================================-->
+   <!--   M E S S A G E    H A N D L E R: aggregate_input  -->
+   <!--  for controller: asAggr_ctlr_InnerAggregateQueue_1 -->
+   <!--====================================================-->
    
-   <bean id="aggregate_input_metaMsgHandler_TopLevelTaeQueue_1"
+   <bean id="aggregate_input_metaMsgHandler_InnerAggregateQueue_1"
          class="org.apache.uima.aae.handler.input.MetadataRequestHandler_impl">
       <constructor-arg index="0" value="MetadataRequestHandler"/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
-      <property name="delegate" ref="aggregate_input_processRequestHandler_TopLevelTaeQueue_1"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
+      <property name="delegate"
+                ref="aggregate_input_processRequestHandler_InnerAggregateQueue_1"/>
    </bean>
 
-   <bean id="aggregate_input_processRequestHandler_TopLevelTaeQueue_1"
+   <bean id="aggregate_input_processRequestHandler_InnerAggregateQueue_1"
          class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
       <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
    </bean>
  
    <!--====================================================-->
    <!--   M E S S A G E    H A N D L E R: aggregate_return -->
-   <!--  for controller: asAggr_ctlr_TopLevelTaeQueue_1    -->
+   <!--  for controller: asAggr_ctlr_InnerAggregateQueue_1 -->
    <!--====================================================-->
    
     
 
-<bean id="aggregate_return_processResponseHandler_TopLevelTaeQueue_1"
+<bean id="aggregate_return_processResponseHandler_InnerAggregateQueue_1"
          class="org.apache.uima.aae.handler.input.ProcessResponseHandler">
       <constructor-arg index="0" value="ProcessResponseHandler"/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
       <property name="delegate"
-                ref="aggregate_return_response_metaMsgHandler_TopLevelTaeQueue_1"/>
+                ref="aggregate_return_response_metaMsgHandler_InnerAggregateQueue_1"/>
    </bean>
 
-   <bean id="aggregate_return_response_metaMsgHandler_TopLevelTaeQueue_1"
+   <bean id="aggregate_return_response_metaMsgHandler_InnerAggregateQueue_1"
          class="org.apache.uima.aae.handler.input.MetadataResponseHandler_impl">
       <constructor-arg index="0" value="MetadataResponseHandler"/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
-      <property name="delegate" ref="aggregate_return_processRequestHandler_TopLevelTaeQueue_1"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
+      <property name="delegate"
+                ref="aggregate_return_processRequestHandler_InnerAggregateQueue_1"/>
    </bean>
 
-   <bean id="aggregate_return_processRequestHandler_TopLevelTaeQueue_1"
+   <bean id="aggregate_return_processRequestHandler_InnerAggregateQueue_1"
          class="org.apache.uima.aae.handler.input.ProcessRequestHandler_impl">
       <constructor-arg index="0" value="ProcessRequestHandler"/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
    </bean>
 
    <!-- Create the endpoints + output channels, one per delegate -->
    
 
    <!-- ==================================== -->
-   <!--            TestMultiplier            -->
+   <!--         InnerTestMultiplier          -->
    <!--        ** Delegate Endpoint **       -->
    <!-- ==================================== -->
-   <bean id="endpt_TestMultiplier_1.1"
+   <bean id="endpt_InnerTestMultiplier_1.1"
          class="org.apache.uima.aae.controller.Endpoint_impl">
 
      <!--     Broker URI     -->
      <property name="serverURI" value="vm://localhost"/>
 
      <!-- Delegate key name or remote queue name -->
-     <property name="endpoint" value="inQ_TestMultiplier_1.1"/>
+     <property name="endpoint" value="inQ_InnerTestMultiplier_1.1"/>
       <property name="processParentLast" value="false"/>
 
      <!--      Timeouts      -->
-     <property name="metadataRequestTimeout" value="60000"/>
+     <property name="metadataRequestTimeout" value="0"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
-      <property name="concurrentRequestConsumers" value="8"/>
-      <property name="concurrentReplyConsumers" value="7"/>
+      <property name="concurrentRequestConsumers" value="1"/>
+      <property name="concurrentReplyConsumers" value="1"/>
    </bean>
 
    <!-- ==================================== -->
-   <!--                 NoOp                 -->
+   <!--              RemoteNoOp              -->
    <!--        ** Delegate Endpoint **       -->
    <!-- ==================================== -->
-   <bean id="endpt_NoOp_1.2" class="org.apache.uima.aae.controller.Endpoint_impl">
+   <bean id="endpt_RemoteNoOp_1.2" class="org.apache.uima.aae.controller.Endpoint_impl">
 
      <!--     Broker URI     -->
      <property name="serverURI" value="tcp://localhost:8118"/>
@@ -216,33 +244,54 @@
 
      <!-- Queue name used for replies, on the remote broker  -->
      <property name="replyToEndpoint"
-                value="rmtRtrnQ_TopLevelTaeQueue_1_NoOp_9.2.35.42-4dec76eb:120446f1dde:-8000"/>
+                value="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp_9.2.35.42-2fa7c25b:1204461b724:-8000"/>
 
      <!--      Timeouts      -->
-     <property name="metadataRequestTimeout" value="4000"/>
+     <property name="metadataRequestTimeout" value="0"/>
       <property name="processRequestTimeout" value="0"/>
       <property name="collectionProcessCompleteTimeout" value="0"/>
       <property name="serializer" value="xmi"/>
       <property name="tempReplyDestination" value="true"/>
    </bean>
 
+   <!-- ==================================== -->
+   <!--                NoOpCC                -->
+   <!--        ** Delegate Endpoint **       -->
+   <!-- ==================================== -->
+   <bean id="endpt_NoOpCC_1.3" class="org.apache.uima.aae.controller.Endpoint_impl">
+
+     <!--     Broker URI     -->
+     <property name="serverURI" value="vm://localhost"/>
+
+     <!-- Delegate key name or remote queue name -->
+     <property name="endpoint" value="inQ_NoOpCC_1.3"/>
+
+     <!--      Timeouts      -->
+     <property name="metadataRequestTimeout" value="60000"/>
+      <property name="processRequestTimeout" value="0"/>
+      <property name="collectionProcessCompleteTimeout" value="0"/>
+      <property name="concurrentRequestConsumers" value="1"/>
+      <property name="concurrentReplyConsumers" value="1"/>
+   </bean>
+
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
    <!-- JMS msg listener for input queue for:  -->
    <!--    top_level_input_queue_service_1     -->
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="asAggr_input_q_listenerID_TopLevelTaeQueue_1"
+   <bean id="asAggr_input_q_listenerID_InnerAggregateQueue_1"
          class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
-      <property name="messageHandler" ref="aggregate_input_metaMsgHandler_TopLevelTaeQueue_1"/>
+      <property name="messageHandler"
+                ref="aggregate_input_metaMsgHandler_InnerAggregateQueue_1"/>
       <property name="endpointName" value="top_level_input_queue_service_1"/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
-      <property name="listenerContainer" ref="asAggr_input_msgLsnrCntnr_TopLevelTaeQueue_1"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
+      <property name="listenerContainer" ref="asAggr_input_msgLsnrCntnr_InnerAggregateQueue_1"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
    <!-- JMS msg listener container for input queue for:  -->
    <!--         top_level_input_queue_service_1          -->
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="asAggr_input_msgLsnrCntnr_TopLevelTaeQueue_1"
+   <bean id="asAggr_input_msgLsnrCntnr_InnerAggregateQueue_1"
          class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
 
      <!-- Define number of JMS Consumers -->
@@ -252,7 +301,7 @@
      <property name="destination" ref="top_level_input_queue_service_1"/>
 
      <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="asAggr_input_q_listenerID_TopLevelTaeQueue_1"/>
+     <property name="messageListener" ref="asAggr_input_q_listenerID_InnerAggregateQueue_1"/>
       <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118"/>
       <property name="messageSelector" value="Command=2000 OR Command=2002"/>
    </bean>
@@ -261,7 +310,7 @@
    <!-- GetMeta JMS msg listener container for input queue for:  -->
    <!--             top_level_input_queue_service_1              -->
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-   <bean id="asAggr_input_msgLsnrCntnr_TopLevelTaeQueue_1_getMeta"
+   <bean id="asAggr_input_msgLsnrCntnr_InnerAggregateQueue_1_getMeta"
          class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
 
      <!-- Define number of JMS Consumers -->
@@ -271,56 +320,58 @@
      <property name="destination" ref="top_level_input_queue_service_1"/>
 
      <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="asAggr_input_q_listenerID_TopLevelTaeQueue_1"/>
+     <property name="messageListener" ref="asAggr_input_q_listenerID_InnerAggregateQueue_1"/>
       <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118"/>
       <property name="messageSelector" value="Command=2001"/>
    </bean>
 
    <!-- return queue for http or tcp remote service  -->
    <!--               on remote broker               -->
-   <bean id="rmtRtrnQ_TopLevelTaeQueue_1_NoOp"
+   <bean id="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp"
          class="org.apache.activemq.command.ActiveMQQueue">
       <constructor-arg index="0"
-                       value="rmtRtrnQ_TopLevelTaeQueue_1_NoOp_9.2.35.42-4dec76eb:120446f1dde:-8000"/>
+                       value="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp_9.2.35.42-2fa7c25b:1204461b724:-8000"/>
    </bean>
 
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <!-- JMS msg listener for return queue for: -->
-   <!--    rmtRtrnQ_TopLevelTaeQueue_1_NoOp    -->
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <bean id="asAggr_return_q_listenerID_TopLevelTaeQueue_1_NoOp"
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   <!--   JMS msg listener for return queue for:   -->
+   <!-- rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp  -->
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   <bean id="asAggr_return_q_listenerID_InnerAggregateQueue_1_RemoteNoOp"
          class="org.apache.uima.adapter.jms.activemq.JmsInputChannel">
       <property name="messageHandler"
-                ref="aggregate_return_processResponseHandler_TopLevelTaeQueue_1"/>
+                ref="aggregate_return_processResponseHandler_InnerAggregateQueue_1"/>
       <property name="endpointName" value=""/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
    <!-- JMS msg listener container for return queue for: -->
-   <!--         rmtRtrnQ_TopLevelTaeQueue_1_NoOp         -->
+   <!--    rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp     -->
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <bean id="asAggr_return_msgLsnrCntnr_TopLevelTaeQueue_1_NoOp"
+   <bean id="asAggr_return_msgLsnrCntnr_InnerAggregateQueue_1_RemoteNoOp"
          class="org.apache.uima.adapter.jms.activemq.UimaDefaultMessageListenerContainer">
 
      <!-- Define number of JMS Consumers -->
      <property name="concurrentConsumers" value="1"/>
 
      <!--    return Queue    -->
-     <property name="destinationResolver" ref="destinationResolver_TopLevelTaeQueue_1_NoOp"/>
+     <property name="destinationResolver"
+                ref="destinationResolver_InnerAggregateQueue_1_RemoteNoOp"/>
       <property name="destinationName" value=""/>
-      <property name="targetEndpoint" ref="endpt_NoOp_1.2"/>
+      <property name="targetEndpoint" ref="endpt_RemoteNoOp_1.2"/>
 
      <!-- POJO to delegate JMS Messages to -->
-     <property name="messageListener" ref="asAggr_return_q_listenerID_TopLevelTaeQueue_1_NoOp"/>
+     <property name="messageListener"
+                ref="asAggr_return_q_listenerID_InnerAggregateQueue_1_RemoteNoOp"/>
       <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118-reply"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <!--       Destination Resolver for NoOp        -->
-   <!--      rmtRtrnQ_TopLevelTaeQueue_1_NoOp      -->
+   <!--    Destination Resolver for RemoteNoOp     -->
+   <!-- rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp  -->
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-   <bean id="destinationResolver_TopLevelTaeQueue_1_NoOp"
+   <bean id="destinationResolver_InnerAggregateQueue_1_RemoteNoOp"
          class="org.apache.uima.adapter.jms.activemq.TempDestinationResolver"
          singleton="false">
       <property name="connectionFactory" ref="qBroker_tcp_c__ss_localhost_c_8118-reply"/>
@@ -331,23 +382,27 @@
    <!-- this component, both to delegates  -->
    <!--  (if aggr) and back up to sender   -->
    <!-- ================================== -->
-   <bean id="outChnl_TopLevelTaeQueue_1"
+   <bean id="outChnl_InnerAggregateQueue_1"
          class="org.apache.uima.adapter.jms.activemq.JmsOutputChannel"
          init-method="initialize">
-      <property name="serviceInputEndpoint" value="TopLevelTaeQueue"/>
-      <property name="controller" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
-      <property name="controllerInputEndpoint" value="asynAggr_retQ_TopLevelTaeQueue_1"/>
+      <property name="serviceInputEndpoint" value="InnerAggregateQueue"/>
+      <property name="controller" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
+      <property name="controllerInputEndpoint" value="asynAggr_retQ_InnerAggregateQueue_1"/>
    </bean>
 
    <!-- map for delegate keys  -->
-   <bean id="delegate_map_TopLevelTaeQueue_1" class="java.util.HashMap" singleton="true">
+   <bean id="delegate_map_InnerAggregateQueue_1" class="java.util.HashMap"
+         singleton="true">
       <constructor-arg>
          <map>
-            <entry key="TestMultiplier">
-               <ref bean="endpt_TestMultiplier_1.1"/>
+            <entry key="InnerTestMultiplier">
+               <ref bean="endpt_InnerTestMultiplier_1.1"/>
             </entry>
-            <entry key="NoOp">
-               <ref bean="endpt_NoOp_1.2"/>
+            <entry key="RemoteNoOp">
+               <ref bean="endpt_RemoteNoOp_1.2"/>
+            </entry>
+            <entry key="NoOpCC">
+               <ref bean="endpt_NoOpCC_1.3"/>
             </entry>
          </map>
       </constructor-arg>
@@ -361,11 +416,14 @@
          class="org.apache.uima.aae.error.handler.GetMetaErrorHandler">
       <constructor-arg>
          <map>
-            <entry key="TestMultiplier">
+            <entry key="InnerTestMultiplier">
                <ref bean="errorConfig__Rtry_0_Action_terminate"/>
             </entry>
-            <entry key="NoOp">
+            <entry key="RemoteNoOp">
                <ref bean="errorConfig__Rtry_0_Action_disable"/>
+            </entry>
+            <entry key="NoOpCC">
+               <ref bean="errorConfig__Rtry_0_Action_terminate"/>
             </entry>
          </map>
       </constructor-arg>
@@ -375,14 +433,17 @@
          class="org.apache.uima.aae.error.handler.ProcessCasErrorHandler">
       <constructor-arg>
          <map>
-            <entry key="TestMultiplier">
+            <entry key="InnerTestMultiplier">
+               <ref bean="errorConfig__Rtry_0_Continue_false_TCnt_0_TWndw_0_Action_terminate"/>
+            </entry>
+            <entry key="RemoteNoOp">
+               <ref bean="errorConfig__Rtry_0_Continue_false_TCnt_1_TWndw_0_Action_terminate"/>
+            </entry>
+            <entry key="NoOpCC">
                <ref bean="errorConfig__Rtry_0_Continue_false_TCnt_0_TWndw_0_Action_"/>
             </entry>
-            <entry key="NoOp">
-               <ref bean="errorConfig__Rtry_0_Continue_true_TCnt_2_TWndw_0_Action_disable"/>
-            </entry>
             <entry key="">
-               <ref bean="errorConfig__TCnt_0_TWndw_0_Action_"/>
+               <ref bean="errorConfig__TCnt_0_TWndw_0_Action_terminate"/>
             </entry>
          </map>
       </constructor-arg>
@@ -392,14 +453,17 @@
          class="org.apache.uima.aae.error.handler.CpcErrorHandler">
       <constructor-arg>
          <map>
-            <entry key="TestMultiplier">
-               <ref bean="errorConfig__Action_"/>
+            <entry key="InnerTestMultiplier">
+               <ref bean="errorConfig__Action_terminate"/>
             </entry>
-            <entry key="NoOp">
+            <entry key="RemoteNoOp">
+               <ref bean="errorConfig__Action_terminate"/>
+            </entry>
+            <entry key="NoOpCC">
                <ref bean="errorConfig__Action_"/>
             </entry>
             <entry key="">
-               <ref bean="errorConfig__Action_"/>
+               <ref bean="errorConfig__Action_terminate"/>
             </entry>
          </map>
       </constructor-arg>
@@ -409,7 +473,7 @@
    <!--=======================-->
    <!--  Error Handler Chain  -->
    <!--=======================-->
-   <bean id="err_hdlr_chn_TopLevelTaeQueue_1"
+   <bean id="err_hdlr_chn_InnerAggregateQueue_1"
          class="org.apache.uima.aae.error.ErrorHandlerChain">
       <constructor-arg>
          <list>
@@ -419,16 +483,16 @@
          </list>
       </constructor-arg>
    </bean>
-   <!--=============================================-->
-   <!-- Primitive or non-Async Aggr: TestMultiplier -->
-   <!--=============================================-->
-   <bean id="primitive_ctlr_TestMultiplier_1.1"
+   <!--==================================================-->
+   <!-- Primitive or non-Async Aggr: InnerTestMultiplier -->
+   <!--==================================================-->
+   <bean id="primitive_ctlr_InnerTestMultiplier_1.1"
          class="org.apache.uima.aae.controller.PrimitiveAnalysisEngineController_impl"
          init-method="initialize">
-      <constructor-arg index="0" ref="asAggr_ctlr_TopLevelTaeQueue_1"/>
+      <constructor-arg index="0" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
 
      <!--      Key name      -->
-     <constructor-arg index="1" value="TestMultiplier"/>
+     <constructor-arg index="1" value="InnerTestMultiplier"/>
       <constructor-arg index="2"
                        value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/../multiplier/SimpleCasGenerator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
@@ -438,12 +502,33 @@
      <constructor-arg index="5" value="10"/>
 
      <!-- scaleout number of instances -->
-     <constructor-arg index="6" value="8"/>
+     <constructor-arg index="6" value="1"/>
 
      <!-- CAS Multiplier poolSize  -->
-     <constructor-arg index="7" value="5"/>
+     <constructor-arg index="7" value="7"/>
 
      <!-- CAS Multiplier initial heap size -->
      <constructor-arg index="8" value="2000000"/>
+   </bean>
+   <!--=====================================-->
+   <!-- Primitive or non-Async Aggr: NoOpCC -->
+   <!--=====================================-->
+   <bean id="primitive_ctlr_NoOpCC_1.3"
+         class="org.apache.uima.aae.controller.PrimitiveAnalysisEngineController_impl"
+         init-method="initialize">
+      <constructor-arg index="0" ref="asAggr_ctlr_InnerAggregateQueue_1"/>
+
+     <!--      Key name      -->
+     <constructor-arg index="1" value="NoOpCC"/>
+      <constructor-arg index="2"
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/analysis_engine/NoOpAnnotator.xml"/>
+      <constructor-arg index="3" ref="casManager"/>
+      <constructor-arg index="4" ref="inProcessCache"/>
+
+     <!-- this parameter is ignored  -->
+     <constructor-arg index="5" value="10"/>
+
+     <!-- scaleout number of instances -->
+     <constructor-arg index="6" value="1"/>
    </bean>
 </beans>

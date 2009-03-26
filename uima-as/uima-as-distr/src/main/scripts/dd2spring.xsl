@@ -455,7 +455,12 @@
         
         <xsl:if test="$remoteAnalysisEngine/u:casMultiplier">
           <property name="shadowCasPoolSize" value="{$remoteAnalysisEngine/u:casMultiplier/@poolSize}"/>  
-          <property name="initialFsHeapSize" value="{$remoteAnalysisEngine/u:casMultiplier/@initialFsHeapSize}" />
+          <property name="initialFsHeapSize" value="{$remoteAnalysisEngine/u:casMultiplier/@initialFsHeapSize}"/>
+        </xsl:if>
+        
+        <!-- jira UIMA-1245 -->
+        <xsl:if test="$aeDelegate/u:casMultiplier">
+          <property name="processParentLast" value="{$aeDelegate/u:casMultiplier/@processParentLast}"/>
         </xsl:if>
         
         <xsl:sequence select="f:generateLineComment('Timeouts', 5)"/>
@@ -1742,7 +1747,7 @@
     <u:analysisEngine key="{$key}" async="{$async}"
       internalReplyQueueScaleout="{$internalReplyQueueScaleout}"
       inputQueueScaleout        ="{$inputQueueScaleout}">
-      
+ 
       <i:local_ae_descriptor file_path="{$local_ae_descriptor_file_path[1]}">
         <!--xsl:message select="'local_ae_descriptor'"/>
         <xsl:message select="$local_ae_descriptor"/-->  
@@ -1758,16 +1763,85 @@
           </xsl:if-->
           <xsl:choose>
             <xsl:when test="u:casMultiplier">
-              <u:casMultiplier poolSize="{if (u:casMultiplier/@poolSize) then u:casMultiplier/@poolSize else '1'}"
-                      initialFsHeapSize="{if (u:casMultiplier/@initialFsHeapSize) then u:casMultiplier/@initialFsHeapSize else '2000000'}"/>
+              <xsl:if test="(string($async) eq 'true') and
+                      (u:casMultiplier/@poolSize or
+                       u:casMultiplier/@initialFsHeapSize)">
+                <xsl:sequence select="f:msgWithLineNumber('WARNING',
+                   ('casMultiplier settings for poolSize (', u:casMultiplier/@poolSize, 
+                    ') and initialFsHeapSize (', u:casMultiplier/@initialFsHeapSize, ')',
+                    $nl, 'will be ignored',
+                    'for the analysisEngine with key=', $key, $nl,
+                    'because the pool specs are set using the contained delegate cas multiplier specification.'
+                   ),
+                   .)"/>       
+              </xsl:if>
+              <xsl:if test="parent::u:service and u:casMultiplier/@processParentLast">
+                <xsl:sequence select="f:msgWithLineNumber('WARNING',
+                   ('casMultiplier settings for processParentLast will be ignored',
+                    'for the top-level analysisEngine with key=', $key, $nl,
+                    'To specify this value for the top level, specify it on the containing (remote) aggregate for this service.'
+                   ),
+                   .)"/>       
+              </xsl:if>
+              
+              <!-- the above conditionally printed warnings 
+                   The below generates the properly defaulted element -->
+              <xsl:choose>
+                <xsl:when test="(string($async) eq 'true') and not(parent::u:service)">
+                  <u:casMultiplier 
+                    processParentLast="{if (u:casMultiplier/@processParentLast) then u:casMultiplier/@processParentLast else 'false'}"
+                  />
+                </xsl:when>
+                <xsl:when test="string($async) eq 'true'">
+                  <u:casMultiplier 
+                    processParentLast="{if (u:casMultiplier/@processParentLast) then u:casMultiplier/@processParentLast else 'false'}"
+                  />                  
+                </xsl:when>
+                <xsl:when test="not(parent::u:service)">
+                  <u:casMultiplier poolSize="{if (u:casMultiplier/@poolSize) then u:casMultiplier/@poolSize else '1'}"
+                          initialFsHeapSize="{if (u:casMultiplier/@initialFsHeapSize) then u:casMultiplier/@initialFsHeapSize else '2000000'}"
+                          processParentLast="{if (u:casMultiplier/@processParentLast) then u:casMultiplier/@processParentLast else 'false'}"
+                  />  
+                </xsl:when>
+                <xsl:otherwise>
+                  <u:casMultiplier poolSize="{if (u:casMultiplier/@poolSize) then u:casMultiplier/@poolSize else '1'}"
+                          initialFsHeapSize="{if (u:casMultiplier/@initialFsHeapSize) then u:casMultiplier/@initialFsHeapSize else '2000000'}"
+                  />  
+                </xsl:otherwise>             
+              </xsl:choose>
+            </xsl:when>
+            
+            <!-- after this point, have a cas multiplier, without a <casMultiplier> element -->
+
+            <xsl:when test="(string($async) eq 'true') and
+                            (not(parent::u:service))">
+             <xsl:sequence select="f:msgWithLineNumber('WARN',
+               ('deployment descriptor for analysisEngine:', $key,
+               'is for a CAS Multiplier (or Collection Reader wrapped as a CAS Multiplier).', $nl,
+               'However, the &lt;casMultiplier> element is missing.',
+                  'Defaulting to a processParentLast to false for this case.'),
+               .)"/>
+              <u:casMultiplier processParentLast="false"/>
+            </xsl:when>
+             
+            <xsl:when test="parent::u:service">
+              <xsl:sequence select="f:msgWithLineNumber('WARN',
+                 ('deployment descriptor for analysisEngine:', $key,
+                 'is for a top-level CAS Multiplier (or Collection Reader wrapped as a CAS Multiplier).', $nl,
+                 'However, the &lt;casMultiplier> element is missing.', $nl,
+                    'Defaulting to a poolSize of 1, initialFsHeapSize of 2,000,000'),
+                 .)"/>
+              <u:casMultiplier poolSize="1" initialFsHeapSize="2000000"/>             
             </xsl:when>
             <xsl:otherwise>
               <xsl:sequence select="f:msgWithLineNumber('WARN',
              ('deployment descriptor for analysisEngine:', $key,
-             'is for a CAS Multiplier (or Collection Reader wrapped as a CAS Multiplier).  However, the &lt;casMultiplier> element is missing.',
-                'Defaulting to a poolSize of 1 for this case.'),
+             'is for a CAS Multiplier (not top level) (or Collection Reader wrapped as a CAS Multiplier).', $nl,
+             'However, the &lt;casMultiplier> element is missing.', $nl,
+                'Defaulting to a poolSize of 1, initialFsHeapSize of 2,000,000, and', $nl,
+                '  processParentLast of false, for this case.'),
              .)"/>
-              <u:casMultiplier poolSize="1" initialFsHeapSize="2000000"/>
+              <u:casMultiplier poolSize="1" initialFsHeapSize="2000000" processParentLast="false"/>
             </xsl:otherwise>
 
             <!--xsl:when test="u:casMultiplier/@poolSize">
@@ -2105,7 +2179,9 @@
     <u:remoteAnalysisEngine key="{@key}" remoteReplyQueueScaleout="{$remoteReplyQueueScaleout}">
       <xsl:if test="u:casMultiplier">
         <u:casMultiplier poolSize="{if (u:casMultiplier/@poolSize) then u:casMultiplier/@poolSize else '1'}"
-                initialFsHeapSize="{if (u:casMultiplier/@initialFsHeapSize) then u:casMultiplier/@initialFsHeapSize else '2000000'}"/>
+                initialFsHeapSize="{if (u:casMultiplier/@initialFsHeapSize) then u:casMultiplier/@initialFsHeapSize else '2000000'}"
+                processParentLast="{if (u:casMultiplier/@processParentLast) then u:casMultiplier/@processParentLast else 'false'}"
+                />
       </xsl:if>
       <xsl:variable name="tmp">
         <xsl:apply-templates mode="addDefaults" select="u:inputQueue"/>
@@ -2646,7 +2722,7 @@
               <u:delegates i:maxone="">
                 <u:analysisEngine/>
                 <u:remoteAnalysisEngine key="" remoteReplyQueueScaleout="">
-                  <u:casMultiplier i:maxone="" poolSize="" initialFsHeapSize=""/>
+                  <u:casMultiplier i:maxone="" poolSize="" initialFsHeapSize="" processParentLast=""/>
                   <u:inputQueue i:maxone="" i:required="" brokerURL="" endpoint="" queueName=""/>
                   <u:replyQueue i:maxone="" location=""/>
                   <u:serializer i:maxone="" method=""/>
