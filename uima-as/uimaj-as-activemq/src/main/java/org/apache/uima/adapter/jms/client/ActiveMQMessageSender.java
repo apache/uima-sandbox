@@ -71,7 +71,7 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 	}
 	private void createSession() throws Exception {
 		if ( session == null )	{
-			session = connection.createSession(false, 0);
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		}
 	}
 	/**
