@@ -301,7 +301,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	protected Session getSession(String aBrokerURI) throws Exception
 	{
 		validateConnection(aBrokerURI);
-		session = connection.createSession(false, 0);
+		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		return session;
 	}
 
