@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Implementation-License: http://www.apache.org/licenses/LICENSE-2.0.txt
-Implementation-Title: Apache UIMA Cas Editor
-Implementation-Url: http://incubator.apache.org/uima
-Implementation-Vendor: Apache Software Foundation
-Implementation-Version: 2.2.2-incubating
-Project-Title: Apache UIMA
