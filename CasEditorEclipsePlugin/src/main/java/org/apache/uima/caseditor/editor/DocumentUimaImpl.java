@@ -44,6 +44,7 @@ import org.apache.uima.cas.impl.XCASSerializer;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.editor.util.Span;
 import org.apache.uima.caseditor.editor.util.StrictTypeConstraint;
 import org.apache.uima.util.XMLSerializer;

@@ -23,8 +23,8 @@ import java.util.Collection;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
-import org.apache.uima.caseditor.editor.CasEditorPlugin;
-import org.apache.uima.caseditor.editor.Images;
+import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.Images;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.CasEditorError;
 import org.apache.uima.caseditor.editor.IAnnotationEditorModifyListener;
