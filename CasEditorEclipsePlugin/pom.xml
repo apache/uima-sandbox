@@ -162,6 +162,14 @@
 							org.apache.uima.caseditor.editor.outline,
 							org.apache.uima.caseditor.editor.util
             			</Export-Package>
+            			<Import-Package>org.eclipse.core.runtime.jobs,
+            				org.eclipse.core.commands.common,
+            				org.eclipse.core.runtime.content,
+            				org.eclipse.swt,
+            				org.eclipse.swt.layout,
+            				org.eclipse.ui.progress,
+            				org.eclipse.jface.layout,
+       						*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

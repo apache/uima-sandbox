@@ -264,4 +264,13 @@
           class="org.apache.uima.caseditor.editor.DefaultCasDocumentProvider">
     </provider>
  </extension>
+ 
+ 	<extension point="org.eclipse.ui.perspectives">
+		<perspective
+			class="org.apache.uima.caseditor.ui.NlpPerspectiveFactory"
+			fixed="true" icon="icons/svgicons/corpus.png"
+			id="org.apache.uima.caseditor.perspective.NLP" name="NLP">
+		</perspective>
+	</extension>
+	
 </plugin>
