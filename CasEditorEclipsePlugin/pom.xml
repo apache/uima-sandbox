@@ -141,6 +141,10 @@
 				<targetPath>icons</targetPath>
 				<directory>${basedir}/icons</directory>
         	</resource>
+        	<resource>
+				<directory>${basedir}</directory>
+        		<includes><include>plugin.xml</include></includes>
+        	</resource>
         </resources>
 		
 		<plugins>
