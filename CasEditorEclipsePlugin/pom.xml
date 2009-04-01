@@ -136,6 +136,13 @@
 
 	<build>
 		<finalName>org.apache.uima.caseditor_${uimaj-release-eclipse-version}</finalName>
+		<resources>
+			<resource>
+				<targetPath>icons</targetPath>
+				<directory>${basedir}/icons</directory>
+        	</resource>
+        </resources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -163,12 +170,19 @@
 							org.apache.uima.caseditor.editor.util
             			</Export-Package>
             			<Import-Package>org.eclipse.core.runtime.jobs,
-            				org.eclipse.core.commands.common,
             				org.eclipse.core.runtime.content,
+            				org.eclipse.core.resources,
+            				org.eclipse.core.commands.common,
             				org.eclipse.swt,
             				org.eclipse.swt.layout,
             				org.eclipse.ui.progress,
             				org.eclipse.jface.layout,
+            				org.eclipse.jface.resource,
+            				org.eclipse.ui.plugin,
+            				org.osgi.framework,
+            				org.eclipse.ui.texteditor,
+            				org.eclipse.ui.views.contentoutline,
+            				org.eclipse.jface.window,
        						*</Import-Package>
 					</instructions>
 				</configuration>
