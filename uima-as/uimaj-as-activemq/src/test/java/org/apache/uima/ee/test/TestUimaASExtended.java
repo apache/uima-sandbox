@@ -480,6 +480,7 @@ public class TestUimaASExtended extends BaseTestSupport
     
     try {
       //  RuntimeException is expected due to failure
+      super.addExceptionToignore(ResourceInitializationException.class);
       runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 500, EXCEPTION_LATCH);
     } catch( RuntimeException e) {}
     
