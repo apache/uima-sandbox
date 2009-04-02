@@ -428,6 +428,11 @@ implements UimaAsynchronousEngine, MessageListener
 	      listeners.clear();
 	      clientCache.clear();
 	      threadQueue.clear();
+	      // Add empty CasQueueEntry object to the queue so that we wake up a reader thread which
+	      // may be sitting in the threadQueue.take() method. The reader will
+	      // first check the state of the 'running' flag and find it false which
+	      // will cause the reader to exit run() method
+	      threadQueue.add(new CasQueueEntry());
 	      threadRegistrar.clear();
 	    }
 	    catch (Exception e)
