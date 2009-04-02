@@ -161,6 +161,61 @@ public class TestUimaASExtended extends BaseTestSupport
 		super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
 	}
+  /**
+   * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
+   * 
+   * @throws Exception
+   */
+  public void testDeployAggregateServiceWithBrokerPlaceholder() throws Exception
+  {
+    System.out.println("-------------- testDeployAggregateServiceWithBrokerPlaceholder -------------");
+    final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    super.setExpectingServiceShutdown();
+    System.setProperty(JmsConstants.SessionTimeoutOverride, "2500000");
+    System.setProperty("AggregateBroker", "tcp://localhost:8120");
+    System.setProperty("NoOpBroker","tcp://localhost:8120");
+
+    try {
+      Thread t = new Thread() {
+         public void run()
+         {
+           BrokerService bs = null;
+           try {
+               // at this point the top level service should show a connection error
+               synchronized( this ) {
+                 this.wait(5000);  // wait for 5 secs
+               }
+               // Create a new broker that runs a different port that the rest of testcases
+               bs = createBroker(8120, false);
+               bs.start(); 
+               deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorUsingPlaceholder.xml");
+               deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorUsingPlaceholder.xml");
+               // Start the uima AS client. It connects to the top level service and sends
+               // 10 messages
+               runTest(null,eeUimaEngine,System.getProperty("AggregateBroker"),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+             } catch( InterruptedException e ) {
+             } catch( Exception e) {
+               e.printStackTrace();
+               fail(e.getMessage());
+             }
+             finally {
+               if ( bs != null ) {
+                 try {
+                   bs.stop();
+                 } catch( Exception e) {
+                   e.printStackTrace();
+                 }
+               }
+             }
+         }
+       };
+      t.start();
+      t.join();
+    } catch( Exception e) {
+      e.printStackTrace();
+    }
+//    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
 	/**
 	 * Tests missing broker on service startup. The service listener on input queue recovers from
 	 * this by silently attempting reconnect at 5 second intervals. The test first launches the 
