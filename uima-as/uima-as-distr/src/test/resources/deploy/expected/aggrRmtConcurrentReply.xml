@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--==================================================================================-->
- <!-- Generated from                                                                     -->
- <!-- file:/C:/apache/uima-as-distr/src/test/resources/deploy/aggrRmtConcurrentReply.xml -->
- <!-- 9 January, 2009, 1:45:24 P.M.                                                      -->
+ <!-- Generated from                                                                               -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/aggrRmtConcurrentReply.xml -->
+ <!-- 2 April, 2009, 11:37:11 A.M.                                                                 -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -55,6 +55,10 @@
 
      <!-- Initial heap size for CASes  -->
      <property name="initialFsHeapSize" value="2000000"/>
+   </bean>
+   <bean id="placeholderSubstitution"
+         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
    </bean>
 
    <!-- Creates a Shared Cache -->
@@ -118,7 +122,7 @@
       </constructor-arg>
       <constructor-arg index="1" value="RoomNumberAnnotatorQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="delegate_map_RoomNumberAnnotatorQueue_1"/>
@@ -215,7 +219,7 @@
 
      <!-- Queue name used for replies, on the remote broker  -->
      <property name="replyToEndpoint"
-                value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.35.129-628e130c:11ebcb68398:-8000"/>
+                value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.35.4259f0db9f:120677a067a:-8000"/>
 
      <!--      Timeouts      -->
      <property name="metadataRequestTimeout" value="60000"/>
@@ -304,7 +308,7 @@
    <bean id="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime"
          class="org.apache.activemq.command.ActiveMQQueue">
       <constructor-arg index="0"
-                       value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.35.129-628e130c:11ebcb68398:-8000"/>
+                       value="rmtRtrnQ_RoomNumberAnnotatorQueue_1_DateTime_9.2.35.4259f0db9f:120677a067a:-8000"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -468,7 +472,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="RoomNumber"/>
       <constructor-arg index="2"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -489,7 +493,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="Meeting"/>
       <constructor-arg index="2"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

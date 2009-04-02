@@ -98,7 +98,7 @@
   <!-- collect unique instances of queue brokers where we need generate
        a broker factory.
     
-       Omit vm://localBroker ones - those use a common factory for this node
+       obsolete ->> Jira UIMA-1288 Omit vm://localBroker ones - those use a common factory for this node
        Include remotes if the replyQueue is "remote"
        
     -->
@@ -120,7 +120,7 @@
           -->
     <xsl:for-each-group group-by="@brokerURL"
       select="$ddd//u:inputQueue
-         [ @brokerURL ne 'vm://localhost' ]">
+         [ @brokerURL ne 'vm://localhost' ]">  
        <!--xsl:message select="('*** ', ..)"/-->
        <xsl:sequence select="."/>
     </xsl:for-each-group>
@@ -1264,13 +1264,14 @@
   <xsl:template name="generateStandardBeans">
 
     
-    <!-- need an internal broker if any of the following are true -->
+    <!-- no longer true need an internal broker if any of the following are true -->
     <!--   A service is async = true (implies aggregate)
     or The service specifies its input queue as "vm:..."
     -->
 
     <!-- only generate for inputq = localhost.  async=true handled with Java queue -->
     <!-- removed: boolean(u:service/u:analysisEngine[@async eq 'true']) or  -->    
+    <!-- next removed per Jira UIMA-1288
     <xsl:if
       test="boolean(u:service/u:inputQueue[@brokerURL='vm://localhost'])">
       
@@ -1282,8 +1283,10 @@
         <property name="prefetchPolicy" ref="prefetchPolicy"/>
       </bean>
     </xsl:if>
+    -->
     
     <!-- no longer for async=true, only for inputq = localhost -->
+    <!-- next removed per Jira UIMA-1288
     <xsl:if test="boolean(u:service/u:inputQueue[@brokerURL='vm://localhost'])">
       <xsl:sequence select="f:generateLineComment('Deploys a co-located broker',3)"/>
       <bean id="brokerDeployerService" class="org.apache.uima.adapter.jms.activemq.BrokerDeployer">
@@ -1291,6 +1294,7 @@
       </bean>
         
     </xsl:if>
+    -->
         <!--    
     <xsl:message select="$uniqueInputQueueBrokers"/>
     <xsl:message select="name($uniqueInputQueueBrokers/u:inputQueue)"/>
@@ -1342,6 +1346,11 @@
       </xsl:if>
     </bean>
 
+    <!-- create bean to do placeholder substitution Jira UIMA-1288 -->
+    <bean id="placeholderSubstitution" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>  
+    </bean>
+    
     <!-- Creates a Shared Cache  -->
     <xsl:sequence select="f:generateLineComment('Creates a Shared Cache',3)"/>
     <bean id="inProcessCache" class="org.apache.uima.aae.InProcessCache" /> 
@@ -1503,7 +1512,8 @@
       
       <xsl:choose>
         <xsl:when test="u:inputQueue">
-          <xsl:if test="not(starts-with(u:inputQueue/@brokerURL, 'tcp://'))">
+          <xsl:if test="not(starts-with(u:inputQueue/@brokerURL, 'tcp://')) and 
+                        not(starts-with(u:inputQueue/@brokerURL, '${'))">
             <xsl:sequence select="f:msgWithLineNumber(
             'ERROR',
             'top level input Queue broker protocol must be tcp:// for a top level C++ component',
@@ -1584,6 +1594,12 @@
       <xsl:sequence select="f:msgWithLineNumber('ERROR', 'missing endpoint name in inputQueue element', .)"/>
       <!--xsl:message select="'ERROR: missing endpoint name in inputQueue element'"/-->
       <xsl:message select="."/>
+    </xsl:if>
+    <xsl:if test="@brokerURL eq 'vm://localhost'">
+      <xsl:sequence select="f:msgWithLineNumber(
+        'ERROR',
+        'broker protocol of vm://localhost not supported',
+        .)"/>
     </xsl:if>
     <xsl:choose>
       <xsl:when test="../../u:remoteAnalysisEngine">
@@ -2486,13 +2502,23 @@
  
   <xsl:function name="f:getQbrokerID">
     <xsl:param name="inputQueue"/>
-    <xsl:variable name="u" select=
-      "replace(
-         replace(
-           replace($inputQueue/@brokerURL,':','_c_')
-                                         ,'//','_ss_')
-                                         ,'/', '_s_')"/>
-       
+    <xsl:variable name="u">
+      <xsl:choose>
+        <xsl:when test="starts-with($inputQueue/@brokerURL, '${')">
+          <xsl:sequence select=
+            "replace(replace($inputQueue/@brokerURL, '\$\{', ''), '\}', '')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select=
+            "replace(
+              replace(
+               replace($inputQueue/@brokerURL,':','_c_')
+                       ,'//','_ss_')
+                     ,'/', '_s_')"/>     
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+             
     <xsl:sequence select="concat('qBroker_',$u)"/>
   </xsl:function>         
   

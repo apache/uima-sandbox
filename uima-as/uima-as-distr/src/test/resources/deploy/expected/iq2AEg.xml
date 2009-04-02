@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--====================================================================-->
- <!-- Generated from                                                     -->
- <!-- file:/C:/apache/uima-as-distr/src/test/resources/deploy/iq2AEg.xml -->
- <!-- 9 January, 2009, 1:46:03 P.M.                                      -->
- <!--====================================================================-->
+<!--==============================================================================-->
+ <!-- Generated from                                                               -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/iq2AEg.xml -->
+ <!-- 2 April, 2009, 11:37:43 A.M.                                                 -->
+ <!--==============================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
@@ -39,6 +39,10 @@
 
      <!-- Initial heap size for CASes  -->
      <property name="initialFsHeapSize" value="2000000"/>
+   </bean>
+   <bean id="placeholderSubstitution"
+         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
    </bean>
 
    <!-- Creates a Shared Cache -->
@@ -102,7 +106,7 @@
       </constructor-arg>
       <constructor-arg index="1" value="RoomNumberAnnotatorQueue"/>
       <constructor-arg index="2"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingDetectorTAE.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
       <constructor-arg index="5" ref="delegate_map_RoomNumberAnnotatorQueue_1"/>
@@ -367,7 +371,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="RoomNumber"/>
       <constructor-arg index="2"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex2/RoomNumberAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -388,7 +392,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="DateTime"/>
       <constructor-arg index="2"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex3/TutorialDateTime.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/../ex3/TutorialDateTime.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 
@@ -409,7 +413,7 @@
      <!--      Key name      -->
      <constructor-arg index="1" value="Meeting"/>
       <constructor-arg index="2"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/descriptors/tutorial/ex4/MeetingAnnotator.xml"/>
       <constructor-arg index="3" ref="casManager"/>
       <constructor-arg index="4" ref="inProcessCache"/>
 

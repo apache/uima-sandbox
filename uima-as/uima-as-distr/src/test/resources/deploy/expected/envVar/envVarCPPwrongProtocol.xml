@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--==================================================================================-->
- <!-- Generated from                                                                            -->
- <!-- file:/C:/apache/uima-as-distr/src/test/resources/deploy/envVar/envVarCPPwrongProtocol.xml -->
- <!-- 9 January, 2009, 1:45:17 P.M.                                                             -->
+ <!-- Generated from                                                                                  -->
+ <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/envVar/envVarCPPwrongProtocol.xml -->
+ <!-- 2 April, 2009, 11:43:02 A.M.                                                                        -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -15,7 +15,7 @@
 
      <!-- path to top level descriptor -->
      <constructor-arg index="0"
-                       value="file:/C:/apache/uima-as-distr/src/test/resources/deploy/envVar/cppDescr.xml"/>
+                       value="file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/envVar/cppDescr.xml"/>
 
      <!--    input q name    -->
      <constructor-arg index="1" value="MeetingDetectorTaeQueue"/>

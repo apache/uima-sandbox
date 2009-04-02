@@ -2,7 +2,7 @@
 <!--==================================================================================-->
  <!-- Generated from                                                                                  -->
  <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/Deploy_CMAggregateWithCollocatedCM.xml -->
- <!-- 26 March, 2009, 4:03:55 P.M.                                                                             -->
+ <!-- 2 April, 2009, 11:37:33 A.M.                                                                             -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -39,6 +39,10 @@
 
      <!-- Initial heap size for CASes  -->
      <property name="initialFsHeapSize" value="2000000"/>
+   </bean>
+   <bean id="placeholderSubstitution"
+         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
    </bean>
 
    <!-- Creates a Shared Cache -->
@@ -244,7 +248,7 @@
 
      <!-- Queue name used for replies, on the remote broker  -->
      <property name="replyToEndpoint"
-                value="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp_9.2.35.42-2fa7c25b:1204461b724:-8000"/>
+                value="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp_9.2.35.42-13e17b06:120677a5eeb:-8000"/>
 
      <!--      Timeouts      -->
      <property name="metadataRequestTimeout" value="0"/>
@@ -330,7 +334,7 @@
    <bean id="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp"
          class="org.apache.activemq.command.ActiveMQQueue">
       <constructor-arg index="0"
-                       value="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp_9.2.35.42-2fa7c25b:1204461b724:-8000"/>
+                       value="rmtRtrnQ_InnerAggregateQueue_1_RemoteNoOp_9.2.35.42-13e17b06:120677a5eeb:-8000"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

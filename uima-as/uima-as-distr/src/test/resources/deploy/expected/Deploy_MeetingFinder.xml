@@ -2,7 +2,7 @@
 <!--==================================================================================-->
  <!-- Generated from                                                                             -->
  <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/Deploy_MeetingFinder.xml -->
- <!-- 26 March, 2009, 4:19:06 P.M.                                                               -->
+ <!-- 2 April, 2009, 11:37:38 A.M.                                                               -->
  <!--==================================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -39,6 +39,10 @@
 
      <!-- Initial heap size for CASes  -->
      <property name="initialFsHeapSize" value="2000000"/>
+   </bean>
+   <bean id="placeholderSubstitution"
+         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
    </bean>
 
    <!-- Creates a Shared Cache -->

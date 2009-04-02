@@ -2,7 +2,7 @@
 <!--===========================================================================-->
  <!-- Generated from                                                            -->
  <!-- file:/C:/a/Eclipse/apache/uima-as-distr/src/test/resources/deploy/iq3.xml -->
- <!-- 26 March, 2009, 4:04:02 P.M.                                              -->
+ <!-- 2 April, 2009, 11:37:49 A.M.                                              -->
  <!--===========================================================================-->
  <!DOCTYPE beans
   PUBLIC "-//Spring//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -55,6 +55,10 @@
 
      <!-- Initial heap size for CASes  -->
      <property name="initialFsHeapSize" value="2000000"/>
+   </bean>
+   <bean id="placeholderSubstitution"
+         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
    </bean>
 
    <!-- Creates a Shared Cache -->
@@ -206,7 +210,7 @@
 
      <!-- Queue name used for replies, on the remote broker  -->
      <property name="replyToEndpoint"
-                value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.35.421beb7ed1:1204461cf8e:-8000"/>
+                value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.35.424ba097ee:120677a9b96:-8000"/>
       <property name="shadowCasPoolSize" value="7"/>
       <property name="initialFsHeapSize" value="999"/>
       <property name="processParentLast" value="false"/>
@@ -298,7 +302,7 @@
    <bean id="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter"
          class="org.apache.activemq.command.ActiveMQQueue">
       <constructor-arg index="0"
-                       value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.35.421beb7ed1:1204461cf8e:-8000"/>
+                       value="rmtRtrnQ_MeetingDetectorTaeQueue_1_Segmenter_9.2.35.424ba097ee:120677a9b96:-8000"/>
    </bean>
 
    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
