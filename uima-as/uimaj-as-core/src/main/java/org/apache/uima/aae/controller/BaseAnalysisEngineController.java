@@ -21,7 +21,12 @@ package org.apache.uima.aae.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -212,6 +217,7 @@ implements AnalysisEngineController, EventSubscriber
   protected ConcurrentHashMap<String, String> abortedCasesMap = 
     new ConcurrentHashMap<String, String>();
 
+  protected String processPid = "";
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -277,21 +283,22 @@ implements AnalysisEngineController, EventSubscriber
 			endpointName = endpoint.getEndpoint();
 		}
 
-    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-                "BaseAnalysisEngineController", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_service_id_INFO",
-                new Object[] { endpointName });
-    }
 		resourceSpecifier = UimaClassFactory.produceResourceSpecifier(aDescriptor);
 
 		
 		if ( isTopLevelComponent())
 		{
-			System.out.println("************** Initializing Component:"+getComponentName());		
+	    logPlatformInfo(getComponentName());
+//			System.out.println("************** Initializing Component:"+getComponentName());		
 		}
 		else
 		{
-			System.out.println("************** Initializing Component:"+getComponentName()+" Parent Controller:"+parentController.getComponentName());		
+			System.out.println("************** Initializing Collocated Component:"+getComponentName()+" Parent Controller:"+parentController.getComponentName());		
+	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	                "BaseAnalysisEngineController", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_service_id_INFO",
+	                new Object[] { endpointName });
+	    }
 		}
 		
 		//	Is this service a CAS Multiplier?
@@ -407,10 +414,56 @@ implements AnalysisEngineController, EventSubscriber
         }
       }
     }
-		
+    if ( isTopLevelComponent() ) {
+      Controller controller = new Controller(this);
+      String jmxName = getManagementInterface().getJmxDomain()+"name="+"Controller";
+      registerWithAgent( controller, jmxName);
+    }
 		
 	}
 	
+	private void logPlatformInfo(String serviceName ) {
+    if ( ManagementFactory.getPlatformMBeanServer() != null )
+    {
+      RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+      MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+      OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+      //  bean.getName() should return a string that looks like this: PID@HOSTNAME
+      //  where PID is the process id and the HOSTNAME is the name of the machine
+      processPid = bean.getName();
+      if ( processPid != null && processPid.trim().length() > 0 ) {
+        int endPos = processPid.indexOf("@"); // find the position where the PID ends
+        if ( endPos > -1 ) {
+          processPid = processPid.substring(0, endPos);  
+       }
+      }
+      
+      DateFormat df = new SimpleDateFormat("dd MMM yyyy HH:mm:ss ");
+      
+      StringBuffer platformInfo = new StringBuffer();
+      platformInfo.append("\n+------------------------------------------------------------------");
+      platformInfo.append("\n                   Starting UIMA AS Service - PID:"+processPid);
+      platformInfo.append("\n+------------------------------------------------------------------");
+      platformInfo.append("\n+ Service Name:"+serviceName);
+      platformInfo.append("\n+ Service Queue Name:"+endpointName);
+      platformInfo.append("\n+ Service Start Time:"+df.format(bean.getStartTime()));
+      platformInfo.append("\n+ OS Name:"+osBean.getName());
+      platformInfo.append("\n+ OS Version:"+osBean.getVersion());
+      platformInfo.append("\n+ OS Architecture:"+osBean.getArch());
+      platformInfo.append("\n+ OS CPU Count:"+osBean.getAvailableProcessors());
+      platformInfo.append("\n+ JVM Vendor:"+bean.getVmVendor());
+      platformInfo.append("\n+ JVM Name:"+bean.getVmName());
+      platformInfo.append("\n+ JVM Version:"+bean.getVmVersion());
+      platformInfo.append("\n+ JVM Input Args:"+bean.getInputArguments());
+      platformInfo.append("\n+ JVM Classpath:"+bean.getClassPath());
+      platformInfo.append("\n+ JVM LIB_PATH:"+bean.getLibraryPath());
+      platformInfo.append("\n+------------------------------------------------------------------");
+      System.out.println(platformInfo.toString());
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+              "logPlatformInfo", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_show_platform_info__INFO",
+              new Object[] { platformInfo.toString() });
+    }
+	}
 	public AnalysisEngineController getParentController() {
     return parentController;
 	}
