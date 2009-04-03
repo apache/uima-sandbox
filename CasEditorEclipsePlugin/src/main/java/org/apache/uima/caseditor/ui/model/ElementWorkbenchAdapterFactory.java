@@ -49,6 +49,7 @@ public class ElementWorkbenchAdapterFactory implements IAdapterFactory {
 
   private IWorkbenchAdapter mSimpleProject = new SimpleProjectAdapter();
 
+  @SuppressWarnings("unchecked")
   public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (adaptableObject instanceof NlpModel) {
       return mModelAdapter;
@@ -71,8 +72,8 @@ public class ElementWorkbenchAdapterFactory implements IAdapterFactory {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public Class[] getAdapterList() {
     return new Class[] { IWorkbenchAdapter.class };
-
   }
 }

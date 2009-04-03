@@ -61,7 +61,6 @@ final class CopyAction  extends ResourceAction {
    * Starts the copy process.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void run() {
     List<IResource> selectedResources = getSelectedResources();
 
@@ -125,7 +124,6 @@ final class CopyAction  extends ResourceAction {
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   private boolean isAllHaveSameParent() {
     List<IResource> resources = getSelectedResources();
 

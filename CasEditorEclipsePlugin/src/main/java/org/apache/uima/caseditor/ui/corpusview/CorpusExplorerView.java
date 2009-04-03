@@ -35,7 +35,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.FillLayout;
@@ -213,7 +212,7 @@ public final class CorpusExplorerView extends ViewPart
      */
     private void initDragAndDrop()
     {
-        int ops = DND.DROP_COPY | DND.DROP_MOVE;
+//        int ops = DND.DROP_COPY | DND.DROP_MOVE;
 
         //Transfer[] transfers = new Transfer[]
         //{ LocalSelectionTransfer.getInstance(), ResourceTransfer.getInstance(),

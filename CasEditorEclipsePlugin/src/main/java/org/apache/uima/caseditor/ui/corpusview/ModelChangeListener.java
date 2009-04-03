@@ -21,7 +21,6 @@ package org.apache.uima.caseditor.ui.corpusview;
 
 import java.util.LinkedList;
 
-import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.apache.uima.caseditor.core.model.delta.INlpModelChangeListener;

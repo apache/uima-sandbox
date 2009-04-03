@@ -43,7 +43,7 @@ final class CorpusExplorerUtil
 
 		LinkedList<Object> newSelectionList = new LinkedList<Object>();
 
-        for (Iterator elements = selection.iterator(); elements.hasNext();)
+        for (Iterator<?> elements = selection.iterator(); elements.hasNext();)
         {
 			Object element = elements.next();
 
@@ -75,7 +75,7 @@ final class CorpusExplorerUtil
     {
         boolean isNLPProjectOrNonNLPResource = false;
 
-        for (Iterator resources = selection.iterator() ;
+        for (Iterator<?> resources = selection.iterator() ;
                 resources.hasNext() && !isNLPProjectOrNonNLPResource;)
         {
             Object resource =  resources.next();

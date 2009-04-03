@@ -44,7 +44,7 @@ public abstract class ResourceAction extends BaseSelectionListenerAction {
   protected List<Object> getSelectedNonResources() {
     List<Object> nonResources = new ArrayList<Object>();
 
-    for (Iterator it = getStructuredSelection().iterator(); it.hasNext(); ) {
+    for (Iterator<?> it = getStructuredSelection().iterator(); it.hasNext(); ) {
 
       Object selection = it.next();
 
@@ -74,7 +74,7 @@ public abstract class ResourceAction extends BaseSelectionListenerAction {
 
     List<IResource> resources = new ArrayList<IResource>();
 
-    for (Iterator it = getStructuredSelection().iterator(); it.hasNext(); ) {
+    for (Iterator<?> it = getStructuredSelection().iterator(); it.hasNext(); ) {
       Object selection = it.next();
 
       if (selection instanceof IResource) {
