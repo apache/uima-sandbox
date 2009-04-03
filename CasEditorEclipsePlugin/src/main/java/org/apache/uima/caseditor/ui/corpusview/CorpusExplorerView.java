@@ -20,6 +20,8 @@
 package org.apache.uima.caseditor.ui.corpusview;
 
 import org.apache.uima.caseditor.CasEditorPlugin;
+import org.apache.uima.caseditor.ui.model.*;
+import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -42,6 +44,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionContext;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
+import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 
@@ -51,6 +54,27 @@ import org.eclipse.ui.part.ViewPart;
  */
 public final class CorpusExplorerView extends ViewPart
 {
+	
+	private static class ExtendedBaseWorkbenchContentProvider 
+			extends BaseWorkbenchContentProvider {
+		
+		IAdapterFactory factory = new ElementWorkbenchAdapterFactory();
+		
+		@Override
+		protected IWorkbenchAdapter getAdapter(Object element) {
+			
+			IWorkbenchAdapter adapter = 
+					(IWorkbenchAdapter) factory.getAdapter(element, IWorkbenchAdapter.class);
+			
+			if (adapter != null) {
+				return adapter;
+			}
+			else {
+				return super.getAdapter(element);
+			}
+		}
+	}
+	
 
     /**
      * The ID of the <code>CorpusExplorerView</code>.
@@ -72,7 +96,7 @@ public final class CorpusExplorerView extends ViewPart
         parent.setLayout(new FillLayout());
 
         mTreeViewer = new TreeViewer(parent);
-        mTreeViewer.setContentProvider(new BaseWorkbenchContentProvider());
+        mTreeViewer.setContentProvider(new ExtendedBaseWorkbenchContentProvider());
 
         mTreeViewer.setLabelProvider(new DecoratingLabelProvider(
                 new WorkbenchLabelProvider(), PlatformUI.getWorkbench()
