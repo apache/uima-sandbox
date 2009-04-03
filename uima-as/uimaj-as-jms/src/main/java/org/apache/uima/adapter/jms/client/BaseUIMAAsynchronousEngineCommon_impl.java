@@ -364,7 +364,7 @@ implements UimaAsynchronousEngine, MessageListener
 	    }
 
 	    running = false;
-	    
+	    casQueueProducerReady = false;
 	    uimaSerializer.reset();
 	    try
 	    {
