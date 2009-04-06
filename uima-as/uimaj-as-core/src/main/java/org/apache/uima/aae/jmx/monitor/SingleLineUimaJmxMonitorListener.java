@@ -79,7 +79,7 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 				items = items + "\t" + srvName + "-Idle";
 				items = items + "\t" + srvName + "-CASes";
 				items = items + "\t" + srvName + "-InQ";
-				if (serviceMetrics.isServiceRemote() || serviceMetrics.isTopLevelService()) {
+				if (!serviceMetrics.isTopLevelService()) {
 					items = items + "\t" + srvName + "-RepQ";
 				}
 				if (serviceMetrics.isTopLevelService() ||
@@ -106,7 +106,7 @@ public class SingleLineUimaJmxMonitorListener implements JmxMonitorListener {
 			items = items + "\t" + format(serviceMetrics.getIdleTime()/period);
 			items = items + "\t" + serviceMetrics.getProcessCount();
 			items = items + "\t" + serviceMetrics.getInputQueueDepth();
-			if (serviceMetrics.isServiceRemote() || serviceMetrics.isTopLevelService()) {
+			if (!serviceMetrics.isTopLevelService()) {
 				items = items + "\t" + serviceMetrics.getReplyQueueDepth();
 			}
 			if ( serviceMetrics.isTopLevelService() ) {
