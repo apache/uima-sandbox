@@ -1359,7 +1359,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     boolean casDropped = false;
     boolean doDecrementChildCount = false;
     localCache.dumpContents();
-    boolean incrementedChildrenProcessed = false;
     //  First locate entries in the global and local cache for a given CAS
     //  If not found, log a message and return
 		try
@@ -1374,6 +1373,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	      //  all of them are fully processed. This state info will aid in the
 	      //  internal bookkeeping when the final child is processed.
 	      casStateEntry.setState(CacheEntry.FINAL_STATE);
+        casStateEntry.setFinalStep(aStep);
 			}
 		}
 		catch(Exception e)
@@ -1383,6 +1383,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       }
 			return;
 		}
+		
 		//	Found entries in caches for a given CAS id
 		try
 		{
@@ -1390,11 +1391,16 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			
 			synchronized( super.finalStepMux)
 			{
+			  // Check if the global cache still contains the CAS. It may have been deleted by another 
+			  // thread already
+			  if ( !getInProcessCache().entryExists(aCasReferenceId)) {
+			    return;
+			  }
 			  // Check if this CAS has children that are still being processed in this aggregate
 			  if ( casHasChildrenInPlay(casStateEntry)) {
 			    // save this Step object in the local cache. It will be needed when this CAS is
 			    // resumed when all its children are fully processed
-          casStateEntry.setFinalStep(aStep);
+//          casStateEntry.setFinalStep(aStep);
 
           return;
         }
@@ -1463,28 +1469,30 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
           // Child CAS has been fully processed, decrement its parent count of active child CASes
           if ( parentCasStateEntry != null ) {
              parentCasStateEntry.decrementSubordinateCasInPlayCount();
+             // If debug level=FINEST dump the entire cache
+             localCache.dumpContents();
           }
 	      }
+	      boolean clientIsCollocated = ( cEndpoint == null || !cEndpoint.isRemote());
+	      // For subordinate CAS, check if its parent needs to be put in play. This should happen if 
+	      // this CAS was the last of the children in play
+	      if ( isSubordinate && releaseParentCas(casDropped, clientIsCollocated, parentCasStateEntry) )
+	      {
+	        // Put the parent CAS in play. The parent CAS can be in one of two places now depending
+	        // on the configuration. The parent CAS could have been suspended in the final step, or it could have
+	        // been suspended in the process method. If the configuration indicates that the parent 
+	        // should follow only when the last of its children leaves this aggregate, call the process method.
+	        // Otherwise, the CAS is in a final state and simply needs to resume there. 
+	        Endpoint lastDelegateEndpoint = casStateEntry.getLastDelegate().getEndpoint(); 
+	        if ( lastDelegateEndpoint.processParentLast()) {
+	          //  The parent was suspended in the process call. Resume processing the CAS
+	          process(parentCASCacheEntry.getCas(), parentCasStateEntry.getCasReferenceId());
+	        } else {
+	          //  The parent was suspended in the final step. Resume processing the CAS
+            finalStep(parentCasStateEntry.getFinalStep(), parentCasStateEntry.getCasReferenceId());
+	        }
+	      }
 			}  // synchronized
-			boolean clientIsCollocated = ( cEndpoint == null || !cEndpoint.isRemote());
-			// For subordinate CAS, check if its parent needs to be put in play. This should happen if 
-			// this CAS was the last of the children in play
-			if ( isSubordinate && releaseParentCas(casDropped, clientIsCollocated, parentCasStateEntry) )
-      {
-			  // Put the parent CAS in play. The parent CAS can be in one of two places now depending
-			  // on the configuration. The parent CAS could have been suspended in the final step, or it could have
-			  // been suspended in the process method. If the configuration indicates that the parent 
-			  // should follow only when the last of its children leaves this aggregate, call the process method.
-			  // Otherwise, the CAS is in a final state and simply needs to resume there. 
-        Endpoint lastDelegateEndpoint = casStateEntry.getLastDelegate().getEndpoint(); 
-        if ( lastDelegateEndpoint.processParentLast()) {
-          //  The parent was suspended in the process call. Resume processing the CAS
-          process(parentCASCacheEntry.getCas(), parentCasStateEntry.getCasReferenceId());
-        } else {
-          //  The parent was suspended in the final step. Resume processing the CAS
-          finalStep(parentCasStateEntry.getFinalStep(), parentCasStateEntry.getCasReferenceId());
-        }
-      }
 			if ( endpoint != null )
 			{
 				//	remove stats associated with this Cas and a given endpoint
@@ -1520,7 +1528,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				freeCasEndpoint.setReplyEndpoint(true);
 				try
 				{
-					//	send Free CAS Notification to a Cas Multiplier
+				  //	send Free CAS Notification to a Cas Multiplier
 					getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, aCasReferenceId, freeCasEndpoint);
 				}
 				catch( Exception e) 
