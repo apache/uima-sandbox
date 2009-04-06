@@ -87,7 +87,7 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 			  Threshold threshold = super.getThreshold(endpoint, delegateMap, aController);
 	    	String key = ((AggregateAnalysisEngineController)aController).lookUpDelegateKey(endpoint.getEndpoint());
 	    	Delegate delegate = ((AggregateAnalysisEngineController)aController).lookupDelegate(key);
-	    	if (  delegate.isAwaitingPingReply() || threshold == null || threshold.getMaxRetries() == 0 || 
+	    	if ( delegate != null  && delegate.isAwaitingPingReply() || threshold == null || threshold.getMaxRetries() == 0 || 
 	    			  ( super.retryLastCommand(AsynchAEMessage.GetMeta, endpoint, aController, key, threshold, anErrorContext) == false )	
 	    	        )
 	    	{
