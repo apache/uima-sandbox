@@ -416,6 +416,7 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testTerminateOnFlowControllerExceptionOnInitialization -------------");
     
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    super.setExpectingServiceShutdown();
     String[] containerIds = new String[2];
     try {
         containerIds[0] = deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
@@ -446,6 +447,7 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testTerminateOnFlowControllerExceptionOnInitializationWithDisabledDelegates -----");
     
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    super.setExpectingServiceShutdown();
     String containerId = null;
     try {
         containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFlowControllerExceptionOnInitialization.xml");
@@ -759,7 +761,8 @@ public class TestUimaASExtended extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
-		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlow.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlow.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 	/**
@@ -773,6 +776,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlow.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 	/**
@@ -793,6 +797,7 @@ public class TestUimaASExtended extends BaseTestSupport
     appCtx.put(UimaAsynchronousEngine.Timeout, 20000 );
     addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
     addExceptionToignore(org.apache.uima.aae.error.UimaASProcessCasTimeout.class);
+    super.setExpectingServiceShutdown();
     
     runTest(appCtx, eeUimaEngine, null, null, 1, PROCESS_LATCH);
   }
@@ -817,6 +822,7 @@ public class TestUimaASExtended extends BaseTestSupport
     addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
     addExceptionToignore(org.apache.uima.aae.error.UimaASProcessCasTimeout.class);
 
+    super.setExpectingServiceShutdown();
     runTest(appCtx, eeUimaEngine, null, null, 1, PROCESS_LATCH);
   }
 
@@ -843,6 +849,7 @@ public class TestUimaASExtended extends BaseTestSupport
     //  the CAS Process and Ping timeout.
     eeUimaEngine.undeploy(delegateContainerId);  
     //  Send the CAS and handle exception
+    super.setExpectingServiceShutdown();
     runTest(appCtx, eeUimaEngine, null, null, 1, EXCEPTION_LATCH);
   }
 
@@ -862,6 +869,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
@@ -872,6 +880,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplier.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMultiplier.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
@@ -887,6 +896,7 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testProcessWithAggregateUsingRemoteMerger -------------");
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithCollocatedMerger.xml");
+    super.setExpectingServiceShutdown();
     runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
   }
 
@@ -896,6 +906,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 	    deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMerger.xml");
 	    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithRemoteMerger.xml");
+	    super.setExpectingServiceShutdown();
 	    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
   }
 
@@ -911,6 +922,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	    // reduce the cas pool size and reply window
 	    appCtx.remove(UimaAsynchronousEngine.ShadowCasPoolSize);
 	    appCtx.put(UimaAsynchronousEngine.ShadowCasPoolSize, Integer.valueOf(2));
+	    super.setExpectingServiceShutdown();
 		runTest(appCtx, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 	public void testClientProcessWithRemoteMultiplier() throws Exception
@@ -922,6 +934,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"TestMultiplierQueue" );
 	    appCtx.remove(UimaAsynchronousEngine.ShadowCasPoolSize);
 	    appCtx.put(UimaAsynchronousEngine.ShadowCasPoolSize, Integer.valueOf(1));
+	    super.setExpectingServiceShutdown();
 	    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TestMultiplierQueue", 1, PROCESS_LATCH);
 	}
 
@@ -934,6 +947,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith10Docs_1.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_CasMultiplierAggregateWithRemoteCasMultiplier.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 	
@@ -946,6 +960,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith10Docs_1.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith10Docs_2.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWith2RemoteMultipliers.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 	
@@ -955,6 +970,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWith2Multipliers.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 
@@ -963,6 +979,7 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testProcessAggregateWithInnerCMAggregate -------------");
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_TopAggregateWithInnerAggregateCM.xml");
+    super.setExpectingServiceShutdown();
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
   }
 	
@@ -982,7 +999,9 @@ public class TestUimaASExtended extends BaseTestSupport
 		//	CM1 --> CM2 --> Remote AggregateCM --> Candidate Answer --> CC
 		deployService(eeUimaEngine, relativePath+"/Deploy_TopLevelBlueJAggregateCM.xml");
 		super.setExpectingServiceShutdown();
-		runTest2(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, PROCESS_LATCH);
+		
+//    runTest2(null,eeUimaEngine,"tcp://localhost:61616","BJTopLevelAggregate", 1, PROCESS_LATCH);
+  runTest2(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, PROCESS_LATCH);
 	}
 	
 	public void testTypesystemMergeWithMultiplier() throws Exception
@@ -990,6 +1009,7 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testTypesystemMergeWithMultiplier -------------");
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithMergedTypes.xml");
+    super.setExpectingServiceShutdown();
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
 	
@@ -1086,6 +1106,7 @@ public class TestUimaASExtended extends BaseTestSupport
     // Set an explicit CPC timeout as exceptions thrown in the 2nd annotator's CPC don't reach the client.
     appCtx.put(UimaAsynchronousEngine.CpcTimeout, 20000 );
     addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
+    super.setExpectingServiceShutdown();
     runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
   }
 
@@ -1098,6 +1119,7 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlowDisableOnDelegateFailure.xml");
     addExceptionToignore(org.apache.uima.aae.error.UimaEEServiceException.class);
+    super.setExpectingServiceShutdown();
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
   }
 
@@ -1380,6 +1402,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		appCtx.put(UimaAsynchronousEngine.ServerUri, String.valueOf(broker.getMasterConnectorURI()));
 		appCtx.put(UimaAsynchronousEngine.Endpoint, "TopLevelTaeQueue");
 		appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 20000);
+    super.setExpectingServiceShutdown();
 		runTest(appCtx,eeUimaEngine, String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue", 1, EXCEPTION_LATCH );
 		fail("Expected ResourceInitializationException. Instead, the Aggregate Reports Successfull Initialization");
 	}
@@ -1422,6 +1445,7 @@ public class TestUimaASExtended extends BaseTestSupport
 		appCtx.put(UimaAsynchronousEngine.ServerUri, String.valueOf(broker.getMasterConnectorURI()));
 		appCtx.put(UimaAsynchronousEngine.Endpoint, "TopLevelTaeQueue");
 		appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 20000);
+    super.setExpectingServiceShutdown();
 		runTest(appCtx,eeUimaEngine, String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue", 1, PROCESS_LATCH );
 	}
 	catch( Exception e)
@@ -1484,6 +1508,7 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_WriterAnnotatorA.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_WriterAnnotatorB.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithContinueOnRetryFailures.xml");
+    super.setExpectingServiceShutdown();
     runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
     if ( !(new File(tempDir, "WriterAnnotatorB.3")).exists()
             || (new File(tempDir, "WriterAnnotatorB.4")).exists()) {
@@ -1505,6 +1530,7 @@ public class TestUimaASExtended extends BaseTestSupport
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
+    super.setExpectingServiceShutdown();
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
   }
 
@@ -1513,6 +1539,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	  BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
+    super.setExpectingServiceShutdown();
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
   }
   
@@ -1521,6 +1548,7 @@ public class TestUimaASExtended extends BaseTestSupport
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithLongDelay.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsServiceLongDelay.xml");
+    super.setExpectingServiceShutdown();
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
   }
 
@@ -1531,6 +1559,7 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
     Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
     appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 1500 );
+    super.setExpectingServiceShutdown();
     runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
   }
 
@@ -1538,6 +1567,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	  {
 	    System.out.println("-------------- testDeployAgainAndAgain -------------");
 	    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl(); // here or in the loop, no change.
+	    super.setExpectingServiceShutdown();
 	    
 	    for (int num=1; num<=50; num++) {
 	      System.out.println("\nRunning iteration " + num );
