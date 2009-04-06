@@ -426,6 +426,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			Endpoint cEndpoint = null;
 			if (sendReply && allDelegatesCompletedCollection() && (( cEndpoint = getClientEndpoint()) != null) )
 			{
+			  if ( flowControllerContainer != null  ) {
+			    flowControllerContainer.collectionProcessComplete();
+			  }
 				sendCpcReply(cEndpoint);
 			}
 		}
@@ -1425,6 +1428,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
         if (forceToDropTheCas(cacheEntry, aStep)) {
           if (casStateEntry.isReplyReceived()) {
             if (isSubordinate) {
+              //  drop the flow since we no longer need it
+              dropFlow(aCasReferenceId, true);
               // Drop the CAS and remove cache entry for it
               dropCAS(aCasReferenceId, true);
               casDropped = true;
