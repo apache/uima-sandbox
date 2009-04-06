@@ -43,13 +43,13 @@ public class Endpoint_impl implements Endpoint, Cloneable
 
 	private String serverURI;
 
-	private boolean initialized;
+	private volatile boolean initialized;
 
 	private Timer timer;
 
-	private volatile String replyTo;
+	private String replyTo;
 	
-	private boolean waitingForResponse;
+	private volatile boolean waitingForResponse;
 
 	private int metadataRequestTimeout;
 
@@ -57,13 +57,13 @@ public class Endpoint_impl implements Endpoint, Cloneable
 
 	private int collectionProcessCompleteTimeout;
 	
-	private boolean isRemote;
+	private volatile boolean isRemote;
 
 	private String descriptor;
 
 	private String serializer="xmi";
 
-	private boolean finalEndpoint;
+	private volatile boolean finalEndpoint;
 	
 	private final long timeIn = System.nanoTime(); 
 	
@@ -73,31 +73,31 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	
 	private Endpoint selfRef = this;
 	
-	private boolean retryEnabled;
+	private volatile boolean retryEnabled;
 	
 	private Object monitor = new Object();
 	
 	private String highWaterMark = null;
 	
-	private boolean completedProcessingCollection;
+	private volatile boolean completedProcessingCollection;
 	
-	private boolean noConsumers =false;
+	private volatile boolean noConsumers =false;
 	
-	private boolean remove = false;
+	private volatile boolean remove = false;
 	
-	private boolean isCasMultiplier = false;
+	private volatile boolean isCasMultiplier = false;
 	
 	private int shadowCasPoolSize = 0;
 	
-	private boolean isReplyEndpointFlag;
+	private volatile boolean isReplyEndpointFlag;
 	
 	private ServiceInfo serviceInfo = null;
 
 	private int command; 
 	
-	private boolean registeredWithParent;
+	private volatile boolean registeredWithParent;
 	
-	private boolean tempReplyDestination;
+	private volatile boolean tempReplyDestination;
 		
 	private int initialHeapSize;
 	
@@ -116,7 +116,7 @@ public class Endpoint_impl implements Endpoint, Cloneable
 	private int status;
 	
 	private String delegateKey;
-	private boolean processParentLast=false;
+	private volatile boolean processParentLast=false;
 	
 	public Endpoint_impl() {
 	  status = Endpoint.OK;
