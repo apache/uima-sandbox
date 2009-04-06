@@ -84,6 +84,8 @@ public abstract class Delegate {
   //  Flag that is set when getMeta reply is received
   private volatile boolean awaitingPingReply;
 
+  private volatile boolean concurrentConsumersOnReplyQueue;
+  
   public boolean isAwaitingPingReply() {
     return awaitingPingReply;
   }
@@ -654,7 +656,12 @@ public abstract class Delegate {
       state = aState;
     }
   }
-
+  public void setConcurrentConsumersOnReplyQueue() {
+    concurrentConsumersOnReplyQueue = true;
+  }
+  public boolean hasConcurrentConsumersOnReplyQueue() {
+    return concurrentConsumersOnReplyQueue;
+  }
   public abstract void handleError(Exception e, ErrorContext errorContext);
 
   public abstract String getComponentName();
@@ -700,5 +707,5 @@ public abstract class Delegate {
       return casReferenceId;
     }
   }
-
+  
 }
