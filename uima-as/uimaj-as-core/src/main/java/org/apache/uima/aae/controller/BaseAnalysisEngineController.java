@@ -1927,7 +1927,7 @@ implements AnalysisEngineController, EventSubscriber
 	                    freeCasNotificationEndpoint.setCommand(AsynchAEMessage.Stop);
 	                    getOutputChannel().sendRequest(AsynchAEMessage.Stop, casEntry.getCasReferenceId(), freeCasNotificationEndpoint);
 	                  }
-	                  if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+	                  if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) && delegateCasMultiplier != null ) {
 	                    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stopCasMultipliers", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stopping_remote_cm_INFO", new Object[] { getComponentName(), delegateCasMultiplier.getComponentName() });
 	                  }
 	                  System.out.println(">>> Controller:"+getComponentName()+" Stopping Remote Delegate Cas Multiplier:"+delegateCasMultiplier.getComponentName());
