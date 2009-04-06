@@ -30,8 +30,11 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
+import org.apache.uima.aae.controller.AggregateAnalysisEngineController_impl;
 import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
+import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.util.Level;
@@ -92,15 +95,20 @@ public class ConcurrentMessageListener implements SessionAwareMessageListener {
     }
     concurrentThreadCount = concurrentThreads;
     this.delegateListener = (SessionAwareMessageListener)delegateListener;
-    workQueue = new LinkedBlockingQueue<Runnable>(concurrentThreadCount); 
-    executor = new ThreadPoolExecutor(concurrentThreads, concurrentThreads, Long.MAX_VALUE,
-            TimeUnit.NANOSECONDS, workQueue);
-    executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-    executor.prestartAllCoreThreads();
+    if ( concurrentThreads > 1 ) {
+      workQueue = new LinkedBlockingQueue<Runnable>(concurrentThreadCount); 
+      executor = new ThreadPoolExecutor(concurrentThreads, concurrentThreads, Long.MAX_VALUE,
+              TimeUnit.NANOSECONDS, workQueue);
+      executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+      executor.prestartAllCoreThreads();
+    }
   }
   public void setAnalysisEngineController(AnalysisEngineController controller) {
     this.controller = controller;
     controllerLatch.countDown();
+  }
+  private boolean isMessageFromCasMultiplier(final Message message ) throws JMSException {
+    return message.propertyExists(AsynchAEMessage.CasSequence);
   }
   /**
    * Intercept a message to increment a child count of the input CAS. 
@@ -116,34 +124,27 @@ public class ConcurrentMessageListener implements SessionAwareMessageListener {
       //  Wait until the controller is plugged in
       controllerLatch.await();
     } catch( InterruptedException e) {}
-    //  Check if the message came from a Cas Multiplier and it contains a new Process Request
-    int command = message.getIntProperty(AsynchAEMessage.Command);
-    int messageType = message.getIntProperty(AsynchAEMessage.MessageType);
-    //  Intercept Cas Process Request from a Cas Multiplier
-    if (command == AsynchAEMessage.Process && messageType == AsynchAEMessage.Request
-            && message.propertyExists(AsynchAEMessage.CasSequence)) {
-      try {
-        String parentCasReferenceId = message.getStringProperty(AsynchAEMessage.InputCasReference);
-        //  Fetch parent CAS entry from the local cache
-        CasStateEntry parentEntry = controller.getLocalCache().lookupEntry(parentCasReferenceId);
-        //  increment number of child CASes this parent has in play
-        parentEntry.incrementSubordinateCasInPlayCount();
-      } catch (Exception e) {
-        e.printStackTrace();
-        if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-                  "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
-                  new Object[] {  e });
+    if ( isMessageFromCasMultiplier(message)) {
+      //  Check if the message came from a Cas Multiplier and it contains a new Process Request
+      int command = message.getIntProperty(AsynchAEMessage.Command);
+      int messageType = message.getIntProperty(AsynchAEMessage.MessageType);
+      //  Intercept Cas Process Request from a Cas Multiplier
+      if (command == AsynchAEMessage.Process && messageType == AsynchAEMessage.Request ) {
+        String msgFrom = (String)message.getStringProperty(AsynchAEMessage.MessageFrom); 
+        if ( msgFrom != null && controller instanceof AggregateAnalysisEngineController ) {
+          String delegateKey =((AggregateAnalysisEngineController)controller).lookUpDelegateKey(msgFrom);
+          if ( delegateKey != null ) {
+            Delegate delegate = ((AggregateAnalysisEngineController)controller).lookupDelegate(delegateKey);
+            delegate.setConcurrentConsumersOnReplyQueue();
+          }
         }
-
-      }
-    }
-    //  Delegate meesage to the JmsInputChannel 
-    executor.execute(new Runnable() {
-      public void run() {
         try {
-          delegateListener.onMessage(message, session);
-        } catch( Exception e) {
+          String parentCasReferenceId = message.getStringProperty(AsynchAEMessage.InputCasReference);
+          //  Fetch parent CAS entry from the local cache
+          CasStateEntry parentEntry = controller.getLocalCache().lookupEntry(parentCasReferenceId);
+          //  increment number of child CASes this parent has in play
+          parentEntry.incrementSubordinateCasInPlayCount();
+        } catch (Exception e) {
           e.printStackTrace();
           if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
@@ -152,6 +153,27 @@ public class ConcurrentMessageListener implements SessionAwareMessageListener {
           }
         }
       }
-    });
+      
+    }
+    if ( concurrentThreadCount > 1 ) {
+      //  Delegate meesage to the JmsInputChannel 
+      executor.execute(new Runnable() {
+        public void run() {
+          try {
+            delegateListener.onMessage(message, session);
+          } catch( Exception e) {
+            e.printStackTrace();
+            if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                      "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
+                      new Object[] {  e });
+            }
+          }
+        }
+      });
+    } else {
+      //  Just handoff the message to the InputChannel object
+      delegateListener.onMessage(message, session);
+    }
   }
 }
