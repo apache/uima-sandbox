@@ -160,7 +160,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			if ( isReplyEndpoint && brokerUri.startsWith("http") && controller != null && controller.getInputChannel() != null )
 			{
 				org.apache.uima.aae.InputChannel iC = controller.getInputChannel(controller.getName());
-				if ( iC != null )
+				if ( ( brokerUri == null || brokerUri.trim().length() == 0 ) && iC != null )
 				{
 					brokerUri = iC.getServiceInfo().getBrokerURL();
 				}
