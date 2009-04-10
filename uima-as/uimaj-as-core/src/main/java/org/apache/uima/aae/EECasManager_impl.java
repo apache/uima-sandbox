@@ -96,5 +96,10 @@ protected void finalize() throws Throwable
 	casPoolMap.clear();
 }
 
-
+  public void cleanUp() {
+    try {
+      this.finalize();
+    } catch( Throwable t ) { t.printStackTrace();}
+    
+  }
 }
