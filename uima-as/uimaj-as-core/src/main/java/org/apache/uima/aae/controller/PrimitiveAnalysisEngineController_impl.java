@@ -593,7 +593,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	         }
 					getInProcessCache().releaseCASesProducedFromInputCAS(aCasReferenceId);
 				}
-				else if ( inputCASReturned )
+				else if ( inputCASReturned && isTopLevelComponent() )
 				{
 					//	Remove input CAS cache entry if the CAS has been sent to the client
 					dropCAS(aCasReferenceId, true);
@@ -717,13 +717,11 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 	{
 	  System.out.println(">>>>> Stopping Controller:"+getComponentName());
 		super.stop();
-		stopInputChannel();
 		if ( aeInstancePool != null )
 		{
 			try
 			{
 				aeInstancePool.destroy();
-	      stopTransportLayer();
 			}
 			catch( Exception e){ e.printStackTrace();}
 		}
