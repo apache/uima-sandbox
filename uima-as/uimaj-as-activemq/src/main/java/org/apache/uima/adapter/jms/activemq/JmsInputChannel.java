@@ -365,14 +365,44 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			Map properties = ((ActiveMQMessage)aMessage).getProperties();
 			if ( !validMessageType(aMessage, properties) )
 			{
+			  int msgType = 0;
+			  if ( properties.containsKey(AsynchAEMessage.MessageType))
+		    {
+		      msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
+		    }
+			  if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+		                "validMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_msg_type__INFO",
+		                new Object[] { getController().getComponentName(), msgType });
+		    }
 				return false;
 			}
 			if ( !validCommand(aMessage, properties) )
 			{
+        int command = 0;
+        if ( properties.containsKey(AsynchAEMessage.Command))
+        {
+          command = aMessage.getIntProperty(AsynchAEMessage.Command);
+        }
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                    "validMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_cmd_type__INFO",
+                    new Object[] { getController().getComponentName(), command });
+        }
 				return false;
 			}
 			if ( !validPayload(aMessage, properties) )
 			{
+        int payload = 0;
+        if ( properties.containsKey(AsynchAEMessage.Payload))
+        {
+          payload = aMessage.getIntProperty(AsynchAEMessage.Payload);
+        }
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                    "validMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_invalid_payload_type__INFO",
+                    new Object[] { getController().getComponentName(), payload });
+        }
 				return false;
 			}
 			
