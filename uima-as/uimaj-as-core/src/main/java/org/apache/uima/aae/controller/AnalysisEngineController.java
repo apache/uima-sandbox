@@ -205,5 +205,7 @@ public interface AnalysisEngineController extends ControllerLifecycle
   
   public AnalysisEngineController getParentController();
   public void addAbortedCasReferenceId( String aCasReferenceId );
+  public boolean isAwaitingCacheCallbackNotification();
+  public void quiesceAndStop();
 
 }
