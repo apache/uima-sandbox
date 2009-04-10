@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager;
+import org.apache.uima.aae.EECasManager_impl;
 import org.apache.uima.aae.InProcessCache;
 import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.UIMAEE_Constants;
@@ -114,7 +115,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	private String serviceEndpointName = null;
 
-	private volatile boolean initialized = false;
+	protected volatile boolean initialized = false;
  
 	protected List childControllerList = new ArrayList();
 	
@@ -683,7 +684,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
           stopListener( key, endpoint);
           endpoint.setStatus(Endpoint.DISABLED);
 				}
-        System.out.println("Controller:"+getComponentName()+ " Disabling Delegate:"+key+" Due to Excessive Errors");
+        System.out.println("Controller:"+getComponentName()+ " Disabled Delegate:"+key+" Due to Excessive Errors");
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "disableDelegates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_disable_endpoint__INFO", new Object[] { getComponentName(), key });
         }
@@ -713,6 +714,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
 	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "disableDelegates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { ex });
 	         }
+	         ex.printStackTrace();
 					handleAction(ErrorHandler.TERMINATE, null, null);
 					return;
 				}
@@ -722,6 +724,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			  try {
 	        completeInitialization();
 			  } catch ( ResourceInitializationException ex) {
+			    ex.printStackTrace();
 			    handleInitializationError(ex);
 			    return;
 			  }
@@ -737,7 +740,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	public boolean continueOnError(String aCasReferenceId, String aDelegateKey, Exception anException) throws AsynchAEException
 	{
-		if (aDelegateKey == null)
+		if (aDelegateKey == null || aCasReferenceId == null)
 		{
 			return false;
 		}
@@ -761,6 +764,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	private FlowContainer lookupFlow(String aCasReferenceId)
 	{
+	  if ( flowMap != null ) {
 		synchronized( flowMap )
 		{
 			if (flowMap.containsKey(aCasReferenceId))
@@ -769,6 +773,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "lookupFlow", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_retrieve_flow_object__FINEST", new Object[] { getComponentName(), aCasReferenceId });
         }
 				return (FlowContainer) flowMap.get(aCasReferenceId);
+	      }
 			}
 		}
 		return null;
@@ -2300,11 +2305,14 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	public void dispatchMetadataRequest(Endpoint anEndpoint) throws AsynchAEException
 	{
+	  if ( isStopped() ) {
+	    return;
+	  }
 		anEndpoint.startMetadataRequestTimer();
 		anEndpoint.setController(this);
 		anEndpoint.setWaitingForResponse(true);
 		String key = lookUpDelegateKey(anEndpoint.getEndpoint());
-		if ( !delegateStatMap.containsKey(key))
+		if ( key != null && !delegateStatMap.containsKey(key))
 		{
 			if ( key != null && anEndpoint != null)
 			{
@@ -2530,14 +2538,23 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
         	flowControllerContainer.destroy();
     	}
     }
-    	perCasStatistics.clear();
+   perCasStatistics.clear();
+
+   if ( disabledDelegateList != null ) {
+     disabledDelegateList.clear();
+   }
+   
+   if ( delegateStatMap != null ) {
+     delegateStatMap.clear();
+   }
+    	
 	}
 	
 	
 	public void stop()
 	{
 		super.stop();
-		cleanUp();
+    this.cleanUp();
 	}
 	public List getChildControllerList()
 	{
