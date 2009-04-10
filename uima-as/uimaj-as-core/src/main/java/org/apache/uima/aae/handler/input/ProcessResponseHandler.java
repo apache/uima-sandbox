@@ -19,6 +19,9 @@
 
 package org.apache.uima.aae.handler.input;
 
+import java.rmi.RemoteException;
+
+import org.apache.uima.UIMAException;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
@@ -33,6 +36,7 @@ import org.apache.uima.aae.error.AsynchAEException;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.ExpiredMessageException;
 import org.apache.uima.aae.error.ServiceShutdownException;
+import org.apache.uima.aae.error.UimaAsDelegateException;
 import org.apache.uima.aae.error.UimaEEServiceException;
 import org.apache.uima.aae.handler.HandlerBase;
 import org.apache.uima.aae.jmx.ServicePerformance;
@@ -528,7 +532,7 @@ public class ProcessResponseHandler extends HandlerBase
 			{
 				
 				
-				Exception remoteException = (Exception) object;
+				Exception remoteException = new UimaAsDelegateException("----> Controller:"+getController().getComponentName()+" Received Exception From Delegate:"+delegateKey, (Exception) object);
 				ErrorContext errorContext = new ErrorContext();
 				errorContext.add(AsynchAEMessage.Command, aMessageContext.getMessageIntProperty(AsynchAEMessage.Command));
 				errorContext.add(AsynchAEMessage.MessageType, aMessageContext.getMessageIntProperty(AsynchAEMessage.MessageType));
