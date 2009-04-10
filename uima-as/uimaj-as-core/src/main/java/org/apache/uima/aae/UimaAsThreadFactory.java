@@ -23,6 +23,7 @@ package org.apache.uima.aae;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
+import org.springframework.core.task.TaskRejectedException;
 
 /**
  * Custom ThreadFactory for use in the TaskExecutor. The TaskExecutor is plugged in
@@ -65,14 +66,14 @@ public class UimaAsThreadFactory implements ThreadFactory {
                   //  AE instance process() method will only be called from this thread
                   controller.initializeAnalysisEngine();
                 } 
+                r.run();
                 
               } catch( Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 return;
             }
             //  Call given Worker (Runnable) run() method and block. This call block until the 
             //  TaskExecutor is terminated. 
-            r.run();
           }
         });
       } catch ( Exception e) {
