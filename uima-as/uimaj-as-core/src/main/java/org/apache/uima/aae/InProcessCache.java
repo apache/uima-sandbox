@@ -53,6 +53,7 @@ public class InProcessCache implements InProcessCacheMBean
 
 	private static final Class CLASS_NAME = InProcessCache.class;
 
+	public static final int NotifyWhenRegistering = 1;
 	private transient UIDGenerator idGenerator = new UIDGenerator();
 	private ConcurrentHashMap cache = new ConcurrentHashMap();
 
@@ -61,7 +62,10 @@ public class InProcessCache implements InProcessCacheMBean
 	
 	int size = 0;
 
-	public void registerCallbackWhenCacheEmpty(EventSubscriber aController )
+	public void registerCallbackWhenCacheEmpty(EventSubscriber aController ) {
+    registerCallbackWhenCacheEmpty(aController, 0);
+  }
+  public void registerCallbackWhenCacheEmpty(EventSubscriber aController, int notification )
 	{
 		if ( !callbackListeners.isEmpty() )
 		{
@@ -74,8 +78,16 @@ public class InProcessCache implements InProcessCacheMBean
 					return;
 				}
 			}
+		} else if ( notification == NotifyWhenRegistering ) {
+		  if ( isEmpty()) {
+	      aController.onCacheEmpty();
+		  }
 		}
+		//  If not registered already add the event subscriber to the list of 
+		//  of objects to be called when the cache becomes empty
+		if ( !callbackListeners.contains(aController)) {
 		callbackListeners.add(aController);
+		}
 	}
 	public void destroy()
 	{
@@ -168,7 +180,9 @@ public class InProcessCache implements InProcessCacheMBean
 			CacheEntry entry = (CacheEntry) cache.get(key);
 			if ( entry != null && entry.getCas() != null )
 			{
-				entry.getCas().release();
+			  try {
+	        entry.getCas().release();
+			  } catch( Exception e) {}
 			}
 			cache.remove(key);
 		}
@@ -310,7 +324,7 @@ public class InProcessCache implements InProcessCacheMBean
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, getClass().getName(), "remove", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_is_invalid_remove_from_cache_failed__FINE", new Object[] { aCasReferenceId });
       }
 		}
-		if ( isEmpty() && callbackListeners.size() > 0 )
+		if ( cache.size() == 0 && callbackListeners.size() > 0 )
 		{
 			for( int i=0; i < callbackListeners.size(); i++ )
 			{
