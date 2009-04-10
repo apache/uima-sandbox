@@ -103,7 +103,7 @@ public class GetMetaErrorHandler extends ErrorHandlerBase implements ErrorHandle
 	    			//  Notify if the error occurred during initialization of the service.
 	    			//  If the ping times out, there is no need to notify the listener. We
 	    			//  use getMeta request as a ping to check if the service is running.
-	    			if ( !delegate.isAwaitingPingReply() ) {
+	    			if ( delegate != null && !delegate.isAwaitingPingReply() ) {
 	            aController.notifyListenersWithInitializationStatus((Exception)t);
 	    			}
 	    		}
