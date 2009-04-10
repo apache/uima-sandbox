@@ -22,27 +22,23 @@ package org.apache.uima.adapter.jms.activemq;
 import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
-import java.nio.channels.AsynchronousCloseException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import javax.jms.BytesMessage;
-import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
-import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.management.ServiceNotFoundException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.Channel;
 import org.apache.uima.aae.InputChannel;
 import org.apache.uima.aae.OutputChannel;
 import org.apache.uima.aae.UIMAEE_Constants;
@@ -67,7 +63,6 @@ import org.apache.uima.aae.monitor.Monitor;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.Marker;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
@@ -233,7 +228,7 @@ public class JmsOutputChannel implements OutputChannel
 			}
 			else
 			{
-				serSharedData = cacheEntry.getDeserSharedData();//new XmiSerializationSharedData();
+				serSharedData = cacheEntry.getDeserSharedData();
 				if (serSharedData == null) {
 					serSharedData = new XmiSerializationSharedData();
 					cacheEntry.setXmiSerializationData(serSharedData);
@@ -1865,7 +1860,10 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		return cacheEntry; 
 	}
-	public void stop()
+  public void stop() {
+    stop(Channel.CloseAllChannels);
+  }
+	public void stop(int channelsToClose)
 	{
 		aborting = true;
 		try
