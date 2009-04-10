@@ -86,6 +86,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceCreationSpecifier;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.resource.Resource_ImplBase;
 import org.apache.uima.util.Level;
@@ -213,11 +214,22 @@ implements AnalysisEngineController, EventSubscriber
   protected String aeDescriptor; 
   //	List of Delegates
   protected List<Delegate> delegates = new ArrayList<Delegate>();
-
+  //  indicates whether or not we received a callback from the InProcessCache when
+  //  it becomes empty
+  protected volatile boolean  callbackReceived = false;
+  //  Monitor used in stop() to await a callback from InProcessCache
+  protected Object callbackMonitor = new Object();
+  
+  protected volatile boolean awaitingCacheCallbackNotification = false;
   protected ConcurrentHashMap<String, String> abortedCasesMap = 
     new ConcurrentHashMap<String, String>();
 
   protected String processPid = "";
+  private CountDownLatch stopLatch = new CountDownLatch(1);
+  
+  //  Set to true when stopping the service
+  private volatile boolean releasedAllCASes;
+  
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -414,6 +426,9 @@ implements AnalysisEngineController, EventSubscriber
         }
       }
     }
+    
+    //  Create an instance of ControllerMBean and register it with JMX Server.
+    //  This bean exposes service lifecycle APIs to enable remote stop
     if ( isTopLevelComponent() ) {
       Controller controller = new Controller(this);
       String jmxName = getManagementInterface().getJmxDomain()+"name="+"Controller";
@@ -1012,7 +1027,23 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		if (aCAS != null)
 		{
-			aCAS.release();
+		  //  Check if this method was called while another thread is stopping the service.
+		  //  This is a special case. Normally the releasedAllCASes is false. It is only
+		  //  true if another thread forcefully released CASes. 
+		  if ( releasedAllCASes ) {
+		    //  All CASes could have been forcefully released in the stop() method. If another
+		    //  thread was operating on a CAS while the stop() was releasing the CAS we may
+		    //  get an exception which will be ignored. We are shutting down. The forceful 
+		    //  CAS release is not part of the graceful. In that case, stop() is only called
+		    //  when ALL CASes are fully processed. Only than stop() is called and since ALL
+		    //  CASes are released at that point we would not see any exceptions.
+		    try {
+		      aCAS.release();
+		    } catch( Exception e) {}
+		  } else {
+	      aCAS.release();
+		  }
+		  
 		}
 
 	}
@@ -1731,13 +1762,13 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			getControllerLatch().release();
 			//	Stops the input channel of this service
-			stopInputChannels();
+      stopInputChannels(InputChannel.CloseAllChannels);
 		}
 		else
 		{
 			((AggregateAnalysisEngineController_impl)this).stopTimers();
 			//	Stops ALL input channels of this service including the reply channels
-			stopInputChannels();
+      stopInputChannels(InputChannel.CloseAllChannels);
 			int childControllerListSize = ((AggregateAnalysisEngineController_impl)this).getChildControllerList().size();
 			//	send terminate event to all collocated child controllers
 			if ( childControllerListSize > 0 )
@@ -1754,8 +1785,9 @@ implements AnalysisEngineController, EventSubscriber
 					childController.getControllerLatch().release();
 				}
 			}
-			stopTransportLayer();
 		}
+		//	Stops internal transport used to communicate with colocated services
+    stopTransportLayer();
 		/*
 		 * Commented this block. It generates ShutdownException which causes problems
 		 * The shutdown of services happens ad hoc and not orderly. This whole logic
@@ -1784,6 +1816,9 @@ implements AnalysisEngineController, EventSubscriber
 			}
 		}
 		
+    getInProcessCache().releaseAllCASes();
+    
+    releasedAllCASes = true;
 		if ( !isTopLevelComponent() )
 		{
 			adminContext = null;
@@ -1803,32 +1838,38 @@ implements AnalysisEngineController, EventSubscriber
 				getInProcessCache().destroy();
 			}
 			catch( Exception e){}
-		}
-		if (  statsMap != null )
-		{
-			statsMap.clear();
-		}
-		if ( inputChannelList != null )
-		{
-			inputChannelList.clear();
-		}
-		inputChannel = null;
-		if ( idleTimeMap != null )
-		{
-			idleTimeMap.clear();
-		}
-		if ( serviceErrorMap != null )
-		{
-			serviceErrorMap.clear();
-		}
-		if ( mBeanMap != null )
-		{
-			mBeanMap.clear();
-		}
-		if ( timeSnapshotMap != null )
-		{
-			timeSnapshotMap.clear();
-		}
+    }
+    if ( this instanceof AggregateAnalysisEngineController_impl ) {
+      ((AggregateAnalysisEngineController_impl)this).cleanUp();
+      if ( !((AggregateAnalysisEngineController_impl)this).initialized ) {
+        notifyListenersWithInitializationStatus(new ResourceInitializationException());
+      }
+    }
+    if (  statsMap != null )
+    {
+      statsMap.clear();
+    }
+    if ( inputChannelList != null )
+    {
+      inputChannelList.clear();
+    }
+    inputChannel = null;
+    if ( idleTimeMap != null )
+    {
+      idleTimeMap.clear();
+    }
+    if ( serviceErrorMap != null )
+    {
+      serviceErrorMap.clear();
+    }
+    if ( mBeanMap != null )
+    {
+      mBeanMap.clear();
+    }
+    if ( timeSnapshotMap != null )
+    {
+      timeSnapshotMap.clear();
+    }
     synchronized (unregisteredDelegateList) {
       //TODO any reason this list needs to be cleared on Stop???
       if ( unregisteredDelegateList != null )
@@ -1836,12 +1877,86 @@ implements AnalysisEngineController, EventSubscriber
         unregisteredDelegateList.clear();
       }
     }
-		if ( casManager != null )
-		{
-			casManager = null;
-		}
-		super.destroy();
+    if ( casManager != null )
+    {
+      casManager = null;
+    }
+    if ( transports != null ) {
+      transports.clear();
+    }
+    if ( threadStateMap != null ) {
+      threadStateMap.clear();
+    }
+    if (inputChannelMap != null) {
+      inputChannelMap.clear();
+    }
+    if ( controllerListeners != null) {
+      controllerListeners.clear();
+    }
+    if ( perCasStatistics != null)  {
+      perCasStatistics.clear();
+    }
+    if ( cmOutstandingCASes != null ) {
+      cmOutstandingCASes.clear();
+    }
+    if ( messageListeners != null) {
+      messageListeners.clear();
+    }
+    
+    EECasManager_impl cm = (EECasManager_impl) getResourceManager().getCasManager();
+    if ( cm != null ) {
+      cm.cleanUp();
+    }
+    super.destroy();
+  
+  }
 	
+	/**
+	 * Stops input channel(s) and waits for CASes still in play to complete processing.
+	 * When the InProcessCache becomes empty, initiate the service shutdown.
+	 */
+	public  void quiesceAndStop()
+	{
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "quiesceAndStop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop__INFO", new Object[] { getComponentName() });
+    }
+    if ( !isStopped() && !callbackReceived ) {
+      getControllerLatch().release();
+      //  To support orderly shutdown, the service must first stop its input channel and 
+      //  then wait until all CASes still in play are processed. When all CASes are processed
+      //  we proceed with the shutdown of delegates and finally of the top level service.
+      if ( isTopLevelComponent()) {
+        //  Stops all input channels of this service, but keep temp reply queue input channels open
+        //  to process replies.
+        stopInputChannels(InputChannel.InputChannels);
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "quiesceAndStop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_register_onEmpty_callback__INFO", new Object[] { getComponentName() });
+        }
+        //  Register a callback with the cache. The callback will be made when the cache becomes empty
+        getInProcessCache().registerCallbackWhenCacheEmpty(this, InProcessCache.NotifyWhenRegistering);
+        //  Now wait until the InProcessCache becomes empty
+        while( !callbackReceived ) {
+          synchronized(callbackMonitor) {
+            //  set global flag to indicate that the controller awaits notification from
+            //  the cache. This mechanism is used in the Listener code to determine whether
+            //  or not to call stop() on the controller in the event there is an exception.
+            awaitingCacheCallbackNotification = true;
+            try {
+              System.out.println("Controller:"+getComponentName()+" Waiting For InProcessCache Callback. Cache Size:"+getInProcessCache().getSize());
+              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "quiesceAndStop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_waiting_for_onEmpty_callback__INFO", new Object[] { getComponentName() });
+              }
+              callbackMonitor.wait();
+            } catch ( Exception e) {}
+          }
+        }
+        System.out.println("Controller:"+getComponentName()+" Received Callback From the InProcessCache. The Cache Is Empty.");
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "quiesceAndStop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_onEmpty_callback_received__INFO", new Object[] { getComponentName() });
+        }
+        stop();
+      }
+    }
 	}
 	
 	
@@ -1855,27 +1970,27 @@ implements AnalysisEngineController, EventSubscriber
 	 */
 	public void terminate()
 	{
-    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "terminate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_process_termiate_event__INFO", new Object[] { getComponentName() });
+    synchronized(stopLatch) {
+      if ( stopLatch.getCount() > 0 ) {
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "terminate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_process_termiate_event__INFO", new Object[] { getComponentName() });
+        }
+        stopLatch.countDown();
+      } else {
+        return;
+      }
     }
-		if ( !isTopLevelComponent() )
-		{
-			((BaseAnalysisEngineController)parentController).terminate();
-		}
-		else if ( !isStopped() )
-		{
-			setStopped();
-			//	Stop the inflow of new input CASes
-			stopInputChannel();
-			System.out.println("Controller:"+getComponentName()+" Done Stopping Main Input Channel");			
-			//	If this is an aggregate that uses a collocated CAS Multiplier, we need to stop generating new CASes.
-			//	Call stop() on the CM, and await an input CAS. When the CM is stopped() it will set 'Aborted' flag
-			//	in the InProcessCache for the input CAS. When this aggregate receives the input CAS, it will detect
-			//	the aborted CAS and will set a callback on the InProcessCache to await an event when all CASes are
-			//	fully processed.
-			stopCasMultipliers();
-			stop();
-		}
+    if ( !isTopLevelComponent() ) {
+      ((BaseAnalysisEngineController)parentController).stop();
+    }
+    else if ( !isStopped() )
+    {
+      //  Stop the inflow of new input CASes
+      stopInputChannel();
+      System.out.println("Controller:"+getComponentName()+" Done Stopping Main Input Channel");     
+      stopCasMultipliers();
+      this.stop();
+    }
 	}
 
 	private AnalysisEngineController lookupDelegateController( String aName ) {
@@ -1930,7 +2045,9 @@ implements AnalysisEngineController, EventSubscriber
 	                  if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) && delegateCasMultiplier != null ) {
 	                    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stopCasMultipliers", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stopping_remote_cm_INFO", new Object[] { getComponentName(), delegateCasMultiplier.getComponentName() });
 	                  }
-	                  System.out.println(">>> Controller:"+getComponentName()+" Stopping Remote Delegate Cas Multiplier:"+delegateCasMultiplier.getComponentName());
+	                  if ( delegateCasMultiplier != null ) {
+	                    System.out.println(">>> Controller:"+getComponentName()+" Stopping Remote Delegate Cas Multiplier:"+delegateCasMultiplier.getComponentName());
+	                  }
 	                }
 	                catch( Exception e) { e.printStackTrace();}
 	              }
@@ -1975,18 +2092,9 @@ implements AnalysisEngineController, EventSubscriber
 	 * is configured with.
 	 * 
 	 */
-	protected void stopInputChannels()
+	protected void stopInputChannels(int channelsToStop)
 	{
 		InputChannel iC = null;
-		try
-		{
-			if ( inputChannel != null )
-			{
-				inputChannel.stop();
-			}
-		}
-		catch( Exception e) { e.printStackTrace();}
-		
 		Iterator it = inputChannelMap.keySet().iterator();
 		int i=1;
 		while( it.hasNext() )
@@ -1999,7 +2107,13 @@ implements AnalysisEngineController, EventSubscriber
 					iC = (InputChannel)inputChannelMap.get(key);
 					if ( iC != null )
 					{
-						iC.stop();
+				    if ( channelsToStop == InputChannel.InputChannels && 
+				            iC.getServiceInfo() != null && iC.getServiceInfo().getInputQueueName().startsWith("top_level_input_queue") ) {
+				      //  This closes both listeners on the input queue: Process Listener and GetMeta Listener 
+				      iC.stop(channelsToStop);
+				      return; // Just closed input channels. Keep the others open
+				    }
+						iC.stop(channelsToStop);
 					}
 				}
 				i++;
@@ -2072,22 +2186,18 @@ implements AnalysisEngineController, EventSubscriber
 	 */
 	public void onCacheEmpty()
 	{
-		
-		if ( stopped )
-		{
-			getInProcessCache().cancelTimers();
-		}
-		if ( isTopLevelComponent())
-		{
-			//	Stop all collocated services
-			stop();
-			if ( getUimaEEAdminContext() != null)
-			{
-				//	Stop the container
-				getUimaEEAdminContext().shutdown();
-			}
-			adminContext = null;
-		}
+    callbackReceived = true;
+	  if ( !stopped ) {
+      quiesceAndStop();
+    } 
+    getInProcessCache().cancelTimers();
+    synchronized(callbackMonitor) {
+      try {
+          callbackMonitor.notifyAll();
+      } catch ( Exception e) {}
+    }
+
+      
 	}
 	
 	/**
@@ -2243,10 +2353,12 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				synchronized( mux )
 				{
-					AnalysisThreadState threadState = getThreadState();					
-					threadState.setLastUpdate(System.nanoTime());
-					threadState.setIdle(true);
-					threadState.setLastMessageDispatchTime();
+					AnalysisThreadState threadState = getThreadState();
+					if ( threadState != null ) {
+	          threadState.setLastUpdate(System.nanoTime());
+	          threadState.setIdle(true);
+	          threadState.setLastMessageDispatchTime();
+					}
 				}
 			}
 		}
@@ -2256,8 +2368,10 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				synchronized( mux )
 				{
-					AnalysisThreadState threadState = getThreadState();					
-					return threadState.getIdleTimeBetweenProcessCalls();
+					AnalysisThreadState threadState = getThreadState();		
+					if ( threadState != null ) {
+	          return threadState.getIdleTimeBetweenProcessCalls();
+					}
 				}
 			}
 			return 0;
@@ -2347,8 +2461,10 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			Set<Long> set = threadStateMap.keySet();
 			Iterator<Long> it = set.iterator();
-			return threadStateMap.get(it.next());
-
+			if ( it.hasNext() ) {
+	      return threadStateMap.get(it.next());
+			}
+			return null;
 		}
 		/**
 		 * Returns the {@link AnalysisThreadState} object associated with the current thread.
@@ -2439,7 +2555,9 @@ implements AnalysisEngineController, EventSubscriber
 			synchronized( mux )
 			{
 				AnalysisThreadState threadState = getThreadState();
-				threadState.incrementSerializationTime(cpuTime);
+				if ( threadState != null ) {
+	        threadState.incrementSerializationTime(cpuTime);
+				}
 			}
 		}
 		/**
@@ -2450,7 +2568,9 @@ implements AnalysisEngineController, EventSubscriber
 			synchronized( mux )
 			{
 				AnalysisThreadState threadState = getThreadState();
-				threadState.incrementDeserializationTime(cpuTime);
+				if ( threadState != null ) {
+	        threadState.incrementDeserializationTime(cpuTime);
+				}
 			}
 		}
 		private class AnalysisThreadState
@@ -2602,6 +2722,9 @@ implements AnalysisEngineController, EventSubscriber
 	    } else {
 	      return false;
 	    }
+	  }
+	  public boolean isAwaitingCacheCallbackNotification() {
+	    return awaitingCacheCallbackNotification;
 	  }
 	  
 }
