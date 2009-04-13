@@ -75,14 +75,21 @@ public class UIMA_Service implements  ApplicationListener
 		String saxonURL = getArg("-saxonURL", args);
 		String xslTransform = getArg("-xslt", args);
 		String uimaAsDebug = getArg("-uimaEeDebug", args);
-		
+				
 		if (nbrOfArgs < 1 || (args[0].startsWith("-") && (deploymentDescriptors.length == 0 || saxonURL.equals("") || xslTransform.equals(""))))
 		{
 			printUsageMessage();
 			return null;
 		}
-
-		if (deploymentDescriptors.length == 0)
+    String brokerURL = getArg("-brokerURL",args);
+    if ( brokerURL != null ) {
+      System.out.println(">>> Setting defaultBrokerURL to:"+brokerURL);
+      System.setProperty("defaultBrokerURL", brokerURL);
+    } else {
+      System.setProperty("defaultBrokerURL", "tcp://localhost:61616");
+    }
+    
+    if (deploymentDescriptors.length == 0)
 		{
 			// array of context files passed in
 			springConfigFileArray = args;
@@ -351,7 +358,8 @@ public class UIMA_Service implements  ApplicationListener
 	private static void printUsageMessage()
 	{
 		System.out.println(" Arguments to the program are as follows : \n" + "-d path-to-UIMA-Deployment-Descriptor [-d path-to-UIMA-Deployment-Descriptor ...] \n" + "-saxon path-to-saxon.jar \n" + "-xslt path-to-dd2spring-xslt\n" + "   or\n"
-				+ "path to Spring XML Configuration File which is the output of running dd2spring\n");
+				+ "path to Spring XML Configuration File which is the output of running dd2spring\n"+
+				"-defaultBrokerURL the default broker URL to use for the service and all its delegates");
 	}
 	public void onApplicationEvent(ApplicationEvent event) {
 		if ( event instanceof ContextClosedEvent && monitor != null && monitor.isRunning() )
