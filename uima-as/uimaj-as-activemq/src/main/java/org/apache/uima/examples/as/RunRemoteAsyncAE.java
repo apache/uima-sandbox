@@ -167,6 +167,7 @@ public class RunRemoteAsyncAE {
             }
             String service = args[++i];
             System.out.println("Attempting to deploy " + service + " ...");
+            
             uimaEEEngine.deploy(service, appCtx);
           } else if (args[i].equals("-t")) {
             timeout = Integer.parseInt(args[++i]);
@@ -185,6 +186,10 @@ public class RunRemoteAsyncAE {
       } else {
         if (brokerUrl == null) {
           brokerUrl = args[i];
+          //  Set System property that may be used by Spring while resolving a broker URL 
+          //  placeholder in the deployment descriptor. This is only used when launching
+          //  RunRemoteAsyncAE with -d option.
+          System.setProperty("defaultBrokerURL", brokerUrl);
         } else if (endpoint == null) {
           endpoint = args[i];
         }
