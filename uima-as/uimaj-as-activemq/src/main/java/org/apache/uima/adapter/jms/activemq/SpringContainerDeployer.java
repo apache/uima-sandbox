@@ -333,9 +333,15 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			context = new FileSystemXmlApplicationContext(springContextFile);
 			return initializeContainer(context);
 		} catch (ResourceInitializationException e) {
-			//e.printStackTrace();
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "deploy", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] { Thread.currentThread().getId(), e });
+      }
+      e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+	    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "deploy", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] { Thread.currentThread().getId(), e });
+	    }
 			e.printStackTrace();
 			throw new ResourceInitializationException(e);
 		}
