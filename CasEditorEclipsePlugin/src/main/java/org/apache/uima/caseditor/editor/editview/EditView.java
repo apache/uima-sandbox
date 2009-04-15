@@ -22,7 +22,6 @@ package org.apache.uima.caseditor.editor.editview;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.AnnotationEditorView;
-import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * TODO: add javadoc here

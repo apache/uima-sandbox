@@ -77,8 +77,8 @@ public class AnnotationTreeNodeList {
   }
 
   void buildTree() {
-    for (Iterator it = mElements.iterator(); it.hasNext();) {
-      AnnotationTreeNode aNode = (AnnotationTreeNode) it.next();
+    for (Iterator<AnnotationTreeNode> it = mElements.iterator(); it.hasNext();) {
+      AnnotationTreeNode aNode = it.next();
 
       boolean isMoved = false;
 

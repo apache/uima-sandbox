@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.editor.annotation;
 
-import org.apache.uima.cas.text.AnnotationFS;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy;
 import org.eclipse.swt.custom.StyledText;
@@ -34,8 +33,6 @@ public class TextColorDrawingStrategy implements IDrawingStrategy {
   public void draw(Annotation annotation, GC gc, StyledText textWidget, int offset, int length, Color color) {
     if (length > 0) {
       if ((annotation instanceof EclipseAnnotationPeer)) {
-        AnnotationFS annotationFS = ((EclipseAnnotationPeer) annotation).getAnnotationFS();
-
         if (gc != null) {
 
           int start = offset;

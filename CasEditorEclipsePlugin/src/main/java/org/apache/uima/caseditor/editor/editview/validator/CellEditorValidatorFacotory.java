@@ -28,7 +28,8 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
  * TODO: add javadoc here
  */
 public class CellEditorValidatorFacotory {
-  private static Map<Class, ICellEditorValidator> sValidatorMap = new HashMap<Class, ICellEditorValidator>();
+  private static Map<Class<?>, ICellEditorValidator> sValidatorMap = 
+	  	new HashMap<Class<?>, ICellEditorValidator>();
 
   static {
     sValidatorMap.put(Byte.class, new ByteCellEditorValidator());
@@ -50,7 +51,7 @@ public class CellEditorValidatorFacotory {
    *
    * @return {@link ICellEditorValidator} or null
    */
-  public static ICellEditorValidator createValidator(Class type) {
+  public static ICellEditorValidator createValidator(Class<?> type) {
     if (type == null) {
       throw new IllegalArgumentException("type must not be null!");
     }
