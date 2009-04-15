@@ -941,6 +941,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     if (document != null) {
       document.removeChangeListener(mAnnotationSynchronizer);
     }
+    
+    super.dispose();
   }
 
   public void setDirty() {
