@@ -40,7 +40,7 @@ public final class MarkerUtil {
 
   /**
    * Clears all markers of the given id for the given resource.
-   *
+   * 
    * @param resource
    * @param markerId
    * @throws CoreException
@@ -57,7 +57,7 @@ public final class MarkerUtil {
 
   /**
    * Creates a new marker.
-   *
+   * 
    * @param resource
    * @param errorMessage
    * @throws CoreException
@@ -74,7 +74,7 @@ public final class MarkerUtil {
 
   /**
    * Creates a new marker.
-   *
+   * 
    * @param resource
    * @param xmlException
    * @throws CoreException

@@ -30,7 +30,7 @@ public class TaeError extends RuntimeException {
 
   /**
    * Initializes the current instance.
-   *
+   * 
    * @param message
    */
   public TaeError(String message) {
@@ -39,7 +39,7 @@ public class TaeError extends RuntimeException {
 
   /**
    * Initializes the current instance.
-   *
+   * 
    * @param message
    * @param cause
    */

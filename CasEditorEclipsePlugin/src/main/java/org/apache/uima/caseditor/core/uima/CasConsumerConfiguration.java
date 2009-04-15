@@ -43,9 +43,9 @@ public final class CasConsumerConfiguration {
 
   /**
    * Initializes a new instance.
-   *
+   * 
    * @param element
-   *
+   * 
    * @param descriptor
    */
   public CasConsumerConfiguration(ConsumerElement element, CasConsumerDescription descriptor) {
@@ -55,7 +55,7 @@ public final class CasConsumerConfiguration {
 
   /**
    * Retrieves the name.
-   *
+   * 
    * @return the name
    */
   public String getName() {
@@ -66,7 +66,7 @@ public final class CasConsumerConfiguration {
 
   /**
    * Sets the base folder.
-   *
+   * 
    * @param baseFolder
    */
   public void setBaseFolder(IFolder baseFolder) {
@@ -74,12 +74,12 @@ public final class CasConsumerConfiguration {
   }
 
   public IFolder getBaseFolder() {
-	  return resourceBasePath;
+    return resourceBasePath;
   }
 
   /**
    * Creates the consumer.
-   *
+   * 
    * @return the consumer
    */
   public CasConsumer createConsumer() {
@@ -96,8 +96,8 @@ public final class CasConsumerConfiguration {
     }
 
     try {
-      CasConsumer consumer = UIMAFramework.produceCasConsumer(casConsumerDescriptor,
-              resourceManager, null);
+      CasConsumer consumer =
+              UIMAFramework.produceCasConsumer(casConsumerDescriptor, resourceManager, null);
 
       return consumer;
     } catch (ResourceInitializationException e) {
@@ -109,7 +109,7 @@ public final class CasConsumerConfiguration {
 
   /**
    * Retrieves the {@link ConsumerElement}.
-   *
+   * 
    * @return the {@link ConsumerElement}
    */
   public ConsumerElement getConsumerElement() {

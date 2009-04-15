@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * The EventDispatcher routes received events to the registered handler objects.
- *
+ * 
  * @param <K>
  *          the key type
  * @param <E>
@@ -37,7 +37,7 @@ public class EventDispatcher<K, E> {
 
   /**
    * Initializes the current instance with a default handler.
-   *
+   * 
    * @param defaultHandler
    *          handles all unkown events, must not be null
    */
@@ -51,7 +51,7 @@ public class EventDispatcher<K, E> {
 
   /**
    * Registers the given handler for the given key.
-   *
+   * 
    * @param key
    * @param handler
    */
@@ -62,7 +62,7 @@ public class EventDispatcher<K, E> {
   /**
    * Notifies the registered handler, if there is no handler registered for this key the default
    * handler is notified.
-   *
+   * 
    * @param key
    *          the key type
    * @param event

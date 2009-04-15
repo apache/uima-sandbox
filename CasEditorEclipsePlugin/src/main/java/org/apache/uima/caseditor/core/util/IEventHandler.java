@@ -22,16 +22,17 @@ package org.apache.uima.caseditor.core.util;
 /**
  * Clients which implement this interface can receive event notifications from the
  * {@link EventDispatcher} after registering the handler for an specific event type.
- *
+ * 
  * @param <E>
  *          the event object type
  */
 public interface IEventHandler<E> {
   /**
    * This method is called to handle the given event.
-   *
+   * 
    * @param event
    *          the event to handle
    */
   void handle(E event);
 }
+

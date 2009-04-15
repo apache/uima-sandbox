@@ -42,21 +42,21 @@ public class AnnotatorConfiguration {
 
   /**
    * Initializes the instance.
-   *
+   * 
    * @param descriptor
    */
   public AnnotatorConfiguration(AnnotatorElement element, ResourceSpecifier descriptor) {
     this.element = element;
-	mDescriptor = descriptor;
+    mDescriptor = descriptor;
   }
 
   public AnnotatorElement getAnnotatorElement() {
-	  return element;
+    return element;
   }
 
   /**
    * Only text analysis engines are supported.
-   *
+   * 
    * @return the text analysis engine
    * @throws ResourceInitializationException
    */
@@ -76,12 +76,12 @@ public class AnnotatorConfiguration {
   }
 
   public IFolder getBaseFolder() {
-	  return mResourceBasePath;
+    return mResourceBasePath;
   }
 
   /**
    * Sets the base folder
-   *
+   * 
    * @param baseFolder
    */
   public void setBaseFolder(IFolder baseFolder) {
