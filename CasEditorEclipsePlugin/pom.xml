@@ -164,20 +164,28 @@
 						<Export-Package>
 							org.apache.uima.caseditor.*
             			</Export-Package>
-            			<Import-Package>org.eclipse.core.runtime.jobs,
-            				org.eclipse.core.runtime.content,
-            				org.eclipse.core.resources,
-            				org.eclipse.core.commands.common,
-            				org.eclipse.swt,
-            				org.eclipse.swt.layout,
-            				org.eclipse.ui.progress,
-            				org.eclipse.jface.layout,
-            				org.eclipse.jface.resource,
-            				org.eclipse.ui.plugin,
-            				org.osgi.framework,
-            				org.eclipse.ui.texteditor,
-            				org.eclipse.ui.views.contentoutline,
-            				org.eclipse.jface.window,
+						<Require-Bundle>
+							org.eclipse.jface.text,
+							org.eclipse.text,
+							org.eclipse.ui.editors,
+							org.eclipse.ui.workbench.texteditor,
+							org.eclipse.ui.ide,
+							org.eclipse.ui,
+							org.eclipse.ui.workbench,
+							org.eclipse.core.runtime
+					    </Require-Bundle>
+            			<Import-Package>
+            			    !org.eclipse.jface.text,
+							!org.eclipse.jface.text.link,
+							!org.eclipse.jface.text.source,
+							!org.eclipse.jface.text.templates,
+							!org.eclipse.ui.texteditor,
+							!org.eclipse.ui,
+							!org.eclipse.ui.actions,
+							!org.eclipse.ui.dialogs,
+							!org.eclipse.ui.model,
+							!org.eclipse.ui.part, 
+							!org.eclipse.core.runtime,
        						*</Import-Package>
 					</instructions>
 				</configuration>
