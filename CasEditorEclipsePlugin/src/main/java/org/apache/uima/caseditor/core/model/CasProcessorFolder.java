@@ -45,14 +45,13 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
 
   /**
    * Initializes a new instance.
-   *
+   * 
    * @param configFolder
    * @param sourceFolder
    * @param project
    * @throws CoreException
    */
-  CasProcessorFolder(IFolder configFolder, NlpProject project)
-          throws CoreException {
+  CasProcessorFolder(IFolder configFolder, NlpProject project) throws CoreException {
     mConfigFolder = configFolder;
     mProject = project;
     createAnnotatorConfigurations();
@@ -61,7 +60,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
 
   /**
    * Retrieves the {@link AnnotatorConfiguration}.
-   *
+   * 
    * @return the {@link AnnotatorConfiguration}
    */
   public Collection<AnnotatorElement> getAnnotators() {
@@ -83,7 +82,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
 
   /**
    * Retrieves the consumers.
-   *
+   * 
    * @return consumers
    */
   public Collection<ConsumerElement> getConsumers() {
@@ -106,7 +105,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
 
   /**
    * Retrieves all contained {@link IFile} and {@link IFolder} resources.
-   *
+   * 
    * @return {@link IFile}s and {@link IFolder}s
    * @throws CoreException
    */
@@ -127,7 +126,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
 
   /**
    * Retrieves the {@link NlpProject}.
-   *
+   * 
    * @return the {@link NlpProject}
    */
   public NlpProject getNlpProject() {
@@ -168,7 +167,7 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
 
   /**
    * Retrieves the parent.
-   *
+   * 
    * @return the parent
    */
   public INlpElement getParent() {

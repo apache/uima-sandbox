@@ -23,6 +23,7 @@ package org.apache.uima.caseditor.core.model.delta;
  * The kind of the {@link INlpElementDelta}.
  */
 public enum Kind {
+  
   /**
    * Added a resource.
    */

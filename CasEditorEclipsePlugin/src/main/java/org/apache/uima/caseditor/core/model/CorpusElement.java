@@ -32,7 +32,7 @@ import org.eclipse.jface.text.IDocument;
 
 /**
  * The CorpusElement is a container for {@link IDocument}s.
- *
+ * 
  * TODO: do not include defective elements!
  */
 public final class CorpusElement extends AbstractNlpElement implements INlpElement, IAdaptable {
@@ -44,7 +44,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Creates a new <code>CorpusElement</code> object.
-   *
+   * 
    * @param nlpProject
    * @param corpusFolder
    */
@@ -63,7 +63,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Checks if the current document still exists.
-   *
+   * 
    * @return true if exists
    */
   public boolean exists() {
@@ -72,7 +72,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Retrieves all documents contained in the current corpus instance.
-   *
+   * 
    * @return the documents
    */
   public Collection<DocumentElement> getDocuments() {
@@ -81,7 +81,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Returns all <code>DocumentElement</code>s inside this corpus.
-   *
+   * 
    * @throws CoreException
    */
   private void createDocuments() throws CoreException {
@@ -131,7 +131,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Retrieves the name of the current instance.
-   *
+   * 
    * @return the name
    */
   public String getName() {
@@ -174,7 +174,8 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Adds the given resource.
- * @param resource
+   * 
+   * @param resource
    */
   @Override
   void addResource(INlpElementDelta delta, IResource resource) {
@@ -195,7 +196,8 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
 
   /**
    * Removes the given resource.
- * @param resource
+   * 
+   * @param resource
    */
   @Override
   void removeResource(INlpElementDelta delta, IResource resource) {

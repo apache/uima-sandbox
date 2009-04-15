@@ -19,7 +19,6 @@
 
 package org.apache.uima.caseditor.core.model;
 
-
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -29,6 +28,7 @@ import org.eclipse.core.runtime.PlatformObject;
  * The abstract base class of all nlp element implementations.
  */
 public abstract class AbstractNlpElement extends PlatformObject implements INlpElement {
+  
   /**
    * Checks if the current elements resource equals the given resource, if so it returns the current
    * element, otherwise null.
@@ -61,7 +61,7 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
   /**
    * Checks if the given resource equals the current elements resource, if so it returns the parent
    * of the current element, otherwise null.
-   *
+   * 
    * @throws CoreException
    */
   public INlpElement getParent(IResource resource) throws CoreException {
@@ -78,27 +78,31 @@ public abstract class AbstractNlpElement extends PlatformObject implements INlpE
 
   /**
    * Adds resources after the element was initialized.
- * @param delta TODO
- * @param resource
+   * 
+   * @param delta
+   *          TODO
+   * @param resource
    *          the added resource
-   *
+   * 
    * @throws CoreException
    */
   abstract void addResource(INlpElementDelta delta, IResource resource) throws CoreException;
 
   /**
    * Removes resources after the element was initialized.
- * @param delta TODO
- * @param resource
+   * 
+   * @param delta
+   *          TODO
+   * @param resource
    *          the removed resource
-   *
+   * 
    * @throws CoreException
    */
   abstract void removeResource(INlpElementDelta delta, IResource resource) throws CoreException;
 
   /**
    * Changed resource after the element was initialized.
-   *
+   * 
    * @param resource
    */
   @SuppressWarnings("all")

@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.Status;
  * TODO: add javadoc
  */
 public class TypesystemElement extends AbstractNlpElement {
+  
   private IFile mTypesytemFile;
 
   private NlpProject mProject;
@@ -71,12 +72,10 @@ public class TypesystemElement extends AbstractNlpElement {
   }
 
   /**
-     * Retrieves the {@link CAS}.
-     *
-     * @return the {@link CAS} or null if there is an error in the type system.
-     * @deprecated
-     */
-  @Deprecated
+   * Retrieves the {@link CAS}.
+   * 
+   * @return the {@link CAS} or null if there is an error in the type system.
+   */
   public CAS getCAS() {
     Runnable clearMarkers = new Runnable() {
       public void run() {
@@ -191,7 +190,7 @@ public class TypesystemElement extends AbstractNlpElement {
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) throws CoreException {
-      getCAS();
+    getCAS();
   }
 
   @Override

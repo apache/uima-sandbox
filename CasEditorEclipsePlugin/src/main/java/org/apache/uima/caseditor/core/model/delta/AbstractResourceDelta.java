@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IPath;
  * Abstract base class, so clients must not implement all methods.
  */
 public abstract class AbstractResourceDelta implements IResourceDelta {
+  
   /**
    * Dummy method, does nothing.
    */

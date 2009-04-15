@@ -65,7 +65,7 @@ public class DotCorpus {
 
   /**
    * Retrieves type system name parameter.
-   *
+   * 
    * @return type system name parameter
    */
   public String getTypeSystemFileName() {
@@ -74,7 +74,7 @@ public class DotCorpus {
 
   /**
    * Sets type system name parameter.
-   *
+   * 
    * @param name
    *          type system name parameter
    */
@@ -84,7 +84,7 @@ public class DotCorpus {
 
   /**
    * Retrieves the uima config folder name parameter.
-   *
+   * 
    * @return uima config folder name parameter.
    */
   public Collection<String> getCasProcessorFolderNames() {
@@ -93,7 +93,7 @@ public class DotCorpus {
 
   /**
    * Sets the uima config folder name parameter.
-   *
+   * 
    * @param folder
    *          uima config folder name parameter.
    */
@@ -107,7 +107,7 @@ public class DotCorpus {
 
   /**
    * Adds a corpus folder
-   *
+   * 
    * @param name
    */
   public void addCorpusFolder(String name) {
@@ -116,7 +116,7 @@ public class DotCorpus {
 
   /**
    * Removes the given corpus folder.
-   *
+   * 
    * @param name
    */
   public void removeCorpusFolder(String name) {
@@ -125,7 +125,7 @@ public class DotCorpus {
 
   /**
    * Retrieves the list of all corpus folders.
-   *
+   * 
    * @return corpus folder list
    */
   public Collection<String> getCorpusFolderNameList() {
@@ -134,7 +134,7 @@ public class DotCorpus {
 
   /**
    * Retrieves the editor line length hint parameter.
-   *
+   * 
    * @return line length hint
    */
   public int getEditorLineLengthHint() {
@@ -143,7 +143,7 @@ public class DotCorpus {
 
   /**
    * Sets the editor line length hint parameter.
-   *
+   * 
    * @param lineLengthHint
    */
   public void setEditorLineLength(int lineLengthHint) {
@@ -152,7 +152,7 @@ public class DotCorpus {
 
   /**
    * Retrieves the annotation styles.
-   *
+   * 
    * @return - the annotation styles
    */
   public Collection<AnnotationStyle> getAnnotationStyles() {
@@ -161,14 +161,14 @@ public class DotCorpus {
 
   /**
    * Adds an AnnotationStyle. TODO: move style stuff to nlp project
-   *
+   * 
    * @param style
    */
   public void setStyle(AnnotationStyle style) {
 
-    boolean isDefaultAnnotation = AnnotationStyle.DEFAULT_COLOR.equals(style.getColor()) &&
-        AnnotationStyle.DEFAULT_STYLE.equals(style.getStyle()) &&
-        AnnotationStyle.DEFAULT_LAYER == style.getLayer();
+    boolean isDefaultAnnotation = AnnotationStyle.DEFAULT_COLOR.equals(style.getColor())
+            && AnnotationStyle.DEFAULT_STYLE.equals(style.getStyle())
+            && AnnotationStyle.DEFAULT_LAYER == style.getLayer();
 
     if (isDefaultAnnotation) {
       mStyleMap.remove(style.getAnnotation());
@@ -179,7 +179,7 @@ public class DotCorpus {
 
   /**
    * Removes an AnnotationStyle for the given name, does nothing if not existent.
-   *
+   * 
    * @param name
    */
   public void removeStyle(String name) {
@@ -188,7 +188,7 @@ public class DotCorpus {
 
   /**
    * Retrieves the AnnotationStyle for the given type or null if not available.
-   *
+   * 
    * @param type
    * @return the requested style or null if none
    */
@@ -209,12 +209,11 @@ public class DotCorpus {
   @Override
   public boolean equals(Object obj) {
 
-	boolean result;
+    boolean result;
 
     if (obj == this) {
-    	result = true;
-    }
-    else if (obj instanceof DotCorpus) {
+      result = true;
+    } else if (obj instanceof DotCorpus) {
 
       DotCorpus corpus = (DotCorpus) obj;
 
@@ -223,9 +222,8 @@ public class DotCorpus {
               && isEqual(mCasProcessorFolders, corpus.mCasProcessorFolders)
               && isEqual(mStyleMap, corpus.mStyleMap)
               && isEqual(mEditorLineLengthHint, corpus.mEditorLineLengthHint);
-    }
-    else {
-    	result = false;
+    } else {
+      result = false;
     }
 
     return result;
@@ -233,12 +231,12 @@ public class DotCorpus {
 
   /**
    * Compares two objects for equality.
-   *
-   * @param a -
+   * 
+   * @param a
    *          the first object or null
-   * @param b -
+   * @param b
    *          the second object or null
-   * @return - a.equals(b) or true if both null
+   * @return a.equals(b) or true if both null
    */
   private static boolean isEqual(Object a, Object b) {
     boolean result;

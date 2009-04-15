@@ -45,6 +45,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * This class is responsible to read and write {@link DotCorpus} objects from or to a byte stream.
  */
 public class DotCorpusSerializer {
+
   private static final String CONFIG_ELEMENT = "config";
 
   private static final String CORPUS_ELEMENT = "corpus";
@@ -75,7 +76,7 @@ public class DotCorpusSerializer {
 
   /**
    * Creates a {@link DotCorpus} object from a given {@link InputStream}.
-   *
+   * 
    * @param dotCorpusStream
    * @return the {@link DotCorpus} instance.
    * @throws CoreException
@@ -145,7 +146,8 @@ public class DotCorpusSerializer {
 
         String styleString = corporaChildElement.getAttribute(STYLE_STYLE_ATTRIBUTE);
 
-        int colorInteger = Integer.parseInt(corporaChildElement.getAttribute(STYLE_COLOR_ATTRIBUTE));
+        int colorInteger = Integer
+                .parseInt(corporaChildElement.getAttribute(STYLE_COLOR_ATTRIBUTE));
 
         Color color = new Color(colorInteger);
 
@@ -154,8 +156,8 @@ public class DotCorpusSerializer {
         int drawingLayer;
 
         try {
-        drawingLayer = Integer.parseInt(drawingLayerString);
-        } catch(NumberFormatException e) {
+          drawingLayer = Integer.parseInt(drawingLayerString);
+        } catch (NumberFormatException e) {
           drawingLayer = 0;
         }
 
@@ -164,7 +166,8 @@ public class DotCorpusSerializer {
 
         dotCorpus.setStyle(style);
       } else if (CAS_PROCESSOR_ELEMENT.equals(corporaChildElement.getNodeName())) {
-        dotCorpus.addCasProcessorFolder(corporaChildElement.getAttribute(CAS_PROCESSOR_FOLDER_ATTRIBUTE));
+        dotCorpus.addCasProcessorFolder(corporaChildElement
+                .getAttribute(CAS_PROCESSOR_FOLDER_ATTRIBUTE));
       } else if (EDITOR_ELEMENT.equals(corporaChildElement.getNodeName())) {
         String lineLengthHintString = corporaChildElement
                 .getAttribute(EDITOR_LINE_LENGTH_ATTRIBUTE);
@@ -186,11 +189,11 @@ public class DotCorpusSerializer {
 
   /**
    * Writes the <code>DotCorpus</code> instance to the given <code>OutputStream</code>.
-   *
+   * 
    * @param dotCorpus
    *          the {@link DotCorpus} object to serialize.
-   * @param out -
-   *          the stream to write the current <code>DotCorpus</code> instance.
+   * @param out
+   *          - the stream to write the current <code>DotCorpus</code> instance.
    * @throws CoreException
    */
   public static void serialize(DotCorpus dotCorpus, OutputStream out) throws CoreException {
@@ -204,7 +207,7 @@ public class DotCorpusSerializer {
 
       for (String corpusFolder : dotCorpus.getCorpusFolderNameList()) {
         AttributesImpl corpusFolderAttributes = new AttributesImpl();
-        corpusFolderAttributes.addAttribute("", "",CORPUS_FOLDER_ATTRIBUTE, "", corpusFolder);
+        corpusFolderAttributes.addAttribute("", "", CORPUS_FOLDER_ATTRIBUTE, "", corpusFolder);
 
         xmlSerHandler.startElement("", CORPUS_ELEMENT, CORPUS_ELEMENT, corpusFolderAttributes);
         xmlSerHandler.endElement("", CORPUS_ELEMENT, CORPUS_ELEMENT);
@@ -212,16 +215,14 @@ public class DotCorpusSerializer {
 
       for (AnnotationStyle style : dotCorpus.getAnnotationStyles()) {
         AttributesImpl styleAttributes = new AttributesImpl();
-        styleAttributes
-                .addAttribute("", "", STYLE_TYPE_ATTRIBUTE, "", style.getAnnotation());
-        styleAttributes.addAttribute("", "", STYLE_STYLE_ATTRIBUTE, "", style.getStyle()
-                .name());
+        styleAttributes.addAttribute("", "", STYLE_TYPE_ATTRIBUTE, "", style.getAnnotation());
+        styleAttributes.addAttribute("", "", STYLE_STYLE_ATTRIBUTE, "", style.getStyle().name());
 
         Color color = style.getColor();
         Integer colorInt = new Color(color.getRed(), color.getGreen(), color.getBlue()).getRGB();
         styleAttributes.addAttribute("", "", STYLE_COLOR_ATTRIBUTE, "", colorInt.toString());
-        styleAttributes.addAttribute("", "", STYLE_LAYER_ATTRIBUTE, "",
-                Integer.toString(style.getLayer()));
+        styleAttributes.addAttribute("", "", STYLE_LAYER_ATTRIBUTE, "", Integer.toString(style
+                .getLayer()));
 
         xmlSerHandler.startElement("", STYLE_ELEMENT, STYLE_ELEMENT, styleAttributes);
         xmlSerHandler.endElement("", STYLE_ELEMENT, STYLE_ELEMENT);
@@ -232,7 +233,8 @@ public class DotCorpusSerializer {
         typeSystemFileAttributes.addAttribute("", "", TYPESYTEM_FILE_ATTRIBUTE, "", dotCorpus
                 .getTypeSystemFileName());
 
-        xmlSerHandler.startElement("", TYPESYSTEM_ELEMENT, TYPESYSTEM_ELEMENT, typeSystemFileAttributes);
+        xmlSerHandler.startElement("", TYPESYSTEM_ELEMENT, TYPESYSTEM_ELEMENT,
+                typeSystemFileAttributes);
         xmlSerHandler.endElement("", TYPESYSTEM_ELEMENT, TYPESYSTEM_ELEMENT);
       }
 
@@ -240,7 +242,8 @@ public class DotCorpusSerializer {
         AttributesImpl taggerConfigAttributes = new AttributesImpl();
         taggerConfigAttributes.addAttribute("", "", CAS_PROCESSOR_FOLDER_ATTRIBUTE, "", folder);
 
-        xmlSerHandler.startElement("", CAS_PROCESSOR_ELEMENT, CAS_PROCESSOR_ELEMENT, taggerConfigAttributes);
+        xmlSerHandler.startElement("", CAS_PROCESSOR_ELEMENT, CAS_PROCESSOR_ELEMENT,
+                taggerConfigAttributes);
         xmlSerHandler.endElement("", CAS_PROCESSOR_ELEMENT, CAS_PROCESSOR_ELEMENT);
       }
 
@@ -249,7 +252,8 @@ public class DotCorpusSerializer {
         editorLineLengthHintAttributes.addAttribute("", "", EDITOR_LINE_LENGTH_ATTRIBUTE, "",
                 Integer.toString(dotCorpus.getEditorLineLengthHint()));
 
-        xmlSerHandler.startElement("", EDITOR_ELEMENT, EDITOR_ELEMENT, editorLineLengthHintAttributes);
+        xmlSerHandler.startElement("", EDITOR_ELEMENT, EDITOR_ELEMENT,
+                editorLineLengthHintAttributes);
         xmlSerHandler.endElement("", EDITOR_ELEMENT, EDITOR_ELEMENT);
       }
 

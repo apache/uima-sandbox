@@ -49,8 +49,8 @@ import org.eclipse.core.runtime.IPath;
  */
 public final class NlpModel extends AbstractNlpElement {
   private final class ResourceChangeListener implements IResourceChangeListener {
-    EventDispatcher<Kind, NlpModelDeltaImpl> mEventDispatcher = new EventDispatcher<Kind, NlpModelDeltaImpl>(
-            new DefaultEventHandler());
+    EventDispatcher<Kind, NlpModelDeltaImpl> mEventDispatcher =
+            new EventDispatcher<Kind, NlpModelDeltaImpl>(new DefaultEventHandler());
 
     ResourceChangeListener() {
       mEventDispatcher.register(Kind.ADDED, new AddHandler(mEventDispatcher));
@@ -224,8 +224,9 @@ public final class NlpModel extends AbstractNlpElement {
               }
             };
 
-            NlpModelDeltaImpl removeProjectDelta = new NlpModelDeltaImpl((NlpModelDeltaImpl) delta
-                    .getParent(), removeProjectResourceDelta);
+            NlpModelDeltaImpl removeProjectDelta =
+                    new NlpModelDeltaImpl((NlpModelDeltaImpl) delta.getParent(),
+                    removeProjectResourceDelta);
 
             NlpModelDeltaImpl parent = (NlpModelDeltaImpl) delta.getParent();
 
@@ -265,8 +266,9 @@ public final class NlpModel extends AbstractNlpElement {
               }
             };
 
-            NlpModelDeltaImpl removeProjectDelta = new NlpModelDeltaImpl((NlpModelDeltaImpl) delta
-                    .getParent(), removeProjectResourceDelta);
+            NlpModelDeltaImpl removeProjectDelta =
+                    new NlpModelDeltaImpl((NlpModelDeltaImpl) delta.getParent(),
+                    removeProjectResourceDelta);
 
             NlpModelDeltaImpl parent = (NlpModelDeltaImpl) delta.getParent();
 
@@ -304,8 +306,9 @@ public final class NlpModel extends AbstractNlpElement {
               }
             };
 
-            NlpModelDeltaImpl removeProjectDelta = new NlpModelDeltaImpl((NlpModelDeltaImpl) delta
-                    .getParent(), removeProjectResourceDelta);
+            NlpModelDeltaImpl removeProjectDelta =
+                    new NlpModelDeltaImpl((NlpModelDeltaImpl) delta.getParent(),
+                    removeProjectResourceDelta);
 
             NlpModelDeltaImpl parent = (NlpModelDeltaImpl) delta.getParent();
 
@@ -337,7 +340,8 @@ public final class NlpModel extends AbstractNlpElement {
     }
   }
 
-  private Set<INlpModelChangeListener> mModelChangeListeners = new HashSet<INlpModelChangeListener>();
+  private Set<INlpModelChangeListener> mModelChangeListeners =
+          new HashSet<INlpModelChangeListener>();
 
   private IWorkspaceRoot mWorkspaceRoot;
 
@@ -349,7 +353,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Initializes a new instance.
-   *
+   * 
    * @throws CoreException
    */
   public NlpModel() throws CoreException {
@@ -439,7 +443,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Retrieves all nlp projects.
-   *
+   * 
    * @return the nlp projects
    */
   public NlpProject[] getNlpProjects() {
@@ -470,7 +474,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Retrieves the resource projects in the workspace without a nlp nature.
-   *
+   * 
    * @return array of projects
    * @throws CoreException
    */
@@ -556,7 +560,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Checks if the given element is a {@link INlpElement}.
-   *
+   * 
    * @param resource
    * @return true if it is a {@link INlpElement} otherwise false.
    */
@@ -566,7 +570,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * The {@link NlpModel} does not have a parent.
-   *
+   * 
    * @return null
    */
   public INlpElement getParent() {
@@ -582,7 +586,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Registers a model change listener.
-   *
+   * 
    * @param listener
    */
   public void addNlpModelChangeListener(INlpModelChangeListener listener) {
@@ -591,7 +595,7 @@ public final class NlpModel extends AbstractNlpElement {
 
   /**
    * Removes a model change listener.
-   *
+   * 
    * @param listener
    */
   public void removeNlpModelChangeListener(INlpModelChangeListener listener) {
@@ -621,7 +625,7 @@ public final class NlpModel extends AbstractNlpElement {
   /**
    * Asynchrony executes the workers on the queue. This method can be used to post resource tree
    * changes inside the event handler, where the resource tree is locked.
-   *
+   * 
    * @param worker
    */
   public void asyncExcuteQueue(Runnable worker) {

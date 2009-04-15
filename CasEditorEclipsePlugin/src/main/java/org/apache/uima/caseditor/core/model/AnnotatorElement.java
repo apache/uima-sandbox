@@ -46,7 +46,7 @@ public class AnnotatorElement extends AbstractNlpElement {
 
   /**
    * Initializes the current instance.
-   *
+   * 
    * @param config
    * @param annotatorFile
    */
@@ -59,7 +59,7 @@ public class AnnotatorElement extends AbstractNlpElement {
 
   /**
    * Retrieves the {@link AnnotatorConfiguration}.
-   *
+   * 
    * @return the {@link AnnotatorConfiguration}
    */
   public AnnotatorConfiguration getAnnotatorConfiguration() {
@@ -67,7 +67,6 @@ public class AnnotatorElement extends AbstractNlpElement {
   }
 
   private AnnotatorConfiguration createAnnotatorConfiguration() {
-
 
     Runnable clearMarkers = new Runnable() {
       public void run() {
@@ -118,9 +117,9 @@ public class AnnotatorElement extends AbstractNlpElement {
     }
 
     // TODO: refactor here
-    AnnotatorConfiguration annotatorConfiguration = new AnnotatorConfiguration(this,
-        specifier); // cast is unsafe !!!
+    AnnotatorConfiguration annotatorConfiguration = new AnnotatorConfiguration(this, specifier);
 
+    // TODO: cast is unsafe !!!
     annotatorConfiguration.setBaseFolder((IFolder) mParent.getResource());
 
     return annotatorConfiguration;
@@ -135,7 +134,7 @@ public class AnnotatorElement extends AbstractNlpElement {
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) throws CoreException {
-      mAnnotatorConfig = createAnnotatorConfiguration();
+    mAnnotatorConfig = createAnnotatorConfiguration();
   }
 
   @Override

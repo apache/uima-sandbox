@@ -53,7 +53,7 @@ public class ConsumerElement extends AbstractNlpElement {
 
   /**
    * Retrieves the {@link CasConsumerConfiguration}.
-   *
+   * 
    * @return the configuration
    */
   public CasConsumerConfiguration getConsumerConfiguration() {
@@ -62,7 +62,7 @@ public class ConsumerElement extends AbstractNlpElement {
 
   /**
    * @return the configuration
-   *
+   * 
    * @throws CoreException
    */
   private CasConsumerConfiguration createConsumerConfiguration() throws CoreException {
@@ -78,14 +78,14 @@ public class ConsumerElement extends AbstractNlpElement {
     ((NlpModel) getNlpProject().getParent()).asyncExcuteQueue(clearMarkers);
 
     String dataPath = ((IFolder) mParent.getResource()).getLocation().toOSString();
-    XMLInputSource inCasConsumer = new XMLInputSource(mConsumerResource.getContents(),
-            new File(dataPath));
+    XMLInputSource inCasConsumer =
+            new XMLInputSource(mConsumerResource.getContents(), new File(dataPath));
 
     XMLParser xmlParser = UIMAFramework.getXMLParser();
     CasConsumerDescription casConsumerDesciptor;
 
     try {
-    	// TODO: this throws a class cast exception if the file has an other descriptor, check it
+      // TODO: this throws a class cast exception if the file has an other descriptor, check it
       casConsumerDesciptor = (CasConsumerDescription) xmlParser.parse(inCasConsumer);
     } catch (final InvalidXMLException e) {
       Runnable createMarker = new Runnable() {
@@ -115,8 +115,8 @@ public class ConsumerElement extends AbstractNlpElement {
       return null;
     }
 
-    CasConsumerConfiguration trainerConfiguration = new CasConsumerConfiguration(this,
-            casConsumerDesciptor);
+    CasConsumerConfiguration trainerConfiguration =
+            new CasConsumerConfiguration(this, casConsumerDesciptor);
 
     trainerConfiguration.setBaseFolder((IFolder) getParent().getResource());
 
@@ -130,7 +130,7 @@ public class ConsumerElement extends AbstractNlpElement {
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) throws CoreException {
-      mConsumerConfiguration = createConsumerConfiguration();
+    mConsumerConfiguration = createConsumerConfiguration();
   }
 
   @Override

@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-
 /**
  * The document element contains the uima cas document.
  */
@@ -47,25 +46,24 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
   private IFile mDocumentFile;
 
   /**
-   * The working copy of the document. This instance is
-   * shared by everyone who wants to edit the document.
+   * The working copy of the document. This instance is shared by everyone who wants to edit the
+   * document.
    */
-  private SoftReference<DocumentUimaImpl> mWorkingCopy =
-	  new SoftReference<DocumentUimaImpl>(null);
+  private SoftReference<DocumentUimaImpl> mWorkingCopy = new SoftReference<DocumentUimaImpl>(null);
 
   private boolean isSavingWorkingCopy;
 
   /**
    * Initializes a new instance.
-   *
+   * 
    * @param corpus
    * @param documentFile
    */
   DocumentElement(CorpusElement corpus, IFile documentFile) {
 
-	if (corpus == null || documentFile == null) {
-	  throw new IllegalArgumentException("Parameters must not be null!");
-	}
+    if (corpus == null || documentFile == null) {
+      throw new IllegalArgumentException("Parameters must not be null!");
+    }
 
     mParent = corpus;
     mDocumentFile = documentFile;
@@ -85,7 +83,6 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
     return mDocumentFile.getName();
   }
 
-
   /**
    * Retrieves the parent.
    */
@@ -95,7 +92,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   /**
    * Retrieves the working copy.
-   *
+   * 
    * @throws CoreException
    * @return the working copy
    */
@@ -105,35 +102,33 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
     if (project.getTypesystemElement() == null) {
       mWorkingCopy = null;
-      throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID,
-              0, "Typesystem not available!", null));
+      throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID, 0,
+              "Typesystem not available!", null));
     }
 
     DocumentUimaImpl document = mWorkingCopy.get();
 
     if (reload || document == null) {
 
-    	InputStream in = mDocumentFile.getContents();
+      InputStream in = mDocumentFile.getContents();
 
-    	DocumentFormat format;
+      DocumentFormat format;
 
-    	if (getResource().getFileExtension().equalsIgnoreCase("xcas")) {
-    		format = DocumentFormat.XCAS;
-    	}
-    	else if (getResource().getFileExtension().equalsIgnoreCase("xmi")) {
-    		format = DocumentFormat.XMI;
-    	}
-    	else {
-    		throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID,
-    	              0, "Unkown file extension!", null));
-    	}
-    	
-    	// TODO: check if this is correct this way
-    	CAS cas = project.getTypesystemElement().getCAS();
-    	
-    	document  = new DocumentUimaImpl(cas, in, format);
+      if (getResource().getFileExtension().equalsIgnoreCase("xcas")) {
+        format = DocumentFormat.XCAS;
+      } else if (getResource().getFileExtension().equalsIgnoreCase("xmi")) {
+        format = DocumentFormat.XMI;
+      } else {
+        throw new CoreException(new Status(IStatus.ERROR, CasEditorPlugin.ID, 0,
+                "Unkown file extension!", null));
+      }
 
-    	mWorkingCopy = new SoftReference<DocumentUimaImpl>(document);
+      // TODO: check if this is correct this way
+      CAS cas = project.getTypesystemElement().getCAS();
+
+      document = new DocumentUimaImpl(cas, in, format);
+
+      mWorkingCopy = new SoftReference<DocumentUimaImpl>(document);
     }
 
     return document;
@@ -141,10 +136,10 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   /**
    * Writes the document element to the file system.
-   *
-   * TODO: move it to the document, maybe the document gets not
-   * saved if the caller lost the reference to it, before this call
-   *
+   * 
+   * TODO: move it to the document, maybe the document gets not saved if the caller lost the
+   * reference to it, before this call
+   * 
    * @throws CoreException
    */
   public void saveDocument() throws CoreException {
@@ -162,7 +157,7 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   /**
    * Retrieves the corresponding {@link NlpProject} instance.
-   *
+   * 
    * @return the {@link NlpProject} instance
    */
   public NlpProject getNlpProject() {
@@ -179,8 +174,8 @@ public final class DocumentElement extends AbstractNlpElement implements IAdapta
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) {
-	// TODO: What should happen if the document is changed externally
-	// e.g. with a text editor ?
+    // TODO: What should happen if the document is changed externally
+    // e.g. with a text editor ?
 
     // if saveDocument() was called, we receive a changedResource event
     // in this case do not remove a reference to the working copy, cause its in sync

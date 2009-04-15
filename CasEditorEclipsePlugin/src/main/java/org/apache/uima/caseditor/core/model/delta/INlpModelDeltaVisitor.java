@@ -23,9 +23,10 @@ package org.apache.uima.caseditor.core.model.delta;
  * The listener is used to visit the given delta.
  */
 public interface INlpModelDeltaVisitor {
+  
   /**
    * Called to visit the given delta.
-   *
+   * 
    * @param delta
    * @return true if the implementor wants to visit children.
    */

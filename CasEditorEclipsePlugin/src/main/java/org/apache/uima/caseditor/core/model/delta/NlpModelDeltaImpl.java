@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * The internal implementation of the nlp model delta interface.
- *
+ * 
  * TODO: Add a filter to avoid node with Kind.NOTHING.
  */
 public final class NlpModelDeltaImpl implements INlpElementDelta {
@@ -51,7 +51,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
 
   /**
    * Initializes a new instance.
-   *
+   * 
    * @param parent
    * @param resourceDelta
    */
@@ -72,8 +72,8 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   }
 
   /**
-   * Sets the nlp element Note: do not call this method from ouside code
-   *
+   * Sets the nlp element Note: do not call this method from outside code
+   * 
    * @param element
    */
   public void setNlpElement(INlpElement element) {
@@ -82,7 +82,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
 
   /**
    * Retrieves the parent element or null if this is the root delta.
-   *
+   * 
    * @return parent element or null
    */
   public INlpElementDelta getParent() {
@@ -91,7 +91,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
 
   /**
    * Adds a child to the current element instance.
-   *
+   * 
    * @param child
    */
   public void addChild(NlpModelDeltaImpl child) {
@@ -147,9 +147,9 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   }
 
   /**
-   * Sets the new kind. This method should only be called from the event handlers snd not by any
+   * Sets the new kind. This method should only be called from the event handlers and not by any
    * client.
-   *
+   * 
    * @param kind
    */
   public void setKind(Kind kind) {
@@ -165,7 +165,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
 
   /**
    * Retrieves the resource delta.
-   *
+   * 
    * @return the resource delta
    */
   public IResourceDelta getResourceDelta() {
@@ -177,7 +177,7 @@ public final class NlpModelDeltaImpl implements INlpElementDelta {
   }
 
   public IPath getMovedToPath() {
-      return mResourceDelta.getMovedToPath();
+    return mResourceDelta.getMovedToPath();
   }
 
   /**

@@ -27,14 +27,15 @@ import org.eclipse.core.runtime.IPath;
 /**
  * A element delta represents changes in the state of a element tree between two discrete points in
  * time.
- *
+ * 
  * @see IResourceDelta
  */
 public interface INlpElementDelta {
+
   /**
    * Accepts the given visitor. The only kinds of resource deltas visited are <code>ADDED</code>,
    * <code>REMOVED</code>, and <code>CHANGED</code>.
-   *
+   * 
    * @param visotor
    */
   void accept(INlpModelDeltaVisitor visotor);
@@ -42,55 +43,56 @@ public interface INlpElementDelta {
   /**
    * Returns resource deltas for all children of this resource which were added, removed, or
    * changed. Returns an empty array if there are no affected children.
-   *
+   * 
    * @return - children or empty array
    */
   public INlpElementDelta[] getAffectedChildren();
 
   /**
    * Returns true if the given element is an nlp element.
-   *
+   * 
    * @return true if an nlp element otherwise false
    */
   boolean isNlpElement();
 
   /**
    * Retrieves the nlp element.
-   *
+   * 
    * @return the nlp element or if non null.
    */
   INlpElement getNlpElement();
 
   /**
    * Retrieves the resource belonging to this delta.
-   *
+   * 
    * @return the resource
    */
   IResource getResource();
 
   /**
    * Retrieves the kind.
-   *
+   * 
    * @return the kind
    */
   Kind getKind();
 
   /**
    * Retrieves the flags.
-   *
+   * 
    * @return the flags
    */
   int getFlags();
 
   /**
    * Retrieves the moved to path.
-   *
+   * 
    * @return
    */
   IPath getMovedToPath();
 
   /**
    * Retrieves the moved from path.
+   * 
    * @return
    */
   IPath getMovedFromPath();

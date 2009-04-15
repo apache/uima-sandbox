@@ -39,8 +39,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * The <code>DotCorpus</code> is responsible to load/store the project dependent configuration.
- * It has several methods to set and retrieve configuration parameters.
+ * The <code>DotCorpus</code> is responsible to load/store the project dependent configuration. It
+ * has several methods to set and retrieve configuration parameters.
  */
 public class DotCorpusElement extends AbstractNlpElement {
   private DotCorpus mDotCorpus;
@@ -52,7 +52,7 @@ public class DotCorpusElement extends AbstractNlpElement {
   /**
    * The creation of the DotCorpus class is controlled by the factory method
    * <code>createDefaultDotCorpus(...)</code>.
-   *
+   * 
    * @param resource
    *          internal use only
    * @param nlpProject
@@ -66,7 +66,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Retrieves the name of the type system file.
-   *
+   * 
    * @return - type system file name or null if no set
    */
   public IFile getTypeSystemFile() {
@@ -83,7 +83,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Returns true if the given file is the type system file.
-   *
+   * 
    * @param file
    * @return true if type system file otherwise false
    */
@@ -93,8 +93,8 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Sets the type system file name.
-   *
-   * @param filename -
+   * 
+   * @param filename
    *          type system file name
    */
   public void setTypeSystemFilename(String filename) {
@@ -103,7 +103,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Retrieves the corpus folder names.
-   *
+   * 
    * @return - corpus folder names
    */
   public Collection<IFolder> getCorpusFolderNameList() {
@@ -118,7 +118,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Adds a corpus folder.
-   *
+   * 
    * @param name
    *          the corpus folder.
    */
@@ -128,7 +128,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Removes the given corpus folder;
-   *
+   * 
    * @param folder
    */
   public void removeCorpusFolder(IFolder folder) {
@@ -137,7 +137,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Returns true if the given folder is a corpus folder.
-   *
+   * 
    * @param folder
    * @return - true if corpus folder otherwise false
    */
@@ -156,7 +156,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Retrieves the annotation styles.
-   *
+   * 
    * @return - the annotation styles
    */
   Collection<AnnotationStyle> getAnnotationStyles() {
@@ -165,7 +165,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Adds an AnnotationStyle. TODO: move style stuff to nlp project
-   *
+   * 
    * @param style
    */
   public void setStyle(AnnotationStyle style) {
@@ -174,7 +174,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Removes an AnnotationStyle for the given name, does nothing if not existent.
-   *
+   * 
    * @param name
    */
   public void removeStyle(String name) {
@@ -183,7 +183,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Retrieves the AnnotationStyle for the given type or null if not available.
-   *
+   * 
    * @param type
    * @return the requested style or null if none
    */
@@ -193,11 +193,10 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Retrieves the config folder name.
-   *
+   * 
    * @return - config folder name
    */
   public Collection<IFolder> getCasProcessorFolders() {
-
 
     Collection<IFolder> casProcessorFolders = new LinkedList<IFolder>();
 
@@ -223,7 +222,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Returns true if the given folder is a uima config folder.
-   *
+   * 
    * @param folder
    * @return true if is config folder
    */
@@ -233,8 +232,8 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Sets the config folder name
-   *
-   * @param name -
+   * 
+   * @param name
    *          the new name
    */
   public void removeCasProcessorFolder(String name) {
@@ -255,7 +254,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Retrieves the line length hint of the editor.
-   *
+   * 
    * @return line length hint of the current editor, 0 means disabled
    */
   public int getEditorLineLengthHint() {
@@ -264,8 +263,8 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Sets the line length hint of the current editor.
-   *
-   * @param lineLengthHint -
+   * 
+   * @param lineLengthHint
    *          line length hint of the current editor, 0 means disabled
    */
   public void setEditorLineLengthHint(int lineLengthHint) {
@@ -274,7 +273,7 @@ public class DotCorpusElement extends AbstractNlpElement {
 
   /**
    * Serializes the <code>DotCorpus</code> instance to the given <code>IFile</code>.
-   *
+   * 
    * @throws CoreException
    */
   public void serialize() throws CoreException {
@@ -299,15 +298,14 @@ public class DotCorpusElement extends AbstractNlpElement {
 
     if (this == object) {
       result = true;
-    }
-    else if (object instanceof DotCorpusElement) {
+    } else if (object instanceof DotCorpusElement) {
 
       DotCorpusElement element = (DotCorpusElement) object;
 
-      result = mDotCorpus.equals(element.mDotCorpus) && mResource.equals(element.mResource)
-              && mNlpProject.equals(element.mNlpProject);
-    }
-    else {
+      result =
+              mDotCorpus.equals(element.mDotCorpus) && mResource.equals(element.mResource)
+                      && mNlpProject.equals(element.mNlpProject);
+    } else {
       result = false;
     }
 
@@ -318,7 +316,7 @@ public class DotCorpusElement extends AbstractNlpElement {
    * Creates a new <code>DotCorpus</code> object from an <code>IFile</code> object. If creation
    * fails, the default dotCorpus is returned and if possible markers are added to the invalid
    * .corpus resource.
-   *
+   * 
    * @param file
    * @param project
    * @return - the new <code>DotCorpus</code> instance.
