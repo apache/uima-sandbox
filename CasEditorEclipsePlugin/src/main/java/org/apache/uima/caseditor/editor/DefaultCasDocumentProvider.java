@@ -18,7 +18,7 @@ public class DefaultCasDocumentProvider
 	@Override
 	protected IDocument createDocument(Object element) throws CoreException {
 		if (element instanceof FileEditorInput) {
-      FileEditorInput fileInput = (FileEditorInput) element;
+			FileEditorInput fileInput = (FileEditorInput) element;
 
 			IFile file = fileInput.getFile();
 
@@ -31,8 +31,6 @@ public class DefaultCasDocumentProvider
 						((DocumentElement) nlpElement).getDocument(true);
 
 					AnnotationDocument document = new AnnotationDocument();
-					// TODO: fix it
-					// document.setProject(nlpElement.getNlpProject());
 
 					document.setDocument(workingCopy);
 					return document;
@@ -65,6 +63,35 @@ public class DefaultCasDocumentProvider
 	@Override
 	protected void doSaveDocument(IProgressMonitor monitor, Object element,
 			IDocument document, boolean overwrite) throws CoreException {
+		
+		fireElementStateChanging(element);
+
+		
+		if (element instanceof FileEditorInput) {
+			FileEditorInput fileInput = (FileEditorInput) element;
+
+			IFile file = fileInput.getFile();
+
+			INlpElement nlpElement = org.apache.uima.caseditor.CasEditorPlugin.getNlpModel().findMember(file);
+		
+			if (nlpElement instanceof DocumentElement) {
+				DocumentElement documentElement = (DocumentElement) nlpElement;
+				
+				try {
+					documentElement.saveDocument();
+				}
+				catch (CoreException e) {
+					fireElementStateChangeFailed(element);
+					throw e;
+				}
+			}
+			else {
+				fireElementStateChangeFailed(element);
+				return;
+			}
+		}
+		
+		fireElementDirtyStateChanged(element, false);
 	}
 	
 	private INlpElement getNlpElement(Object element) {

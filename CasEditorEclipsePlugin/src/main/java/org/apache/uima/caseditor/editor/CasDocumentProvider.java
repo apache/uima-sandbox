@@ -74,6 +74,7 @@ public abstract class CasDocumentProvider extends AbstractDocumentProvider {
 				mDocument = null;
 			}
 
+			@SuppressWarnings("unchecked")
 			public Iterator<EclipseAnnotationPeer> getAnnotationIterator() {
 				return new Iterator<EclipseAnnotationPeer>() {
 					private Iterator<AnnotationFS> mAnnotations =
