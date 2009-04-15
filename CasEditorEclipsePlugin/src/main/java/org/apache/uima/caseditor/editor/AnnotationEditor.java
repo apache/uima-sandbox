@@ -79,9 +79,13 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.IStatusField;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.IWorkbenchActionDefinitionIds;
@@ -442,12 +446,13 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    * Creates an new AnnotationEditor object.
    */
   public AnnotationEditor() {
-	CasDocumentProvider provider = 
+	CasDocumentProvider provider =
 			CasDocumentProviderFactory.instance().getDocumentProvider();
 	
     setDocumentProvider(provider);
   }
   
+  @Override
   public CasDocumentProvider getDocumentProvider() {
 	  return (CasDocumentProvider) super.getDocumentProvider();
   }
@@ -574,7 +579,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 		          // get and set editor annotation status must
 		          // be added to document provider
 		          
-		          EditorAnnotationStatus status = 
+		          EditorAnnotationStatus status =
 		        	  	getDocumentProvider().getEditorAnnotationStatus(getEditorInput());
 
 		          getDocumentProvider().setEditorAnnotationStatus(getEditorInput(),
@@ -732,7 +737,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   /**
    * Synchronizes all annotations which the eclipse annotation painter.
    */
-  private void syncAnnotations() {
+  public void syncAnnotations() {
 
     mPainter.removeAllAnnotationTypes();
 
@@ -746,7 +751,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     mPainter.paint(IPainter.CONFIGURATION);
   }
-
+  
   /**
    * @param listener
    */
@@ -951,5 +956,29 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
   void setAnnotationSelection(AnnotationFS annotation) {
     mFeatureStructureSelectionProvider.setSelection(getDocument(), annotation);
+  }
+  
+  /**
+   * Creates a list of all {@link AnnotationEditor} which are currently opened.
+   */
+  public static AnnotationEditor[] getAnnotationEditors() {
+
+    ArrayList<AnnotationEditor> dirtyParts = new ArrayList<AnnotationEditor>();
+    IWorkbenchWindow windows[] = PlatformUI.getWorkbench().getWorkbenchWindows();
+    for (IWorkbenchWindow element : windows) {
+      IWorkbenchPage pages[] = element.getPages();
+      for (IWorkbenchPage page : pages) {
+        IEditorPart[] parts = page.getEditors();
+
+        for (IEditorPart part : parts) {
+          if (part instanceof AnnotationEditor) {
+            AnnotationEditor editor = (AnnotationEditor) part;
+            dirtyParts.add(editor);
+          }
+        }
+      }
+    }
+
+    return dirtyParts.toArray(new AnnotationEditor[dirtyParts.size()]);
   }
 }

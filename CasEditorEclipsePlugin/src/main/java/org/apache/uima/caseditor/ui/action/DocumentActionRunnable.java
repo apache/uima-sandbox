@@ -20,7 +20,6 @@
 package org.apache.uima.caseditor.ui.action;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,10 +33,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * This class can be reused by ui actions which want to modify documents.
@@ -57,29 +52,7 @@ abstract class DocumentActionRunnable implements IRunnableWithProgress {
     this.documents = documents;
   }
 
-  /**
-   * Creates a list of all {@link AnnotationEditor} which are currently opened.
-   */
-  protected AnnotationEditor[] getAnnotationEditors() {
 
-    ArrayList<AnnotationEditor> dirtyParts = new ArrayList<AnnotationEditor>();
-    IWorkbenchWindow windows[] = PlatformUI.getWorkbench().getWorkbenchWindows();
-    for (IWorkbenchWindow element : windows) {
-      IWorkbenchPage pages[] = element.getPages();
-      for (IWorkbenchPage page : pages) {
-        IEditorPart[] parts = page.getEditors();
-
-        for (IEditorPart part : parts) {
-          if (part instanceof AnnotationEditor) {
-            AnnotationEditor editor = (AnnotationEditor) part;
-            dirtyParts.add(editor);
-          }
-        }
-      }
-    }
-
-    return dirtyParts.toArray(new AnnotationEditor[dirtyParts.size()]);
-  }
 
   /**
    * This method is called before the processing of the documents is started.
@@ -126,7 +99,7 @@ abstract class DocumentActionRunnable implements IRunnableWithProgress {
     // do this kind of document element mapping
     Map<DocumentElement, AnnotationEditor> editorMap = new HashMap<DocumentElement, AnnotationEditor>();
 
-    for (AnnotationEditor annotationEditor : getAnnotationEditors()) {
+    for (AnnotationEditor annotationEditor : AnnotationEditor.getAnnotationEditors()) {
     	// TODO: fix it
       // editorMap.put(annotationEditor.getDocument().getDocumentElement(), annotationEditor);
     }

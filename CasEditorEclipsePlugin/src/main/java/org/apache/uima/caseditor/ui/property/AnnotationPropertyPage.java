@@ -29,6 +29,7 @@ import org.apache.uima.caseditor.core.model.DotCorpusElement;
 import org.apache.uima.caseditor.core.model.INlpElement;
 import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.core.model.TypesystemElement;
+import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.apache.uima.caseditor.editor.AnnotationStyle;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -333,7 +334,12 @@ public class AnnotationPropertyPage extends PropertyPage {
       CasEditorPlugin.log(e);
       return false;
     }
-
+     
+    // Repaint annotations of all open editors
+    for (AnnotationEditor editor : AnnotationEditor.getAnnotationEditors()) {
+      editor.syncAnnotations();
+    }
+    
     return true;
   }
 }
