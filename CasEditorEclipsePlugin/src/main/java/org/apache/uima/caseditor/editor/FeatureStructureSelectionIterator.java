@@ -32,7 +32,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
  */
 public class FeatureStructureSelectionIterator implements Iterator<FeatureStructure> {
 
-  private Iterator mSelectionIterator;
+  private Iterator<?> mSelectionIterator;
 
   private FeatureStructure mNext;
 

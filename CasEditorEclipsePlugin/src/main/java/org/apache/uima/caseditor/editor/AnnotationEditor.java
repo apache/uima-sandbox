@@ -459,6 +459,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    * @return an adapter or null
    */
   @Override
+  @SuppressWarnings("unchecked")
   public Object getAdapter(Class adapter) {
 
 
