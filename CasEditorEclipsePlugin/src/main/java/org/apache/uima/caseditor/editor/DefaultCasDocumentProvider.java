@@ -33,6 +33,9 @@ public class DefaultCasDocumentProvider
 					AnnotationDocument document = new AnnotationDocument();
 
 					document.setDocument(workingCopy);
+					
+					elementErrorStatus.remove(element);
+					
 					return document;
 				}
 				catch (CoreException e) {
