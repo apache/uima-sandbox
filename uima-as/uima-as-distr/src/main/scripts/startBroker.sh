@@ -44,4 +44,8 @@ if [ ! -f "$ACTIVEMQ_BASE/conf/activemq-nojournal.xml" ] ; then
   cp "$UIMA_HOME/config/log4j.properties" "$ACTIVEMQ_BASE/conf/"
 fi
 
+if [ ! -x "$ACTIVEMQ_HOME/bin/activemq" ]; then
+    chmod +x "$ACTIVEMQ_HOME/bin/activemq"
+fi
+
 "$ACTIVEMQ_HOME/bin/activemq" "xbean:file:$ACTIVEMQ_BASE/conf/activemq-nojournal.xml"
