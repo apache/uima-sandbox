@@ -25,7 +25,7 @@
   <artifactId>uimaj-as-osgi-runtime</artifactId>
   <packaging>bundle</packaging>
   <!-- version omitted - inherited from parent-->
-  <name>Apache UIMA AS Runtime Fragment</name>
+  <name>Apache UIMA AS OSGI Runtime Fragment</name>
   <url>http://incubator.apache.org/uima</url>
   <licenses>
     <license>
