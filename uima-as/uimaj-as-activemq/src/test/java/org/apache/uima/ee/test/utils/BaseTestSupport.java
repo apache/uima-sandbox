@@ -80,6 +80,15 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
 	{
+	  String defaultBrokerURL = System.getProperty("BrokerURL");
+	  if (  defaultBrokerURL != null ) {
+	      System.out.println(">>> Setting defaultBrokerURL to:"+defaultBrokerURL);
+	      System.setProperty("defaultBrokerURL", defaultBrokerURL);
+    } else {
+	      System.setProperty("defaultBrokerURL", "tcp://localhost:8118");
+	  }
+	  
+	  
 		Map<String, Object> appCtx = new HashMap();
 		appCtx.put(UimaAsynchronousEngine.DD2SpringXsltFilePath, "../uima-as-distr/src/main/scripts/dd2spring.xsl".replace('/', FS));
 		appCtx.put(UimaAsynchronousEngine.SaxonClasspath, "file:../uima-as-distr/src/main/saxon/saxon8.jar".replace('/', FS)); 
