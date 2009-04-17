@@ -145,6 +145,13 @@ under the License.
       </includes>
     </fileSet>     
     <fileSet>
+      <directory>../uimaj-as-osgi-runtime</directory>
+      <outputDirectory>uimaj-as-osgi-runtime</outputDirectory>
+      <includes>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>../uimaj-as</directory>
       <outputDirectory>uimaj-as</outputDirectory>
       <includes>

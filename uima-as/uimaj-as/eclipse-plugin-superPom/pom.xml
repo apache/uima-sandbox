@@ -110,5 +110,6 @@
   <modules>
     <module>../../uimaj-ep-deployeditor</module>
     <module>../../uimaj-ep-runtime-deployeditor</module>
+    <module>../../uimaj-as-osgi-runtime</module>    
   </modules>
 </project>

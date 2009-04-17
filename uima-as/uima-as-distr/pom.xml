@@ -152,6 +152,12 @@
       <version>${uimaj-as-release-eclipse-version}</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-as-osgi-runtime</artifactId>
+      <version>${uimaj-as-release-eclipse-version}</version>
+      <scope>compile</scope>
+    </dependency>
     
     <dependency>
       <groupId>org.apache.uima</groupId>

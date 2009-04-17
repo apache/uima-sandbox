@@ -195,6 +195,7 @@ under the License.
         <!-- uima-as plugins -->
         <include>org.apache.uima:uimaj-ep-deployeditor</include>
         <include>org.apache.uima:uimaj-ep-runtime-deployeditor</include>
+        <include>org.apache.uima:uimaj-as-osgi-runtime</include>
         
       </includes>
       <outputDirectory>eclipsePlugins</outputDirectory>
