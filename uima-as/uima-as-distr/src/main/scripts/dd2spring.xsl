@@ -126,8 +126,8 @@
     </xsl:for-each-group>
   </xsl:variable>
   
-  <xsl:variable name="topLevelInputQueueBroker" 
-    select="$ddd/u:analysisEngineDeploymentDescription/u:deployment/u:service/u:inputQueue/@brokerURL"/>
+  <!--xsl:variable name="topLevelInputQueueBroker" 
+    select="$ddd/u:analysisEngineDeploymentDescription/u:deployment/u:service/u:inputQueue/@brokerURL"/-->
        
   <!--============================================================-->       
   <!--=  Error Configuration Details are sharable                =-->       
@@ -1513,7 +1513,8 @@
       <xsl:choose>
         <xsl:when test="u:inputQueue">
           <xsl:if test="not(starts-with(u:inputQueue/@brokerURL, 'tcp://')) and 
-                        not(starts-with(u:inputQueue/@brokerURL, '${'))">
+                        not(starts-with(u:inputQueue/@brokerURL, '${')) and
+                        @brokerURL">
             <xsl:sequence select="f:msgWithLineNumber(
             'ERROR',
             'top level input Queue broker protocol must be tcp:// for a top level C++ component',
@@ -1603,12 +1604,18 @@
     </xsl:if>
     <xsl:choose>
       <xsl:when test="../../u:remoteAnalysisEngine">
-        <xsl:choose>
+        <xsl:choose>     
           <xsl:when test="not(@brokerURL)">
-            <xsl:sequence select="f:msgWithLineNumber(
+            <!-- no longer an error - see UIMA-1288 -->
+            <!--xsl:sequence select="f:msgWithLineNumber(
                'ERROR',
                'remote input Queue broker protocol must be specified',
-               .)"/>
+               .)"/-->
+            <u:inputQueue brokerURL="{'${defaultBrokerURL}'}"
+                           endpoint="{if (@endpoint) then @endpoint
+                                                     else if (@queueName) then @queueName
+                                                                          else ''}"
+                           prefetch="{if (@prefetch) then @prefetch else '0'}"/>
           </xsl:when>
           <xsl:when test="starts-with(@brokerURL, 'vm://')">
             <xsl:sequence select="f:msgWithLineNumber(
@@ -1626,7 +1633,7 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <u:inputQueue brokerURL="{if (@brokerURL) then @brokerURL else 'vm://localhost'}"
+        <u:inputQueue brokerURL="{if (@brokerURL) then @brokerURL else '${defaultBrokerURL}'}"
                        endpoint="{if (@endpoint) then @endpoint
                                                  else if (@queueName) then @queueName
                                                                       else ''}"

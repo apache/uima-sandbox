@@ -90,6 +90,14 @@ public class Dd2SpringTest extends TestCase{
     
   }
 
+  public void testDd2Spring_Deploy_AggregateUsingRemoteTempQueueNoBroker() throws Exception {
+    checkDd2Spring("Deploy_AggregateUsingRemoteTempQueueNoBroker.xml");
+  }
+
+  public void testDd2Spring_defaultingAENoBroker() throws Exception {
+    checkDd2Spring("defaultingAENoBroker.xml");
+  }
+
   public void testDd2Spring_var1() throws Exception {
     checkDd2Spring("var1.xml");
   }
@@ -181,8 +189,7 @@ public class Dd2SpringTest extends TestCase{
   public void testDd2Spring_CPPwrongProtocol() throws Exception {   
     checkDd2SpringErrMsg(
         "envVar/envVarCPPwrongProtocol.xml",
-        "running test envVar/envVarCPPwrongProtocol.xml: \n *** ERROR: line-number: 28 top level input Queue broker protocol must be tcp:// for a top level C++ component" +
-                                                        "\n *** ERROR: line-number: 31 broker protocol of vm://localhost not supported");
+        "running test envVar/envVarCPPwrongProtocol.xml: \n *** ERROR: line-number: 31 broker protocol of vm://localhost not supported");
   }
 
 
