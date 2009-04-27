@@ -941,6 +941,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     // remove selection listener
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
 
+    getSite().getPage().removeSelectionListener(this);
+    
     ICasDocument document = getDocument();
 
     if (document != null) {

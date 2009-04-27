@@ -69,7 +69,7 @@ import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
  * This outline view displays all <code>AnnotationFS</code>s of the current
  * mode/type from the binded editor.
  */
-public final class AnnotationOutline extends ContentOutlinePage 
+public final class AnnotationOutline extends ContentOutlinePage
 		implements ISelectionListener {
   
   /**
@@ -273,7 +273,7 @@ public final class AnnotationOutline extends ContentOutlinePage
     
     Action action = new SwitchStyleAction(this);
     
-    IMenuManager dropDownMenu = actionBars.getMenuManager();    
+    IMenuManager dropDownMenu = actionBars.getMenuManager();
     dropDownMenu.add(action);
     
     super.setActionBars(actionBars);
@@ -353,7 +353,7 @@ public final class AnnotationOutline extends ContentOutlinePage
 				
 				if (shownTypes.contains(typeNode.getType()))
 					return true;
-				else 
+				else
 					return false;
 			}
 			else if (element instanceof AnnotationTreeNode) {
@@ -395,6 +395,11 @@ public final class AnnotationOutline extends ContentOutlinePage
 
   @Override
   public void dispose() {
+    
+    super.dispose();
+    
+    getSite().getPage().removeSelectionListener(this);
+    
     // remove selection listener
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
   }
