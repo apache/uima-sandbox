@@ -30,6 +30,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;
 import org.apache.uima.caseditor.editor.annotation.DrawingStyle;
 import org.apache.uima.caseditor.editor.annotation.EclipseAnnotationPeer;
@@ -43,6 +44,12 @@ import org.apache.uima.caseditor.editor.util.AnnotationComparator;
 import org.apache.uima.caseditor.editor.util.AnnotationSelection;
 import org.apache.uima.caseditor.editor.util.FeatureStructureTransfer;
 import org.apache.uima.caseditor.editor.util.Span;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -86,6 +93,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IStatusField;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.IWorkbenchActionDefinitionIds;
@@ -414,6 +422,51 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     }
   }
 
+  /**
+   * Listens for resource remove/delete event, if the input file for the
+   * editor is removed the editor will be closed.
+   */
+  private class CloseEditorListener implements IResourceChangeListener {
+
+    private AnnotationEditor editor;
+    
+    public CloseEditorListener(AnnotationEditor editor) {
+      this.editor = editor;
+    }
+    
+    public void resourceChanged(IResourceChangeEvent event) {
+      IResourceDelta delta = event.getDelta();
+      try {
+        IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
+          public boolean visit(IResourceDelta delta) throws CoreException {
+            if (delta.getFlags() != IResourceDelta.MARKERS
+                    && delta.getResource().getType() == IResource.FILE) {
+              if (delta.getKind() == IResourceDelta.REMOVED) {
+                IResource resource = delta.getResource();
+
+                IEditorInput input = editor.getEditorInput();
+
+                if (input instanceof FileEditorInput) {
+                  FileEditorInput fileInput = (FileEditorInput) input;
+
+                  if (resource.equals(fileInput.getFile())) {
+                    editor.close(false);
+                  }
+                }
+              }
+            }
+
+            return true;
+          }
+        };
+
+        delta.accept(visitor);
+      } catch (CoreException e) {
+        CasEditorPlugin.log(e);
+      }
+    }
+  }
+  
   private Type mAnnotationMode;
 
   /**
@@ -442,6 +495,8 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
   private DocumentListener mAnnotationSynchronizer;
 
+  private CloseEditorListener closeEditorListener;
+  
   /**
    * Creates an new AnnotationEditor object.
    */
@@ -620,6 +675,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     mDocument = (AnnotationDocument) getDocumentProvider().getDocument(input);
 
     if (mDocument != null) {
+      
+      closeEditorListener = new CloseEditorListener(this);
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(
+              closeEditorListener, IResourceChangeEvent.POST_CHANGE);
+      
     	// mAnnotationModel = getDocumentProvider().getAnnotationModel(input);
 
       mAnnotationSynchronizer = new DocumentListener();
@@ -947,6 +1007,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     if (document != null) {
       document.removeChangeListener(mAnnotationSynchronizer);
+    }
+    
+    if (closeEditorListener != null) {
+      ResourcesPlugin.getWorkspace()
+              .removeResourceChangeListener(closeEditorListener);
     }
     
     super.dispose();
