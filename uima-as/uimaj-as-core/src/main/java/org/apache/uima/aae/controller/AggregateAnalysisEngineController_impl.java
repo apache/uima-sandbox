@@ -132,7 +132,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	
 	public final Object parallelStepMux = new Object();
 	
-	
+	// prevents more than one thread to call collectionProcessComplete on the FC
+	private volatile boolean doSendCpcReply = false;
+
 	/**
 	 * 
 	 * @param anEndpointName
@@ -376,6 +378,19 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
 	}
 	/**
+	 * Change the CPC status for each delegate in the destination Map.
+	 */
+	private void resetEndpointsCpcStatus() {
+    Set set = destinationMap.entrySet();
+    for( Iterator it = set.iterator(); it.hasNext();) {
+      Map.Entry entry = (Map.Entry)it.next();
+      Endpoint endpoint = (Endpoint)entry.getValue();
+      if ( endpoint != null && endpoint.getStatus() == Endpoint.OK ) {
+        endpoint.setCompletedProcessingCollection(false);
+      }
+    }
+	}
+	/**
 	 * 
 	 * @return
 	 */
@@ -392,7 +407,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				return false;
 			}
 		}
-
+		//  All delegates replied to CPC, change the status of each delegate
+		//  to handle next CPC request.
+		resetEndpointsCpcStatus();
 		return true;
 	}
 	public Map getDelegateStats()
@@ -425,12 +442,24 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_recvd_cpc_reply__FINE", new Object[] { key });
       }
 			Endpoint cEndpoint = null;
-			if (sendReply && allDelegatesCompletedCollection() && (( cEndpoint = getClientEndpoint()) != null) )
-			{
-			  if ( flowControllerContainer != null  ) {
-			    flowControllerContainer.collectionProcessComplete();
+			// synchronized to prevent more than one thread to call collectionProcessComplete() on
+			// the Flow Controller. 
+			synchronized(flowControllerContainer) {
+			  if ( doSendCpcReply == false &&
+			          sendReply && 
+			          allDelegatesCompletedCollection() && 
+			          (( cEndpoint = getClientEndpoint()) != null) ) {
+			    doSendCpcReply = true;
+			    if ( flowControllerContainer != null  ) {
+			      flowControllerContainer.collectionProcessComplete();
+			    }
 			  }
-				sendCpcReply(cEndpoint);
+			}
+			// Reply to a client once for each CPC request. doSendCpcReply is volatile thus
+			// no need to synchronize it
+			if ( doSendCpcReply) {
+        sendCpcReply(cEndpoint);
+        doSendCpcReply = false; //reset for the next CPC
 			}
 		}
 		catch ( Exception e)
@@ -644,6 +673,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	}
 	
 	public void handleInitializationError(Exception ex) {
+	  ex.printStackTrace();
     // Any problems in completeInitialization() is a reason to stop
     notifyListenersWithInitializationStatus(ex);
     super.stop();
