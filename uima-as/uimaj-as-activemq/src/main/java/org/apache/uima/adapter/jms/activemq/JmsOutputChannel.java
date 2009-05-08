@@ -1424,7 +1424,7 @@ public class JmsOutputChannel implements OutputChannel
 	    } else {
 	      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
 	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-	                    "dispatch", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_reply_failed__FINE",
+	                    "dispatch", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_reply_failed__INFO",
 	                    new Object[] {getAnalysisEngineController().getComponentName(),endpointConnection.getServerUri(), endpointConnection.getEndpoint() });
 	      }
 	    }
