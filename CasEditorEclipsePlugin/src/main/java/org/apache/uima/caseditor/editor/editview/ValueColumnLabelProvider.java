@@ -20,16 +20,18 @@
 package org.apache.uima.caseditor.editor.editview;
 
 import org.apache.uima.cas.ArrayFS;
-import org.apache.uima.cas.CommonArrayFS;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.StringArrayFS;
 import org.apache.uima.caseditor.editor.ArrayValue;
 import org.apache.uima.caseditor.editor.CasEditorError;
 import org.apache.uima.caseditor.editor.FeatureValue;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 
+/**
+ * Provides the labels for the edit view.
+ */
 final class ValueColumnLabelProvider extends CellLabelProvider {
+  
   @Override
   public void update(ViewerCell cell) {
 
@@ -56,12 +58,7 @@ final class ValueColumnLabelProvider extends CellLabelProvider {
 
       ArrayValue value = (ArrayValue) element;
 
-      // if primitive array
-      if (value.getFeatureStructure() instanceof CommonArrayFS ||
-              value.getFeatureStructure() instanceof StringArrayFS) {
-        cell.setText(value.get().toString());
-      }
-      else if (value.getFeatureStructure() instanceof ArrayFS) {
+      if (value.getFeatureStructure() instanceof ArrayFS) {
         ArrayFS array = (ArrayFS) value.getFeatureStructure();
 
         FeatureStructure fs = array.get(value.slot());
@@ -74,7 +71,7 @@ final class ValueColumnLabelProvider extends CellLabelProvider {
         }
       }
       else {
-        throw new CasEditorError("Unexpected array type!");
+        cell.setText(value.get().toString());
       }
     }
     else {
