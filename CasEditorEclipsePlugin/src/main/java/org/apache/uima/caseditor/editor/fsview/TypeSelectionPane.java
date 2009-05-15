@@ -20,7 +20,6 @@
 package org.apache.uima.caseditor.editor.fsview;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.uima.cas.Type;
@@ -92,11 +91,7 @@ public final class TypeSelectionPane extends Composite {
 
     typeNameList.add(superType.getName());
 
-    // get a collection of all types
-    Iterator typeIterator = mTypeSystem.getProperlySubsumedTypes(superType).iterator();
-
-    while (typeIterator.hasNext()) {
-      Type type = (Type) typeIterator.next();
+    for (Type type : mTypeSystem.getProperlySubsumedTypes(superType)) {
 
       if (!filterTypes.contains(type)) {
         typeNameList.add(type.getName());

@@ -21,9 +21,7 @@ package org.apache.uima.caseditor.editor.fsview;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Vector;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
@@ -160,12 +158,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
       Type type = featureStructure.getType();
 
-      Vector featureTypes = type.getAppropriateFeatures();
-
-      Iterator featuresItertor = featureTypes.iterator();
-
-      while (featuresItertor.hasNext()) {
-        Feature feature = (Feature) featuresItertor.next();
+      for (Feature feature : type.getFeatures()) {
 
         if (Primitives.isPrimitive(feature)) {
           // create a new pair

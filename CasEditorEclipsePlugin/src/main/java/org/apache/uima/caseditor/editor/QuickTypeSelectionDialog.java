@@ -161,7 +161,6 @@ class QuickTypeSelectionDialog extends PopupDialog {
 	  typeShortcutMap.put(type, shortcut);
   }
 
-  @SuppressWarnings("unchecked")
   private Type[] getTypes() {
 
 	  TypeSystem typeSystem = editor.getDocument().getCAS().getTypeSystem();

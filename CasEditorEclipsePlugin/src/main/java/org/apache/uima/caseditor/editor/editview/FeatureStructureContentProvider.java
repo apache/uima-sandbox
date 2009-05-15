@@ -20,9 +20,7 @@
 package org.apache.uima.caseditor.editor.editview;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.uima.cas.ArrayFS;
 import org.apache.uima.cas.CommonArrayFS;
@@ -92,15 +90,10 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
       Type type = featureStructure.getType();
 
       if (!type.isArray()) {
-        List featureTypes = type.getFeatures();
 
         Collection<FeatureValue> featureValues = new LinkedList<FeatureValue>();
 
-        Iterator featuresItertor = featureTypes.iterator();
-
-        while (featuresItertor.hasNext()) {
-          Feature feature = (Feature) featuresItertor.next();
-
+        for (Feature feature : type.getFeatures()) {
           featureValues.add(new FeatureValue(mDocument, featureStructure, feature));
         }
 

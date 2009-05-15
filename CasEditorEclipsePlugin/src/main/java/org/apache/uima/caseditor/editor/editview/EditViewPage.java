@@ -419,7 +419,7 @@ final class EditViewPage extends Page implements ISelectionListener {
         Type fsSuperType = featureValue.getFeature().getRange();
 
         if (!fsSuperType.isArray()) {
-          List subTypes =
+          List<Type> subTypes =
               document.getCAS().getTypeSystem().getProperlySubsumedTypes(fsSuperType);
 
           Type typeToCreate;
