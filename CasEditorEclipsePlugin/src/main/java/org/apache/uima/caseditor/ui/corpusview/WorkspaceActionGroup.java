@@ -98,6 +98,7 @@ final class WorkspaceActionGroup extends ActionGroup
      * Fills the context menu with the actions.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void fillContextMenu(IMenuManager menu)
     {
         IStructuredSelection selection = CorpusExplorerUtil

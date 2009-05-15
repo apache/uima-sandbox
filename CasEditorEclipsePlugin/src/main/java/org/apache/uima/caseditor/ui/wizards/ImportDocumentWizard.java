@@ -58,11 +58,8 @@ public final class ImportDocumentWizard extends Wizard implements IImportWizard
 
     private IStructuredSelection mCurrentResourceSelection;
 
-    private IWorkbench mWorkbench = null;
-
     public void init(IWorkbench workbench, IStructuredSelection selection)
     {
-        mWorkbench = workbench;
         mCurrentResourceSelection = selection; // if corpus set as import corpus
 
         setWindowTitle("Import Documents");

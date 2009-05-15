@@ -33,7 +33,6 @@ import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.ArrayValue;
 import org.apache.uima.caseditor.editor.CasEditorError;
 import org.apache.uima.caseditor.editor.FeatureValue;
-import org.apache.uima.caseditor.editor.util.Primitives;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
@@ -217,7 +216,7 @@ final class FeatureStructureContentProvider extends AbstractDocumentListener
     if (element instanceof FeatureValue) {
       FeatureValue value = (FeatureValue) element;
 
-      if (Primitives.isPrimitive(value.getFeature())) {
+      if (value.getFeature().getRange().isPrimitive()) {
         return false;
       }
       else {

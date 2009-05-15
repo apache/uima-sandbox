@@ -23,7 +23,6 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.impl.FeatureStructureImpl;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.caseditor.editor.FeatureValue;
-import org.apache.uima.caseditor.editor.util.Primitives;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -42,7 +41,7 @@ public final class FeatureStructureLabelProvider implements ILabelProvider {
         return featureValue.getFeature().getShortName() + ": null";
       }
 
-      if (Primitives.isPrimitive(featureValue.getFeature())) {
+      if (featureValue.getFeature().getRange().isPrimitive()) {
         return featureValue.getFeature().getShortName() + " : " + value.toString();
       }
 

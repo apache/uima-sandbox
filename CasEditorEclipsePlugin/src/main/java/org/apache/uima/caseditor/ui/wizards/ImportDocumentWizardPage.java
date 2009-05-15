@@ -134,6 +134,7 @@ final class ImportDocumentWizardPage extends WizardPage {
       /**
        * Removes selected elements from the file table viewer.
        */
+      @SuppressWarnings("unchecked")
       public void widgetSelected(SelectionEvent e) {
         IStructuredSelection selection = (IStructuredSelection) fileTable.getSelection();
 

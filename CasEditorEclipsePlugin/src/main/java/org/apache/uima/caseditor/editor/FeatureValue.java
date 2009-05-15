@@ -32,8 +32,6 @@ public final class FeatureValue implements IAdaptable {
 
   private Feature mFeature;
 
-  private AnnotationDocument mDocument;
-
   /**
    * Initializes a new instance.
    *
@@ -42,8 +40,8 @@ public final class FeatureValue implements IAdaptable {
    */
   public FeatureValue(AnnotationDocument document, FeatureStructure structure, Feature feature) {
     Assert.isNotNull(document);
-    mDocument = document;
-
+    // TODO: Remove document parameter ? Not needed anymore!
+    
     Assert.isNotNull(feature);
     mFeature = feature;
 
@@ -56,7 +54,7 @@ public final class FeatureValue implements IAdaptable {
   }
 
   public Object getValue() {
-    if (Primitives.isPrimitive(mFeature)) {
+    if (mFeature.getRange().isPrimitive()) {
       return Primitives.getPrimitiv(mStructure, mFeature);
     }
 

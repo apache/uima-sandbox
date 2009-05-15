@@ -60,7 +60,7 @@ final class DocumentImportStructureProvider implements IImportStructureProvider 
   public DocumentImportStructureProvider() {
   }
 
-  public List getChildren(Object element) {
+  public List<Object> getChildren(Object element) {
     return null;
   }
 

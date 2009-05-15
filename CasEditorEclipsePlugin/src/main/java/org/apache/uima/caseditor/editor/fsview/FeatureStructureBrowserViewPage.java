@@ -37,7 +37,6 @@ import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.FeatureValue;
 import org.apache.uima.caseditor.editor.ModelFeatureStructure;
 import org.apache.uima.caseditor.editor.action.DeleteFeatureStructureAction;
-import org.apache.uima.caseditor.editor.util.Primitives;
 import org.apache.uima.caseditor.editor.util.StrictTypeConstraint;
 import org.apache.uima.jcas.cas.StringArray;
 import org.eclipse.core.runtime.IAdaptable;
@@ -160,7 +159,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
       for (Feature feature : type.getFeatures()) {
 
-        if (Primitives.isPrimitive(feature)) {
+        if (feature.getRange().isPrimitive()) {
           // create a new pair
           // feature and value
           // add string
@@ -186,7 +185,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
       } else if (element instanceof FeatureValue) {
         FeatureValue featureValue = (FeatureValue) element;
 
-        if (Primitives.isPrimitive(featureValue.getFeature())) {
+        if (featureValue.getFeature().getRange().isPrimitive()) {
           Object value = featureValue.getValue();
 
           if (value == null) {

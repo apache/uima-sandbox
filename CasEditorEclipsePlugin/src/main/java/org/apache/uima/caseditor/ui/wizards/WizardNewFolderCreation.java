@@ -35,14 +35,10 @@ final public class WizardNewFolderCreation extends Wizard implements INewWizard
 
 //    private WizardNewFolderCreationPage mMainPage;
 
-    private IStructuredSelection selection;
-
     /**
      * Initializes the <code>NLPProjectWizard</code>.
      */
-    public void init(IWorkbench workbench, IStructuredSelection selection)
-    {
-        this.selection = selection;
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
         setWindowTitle("New folder");
     }
 

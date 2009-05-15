@@ -20,6 +20,7 @@
 package org.apache.uima.caseditor.ui.property;
 
 import java.awt.Color;
+import java.util.List;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
@@ -87,8 +88,6 @@ public class AnnotationPropertyPage extends PropertyPage {
     IStructuredSelection selection = (IStructuredSelection) mTypeList.getSelection();
 
     Type selectedType = (Type) selection.getFirstElement();
-
-    TypeSystem typesystem = mProject.getTypesystemElement().getTypeSystem();
 
     AnnotationStyle style = mDotCorpusElement.getAnnotation(selectedType);
 
@@ -181,11 +180,11 @@ public class AnnotationPropertyPage extends PropertyPage {
 
     Type annotationType = typeSytstem.getType(CAS.TYPE_NAME_ANNOTATION);
 
-    java.util.List types = typeSytstem.getProperlySubsumedTypes(annotationType);
+    List<Type> types = typeSytstem.getProperlySubsumedTypes(annotationType);
 
-    for (Object typeObject : types) {
+    for (Type type : types) {
       // inserts objects with type Type
-      mTypeList.add(typeObject);
+      mTypeList.add(type);
     }
 
     mTypeList.addSelectionChangedListener(new ISelectionChangedListener() {

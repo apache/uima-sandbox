@@ -50,6 +50,7 @@ final class ConsumerCorpusActionGroup extends ActionGroup {
    * the given menu. The action appears only in the menu if a document or corpus is selected.
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void fillContextMenu(IMenuManager menu) {
     IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 

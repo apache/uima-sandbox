@@ -62,6 +62,7 @@ final class AnnotatorActionGroup extends ActionGroup {
    *          the context menu manager
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void fillContextMenu(IMenuManager menu) {
     IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 

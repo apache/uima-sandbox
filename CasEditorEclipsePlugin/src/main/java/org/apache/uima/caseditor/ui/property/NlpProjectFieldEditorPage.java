@@ -33,30 +33,23 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
  * TODO: add javadoc here
  */
 public abstract class NlpProjectFieldEditorPage extends FieldEditorPreferencePage
-        implements IWorkbenchPropertyPage
-{
-    private ImageDescriptor mImage;
-
+        implements IWorkbenchPropertyPage {
+  
     private IAdaptable mElement;
 
     private IPreferenceStore mPreferenceStore;
 
-    NlpProjectFieldEditorPage(int style)
-    {
+    NlpProjectFieldEditorPage(int style) {
         super(style);
     }
 
-    public NlpProjectFieldEditorPage(String title, int style)
-    {
+    public NlpProjectFieldEditorPage(String title, int style) {
           super(title, style);
     }
 
     public NlpProjectFieldEditorPage(String title, ImageDescriptor image,
-            int style)
-    {
+            int style) {
         super(title, image, style);
-
-        mImage = image;
     }
 
     /**
