@@ -93,15 +93,6 @@ public class AnnotationDocument extends Document implements ICasDocument {
 
   /**
    * Call is forwarded to the set document.
-   */
-  public void removeAnnotation() {
-    mDocument.removeAnnotation();
-
-    fireDocumentChanged();
-  }
-
-  /**
-   * Call is forwarded to the set document.
    *
    * @param annotation
    */

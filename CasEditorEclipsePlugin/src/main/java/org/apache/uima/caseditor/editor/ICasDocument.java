@@ -109,14 +109,6 @@ public interface ICasDocument {
   void removeAnnotations(Collection<AnnotationFS> annotationsToRemove);
 
   /**
-   * Remove all annotations.
-   *
-   * @deprecated
-   */
-  @Deprecated
-  void removeAnnotation();
-
-  /**
    * Updates the given {@link FeatureStructure}.
    *
    * @param structure
