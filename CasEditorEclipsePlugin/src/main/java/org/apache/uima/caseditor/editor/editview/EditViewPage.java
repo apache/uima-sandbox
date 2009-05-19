@@ -193,14 +193,14 @@ final class EditViewPage extends Page implements ISelectionListener {
             // no validator needed
           }
           else {
-            throw new CasEditorError("Unkown array type!");
+            throw new CasEditorError("Unkown array type: " + arrayFS.getClass().getName());
           }
         }
 
         return editor;
       }
       else {
-        throw new CasEditorError("Unknown element type!");
+        throw new CasEditorError("Unknown element type: " + element.getClass().getName());
       }
     }
 
