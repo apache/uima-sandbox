@@ -87,6 +87,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -95,6 +96,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IStatusField;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.IWorkbenchActionDefinitionIds;
 import org.eclipse.ui.texteditor.StatusTextEditor;
@@ -948,12 +950,17 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   }
 
   /**
-   * Creates custom annotation actions.
+   * Creates custom annotation actions:
+   * 
+   * Annotate Action
+   * Smart Annotate Action
+   * Delete Annotations Action
+   * Find Annotate Action
    */
   @Override
   protected void createActions() {
+    
     super.createActions();
-
 
     mFeatureStructureSelectionProvider = new FeatureStructureSelectionProvider();
     getSite().setSelectionProvider(mFeatureStructureSelectionProvider);
@@ -992,8 +999,12 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
             new ShowAnnotationContextEditAction();
 
     annotationContextEditAction.setActionDefinitionId(ITextEditorActionDefinitionIds.QUICK_ASSIST);
-
     setAction(ITextEditorActionDefinitionIds.QUICK_ASSIST, annotationContextEditAction);
+    
+    // create find annotate action
+    FindAnnotateAction findAnnotateAction = new FindAnnotateAction(this, getSourceViewer().getFindReplaceTarget());
+    findAnnotateAction.setActionDefinitionId(IWorkbenchActionDefinitionIds.FIND_REPLACE);
+    setAction(ITextEditorActionConstants.FIND, findAnnotateAction);
   }
 
   @Override
@@ -1035,9 +1046,12 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     for (IWorkbenchWindow element : windows) {
       IWorkbenchPage pages[] = element.getPages();
       for (IWorkbenchPage page : pages) {
-        IEditorPart[] parts = page.getEditors();
+        IEditorReference[] references = page.getEditorReferences();
 
-        for (IEditorPart part : parts) {
+        for (IEditorReference reference : references) {
+          
+          IEditorPart part = reference.getEditor(false);
+          
           if (part instanceof AnnotationEditor) {
             AnnotationEditor editor = (AnnotationEditor) part;
             dirtyParts.add(editor);

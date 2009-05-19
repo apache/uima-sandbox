@@ -24,7 +24,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.caseditor.editor.fsview.ITypePaneListener;
-import org.apache.uima.caseditor.editor.fsview.TypeSelectionPane;
+import org.apache.uima.caseditor.editor.fsview.TypeCombo;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IconAndMessageDialog;
 import org.eclipse.swt.SWT;
@@ -55,7 +55,7 @@ public class CreateFeatureStructureDialog extends IconAndMessageDialog {
 
   private boolean isArraySizeDisplayed;
 
-  private TypeSelectionPane typeSelection;
+  private TypeCombo typeSelection;
 
   private Type selectedType;
 
@@ -163,8 +163,17 @@ public class CreateFeatureStructureDialog extends IconAndMessageDialog {
     labelAndText.setLayoutData(labelAndTextData);
 
     if (!superType.isArray()) {
-
-      typeSelection = new TypeSelectionPane(labelAndText, superType, typeSystem, filterTypes);
+      
+      Composite typePanel = new Composite(labelAndText, SWT.NULL);
+      
+      GridLayout typePanelLayout = new GridLayout();
+      typePanelLayout.numColumns = 2;
+      typePanel.setLayout(typePanelLayout);
+      
+      Label typeLabel = new Label(typePanel, SWT.NONE);
+      typeLabel.setText("Type: ");
+      
+      typeSelection = new TypeCombo(typePanel, superType, typeSystem, filterTypes);
 
       selectedType = typeSelection.getType();
 
@@ -176,7 +185,7 @@ public class CreateFeatureStructureDialog extends IconAndMessageDialog {
 
       typeSelection.setLayoutData(typeSelectionData);
 
-      typeSelection.setListener(new ITypePaneListener() {
+      typeSelection.addListener(new ITypePaneListener() {
         public void typeChanged(Type newType) {
           selectedType = newType;
 

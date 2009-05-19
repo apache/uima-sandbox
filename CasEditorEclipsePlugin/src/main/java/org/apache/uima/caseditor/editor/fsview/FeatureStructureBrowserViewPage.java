@@ -53,6 +53,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.Page;
@@ -410,16 +411,33 @@ public final class FeatureStructureBrowserViewPage extends Page {
     layout.numColumns = 1;
 
     mInstanceComposite.setLayout(layout);
+    
+    Composite typePanel = new Composite(mInstanceComposite, SWT.NULL);
+    
+    GridData typePanelData = new GridData();
+    typePanelData.grabExcessHorizontalSpace = true;
+    typePanelData.grabExcessVerticalSpace = false;
+    typePanelData.horizontalAlignment = SWT.FILL;
+    typePanel.setLayoutData(typePanelData);
+    
+    GridLayout typePanelLayout = new GridLayout();
+    typePanelLayout.numColumns = 2;
+    typePanel.setLayout(typePanelLayout);
+    
+    Label typeLabel = new Label(typePanel, SWT.NONE);
+    typeLabel.setText("Type: ");
 
-    TypeSelectionPane mTypePane = new TypeSelectionPane(mInstanceComposite,
+    GridData typeLabelData = new GridData();
+    typeLabelData.horizontalAlignment = SWT.LEFT;
+    typeLabel.setLayoutData(typeLabelData);
+    
+    TypeCombo typeCombo = new TypeCombo(typePanel,
             mCAS.getTypeSystem().getType(CAS.TYPE_NAME_TOP),mCAS.getTypeSystem(), filterTypes);
-
-    GridData typePaneData = new GridData();
-    typePaneData.grabExcessHorizontalSpace = true;
-    typePaneData.grabExcessVerticalSpace = false;
-    typePaneData.horizontalAlignment = SWT.FILL;
-    mTypePane.setLayoutData(typePaneData);
-
+    GridData typeComboData = new GridData();
+    typeComboData.horizontalAlignment = SWT.FILL;
+    typeComboData.grabExcessHorizontalSpace = true;
+    typeCombo.setLayoutData(typeComboData);
+    
     mFSList = new ListViewer(mInstanceComposite, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
     GridData instanceListData = new GridData();
     instanceListData.grabExcessHorizontalSpace = true;
@@ -433,7 +451,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
     mFSList.setUseHashlookup(true);
 
-    mTypePane.setListener(new ITypePaneListener() {
+    typeCombo.addListener(new ITypePaneListener() {
       public void typeChanged(Type newType) {
         mCurrentType = newType;
 
