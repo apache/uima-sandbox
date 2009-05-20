@@ -84,16 +84,6 @@
 			verticalRulerPreferenceValue="false" includeOnPreferencePage="false" />
 	</extension>
 	
-	<extension point="org.eclipse.core.runtime.adapters">
-		<factory
-			adaptableType="org.apache.uima.caseditor.editor.ModelFeatureStructure"
-			class="org.apache.uima.caseditor.editor.PropertySourceAdapterFactory">
-
-			<adapter
-				type="org.eclipse.ui.views.properties.IPropertySource" />
-		</factory>
-	</extension>
-	
 	<extension point="org.eclipse.core.resources.natures"
 		id="NLPProject" name="NLP Nature">
 		<runtime>
@@ -163,9 +153,13 @@
 
   
 		<extension point="org.eclipse.ui.importWizards">
+		
+		<category name="NLP" id="org.apache.uima.caseditor.ui.wizards" />
+		
 		<wizard
+		category="org.apache.uima.caseditor.ui.wizards"
 		class="org.apache.uima.caseditor.ui.wizards.ImportDocumentWizard"
-		icon="icons/nlp.gif"
+		icon="icons/svgicons/document.png"
 		id="org.apache.uima.caseditor.ui.wizards.NewDocumentWizard"
 		name="Document">
 		<description>Create a Document</description>
@@ -255,11 +249,6 @@
 		</factory>
 	</extension>
 
-
-	<extension point="org.eclipse.ui.elementFactories">
-		<factory id="org.apache.uima.caseditor.FileEditorInputFactory"
-			class="org.apache.uima.caseditor.FileEditorInputFactory" />
-	</extension>
  <extension
        point="org.apache.uima.caseditor.editor">
     <provider
