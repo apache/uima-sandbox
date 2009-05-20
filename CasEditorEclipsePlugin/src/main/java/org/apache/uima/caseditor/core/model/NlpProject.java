@@ -28,6 +28,7 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.core.model.delta.INlpElementDelta;
+import org.apache.uima.caseditor.editor.AnnotationStyle;
 import org.apache.uima.caseditor.editor.EditorAnnotationStatus;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -61,7 +62,9 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   private Collection<CorpusElement> mCopora = new LinkedList<CorpusElement>();
 
   private Collection<CasProcessorFolder> mUimaSourceFolder = new LinkedList<CasProcessorFolder>();
-
+  
+  private boolean mDotCorpusMustBeSerialized;
+  
   private boolean mIsDotCorpusDirty;
 
   private EditorAnnotationStatus mEditorAnnotationStatus;
@@ -388,6 +391,25 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
     return false;
   }
 
+  private void updateAnnotationTypeColors() throws CoreException {
+    Collection<AnnotationStyle> styles = getDotCorpus().getAnnotationStyles();
+    
+    if (getTypesystemElement() != null) {
+      TypeSystem ts = getTypesystemElement().getTypeSystem();
+      if (ts != null) {
+        Collection<AnnotationStyle> newStyles = DefaultColors.assignColors(ts, styles);
+        
+        for (AnnotationStyle style : newStyles) {
+          getDotCorpus().setStyle(style);
+        }
+        
+        if (styles.size() != newStyles.size()) {
+          mDotCorpusMustBeSerialized = true;
+        }
+      }
+    }
+  }
+  
   /**
    * Adds a resource to the current project instance.
    */
@@ -427,6 +449,8 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       else if (mDotCorpusElement.getTypeSystemFile() != null
               && mDotCorpusElement.getTypeSystemFile().equals(resource)) {
         mTypesystem = new TypesystemElement((IFile) resource, this);
+        
+        updateAnnotationTypeColors();
       }
     } else if (resource instanceof IFolder) {
       // corpus
@@ -478,6 +502,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
       mTypesystem.changedResource(resource, delta);
 
       if (getTypesystemElement().getTypeSystem() != null) {
+        updateAnnotationTypeColors();
         mEditorAnnotationStatus = new EditorAnnotationStatus(CAS.TYPE_NAME_ANNOTATION, null);
       }
     }
@@ -489,15 +514,30 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
 
       mDotCorpusElement = null;
       loadDotCorpus();
-
+      
       mUimaSourceFolder.clear();
       mCopora.clear();
 
       mTypesystem = null;
 
       initialize();
-
+      
+      updateAnnotationTypeColors();
+      
       CasEditorPlugin.getNlpModel().fireRefreshEvent(this);
+    }
+    
+    if (mDotCorpusMustBeSerialized) {
+      Runnable writeDotCorpus = new Runnable() {
+        public void run() {
+          try {
+            getDotCorpus().serialize();
+          } catch (CoreException e) {
+            CasEditorPlugin.log(e);
+          }
+        }
+      };
+      CasEditorPlugin.getNlpModel().asyncExcuteQueue(writeDotCorpus);
     }
   }
 
