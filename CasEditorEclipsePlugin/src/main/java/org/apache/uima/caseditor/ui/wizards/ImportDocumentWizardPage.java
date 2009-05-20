@@ -53,7 +53,7 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * The main page of the ImportDocumentWizard.
+ * The main page of the <code>ImportDocumentWizard</code>.
  */
 final class ImportDocumentWizardPage extends WizardPage {
 
@@ -109,8 +109,8 @@ final class ImportDocumentWizardPage extends WizardPage {
         // open a file dialog
         FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.MULTI);
         fd.setText("Choose text files");
-        fd.setFilterExtensions(new String[] { "*.txt", "*.rtf" });
-
+        fd.setFilterExtensions(new String[] { "*.txt;*.rtf", "*.*"});
+        fd.setFilterNames(new String[] {"Text Files", "All Files (*)"});
         if (fd.open() != null) {
           for (String fileItem : fd.getFileNames()) {
             fileTable.add(new File(fd.getFilterPath() + File.separator + fileItem));
