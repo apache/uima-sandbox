@@ -44,6 +44,7 @@ public enum DrawingStyle {
   /**
    * The squiggles {@link IDrawingStrategy}.
    */
+  @SuppressWarnings("deprecation")
   SQUIGGLES(new org.eclipse.jface.text.source.AnnotationPainter.SquigglesStrategy()),
 
   /**
