@@ -68,7 +68,7 @@ final class AnnotatorActionGroup extends ActionGroup {
 
     LinkedList<DocumentElement> documentElements = new LinkedList<DocumentElement>();
 
-    if (!CorpusExplorerUtil.isContaingNLPProjectOrNonNLPResources(selection)) {
+    if (CorpusExplorerUtil.isContaingOnlyNlpElements(selection)) {
       Iterator resources = selection.iterator();
       while (resources.hasNext()) {
         Object resource = resources.next();

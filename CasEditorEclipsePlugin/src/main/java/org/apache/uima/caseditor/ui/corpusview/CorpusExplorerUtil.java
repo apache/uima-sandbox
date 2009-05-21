@@ -21,77 +21,60 @@ package org.apache.uima.caseditor.ui.corpusview;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.uima.caseditor.core.model.INlpElement;
-import org.apache.uima.caseditor.core.model.NlpProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 
-final class CorpusExplorerUtil
-{
-    /**
-     * Avoids instanciation of this utility class
-     */
-    private CorpusExplorerUtil()
-    {
-        // overridden to change access to private
+/**
+ * Utility class for the corpus explorer
+ */
+final class CorpusExplorerUtil {
+
+  /**
+   * Avoids instantiation of this utility class
+   */
+  private CorpusExplorerUtil() {
+    // overridden to change access to private
+  }
+
+  static IStructuredSelection convertNLPElementsToResources(IStructuredSelection selection) {
+
+    List<Object> newSelectionList = new LinkedList<Object>();
+
+    for (Iterator<?> elements = selection.iterator(); elements.hasNext();) {
+      Object element = elements.next();
+
+      if (element instanceof INlpElement) {
+        INlpElement nlpElement = (INlpElement) element;
+        newSelectionList.add(nlpElement.getResource());
+      } else {
+        newSelectionList.add(element);
+      }
     }
 
-	static IStructuredSelection convertNLPElementsToResources(
-			IStructuredSelection selection)
-	{
+    return new StructuredSelection(newSelectionList);
+  }
 
-		LinkedList<Object> newSelectionList = new LinkedList<Object>();
+  /**
+   * TODO: Replace this method, the name is very ugly.
+   * 
+   * @param selection
+   * @return true if NLPProject or NonNLPResource is included
+   */
+  static boolean isContaingOnlyNlpElements(IStructuredSelection selection) {
+    boolean isContaingOnlyNlpElements = true;
 
-        for (Iterator<?> elements = selection.iterator(); elements.hasNext();)
-        {
-			Object element = elements.next();
+    for (Iterator<?> resources = selection.iterator(); resources.hasNext()
+            && isContaingOnlyNlpElements;) {
+      Object resource = resources.next();
 
-			if (element instanceof INlpElement)
-			{
-				INlpElement nlpElement = (INlpElement) element;
-				newSelectionList.add(nlpElement.getResource());
-			}
-            else
-            {
-                newSelectionList.add(element);
-            }
-		}
-
-		return new StructuredSelection(newSelectionList);
-	}
-
-    /**
-     * TODO: Replace this method, the name is very ugly.
-     *
-     * @param selection
-     * @return true if NLPProject or NonNLPResource is included
-     *
-     * @deprecated
-     */
-    @Deprecated
-    static boolean isContaingNLPProjectOrNonNLPResources(
-            IStructuredSelection selection)
-    {
-        boolean isNLPProjectOrNonNLPResource = false;
-
-        for (Iterator<?> resources = selection.iterator() ;
-                resources.hasNext() && !isNLPProjectOrNonNLPResource;)
-        {
-            Object resource =  resources.next();
-
-            if (! (resource instanceof INlpElement))
-            {
-                isNLPProjectOrNonNLPResource = true;
-            }
-
-            // if nlp project return also
-            if ((resource instanceof NlpProject))
-            {
-                isNLPProjectOrNonNLPResource = true;
-            }
-        }
-
-        return isNLPProjectOrNonNLPResource;
+      if (!(resource instanceof INlpElement)) {
+        isContaingOnlyNlpElements = false;
+      }
     }
+
+    return isContaingOnlyNlpElements;
+  }
 }

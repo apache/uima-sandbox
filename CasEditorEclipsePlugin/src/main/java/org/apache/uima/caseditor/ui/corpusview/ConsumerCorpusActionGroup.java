@@ -54,7 +54,7 @@ final class ConsumerCorpusActionGroup extends ActionGroup {
   public void fillContextMenu(IMenuManager menu) {
     IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 
-    if (!CorpusExplorerUtil.isContaingNLPProjectOrNonNLPResources(selection)) {
+    if (CorpusExplorerUtil.isContaingOnlyNlpElements(selection)) {
       // TODO: add here also single documents
       LinkedList<CorpusElement> corpora = new LinkedList<CorpusElement>();
 

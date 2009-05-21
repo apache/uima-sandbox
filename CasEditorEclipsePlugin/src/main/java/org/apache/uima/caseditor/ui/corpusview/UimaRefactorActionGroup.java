@@ -52,8 +52,8 @@ public class UimaRefactorActionGroup extends ActionGroup {
 
     LinkedList<DocumentElement> documentElements = new LinkedList<DocumentElement>();
 
-    if (!CorpusExplorerUtil.isContaingNLPProjectOrNonNLPResources(selection)) {
-      Iterator resources = selection.iterator();
+    if (CorpusExplorerUtil.isContaingOnlyNlpElements(selection)) {
+      Iterator<?> resources = selection.iterator();
       while (resources.hasNext()) {
         Object resource = resources.next();
 
