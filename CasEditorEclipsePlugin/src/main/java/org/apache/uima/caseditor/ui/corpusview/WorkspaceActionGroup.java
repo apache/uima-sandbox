@@ -71,6 +71,7 @@ final class WorkspaceActionGroup extends ActionGroup
      * @param shell
      * @param window
      */
+    @SuppressWarnings("deprecation")
     WorkspaceActionGroup(Shell shell, IWorkbenchWindow window)
     {
         // open

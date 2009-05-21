@@ -89,7 +89,8 @@ final class RefactorGroup extends ActionGroup {
      * @param shell
      * @param window
      */
-  RefactorGroup(Shell shell, IWorkbenchWindow window) {
+    @SuppressWarnings("deprecation")
+    RefactorGroup(Shell shell, IWorkbenchWindow window) {
     mClipboard = new Clipboard(shell.getDisplay());
 
     // copy action
