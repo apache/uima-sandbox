@@ -23,9 +23,7 @@ package org.apache.uima.caseditor.core;
  * A general {@link RuntimeException} which is thrown if something unexpected happens.
  */
 public class TaeError extends RuntimeException {
-  /**
-   *
-   */
+
   private static final long serialVersionUID = 1L;
 
   /**

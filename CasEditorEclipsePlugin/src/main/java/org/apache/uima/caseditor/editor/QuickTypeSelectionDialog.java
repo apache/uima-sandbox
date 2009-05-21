@@ -61,8 +61,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 /**
- * This is a lightweight popup dialog which creates an annotation of the
- * chosen type.
+ * This is a lightweight popup dialog which creates an annotation of the chosen type.
  */
 class QuickTypeSelectionDialog extends PopupDialog {
 
@@ -76,14 +75,13 @@ class QuickTypeSelectionDialog extends PopupDialog {
 
   /**
    * Initializes the current instance.
-   *
+   * 
    * @param parent
    * @param editor
    */
   @SuppressWarnings("deprecation")
   QuickTypeSelectionDialog(Shell parent, AnnotationEditor editor) {
-    super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true,
-    			false, true, null, null);
+    super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true, false, true, null, null);
 
     this.editor = editor;
 
@@ -95,100 +93,100 @@ class QuickTypeSelectionDialog extends PopupDialog {
     Set<Character> shortcuts = new HashSet<Character>();
 
     for (int i = 0; i < shortcutsString.length(); i++) {
-    	shortcuts.add(shortcutsString.charAt(i));
+      shortcuts.add(shortcutsString.charAt(i));
     }
 
     List<Type> types = new ArrayList<Type>();
-   	Collections.addAll(types, getTypes());
-   	Collections.sort(types, new Comparator<Type>() {
-		public int compare(Type o1, Type o2) {
-			return o1.getName().compareTo(o2.getName());
-		}
-   	});
+    Collections.addAll(types, getTypes());
+    Collections.sort(types, new Comparator<Type>() {
+      public int compare(Type o1, Type o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+    });
 
-   	// Try to create mappings with first letter of the type name as shortcut
-   	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
+    // Try to create mappings with first letter of the type name as shortcut
+    for (Iterator<Type> it = types.iterator(); it.hasNext();) {
 
-   		Type type = it.next();
+      Type type = it.next();
 
-   		String name = type.getShortName();
+      String name = type.getShortName();
 
-   		Character candidateChar = Character.toLowerCase(name.charAt(0));
+      Character candidateChar = Character.toLowerCase(name.charAt(0));
 
-   		if (shortcuts.contains(candidateChar)) {
-   			putShortcut(candidateChar, type);
+      if (shortcuts.contains(candidateChar)) {
+        putShortcut(candidateChar, type);
 
-   			shortcuts.remove(candidateChar);
-   			it.remove();
-   		}
-   	}
+        shortcuts.remove(candidateChar);
+        it.remove();
+      }
+    }
 
-   	// Try to create mappings with second letter of the type name as shortcut
-   	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
+    // Try to create mappings with second letter of the type name as shortcut
+    for (Iterator<Type> it = types.iterator(); it.hasNext();) {
 
-   		Type type = it.next();
+      Type type = it.next();
 
-   		String name = type.getShortName();
+      String name = type.getShortName();
 
-   		if (name.length() > 2) {
-	   		Character candidateChar = Character.toLowerCase(name.charAt(1));
-	
-	   		if (shortcuts.contains(candidateChar)) {
-	   			putShortcut(candidateChar, type);
-	
-	   			shortcuts.remove(candidateChar);
-	   			it.remove();
-	   		}
-   		}
-   	}
-   	
-   	// Now assign letters to the remaining types
-   	for (Iterator<Type> it = types.iterator(); it.hasNext();) {
+      if (name.length() > 2) {
+        Character candidateChar = Character.toLowerCase(name.charAt(1));
 
-   		if (shortcuts.size() > 0) {
+        if (shortcuts.contains(candidateChar)) {
+          putShortcut(candidateChar, type);
 
-   			Character candidateChar = shortcuts.iterator().next();
+          shortcuts.remove(candidateChar);
+          it.remove();
+        }
+      }
+    }
 
-   			putShortcut(candidateChar, it.next());
+    // Now assign letters to the remaining types
+    for (Iterator<Type> it = types.iterator(); it.hasNext();) {
 
-   			shortcuts.remove(candidateChar);
-   			it.remove();
-   		}
-   	}
+      if (shortcuts.size() > 0) {
+
+        Character candidateChar = shortcuts.iterator().next();
+
+        putShortcut(candidateChar, it.next());
+
+        shortcuts.remove(candidateChar);
+        it.remove();
+      }
+    }
   }
 
   private void putShortcut(Character shortcut, Type type) {
-	  shortcutTypeMap.put(shortcut, type);
-	  typeShortcutMap.put(type, shortcut);
+    shortcutTypeMap.put(shortcut, type);
+    typeShortcutMap.put(type, shortcut);
   }
 
   private Type[] getTypes() {
 
-	  TypeSystem typeSystem = editor.getDocument().getCAS().getTypeSystem();
+    TypeSystem typeSystem = editor.getDocument().getCAS().getTypeSystem();
 
-      List<Type> types = typeSystem.getProperlySubsumedTypes(typeSystem
-              .getType(CAS.TYPE_NAME_ANNOTATION));
+    List<Type> types =
+            typeSystem.getProperlySubsumedTypes(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION));
 
-      return types.toArray(new Type[types.size()]);
+    return types.toArray(new Type[types.size()]);
   }
 
   private void annotateAndClose(Type annotationType) {
-		if (annotationType != null) {
-			Point textSelection = editor.getSelection();
+    if (annotationType != null) {
+      Point textSelection = editor.getSelection();
 
-			AnnotationFS annotation = editor.getDocument().getCAS()
-					.createAnnotation(annotationType, textSelection.x,
-							textSelection.y);
+      AnnotationFS annotation =
+              editor.getDocument().getCAS().createAnnotation(annotationType, textSelection.x,
+                      textSelection.y);
 
-			editor.getDocument().addFeatureStructure(annotation);
+      editor.getDocument().addFeatureStructure(annotation);
 
-			if (annotation.getType().equals(editor.getAnnotationMode())) {
-				editor.setAnnotationSelection(annotation);
-			}
-		}
+      if (annotation.getType().equals(editor.getAnnotationMode())) {
+        editor.setAnnotationSelection(annotation);
+      }
+    }
 
-		QuickTypeSelectionDialog.this.close();
-	}
+    QuickTypeSelectionDialog.this.close();
+  }
 
   @Override
   protected Control createDialogArea(Composite parent) {
@@ -206,8 +204,8 @@ class QuickTypeSelectionDialog extends PopupDialog {
     separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
     final TreeViewer typeTree = new TreeViewer(composite, SWT.SINGLE | SWT.V_SCROLL);
-    typeTree.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL |
-            GridData.FILL_VERTICAL));
+    typeTree.getControl().setLayoutData(
+            new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
     typeTree.getControl().setFocus();
 
@@ -221,7 +219,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
 
           if (tree.getItemCount() > 0) {
 
-        	  tree.setSelection(tree.getItem(0));
+            tree.setSelection(tree.getItem(0));
           }
         }
       }
@@ -246,7 +244,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
       }
 
       public Object[] getElements(Object inputElement) {
-    	  return (Type[]) inputElement;
+        return (Type[]) inputElement;
       }
 
       public void dispose() {
@@ -267,54 +265,53 @@ class QuickTypeSelectionDialog extends PopupDialog {
       }
     } });
 
+    typeTree.setLabelProvider(new ILabelProvider() {
 
-    typeTree.setLabelProvider(new ILabelProvider(){
+      public Image getImage(Object element) {
+        return null;
+      }
 
-		public Image getImage(Object element) {
-			return null;
-		}
+      public String getText(Object element) {
 
-		public String getText(Object element) {
+        Type type = (Type) element;
 
-			Type type = (Type) element;
+        Character key = typeShortcutMap.get(type);
 
-			Character key = typeShortcutMap.get(type);
+        if (typeShortcutMap != null) {
+          return "[" + key + "] " + type.getShortName();
+        } else {
+          return type.getShortName();
+        }
+      }
 
-			if (typeShortcutMap != null) {
-				return "[" + key +"] " + type.getShortName();
-			}
-			else {
-				return type.getShortName();
-			}
-		}
+      public void addListener(ILabelProviderListener listener) {
 
-		public void addListener(ILabelProviderListener listener) {
+      }
 
-		}
+      public void dispose() {
+      }
 
-		public void dispose() {
-		}
+      public boolean isLabelProperty(Object element, String property) {
+        return false;
+      }
 
-		public boolean isLabelProperty(Object element, String property) {
-			return false;
-		}
-
-		public void removeListener(ILabelProviderListener listener) {
-		}});
+      public void removeListener(ILabelProviderListener listener) {
+      }
+    });
 
     typeTree.getControl().addKeyListener(new KeyListener() {
 
-		public void keyPressed(KeyEvent e) {
-        	Type type = shortcutTypeMap.get(Character.toLowerCase(e.character));
+      public void keyPressed(KeyEvent e) {
+        Type type = shortcutTypeMap.get(Character.toLowerCase(e.character));
 
-        	if (type != null) {
-        		annotateAndClose(type);
-        	}
-		}
+        if (type != null) {
+          annotateAndClose(type);
+        }
+      }
 
-		public void keyReleased(KeyEvent e) {
-		}});
-
+      public void keyReleased(KeyEvent e) {
+      }
+    });
 
     typeTree.getControl().addMouseMoveListener(new MouseMoveListener() {
 
@@ -343,8 +340,7 @@ class QuickTypeSelectionDialog extends PopupDialog {
 
     typeTree.setInput(getTypes());
 
-    ISelection modeSelection = new StructuredSelection(new Object[] {
-    		editor.getAnnotationMode()});
+    ISelection modeSelection = new StructuredSelection(new Object[] { editor.getAnnotationMode() });
 
     typeTree.setSelection(modeSelection, true);
 

@@ -32,18 +32,18 @@ public class FindAnnotateAction extends Action {
 
   private AnnotationEditor editor;
   private IFindReplaceTarget target;
-  
+
   FindAnnotateAction(AnnotationEditor editor, IFindReplaceTarget target) {
     this.editor = editor;
     this.target = target;
   }
-  
+
   @Override
   public void run() {
     FindAnnotateDialog dialog = new FindAnnotateDialog(
             Display.getCurrent().getActiveShell(),
             editor.getDocument(), target);
-    
+
     dialog.open();
   }
 }

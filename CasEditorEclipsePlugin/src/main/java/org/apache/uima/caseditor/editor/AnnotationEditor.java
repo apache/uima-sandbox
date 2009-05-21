@@ -324,7 +324,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
             // Workaround: It is possible check that is text under the cursor ?
             try {
-            offset = textWidget.getOffsetAtLocation(new Point(e.x, e.y));
+              offset = textWidget.getOffsetAtLocation(new Point(e.x, e.y));
             }
             catch (IllegalArgumentException e2) {
               return;
@@ -382,7 +382,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
         // ask document provider for this
         // getAnnotation must be added to cas document provider
-        
+
         AnnotationStyle style = getDocumentProvider().getAnnotationStyle(getEditorInput(),
         		eclipseAnnotation.getAnnotationFS().getType());
 
@@ -431,11 +431,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   private class CloseEditorListener implements IResourceChangeListener {
 
     private AnnotationEditor editor;
-    
+
     public CloseEditorListener(AnnotationEditor editor) {
       this.editor = editor;
     }
-    
+
     public void resourceChanged(IResourceChangeEvent event) {
       IResourceDelta delta = event.getDelta();
       try {
@@ -468,7 +468,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       }
     }
   }
-  
+
   private Type mAnnotationMode;
 
   /**
@@ -498,22 +498,22 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   private DocumentListener mAnnotationSynchronizer;
 
   private CloseEditorListener closeEditorListener;
-  
+
   /**
    * Creates an new AnnotationEditor object.
    */
   public AnnotationEditor() {
 	CasDocumentProvider provider =
 			CasDocumentProviderFactory.instance().getDocumentProvider();
-	
+
     setDocumentProvider(provider);
   }
-  
+
   @Override
   public CasDocumentProvider getDocumentProvider() {
 	  return (CasDocumentProvider) super.getDocumentProvider();
   }
-  
+
   /**
    * Retrieves annotation editor adapters.
    *
@@ -622,36 +622,35 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     getSite().setSelectionProvider(mFeatureStructureSelectionProvider);
 
     if (getDocument() != null) {
-	    mShowAnnotationsMenu = new ShowAnnotationsMenu(
-	    		getDocumentProvider().getEditorAnnotationStatus(getEditorInput()),
-	    		getDocument().getCAS().getTypeSystem());
-	    mShowAnnotationsMenu.addListener(new IShowAnnotationsListener() {
+      mShowAnnotationsMenu = new ShowAnnotationsMenu(
+              getDocumentProvider().getEditorAnnotationStatus(getEditorInput()),
+              getDocument().getCAS().getTypeSystem());
+      mShowAnnotationsMenu.addListener(new IShowAnnotationsListener() {
 
-			public void selectionChanged(Collection<Type> selection) {
-		          // TODO: only synchronize annotation which
-		          // must be removed/added
-		          syncAnnotations();
-		          
-		          // TODO:
-		          // get and set editor annotation status must
-		          // be added to document provider
-		          
-		          EditorAnnotationStatus status =
-		        	  	getDocumentProvider().getEditorAnnotationStatus(getEditorInput());
+        public void selectionChanged(Collection<Type> selection) {
+          // TODO: only synchronize annotation which
+          // must be removed/added
+          syncAnnotations();
 
-		          getDocumentProvider().setEditorAnnotationStatus(getEditorInput(),
-		                  new EditorAnnotationStatus(status.getMode(), selection));
-		          
-		          if (mEditorListener != null)
-		        	  	mEditorListener.showAnnotationsChanged(selection);
-			}
-	    });
+          // TODO:
+          // get and set editor annotation status must
+          // be added to document provider
 
-	    EditorAnnotationStatus status =
-	    	getDocumentProvider().getEditorAnnotationStatus(getEditorInput());
+          EditorAnnotationStatus status =
+                  getDocumentProvider().getEditorAnnotationStatus(getEditorInput());
 
+          getDocumentProvider().setEditorAnnotationStatus(getEditorInput(),
+                  new EditorAnnotationStatus(status.getMode(), selection));
 
-	    setAnnotationMode(getDocument().getType(status.getMode()));
+          if (mEditorListener != null)
+            mEditorListener.showAnnotationsChanged(selection);
+        }
+      });
+
+      EditorAnnotationStatus status = getDocumentProvider()
+              .getEditorAnnotationStatus(getEditorInput());
+
+      setAnnotationMode(getDocument().getType(status.getMode()));
     }
   }
 
@@ -677,11 +676,11 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     mDocument = (AnnotationDocument) getDocumentProvider().getDocument(input);
 
     if (mDocument != null) {
-      
+
       closeEditorListener = new CloseEditorListener(this);
       ResourcesPlugin.getWorkspace().addResourceChangeListener(
               closeEditorListener, IResourceChangeEvent.POST_CHANGE);
-      
+
     	// mAnnotationModel = getDocumentProvider().getAnnotationModel(input);
 
       mAnnotationSynchronizer = new DocumentListener();
@@ -699,18 +698,17 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     // mode menu
     MenuManager modeMenuManager = new MenuManager("Mode");
     menu.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, modeMenuManager);
-    
+
     ModeMenu modeMenu = new ModeMenu(typeSytem);
     modeMenu.addListener(new IModeMenuListener(){
 
 		public void modeChanged(Type newMode) {
-	        IAction actionToExecute = new ChangeModeAction(newMode,
-	        		newMode.getShortName(),
-	                AnnotationEditor.this);
+	    IAction actionToExecute = new ChangeModeAction(newMode, newMode.getShortName(),
+	            AnnotationEditor.this);
 
-	        actionToExecute.run();
+      actionToExecute.run();
 		}});
-    
+
     modeMenuManager.add(modeMenu);
 
     // annotation menu
@@ -759,7 +757,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     // TODO: check if this type is a subtype of Annotation
 
     mAnnotationMode = type;
-    
+
     highlight(0, 0);
 
     setProjectEditorStatus();
@@ -769,14 +767,14 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     syncAnnotations();
 
     fireAnnotationTypeChanged(getAnnotationMode());
-    
+
     mShowAnnotationsMenu.setEditorAnnotationMode(type);
   }
 
   public Collection<Type> getShownAnnotationTypes() {
 	  return mShowAnnotationsMenu.getSelectedTypes();
   }
-  
+
   /**
    * @param type
    */
@@ -787,12 +785,12 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   }
 
   private void showAnnotationType(Type type) {
-		AnnotationStyle style = getDocumentProvider().getAnnotationStyle(getEditorInput(), type);
-		mPainter.addDrawingStrategy(type.getName(),
-				DrawingStyle.valueOf(style.getStyle().name()).getStrategy());
-		mPainter.addAnnotationType(type.getName(), type.getName());
+    AnnotationStyle style = getDocumentProvider().getAnnotationStyle(getEditorInput(), type);
+    mPainter.addDrawingStrategy(type.getName(),
+            DrawingStyle.valueOf(style.getStyle().name()).getStrategy());
+    mPainter.addAnnotationType(type.getName(), type.getName());
     java.awt.Color color = style.getColor();
-		mPainter.setAnnotationTypeColor(type.getName(), new Color(null, color.getRed(),
+    mPainter.setAnnotationTypeColor(type.getName(), new Color(null, color.getRed(),
             color.getGreen(), color.getBlue()));
   }
 
@@ -813,7 +811,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     mPainter.paint(IPainter.CONFIGURATION);
   }
-  
+
   /**
    * @param listener
    */
@@ -875,7 +873,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       Span selecectedSpan = new Span(selectedText.x, selectedText.y);
 
       Collection<AnnotationFS> selectedAnnotations = getDocument().getAnnotation(
-    		  getAnnotationMode(), selecectedSpan);
+              getAnnotationMode(), selecectedSpan);
 
       for (AnnotationFS annotation : selectedAnnotations) {
         selection.add(annotation);
@@ -945,13 +943,13 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     // TODO: do not replace if equal ... check this
     EditorAnnotationStatus status = new EditorAnnotationStatus(getAnnotationMode().getName(),
             mShowAnnotationsMenu.getSelectedTypes());
-    
+
     getDocumentProvider().setEditorAnnotationStatus(getEditorInput(), status);
   }
 
   /**
    * Creates custom annotation actions:
-   * 
+   *
    * Annotate Action
    * Smart Annotate Action
    * Delete Annotations Action
@@ -959,7 +957,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    */
   @Override
   protected void createActions() {
-    
+
     super.createActions();
 
     mFeatureStructureSelectionProvider = new FeatureStructureSelectionProvider();
@@ -1000,7 +998,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
 
     annotationContextEditAction.setActionDefinitionId(ITextEditorActionDefinitionIds.QUICK_ASSIST);
     setAction(ITextEditorActionDefinitionIds.QUICK_ASSIST, annotationContextEditAction);
-    
+
     // create find annotate action
     FindAnnotateAction findAnnotateAction = new FindAnnotateAction(this, getSourceViewer().getFindReplaceTarget());
     findAnnotateAction.setActionDefinitionId(IWorkbenchActionDefinitionIds.FIND_REPLACE);
@@ -1013,18 +1011,18 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
 
     getSite().getPage().removeSelectionListener(this);
-    
+
     ICasDocument document = getDocument();
 
     if (document != null) {
       document.removeChangeListener(mAnnotationSynchronizer);
     }
-    
+
     if (closeEditorListener != null) {
       ResourcesPlugin.getWorkspace()
               .removeResourceChangeListener(closeEditorListener);
     }
-    
+
     super.dispose();
   }
 
@@ -1035,7 +1033,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
   void setAnnotationSelection(AnnotationFS annotation) {
     mFeatureStructureSelectionProvider.setSelection(getDocument(), annotation);
   }
-  
+
   /**
    * Creates a list of all {@link AnnotationEditor} which are currently opened.
    */
@@ -1049,9 +1047,9 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
         IEditorReference[] references = page.getEditorReferences();
 
         for (IEditorReference reference : references) {
-          
+
           IEditorPart part = reference.getEditor(false);
-          
+
           if (part instanceof AnnotationEditor) {
             AnnotationEditor editor = (AnnotationEditor) part;
             dirtyParts.add(editor);

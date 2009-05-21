@@ -49,7 +49,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
   private ResourceBundle mResourceBundle;
 
   private static NlpModel sNLPModel;
-  
+
   /**
    * The constructor.
    */
@@ -134,7 +134,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
   public static void log(Throwable t) {
     getDefault().getLog().log(new Status(IStatus.ERROR, ID, IStatus.OK, t.getMessage(), t));
   }
-  
+
   public static void logError(String message) {
     getDefault().getLog().log(new Status(IStatus.ERROR, ID, message));
   }
@@ -166,7 +166,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
 
     return sNLPModel;
   }
-  
+
   /**
    * Destroy the nlp model, only for testing.
    */

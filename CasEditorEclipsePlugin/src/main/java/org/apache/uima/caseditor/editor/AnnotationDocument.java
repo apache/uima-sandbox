@@ -37,16 +37,16 @@ import org.eclipse.jface.text.DocumentEvent;
  * Note: Before an instance can be used the  document must be set.
  */
 public class AnnotationDocument extends Document implements ICasDocument {
-	
+
   private ICasDocument mDocument;
-  
+
   private int lineLengthHint = 80;
 
   public AnnotationDocument() {
   }
 
   public void setLineLengthHint(int lineLengthHint) {
-	  this.lineLengthHint = lineLengthHint;
+    this.lineLengthHint = lineLengthHint;
   }
 
   /**

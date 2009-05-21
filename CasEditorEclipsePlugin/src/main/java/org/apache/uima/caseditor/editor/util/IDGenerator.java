@@ -65,8 +65,8 @@ public class IDGenerator {
     }
 
     byte[] id = new byte[] { (byte) (sUniqueID >> 56), (byte) (sUniqueID >> 48),
-        (byte) (sUniqueID >> 40), (byte) (sUniqueID >> 32), (byte) (sUniqueID >> 24),
-        (byte) (sUniqueID >> 16), (byte) (sUniqueID >> 8), (byte) sUniqueID, };
+            (byte) (sUniqueID >> 40), (byte) (sUniqueID >> 32), (byte) (sUniqueID >> 24),
+            (byte) (sUniqueID >> 16), (byte) (sUniqueID >> 8), (byte) sUniqueID, };
 
     sUniqueID++;
     return id;

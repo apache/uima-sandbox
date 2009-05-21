@@ -49,19 +49,19 @@ public abstract class AnnotationEditorView extends PageBookView {
   }
 
   protected abstract PageRec doCreatePage(AnnotationEditor editor);
-  
+
   @Override
-	protected final PageRec doCreatePage(IWorkbenchPart part) {
-	  
-	    if (part instanceof AnnotationEditor) {
-	        AnnotationEditor editor = (AnnotationEditor) part;
-	        
-	        return doCreatePage(editor);
-	    }
-	    
-		return null;
-	}
-  
+  protected final PageRec doCreatePage(IWorkbenchPart part) {
+
+    if (part instanceof AnnotationEditor) {
+      AnnotationEditor editor = (AnnotationEditor) part;
+
+      return doCreatePage(editor);
+    }
+
+    return null;
+  }
+
   @Override
   protected IWorkbenchPart getBootstrapPart() {
     return getSite().getPage().getActiveEditor();

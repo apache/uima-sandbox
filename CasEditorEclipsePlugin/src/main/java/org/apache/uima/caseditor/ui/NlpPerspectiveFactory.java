@@ -36,65 +36,65 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class NlpPerspectiveFactory implements IPerspectiveFactory
 {
-    /**
-     * ID of the perspective factory. Use this ID for example in the plugin.xml
-     * file.
-     */
-    public static String ID = "Annotator.perspective.NLP";
+  /**
+   * ID of the perspective factory. Use this ID for example in the plugin.xml
+   * file.
+   */
+  public static String ID = "Annotator.perspective.NLP";
 
-    /**
-     * Define the initial layout of the nlp perspective
-     */
-    public void createInitialLayout(IPageLayout layout)
-    {
-        defineActions(layout);
-        defineLayout(layout);
-    }
+  /**
+   * Define the initial layout of the nlp perspective
+   */
+  public void createInitialLayout(IPageLayout layout)
+  {
+    defineActions(layout);
+    defineLayout(layout);
+  }
 
-    private void defineActions(IPageLayout layout)
-    {
-        // add "new wizards"
-        layout.addNewWizardShortcut(NewNlpProjectWizard.ID);
-//        layout.addNewWizardShortcut(NewCorpusWizard.ID);
-        layout.addNewWizardShortcut(WizardNewFolderCreation.ID);
-        layout.addNewWizardShortcut(WizardNewFileCreation.ID);
+  private void defineActions(IPageLayout layout)
+  {
+    // add "new wizards"
+    layout.addNewWizardShortcut(NewNlpProjectWizard.ID);
+    //        layout.addNewWizardShortcut(NewCorpusWizard.ID);
+    layout.addNewWizardShortcut(WizardNewFolderCreation.ID);
+    layout.addNewWizardShortcut(WizardNewFileCreation.ID);
 
-        // layout.addNewWizardShortcut("Annotator.NewDocumentWizard");
+    // layout.addNewWizardShortcut("Annotator.NewDocumentWizard");
 
-        // add "show views"
-        layout.addShowViewShortcut(CorpusExplorerView.ID);
-        layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
+    // add "show views"
+    layout.addShowViewShortcut(CorpusExplorerView.ID);
+    layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 
-        // add "open perspective"
-        layout.addPerspectiveShortcut(NlpPerspectiveFactory.ID);
-    }
+    // add "open perspective"
+    layout.addPerspectiveShortcut(NlpPerspectiveFactory.ID);
+  }
 
-    private void defineLayout(IPageLayout layout)
-    {
-        String editorArea = layout.getEditorArea();
+  private void defineLayout(IPageLayout layout)
+  {
+    String editorArea = layout.getEditorArea();
 
-        // left views
-        IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT,
-                0.19f, editorArea);
-        left.addView(CorpusExplorerView.ID);
+    // left views
+    IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT,
+            0.19f, editorArea);
+    left.addView(CorpusExplorerView.ID);
 
-        // right views
-        IFolderLayout right = layout.createFolder("right", IPageLayout.RIGHT,
-                0.70f, editorArea);
+    // right views
+    IFolderLayout right = layout.createFolder("right", IPageLayout.RIGHT,
+            0.70f, editorArea);
 
-        right.addView(IPageLayout.ID_OUTLINE);
-        right.addView(FeatureStructureBrowserView.ID);
-        right.addView("org.eclipse.pde.runtime.LogView");
+    right.addView(IPageLayout.ID_OUTLINE);
+    right.addView(FeatureStructureBrowserView.ID);
+    right.addView("org.eclipse.pde.runtime.LogView");
 
-        // bottom views
-        IFolderLayout rightBottom = layout.createFolder("rightBottom",
-                IPageLayout.BOTTOM, 0.75f, editorArea);
+    // bottom views
+    IFolderLayout rightBottom = layout.createFolder("rightBottom",
+            IPageLayout.BOTTOM, 0.75f, editorArea);
 
-        rightBottom.addView(EditView.ID);
+    rightBottom.addView(EditView.ID);
 
-        IFolderLayout leftBottom = layout.createFolder("leftBottom",
-                IPageLayout.RIGHT, 0.5f, EditView.ID);
+    IFolderLayout leftBottom = layout.createFolder("leftBottom",
+            IPageLayout.RIGHT, 0.5f, EditView.ID);
 
-        leftBottom.addView(EditView.ID_2);
-    }
+    leftBottom.addView(EditView.ID_2);
+  }
 }

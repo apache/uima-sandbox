@@ -33,7 +33,7 @@ import org.apache.uima.cas.Type;
  * as the previously opened editor. 
  */
 public class EditorAnnotationStatus {
-	
+
   private String mode;
 
   private Collection<String> displayAnnotations = new HashSet<String>();

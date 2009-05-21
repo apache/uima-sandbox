@@ -24,49 +24,49 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
 class CasDocumentProviderFactory {
-	
-	private static final String CAS_EDITOR_EXTENSION = "org.apache.uima.caseditor.editor";
-	
-	private static CasDocumentProviderFactory instance;
-	
-	private CasDocumentProvider documentProvider;
-	
-	CasDocumentProviderFactory() {
-		
-		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(CAS_EDITOR_EXTENSION);
-		
-		for (IConfigurationElement e : config) {
-			
-			if ("provider".equals(e.getName())) {
-			
-				Object o;
-				try {
-					o = e.createExecutableExtension("class");
-				} catch (CoreException e1) {
-					// TODO: Log error, extension point was not specified correctly !!!
-					e1.printStackTrace();
-					o = null;
-				}
-				
-				if (o instanceof CasDocumentProvider) {
-					documentProvider = (CasDocumentProvider) o;
-				}
-			}
-		}
-		
-	}
-	
-	CasDocumentProvider getDocumentProvider() {
-		return documentProvider;
-	}
-	
-	static CasDocumentProviderFactory instance() {
-		
-		if (instance == null) {
-			instance = new CasDocumentProviderFactory();
-		}
-		
-		return instance;
-	}
+
+  private static final String CAS_EDITOR_EXTENSION = "org.apache.uima.caseditor.editor";
+
+  private static CasDocumentProviderFactory instance;
+
+  private CasDocumentProvider documentProvider;
+
+  CasDocumentProviderFactory() {
+
+    IConfigurationElement[] config =
+            Platform.getExtensionRegistry().getConfigurationElementsFor(CAS_EDITOR_EXTENSION);
+
+    for (IConfigurationElement e : config) {
+
+      if ("provider".equals(e.getName())) {
+
+        Object o;
+        try {
+          o = e.createExecutableExtension("class");
+        } catch (CoreException e1) {
+          // TODO: Log error, extension point was not specified correctly !!!
+          e1.printStackTrace();
+          o = null;
+        }
+
+        if (o instanceof CasDocumentProvider) {
+          documentProvider = (CasDocumentProvider) o;
+        }
+      }
+    }
+
+  }
+
+  CasDocumentProvider getDocumentProvider() {
+    return documentProvider;
+  }
+
+  static CasDocumentProviderFactory instance() {
+
+    if (instance == null) {
+      instance = new CasDocumentProviderFactory();
+    }
+
+    return instance;
+  }
 }

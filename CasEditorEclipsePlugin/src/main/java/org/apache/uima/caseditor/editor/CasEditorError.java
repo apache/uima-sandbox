@@ -23,28 +23,28 @@ package org.apache.uima.caseditor.editor;
  * A general {@link RuntimeException} which is thrown if something unexpected happens.
  */
 public class CasEditorError extends RuntimeException {
-	
-	  /**
-	   *
-	   */
-	  private static final long serialVersionUID = 1L;
 
-	  /**
-	   * Initializes the current instance.
-	   *
-	   * @param message
-	   */
-	  public CasEditorError(String message) {
-	    super(message);
-	  }
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-	  /**
-	   * Initializes the current instance.
-	   *
-	   * @param message
-	   * @param cause
-	   */
-	  public CasEditorError(String message, Throwable cause) {
-	    super(message, cause);
-	  }
-	}
+  /**
+   * Initializes the current instance.
+   *
+   * @param message
+   */
+  public CasEditorError(String message) {
+    super(message);
+  }
+
+  /**
+   * Initializes the current instance.
+   *
+   * @param message
+   * @param cause
+   */
+  public CasEditorError(String message, Throwable cause) {
+    super(message, cause);
+  }
+}

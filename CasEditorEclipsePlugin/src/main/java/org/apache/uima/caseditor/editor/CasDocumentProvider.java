@@ -40,110 +40,108 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDocumentProvider;
 
 /**
- * Provides the {@link org.apache.uima.caseditor.editor.ICasDocument} for
- * the {@link AnnotationEditor}.
+ * Provides the {@link org.apache.uima.caseditor.editor.ICasDocument} for the
+ * {@link AnnotationEditor}.
  */
 public abstract class CasDocumentProvider extends AbstractDocumentProvider {
 
-	/**
-	 * The method {@link #createDocument(Object)} put error status
-	 * objects for the given element in this map, if something with document creation
-	 * goes wrong.
-	 *
-	 * The method {@link #getStatus(Object)} can then retrieve and return the status.
-	 */
-	protected Map<Object, IStatus> elementErrorStatus =
-			new HashMap<Object, IStatus>();
+  /**
+   * The method {@link #createDocument(Object)} put error status objects for the given element in
+   * this map, if something with document creation goes wrong.
+   * 
+   * The method {@link #getStatus(Object)} can then retrieve and return the status.
+   */
+  protected Map<Object, IStatus> elementErrorStatus = new HashMap<Object, IStatus>();
 
-	@Override
-	protected IAnnotationModel createAnnotationModel(Object element) throws CoreException {
-		return new IAnnotationModel() {
+  @Override
+  protected IAnnotationModel createAnnotationModel(Object element) throws CoreException {
+    return new IAnnotationModel() {
 
-			private org.apache.uima.caseditor.editor.ICasDocument mDocument;
+      private org.apache.uima.caseditor.editor.ICasDocument mDocument;
 
-			public void addAnnotation(Annotation annotation, Position position) {
-			}
+      public void addAnnotation(Annotation annotation, Position position) {
+      }
 
-			public void addAnnotationModelListener(IAnnotationModelListener listener) {
-			}
+      public void addAnnotationModelListener(IAnnotationModelListener listener) {
+      }
 
-			public void connect(IDocument document) {
-				mDocument = (org.apache.uima.caseditor.editor.ICasDocument) document;
-			}
+      public void connect(IDocument document) {
+        mDocument = (org.apache.uima.caseditor.editor.ICasDocument) document;
+      }
 
-			public void disconnect(IDocument document) {
-				mDocument = null;
-			}
+      public void disconnect(IDocument document) {
+        mDocument = null;
+      }
 
-			public Iterator<EclipseAnnotationPeer> getAnnotationIterator() {
-				return new Iterator<EclipseAnnotationPeer>() {
-					private Iterator<FeatureStructure> mAnnotations =
-						mDocument.getCAS().getAnnotationIndex().iterator();
+      public Iterator<EclipseAnnotationPeer> getAnnotationIterator() {
+        return new Iterator<EclipseAnnotationPeer>() {
+          private Iterator<FeatureStructure> mAnnotations =
+                  mDocument.getCAS().getAnnotationIndex().iterator();
 
-					public boolean hasNext() {
-						return mAnnotations.hasNext();
-					}
+          public boolean hasNext() {
+            return mAnnotations.hasNext();
+          }
 
-					public EclipseAnnotationPeer next() {
-						AnnotationFS annotation = (AnnotationFS) mAnnotations.next();
+          public EclipseAnnotationPeer next() {
+            AnnotationFS annotation = (AnnotationFS) mAnnotations.next();
 
-						EclipseAnnotationPeer peer = new EclipseAnnotationPeer(annotation.getType().getName(), false, "");
-						peer.setAnnotation(annotation);
-						return peer;
-					}
+            EclipseAnnotationPeer peer =
+                    new EclipseAnnotationPeer(annotation.getType().getName(), false, "");
+            peer.setAnnotation(annotation);
+            return peer;
+          }
 
-					public void remove() {
-					}};
-			}
+          public void remove() {
+          }
+        };
+      }
 
-			public Position getPosition(Annotation annotation) {
-				EclipseAnnotationPeer peer = (EclipseAnnotationPeer) annotation;
-				AnnotationFS annotationFS = peer.getAnnotationFS();
-				return new Position(annotationFS.getBegin(),
-						annotationFS.getEnd() - annotationFS.getBegin());
-			}
+      public Position getPosition(Annotation annotation) {
+        EclipseAnnotationPeer peer = (EclipseAnnotationPeer) annotation;
+        AnnotationFS annotationFS = peer.getAnnotationFS();
+        return new Position(annotationFS.getBegin(), annotationFS.getEnd()
+                - annotationFS.getBegin());
+      }
 
-			public void removeAnnotation(Annotation annotation) {
-			}
+      public void removeAnnotation(Annotation annotation) {
+      }
 
-			public void removeAnnotationModelListener(IAnnotationModelListener listener) {
-			}
-		};
-	}
+      public void removeAnnotationModelListener(IAnnotationModelListener listener) {
+      }
+    };
+  }
 
-	/**
-	 * Creates the a new {@link AnnotationDocument} from the given {@link FileEditorInput}
-	 * element. For all other elements null is returned.
-	 */
-	@Override
-	protected abstract IDocument createDocument(Object element) throws CoreException;
+  /**
+   * Creates the a new {@link AnnotationDocument} from the given {@link FileEditorInput} element.
+   * For all other elements null is returned.
+   */
+  @Override
+  protected abstract IDocument createDocument(Object element) throws CoreException;
 
-	@Override
-	protected abstract void doSaveDocument(IProgressMonitor monitor, 
-			Object element, IDocument document, boolean overwrite) throws CoreException;
+  @Override
+  protected abstract void doSaveDocument(IProgressMonitor monitor, Object element,
+          IDocument document, boolean overwrite) throws CoreException;
 
+  @Override
+  protected IRunnableContext getOperationRunner(IProgressMonitor monitor) {
+    return null;
+  }
 
-	@Override
-	protected IRunnableContext getOperationRunner(IProgressMonitor monitor) {
-		return null;
-	}
+  @Override
+  public IStatus getStatus(Object element) {
+    IStatus status = elementErrorStatus.get(element);
 
-	@Override
-	public IStatus getStatus(Object element) {
-	    IStatus status = elementErrorStatus.get(element);
+    if (status == null) {
+      status = super.getStatus(element);
+    }
 
-	    if (status == null) {
-	      status = super.getStatus(element);
-	    }
+    return status;
+  }
 
-	    return status;
-	}
+  protected abstract AnnotationStyle getAnnotationStyle(Object element, Type type);
 
-	protected abstract AnnotationStyle getAnnotationStyle(Object element, Type type);
-	
-	protected abstract EditorAnnotationStatus getEditorAnnotationStatus(
-			Object element);
+  protected abstract EditorAnnotationStatus getEditorAnnotationStatus(Object element);
 
-	protected abstract void setEditorAnnotationStatus(Object element,
-			EditorAnnotationStatus editorAnnotationStatus);
+  protected abstract void setEditorAnnotationStatus(Object element,
+          EditorAnnotationStatus editorAnnotationStatus);
 }

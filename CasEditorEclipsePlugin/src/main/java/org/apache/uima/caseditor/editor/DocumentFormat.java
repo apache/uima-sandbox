@@ -23,6 +23,6 @@ package org.apache.uima.caseditor.editor;
  * Specifies the format of the uima document.
  */
 public enum DocumentFormat {
-    XCAS,
-    XMI
+  XCAS,
+  XMI
 }

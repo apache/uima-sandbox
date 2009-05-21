@@ -15,7 +15,9 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */package org.apache.uima.caseditor.ui.wizards;
+ */
+
+package org.apache.uima.caseditor.ui.wizards;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -25,42 +27,38 @@ import org.eclipse.ui.IWorkbench;
 /**
  * Wizard to create a new folder.
  */
-final public class WizardNewFolderCreation extends Wizard implements INewWizard
-{
-    /**
-     * The ID of the new nlp project wizard.
-     */
-    public static final String ID =
-        "org.apache.uima.caseditor.ui.wizards.WizardNewFolderCreation";
+final public class WizardNewFolderCreation extends Wizard implements INewWizard {
+  /**
+   * The ID of the new nlp project wizard.
+   */
+  public static final String ID = "org.apache.uima.caseditor.ui.wizards.WizardNewFolderCreation";
 
-//    private WizardNewFolderCreationPage mMainPage;
+  // private WizardNewFolderCreationPage mMainPage;
 
-    /**
-     * Initializes the <code>NLPProjectWizard</code>.
-     */
-    public void init(IWorkbench workbench, IStructuredSelection selection) {
-        setWindowTitle("New folder");
-    }
+  /**
+   * Initializes the <code>NLPProjectWizard</code>.
+   */
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    setWindowTitle("New folder");
+  }
 
-    /**
-     * Adds the project wizard page to the wizard.
-     */
-    @Override
-    public void addPages()
-    {
-//        mMainPage = new WizardNewFolderCreationPage("Folder", selection);
-//        mMainPage.setTitle("Folder creation");
-//        mMainPage.setDescription("Create a folder");
-//        addPage(mMainPage);
-    }
+  /**
+   * Adds the project wizard page to the wizard.
+   */
+  @Override
+  public void addPages() {
+    // mMainPage = new WizardNewFolderCreationPage("Folder", selection);
+    // mMainPage.setTitle("Folder creation");
+    // mMainPage.setDescription("Create a folder");
+    // addPage(mMainPage);
+  }
 
-    /**
-     * Creates the nlp project.
-     */
-    @Override
-    public boolean performFinish()
-    {
-//        mMainPage.createNewFolder();
-        return true;
-    }
+  /**
+   * Creates the nlp project.
+   */
+  @Override
+  public boolean performFinish() {
+    // mMainPage.createNewFolder();
+    return true;
+  }
 }

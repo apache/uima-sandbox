@@ -57,7 +57,7 @@ public class AnnotationEditorActionContributor extends EditorActionBarContributo
       Type annotationType = mActiveEditorPart.getAnnotationMode();
 
       if (annotationType != null) {
-    	  mStatusLineModeItem.setText(annotationType.getShortName());
+        mStatusLineModeItem.setText(annotationType.getShortName());
       }
     }
   }

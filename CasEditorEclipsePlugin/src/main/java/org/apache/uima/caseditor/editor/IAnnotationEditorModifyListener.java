@@ -24,14 +24,14 @@ import java.util.Collection;
 import org.apache.uima.cas.Type;
 
 public interface IAnnotationEditorModifyListener {
-	
+
   /**
    * Called when the editor annotation mode changed.
    *
    * @param newMode
    */
   public void annotationModeChanged(Type newMode);
-  
+
   /**
    * Called when the shown annotation types in the editor are changed.
    * 
