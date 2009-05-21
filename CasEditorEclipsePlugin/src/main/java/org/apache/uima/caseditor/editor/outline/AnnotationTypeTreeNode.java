@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.IAdaptable;
  * by their type. Only the {@link TypeGroupedContentProvider} creates
  * {@link AnnotationTreeNode} objects. 
  */
-public class AnnotationTypeTreeNode implements IAdaptable {
+class AnnotationTypeTreeNode implements IAdaptable {
 
 	// annotation type
 	private Type type;

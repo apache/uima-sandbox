@@ -30,15 +30,17 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.cas.text.AnnotationIndex;
+import org.apache.uima.caseditor.CasEditorPlugin;
 import org.apache.uima.caseditor.editor.AnnotationDocument;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
+ * The content provider for the type grouped annotation outline.
+ * 
  * TODO:
  * Make it sensitive to show annotations menu from the editor ...
- * 
  * Who sends selection events which are not from the UI thread ?
  */
 public class TypeGroupedContentProvider extends OutlineContentProviderBase {
@@ -74,11 +76,16 @@ public class TypeGroupedContentProvider extends OutlineContentProviderBase {
 			String name = annotation.getType().getName();
 
 			AnnotationTypeTreeNode typeNode = nameAnnotationTypeNodeMap.get(name);
-
-			AnnotationTreeNode annotationNode = new AnnotationTreeNode(mInputDocument, annotation); 
-			typeNode.remove(annotationNode);
 			
-			viewer.remove(annotationNode);
+			if (typeNode != null) {
+  			AnnotationTreeNode annotationNode = new AnnotationTreeNode(mInputDocument, annotation); 
+  			typeNode.remove(annotationNode);
+  			
+  			viewer.remove(annotationNode);
+			}
+			else {
+			  CasEditorPlugin.logError("Unmapped annotation type!");
+			}
 		}
 	}
 
@@ -133,6 +140,8 @@ public class TypeGroupedContentProvider extends OutlineContentProviderBase {
 			List<Type> types = typeSystem.getProperlySubsumedTypes(
 					typeSystem.getType(CAS.TYPE_NAME_ANNOTATION));
 			
+			types.add(typeSystem.getType(CAS.TYPE_NAME_ANNOTATION));
+			
 			for (Type type : types) {
 				
 				AnnotationTypeTreeNode typeNode = new AnnotationTypeTreeNode(type);
@@ -146,7 +155,9 @@ public class TypeGroupedContentProvider extends OutlineContentProviderBase {
 				for (FSIterator it = index.iterator(); it.hasNext(); ) {
 					AnnotationFS annotation = (AnnotationFS) it.next();
 					
-					typeNode.add(new AnnotationTreeNode(mInputDocument, annotation));
+					if (annotation.getType().equals(type)) {
+					  typeNode.add(new AnnotationTreeNode(mInputDocument, annotation));
+					}
 				}
 			}
 			
