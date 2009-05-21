@@ -275,7 +275,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
       List<ModelFeatureStructure> structures = new LinkedList<ModelFeatureStructure>();
 
       for (AnnotationFS annotation : annotations) {
-        structures.add((new ModelFeatureStructure(getDocument(), annotation)));
+        structures.add(new ModelFeatureStructure(getDocument(), annotation));
       }
 
       selectionChanged(getSite().getPage().getActivePart(), new StructuredSelection(structures));

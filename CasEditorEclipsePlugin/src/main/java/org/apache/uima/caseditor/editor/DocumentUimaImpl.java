@@ -259,14 +259,14 @@ public class DocumentUimaImpl extends AbstractDocument {
 		try {
 			saxParser = saxParserFactory.newSAXParser();
 		} catch (ParserConfigurationException e) {
-			String message = (e.getMessage() != null ? e.getMessage() : "");
+			String message = e.getMessage() != null ? e.getMessage() : "";
 
 			IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 					IStatus.OK, message, e);
 
 			throw new CoreException(s);
 		} catch (SAXException e) {
-			String message = (e.getMessage() != null ? e.getMessage() : "");
+			String message = e.getMessage() != null ? e.getMessage() : "";
 
 			IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 					IStatus.OK, message, e);
@@ -280,14 +280,14 @@ public class DocumentUimaImpl extends AbstractDocument {
 			try {
 				saxParser.parse(content, dezerializer.getXCASHandler(mCAS));
 			} catch (IOException e) {
-				String message = (e.getMessage() != null ? e.getMessage() : "");
+				String message = e.getMessage() != null ? e.getMessage() : "";
 
 				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 						IStatus.OK, message, e);
 
 				throw new CoreException(s);
 			} catch (SAXException e) {
-				String message = (e.getMessage() != null ? e.getMessage() : "");
+				String message = e.getMessage() != null ? e.getMessage() : "";
 
 				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 						IStatus.OK, message, e);
@@ -301,14 +301,14 @@ public class DocumentUimaImpl extends AbstractDocument {
 			try {
 				saxParser.parse(content, dezerializer.getXmiCasHandler(mCAS));
 			} catch (IOException e) {
-				String message = (e.getMessage() != null ? e.getMessage() : "");
+				String message = e.getMessage() != null ? e.getMessage() : "";
 
 				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 						IStatus.OK, message, e);
 
 				throw new CoreException(s);
 			} catch (SAXException e) {
-				String message = (e.getMessage() != null ? e.getMessage() : "");
+				String message = e.getMessage() != null ? e.getMessage() : "";
 
 				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 						IStatus.OK, message, e);
@@ -338,14 +338,14 @@ public class DocumentUimaImpl extends AbstractDocument {
 				xcasSerializer
 						.serialize(mCAS, xmlSerialzer.getContentHandler());
 			} catch (IOException e) {
-				String message = (e.getMessage() != null ? e.getMessage() : "");
+				String message = e.getMessage() != null ? e.getMessage() : "";
 
 				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 						IStatus.OK, message, e);
 
 				throw new CoreException(s);
 			} catch (SAXException e) {
-				String message = (e.getMessage() != null ? e.getMessage() : "");
+				String message = e.getMessage() != null ? e.getMessage() : "";
 
 				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 						IStatus.OK, message, e);
@@ -361,7 +361,7 @@ public class DocumentUimaImpl extends AbstractDocument {
 			try {
 				xmiSerializer.serialize(mCAS, xmlSerialzer.getContentHandler());
 			} catch (SAXException e) {
-				String message = (e.getMessage() != null ? e.getMessage() : "");
+				String message = e.getMessage() != null ? e.getMessage() : "";
 
 				IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID,
 						IStatus.OK, message, e);

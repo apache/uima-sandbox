@@ -131,7 +131,7 @@ public class TypesystemElement extends AbstractNlpElement {
       typeSystemDesciptor.resolveImports();
     } catch (InvalidXMLException e) {
 
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+      String message = e.getMessage() != null ? e.getMessage() : "";
 
       IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
@@ -150,7 +150,7 @@ public class TypesystemElement extends AbstractNlpElement {
       cas = CasCreationUtils.createCas(typeSystemDesciptor, typePriorities,
               new FsIndexDescription[] { indexDesciptor });
     } catch (ResourceInitializationException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+      String message = e.getMessage() != null ? e.getMessage() : "";
 
       IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 

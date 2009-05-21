@@ -120,10 +120,12 @@ public class TypeGroupedContentProvider extends OutlineContentProviderBase {
 		return typeNode.getAnnotations();
 	}
 
-	public void dispose() {
+	@Override
+  public void dispose() {
 	}
 
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	@Override
+  public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (oldInput != null) {
 			((AnnotationDocument) oldInput).removeChangeListener(this);
 		}

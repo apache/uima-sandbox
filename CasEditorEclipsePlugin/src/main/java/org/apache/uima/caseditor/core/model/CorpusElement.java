@@ -88,7 +88,7 @@ public final class CorpusElement extends AbstractNlpElement implements INlpEleme
     IResource[] resources = getCorpusFolder().members();
 
     for (IResource resource : resources) {
-      if ((resource instanceof IFile)) {
+      if (resource instanceof IFile) {
         mDocuments.add(new DocumentElement(this, (IFile) resource));
       }
     }

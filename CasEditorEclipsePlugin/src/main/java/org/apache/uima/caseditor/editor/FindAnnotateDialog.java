@@ -283,6 +283,7 @@ class FindAnnotateDialog extends Dialog {
     document.addFeatureStructure(newAnnotation);
   }
   
+  @Override
   protected void buttonPressed(int buttonID) {
     
     if (FIND_BUTTON == buttonID) {

@@ -24,7 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.caseditor.core.model.NlpModel;
+import org.apache.uima.caseditor.core.model.NlpProject;
 import org.apache.uima.caseditor.editor.AnnotationEditor;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 

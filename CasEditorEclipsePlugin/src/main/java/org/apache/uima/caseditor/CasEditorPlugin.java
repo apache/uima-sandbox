@@ -103,7 +103,7 @@ public class CasEditorPlugin extends AbstractUIPlugin {
     ResourceBundle bundle = getDefault().getResourceBundle();
 
     try {
-      return (bundle != null) ? bundle.getString(key) : key;
+      return bundle != null ? bundle.getString(key) : key;
     } catch (MissingResourceException e) {
       return key;
     }

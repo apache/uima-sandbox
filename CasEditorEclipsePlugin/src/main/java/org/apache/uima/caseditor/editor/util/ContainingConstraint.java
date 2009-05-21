@@ -50,7 +50,7 @@ public class ContainingConstraint implements FSMatchConstraint {
   public boolean match(FeatureStructure featureStructure) {
     boolean result = false;
 
-    if ((featureStructure instanceof AnnotationFS)) {
+    if (featureStructure instanceof AnnotationFS) {
       AnnotationFS annotation = (AnnotationFS) featureStructure;
 
       for (AnnotationFS containingAnnotation : mContainingAnnotations) {
@@ -67,8 +67,8 @@ public class ContainingConstraint implements FSMatchConstraint {
   private boolean isContaining(AnnotationFS annotation, AnnotationFS containing) {
     boolean isContaining;
 
-    if ((containing.getBegin() <= annotation.getBegin())
-            && (containing.getEnd() >= annotation.getEnd())) {
+    if (containing.getBegin() <= annotation.getBegin()
+            && containing.getEnd() >= annotation.getEnd()) {
       isContaining = true;
     } else {
       isContaining = false;

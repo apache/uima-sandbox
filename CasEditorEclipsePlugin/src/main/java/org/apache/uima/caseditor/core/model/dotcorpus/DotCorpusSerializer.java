@@ -89,7 +89,7 @@ public class DotCorpusSerializer {
     try {
       documentBuilder = documentBuilderFacoty.newDocumentBuilder();
     } catch (ParserConfigurationException e) {
-      String message = ("This should never happen:" + e.getMessage() != null ? e.getMessage() : "");
+      String message = "This should never happen:" + e.getMessage() != null ? e.getMessage() : "";
 
       IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
@@ -101,13 +101,13 @@ public class DotCorpusSerializer {
     try {
       dotCorpusDOM = documentBuilder.parse(dotCorpusStream);
     } catch (SAXException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+      String message = e.getMessage() != null ? e.getMessage() : "";
 
       IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
       throw new CoreException(s);
     } catch (IOException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+      String message = e.getMessage() != null ? e.getMessage() : "";
 
       IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
 
@@ -176,7 +176,7 @@ public class DotCorpusSerializer {
 
         dotCorpus.setEditorLineLength(lineLengthHint);
       } else {
-        String message = ("Unexpected element: " + corporaChildElement.getNodeName());
+        String message = "Unexpected element: " + corporaChildElement.getNodeName();
 
         IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, null);
 
@@ -260,7 +260,7 @@ public class DotCorpusSerializer {
       xmlSerHandler.endElement("", CONFIG_ELEMENT, CONFIG_ELEMENT);
       xmlSerHandler.endDocument();
     } catch (SAXException e) {
-      String message = (e.getMessage() != null ? e.getMessage() : "");
+      String message = e.getMessage() != null ? e.getMessage() : "";
 
       IStatus s = new Status(IStatus.ERROR, CasEditorPlugin.ID, IStatus.OK, message, e);
       throw new CoreException(s);

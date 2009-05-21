@@ -91,7 +91,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
 
       for (int i = 0; strictTypeIterator.hasNext(); i++) {
         featureStrucutreList.add(new ModelFeatureStructure(mDocument,
-                (FeatureStructure) strictTypeIterator.next()));
+                strictTypeIterator.next()));
       }
 
       ModelFeatureStructure[] featureStructureArray = new ModelFeatureStructure[featureStrucutreList

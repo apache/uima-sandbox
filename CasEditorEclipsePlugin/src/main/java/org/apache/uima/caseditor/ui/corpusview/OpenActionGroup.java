@@ -61,7 +61,7 @@ final class OpenActionGroup extends ActionGroup implements ICorpusExplorerAction
     mOpenFileAction.selectionChanged(selection);
     menu.add(mOpenFileAction);
 
-    if (selection.size() == 1 && (selection.getFirstElement() instanceof IFile)) {
+    if (selection.size() == 1 && selection.getFirstElement() instanceof IFile) {
 
       MenuManager submenu = new MenuManager("Open With");
       submenu.add(new OpenWithMenu(mPage, (IFile) selection.getFirstElement()));

@@ -53,7 +53,7 @@ public abstract class AnnotationEditorView extends PageBookView {
   @Override
 	protected final PageRec doCreatePage(IWorkbenchPart part) {
 	  
-	    if ((part instanceof AnnotationEditor)) {
+	    if (part instanceof AnnotationEditor) {
 	        AnnotationEditor editor = (AnnotationEditor) part;
 	        
 	        return doCreatePage(editor);
@@ -77,7 +77,7 @@ public abstract class AnnotationEditorView extends PageBookView {
   @Override
   protected boolean isImportant(IWorkbenchPart part) {
     // only interested in annotation editors
-    return (part instanceof AnnotationEditor);
+    return part instanceof AnnotationEditor;
   }
 
   /**

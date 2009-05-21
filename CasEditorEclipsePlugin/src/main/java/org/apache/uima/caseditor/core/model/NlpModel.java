@@ -185,7 +185,7 @@ public final class NlpModel extends AbstractNlpElement {
      * Executes the current action.
      */
     public void handle(final NlpModelDeltaImpl delta) {
-      if ((delta.getResource() instanceof IProject)) {
+      if (delta.getResource() instanceof IProject) {
         final IResourceDelta resourceDelta = delta.getResourceDelta();
 
         final IProject project = (IProject) delta.getResource();

@@ -44,7 +44,7 @@ public class TokenDrawingStrategy implements IDrawingStrategy {
   public void draw(Annotation annotation, GC gc, StyledText textWidget, int offset, int length,
           Color color) {
     if (length > 0) {
-      if ((annotation instanceof EclipseAnnotationPeer)) {
+      if (annotation instanceof EclipseAnnotationPeer) {
         AnnotationFS annotationFS = ((EclipseAnnotationPeer) annotation).getAnnotationFS();
 
         if (gc != null) {

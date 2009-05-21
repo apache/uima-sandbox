@@ -32,7 +32,7 @@ public class TextColorDrawingStrategy implements IDrawingStrategy {
 
   public void draw(Annotation annotation, GC gc, StyledText textWidget, int offset, int length, Color color) {
     if (length > 0) {
-      if ((annotation instanceof EclipseAnnotationPeer)) {
+      if (annotation instanceof EclipseAnnotationPeer) {
         if (gc != null) {
 
           int start = offset;

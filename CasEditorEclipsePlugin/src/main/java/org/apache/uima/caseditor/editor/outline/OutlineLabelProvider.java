@@ -64,7 +64,7 @@ class OutlineLabelProvider extends LabelProvider implements ITableLabelProvider 
     char stringChars[] = string.toCharArray();
 
     for (char element : stringChars) {
-      if ((element == '\r')) {
+      if (element == '\r') {
         continue;
       }
 

@@ -20,7 +20,7 @@
 package org.apache.uima.caseditor.ui.corpusview;
 
 import org.apache.uima.caseditor.CasEditorPlugin;
-import org.apache.uima.caseditor.ui.model.*;
+import org.apache.uima.caseditor.ui.model.ElementWorkbenchAdapterFactory;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;

@@ -109,19 +109,22 @@ public class DefaultCasDocumentProvider
 		return null;
 	}
 	
-	protected AnnotationStyle getAnnotationStyle(Object element, Type type) {
+	@Override
+  protected AnnotationStyle getAnnotationStyle(Object element, Type type) {
 		INlpElement nlpElement = getNlpElement(element);
 		
 		return nlpElement.getNlpProject().getDotCorpus().getAnnotation(type);
 	}
 	 
-	protected EditorAnnotationStatus getEditorAnnotationStatus(Object element) {
+	@Override
+  protected EditorAnnotationStatus getEditorAnnotationStatus(Object element) {
 		INlpElement nlpElement = getNlpElement(element);
 		
 		return nlpElement.getNlpProject().getEditorAnnotationStatus();
 	}
 
-	protected void setEditorAnnotationStatus(Object element,
+	@Override
+  protected void setEditorAnnotationStatus(Object element,
 			EditorAnnotationStatus editorAnnotationStatus) {
 		INlpElement nlpElement = getNlpElement(element);
 		

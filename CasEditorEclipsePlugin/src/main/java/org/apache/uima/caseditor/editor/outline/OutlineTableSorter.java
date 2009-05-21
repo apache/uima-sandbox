@@ -47,7 +47,7 @@ class OutlineTableSorter extends ViewerSorter {
   public int compare(Viewer viewer, Object aObject, Object bObject) {
     int result = 1;
 
-    if ((aObject instanceof IAdaptable && bObject instanceof IAdaptable)) {
+    if (aObject instanceof IAdaptable && bObject instanceof IAdaptable) {
       AnnotationFS aAnnotation = (AnnotationFS) ((IAdaptable) aObject)
               .getAdapter(AnnotationFS.class);
 

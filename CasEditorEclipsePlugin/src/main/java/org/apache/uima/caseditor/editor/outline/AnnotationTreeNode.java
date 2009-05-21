@@ -99,9 +99,9 @@ public class AnnotationTreeNode implements IAdaptable {
   public int hashCode() {
     final int PRIME = 31;
     int result = 1;
-    result = PRIME * result + ((mAnnotation == null) ? 0 : mAnnotation.hashCode());
-    result = PRIME * result + ((mChildren == null) ? 0 : mChildren.hashCode());
-    result = PRIME * result + ((mParent == null) ? 0 : mParent.hashCode());
+    result = PRIME * result + (mAnnotation == null ? 0 : mAnnotation.hashCode());
+    result = PRIME * result + (mChildren == null ? 0 : mChildren.hashCode());
+    result = PRIME * result + (mParent == null ? 0 : mParent.hashCode());
     return mAnnotation.hashCode();
   }
 
