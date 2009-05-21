@@ -178,20 +178,29 @@
 		<page
 			class="org.apache.uima.caseditor.ui.property.ProjectPropertyPage"
 			icon="icons/svgicons/corpus.png"
-			id="org.apache.uima.caseditor.corpusPropertyPage" name="Project"
-			objectClass="org.apache.uima.caseditor.core.model.NlpProject" />
+			id="org.apache.uima.caseditor.corpusPropertyPage" name="Project"> 
+			<enabledWhen>
+				<instanceof value="org.apache.uima.caseditor.core.model.NlpProject"/>
+			</enabledWhen>
+		</page>
 
 		<page
 			class="org.apache.uima.caseditor.ui.property.DocumentPropertyPage"
 			icon="icons/svgicons/document.png"
-			id="org.apache.uima.caseditor.documentPropertyPage" name="Document"
-			objectClass="org.apache.uima.caseditor.core.model.DocumentElement" />
+			id="org.apache.uima.caseditor.documentPropertyPage" name="Document">
+			<enabledWhen>
+				<instanceof value="org.apache.uima.caseditor.core.model.DocumentElement"/>
+			</enabledWhen>
+		</page>
 		<page
 			class="org.apache.uima.caseditor.ui.property.AnnotationPropertyPage"
 			icon="icons/svgicons/corpus.png"
 			id="org.apache.uima.caseditor.annotationspropertypage"
-			name="Annotations"
-			objectClass="org.apache.uima.caseditor.core.model.NlpProject" />
+			name="Annotations">
+			<enabledWhen>
+				<instanceof value="org.apache.uima.caseditor.core.model.NlpProject"/>
+			</enabledWhen>
+		</page>
 	</extension>
 	
 	<extension point="org.eclipse.core.runtime.adapters">
