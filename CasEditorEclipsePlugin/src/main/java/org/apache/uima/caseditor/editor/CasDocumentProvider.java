@@ -58,6 +58,7 @@ public abstract class CasDocumentProvider extends AbstractDocumentProvider {
     return new IAnnotationModel() {
 
       private org.apache.uima.caseditor.editor.ICasDocument mDocument;
+      private int numberOfConnectedDocuments;
 
       public void addAnnotation(Annotation annotation, Position position) {
       }
@@ -67,16 +68,24 @@ public abstract class CasDocumentProvider extends AbstractDocumentProvider {
 
       public void connect(IDocument document) {
         mDocument = (org.apache.uima.caseditor.editor.ICasDocument) document;
+        
+        numberOfConnectedDocuments++;
       }
 
       public void disconnect(IDocument document) {
-        mDocument = null;
+        numberOfConnectedDocuments--;
+        
+        if (numberOfConnectedDocuments == 0) {
+          mDocument = null;
+        }
       }
 
       public Iterator<EclipseAnnotationPeer> getAnnotationIterator() {
+        
+        final Iterator<FeatureStructure> mAnnotations =
+                mDocument.getCAS().getAnnotationIndex().iterator();
+        
         return new Iterator<EclipseAnnotationPeer>() {
-          private Iterator<FeatureStructure> mAnnotations =
-                  mDocument.getCAS().getAnnotationIndex().iterator();
 
           public boolean hasNext() {
             return mAnnotations.hasNext();
