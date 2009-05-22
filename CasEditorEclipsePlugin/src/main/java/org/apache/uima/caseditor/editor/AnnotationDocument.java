@@ -242,7 +242,7 @@ public class AnnotationDocument extends Document implements ICasDocument {
 
     for (int i = 0; i < text.length; i++) {
 
-      if (text[i] == '\r' | text[i] == '\n') {
+      if (text[i] == '\r' || text[i] == '\n') {
         charCounter = 0;
       }
 

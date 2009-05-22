@@ -289,6 +289,14 @@ public class DotCorpusElement extends AbstractNlpElement {
   }
 
   /**
+   * Always returns hash code 0.
+   */
+  @Override
+  public int hashCode() {
+    return 0;
+  }
+  
+  /**
    * Test for equality with another object.
    */
   @Override

@@ -42,7 +42,7 @@ public class StrictTypeConstraint implements FSConstraint, FSMatchConstraint {
   }
 
   /**
-   * Chekcs if the given {@link FeatureStructure} matchs this constraint.
+   * Checks if the given {@link FeatureStructure} matchs this constraint.
    */
   public boolean match(FeatureStructure candidateFS) {
     return candidateFS.getType().getName().equals(mMatch.getName());

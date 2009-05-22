@@ -33,11 +33,11 @@ import org.eclipse.core.runtime.IAdaptable;
 public class AnnotationTreeNode implements IAdaptable {
   private AnnotationTreeNode mParent;
 
-  private AnnotationTreeNodeList mChildren;
+  private final AnnotationTreeNodeList mChildren;
 
-  private AnnotationFS mAnnotation;
+  private final AnnotationFS mAnnotation;
 
-  private ICasDocument mDocument;
+  private final ICasDocument mDocument;
 
   AnnotationTreeNode(ICasDocument document, AnnotationFS annotation) {
     Assert.isNotNull(document);
@@ -97,32 +97,29 @@ public class AnnotationTreeNode implements IAdaptable {
 
   @Override
   public int hashCode() {
-    final int PRIME = 31;
-    int result = 1;
-    result = PRIME * result + (mAnnotation == null ? 0 : mAnnotation.hashCode());
-    result = PRIME * result + (mChildren == null ? 0 : mChildren.hashCode());
-    result = PRIME * result + (mParent == null ? 0 : mParent.hashCode());
+    
+//    final int PRIME = 31;
+//    int result = 1;
+//    result = PRIME * result + (mAnnotation == null ? 0 : mAnnotation.hashCode());
+//    result = PRIME * result + (mChildren == null ? 0 : mChildren.hashCode());
+//    result = PRIME * result + (mParent == null ? 0 : mParent.hashCode());
+    
     return mAnnotation.hashCode();
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (getClass() != obj.getClass()) {
+    
+    if (this == obj) {
+      return true;
+    }
+    else if (obj instanceof AnnotationTreeNode) {
+      AnnotationTreeNode other = (AnnotationTreeNode) obj;
+      
+      return other.getAnnotation().equals(mAnnotation);
+    }
+    else {
       return false;
     }
-
-    final AnnotationTreeNode other = (AnnotationTreeNode) obj;
-
-    /*
-     * if (this == obj) return true; if (!super.equals(obj)) return false; if (getClass() !=
-     * obj.getClass()) return false; final AnnotationTreeNode other = (AnnotationTreeNode) obj; if
-     * (mAnnotation == null) { if (other.mAnnotation != null) return false; } else if
-     * (!mAnnotation.equals(other.mAnnotation)) return false; if (mChildren == null) { if
-     * (other.mChildren != null) return false; } else if (!mChildren.equals(other.mChildren)) return
-     * false; if (mParent == null) { if (other.mParent != null) return false; } else if
-     * (!mParent.equals(other.mParent)) return false;
-     */
-    return other.getAnnotation().equals(mAnnotation);
   }
-
 }

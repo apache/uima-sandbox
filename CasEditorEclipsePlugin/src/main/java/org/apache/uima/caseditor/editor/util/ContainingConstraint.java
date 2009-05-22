@@ -27,15 +27,17 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationFS;
 
 /**
- * TODO: add javadoc here
+ * Filters out all annotations which are not contained by one of the provided
+ * annotations.
  */
 public class ContainingConstraint implements FSMatchConstraint {
+  
   private static final long serialVersionUID = 1;
 
-  transient private Collection<AnnotationFS> mContainingAnnotations = new LinkedList<AnnotationFS>();
+  private Collection<AnnotationFS> mContainingAnnotations = new LinkedList<AnnotationFS>();
 
   /**
-   * Adds an annoation in which the an other annotations must be containded to match this
+   * Adds an annotation in which the an other annotations must be contained to match this
    * constraint.
    *
    * @param containingAnnotation
@@ -45,7 +47,7 @@ public class ContainingConstraint implements FSMatchConstraint {
   }
 
   /**
-   * Checks if the given FeatureStructure is inside the a containing annoation.
+   * Checks if the given FeatureStructure is inside the a containing annotation.
    */
   public boolean match(FeatureStructure featureStructure) {
     boolean result = false;

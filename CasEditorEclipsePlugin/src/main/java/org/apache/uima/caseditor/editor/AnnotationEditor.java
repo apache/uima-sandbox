@@ -187,14 +187,12 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
      * Initializes a new instance.
      */
     ShowAnnotationContextEditAction() {
-      if (mPresenter == null) {
-        mPresenter = new InformationPresenter(new AnnotationEditingControlCreator());
+      mPresenter = new InformationPresenter(new AnnotationEditingControlCreator());
 
-        mPresenter.setInformationProvider(new AnnotationInformationProvider(AnnotationEditor.this),
-                org.eclipse.jface.text.IDocument.DEFAULT_CONTENT_TYPE);
-        mPresenter.setDocumentPartitioning(org.eclipse.jface.text.IDocument.DEFAULT_CONTENT_TYPE);
-        mPresenter.install(getSourceViewer());
-      }
+      mPresenter.setInformationProvider(new AnnotationInformationProvider(AnnotationEditor.this),
+              org.eclipse.jface.text.IDocument.DEFAULT_CONTENT_TYPE);
+      mPresenter.setDocumentPartitioning(org.eclipse.jface.text.IDocument.DEFAULT_CONTENT_TYPE);
+      mPresenter.install(getSourceViewer());
     }
 
     /**
@@ -428,7 +426,7 @@ public final class AnnotationEditor extends StatusTextEditor implements ISelecti
    * Listens for resource remove/delete event, if the input file for the
    * editor is removed the editor will be closed.
    */
-  private class CloseEditorListener implements IResourceChangeListener {
+  private static class CloseEditorListener implements IResourceChangeListener {
 
     private AnnotationEditor editor;
 

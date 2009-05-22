@@ -166,7 +166,7 @@ public final class AnnotationStyle {
     } else if (object instanceof AnnotationStyle) {
       AnnotationStyle style = (AnnotationStyle) object;
 
-      isEqual = annotation.equals(style.annotation) && style.style.equals(style.style)
+      isEqual = annotation.equals(style.annotation) && this.style.equals(style.style)
               && color.equals(style.color) && layer == style.layer;
     } else {
       isEqual = false;

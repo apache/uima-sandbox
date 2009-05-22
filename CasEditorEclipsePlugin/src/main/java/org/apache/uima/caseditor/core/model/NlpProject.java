@@ -194,9 +194,7 @@ public final class NlpProject extends AbstractNlpElement implements IProjectNatu
   private void loadDotCorpus() {
     IResource dotCorpusResource = getProject().getFile(DOT_CORPUS_FILENAME);
 
-    if (dotCorpusResource instanceof IFile) {
-      mDotCorpusElement = DotCorpusElement.createDotCorpus((IFile) dotCorpusResource, this);
-    }
+    mDotCorpusElement = DotCorpusElement.createDotCorpus((IFile) dotCorpusResource, this);
 
     // TODO: What happens when there is a folder with the name ".corpus"
     // then load default .corpus ...

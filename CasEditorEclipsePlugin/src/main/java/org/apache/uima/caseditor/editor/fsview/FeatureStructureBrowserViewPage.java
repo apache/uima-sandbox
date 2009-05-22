@@ -144,11 +144,6 @@ public final class FeatureStructureBrowserViewPage extends Page {
       } else if (parentElement instanceof FeatureValue) {
         FeatureValue value = (FeatureValue) parentElement;
 
-        if (parentElement instanceof StringArray) {
-          StringArray array = (StringArray) parentElement;
-          return array.toArray();
-        }
-
         featureStructure = (FeatureStructure) value.getValue();
       } else {
         assert false : "Unexpected element!";
@@ -159,15 +154,7 @@ public final class FeatureStructureBrowserViewPage extends Page {
       Type type = featureStructure.getType();
 
       for (Feature feature : type.getFeatures()) {
-
-        if (feature.getRange().isPrimitive()) {
-          // create a new pair
-          // feature and value
-          // add string
-          childs.add(new FeatureValue(mDocument, featureStructure, feature));
-        } else {
-          childs.add(new FeatureValue(mDocument, featureStructure, feature));
-        }
+        childs.add(new FeatureValue(mDocument, featureStructure, feature));
       }
 
       assert childs.size() > 0;

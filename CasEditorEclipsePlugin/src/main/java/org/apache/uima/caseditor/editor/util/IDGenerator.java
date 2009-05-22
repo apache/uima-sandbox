@@ -36,7 +36,7 @@ public class IDGenerator {
   /**
    * The unique id that will be incremented.
    */
-  private long sUniqueID = sStartValue + 1;
+  private long sUniqueID;
 
   /**
    * The singleton instance.
@@ -44,15 +44,16 @@ public class IDGenerator {
   private static IDGenerator sIdGeneratorInstance;
 
   /**
-   * Call <code>IDGenerator.getInstance()</code> to retrive an instance of this class. Must not be
-   * instanciated outside this class, singleton pattern.
+   * Call <code>IDGenerator.getInstance()</code> to retrieve an instance of this class. Must not be
+   * instantiated outside this class, singleton pattern.
    */
   private IDGenerator() {
     sStartValue = new Random().nextLong();
+    sUniqueID = sStartValue + 1;
   }
 
   /**
-   * Retrive the next unique ID.
+   * Retrieve the next unique ID.
    *
    * @throws IllegalStateException -
    *           if there are more than Long.MAX_VALUE calls to

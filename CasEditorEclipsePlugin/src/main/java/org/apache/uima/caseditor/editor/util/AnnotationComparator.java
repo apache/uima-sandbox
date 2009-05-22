@@ -19,6 +19,7 @@
 
 package org.apache.uima.caseditor.editor.util;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.apache.uima.cas.text.AnnotationFS;
@@ -26,7 +27,10 @@ import org.apache.uima.cas.text.AnnotationFS;
 /**
  * Checks two annotations for equality.
  */
-public class AnnotationComparator implements Comparator<AnnotationFS> {
+public class AnnotationComparator implements Comparator<AnnotationFS>, Serializable  {
+  
+  private static final long serialVersionUID = 1L;
+
   /**
    * Compares the given annotations a and b. This implementations only compares the begin index.
    */

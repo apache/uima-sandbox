@@ -204,6 +204,14 @@ public class DotCorpus {
   }
 
   /**
+   * Always returns hash code 0.
+   */
+  @Override
+  public int hashCode() {
+    return 0;
+  }
+  
+  /**
    * Checks if the given object is equal to the current instance.
    */
   @Override

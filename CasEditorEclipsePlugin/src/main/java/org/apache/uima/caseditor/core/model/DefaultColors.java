@@ -110,9 +110,9 @@ class DefaultColors {
       newStyles.add(style);
     }
     
-    for (String typeName : typeNameToColorMap.keySet()) {
-      newStyles.add(new AnnotationStyle(typeName, AnnotationStyle.Style.BACKGROUND,
-              typeNameToColorMap.get(typeName), 0));
+    for (Map.Entry<String, Color> entry : typeNameToColorMap.entrySet()) {
+      newStyles.add(new AnnotationStyle(entry.getKey(), AnnotationStyle.Style.BACKGROUND,
+              entry.getValue(), 0));
     }
     
     return Collections.unmodifiableSet(newStyles);
