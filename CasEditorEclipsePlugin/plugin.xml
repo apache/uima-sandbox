@@ -23,6 +23,29 @@
 <plugin>
    <extension-point id="org.apache.uima.caseditor.editor" name="DocumentProvider" schema="schema/org.apache.uima.caseditor.editor.exsd"/>
 
+	<extension point="org.eclipse.core.contenttype.contentTypes">
+	   <content-type base-type="org.eclipse.core.runtime.xml"
+	                 file-extensions="xml"
+	                 id="org.apache.uima.caseditor.AnalysisEngineDescriptor"
+	                 name="Analysis Engine Descriptor"
+	                 priority="normal">
+	      <describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
+	         <parameter name="element" value="analysisEngineDescription"/>
+	      </describer>
+	   </content-type>
+	   
+	   <content-type base-type="org.eclipse.core.runtime.xml"
+	                 file-extensions="xml"
+	                 id="org.apache.uima.caseditor.CasConsumerDescriptor"
+	                 name="Cas Consumer Descriptor"
+	                 priority="normal">
+	      <describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
+	         <parameter name="element" value="casConsumerDescription"/>
+	      </describer>
+	   </content-type>
+	</extension>
+
+
 	<extension point="org.eclipse.ui.views">
 		<category id="org.apache.uima.caseditor.ui.views" name="NLP" />
 

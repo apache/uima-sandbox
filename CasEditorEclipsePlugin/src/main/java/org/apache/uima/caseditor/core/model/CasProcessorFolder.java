@@ -29,12 +29,18 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 
 /**
- * The UimaSourceFolder contains folders, each of these folders can contain uima consumer or
+ * The UimaSourceFolder contains folders, each of these folders can contain UIMA consumer or
  * annotator configurations.
  */
 public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable {
+  
+  private static final String CONSUMER_DESCRIPTOR_ID = "org.apache.uima.caseditor.CasConsumerDescriptor";
+  private static final String ANALYSIS_ENGINE_DESCRIPTOR_ID = "org.apache.uima.caseditor.AnalysisEngineDescriptor";
+  
   private IFolder mConfigFolder;
 
   private NlpProject mProject;
@@ -67,14 +73,49 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
     return mAnnotators;
   }
 
+  private boolean isConsumerDescriptorFile(IResource resource) throws CoreException {
+    
+    boolean isConsumerDescritporFile = false;
+    
+    if (resource instanceof IFile) {
+      IContentDescription contentDescription = ((IFile) resource).getContentDescription();
+     
+      if (contentDescription != null) {
+        IContentType contentType = contentDescription.getContentType();
+        
+        isConsumerDescritporFile = 
+                contentType != null && CONSUMER_DESCRIPTOR_ID.equals(contentType.getId());
+      }
+    }
+    
+    return isConsumerDescritporFile;
+  }
+
+  private boolean isAnalysisEngineDescriptorFile(IResource resource) throws CoreException {
+    
+    boolean isAnalysisEngineDescriptorFile = false;
+    
+    if (resource instanceof IFile) {
+      IContentDescription contentDescription = ((IFile) resource).getContentDescription();
+      
+      if (contentDescription != null) {
+        IContentType contentType = contentDescription.getContentType();
+        
+        isAnalysisEngineDescriptorFile = 
+                contentType != null && ANALYSIS_ENGINE_DESCRIPTOR_ID.equals(contentType.getId());
+
+      }
+    }
+    
+    return isAnalysisEngineDescriptorFile;
+  }  
+  
   private void createAnnotatorConfigurations() throws CoreException {
     mAnnotators = new LinkedList<AnnotatorElement>();
 
     for (IResource resource : mConfigFolder.members()) {
-      if (resource instanceof IFile && resource.getName().endsWith(".ann")) {
-        IFile consumerFile = (IFile) resource;
-
-        AnnotatorElement annotator = new AnnotatorElement(this, consumerFile);
+      if (isAnalysisEngineDescriptorFile(resource)) {
+        AnnotatorElement annotator = new AnnotatorElement(this, (IFile) resource);
         mAnnotators.add(annotator);
       }
     }
@@ -93,14 +134,13 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
     mConsumers = new LinkedList<ConsumerElement>();
 
     for (IResource resource : mConfigFolder.members()) {
-      if (resource instanceof IFile && resource.getName().endsWith(".con")) {
+      if (isConsumerDescriptorFile(resource)) {
         IFile consumerFile = (IFile) resource;
 
         ConsumerElement consumer = new ConsumerElement(this, consumerFile);
         mConsumers.add(consumer);
       }
     }
-
   }
 
   /**
@@ -110,11 +150,11 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
    * @throws CoreException
    */
   public Collection<IResource> getNonNlpResources() throws CoreException {
-    // just filter all .con and .ann files
+    
     Collection<IResource> resources = new LinkedList<IResource>();
 
     for (IResource candidate : mConfigFolder.members()) {
-      if (candidate.getName().endsWith(".con") || candidate.getName().endsWith(".ann")) {
+      if (isConsumerDescriptorFile(candidate) || isAnalysisEngineDescriptorFile(candidate)) {
         continue;
       }
 
@@ -205,45 +245,33 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
   }
 
   /**
-   * Not implemented.
+   * Adds a consumer or analysis engine descriptor to the CAS processor folder.
    */
   @Override
   void addResource(INlpElementDelta delta, IResource resource) throws CoreException {
-    if (resource instanceof IFile) {
-      // if .con file notify it
-      if (resource.getName().endsWith(".con")) {
-        ConsumerElement consumerElement = new ConsumerElement(this, (IFile) resource);
-        mConsumers.add(consumerElement);
-      } else if (resource.getName().endsWith(".ann")) {
-        AnnotatorElement annotator = new AnnotatorElement(this, (IFile) resource);
 
-        mAnnotators.add(annotator);
-      } else {
-        // do nothing
-      }
+    if (isConsumerDescriptorFile(resource)) {
+      mConsumers.add(new ConsumerElement(this, (IFile) resource));
+    } else if (isAnalysisEngineDescriptorFile(resource)) {
+      mAnnotators.add(new AnnotatorElement(this, (IFile) resource));
     }
   }
 
   @Override
   void changedResource(IResource resource, INlpElementDelta delta) throws CoreException {
-    if (resource instanceof IFile) {
-      // if .con file notify it
-      if (resource.getName().endsWith(".con")) {
-        for (ConsumerElement consumer : mConsumers) {
-          if (consumer.getResource().equals(resource)) {
-            consumer.changedResource(resource, delta);
-            break;
-          }
+    if (isConsumerDescriptorFile(resource)) {
+      for (ConsumerElement consumer : mConsumers) {
+        if (consumer.getResource().equals(resource)) {
+          consumer.changedResource(resource, delta);
+          break;
         }
-      } else if (resource.getName().endsWith(".ann")) {
-        for (AnnotatorElement annotator : mAnnotators) {
-          if (annotator.getResource().equals(resource)) {
-            annotator.changedResource(resource, delta);
-            break;
-          }
+      }
+    } else if (isAnalysisEngineDescriptorFile(resource)) {
+      for (AnnotatorElement annotator : mAnnotators) {
+        if (annotator.getResource().equals(resource)) {
+          annotator.changedResource(resource, delta);
+          break;
         }
-      } else {
-        // do nothing
       }
     }
   }
@@ -252,25 +280,20 @@ public class CasProcessorFolder extends AbstractNlpElement implements IAdaptable
    * Not implemented.
    */
   @Override
-  void removeResource(INlpElementDelta delta, IResource resource) {
-    if (resource instanceof IFile) {
-      // if .con file notify it
-      if (resource.getName().endsWith(".con")) {
-        for (ConsumerElement consumer : mConsumers) {
-          if (consumer.getResource().equals(resource)) {
-            mConsumers.remove(consumer);
-            break;
-          }
+  void removeResource(INlpElementDelta delta, IResource resource) throws CoreException {
+    if (isConsumerDescriptorFile(resource)) {
+      for (ConsumerElement consumer : mConsumers) {
+        if (consumer.getResource().equals(resource)) {
+          mConsumers.remove(consumer);
+          break;
         }
-      } else if (resource.getName().endsWith(".ann")) {
-        for (AnnotatorElement annotator : mAnnotators) {
-          if (annotator.getResource().equals(resource)) {
-            mAnnotators.remove(annotator);
-            break;
-          }
+      }
+    } else if (isAnalysisEngineDescriptorFile(resource)) {
+      for (AnnotatorElement annotator : mAnnotators) {
+        if (annotator.getResource().equals(resource)) {
+          mAnnotators.remove(annotator);
+          break;
         }
-      } else {
-        // do nothing
       }
     }
   }
