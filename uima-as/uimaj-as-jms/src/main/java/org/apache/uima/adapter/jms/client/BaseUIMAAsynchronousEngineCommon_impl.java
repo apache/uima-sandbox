@@ -1236,9 +1236,8 @@ implements UimaAsynchronousEngine, MessageListener
 		completeProcessingReply(cas, casReferenceId, payload, true, message, inputCasCachedRequest, null);
 	}
 
-	private boolean isShutdownException( Message message ) throws Exception
+	private boolean isShutdownException( Exception exception ) throws Exception
 	{
-		Exception exception = retrieveExceptionFromMessage(message);
 		if ( exception != null )
 		{
 			if ( exception instanceof ServiceShutdownException || 
@@ -1253,11 +1252,11 @@ implements UimaAsynchronousEngine, MessageListener
 	private void handleException( Message message, ClientRequest cachedRequest, boolean doNotify )
 	throws Exception
 	{
-		if ( !isShutdownException(message))
+	  Exception exception = retrieveExceptionFromMessage(message);
+		if ( !isShutdownException(exception))
 		{
 			clientSideJmxStats.incrementProcessErrorCount();
 		}
-		Exception exception = retrieveExceptionFromMessage(message);
 		if ( exception != null && cachedRequest != null ) {
 	    cachedRequest.setException(exception);
 	    if ( exception instanceof AnalysisEngineProcessException ||
@@ -1273,25 +1272,29 @@ implements UimaAsynchronousEngine, MessageListener
 			endOfCollectionMonitor.notifyAll();
 		}
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_exception_msg_INFO",
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "handleException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_exception_msg_INFO",
 				new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom), message.getStringProperty(AsynchAEMessage.CasReference), exception });
     }
-    String casReferenceId = null;
+    String casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
     try {
       if ( doNotify )
       {
         ProcessTrace pt = new ProcessTrace_impl();
-        UimaASProcessStatusImpl status = null; //  new UimaASProcessStatusImpl(pt);
-        casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
-        if ( casReferenceId != null && casReferenceId.trim().length() > 0)
-        {
-          //  Add Cas reference Id to enable matching replies with requests
-          status = new UimaASProcessStatusImpl(pt, casReferenceId);
+        String inputCasReferenceId = message.getStringProperty(AsynchAEMessage.InputCasReference);
+
+        // HACK! Service should only send exceptions for CASes that we sent.
+        // Check if this or its input parent is known.
+        if (inputCasReferenceId != null ) {
+          if (!serviceDelegate.removeCasFromOutstandingList(inputCasReferenceId)) {
+            System.out.println("\t!!!!! WARNING: Unknown input CAS "+inputCasReferenceId+" generated exception: "+exception);
+          }
+        } else if (casReferenceId != null && !serviceDelegate.removeCasFromOutstandingList(casReferenceId)) {
+          System.out.println("\t!!!!! WARNING: Unknown CAS "+casReferenceId+" generated exception: "+exception);
         }
-        else
-        {
-          status = new UimaASProcessStatusImpl(pt);
-        }
+
+        //  Add Cas referenceId(s) to enable matching replies with requests (ids may be null)
+        UimaASProcessStatusImpl status = new UimaASProcessStatusImpl(pt, casReferenceId, inputCasReferenceId);
+      
         status.addEventStatus("Process", "Failed", exception);
         if ( cachedRequest != null && 
                 !cachedRequest.isSynchronousInvocation() && 
