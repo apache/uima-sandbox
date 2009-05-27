@@ -92,7 +92,7 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 			System.out.println("NoOpAnnotator.process() called for the " + counter + "th time. Hashcode:"+hashCode());
       }
      else {
-    	 if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
+//    	 if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
 				System.out.println("NoOpAnnotator.process() called for the " + counter + "th time, delaying Response For:" +processDelay +" millis");
 				synchronized( this )
 				{

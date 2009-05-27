@@ -68,6 +68,25 @@
           <parameter>AdvancedFixedFlowController/AllowContinueOnFailure</parameter>
         </overrides>
       </configurationParameter>
+      <configurationParameter>
+        <name>AllowDropOnFailure</name>
+        <description/>
+        <type>String</type>
+        <multiValued>true</multiValued>
+        <overrides>
+          <parameter>AdvancedFixedFlowController/AllowDropOnFailure</parameter>
+        </overrides>
+      </configurationParameter>
+      <configurationParameter>
+	        <name>ExceptionsToIgnore</name>
+	        <description>Specifies which exceptions to ignore.</description>
+	        <type>String</type>
+	        <multiValued>true</multiValued>
+	        <mandatory>false</mandatory>
+	        <overrides>
+	          <parameter>AdvancedFixedFlowController/ExceptionsToIgnore</parameter>
+	        </overrides>
+      </configurationParameter>
     </configurationParameters>
     <configurationParameterSettings>
       <nameValuePair>
@@ -88,6 +107,23 @@
             <string>WriterAnnotatorA</string>
           </array>
         </value>
+      </nameValuePair>
+      <!-- This specifies for which AEs we can drop when an error occurs -->
+      <nameValuePair>
+        <name>AllowDropOnFailure</name>
+        <value>
+          <array>
+            <string>WriterAnnotatorB</string>
+          </array>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+	        <name>ExceptionsToIgnore</name>
+	        <value>
+	          <array>
+              <string>java.lang.IndexOutOfBoundsException</string>
+	          </array>
+	        </value>
       </nameValuePair>
     </configurationParameterSettings>
     <flowConstraints>

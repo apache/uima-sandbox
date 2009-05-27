@@ -104,6 +104,7 @@
         <value>
           <array>
             <string>TestMultiplier</string>
+            <string>NoOp1</string>
           </array>
         </value>
       </nameValuePair>
@@ -112,6 +113,7 @@
 	        <name>ExceptionsToIgnore</name>
 	        <value>
 	          <array>
+              <string>java.lang.IndexOutOfBoundsException</string>
 	            <string>org.apache.uima.aae.error.MessageTimeoutException</string>
 	          </array>
 	        </value>

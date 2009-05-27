@@ -31,12 +31,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Message;
-import org.apache.uima.aae.error.UimaASProcessCasTimeout;
+
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaASProcessStatus;
+import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.client.UimaASProcessStatusImpl;
-import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.error.UimaASPingTimeout;
 import org.apache.uima.aae.error.UimaASProcessCasTimeout;
@@ -46,6 +46,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.EntityProcessStatus;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
+import org.apache.uima.util.Level;
 import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.ProcessTraceEvent;
 import org.apache.uima.util.impl.ProcessTrace_impl;
@@ -68,6 +69,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	protected boolean initialized = false;
 	protected Object initializeMonitor = new Object();
 	protected boolean isStopped = false;
+	protected boolean isStopping = false;
 	protected long responseCounter = 0;
 	protected boolean expectingServiceShutdownException = false;
 	protected long expectedProcessTime = 0;
@@ -82,7 +84,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	{
 	  String defaultBrokerURL = System.getProperty("BrokerURL");
 	  if (  defaultBrokerURL != null ) {
-	      System.out.println(">>> Setting defaultBrokerURL to:"+defaultBrokerURL);
+	      System.out.println(">>> runTest: Setting defaultBrokerURL to:"+defaultBrokerURL);
 	      System.setProperty("defaultBrokerURL", defaultBrokerURL);
     } else {
 	      System.setProperty("defaultBrokerURL", "tcp://localhost:8118");
@@ -98,13 +100,14 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		  containerId = eeUimaEngine.deploy(aDeploymentDescriptorPath, appCtx);
 		} catch( ResourceInitializationException e) {
 		  if ( !ignoreException(ResourceInitializationException.class)) {
-		    System.out.println(">>>>>>>>>>> Stopping Client API Due To Initialization Exception");
+		    System.out.println(">>>>>>>>>>> runTest: Stopping Client API Due To Initialization Exception");
+		    isStopping = true;
 		    eeUimaEngine.stop();
 		    throw e;
 		  }
       System.out.println(">>>>>>>>>>> Exception ---:"+e.getClass().getName());
 		} catch( Exception e) {
-      System.out.println(">>>>>>>>>>> Exception:"+e.getClass().getName());
+      System.out.println(">>>>>>>>>>> runTest: Exception:"+e.getClass().getName());
       throw e;
 		}
 		return containerId;
@@ -126,6 +129,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	    String name = anException.getName();
 	    if ( name.equals( exceptionsToIgnore.get(i).getName()) )
 	    {
+	      System.out.println("!!! runTest ignoring exception: "+name);
 	      return true;
 	    }
 	  }
@@ -135,10 +139,6 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	{
 		eeUimaEngine.addStatusCallbackListener(listener);
 		eeUimaEngine.initialize(appCtx);
-	}
-	protected void setExpectingServiceShutdown()
-	{
-		expectingServiceShutdownException = true;
 	}
 	protected void setDoubleByteText( String aDoubleByteText )
 	{
@@ -195,7 +195,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 
 		case PROCESS_LATCH:
 			// Initialize latch to open after CPC reply comes in.
-			System.out.println("Initializing Process Latch. Number of CASes Expected:" + howMany);
+			System.out.println("runTest: Initializing Process Latch. Number of CASes Expected:" + howMany);
 			processCountLatch = new CountDownLatch(howMany);
 			break;
 		}
@@ -278,6 +278,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	protected void runTestWithMultipleThreads(String serviceDeplyDescriptor, String queueName, int howManyCASesPerRunningThread, int howManyRunningThreads, int timeout, int aGetMetaTimeout, boolean failOnTimeout) throws Exception
 	{
 		// Instantiate Uima EE Client
+	  isStopped = false;
+	  isStopping = false;
 		final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		// Deploy Uima EE Primitive Service
 		final String containerId = deployService(eeUimaEngine, serviceDeplyDescriptor);
@@ -328,7 +330,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 			SynchRunner runner = new SynchRunner(eeUimaEngine, howManyCASesPerRunningThread);
 			Thread runnerThread = new Thread(runner);
 			runnerThread.start();
-			System.out.println("Started Runner Thread::Id=" + runnerThread.getId());
+			System.out.println("runTest: Started Runner Thread::Id=" + runnerThread.getId());
 
 		}
 		// Wait until ALL CASes return from the service
@@ -337,7 +339,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 
 		if (!isStopped && !unexpectedException)
 		{
-			System.out.println("Sending CPC");
+			System.out.println("runTest: Sending CPC");
 			// Send CPC
 			eeUimaEngine.collectionProcessingComplete();
 		}
@@ -348,8 +350,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 			cpcLatch.countDown();
 		}
 		t1.join();
+		isStopping = true;
 		eeUimaEngine.stop();
-
 	}
 
   protected void runCrTest(BaseUIMAAsynchronousEngine_impl aUimaEeEngine, int howMany) throws Exception
@@ -392,8 +394,10 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		serviceShutdownException = false;
 		unexpectedException = false;
     engine = aUimaEeEngine;
+    isStopped = false;
+    isStopping = false;
 
-		if (appCtx == null)
+    if (appCtx == null)
 		{
 			appCtx = buildContext(aBrokerURI, aTopLevelServiceQueueName, 0);
 		}
@@ -414,8 +418,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		if (howMany > 0)
 		{
 			final AtomicBoolean ctrlMonitor = new AtomicBoolean();
-			// Create a thread that will block until the CPC reply come back
-			// from the top level service
+			// Create a thread that will block until an exception is returned,
+			// or 2 threads that wait for 'howMany' CASes and then a CPC reply
 			if (aLatchKind == EXCEPTION_LATCH)
 			{
 				t1 = spinMonitorThread(ctrlMonitor, 1, EXCEPTION_LATCH);
@@ -428,7 +432,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 
 			if (!isStopped)
 			{
-				// Wait until the CPC Thread is ready.
+				// Wait until the monitor thread(s) start.
 				waitOnMonitor(ctrlMonitor);
 				if (!isStopped)
 				{
@@ -442,19 +446,17 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 
 					if (!serviceShutdownException && !isStopped && !unexpectedException)
 					{
-						System.out.println("Sending CPC");
-
-						// Send CPC
+						System.out.println("runTest: Sending CPC");
 						aUimaEeEngine.collectionProcessingComplete();
 					}
 					else
 					{
-            System.out.println(">>>>>>>>>>>>>>>> Not Sending CPC Due To Exception [serviceShutdownException="+serviceShutdownException+"] [isStopped="+isStopped+"] [unexpectedException="+unexpectedException+"]");
+            System.out.println(">>>>>>>>>>>>>>>> runTest: Not Sending CPC Due To Exception [serviceShutdownException="+serviceShutdownException+"] [isStopped="+isStopped+"] [unexpectedException="+unexpectedException+"]");
 					}
 				}
 
 				// If have skipped CPC trip the latch
-				if ( serviceShutdownException || (unexpectedException && cpcLatch != null) )
+				if ( (serviceShutdownException || unexpectedException) && cpcLatch != null )
 				{
 					cpcLatch.countDown();
 				}
@@ -467,6 +469,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		{
 			fail("Unexpected exception returned");
 		}
+		isStopping = true;
 		aUimaEeEngine.stop();
 	}
 
@@ -488,6 +491,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		Thread t1 = null;
 		Thread t2 = null;
     engine = aUimaEeEngine;
+    isStopped = false;
+    isStopping = false;
 
 		if (appCtx == null)
 		{
@@ -528,7 +533,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 
 					if (!serviceShutdownException && !isStopped && !unexpectedException)
 					{
-						System.out.println("Sending CPC");
+						System.out.println("runTest: Sending CPC");
 
 						// Send CPC
 						aUimaEeEngine.collectionProcessingComplete();
@@ -549,6 +554,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		{
 			fail("Unexpected exception returned");
 		}
+		isStopping = true;
 		aUimaEeEngine.stop();
 	}
 	/**
@@ -566,13 +572,22 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		for (int i = 0; i < howMany; i++)
 		{
 			CAS cas = eeUimaEngine.getCAS();
+			if (cas == null) {
+			  if (isStopping) {
+			    System.out.println(">> runTest: stopping after sending "+i+" of "+howMany+" CASes");
+			    return;
+			  }
+			  else {
+			    System.out.println(">>>> ERROR! sendCas: "+(i+1)+"-th CAS is null?");
+			  }
+			}
 			if ( doubleByteText != null )
 			{
 				cas.setDocumentText(doubleByteText);
 			}
 			else
 			{
-				cas.setDocumentText(text);
+			  cas.setDocumentText(text);
 			}
 			if (sendCasAsynchronously)
 			{
@@ -591,14 +606,14 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	protected void incrementCASesProcessed()
 	{
 		responseCounter++;
-		System.out.println("Client:::::::::::::: Received:" + responseCounter + " Reply");
+		System.out.println("runTest: Client:::::::::::::: Received:" + responseCounter + " Reply");
 
 	}
 	
 	protected class UimaAsTestCallbackListener extends UimaAsBaseCallbackListener {
 	  
     public void onBeforeMessageSend(UimaASProcessStatus status) {
-      System.out.println("Received onBeforeMessageSend() Notification With CAS:"+status.getCasReferenceId());
+      System.out.println("runTest: Received onBeforeMessageSend() Notification With CAS:"+status.getCasReferenceId());
     }
 
 	  /**
@@ -618,13 +633,16 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	      parentCasReferenceId = 
 	        ((UimaASProcessStatus)aProcessStatus).getParentCasReferenceId();
 	    }
+	    if (isStopping) {
+	      System.out.println(">>>>> runTest: Ignoring entityProcessComplete callback as engine is shutting down");
+	      return;
+	    }
 	    if (aProcessStatus.isException())
 	    {
-	      if ( !expectingServiceShutdownException )
-	        System.out.println(" Process Received Reply Containing Exception.");
-	      
-
 	      List list = aProcessStatus.getExceptions();
+	      if ( !expectingServiceShutdownException )
+	        System.out.println("runTest: Process Received Reply Containing "+list.size()+" Exception(s)");	      
+
 	      for( int i=0; i < list.size(); i++)
 	      {
 	        Exception e = (Exception)list.get(i);
@@ -638,16 +656,15 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	          expectedException = true;
 	        } else if ( e instanceof ResourceProcessException && isProcessTimeout(e) ) {
 	          synchronized(errorCounterMonitor) {
-	            System.out.println("Incrementing ProcessTimeout Counter");
+	            System.out.println("runTest: Incrementing ProcessTimeout Counter");
 	            timeoutCounter++;
 	          }
 	        } else if ( engine != null && e instanceof UimaASPingTimeout) {
-	          System.out.println(".......... Listener Stopping Uima AS Due to Ping Timeout. Service Not Responding To Ping");
-	          if ( cpcLatch != null)
-	          {
+	          System.out.println("runTest: Ping Timeout - service Not Responding To Ping");
+	          if ( cpcLatch != null) {
 	            cpcLatch.countDown();
 	          }
-
+	          isStopping = true;
 	          engine.stop();
 	        }
 	        if ( !expectedException && !expectingServiceShutdownException )
@@ -668,7 +685,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	        if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
 	        {
 	        unexpectedException = true;
-	        System.out.println(" ... when expecting normal completion!");
+	        System.out.println("runTest:  ... when expecting normal completion!");
 	        }
 	        while (processCountLatch.getCount() > 0)
 	        {
@@ -680,11 +697,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	    {
 	      if ( parentCasReferenceId != null )
 	      {
-	        System.out.println("Client Received Reply Containing CAS:"+casReferenceId+" The Cas Was Generated From Parent Cas Id:"+parentCasReferenceId);
+	        System.out.println("runTest: Received Reply Containing CAS:"+casReferenceId+" The Cas Was Generated From Parent Cas Id:"+parentCasReferenceId);
 	      }
 	      else
 	      {
-	        System.out.println("Client Received Reply Containing CAS:"+casReferenceId);
+	        System.out.println("runTest: Received Reply Containing CAS:"+casReferenceId);
 	      }
 	      
 	      if ( doubleByteText != null )
@@ -711,7 +728,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	      for( int i=0; i < eList.size(); i++)
 	      {
 	        ProcessTraceEvent eEvent = (ProcessTraceEvent)eList.get(i);
-	        System.out.println("Received Process Event - "+eEvent.getDescription()+" Duration::"+eEvent.getDuration()+" ms"); // / (float) 1000000);
+	        System.out.println("runTest: Received Process Event - "+eEvent.getDescription()+" Duration::"+eEvent.getDuration()+" ms"); // / (float) 1000000);
 	        //  Check if the running test wants to check how long the processing of CAS took
 	        if (  expectedProcessTime > 0 &&
 	            "Total Time In Process CAS".equals(eEvent.getDescription()))
@@ -720,7 +737,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	          //  a CAS. Allow 50ms difference.
 	          if (eEvent.getDuration() > expectedProcessTime &&  (eEvent.getDuration() % expectedProcessTime ) > 50 ) 
 	          {
-	            System.out.println("!!!!!!!!!!!!! Expected Process CAS Duration of:"+expectedProcessTime+" ms. Instead Process CAS Took:"+eEvent.getDuration());
+	            System.out.println("!!!!!!!!!!!!! runTest: Expected Process CAS Duration of:"+expectedProcessTime+" ms. Instead Process CAS Took:"+eEvent.getDuration());
 	            unexpectedException = true;
 	          }
 	        }
@@ -742,12 +759,12 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	    
 	    if (aStatus != null && aStatus.isException())
 	    {
-	      System.out.println("Initialization Received Reply Containing Exception:");
+	      System.out.println("runTest: Initialization Received Reply Containing Exception:");
 	      List exceptions = aStatus.getExceptions();
 	      for (int i = 0; i < exceptions.size(); i++)
 	      {
 	        if ( exceptions.get(i) instanceof UimaASPingTimeout ) {
-	          System.out.println("Client Received PING Timeout. Service Not Available");
+	          System.out.println("runTest: Client Received PING Timeout. Service Not Available");
 	          if (cpcLatch != null)
 	          {
 	            cpcLatch.countDown();
@@ -775,6 +792,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	   */
 	  public void collectionProcessComplete(EntityProcessStatus aStatus)
 	  {
+	    if (isStopping) {
+	      System.out.println(">>>>> runTest: Ignoring collectionProcessComplete callback as engine is shutting down");
+	      return;
+	    }
+
 	    if (aStatus != null && aStatus.isException())
 	    {
 	      
@@ -799,8 +821,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	      }
 	      if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
 	      {
-	        System.out.println(" Received CPC Reply Containing Exception");
-	        System.out.println(" ... when expecting normal CPC reply!");
+	        System.out.println("runTest: Received CPC Reply Containing Exception\n" +
+	                           " ... when expecting normal CPC reply!");
 	        unexpectedException = true;
 	      }
 	      if (exceptionCountLatch != null)
@@ -814,7 +836,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	    }
 	    else
 	    {
-	      System.out.println("Received CPC Reply");
+	      System.out.println("runTest: Received CPC Reply");
 	      if (cpcLatch != null)
 	      {
 	        cpcLatch.countDown();
@@ -867,7 +889,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 						cas.release();
 					}
 				}
-				System.out.println(">>>>>>>>Thread::" + Thread.currentThread().getId() + " Is Exiting - Completed Full Run");
+				System.out.println(">>>>>>>> runTest: Thread::" + Thread.currentThread().getId() + " Is Exiting - Completed Full Run");
 			}
 			catch (Exception e)
 			{
@@ -885,14 +907,19 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 			{
 				timer.cancel();
 				timer.purge();
-				System.out.println(">>>> Stopping UIMA EE Engine");
+				System.out.println(">>>> runTest: Stopping UIMA EE Engine");
+				isStopping = true;
 				uimaEEEngine.stop();
+				isStopping = false;
 				isStopped = true;
-				System.out.println(">>>> UIMA EE Engine Stopped");
+				System.out.println(">>>> runTest: UIMA EE Engine Stopped");
 				if (cpcLatch != null )
-				cpcLatch.countDown();
-				if ( processCountLatch != null)
-				processCountLatch.countDown();
+				  cpcLatch.countDown();
+				if ( processCountLatch != null) {
+          while (processCountLatch.getCount() > 0) {
+            processCountLatch.countDown();
+          }
+				}
 			}
 		}, timeToRun);
 		

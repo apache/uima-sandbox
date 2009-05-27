@@ -80,7 +80,6 @@ public class TestUimaASBasic extends BaseTestSupport
 		System.out.println("-------------- testInvalidInitializeCall -------------");
 		//	Instantiate Uima EE Client
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-		super.setExpectingServiceShutdown();
 
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
 		Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue" );
@@ -132,7 +131,6 @@ public class TestUimaASBasic extends BaseTestSupport
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		//	Deploy Uima EE Primitive Service 
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
-		super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 0, EXCEPTION_LATCH);
 	}
 	/**
@@ -147,7 +145,6 @@ public class TestUimaASBasic extends BaseTestSupport
 		System.setProperty(JmsConstants.SessionTimeoutOverride, "2500000");
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
-		super.setExpectingServiceShutdown();
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, EXCEPTION_LATCH);
 	}
 

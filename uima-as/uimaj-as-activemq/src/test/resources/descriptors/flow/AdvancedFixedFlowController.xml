@@ -64,6 +64,25 @@
         <multiValued>true</multiValued>
         <mandatory>false</mandatory>
       </configurationParameter>
+
+      <configurationParameter>
+        <name>AllowDropOnFailure</name>
+        <description> Specifies for which AnalysisEngines a failed CAS can be dropped when an exception occurs. This
+          only applies to internally created CASes and prevents the exception from being transferred to their parent. This 
+          parameter takes an array of Strings as its value. Each String is the key of AnalysisEngine for which
+          dropping on failure should be allowed. </description>
+        <type>String</type>
+        <multiValued>true</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+
+      <configurationParameter>
+        <name>ExceptionsToIgnore</name>
+        <description>Specifies which exceptions to ignore.</description>
+        <type>String</type>
+        <multiValued>true</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
     </configurationParameters>
     <configurationParameterSettings>
       <nameValuePair>
