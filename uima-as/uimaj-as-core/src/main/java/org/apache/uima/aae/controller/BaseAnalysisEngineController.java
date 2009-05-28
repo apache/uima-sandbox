@@ -1113,41 +1113,16 @@ implements AnalysisEngineController, EventSubscriber
             Delegate delegate = ((AggregateAnalysisEngineController)this).lookupDelegate(key);
             //  Cancel the delegate timer. No more responses are expected 
             delegate.cancelDelegateTimer();
-            
-            //  If the delegate has CASes pending reply still, send each CAS
-            //  from the pending list through the error handler with 
-            //  MessageTimeoutException as a cause of error
-            while ( delegate.getCasPendingReplyListSize() > 0 ) {
-              String timedOutCasId = delegate.removeOldestCasFromOutstandingList();
-              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-                       "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_force_cas_timeout__INFO",
-                       new Object[] { getComponentName(), key, timedOutCasId, " Pending Reply List" });
-              }
-              
-              ErrorContext errorContext = new ErrorContext();
-              errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
-              errorContext.add(AsynchAEMessage.CasReference, timedOutCasId);
-              errorContext.add(AsynchAEMessage.Endpoint, endpoint);
-              getErrorHandlerChain().handle(new MessageTimeoutException(), errorContext, this);
-            }
-            //  If the delegate has CASes pending dispatch, send each CAS
-            //  from the pending dispatch list through the error handler with 
-            //  MessageTimeoutException as a cause of error
-            while ( delegate.getCasPendingDispatchListSize() > 0 ) {
-              String timedOutCasId = delegate.removeOldestFromPendingDispatchList();
-
-              if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-                       "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_force_cas_timeout__INFO",
-                       new Object[] { getComponentName(), key, timedOutCasId, " Pending Dispatch List" });
-              }
-              
-              ErrorContext errorContext = new ErrorContext();
-              errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
-              errorContext.add(AsynchAEMessage.CasReference, timedOutCasId);
-              errorContext.add(AsynchAEMessage.Endpoint, endpoint);
-              getErrorHandlerChain().handle(new MessageTimeoutException(), errorContext, this);
+            //  Check if we should force timeout on all CASes in a pending state. If this
+            //  method is called from ProcessCasErrorHandler we will skip this since we
+            //  want to first completely handle the CAS exception. Once that CAS exception 
+            //  is handled, the ProcessCasErrorHandler will call forceTimeoutOnPendingCases
+            //  to time out CASes in pending lists
+            if ( anErrorContext.containsKey( AsynchAEMessage.SkipPendingLists) == false ) {
+              //  If the delegate has CASes pending reply still, send each CAS
+              //  from the pending list through the error handler with 
+              //  MessageTimeoutException as a cause of error
+              forceTimeoutOnPendingCases(key);
             }
           }
 
@@ -1214,6 +1189,49 @@ implements AnalysisEngineController, EventSubscriber
 		}
 
 	}
+
+	public void forceTimeoutOnPendingCases(String key ) {
+    Delegate delegate = ((AggregateAnalysisEngineController)this).lookupDelegate(key);
+    //  Cancel the delegate timer. No more responses are expected 
+    delegate.cancelDelegateTimer();
+    Endpoint endpoint = delegate.getEndpoint();
+    //  If the delegate has CASes pending reply still, send each CAS
+    //  from the pending list through the error handler with 
+    //  MessageTimeoutException as a cause of error
+    while ( delegate.getCasPendingReplyListSize() > 0 ) {
+      String timedOutCasId = delegate.removeOldestCasFromOutstandingList();
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+               "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_force_cas_timeout__INFO",
+               new Object[] { getComponentName(), key, timedOutCasId, " Pending Reply List" });
+      }
+      
+      ErrorContext errorContext = new ErrorContext();
+      errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+      errorContext.add(AsynchAEMessage.CasReference, timedOutCasId);
+      errorContext.add(AsynchAEMessage.Endpoint, endpoint);
+      getErrorHandlerChain().handle(new MessageTimeoutException(), errorContext, this);
+    }
+    //  If the delegate has CASes pending dispatch, send each CAS
+    //  from the pending dispatch list through the error handler with 
+    //  MessageTimeoutException as a cause of error
+    while ( delegate.getCasPendingDispatchListSize() > 0 ) {
+      String timedOutCasId = delegate.removeOldestFromPendingDispatchList();
+
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+               "handleAction", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_force_cas_timeout__INFO",
+               new Object[] { getComponentName(), key, timedOutCasId, " Pending Dispatch List" });
+      }
+      
+      ErrorContext errorContext = new ErrorContext();
+      errorContext.add(AsynchAEMessage.Command, AsynchAEMessage.Process);
+      errorContext.add(AsynchAEMessage.CasReference, timedOutCasId);
+      errorContext.add(AsynchAEMessage.Endpoint, endpoint);
+      getErrorHandlerChain().handle(new MessageTimeoutException(), errorContext, this);
+    }
+  }
+	
 	protected void plugInDefaultErrorHandlerChain()
 	{
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
