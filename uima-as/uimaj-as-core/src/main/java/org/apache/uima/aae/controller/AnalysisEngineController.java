@@ -207,5 +207,7 @@ public interface AnalysisEngineController extends ControllerLifecycle
   public void addAbortedCasReferenceId( String aCasReferenceId );
   public boolean isAwaitingCacheCallbackNotification();
   public void quiesceAndStop();
+  
+  public void forceTimeoutOnPendingCases(String key);
 
 }
