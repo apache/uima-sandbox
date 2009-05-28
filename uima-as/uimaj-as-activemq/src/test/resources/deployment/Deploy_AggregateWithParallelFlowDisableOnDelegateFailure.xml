@@ -31,13 +31,13 @@
     <service>
       <inputQueue endpoint="TopLevelTaeQueue" brokerURL="tcp://localhost:8118" prefetch="1"/>
       <topDescriptor>
-        <import location="../descriptors/analysis_engine/SimpleTestAggregateWithParallelFlow.xml"/>
+        <import location="../descriptors/analysis_engine/SimpleTestAggregateWithParallelFlowCheck.xml"/>
       </topDescriptor>
       <analysisEngine>
         <delegates>
         
           <analysisEngine key="TestMultiplier">
-	        <casMultiplier poolSize="2"/> 
+	        <casMultiplier poolSize="1"/> 
           </analysisEngine>
 
           <remoteAnalysisEngine key="NoOp1">
@@ -57,6 +57,15 @@
                             <processCasErrors maxRetries="0" thresholdCount="1"  thresholdAction="terminate" />
                       </asyncAggregateErrorConfiguration>
           </remoteAnalysisEngine>
+
+          <analysisEngine key="CheckTextAnnotator" async="false">
+            <scaleout numberOfInstances="1"/>
+            <asyncAggregateErrorConfiguration>
+              <getMetadataErrors maxRetries="0" timeout="0" errorAction="terminate"/>
+              <processCasErrors maxRetries="0" timeout="0" continueOnRetryFailure="false" thresholdCount="1" thresholdWindow="0" thresholdAction="terminate"/>
+              <collectionProcessCompleteErrors timeout="0" additionalErrorAction="terminate"/>
+            </asyncAggregateErrorConfiguration>
+          </analysisEngine>
 
         </delegates>
       </analysisEngine>

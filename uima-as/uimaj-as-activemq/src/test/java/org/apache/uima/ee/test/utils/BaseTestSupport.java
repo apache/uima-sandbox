@@ -71,7 +71,6 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	protected boolean isStopped = false;
 	protected boolean isStopping = false;
 	protected long responseCounter = 0;
-	protected boolean expectingServiceShutdownException = false;
 	protected long expectedProcessTime = 0;
 	boolean serviceShutdownException = false;
 	List<Class> exceptionsToIgnore = new ArrayList<Class>();
@@ -623,25 +622,30 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	   */
 	  public synchronized void entityProcessComplete(CAS aCAS, EntityProcessStatus aProcessStatus)
 	  {
-	    String casReferenceId="";
-	    String parentCasReferenceId="";
+	    String casReferenceId = null;
+	    String parentCasReferenceId = null;
 	    boolean expectedException = false;
+
+      if (isStopping) {
+        System.out.println(">>>>> runTest: Ignoring entityProcessComplete callback as engine is shutting down");
+        return;
+      }
 	    if ( aProcessStatus instanceof UimaASProcessStatus )
 	    {
-	      casReferenceId = 
-	        ((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
-	      parentCasReferenceId = 
-	        ((UimaASProcessStatus)aProcessStatus).getParentCasReferenceId();
-	    }
-	    if (isStopping) {
-	      System.out.println(">>>>> runTest: Ignoring entityProcessComplete callback as engine is shutting down");
-	      return;
+	      casReferenceId = ((UimaASProcessStatus)aProcessStatus).getCasReferenceId();
+	      parentCasReferenceId = ((UimaASProcessStatus)aProcessStatus).getParentCasReferenceId();
 	    }
 	    if (aProcessStatus.isException())
 	    {
 	      List list = aProcessStatus.getExceptions();
-	      if ( !expectingServiceShutdownException )
-	        System.out.println("runTest: Process Received Reply Containing "+list.size()+" Exception(s)");	      
+	      if (casReferenceId == null) {
+	        System.out.println("runTest: Received Reply Containing "+list.size()+" Exception(s)");
+	      } else if ( parentCasReferenceId == null ) {
+          System.out.println("runTest: Received Reply from CAS "+casReferenceId+" Containing "+list.size()+" Exception(s)");
+        } else {
+          System.out.println("runTest: Received Reply from CAS "+casReferenceId+" (Parent "+parentCasReferenceId
+                  +") Containing "+list.size()+" Exception(s)");
+        }
 
 	      for( int i=0; i < list.size(); i++)
 	      {
@@ -667,7 +671,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	          isStopping = true;
 	          engine.stop();
 	        }
-	        if ( !expectedException && !expectingServiceShutdownException )
+	        if ( !expectedException )
 	        {
 	          e.printStackTrace();
 	        }
@@ -682,7 +686,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	      }
 	      else if (processCountLatch != null)
 	      {
-	        if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
+	        if ( !expectedException )
 	        {
 	        unexpectedException = true;
 	        System.out.println("runTest:  ... when expecting normal completion!");
@@ -693,6 +697,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	        }
 	      }
 	    }
+	    // Not an exception
 	    else if (processCountLatch != null && aCAS != null)
 	    {
 	      if ( parentCasReferenceId != null )
@@ -771,10 +776,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	          }
 	          
 	        }
-	        if ( !expectingServiceShutdownException )
-	        {
-	          ((Throwable) exceptions.get(i)).printStackTrace();
-	        }
+	        ((Throwable) exceptions.get(i)).printStackTrace();
 	      }
 	      if (exceptionCountLatch != null)
 	        exceptionCountLatch.countDown();
@@ -814,12 +816,12 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	        {
 	          expectedException = true;
 	        }
-	        if ( !expectedException && !expectingServiceShutdownException )
+	        if ( !expectedException )
 	        {
 	          e.printStackTrace();
 	        }
 	      }
-	      if ( !expectedException && !(serviceShutdownException && expectingServiceShutdownException) )
+	      if ( !expectedException )
 	      {
 	        System.out.println("runTest: Received CPC Reply Containing Exception\n" +
 	                           " ... when expecting normal CPC reply!");

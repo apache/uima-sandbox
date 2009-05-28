@@ -43,7 +43,12 @@ import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.TypeSystem;
+import org.apache.uima.cas.text.AnnotationIndex;
+import org.apache.uima.examples.SourceDocumentInformation;
+import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
@@ -76,7 +81,7 @@ public class CheckTextAnnotator extends CasAnnotator_ImplBase
 
 		// write log messages
 		Logger logger = getContext().getLogger();
-		logger.log(Level.CONFIG, "NAnnotator initialized");
+		logger.log(Level.CONFIG, name+" initialized");
 	}
 
 	public void typeSystemInit(TypeSystem aTypeSystem) throws AnalysisEngineProcessException
@@ -106,12 +111,30 @@ public class CheckTextAnnotator extends CasAnnotator_ImplBase
       System.out.println(name + ".process() called for the " + counter + "th time: \"" + line
               + "\"");
     }
-    if (counter % checkInterval == 0) {
+    if (checkInterval > 0 && counter % checkInterval == 0) {
       if (!line.startsWith(textPrefix)) {
         String msg = name+" expected "+counter+"-th CAS to start with: " + textPrefix;
         System.out.println(msg);
         throw new AnalysisEngineProcessException(new Exception(msg));
       }
+    }
+
+    // If not checking the document text check if a SourceDocumentInformation annotation has been added
+    if (checkInterval == 0) {
+      JCas jcas;
+      try {
+        jcas = aCAS.getJCas();
+      } catch (CASException e) {
+        throw new AnalysisEngineProcessException(e);
+      }
+      AnnotationIndex aIndx = jcas.getAnnotationIndex(SourceDocumentInformation.type);
+      FSIterator aIter = aIndx.iterator();
+      if (!aIter.isValid()) {
+        String msg = name+" didn't find a SourceDocumentInformation annotation";
+        System.out.println(msg);
+        throw new AnalysisEngineProcessException(new Exception(msg));
+      }
+      System.out.println(name+" found a SourceDocumentInformation");
     }
   }
 

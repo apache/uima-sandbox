@@ -1064,7 +1064,7 @@ public class TestUimaASExtended extends BaseTestSupport
     //  Create Uima EE Client
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
-    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator2.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_SimpleAnnotator.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlowDisableOnDelegateFailure.xml");
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH); //PC_LATCH);
   }
@@ -1486,10 +1486,6 @@ public class TestUimaASExtended extends BaseTestSupport
   public void testJmsServiceAdapterWithGetmetaTimeout() throws Exception {
     System.out.println("-------------- testJmsServiceAdapterWithGetmetaTimeout -------------");
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-    // This test now fails.  First the deployment fails, leaving the running flag set (!)
-    // which makes runTest fail in the initialization phase ... so it never gets to
-    // use the EXCEPTION_LATCH
-    //addExceptionToignore(ResourceInitializationException.class);
     try {
       deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
     } catch( ResourceInitializationException e ) {

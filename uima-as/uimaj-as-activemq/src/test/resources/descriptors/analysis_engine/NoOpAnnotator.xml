@@ -24,13 +24,13 @@
   <primitive>true</primitive>
   <annotatorImplementationName>org.apache.uima.ae.noop.NoOpAnnotator</annotatorImplementationName>
   <analysisEngineMetaData>
-    <name>NoOp Annotator</name>
+    <name>NoOpAnnotator</name>
     <description>Annotator That Does Nothin</description>
     <version>1.0</version>
     <vendor>The Apache Software Foundation</vendor>
     
     <configurationParameters>
-          <configurationParameter>
+      <configurationParameter>
         <name>ErrorFrequency</name>
         <description>Frequency of Generated Errors</description>
         <type>Integer</type>
@@ -45,19 +45,18 @@
         <multiValued>false</multiValued>
         <mandatory>true</mandatory>
       </configurationParameter>
-
     
     </configurationParameters>
     
     <configurationParameterSettings>
-          <nameValuePair>
+      <nameValuePair>
         <name>ErrorFrequency</name>
         <value>
           <integer>0</integer>
         </value>
       </nameValuePair>
 
-          <nameValuePair>
+      <nameValuePair>
         <name>ProcessDelay</name>
         <value>
           <integer>0</integer>
@@ -65,8 +64,6 @@
       </nameValuePair>
     
     </configurationParameterSettings>
-    
-    
     
     <typeSystemDescription>
     </typeSystemDescription>

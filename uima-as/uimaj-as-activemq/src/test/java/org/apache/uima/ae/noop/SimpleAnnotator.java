@@ -45,7 +45,7 @@ public class SimpleAnnotator extends CasAnnotator_ImplBase {
 			processDelay = ((Integer) getContext().getConfigParameterValue(
 					"ProcessDelay")).intValue();
 			System.out
-					.println("NoOpAnnotator.initialize() Initializing With Process Delay of "
+					.println("SimpleAnnotator.initialize() Initializing With Process Delay of "
 							+ processDelay + " millis");
 		}
 
@@ -66,9 +66,9 @@ public class SimpleAnnotator extends CasAnnotator_ImplBase {
 	public void collectionProcessComplete()
 			throws AnalysisEngineProcessException {
 		System.out
-				.println("NoOpAnnotator.collectionProcessComplete() Called -------------------------------------");
+				.println("SimpleAnnotator.collectionProcessComplete() Called -------------------------------------");
 		if (finalCount > 0 && finalCount != counter) {
-			String msg = "NoOpAnnotator expected " + finalCount
+			String msg = "SimpleAnnotator expected " + finalCount
 					+ " CASes but was given " + counter;
 			System.out.println(msg);
 			throw new AnalysisEngineProcessException(new Exception(msg));
@@ -80,11 +80,11 @@ public class SimpleAnnotator extends CasAnnotator_ImplBase {
 		++counter;
 		if (processDelay == 0) {
 			if (UIMAFramework.getLogger().isLoggable(Level.FINE))
-				System.out.println("NoOpAnnotator.process() called for the "
+				System.out.println("SimpleAnnotator.process() called for the "
 						+ counter + "th time. Hashcode:" + hashCode());
 		} else {
 			if (UIMAFramework.getLogger().isLoggable(Level.FINE))
-				System.out.println("NoOpAnnotator.process() called for the "
+				System.out.println("SimpleAnnotator.process() called for the "
 						+ counter + "th time, delaying Response For:"
 						+ processDelay + " millis");
 			synchronized (this) {
@@ -103,6 +103,8 @@ public class SimpleAnnotator extends CasAnnotator_ImplBase {
 		SourceDocumentInformation sda = new SourceDocumentInformation(jcas, 0, jcas.getDocumentText().length());
 		sda.setOffsetInSource(0);
 		sda.addToIndexes();
+    if (UIMAFramework.getLogger().isLoggable(Level.FINE))
+      System.out.println("SimpleAnnotator.process() added a SourceDocumentInformation annotation");
 	}
 
 }
