@@ -83,7 +83,8 @@ public class ProcessRequestHandler_impl extends HandlerBase
        try {
          stateEntry = getController().getLocalCache().lookupEntry(casReferenceId);
          if ( stateEntry != null && stateEntry.isSubordinate()) {
-           parentCasReferenceId = stateEntry.getInputCasReferenceId();
+             CasStateEntry topParentEntry = getController().getLocalCache().getTopCasAncestor(casReferenceId);
+             parentCasReferenceId = topParentEntry.getCasReferenceId();
          }
        } catch ( Exception e){}
 

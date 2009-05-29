@@ -148,7 +148,8 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
             try {
               stateEntry = aController.getLocalCache().lookupEntry(aCasReferenceId);
               if ( stateEntry != null && stateEntry.isSubordinate()) {
-                parentCasReferenceId = stateEntry.getInputCasReferenceId();
+                CasStateEntry topParentEntry = aController.getLocalCache().getTopCasAncestor(aCasReferenceId);
+                parentCasReferenceId = topParentEntry.getCasReferenceId();
               }
             } catch ( Exception e){}
 		        aController.getOutputChannel().sendReply(t, aCasReferenceId, parentCasReferenceId, anEndpoint, AsynchAEMessage.Process);

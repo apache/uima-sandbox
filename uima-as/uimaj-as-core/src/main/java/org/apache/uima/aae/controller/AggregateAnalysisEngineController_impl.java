@@ -2412,7 +2412,13 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			for( int i=0; cachedEntries != null && i < cachedEntries.length; i++ )
 			{
 				String casReferenceId = cachedEntries[i].getCasReferenceId();
-				String parentCasReferenceId = cachedEntries[i].getInputCasReferenceId();
+        String parentCasReferenceId = null;
+        try {
+          CasStateEntry parentEntry = getLocalCache().getTopCasAncestor(casReferenceId);//cachedEntries[i].getInputCasReferenceId();
+          if (parentEntry != null ) {
+            parentCasReferenceId = parentEntry.getCasReferenceId();
+          }
+        } catch ( Exception e) {}
 				getInProcessCache().getEndpoint(anEndpoint, casReferenceId).cancelTimer();
 				Endpoint requestOrigin = cachedEntries[i].getMessageOrigin();
 				try
