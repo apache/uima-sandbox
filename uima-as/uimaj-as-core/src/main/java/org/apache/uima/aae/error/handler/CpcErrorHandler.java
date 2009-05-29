@@ -81,7 +81,7 @@ public class CpcErrorHandler  extends ErrorHandlerBase implements ErrorHandler
 				{
 					endpoint = ((AggregateAnalysisEngineController)aController).getClientEndpoint();
 				}
-				aController.getOutputChannel().sendReply(t, null, endpoint, AsynchAEMessage.CollectionProcessComplete);
+				aController.getOutputChannel().sendReply(t, null, null, endpoint, AsynchAEMessage.CollectionProcessComplete);
 			}
 			catch( Exception e)
 			{

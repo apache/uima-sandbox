@@ -78,9 +78,18 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	                "handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_message_has_no_cargo__INFO",
 	                new Object[] { aMessageContext.getEndpoint().getEndpoint() });
       }
+      CasStateEntry stateEntry = null;
+      String parentCasReferenceId = null;
+       try {
+         stateEntry = getController().getLocalCache().lookupEntry(casReferenceId);
+         if ( stateEntry != null && stateEntry.isSubordinate()) {
+           parentCasReferenceId = stateEntry.getInputCasReferenceId();
+         }
+       } catch ( Exception e){}
+
 			getController().
 				getOutputChannel().
-					sendReply(new InvalidMessageException("No XMI data in message"), casReferenceId, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
+					sendReply(new InvalidMessageException("No XMI data in message"), casReferenceId,parentCasReferenceId, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
 			//	Dont process this empty message
 			return false;
 		}
@@ -296,7 +305,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
       }
 			getController().
 				getOutputChannel().
-					sendReply(new InvalidMessageException("No Cas Reference Id Received From Delegate In message"), null, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
+					sendReply(new InvalidMessageException("No Cas Reference Id Received From Delegate In message"), null,null, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
 			return null;
 		}
 		return aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
@@ -734,7 +743,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
           }            
 					getController().
 						getOutputChannel().
-							sendReply(new InvalidMessageException("No XMI data in message"), casReferenceId, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
+							sendReply(new InvalidMessageException("No XMI data in message"), casReferenceId,null, aMessageContext.getEndpoint(),AsynchAEMessage.Process);
 					//	Dont process this empty message
 					return;
 				}

@@ -1820,7 +1820,7 @@ implements AnalysisEngineController, EventSubscriber
 			{
 				try
 				{
-					getOutputChannel().sendReply( new ServiceShutdownException(), null, clientEndpoint, clientEndpoint.getCommand());
+					getOutputChannel().sendReply( new ServiceShutdownException(), null, null, clientEndpoint, clientEndpoint.getCommand());
 				}
 				catch( Exception e)
 				{

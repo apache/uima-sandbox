@@ -2090,7 +2090,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       if (key != null) {
         endpoint = (Endpoint_impl) destinationMap.get(key);
       }
-	
 			if (endpoint == null)
 			{
 				// Log invalid reply and move on
@@ -2413,11 +2412,12 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 			for( int i=0; cachedEntries != null && i < cachedEntries.length; i++ )
 			{
 				String casReferenceId = cachedEntries[i].getCasReferenceId();
+				String parentCasReferenceId = cachedEntries[i].getInputCasReferenceId();
 				getInProcessCache().getEndpoint(anEndpoint, casReferenceId).cancelTimer();
 				Endpoint requestOrigin = cachedEntries[i].getMessageOrigin();
 				try
 				{
-					getOutputChannel().sendReply(new UimaEEServiceException("Delegates Not Found To Process CAS on Endpoint:"+anEndpoint), casReferenceId, requestOrigin, AsynchAEMessage.Process);
+					getOutputChannel().sendReply(new UimaEEServiceException("Delegates Not Found To Process CAS on Endpoint:"+anEndpoint), casReferenceId,parentCasReferenceId, requestOrigin, AsynchAEMessage.Process);
 				}
 				catch( Exception e)
 				{

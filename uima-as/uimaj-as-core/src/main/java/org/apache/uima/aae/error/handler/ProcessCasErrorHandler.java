@@ -143,7 +143,15 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			   }
 			   else
 			   {
-		        aController.getOutputChannel().sendReply(t, aCasReferenceId, anEndpoint, AsynchAEMessage.Process);
+			     CasStateEntry stateEntry = null;
+           String parentCasReferenceId = null;
+            try {
+              stateEntry = aController.getLocalCache().lookupEntry(aCasReferenceId);
+              if ( stateEntry != null && stateEntry.isSubordinate()) {
+                parentCasReferenceId = stateEntry.getInputCasReferenceId();
+              }
+            } catch ( Exception e){}
+		        aController.getOutputChannel().sendReply(t, aCasReferenceId, parentCasReferenceId, anEndpoint, AsynchAEMessage.Process);
 			   }
 			}
 			catch( Exception e)
@@ -626,7 +634,9 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 	private boolean deliverExceptionToClient( Throwable t) {
     //  Dont send TimeOutExceptions to client
 	  if ( t instanceof MessageTimeoutException ||
-	       (t instanceof UimaEEServiceException && t.getCause() != null && t.getCause() instanceof MessageTimeoutException) ) {
+	       t instanceof UimaEEServiceException && 
+	       t.getCause() != null && 
+	       t.getCause() instanceof MessageTimeoutException)  {
       return false;
     }
     return true;

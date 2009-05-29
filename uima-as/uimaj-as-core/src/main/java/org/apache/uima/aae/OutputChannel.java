@@ -52,7 +52,7 @@ public interface OutputChannel extends Channel
 	//	public void sendReply( AnalysisEngineMetaData anAnalysisEngineMetadata, Endpoint anEndpoint, boolean serialize ) throws AsynchAEException;
 	public void sendReply( ProcessingResourceMetaData aProcessingResourceMetadata, Endpoint anEndpoint, boolean serialize ) throws AsynchAEException;
 
-	public void sendReply(Throwable t, String aCasReferenceId, Endpoint anEndpoint, int aCommand) throws AsynchAEException;
+	public void sendReply(Throwable t, String aCasReferenceId, String aParentCasReferenceId, Endpoint anEndpoint, int aCommand) throws AsynchAEException;
 	
 	 public void bindWithClientEndpoint( Endpoint anEndpoint ) throws Exception;
 

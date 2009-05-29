@@ -48,10 +48,11 @@ public class DefaultDelegateErrorHandler extends ErrorHandlerBase implements Err
 			{
 				Endpoint endpoint = (Endpoint)anErrorContext.get(AsynchAEMessage.Endpoint);
 				String casReferenceId = (String)anErrorContext.get(AsynchAEMessage.CasReference);
+        String parentCasReferenceId = (String)anErrorContext.get(AsynchAEMessage.InputCasReference);
 
 				try
 				{
-					aController.getOutputChannel().sendReply(t, casReferenceId, endpoint, AsynchAEMessage.Process );
+					aController.getOutputChannel().sendReply(t, casReferenceId, parentCasReferenceId, endpoint, AsynchAEMessage.Process );
 				}
 				catch( Throwable e)
 				{

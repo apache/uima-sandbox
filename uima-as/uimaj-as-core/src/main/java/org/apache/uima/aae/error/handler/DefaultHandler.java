@@ -79,12 +79,13 @@ public class DefaultHandler extends ErrorHandlerBase implements ErrorHandler
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", t);
       }
 			endpoint = getDestination(aController, anErrorContext);
-			casReferenceId = (String)anErrorContext.get( AsynchAEMessage.CasReference);
+      casReferenceId = (String)anErrorContext.get( AsynchAEMessage.CasReference);
+      String parentCasReferenceId = (String)anErrorContext.get( AsynchAEMessage.InputCasReference);
 
 			//	Notify the parent of the exception
 			if ( endpoint != null && !endpoint.isCasMultiplier())
 			{
-				aController.getOutputChannel().sendReply(t, casReferenceId, endpoint, AsynchAEMessage.Process);
+				aController.getOutputChannel().sendReply(t, casReferenceId, parentCasReferenceId, endpoint, AsynchAEMessage.Process);
 
 				//	Lookup Delegate's key
 				key = super.getDelegateKey(endpoint, aController);
