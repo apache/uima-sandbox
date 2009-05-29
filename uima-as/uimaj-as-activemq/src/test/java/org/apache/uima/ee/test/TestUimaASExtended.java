@@ -839,6 +839,17 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
 		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	}
+  public void testExistanceOfParentCasReferenceIdOnChildFailure() throws Exception
+  {
+    System.out.println("-------------- testExistanceOfParentCasReferenceIdOnChildFailure -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithException.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithDelegateFailure.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+    //  When a callback is received to handle the exception on the child CAS, the message should
+    //  contain an CAS id of the parent. If it does the callback handler will set receivedExpectedParentReferenceId = true
+    Assert.assertTrue(super.receivedExpectedParentReferenceId);
+  }
 
 	public void testProcessWithAggregateUsingRemoteMultiplier() throws Exception
 	{
@@ -984,7 +995,9 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testCancelProcessAggregateWithCollocatedMultiplier -------------");
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+		System.out.println("###############> Deploying Complex Agggregate #####################");
 		deployService(eeUimaEngine, relativePath+"/Deploy_ComplexAggregateWith1MillionDocs.xml");
+    System.out.println("###############> Deploying Complex Agggregate Deployed#####################");
 		//	Spin a thread to cancel Process after 20 seconds
 		spinShutdownThread( eeUimaEngine, 20000 );
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,PROCESS_LATCH);

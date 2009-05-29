@@ -78,6 +78,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	private Object errorCounterMonitor = new Object(); 
 	private BaseUIMAAsynchronousEngine_impl engine;
 	protected UimaAsTestCallbackListener listener = new UimaAsTestCallbackListener();
+	protected boolean receivedExpectedParentReferenceId = false;
 	
 	protected String deployService(BaseUIMAAsynchronousEngine_impl eeUimaEngine, String aDeploymentDescriptorPath) throws Exception
 	{
@@ -643,10 +644,10 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	      } else if ( parentCasReferenceId == null ) {
           System.out.println("runTest: Received Reply from CAS "+casReferenceId+" Containing "+list.size()+" Exception(s)");
         } else {
+          receivedExpectedParentReferenceId = true;
           System.out.println("runTest: Received Reply from CAS "+casReferenceId+" (Parent "+parentCasReferenceId
                   +") Containing "+list.size()+" Exception(s)");
         }
-
 	      for( int i=0; i < list.size(); i++)
 	      {
 	        Exception e = (Exception)list.get(i);
