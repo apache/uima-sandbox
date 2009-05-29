@@ -883,7 +883,7 @@ public class JmsOutputChannel implements OutputChannel
 	 * 
 	 * @throws AsynchAEException
 	 */
-	public void sendReply(Throwable t, String aCasReferenceId, Endpoint anEndpoint, int aCommand ) throws AsynchAEException
+	public void sendReply(Throwable t, String aCasReferenceId, String aParentCasReferenceId, Endpoint anEndpoint, int aCommand ) throws AsynchAEException
 	{
 		anEndpoint.setReplyEndpoint(true);
 		try
@@ -924,6 +924,9 @@ public class JmsOutputChannel implements OutputChannel
 			if ( aCasReferenceId != null )
 			{
 				om.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+				if ( aParentCasReferenceId != null ) {
+	        om.setStringProperty(AsynchAEMessage.InputCasReference, aParentCasReferenceId);
+				}
 			}
 			
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
