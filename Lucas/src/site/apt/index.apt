@@ -1,0 +1,62 @@
+Overview
+
+  Lucas is a {{{http://incubator.apache.org/uima} UIMA}} {{{http://incubator.apache.org/uima/downloads/releaseDocs/2.2.2-incubating/docs/html/overview_and_setup/overview_and_setup.html#ugr.ovv.conceptual.representing_results_in_cas}CAS}} 
+  consumer component which bridges the UIMA framework with the {{{http://lucene.apache.org} Lucene}} search engine library. Lucas maps CASes to lucene index 
+  {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/document/package-summary.html} documents}} according to a {{{documentation.html} mapping file}}. 
+
+* News
+
+  23.01.2009 A pear was added in the download section
+  
+* Features
+
+  * maps feature values addressed by feature paths or the covered text of annotations to lucene document fields
+  
+  * multiple sofa support
+   
+  * lucene highlighting support for annotations
+   
+  * stop word filtering, snowball filtering and case switching support
+  
+  * basic string operations (splitting and concatenation) 
+  
+  * {{{Hypernym}hypernym adding}} 
+  
+  * {{{Mapping}token mapping}} with multiple dictionaries
+
+  []
+  
+**{Hypernym} Adding
+
+  The hypernym feature is intended to enable taxonomic searches. If a users query contains a certain 
+  term all documents where returned which contains this term or terms in the child tree of this term. 
+  The term parent child relationships must be defined in a hypernym file with the following syntax:
+  
+---------------------------------------------------------------------
+...
+TERM1=PARENT_TERM111|PARENT_TERM11|PARENT_TERM1
+TERM2=PARENT_TERM222|PARENT_TERM22|PARENT_TERM2
+...
+---------------------------------------------------------------------
+
+  A entry in this file consists of a (unique) key - the child term and values - all parent terms (the hypernyms) 
+  on the path to the top. The order of the parent terms doesn't matter. If a hypernym file is provided, Lucas will
+  add all parent terms with the same offset and position as the child term which occurred in a annotation based token stream. 
+
+**Token {Mapping}
+
+  This feature allows to replace generated tokens with tokens provided by a mapping file. 
+  This is useful to map between terms and identifiers for example. Its possible to provide multiple
+  mapping files with the following syntax:
+  
+---------------------------------------------------------------------
+...
+ORIG_TERM=REPLACEMENT_TERM
+...
+---------------------------------------------------------------------
+  Each key term has to be unique.
+  
+  
+  
+  
+   

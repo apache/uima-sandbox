@@ -1,0 +1,239 @@
+Documentation
+
+  Lucas is configured by {{{Parameters}descriptor parameters}} and a {{{File}mapping file}}.
+  
+*{Parameters}
+
+  The Lucas CAS consumer can be configured by the following descriptor parameters:
+  
+*-------------------+--------------------+---------------+-----------+----------------+
+|<<parameter>>      | <<type>>           | <<mandatory>> |<<default>>|<<description>> |
+*-------------------+--------------------+---------------+-----------+----------------+
+|indexOutDir        |String              |yes            |-          |The path of the target directory where the index is written to.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|uniqueIndex        |Boolean             |no             |-          |If this parameter is set to <true>, the index directory name is appended with the process id and host name (only tested on linux systems!). |
+*-------------------+--------------------+---------------+-----------+----------------+
+|mappingFile        |String              |yes            |-          |The mapping file path. See {{{File} mapping file}}.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|stopwordFile       |String              |no             |-          |The path and file name of the stop word file. Each line of this file should contain a single stop word.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|hypernymFile       |String              |no             |-          |The path and file name of the hypernym file.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|tokenMappingFiles  |String (multiple)   |no             |-          |The path and file names of token mapping files.|                |
+*-------------------+--------------------+---------------+-----------+----------------+
+|ramBufferSize      |Integer             |no             |-          |See {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/index/IndexWriter.html#setRAMBufferSizeMB(double)} ram buffer size}}.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|compoundFileFormat |Boolean             |no             |-          |See {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/index/IndexWriter.html#setUseCompoundFile(boolean)} compound file format}}.|
+*-------------------+--------------------+---------------+-----------+----------------+
+
+  A deployment descriptor is available {{{downloads/LuceneCASIndexerDescriptor.xml}here}}.
+
+*Deployment
+
+  Lucas can only run in single deployment scenarios. This will change in a future version.
+     
+*Mapping {File} Syntax
+
+  The mapping file configures the mapping of CAS contents to a lucene index document. A xml schema is also {{{downloads/lucas.xsd}available}}.
+  
+** fields element
+  
+  The root element.
+  
+  Contains: {{field}}+
+
+** {field}element
+
+  Generates a lucene {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/document/Field.html}field}}. The field contents
+  is provided by {{{annotation} annotations}}. The field can be configured by the following attributes: 
+
+*-------------------+--------------------+---------------+-----------+----------------+
+|<<attribute name>> | <<allowed values>> | <<mandatory>> |<<default>>|<<description>> |
+*-------------------+--------------------+---------------+-----------+----------------+
+|name               |string              |yes            |-          |The name of the {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/document/Field.html}Field}}
+*-------------------+--------------------+---------------+-----------+----------------+
+|index              |yes\|no\|no_norms\|no_tf\|no_norms_tf  |no             |no         | See {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/document/Field.Index.html} Field.Index}}. We have no analyzed/not_analzed option because we produce token streams directly and there is no need for analyzers. Token filters are configured in the {{annotation}} element.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|termVector         |no\|positions\|offsets\|positions_offsets|no |no | See {{{http://lucene.apache.org/java/2_4_0/api/index.html} Field.TermVector}}| 
+*-------------------+--------------------+---------------+-----------+----------------+
+|delimiter          |string              |no             |-           |If this attribute is set, all generated tokens are concatenated with this delimiter string. This may be useful for stored fields.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|stored			    |yes\|no\|compress   |no             |no         |See {{{http://lucene.apache.org/java/2_4_0/api/index.html} Field.Store}}|
+*-------------------+--------------------+---------------+-----------+----------------+
+|merge			    |boolean		     |no             |false      |If this attribute is set to <true>, all contained annotation token streams are merged according to their offset. The tokens position increment are adopted in the case of overlapping. This is useful to enable annotation highlighting.|
+*-------------------+--------------------+---------------+-----------+----------------+
+
+  Contains: {{annotation}}+
+  
+**{annotation} element
+
+  A annotation element describes a annotation index of a given {{{http://incubator.apache.org/uima/downloads/releaseDocs/2.2.2-incubating/docs/api/org/apache/uima/cas/Type.html}type}} which is converted to a token stream.
+  If the featurePath is empty and no feature element is contained, the token text is taken from the covered text of annotations.
+  
+*-------------------+--------------------+---------------+-----------+----------------+
+|<<attribute name>> | <<allowed values>> | <<mandatory>> |<<default>>|<<description>> |
+*-------------------+--------------------+---------------+-----------+----------------+
+|type               |string              |yes            |-          |The canonical type name. E.g. "uima.cas.Annotation"|
+*-------------------+--------------------+---------------+-----------+----------------+
+|sofa               |string              |no             |InitialView|Determines from which sofa the annotation index is taken|
+*-------------------+--------------------+---------------+-----------+----------------+
+|featurePath        |string              |no             |-          |Allows to address feature structures which are associated with the annotation object. E.g. we have the type <Person> and the featurePath <affiliation.address> points to a address feature structure. This feature structure is referenced by an <address> feature from an affiliation feature structure. At the end, this affiliation feature structure is referenced by an <affiliation> feature from the annotation feature structure (i.e. from the type <Person>). All feature names on the path must be separated by a "."|
+*-------------------+--------------------+---------------+-----------+----------------+
+|tokenizer		    |cas\|white_space\|standard       |no             |cas        |Determines which tokenization is used. "cas" uses the tokenization given by the contained annotation token streams, "standard" uses the {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/analysis/standard/StandardTokenizer.html}standard tokenizer}}.
+*-------------------+--------------------+---------------+-----------+----------------+
+|unique			    |boolean		     |no             |false      |If this attribute is set to <true>, token doublets are filtered.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|concatString       |string              |no             |-          |Concatenates all values of the contained {{{feature}features}} with this string.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|splitString       |string              |no             |-          |Splits the values of the contained {{{feature}features}} by this string.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|uppercase          |boolean             |no             |false      |If this attribute is set to <true> all value strings are converted to upper case.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|lowercase          |boolean             |no             |false      |If this attribute is set to <true> all value strings are converted to lower case.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|stopwordRemove     |boolean             |no             |false      |If this attribute is set to <true>, all stop words are removed from the generated token stream. The stop word list can be configured by a {{{Parameters}parameter}}|
+*-------------------+--------------------+---------------+-----------+----------------+
+|position           |first\|last          |no             |-          |If this attribute is set to <first>, only the first annotation feature structure is converted. If this attribute is set to <last>, only the last annotation feature structure is converted.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|addHypernyms       |boolean             |no             |false      |If this attribute is set to <true>, hypernyms for each feature value are added with {{{http://lucene.apache.org/java/2_4_0/api/org/apache/lucene/analysis/Token.html#setPositionIncrement(int)}position increment}} 0. The hypernym list can be configured by a {{{Parameters}parameter}}.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|mappingFile        |string              |no             |-          |File name (without path) of a mapping file. Each feature value which is present as <key> in the mapping file is replaced by the <value> of this <key>. The mapping files can be configured by a {{{Parameters}parameter}}.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|snowballFilter     |string              |no             |-          |The name of a snow ball filter, e.g. "Porter". If a filter name is set, this filter is applied to the generated token stream.|
+*-------------------+--------------------+---------------+-----------+----------------+
+
+  Contains {{feature}}*
+  
+**{feature} element
+
+  This element corresponds to a feature of the feature structure targeted by the featurePath or the annotation feature structure itself. 
+  Only the following feature types are supported: 
+  
+  * String
+  
+  * String Array
+  
+  * Number Types: Double, Float, Long, Integer, Short
+  
+  []
+  
+*-------------------+--------------------+---------------+-----------+----------------+
+|<<attribute name>> | <<allowed values>> | <<mandatory>> |<<default>>|<<description>> |
+*-------------------+--------------------+---------------+-----------+----------------+
+|name               |string              |yes            |-          |The base name of the feature.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|uppercase          |boolean             |no             |false      |If this attribute is set to <true> all value strings are converted to upper case.|
+*-------------------+--------------------+---------------+-----------+----------------+
+|lowercase          |boolean             |no             |false      |If this attribute is set to <true> all value strings are converted to lower case.|
+*-------------------+--------------------+---------------+-----------+----------------+  
+|numberFormat       |string              |no             |-          |If the feature is a number feature, a number format can be applied to convert this value to a string. See {{{http://java.sun.com/javase/6/docs/api/java/text/DecimalFormat.html} DecimalFormat}}.|
+*-------------------+--------------------+---------------+-----------+----------------+
+
+  Here is a complete example which demonstrates the most features: 
+
+-----------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<fields xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="lucas.xsd">
+
+	<!-- BIBLIOGRAPHIC META DATA -->
+
+	<field name="pubmedID" index="yes" termVector="no" stored="yes">
+		<annotation type="de.julielab.jules.types.Header">
+			<feature name="docId" />
+		</annotation>
+	</field>
+
+	<field name="title" index="no" termVector="no" stored="yes">
+		<annotation type="de.julielab.jules.types.Title" />
+	</field>
+
+	<field name="text" index="no" termVector="no" stored="yes">
+		<annotation type="de.julielab.jules.types.AbstractText" />
+	</field>
+
+	<field name="date" index="no" termVector="no" stored="yes">
+		<annotation type="de.julielab.jules.types.Date" position="first"
+			concatString="|">
+			<feature name="year" />
+			<feature name="month" />
+			<feature name="day" />
+		</annotation>
+	</field>
+
+	<field name="journal" index="no" termVector="no" stored="yes">
+		<annotation type="de.julielab.jules.types.Journal"
+			concatString="|" position="first">
+			<feature name="title" />
+			<feature name="volume" />
+			<feature name="issue" />
+			<feature name="pages" />
+		</annotation>
+	</field>
+
+
+
+	<!-- AUTHOR NAMES AND THEIR VARIATIONS -->
+
+	<field name="authors" index="yes" termVector="no">
+		<annotation type="de.julielab.jules.types.Header"
+			lowercase="true" featurePath="authors">
+			<feature name="lastName" />
+		</annotation>
+	</field>
+
+	<field name="authors" index="yes" termVector="no">
+		<annotation type="de.julielab.jules.types.Header"
+			featurePath="authors" uppercase="true" concatString=", ">
+			<feature name="lastName" />
+			<feature name="foreName" />
+		</annotation>
+	</field>
+
+	<field name="authors" index="no" termVector="no" stored="yes"
+		delimiter="|">
+		<annotation type="de.julielab.jules.types.Header"
+			featurePath="authors" concatString=", ">
+			<feature name="lastName" />
+			<feature name="foreName" />
+		</annotation>
+	</field>
+
+
+
+	<!-- Annotated Text -->
+
+	<field name="text" index="yes" termVector="positions_offsets"
+		merge="true">
+		<annotation sofa="abstract" type="de.julielab.jules.types.Token"
+			lowercase="true" stopwordRemove="true" snowballFilter="Porter" />
+		<annotation sofa="abstract" type="de.julielab.jules.types.Gene"
+			featurePath="resourceEntryList" uppercase="true"
+			addHypernyms="true">
+			<feature name="entryId" />
+		</annotation>
+		<annotation sofa="abstract"
+			type="de.julielab.jules.types.MeshMention" uppercase="true"
+			addHypernyms="true" mappingFile="mesh.desc2ui">
+			<feature name="specificType" />
+		</annotation>
+	</field>
+
+	<field name="title" index="yes" termVector="positions_offsets"
+		merge="true">
+		<annotation sofa="title" type="de.julielab.jules.types.Token"
+			lowercase="true" stopwordRemove="true" snowballFilter="Porter" />
+		<annotation sofa="title" type="de.julielab.jules.types.Gene"
+			featurePath="resourceEntryList" uppercase="true"
+			addHypernyms="true">
+			<feature name="entryId" />
+		</annotation>
+		<annotation sofa="title"
+			type="de.julielab.jules.types.MeshMention" uppercase="true"
+			addHypernyms="true" mappingFile="mesh.desc2ui">
+			<feature name="specificType" />
+		</annotation>
+	</field>
+
+</fields>
+-----------------------------------------------------------------------------

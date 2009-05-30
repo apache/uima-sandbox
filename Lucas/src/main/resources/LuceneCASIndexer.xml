@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.    
+-->
+
+<casConsumerDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <implementationName>de.julielab.jules.consumer.LuceneCASIndexer</implementationName>
+  <processingResourceMetaData>
+    <name>LuceneCASIndexerDescriptor</name>
+    <description/>
+    <version>2.0</version>
+    <vendor>julielab</vendor>
+    <configurationParameters>
+      <configurationParameter>
+        <name>indexOutDir</name>
+        <description>defines the output directory where the index should be written</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>mappingFile</name>
+        <description>path to the mapping file</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>stopwordFile</name>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>hypernymFile</name>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>tokenMappingFile</name>
+        <description>Mapping file for replacement of  tokens.</description>
+        <type>String</type>
+        <multiValued>true</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>uniqueIndex</name>
+        <type>Boolean</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>ramBufferSize</name>
+        <description>Sets the ram buffer size of the index writer. See lucene docs for further information.</description>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>compoundFileFormat</name>
+        <description>Determines wether the index writer should use compound file format or not.</description>
+        <type>Boolean</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>mappingFile</name>
+        <value>
+          <string>src/test/resources/lucas.xml</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>indexOutDir</name>
+        <value>
+          <string>src/test/resources/testIndex</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>stopwordFile</name>
+        <value>
+          <string>src/test/resources/stopwords.txt</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>hypernymFile</name>
+        <value>
+          <string>src/test/resources/hypernyms.txt</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>tokenMappingFile</name>
+        <value>
+          <array>
+            <string>src/test/resources/tokenMapping.txt</string>
+          </array>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>uniqueIndex</name>
+        <value>
+          <boolean>true</boolean>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>ramBufferSize</name>
+        <value>
+          <integer>512</integer>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>compoundFileFormat</name>
+        <value>
+          <boolean>true</boolean>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+    <typeSystemDescription/>
+    <typePriorities/>
+    <fsIndexCollection/>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs/>
+        <languagesSupported/>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>false</modifiesCas>
+      <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </processingResourceMetaData>
+  <resourceManagerConfiguration/>
+</casConsumerDescription>
