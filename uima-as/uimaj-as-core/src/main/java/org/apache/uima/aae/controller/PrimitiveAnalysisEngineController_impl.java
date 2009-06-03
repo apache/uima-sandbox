@@ -150,9 +150,18 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 
 	  } catch ( Exception e) {
 	    e.printStackTrace();
+      super.notifyListenersWithInitializationStatus(e);
       if ( isTopLevelComponent() ) {
         super.notifyListenersWithInitializationStatus(e);
+      } else {
+        //  get the top level controller to notify
+        AnalysisEngineController controller = this.getParentController();
+        while( !controller.isTopLevelComponent()) {
+          controller = controller.getParentController();
+        }
+        getParentController().notifyListenersWithInitializationStatus(e);
       }
+        
 	    throw new ResourceInitializationException(e);
 	  }
 
