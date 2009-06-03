@@ -33,6 +33,7 @@ import javax.jms.Connection;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
+import javax.resource.ResourceException;
 
 import junit.framework.Assert;
 
@@ -74,6 +75,10 @@ public class TestUimaASExtended extends BaseTestSupport
     private static final String primitiveServiceQueue1 = "NoOpAnnotatorQueue";
 	private static final String PrimitiveDescriptor1 = "resources/descriptors/analysis_engine/NoOpAnnotator.xml";
 	private int getMetaRequestCount = 0;
+
+	
+
+	
 	/**
 	 * Tests Broker startup and shutdown
 	 */
@@ -146,20 +151,35 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 0, EXCEPTION_LATCH);
 	}
-	/**
-	 * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
-	 * 
-	 * @throws Exception
-	 */
-	public void testDeployAggregateService() throws Exception
-	{
-		System.out.println("-------------- testDeployAggregateService -------------");
-		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-		System.setProperty(JmsConstants.SessionTimeoutOverride, "2500000");
-		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
-		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
-		runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
-	}
+  /**
+   * Tests handling of ResourceInitializationException that happens in a collocated primitive
+   * 
+   * @throws Exception
+   */
+  public void testDeployAggregateServiceWithFailingCollocatedComponent() throws Exception
+  {
+    System.out.println("-------------- testDeployAggregateServiceWithFailingCollocatedComponent -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    try {
+      deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFailingCollocatedDelegate.xml");
+    } catch ( ResourceInitializationException e) {
+      //  This is expected
+    } catch ( Exception e) {
+      fail("Expected ResourceInitializationException Instead Caught:"+e.getClass().getName());
+    }
+  }
+  public void testDeployAggregateService() throws Exception
+  {
+    System.out.println("-------------- testDeployAggregateService -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    System.setProperty(JmsConstants.SessionTimeoutOverride, "2500000");
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
+  }
+
+	
+	
   /**
    * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
    * 

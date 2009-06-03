@@ -19,6 +19,8 @@
 
 package org.apache.uima.ae.noop;
 
+import java.io.FileNotFoundException;
+
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
@@ -42,16 +44,22 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 	{
 		super.initialize(aContext);
 		
-		if ( getContext().getConfigParameterValue("ErrorFrequency") != null )
+		if ( getContext().getConfigParameterValue("FailDuringInitialization") != null )
 		{
-			errorFrequency = ((Integer)getContext().getConfigParameterValue("ErrorFrequency")).intValue();
-      countDown = errorFrequency;
+	    throw new ResourceInitializationException(new FileNotFoundException("Simulated Exception"));
 		}
+		
+    if ( getContext().getConfigParameterValue("ErrorFrequency") != null )
+    {
+      errorFrequency = ((Integer)getContext().getConfigParameterValue("ErrorFrequency")).intValue();
+      countDown = errorFrequency;
+    }
+		
+		
 		if ( getContext().getConfigParameterValue("CpCDelay") != null )
 		{
 			cpcDelay = ((Integer)getContext().getConfigParameterValue("CpCDelay")).intValue();
 		}
-
 		if ( getContext().getConfigParameterValue("ProcessDelay") != null )
 		{
 			processDelay = ((Integer)getContext().getConfigParameterValue("ProcessDelay")).intValue();
