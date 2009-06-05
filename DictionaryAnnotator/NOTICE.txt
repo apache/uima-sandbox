@@ -1,5 +1,5 @@
 Apache UIMA DictionaryAnnotator software component
-Copyright 2007, 2008 The Apache Software Foundation
+Copyright 2007-2009 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
@@ -17,3 +17,4 @@ following software:
 
     - JSR-173 Streaming API for XML from http://sourceforge.net/projects/xmlpullparser/,
       Copyright 2005 BEA under the terms of the Apache Software License 2.0
+      
