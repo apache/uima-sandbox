@@ -1114,7 +1114,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
         CasStateEntry casStateEntry = getLocalCache().lookupEntry(aCasReferenceId);
 
-				if ( endpoint.isCasMultiplier() )
+				if ( endpoint.isCasMultiplier() && endpoint.isRemote() )
 				{
 					entry.setCasMultiplierKey(analysisEngineKey);
 				}
