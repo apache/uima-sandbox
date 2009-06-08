@@ -2076,7 +2076,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
     {
     	mergeTypeSystem(aTypeSystem, fromDestination, null);
     }
-    public void mergeTypeSystem(String aTypeSystem, String fromDestination, String fromServer) throws AsynchAEException
+    public synchronized void mergeTypeSystem(String aTypeSystem, String fromDestination, String fromServer) throws AsynchAEException
 	{
       
 		try
