@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.uima.AttributeFS;
-import org.apache.uima.MarkupAnnotation;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.Type;
@@ -164,7 +162,7 @@ public class MarkupHandler implements ContentHandler {
 			Attributes protoAttributes = proto.getAtts();
 			FSArray attribs = (FSArray) cas.createArrayFS(protoAttributes.getLength());
 			for (int index=0; index< protoAttributes.getLength();index++){
-				org.apache.uima.AttributeFS afs = (AttributeFS) cas.createFS(attributeType);
+				org.apache.uima.tika.AttributeFS afs = (AttributeFS) cas.createFS(attributeType);
 				afs.setLocalName(protoAttributes.getLocalName(index));
 				afs.setQualifiedName(protoAttributes.getQName(index));
 				afs.setUri(protoAttributes.getURI(index));

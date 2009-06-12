@@ -1,23 +1,6 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package org.apache.uima;
+/* First created by JCasGen Fri Jun 12 15:31:15 CEST 2009 */
+package org.apache.uima.tika;
 
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JCasRegistry;
@@ -31,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.DocumentAnnotation_Type;
 
 /** 
- * Updated by JCasGen Thu Sep 18 08:31:44 BST 2008
+ * Updated by JCasGen Fri Jun 12 15:31:15 CEST 2009
  * @generated */
 public class SourceDocumentAnnotation_Type extends DocumentAnnotation_Type {
   /** @generated */
@@ -56,7 +39,7 @@ public class SourceDocumentAnnotation_Type extends DocumentAnnotation_Type {
   public final static int typeIndexID = SourceDocumentAnnotation.typeIndexID;
   /** @generated 
      @modifiable */
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("org.apache.uima.SourceDocumentAnnotation");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("org.apache.uima.tika.SourceDocumentAnnotation");
  
   /** @generated */
   final Feature casFeat_uri;
@@ -65,13 +48,13 @@ public class SourceDocumentAnnotation_Type extends DocumentAnnotation_Type {
   /** @generated */ 
   public String getUri(int addr) {
         if (featOkTst && casFeat_uri == null)
-      jcas.throwFeatMissing("uri", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("uri", "org.apache.uima.tika.SourceDocumentAnnotation");
     return ll_cas.ll_getStringValue(addr, casFeatCode_uri);
   }
   /** @generated */    
   public void setUri(int addr, String v) {
         if (featOkTst && casFeat_uri == null)
-      jcas.throwFeatMissing("uri", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("uri", "org.apache.uima.tika.SourceDocumentAnnotation");
     ll_cas.ll_setStringValue(addr, casFeatCode_uri, v);}
     
   
@@ -83,13 +66,13 @@ public class SourceDocumentAnnotation_Type extends DocumentAnnotation_Type {
   /** @generated */ 
   public String getContentType(int addr) {
         if (featOkTst && casFeat_contentType == null)
-      jcas.throwFeatMissing("contentType", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("contentType", "org.apache.uima.tika.SourceDocumentAnnotation");
     return ll_cas.ll_getStringValue(addr, casFeatCode_contentType);
   }
   /** @generated */    
   public void setContentType(int addr, String v) {
         if (featOkTst && casFeat_contentType == null)
-      jcas.throwFeatMissing("contentType", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("contentType", "org.apache.uima.tika.SourceDocumentAnnotation");
     ll_cas.ll_setStringValue(addr, casFeatCode_contentType, v);}
     
   
@@ -101,19 +84,19 @@ public class SourceDocumentAnnotation_Type extends DocumentAnnotation_Type {
   /** @generated */ 
   public int getFeatures(int addr) {
         if (featOkTst && casFeat_features == null)
-      jcas.throwFeatMissing("features", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("features", "org.apache.uima.tika.SourceDocumentAnnotation");
     return ll_cas.ll_getRefValue(addr, casFeatCode_features);
   }
   /** @generated */    
   public void setFeatures(int addr, int v) {
         if (featOkTst && casFeat_features == null)
-      jcas.throwFeatMissing("features", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("features", "org.apache.uima.tika.SourceDocumentAnnotation");
     ll_cas.ll_setRefValue(addr, casFeatCode_features, v);}
     
    /** @generated */
   public int getFeatures(int addr, int i) {
         if (featOkTst && casFeat_features == null)
-      jcas.throwFeatMissing("features", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("features", "org.apache.uima.tika.SourceDocumentAnnotation");
     if (lowLevelTypeChecks)
       return ll_cas.ll_getRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_features), i, true);
     jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_features), i);
@@ -123,7 +106,7 @@ public class SourceDocumentAnnotation_Type extends DocumentAnnotation_Type {
   /** @generated */ 
   public void setFeatures(int addr, int i, int v) {
         if (featOkTst && casFeat_features == null)
-      jcas.throwFeatMissing("features", "org.apache.uima.SourceDocumentAnnotation");
+      jcas.throwFeatMissing("features", "org.apache.uima.tika.SourceDocumentAnnotation");
     if (lowLevelTypeChecks)
       ll_cas.ll_setRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_features), i, v, true);
     jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_features), i);

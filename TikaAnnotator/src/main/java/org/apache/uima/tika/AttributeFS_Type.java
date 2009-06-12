@@ -1,23 +1,6 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package org.apache.uima;
+/* First created by JCasGen Fri Jun 12 15:31:15 CEST 2009 */
+package org.apache.uima.tika;
 
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JCasRegistry;
@@ -31,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.cas.TOP_Type;
 
 /** Representation of an attribute
- * Updated by JCasGen Thu Sep 18 08:31:44 BST 2008
+ * Updated by JCasGen Fri Jun 12 15:31:15 CEST 2009
  * @generated */
 public class AttributeFS_Type extends TOP_Type {
   /** @generated */
@@ -56,7 +39,7 @@ public class AttributeFS_Type extends TOP_Type {
   public final static int typeIndexID = AttributeFS.typeIndexID;
   /** @generated 
      @modifiable */
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("org.apache.uima.AttributeFS");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("org.apache.uima.tika.AttributeFS");
  
   /** @generated */
   final Feature casFeat_localName;
@@ -65,13 +48,13 @@ public class AttributeFS_Type extends TOP_Type {
   /** @generated */ 
   public String getLocalName(int addr) {
         if (featOkTst && casFeat_localName == null)
-      jcas.throwFeatMissing("localName", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("localName", "org.apache.uima.tika.AttributeFS");
     return ll_cas.ll_getStringValue(addr, casFeatCode_localName);
   }
   /** @generated */    
   public void setLocalName(int addr, String v) {
         if (featOkTst && casFeat_localName == null)
-      jcas.throwFeatMissing("localName", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("localName", "org.apache.uima.tika.AttributeFS");
     ll_cas.ll_setStringValue(addr, casFeatCode_localName, v);}
     
   
@@ -83,13 +66,13 @@ public class AttributeFS_Type extends TOP_Type {
   /** @generated */ 
   public String getQualifiedName(int addr) {
         if (featOkTst && casFeat_qualifiedName == null)
-      jcas.throwFeatMissing("qualifiedName", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("qualifiedName", "org.apache.uima.tika.AttributeFS");
     return ll_cas.ll_getStringValue(addr, casFeatCode_qualifiedName);
   }
   /** @generated */    
   public void setQualifiedName(int addr, String v) {
         if (featOkTst && casFeat_qualifiedName == null)
-      jcas.throwFeatMissing("qualifiedName", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("qualifiedName", "org.apache.uima.tika.AttributeFS");
     ll_cas.ll_setStringValue(addr, casFeatCode_qualifiedName, v);}
     
   
@@ -101,13 +84,13 @@ public class AttributeFS_Type extends TOP_Type {
   /** @generated */ 
   public String getUri(int addr) {
         if (featOkTst && casFeat_uri == null)
-      jcas.throwFeatMissing("uri", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("uri", "org.apache.uima.tika.AttributeFS");
     return ll_cas.ll_getStringValue(addr, casFeatCode_uri);
   }
   /** @generated */    
   public void setUri(int addr, String v) {
         if (featOkTst && casFeat_uri == null)
-      jcas.throwFeatMissing("uri", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("uri", "org.apache.uima.tika.AttributeFS");
     ll_cas.ll_setStringValue(addr, casFeatCode_uri, v);}
     
   
@@ -119,13 +102,13 @@ public class AttributeFS_Type extends TOP_Type {
   /** @generated */ 
   public String getValue(int addr) {
         if (featOkTst && casFeat_value == null)
-      jcas.throwFeatMissing("value", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("value", "org.apache.uima.tika.AttributeFS");
     return ll_cas.ll_getStringValue(addr, casFeatCode_value);
   }
   /** @generated */    
   public void setValue(int addr, String v) {
         if (featOkTst && casFeat_value == null)
-      jcas.throwFeatMissing("value", "org.apache.uima.AttributeFS");
+      jcas.throwFeatMissing("value", "org.apache.uima.tika.AttributeFS");
     ll_cas.ll_setStringValue(addr, casFeatCode_value, v);}
     
   

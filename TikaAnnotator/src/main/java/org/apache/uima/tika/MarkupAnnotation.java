@@ -1,23 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package org.apache.uima;
+
+/* First created by JCasGen Fri Jun 12 15:31:15 CEST 2009 */
+package org.apache.uima.tika;
 
 import org.apache.uima.jcas.JCas; 
 import org.apache.uima.jcas.JCasRegistry;
@@ -28,8 +12,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Thu Sep 18 08:31:44 BST 2008
- * XML source: /data/gate-plugins/UIMAAnnotationReader/desc/MarkupAnnotationTypeSystem.xml
+ * Updated by JCasGen Fri Jun 12 15:31:15 CEST 2009
+ * XML source: C:/code/uima/TikaAnnotator/desc/MarkupAnnotationTypeSystem.xml
  * @generated */
 public class MarkupAnnotation extends Annotation {
   /** @generated
@@ -83,21 +67,21 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public FSArray getAttributes() {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_attributes == null)
-      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.tika.MarkupAnnotation");
     return (FSArray)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_attributes)));}
     
   /** setter for attributes - sets  
    * @generated */
   public void setAttributes(FSArray v) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_attributes == null)
-      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.ll_cas.ll_setRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_attributes, jcasType.ll_cas.ll_getFSRef(v));}    
     
   /** indexed getter for attributes - gets an indexed value - 
    * @generated */
   public FSArray getAttributes(int i) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_attributes == null)
-      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_attributes), i);
     return (FSArray)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_attributes), i)));}
 
@@ -105,7 +89,7 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public void setAttributes(int i, FSArray v) { 
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_attributes == null)
-      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("attributes", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_attributes), i);
     jcasType.ll_cas.ll_setRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_attributes), i, jcasType.ll_cas.ll_getFSRef(v));}
    
@@ -117,21 +101,21 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public FSArray getChildren() {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_children == null)
-      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.tika.MarkupAnnotation");
     return (FSArray)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_children)));}
     
   /** setter for children - sets  
    * @generated */
   public void setChildren(FSArray v) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_children == null)
-      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.ll_cas.ll_setRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_children, jcasType.ll_cas.ll_getFSRef(v));}    
     
   /** indexed getter for children - gets an indexed value - 
    * @generated */
   public MarkupAnnotation getChildren(int i) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_children == null)
-      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_children), i);
     return (MarkupAnnotation)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_children), i)));}
 
@@ -139,7 +123,7 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public void setChildren(int i, MarkupAnnotation v) { 
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_children == null)
-      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("children", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_children), i);
     jcasType.ll_cas.ll_setRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_children), i, jcasType.ll_cas.ll_getFSRef(v));}
    
@@ -151,14 +135,14 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public String getName() {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_name == null)
-      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.tika.MarkupAnnotation");
     return jcasType.ll_cas.ll_getStringValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_name);}
     
   /** setter for name - sets  
    * @generated */
   public void setName(String v) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_name == null)
-      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.ll_cas.ll_setStringValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_name, v);}    
    
     
@@ -169,14 +153,14 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public MarkupAnnotation getParent() {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_parent == null)
-      jcasType.jcas.throwFeatMissing("parent", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("parent", "org.apache.uima.tika.MarkupAnnotation");
     return (MarkupAnnotation)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_parent)));}
     
   /** setter for parent - sets  
    * @generated */
   public void setParent(MarkupAnnotation v) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_parent == null)
-      jcasType.jcas.throwFeatMissing("parent", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("parent", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.ll_cas.ll_setRefValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_parent, jcasType.ll_cas.ll_getFSRef(v));}    
    
     
@@ -187,14 +171,14 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public String getQualifiedName() {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_qualifiedName == null)
-      jcasType.jcas.throwFeatMissing("qualifiedName", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("qualifiedName", "org.apache.uima.tika.MarkupAnnotation");
     return jcasType.ll_cas.ll_getStringValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_qualifiedName);}
     
   /** setter for qualifiedName - sets  
    * @generated */
   public void setQualifiedName(String v) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_qualifiedName == null)
-      jcasType.jcas.throwFeatMissing("qualifiedName", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("qualifiedName", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.ll_cas.ll_setStringValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_qualifiedName, v);}    
    
     
@@ -205,14 +189,14 @@ public class MarkupAnnotation extends Annotation {
    * @generated */
   public String getUri() {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_uri == null)
-      jcasType.jcas.throwFeatMissing("uri", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("uri", "org.apache.uima.tika.MarkupAnnotation");
     return jcasType.ll_cas.ll_getStringValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_uri);}
     
   /** setter for uri - sets  
    * @generated */
   public void setUri(String v) {
     if (MarkupAnnotation_Type.featOkTst && ((MarkupAnnotation_Type)jcasType).casFeat_uri == null)
-      jcasType.jcas.throwFeatMissing("uri", "org.apache.uima.MarkupAnnotation");
+      jcasType.jcas.throwFeatMissing("uri", "org.apache.uima.tika.MarkupAnnotation");
     jcasType.ll_cas.ll_setStringValue(addr, ((MarkupAnnotation_Type)jcasType).casFeatCode_uri, v);}    
   }
 

@@ -1,23 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package org.apache.uima;
+
+/* First created by JCasGen Fri Jun 12 15:31:15 CEST 2009 */
+package org.apache.uima.tika;
 
 import org.apache.uima.jcas.JCas; 
 import org.apache.uima.jcas.JCasRegistry;
@@ -27,8 +11,8 @@ import org.apache.uima.jcas.cas.TOP;
 
 
 /** Simple Feature Value
- * Updated by JCasGen Thu Sep 18 08:31:44 BST 2008
- * XML source: /data/gate-plugins/UIMAAnnotationReader/desc/MarkupAnnotationTypeSystem.xml
+ * Updated by JCasGen Fri Jun 12 15:31:15 CEST 2009
+ * XML source: C:/code/uima/TikaAnnotator/desc/MarkupAnnotationTypeSystem.xml
  * @generated */
 public class FeatureValue extends TOP {
   /** @generated
@@ -74,14 +58,14 @@ public class FeatureValue extends TOP {
    * @generated */
   public String getName() {
     if (FeatureValue_Type.featOkTst && ((FeatureValue_Type)jcasType).casFeat_name == null)
-      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.FeatureValue");
+      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.tika.FeatureValue");
     return jcasType.ll_cas.ll_getStringValue(addr, ((FeatureValue_Type)jcasType).casFeatCode_name);}
     
   /** setter for name - sets name of the feature 
    * @generated */
   public void setName(String v) {
     if (FeatureValue_Type.featOkTst && ((FeatureValue_Type)jcasType).casFeat_name == null)
-      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.FeatureValue");
+      jcasType.jcas.throwFeatMissing("name", "org.apache.uima.tika.FeatureValue");
     jcasType.ll_cas.ll_setStringValue(addr, ((FeatureValue_Type)jcasType).casFeatCode_name, v);}    
    
     
@@ -92,14 +76,14 @@ public class FeatureValue extends TOP {
    * @generated */
   public String getValue() {
     if (FeatureValue_Type.featOkTst && ((FeatureValue_Type)jcasType).casFeat_value == null)
-      jcasType.jcas.throwFeatMissing("value", "org.apache.uima.FeatureValue");
+      jcasType.jcas.throwFeatMissing("value", "org.apache.uima.tika.FeatureValue");
     return jcasType.ll_cas.ll_getStringValue(addr, ((FeatureValue_Type)jcasType).casFeatCode_value);}
     
   /** setter for value - sets  
    * @generated */
   public void setValue(String v) {
     if (FeatureValue_Type.featOkTst && ((FeatureValue_Type)jcasType).casFeat_value == null)
-      jcasType.jcas.throwFeatMissing("value", "org.apache.uima.FeatureValue");
+      jcasType.jcas.throwFeatMissing("value", "org.apache.uima.tika.FeatureValue");
     jcasType.ll_cas.ll_setStringValue(addr, ((FeatureValue_Type)jcasType).casFeatCode_value, v);}    
   }
 
