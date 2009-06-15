@@ -81,6 +81,7 @@
     <module>../uimaj-as-jms</module>
     <!-- activemq depends on jms -->
     <module>../uimaj-as-activemq</module>
+    <module>../uimaj-as-camel</module>
     <module>eclipse-plugin-superPom</module>
   </modules>
   <repositories>
