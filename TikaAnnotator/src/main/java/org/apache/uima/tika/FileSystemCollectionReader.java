@@ -22,6 +22,7 @@ package org.apache.uima.tika;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.uima.cas.CAS;
@@ -65,7 +66,7 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
 	
 	private String mMIME;
 	
-	private ArrayList mFiles;
+	private List<File> mFiles;
 	
 	private int mCurrentIndex;
 
@@ -156,7 +157,7 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
 		}
 
 		// get list of files (not subdirectories) in the specified directory
-		mFiles = new ArrayList();
+		mFiles = new ArrayList<File>();
 		File[] files = directory.listFiles();
 		for (int i = 0; i < files.length; i++) {
 			if (!files[i].isDirectory()) {
