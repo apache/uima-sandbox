@@ -443,8 +443,8 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 
 			public void run()
 			{
-        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "startTimer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_inactivity_timer_expired_INFO", new Object[] { Thread.currentThread().getName(), inactivityTimeout, endpoint });
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "startTimer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_inactivity_timer_expired_CONFIG", new Object[] { Thread.currentThread().getName(), inactivityTimeout, endpoint });
         }
 				if (connectionCreationTimestamp <= cachedConnectionCreationTimestamp)
 					{
