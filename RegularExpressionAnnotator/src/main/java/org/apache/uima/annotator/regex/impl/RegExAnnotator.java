@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.NumberFormat;
@@ -137,6 +138,13 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
             // parse concept file to internal objects
             Concept[] currentConcepts = parser.parseConceptFile(file
                   .getFilePath(), file.getStream());
+            try {
+              file.getStream().close();
+            } catch (IOException e) {
+              this.logger.logrb(Level.WARNING, "RegExAnnotator", "initialize",
+                  MESSAGE_DIGEST, "regex_annotator_error_closing_input_stream",
+                  new Object[] { file.getFilePath(), e.getMessage() });
+            }
             // add all concepts to the concepts list
             for (int c = 0; c < currentConcepts.length; c++) {
                concepts.add(currentConcepts[c]);

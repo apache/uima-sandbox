@@ -18,8 +18,6 @@
  */
 package org.apache.uima.annotator.regex;
 
-import java.io.File;
-
 import junit.framework.TestCase;
 
 import org.apache.uima.cas.CAS;
