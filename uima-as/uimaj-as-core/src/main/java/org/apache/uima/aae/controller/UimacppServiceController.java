@@ -43,6 +43,7 @@ import org.apache.uima.aae.jmx.JmxManagement;
 import org.apache.uima.internal.util.JmxMBeanAgent;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
+import org.springframework.beans.factory.DisposableBean;
 
 /**
  * This bean functions as a proxy for a Uima C++ service. It starts the Uima C++
@@ -54,7 +55,7 @@ import org.apache.uima.util.Level;
  * JMX and administrative requests such as shutdown.
  * 
  */
-public class UimacppServiceController implements ControllerLifecycle {
+public class UimacppServiceController implements ControllerLifecycle, DisposableBean {
   protected ServerSocket server;
 
   private int port;
@@ -770,6 +771,21 @@ public class UimacppServiceController implements ControllerLifecycle {
    * 
    */ 
   public void terminate() {
+    try {
+      shutdown();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * 
+   * Runs when spring undeploys this bean.
+   * 
+   */ 
+  public void destroy() {
     try {
       shutdown();
     } catch (IOException e) {
