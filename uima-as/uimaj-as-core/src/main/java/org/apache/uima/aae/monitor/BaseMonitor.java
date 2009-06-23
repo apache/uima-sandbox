@@ -19,12 +19,10 @@
 
 package org.apache.uima.aae.monitor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.management.MBeanServerConnection;
-import javax.management.MBeanServerFactory;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -33,9 +31,6 @@ import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.monitor.statistics.LongNumericStatistic;
 import org.apache.uima.aae.monitor.statistics.Statistic;
 import org.apache.uima.aae.monitor.statistics.Statistics;
-import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
-
-import com.sun.jmx.remote.security.MBeanServerAccessController;
 
 public class BaseMonitor implements Monitor
 {
