@@ -88,6 +88,8 @@ public class MetadataResponseHandler_impl extends HandlerBase
             if ( delegate.getEndpoint().isRemote() ) {
               delegate.cancelDelegateTimer();
               delegate.setState(Delegate.OK_STATE);
+              delegate.setNotificationEndpoint(((MessageContext)anObjectToHandle).getEndpoint());
+
               if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
                 UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, this.getClass().getName(),
                         "handle", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
