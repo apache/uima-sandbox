@@ -56,6 +56,8 @@ import org.springframework.beans.factory.DisposableBean;
  * 
  */
 public class UimacppServiceController implements ControllerLifecycle, DisposableBean {
+
+  private static final String STARTING_DIRECTORY = "UIMACPP_STARTING_DIRECTORY";
   protected ServerSocket server;
 
   private int port;
@@ -73,6 +75,8 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
   private StderrHandler stderrHandler;
 
   private ProcessBuilder builder;
+  
+  private String startingDirectory;
 
   private String aeDesc;
 
@@ -103,7 +107,7 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
   private Exception InitializedStatus = null;
   
   /**
-   * Configure and start a Uima C++ service that connects to an ActiveMG
+   * Configure and start a Uima C++ service that connects to an ActiveMQ
    * queue broker. 
    * This class  initializes the process environment and starts a process 
    * to deploy the C++ service.
@@ -140,6 +144,7 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
       this.processCasErrorWindow = processCasErrorWindow;
       this.terminateOnCPCError = terminateOnCPCError;
       this.initialFsHeapSize = initialFsHeapSize;
+      this.startingDirectory = envVarMap.get(STARTING_DIRECTORY);
       
       /* start a listener */
       server = new ServerSocket(0);
@@ -206,7 +211,7 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
       {
         //  If there is an exception, notify listener with failure
         if ( e != null ) {
-          (this.listeners.get(i)).notifyOnInitializationFailure( e);
+          (this.listeners.get(i)).notifyOnInitializationFailure(e);
         }
         // else, Success!
         else {
@@ -268,6 +273,7 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
       this.processCasErrorWindow = processCasErrorWindow;
       this.terminateOnCPCError = terminateOnCPCError;
       this.initialFsHeapSize = initialFsHeapSize;
+      this.startingDirectory = envVarMap.get(STARTING_DIRECTORY);
       this.jmxMgmt = jmxManagement;
 
       /* start a listener */
@@ -332,7 +338,7 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
         uimaLogger.log(Level.WARNING,"UimacppServiceController failed to register the JMX MBean.");
         //throw new ResourceInitializationException( new IOException("JmxManagement object is invalid."));
       }
-      
+
     } catch (IOException e) {
       throw new ResourceInitializationException(e);
     } catch (UIMAException e) {
@@ -560,6 +566,16 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
       Thread t2 = new Thread(handler2);
       t2.start();
     
+      //setup starting directory if specified.
+      if (this.startingDirectory != null && this.startingDirectory.length() > 0) {
+        File startingDir = new File(this.startingDirectory);
+        if (!startingDir.exists()) {
+        	throw new ResourceInitializationException(new IOException(
+            this.startingDirectory + " Uimacpp Starting Directory not found. + ")); 	
+        }
+        builder.directory(startingDir);
+      }
+      
       uimacppProcess = builder.start();
       if (uimacppProcess == null) {
         throw new UIMAException(new Throwable("Could not fork process."));
