@@ -539,7 +539,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 				//	Send a reply to a queue provided by the client
 				
 				//  Stop messages and replies are sent to the endpoint provided in the destination object
-				if ( (command == AsynchAEMessage.Stop || isReplyEndpoint) && delegateEndpoint.getDestination() != null  )
+				if ( (command == AsynchAEMessage.Stop || command == AsynchAEMessage.ReleaseCAS || isReplyEndpoint) && delegateEndpoint.getDestination() != null  )
 				{
 					destinationName = ((ActiveMQDestination)delegateEndpoint.getDestination()).getPhysicalName();
 					if ( UIMAFramework.getLogger().isLoggable(Level.FINE))
