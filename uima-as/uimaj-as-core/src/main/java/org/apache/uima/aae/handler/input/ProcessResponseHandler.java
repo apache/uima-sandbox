@@ -28,6 +28,7 @@ import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.BaseAnalysisEngineController;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
@@ -377,6 +378,7 @@ public class ProcessResponseHandler extends HandlerBase
         casStateEntry.setReplyReceived();
         casStateEntry.setLastDelegate(delegate);
       }
+      delegate.removeCasFromOutstandingList(casReferenceId);
 
 			
 			if (cas != null)
@@ -489,7 +491,6 @@ public class ProcessResponseHandler extends HandlerBase
 		boolean isCpCError = false;
 		String casReferenceId = null;
 
-
     try
 		{
       //  If a Process Request, increment number of docs processed
@@ -530,9 +531,12 @@ public class ProcessResponseHandler extends HandlerBase
 
 			if ( object != null && (object instanceof Exception || object instanceof Throwable ))
 			{
-				
-				
-				Exception remoteException = new UimaAsDelegateException("----> Controller:"+getController().getComponentName()+" Received Exception From Delegate:"+delegateKey, (Exception) object);
+			  String casid_msg = (casReferenceId == null ) ? "" :" on CAS:"+casReferenceId;
+			  String controllerName = "/"+getController().getComponentName();
+			  if ( !getController().isTopLevelComponent()) {
+			    controllerName += ((BaseAnalysisEngineController)getController().getParentController()).getUimaContextAdmin().getQualifiedContextName();
+			  }
+				Exception remoteException = new UimaAsDelegateException("----> Controller:"+controllerName+" Received Exception "+casid_msg+" From Delegate:"+delegateKey, (Exception) object);
 				ErrorContext errorContext = new ErrorContext();
 				errorContext.add(AsynchAEMessage.Command, aMessageContext.getMessageIntProperty(AsynchAEMessage.Command));
 				errorContext.add(AsynchAEMessage.MessageType, aMessageContext.getMessageIntProperty(AsynchAEMessage.MessageType));
