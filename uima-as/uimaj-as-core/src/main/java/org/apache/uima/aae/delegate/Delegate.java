@@ -86,6 +86,16 @@ public abstract class Delegate {
 
   private volatile boolean concurrentConsumersOnReplyQueue;
   
+  private Endpoint notificationEndpoint = null;
+  
+  public Endpoint getNotificationEndpoint() {
+    return notificationEndpoint;
+  }
+
+  public void setNotificationEndpoint(Endpoint notificationEndpoint) {
+    this.notificationEndpoint = notificationEndpoint;
+  }
+
   public boolean isAwaitingPingReply() {
     return awaitingPingReply;
   }
@@ -165,6 +175,24 @@ public abstract class Delegate {
 
   public List<DelegateEntry> getDelegateCasesPendingRepy() {
     return outstandingCasList;
+  }
+  
+  public void addNewCasToOutstandingList(String aCasReferenceId) {
+    addNewCasToOutstandingList(aCasReferenceId, false);
+  }
+  public void addNewCasToOutstandingList(String aCasReferenceId, boolean isCasGeneratingChildren ) {
+    synchronized (outstandingCasListMux) {
+      DelegateEntry entry = null;
+      if ( (entry = lookupEntry(aCasReferenceId, outstandingCasList)) == null) {
+        entry = new DelegateEntry(aCasReferenceId);
+        // Remember the command
+        entry.setCommand(AsynchAEMessage.Process);
+        if ( isCasGeneratingChildren ) {
+          entry.setGeneratingChildren(true);
+        }
+        outstandingCasList.add(entry);
+      }
+    }
   }
   /**
    * Adds a given Cas ID to the list of CASes pending reply. A new timer will be started to handle
@@ -316,7 +344,7 @@ public abstract class Delegate {
    *          - unique id of a CAS to be searched for
    * @return
    */
-  private DelegateEntry lookupEntry(String aCasReferenceId, List<DelegateEntry> list) {
+  private synchronized DelegateEntry lookupEntry(String aCasReferenceId, List<DelegateEntry> list) {
     for (DelegateEntry entry : list) {
       if (entry.getCasReferenceId().equals(aCasReferenceId)) {
         return entry;
@@ -662,6 +690,29 @@ public abstract class Delegate {
   public boolean hasConcurrentConsumersOnReplyQueue() {
     return concurrentConsumersOnReplyQueue;
   }
+  
+  public boolean isGeneratingChildrenFrom(String aCasReferenceId ) {
+    synchronized( outstandingCasList) {
+      DelegateEntry entry = lookupEntry(aCasReferenceId, outstandingCasList);
+      if ( entry == null ) {
+        return false;
+      } else {
+        return entry.isGeneratingChildren();
+      }
+    }
+  }
+  
+  public void setGeneratingChildrenFrom(String aCasReferenceId, boolean tOf ) {
+    synchronized( outstandingCasList) {
+      DelegateEntry entry = lookupEntry(aCasReferenceId, outstandingCasList);
+      if ( entry == null ) {
+        // noop;
+      } else {
+        entry.setGeneratingChildren(tOf);
+      }
+    }
+  }
+
   public abstract void handleError(Exception e, ErrorContext errorContext);
 
   public abstract String getComponentName();
@@ -679,8 +730,18 @@ public abstract class Delegate {
 
     private int retryCount = 0;
 
+    private volatile boolean generatingChildren = false;
+    
     public DelegateEntry(String aCasReferenceId) {
       casReferenceId = aCasReferenceId;
+    }
+
+    public boolean isGeneratingChildren() {
+      return generatingChildren;
+    }
+
+    public void setGeneratingChildren(boolean tOf) {
+      generatingChildren = tOf;
     }
 
     public int getCommand() {
