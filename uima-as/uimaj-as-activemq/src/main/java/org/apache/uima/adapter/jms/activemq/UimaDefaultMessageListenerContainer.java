@@ -739,7 +739,7 @@ implements ExceptionListener
                 doShutdownTaskExecutor = false; // shutdown once
               }
               try {
-                ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(100,TimeUnit.MILLISECONDS); ///Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(100,TimeUnit.MILLISECONDS); 
               } catch ( Exception e){}
             }
           }
