@@ -255,7 +255,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				if ( shadowCasPoolKey != null )
 				{
 					//	Save the key of the Cas Multiplier in the cache. It will be now known which Cas Multiplier produced this CAS
-					entry.setCasMultiplierKey(shadowCasPoolKey);
+					entry.setCasProducerKey(shadowCasPoolKey); 
 				}
 				//	associate this subordinate CAS with the parent CAS
 				entry.setInputCasReferenceId(inputCasReferenceId);
@@ -536,12 +536,22 @@ public class ProcessRequestHandler_impl extends HandlerBase
         	
 				if ( getController() instanceof AggregateAnalysisEngineController )
 				{
-		      String delegateKey =((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
+				  CasStateEntry parentCasEntry = getController().getLocalCache().lookupEntry(inputCasReferenceId);
+          //  Check if the parent CAS is in a failed state first
+				  if ( parentCasEntry != null && parentCasEntry.isFailed()) {
+				    //  handle CAS release
+				    getController().process(null, casReferenceId);
+				    return;
+				  }
+		      
+				  String delegateKey =((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(aMessageContext.getEndpoint().getEndpoint());
 		      Delegate delegate = ((AggregateAnalysisEngineController)getController()).lookupDelegate(delegateKey);
 		      cse.setLastDelegate(delegate);  
+          newCASProducedBy = delegate.getKey();
+          casMultiplierEndpoint.setIsCasMultiplier(true);
 				  try {
-				  //  Save the endpoint of the CM which produced the Cas
-				  getController().getInProcessCache().setCasProducer(casReferenceId, casMultiplierEndpoint.getEndpoint());
+				    //  Save the endpoint of the CM which produced the Cas
+				    getController().getInProcessCache().setCasProducer(casReferenceId, newCASProducedBy);
 				  } catch( Exception e) {
 	          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
 	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
@@ -551,10 +561,6 @@ public class ProcessRequestHandler_impl extends HandlerBase
 				    e.printStackTrace();
 				    return;
 				  }
-					// Convert the endpoint to a key
-//          newCASProducedBy = ((AggregateAnalysisEngineController)getController()).lookUpDelegateKey(casMultiplierEndpoint.getEndpoint());
-          newCASProducedBy = delegate.getKey();
-					casMultiplierEndpoint.setIsCasMultiplier(true);
 	        // Safety check. The input Cas should not be null here
 					if ( inputCasReferenceId != null )
 	        {
@@ -850,9 +856,9 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	
 	private void handleStopRequest(MessageContext aMessageContext)
 	{
-		System.out.println("###################Controller::"+getController().getComponentName()+" Received <<<STOP>>> Request");
 		try	{
 		  String casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
+	    System.out.println("###################Controller::"+getController().getComponentName()+" Received <<<STOP>>> Request For CAS:"+casReferenceId);
 			getController().addAbortedCasReferenceId(casReferenceId); 
 		}
 		catch( Exception e){}
