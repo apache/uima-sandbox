@@ -117,4 +117,7 @@ public interface AggregateAnalysisEngineController extends AnalysisEngineControl
   public boolean delayCasIfDelegateInTimedOutState( String aCasReferenceId, String aDelegateKey ) throws AsynchAEException;
 
   public List getChildControllerList();
+  
+  public void stopCasMultiplier(Delegate casMultiplier, String aCasReferenceId);
+
 }
