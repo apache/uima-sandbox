@@ -731,13 +731,20 @@ implements ExceptionListener
           } catch( Exception e) {}
           //  If using non-default TaskExecutor, stop its threads
           if ( taskExecutor != null && taskExecutor instanceof ThreadPoolTaskExecutor) {
-            int activeThreadCount = ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().getActiveCount();
-            if ( activeThreadCount > 0 && !((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().isTerminated() ) {
-              ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().shutdown();
+            boolean doShutdownTaskExecutor = true;
+            while ( ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().getActiveCount() > 0 && 
+                    !((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().isTerminated() ) {
+              if ( doShutdownTaskExecutor ) {
+                ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().shutdown();
+                doShutdownTaskExecutor = false; // shutdown once
+              }
               try {
-                ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(100,TimeUnit.MILLISECONDS); ///Long.MAX_VALUE, TimeUnit.MILLISECONDS);
               } catch ( Exception e){}
             }
+          }
+          if ( taskExecutor != null ) {
+            System.out.println("+++++++++ Listener:"+getDestination()+" Controller ThreadPoolExecutor Stopped ...");
           }
           //  Shutdown the listener
           __listenerRef.shutdown();
