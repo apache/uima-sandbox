@@ -464,7 +464,6 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 			}
 
 		}
-
 		if (unexpectedException)
 		{
 			fail("Unexpected exception returned");
@@ -612,7 +611,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	
 	protected class UimaAsTestCallbackListener extends UimaAsBaseCallbackListener {
 	  
+	  private String casSent = null;
     public void onBeforeMessageSend(UimaASProcessStatus status) {
+      casSent = status.getCasReferenceId();
       System.out.println("runTest: Received onBeforeMessageSend() Notification With CAS:"+status.getCasReferenceId());
     }
 
@@ -642,9 +643,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	      if (casReferenceId == null) {
 	        System.out.println("runTest: Received Reply Containing "+list.size()+" Exception(s)");
 	      } else if ( parentCasReferenceId == null ) {
-          System.out.println("runTest: Received Reply from CAS "+casReferenceId+" Containing "+list.size()+" Exception(s)");
+	        if ( casSent.equals(casReferenceId)) {
+	          receivedExpectedParentReferenceId = true;
+	        }
+	        System.out.println("runTest: Received Reply from CAS "+casReferenceId+" Containing "+list.size()+" Exception(s)");
         } else {
-          receivedExpectedParentReferenceId = true;
           System.out.println("runTest: Received Reply from CAS "+casReferenceId+" (Parent "+parentCasReferenceId
                   +") Containing "+list.size()+" Exception(s)");
         }
@@ -750,6 +753,16 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 
 	      }
 	      incrementCASesProcessed();
+	    } else if ( aCAS != null ) {
+        if ( parentCasReferenceId != null )
+        {
+          System.out.println("runTest: Received Reply Containing CAS:"+casReferenceId+" The Cas Was Generated From Parent Cas Id:"+parentCasReferenceId);
+        }
+        else
+        {
+          System.out.println("runTest: Received Reply Containing CAS:"+casReferenceId);
+        }
+        incrementCASesProcessed();
 	    }
 	  }
 	  private boolean isProcessTimeout( Exception e) {
