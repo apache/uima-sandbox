@@ -26,13 +26,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import javax.jms.Connection;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
+import javax.management.QueryExp;
 import javax.resource.ResourceException;
 
 import junit.framework.Assert;
@@ -48,8 +53,11 @@ import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
+import org.apache.uima.aae.controller.Controller;
+import org.apache.uima.aae.controller.ControllerMBean;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.ServiceShutdownException;
+import org.apache.uima.aae.jmx.JmxManager;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.JmsOutputChannel;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
@@ -75,8 +83,6 @@ public class TestUimaASExtended extends BaseTestSupport
     private static final String primitiveServiceQueue1 = "NoOpAnnotatorQueue";
 	private static final String PrimitiveDescriptor1 = "resources/descriptors/analysis_engine/NoOpAnnotator.xml";
 	private int getMetaRequestCount = 0;
-
-	
 
 	
 	/**
@@ -175,11 +181,62 @@ public class TestUimaASExtended extends BaseTestSupport
     System.setProperty(JmsConstants.SessionTimeoutOverride, "2500000");
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
-    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 0, PROCESS_LATCH);
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
+  public void testScaledSyncAggregateProcess() throws Exception
+  {
+    System.out.println("-------------- testScaledSyncAggregateProcess -------------");
+    //  Instantiate Uima EE Client
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    //  Deploy Uima EE Primitive Service 
+    deployService(eeUimaEngine, relativePath+"/Deploy_ScaledPrimitiveAggregateAnnotator.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 5, PROCESS_LATCH);
+  }
+  
+  public void testAggregateWithFailedRemoteDelegate() throws Exception
+  {
+    System.out.println("-------------- testAggregateWithFailedRemoteDelegate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithExceptionOn5thCAS.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFailedRemoteDelegate.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
+	
+  public void testAggregateCMWithFailedRemoteDelegate() throws Exception
+  {
+    System.out.println("-------------- testAggregateCMWithFailedRemoteDelegate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithExceptionOn5thCAS.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateCMWithFailedRemoteDelegate.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
+	
+  public void testAggregateCMWithFailedCollocatedDelegate() throws Exception
+  {
+    System.out.println("-------------- testAggregateCMWithFailedCollocatedDelegate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateCMWithFailedCollocatedDelegate.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
   }
 
-	
-	
+  public void testComplexAggregateCMWithFailedCollocatedDelegate() throws Exception
+  {
+    System.out.println("-------------- testComplexAggregateCMWithFailedCollocatedDelegate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_ComplexAggregateWithFailingInnerAggregateCM.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
+  
+  
+  public void testAggregateCMWithRemoteCMAndFailedRemoteDelegate() throws Exception
+  {
+    System.out.println("-------------- testAggregateCMWithRemoteCMAndFailedRemoteDelegate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithExceptionOn5thCAS.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith1MillionDocs.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_AggregateCMWithRemoteCMAndFailedRemoteDelegate.xml");
+    runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
   /**
    * Tests a simple Aggregate with one remote Delegate and collocated Cas Multiplier
    * 
@@ -1476,7 +1533,7 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_WriterAnnotatorA.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_WriterAnnotatorB.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithContinueOnRetryFailures.xml");
-    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+    runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
     if ( !(new File(tempDir, "WriterAnnotatorB.3")).exists()
             || (new File(tempDir, "WriterAnnotatorB.4")).exists()) {
       fail("Second annotator should have run 3 times");
