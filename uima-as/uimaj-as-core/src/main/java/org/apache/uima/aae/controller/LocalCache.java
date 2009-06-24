@@ -1,6 +1,8 @@
 package org.apache.uima.aae.controller;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.uima.UIMAFramework;
@@ -160,6 +162,10 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     private volatile boolean  pendingReply;
     private volatile boolean subordinateCAS;
     private volatile boolean replyReceived;
+    private volatile boolean failed;
+    private volatile boolean dropped;
+    
+    private List<Throwable> exceptionList = new ArrayList<Throwable>(); 
     private FinalStep step;
     private int state;
     private int subordinateCasInPlayCount;
@@ -170,6 +176,13 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     private int howManyDelegatesResponded = 0;
     private Endpoint freeCasNotificationEndpoint;
 
+    public boolean isDropped() {
+      return dropped;
+    }
+    public void setDropped(boolean dropped) {
+      this.dropped = dropped;
+    }
+    
     public Endpoint getFreeCasNotificationEndpoint() {
       return freeCasNotificationEndpoint;
     }
@@ -265,6 +278,17 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     public int getNumberOfParallelDelegates() {
       return numberOfParallelDelegates;
     }
-    
+    public boolean isFailed() {
+      return failed;
+    }
+    public void setFailed() {
+      this.failed = true;
+    }
+    public void addThrowable( Throwable t ) {
+      exceptionList.add(t);
+    }
+    public List<Throwable> getErrors() {
+      return exceptionList;
+    }
   }
 }
