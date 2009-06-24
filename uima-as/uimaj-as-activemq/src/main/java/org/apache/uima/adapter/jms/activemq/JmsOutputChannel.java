@@ -1015,7 +1015,13 @@ public class JmsOutputChannel implements OutputChannel
       tm.setIntProperty(AsynchAEMessage.Serialization, AsynchAEMessage.BinarySerialization);
 
 			populateHeaderWithResponseContext(tm, anEndpoint, AsynchAEMessage.GetMeta);
-			
+      if ( freeCASTempQueue != null )
+      {
+        //  Attach a temp queue to the outgoing message. This a queue where
+        //  Free CAS notifications need to be sent from the client
+        tm.setJMSReplyTo(freeCASTempQueue);
+      }
+
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
                     "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_metadata_reply__endpoint__FINEST",
