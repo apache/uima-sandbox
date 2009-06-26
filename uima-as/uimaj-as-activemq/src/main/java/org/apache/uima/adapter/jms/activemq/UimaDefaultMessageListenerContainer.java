@@ -744,13 +744,14 @@ implements ExceptionListener
             }
           }
           if ( taskExecutor != null ) {
-            System.out.println("+++++++++ Listener:"+getDestination()+" Controller ThreadPoolExecutor Stopped ...");
+            System.out.println(">>>>> Thread:"+Thread.currentThread().getId()+ " +++++++++ Listener:"+getDestination()+" Controller ThreadPoolExecutor Stopped ...");
           }
           //  Shutdown the listener
           __listenerRef.shutdown();
           if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST) ) {
             threadGroup.getParent().list();
           }
+          System.out.println(">>>>> Thread:"+Thread.currentThread().getId()+ " ThreadGroupDestroyer waiting for threads to stop. Active thread count:"+threadGroup.activeCount());
           //  Wait until all threads are accounted for
           while (threadGroup.activeCount() > 0) {
             try {
@@ -758,13 +759,15 @@ implements ExceptionListener
             } catch (InterruptedException e) {
             }
           }
+          System.out.println(">>>>> Thread:"+Thread.currentThread().getId()+ " ThreadGroupDestroyer all threads stopped");
+
           try {
             synchronized(threadGroup ) {
               if ( !threadGroup.isDestroyed() ) {
                 threadGroup.destroy();
               }
             }
-            System.out.println(">>>>>>>>>>>> Listener:"+getDestinationName()+" Thread Group Destroyed");
+            System.out.println(">>>>> Thread:"+Thread.currentThread().getId()+ " >>>>>>>>>>>> Listener:"+getDestinationName()+" Thread Group Destroyed");
           } catch( Exception e) {}   // Ignore 
         }
       };
