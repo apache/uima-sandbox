@@ -256,6 +256,18 @@ public interface UimaAsynchronousEngine
 	   */
 	  public void undeploy( String aSpringContainerId ) throws Exception;
 
+    /**
+     * Undeploys specified UIMA AS container and all services running within it. Each UIMA AS container
+     * has a unique id assigned to it during the deploy phase. This method is synchronous and
+     * will block until the container (and all services contained within it) is destroyed.
+     * 
+     * @param aSpringContainerId - an id of the container to be destroyed.
+     * 
+     * @throws Exception
+     */
+	  public void undeploy(String aSpringContainerId, int stop_level) throws Exception;
+	  
+	  
 	  /**
 	   * Returns serialization strategy for the remote service. All CASes will
 	   * be serialized according to the specified serialization. Either xmi or binary
