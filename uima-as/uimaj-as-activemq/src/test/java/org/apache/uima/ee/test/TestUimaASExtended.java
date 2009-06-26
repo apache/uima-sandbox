@@ -60,6 +60,7 @@ import org.apache.uima.aae.error.ServiceShutdownException;
 import org.apache.uima.aae.jmx.JmxManager;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.JmsOutputChannel;
+import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
 import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.adapter.jms.message.JmsMessageContext;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
@@ -200,6 +201,37 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotatorWithExceptionOn5thCAS.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFailedRemoteDelegate.xml");
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
+  }
+
+  public void testQuiesceAndStop() throws Exception {
+    System.out.println("-------------- testAggregateWithFailedRemoteDelegate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+    // Set an explicit process timeout so to test the ping on timeout
+    appCtx.put(UimaAsynchronousEngine.Timeout, 20000 );
+    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 300 );
+    appCtx.put(UimaAsynchronousEngine.CasPoolSize, 1 );
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+    String containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
+    spinShutdownThread(eeUimaEngine, 5000, containerId, SpringContainerDeployer.QUIESCE_AND_STOP );
+
+    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 2, EXCEPTION_LATCH);
+    
+  }
+  
+  public void testStopNow() throws Exception {
+    System.out.println("-------------- testAggregateWithFailedRemoteDelegate -------------");
+    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+    String containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+    // Set an explicit process timeout so to test the ping on timeout
+    appCtx.put(UimaAsynchronousEngine.Timeout, 4000 );
+    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 300 );
+    spinShutdownThread(eeUimaEngine, 3000, containerId, SpringContainerDeployer.STOP_NOW );
+    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, EXCEPTION_LATCH);
+    
   }
 	
   public void testAggregateCMWithFailedRemoteDelegate() throws Exception
@@ -870,7 +902,7 @@ public class TestUimaASExtended extends BaseTestSupport
     Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
     //  The Remote NoOp delays each CAS for 6000ms. The Aggregate sends two CASes so adjust
     //  client timeout to be just over 12000ms.
-    appCtx.put(UimaAsynchronousEngine.Timeout, 13000 );
+    appCtx.put(UimaAsynchronousEngine.Timeout, 19000 );
 
     runTest(appCtx, eeUimaEngine, null, null, 1, PROCESS_LATCH);
   }
