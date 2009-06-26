@@ -165,7 +165,7 @@ public class UIMA_Service implements  ApplicationListener
 	 * 
 	 * @throws Exception
 	 */
-	public void deploy( String[] springContextFiles ) throws Exception
+	public SpringContainerDeployer deploy( String[] springContextFiles ) throws Exception
 	{
 		SpringContainerDeployer springDeployer =
 			new SpringContainerDeployer();
@@ -190,6 +190,7 @@ public class UIMA_Service implements  ApplicationListener
 		//	the monitor thread
 		FileSystemXmlApplicationContext context = springDeployer.getSpringContext();
 		context.addApplicationListener(this);
+		return springDeployer;
 	}
 	/**
 	 * Creates an instance of a {@link JmxMonitor}, initializes it with the JMX Server URI and
@@ -406,7 +407,7 @@ public class UIMA_Service implements  ApplicationListener
 			//	Deploy components defined in Spring context files. This method blocks until
 			//	the container is fully initialized and all UIMA-AS components are succefully
 			//	deployed.
-			service.deploy( contextFiles );
+			SpringContainerDeployer serviceDeployer = service.deploy( contextFiles );
 			//	Check if we should start an optional JMX-based monitor that will provide service metrics
 			//	The monitor is enabled by existence of -Djmx.monitor.frequency=<number> parameter. By default
 			//	the monitor is not enabled.
@@ -416,6 +417,18 @@ public class UIMA_Service implements  ApplicationListener
 				//	Found monitor checkpoint frequency parameter, configure and start the monitor.
 				//	If the monitor fails to initialize the service is not effected. 
 				service.startMonitor(Long.parseLong(monitorCheckpointFrequency));
+			}
+			boolean stopped = false;
+			while(!stopped) {
+			  System.out.println("Enter 'q' to quiesce and stop the service or 's' to stop it now:");
+			  int c = System.in.read();
+			  if ( c == 's') {
+			    stopped = true;
+			    serviceDeployer.undeploy(SpringContainerDeployer.STOP_NOW);
+			  } else if ( c == 'q') {
+          stopped = true;
+			    serviceDeployer.undeploy(SpringContainerDeployer.QUIESCE_AND_STOP);
+			  }
 			}
 		}
 		catch( Exception e)
