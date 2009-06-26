@@ -40,6 +40,7 @@ import javax.management.ObjectName;
 import org.apache.uima.UIMAException;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.jmx.JmxManagement;
+import org.apache.uima.aae.jmx.JmxManager;
 import org.apache.uima.internal.util.JmxMBeanAgent;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
@@ -55,7 +56,8 @@ import org.springframework.beans.factory.DisposableBean;
  * JMX and administrative requests such as shutdown.
  * 
  */
-public class UimacppServiceController implements ControllerLifecycle, DisposableBean {
+public class UimacppServiceController extends AnalysisEngineControllerAdapter
+implements ControllerLifecycle, DisposableBean {
 
   private static final String STARTING_DIRECTORY = "UIMACPP_STARTING_DIRECTORY";
   protected ServerSocket server;
@@ -106,7 +108,8 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
   
   private Exception InitializedStatus = null;
   
-  /**
+  
+    /**
    * Configure and start a Uima C++ service that connects to an ActiveMQ
    * queue broker. 
    * This class  initializes the process environment and starts a process 
@@ -187,7 +190,7 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
         mbean = new UimacppServiceManagement("org.apache.uima:type=ee.jms.services,",commandConnection, aeDesc,
             numInstances, brokerURL, queueName);
         JmxMBeanAgent.registerMBean(mbean, null);
-        
+
         // Initialization looks good
         notifyInitializationStatus(null);
 
@@ -829,6 +832,10 @@ public class UimacppServiceController implements ControllerLifecycle, Disposable
   public void removeControllerCallbackListener(ControllerCallbackListener aListener)
   {
     this.listeners.remove(aListener);
+  }
+
+  public void quiesceAndStop() {
+    terminate();
   }
 
 }
