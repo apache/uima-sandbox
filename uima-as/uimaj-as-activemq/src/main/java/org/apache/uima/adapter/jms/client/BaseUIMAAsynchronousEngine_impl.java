@@ -51,6 +51,7 @@ import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.controller.ControllerCallbackListener;
 import org.apache.uima.aae.controller.ControllerLifecycle;
 import org.apache.uima.aae.controller.Endpoint;
+import org.apache.uima.aae.controller.UimacppServiceController;
 import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
 import org.apache.uima.aae.jmx.JmxManager;
@@ -591,13 +592,16 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 
 	}
 
+  public void undeploy(String aSpringContainerId) throws Exception {
+    this.undeploy( aSpringContainerId, SpringContainerDeployer.STOP_NOW);
+  }
 
 	/**
 	 * Undeploys Spring container with a given container Id. All deployed Spring
 	 * containers are registered in the local registry under a unique id.
 	 * 
 	 */
-	public void undeploy(String aSpringContainerId) throws Exception
+	public void undeploy(String aSpringContainerId, int stop_level) throws Exception
 		
 	{
 		if ( aSpringContainerId == null )
@@ -640,24 +644,38 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			// terminate() method.
 			if (asyncServiceList != null && asyncServiceList.length > 0)
 			{
-				ControllerLifecycle ctrer = (ControllerLifecycle) ctx.getBean(asyncServiceList[0]);
+			  boolean topLevelController = false;
+        ControllerLifecycle ctrer = null;
+        int indx = 0;
+			  while( !topLevelController ) {
+			    ctrer = (ControllerLifecycle) ctx.getBean(asyncServiceList[indx++]);
+			    if ( ctrer instanceof UimacppServiceController || 
+			         ((AnalysisEngineController)ctrer).isTopLevelComponent() ) {
+			      topLevelController = true;
+			    }
+			  }
 				// Send a trigger to initiate shutdown.
-				if (ctrer instanceof AnalysisEngineController)
-				{
-					((AnalysisEngineController) ctrer).getControllerLatch().release();
+				if (ctrer != null )	{
+				  if ( ctrer instanceof AnalysisEngineController) {
+	          ((AnalysisEngineController) ctrer).getControllerLatch().release();
+				  }
+				  switch( stop_level ) {
+				    case SpringContainerDeployer.QUIESCE_AND_STOP:
+				      ((AnalysisEngineController)ctrer).quiesceAndStop();
+				      break;
+            case SpringContainerDeployer.STOP_NOW:
+              ((AnalysisEngineController)ctrer).terminate();
+              break;
+				  }
 				}
-				ctrer.terminate();
 			}
-
 			if (ctx instanceof FileSystemXmlApplicationContext)
 			{
 				((FileSystemXmlApplicationContext) ctx).destroy();
 			}
-
 			// Remove the container from a local registry
 			springContainerRegistry.remove(aSpringContainerId);
 		}
-
 	}
 
 	/**
