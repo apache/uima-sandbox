@@ -1190,7 +1190,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 				
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "simpleStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_next_step__FINEST", new Object[] { aCasReferenceId, analysisEngineKey });
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "simpleStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_next_step__FINEST", new Object[] {  analysisEngineKey, aCasReferenceId });
         }
 
 				//	Reset number of parallel delegates back to one. This is done only if the previous step was a parallel step.
@@ -1590,7 +1590,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
              // If debug level=FINEST dump the entire cache
              localCache.dumpContents();
 	  		     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_decremented_child_count__FINE", new Object[] { getComponentName(),casStateEntry.getCasReferenceId(),casStateEntry.getCasReferenceId(),casStateEntry.getSubordinateCasInPlayCount() });
+                UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "finalStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_cas_decremented_child_count__FINE", new Object[] { getComponentName(),casStateEntry.getCasReferenceId(),casStateEntry.getSubordinateCasInPlayCount() });
              }
           }
 	      }
