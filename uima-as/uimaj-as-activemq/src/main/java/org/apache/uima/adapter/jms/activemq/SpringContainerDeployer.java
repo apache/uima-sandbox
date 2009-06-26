@@ -46,13 +46,17 @@ import org.springframework.jms.support.destination.DestinationResolver;
 public class SpringContainerDeployer implements ControllerCallbackListener {
 	private static final Class CLASS_NAME = SpringContainerDeployer.class;
 	private static final int MAX_PREFETCH_FOR_CAS_NOTIFICATION_Q = 10;
-	
+  public static final int QUIESCE_AND_STOP = 1000;
+  public static final int STOP_NOW = 1001;
+  
 	private boolean serviceInitializationCompleted;
 	private boolean serviceInitializationException;
 	private Object serviceMonitor = new Object();
 	private ConcurrentHashMap springContainerRegistry=null;
 	private FileSystemXmlApplicationContext context = null;
 	private Object mux = new Object();
+	private AnalysisEngineController topLevelController = null;
+	
 	public SpringContainerDeployer(){
 	}
 
@@ -136,11 +140,15 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	  
 	}
 	
+	public AnalysisEngineController getTopLevelController() {
+	  return topLevelController;
+	}
 	private void initializeTopLevelController( AnalysisEngineController cntlr, ApplicationContext ctx) 
 	throws Exception
 	{
 		((FileSystemXmlApplicationContext) ctx).setDisplayName(cntlr.getComponentName());
 		cntlr.addControllerCallbackListener(this);
+		topLevelController = cntlr;
 		
 		String inputQueueName = cntlr.getServiceEndpointName();
 		if ( inputQueueName != null )
@@ -244,26 +252,29 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 		// Wrap Spring context
 		UimaEEAdminSpringContext springAdminContext = new UimaEEAdminSpringContext((FileSystemXmlApplicationContext) ctx);
 		// Find all deployed instances of the Broker Deployer
-		String[] brokerDeployer = ctx.getBeanNamesForType(org.apache.uima.adapter.jms.activemq.BrokerDeployer.class);
+	//	String[] brokerDeployer = ctx.getBeanNamesForType(org.apache.uima.adapter.jms.activemq.BrokerDeployer.class);
 		// Find all deployed Controllers
 		String[] controllers = ctx.getBeanNamesForType(org.apache.uima.aae.controller.AnalysisEngineController.class);
-
 		for (int i = 0; controllers != null && i < controllers.length; i++) {
 			AnalysisEngineController cntlr = (AnalysisEngineController) ctx.getBean(controllers[i]);
-			// Pass a reference to the context to each of the Controllers
-			cntlr.setUimaEEAdminContext(springAdminContext);
-			if (cntlr.isTopLevelComponent()) {
-				initializeTopLevelController( cntlr, ctx);
+			if ( cntlr instanceof org.apache.uima.aae.controller.UimacppServiceController ) {
+	      cntlr.addControllerCallbackListener(this);
+			} else {
+	      // Pass a reference to the context to each of the Controllers
+	      cntlr.setUimaEEAdminContext(springAdminContext);
+	      if (cntlr.isTopLevelComponent()) {
+	        initializeTopLevelController( cntlr, ctx);
+	      }
 			}
 		}
-
+/*
     String[] cppcontrollers = ctx.getBeanNamesForType(org.apache.uima.aae.controller.UimacppServiceController.class);
     for (int i = 0; cppcontrollers != null && i < cppcontrollers.length; i++) {
       UimacppServiceController cntlr = (UimacppServiceController) ctx.getBean(cppcontrollers[i]);
       // register listener
       cntlr.addControllerCallbackListener(this);
     }
-    
+*/    
 		// blocks until the top level controller sends a notification.
 		// Notification is send
 		// when either the controller successfully initialized or it failed
@@ -377,6 +388,20 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 			throw new ResourceInitializationException(e);
 		}
 
+	}
+	public void undeploy( int stop_level ) throws Exception {
+	  switch( stop_level ) {
+	    case QUIESCE_AND_STOP:
+	      getTopLevelController().quiesceAndStop();
+	      break;
+	      
+	    case STOP_NOW:
+	      getTopLevelController().terminate();
+	      break;
+	      
+	    default:
+	      throw new UnsupportedOperationException("Unsupported argument value in the undeploy() call. Please use stop level "+QUIESCE_AND_STOP + " OR "+STOP_NOW+" as an argument to undeploy() method.");
+	  }
 	}
 	protected void waitForServiceNotification() throws Exception {
 
