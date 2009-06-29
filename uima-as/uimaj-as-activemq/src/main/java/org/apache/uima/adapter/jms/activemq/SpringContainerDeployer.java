@@ -148,7 +148,6 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	{
 		((FileSystemXmlApplicationContext) ctx).setDisplayName(cntlr.getComponentName());
 		cntlr.addControllerCallbackListener(this);
-		topLevelController = cntlr;
 		
 		String inputQueueName = cntlr.getServiceEndpointName();
 		if ( inputQueueName != null )
@@ -251,30 +250,22 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 		serviceInitializationException = false;
 		// Wrap Spring context
 		UimaEEAdminSpringContext springAdminContext = new UimaEEAdminSpringContext((FileSystemXmlApplicationContext) ctx);
-		// Find all deployed instances of the Broker Deployer
-	//	String[] brokerDeployer = ctx.getBeanNamesForType(org.apache.uima.adapter.jms.activemq.BrokerDeployer.class);
 		// Find all deployed Controllers
 		String[] controllers = ctx.getBeanNamesForType(org.apache.uima.aae.controller.AnalysisEngineController.class);
 		for (int i = 0; controllers != null && i < controllers.length; i++) {
 			AnalysisEngineController cntlr = (AnalysisEngineController) ctx.getBean(controllers[i]);
 			if ( cntlr instanceof org.apache.uima.aae.controller.UimacppServiceController ) {
 	      cntlr.addControllerCallbackListener(this);
+	      topLevelController = cntlr;
 			} else {
 	      // Pass a reference to the context to each of the Controllers
 	      cntlr.setUimaEEAdminContext(springAdminContext);
 	      if (cntlr.isTopLevelComponent()) {
+	        topLevelController = cntlr;
 	        initializeTopLevelController( cntlr, ctx);
 	      }
 			}
 		}
-/*
-    String[] cppcontrollers = ctx.getBeanNamesForType(org.apache.uima.aae.controller.UimacppServiceController.class);
-    for (int i = 0; cppcontrollers != null && i < cppcontrollers.length; i++) {
-      UimacppServiceController cntlr = (UimacppServiceController) ctx.getBean(cppcontrollers[i]);
-      // register listener
-      cntlr.addControllerCallbackListener(this);
-    }
-*/    
 		// blocks until the top level controller sends a notification.
 		// Notification is send
 		// when either the controller successfully initialized or it failed
