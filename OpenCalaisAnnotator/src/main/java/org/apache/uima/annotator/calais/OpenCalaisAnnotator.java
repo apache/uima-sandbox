@@ -189,7 +189,7 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
         if (currentType != null) {
           // get reference element that contains the annotation span
 
-          int begin = element.getOffset() - offset.getOffset();
+          int begin = element.getOffset() - offset.getOffset() -1;
           
           //make begin offset correction
           for(int i = 0; i < positions.length; i++) {
