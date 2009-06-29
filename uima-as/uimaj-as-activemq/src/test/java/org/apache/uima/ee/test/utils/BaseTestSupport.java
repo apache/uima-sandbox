@@ -916,28 +916,43 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	protected void spinShutdownThread( final BaseUIMAAsynchronousEngine_impl uimaEEEngine, long when)
 	throws Exception
 	{
-		Date timeToRun = new Date(System.currentTimeMillis() + when);
-		final Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			public void run()
-			{
-				timer.cancel();
-				timer.purge();
-				System.out.println(">>>> runTest: Stopping UIMA EE Engine");
-				isStopping = true;
-				uimaEEEngine.stop();
-				isStopping = false;
-				isStopped = true;
-				System.out.println(">>>> runTest: UIMA EE Engine Stopped");
-				if (cpcLatch != null )
-				  cpcLatch.countDown();
-				if ( processCountLatch != null) {
+	  spinShutdownThread(uimaEEEngine, when, null, 0);
+	}
+
+	protected void spinShutdownThread( final BaseUIMAAsynchronousEngine_impl uimaEEEngine, long when, final String aSpringContainerId, final int stop_level)
+  throws Exception
+  {
+    Date timeToRun = new Date(System.currentTimeMillis() + when);
+    final Timer timer = new Timer();
+    timer.schedule(new TimerTask() {
+      public void run()
+      {
+        timer.cancel();
+        timer.purge();
+        System.out.println(">>>> runTest: Stopping UIMA EE Engine");
+        isStopping = true;
+        if ( aSpringContainerId == null ) {
+          uimaEEEngine.stop();
+        } else {
+          try {
+            uimaEEEngine.undeploy(aSpringContainerId, stop_level);
+          } catch( Exception e) {
+            e.printStackTrace();
+          }
+        }
+        
+        isStopping = false;
+        isStopped = true;
+        System.out.println(">>>> runTest: UIMA EE Engine Stopped");
+        if (cpcLatch != null )
+          cpcLatch.countDown();
+        if ( processCountLatch != null) {
           while (processCountLatch.getCount() > 0) {
             processCountLatch.countDown();
           }
-				}
-			}
-		}, timeToRun);
-		
-	}
+        }
+      }
+    }, timeToRun);
+    
+  }
 }
