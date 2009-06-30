@@ -2025,7 +2025,8 @@ implements AnalysisEngineController, EventSubscriber
     }
     return null; // no match
 	}
-  protected void stopCasMultipliers() {
+
+	public void stopCasMultipliers() {
 
     if (this instanceof AggregateAnalysisEngineController )
     {
@@ -2042,28 +2043,27 @@ implements AnalysisEngineController, EventSubscriber
         {
           //  Fetch the Delegate object corresponding to the current key
           Delegate delegate = ((AggregateAnalysisEngineController)this).lookupDelegate(key);
-          AnalysisEngineController delegateCasMultiplier = 
-            lookupDelegateController(endpoint.getEndpoint());
-          //  Send explicit Stop message to the remote CM
-          if ( endpoint.isRemote() ) {
-            if ( delegate != null ) {
-              // Get a list of all CASes this aggregate has dispatched to the Cas Multiplier
-              List<DelegateEntry> pendingList = delegate.getDelegateCasesPendingRepy();
+          if ( delegate != null ) {
+            // Get a list of all CASes this aggregate has dispatched to the Cas Multiplier
+            List<DelegateEntry> pendingList = delegate.getDelegateCasesPendingRepy();
+            try {
               // For each CAS pending reply send a Stop message to the CM
               for( DelegateEntry delegateEntry : pendingList ) {
-                stopCasMultiplier(delegate, delegateEntry.getCasReferenceId());
+                if ( endpoint.isRemote() ) {
+                  stopCasMultiplier(delegate, delegateEntry.getCasReferenceId());
+                } else {
+                  AnalysisEngineController delegateCasMultiplier = lookupDelegateController(endpoint.getEndpoint());
+                  delegateCasMultiplier.addAbortedCasReferenceId(delegateEntry.getCasReferenceId());
+                }
               }
+            } catch ( Exception exx) {
+              exx.printStackTrace();
             }
-          } else { // Collocated delegate Cas Multiplier
-            delegateCasMultiplier.setStopped();  // stops the CM
-            if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-              UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stopCasMultipliers", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stopping_collocated_cm_INFO", new Object[] { getComponentName(), delegateCasMultiplier.getComponentName() });
-            }
-            System.out.println(">>> Controller:"+getComponentName()+" Stopping Collocated Delegate Cas Multiplier:"+delegateCasMultiplier.getComponentName());
           }
         }
       }
     }
+    System.out.println(">>> Controller:"+getComponentName()+" Sent Stop Request To Its Cas Multipliers");
   }
 	public void stopCasMultiplier(Delegate casMultiplier, String aCasReferenceId)
 	{
