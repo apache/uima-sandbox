@@ -24,6 +24,7 @@ import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
+import org.apache.uima.aae.controller.AggregateAnalysisEngineController_impl;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.Endpoint_impl;
 import org.apache.uima.aae.controller.PrimitiveAnalysisEngineController;
@@ -859,7 +860,26 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		try	{
 		  String casReferenceId = aMessageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
 	    System.out.println("###################Controller::"+getController().getComponentName()+" Received <<<STOP>>> Request For CAS:"+casReferenceId);
-			getController().addAbortedCasReferenceId(casReferenceId); 
+	    if ( getController() instanceof PrimitiveAnalysisEngineController ) {
+	      getController().addAbortedCasReferenceId(casReferenceId);
+	    } else if ( getController() instanceof AggregateAnalysisEngineController_impl ) {
+	      try {
+	        CasStateEntry casStateEntry = 
+	          getController().getLocalCache().lookupEntry(casReferenceId);
+	        // Mark the CAS as if it have failed. In this case we dont associate any
+	        // exceptions with this CAS so its really not a failure of a CAS or any
+	        // of its children. We simply use the same logic here as if the CAS failed.
+	        // The Aggregate replyToClient() method will know that this CAS was stopped
+	        // as opposed to failed by the fact that the CAS has no exceptions associated
+	        // with it. In such case the replyToClient() method returns an input CAS as if
+	        // it has been fully processed.
+	        casStateEntry.setFailed();
+	        ((AggregateAnalysisEngineController_impl)getController()).stopCasMultipliers();
+	      } catch (Exception ex) {}  // CAS may have already been deleted
+	      
+	    }
+			
+
 		}
 		catch( Exception e){}
 	}
