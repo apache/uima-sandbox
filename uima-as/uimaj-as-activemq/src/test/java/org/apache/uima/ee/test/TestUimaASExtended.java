@@ -84,6 +84,7 @@ public class TestUimaASExtended extends BaseTestSupport
     private static final String primitiveServiceQueue1 = "NoOpAnnotatorQueue";
 	private static final String PrimitiveDescriptor1 = "resources/descriptors/analysis_engine/NoOpAnnotator.xml";
 	private int getMetaRequestCount = 0;
+  Object mux = new Object();
 
 	
 	/**
@@ -233,7 +234,55 @@ public class TestUimaASExtended extends BaseTestSupport
     runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, EXCEPTION_LATCH);
     
   }
+  public void testCMAggregateClientStopRequest() throws Exception {
+    System.out.println("-------------- testCMAggregateClientStopRequest -------------");
+    final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithCollocated1MillionDocsCM.xml");
+    Thread t = new Thread() {
+      public void run()
+      {
+        try {
+            // at this point the top level service should show a connection error
+            synchronized( this ) {
+              this.wait(3000);  // wait for 3 secs
+            }
+            eeUimaEngine.stopProducingCases();
+          } catch( Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+          }
+      }
+    };
+   t.start();
+   runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
 	
+  public void testCMAggregateClientStopRequest2() throws Exception {
+    System.out.println("-------------- testCMAggregateClientStopRequest2 -------------");
+    final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith1MillionDocs.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithRemote1MillionDocsCM.xml");
+    Thread t = new Thread() {
+      public void run()
+      {
+        try {
+            // at this point the top level service should show a connection error
+            synchronized( mux ) {
+              mux.wait(3000);  // wait for 3 secs
+            }
+            eeUimaEngine.stopProducingCases();
+          } catch( Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+          }
+      }
+    };
+   t.start();
+   runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+  }
+
   public void testAggregateCMWithFailedRemoteDelegate() throws Exception
   {
     System.out.println("-------------- testAggregateCMWithFailedRemoteDelegate -------------");
