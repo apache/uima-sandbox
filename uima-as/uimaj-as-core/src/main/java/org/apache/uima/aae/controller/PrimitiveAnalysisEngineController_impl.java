@@ -457,9 +457,12 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 						}
 					}
 					if ( casAbortedDueToExternalRequest ) {
+					  
 					  // The controller was told to stop generating new CASes. Just return the input CAS to the 
 					  // client
-					  throw new ResourceProcessException(new InterruptedException("Cas Multiplier:"+getComponentName()+" Aborted CAS:"+aCasReferenceId));
+					  //throw new ResourceProcessException(new InterruptedException("Cas Multiplier:"+getComponentName()+" Aborted CAS:"+aCasReferenceId));
+					  
+					  break;  // break out of the cas producing loop and return an input CAS to the client
 					} else {
 					  // The controller is stopping
 	          return;
@@ -579,13 +582,14 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
           //  Send reply back to the client. Use internal (non-jms) transport
           if ( !stopped ) {
             transport.getUimaMessageDispatcher(anEndpoint.getEndpoint()).dispatch(message);
-          }
+          } 
       }
       else
       {
         if ( !stopped ) {
           getOutputChannel().sendReply(aCasReferenceId, anEndpoint);
         }
+          
         inputCASReturned = true;
 			}
       //  Remove input CAS state entry from the local cache
