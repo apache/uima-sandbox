@@ -276,5 +276,20 @@ public interface UimaAsynchronousEngine
 	   * @return String type of serialization for CASes
 	   */
 	  public String getSerializationStrategy() ;
+	  
+	  /**
+	   * Request Uima AS client to initiate sending Stop requests to a service for all outstanding
+	   * CASes awaiting reply. 
+	   * 
+	   */
+	  public void stopProducingCases();
+
+    /**
+     * Request Uima AS client to initiate sending Stop request to a service for a given CAS id
+     * If the service is a Cas Multiplier, it will stop producing new CASes, will wait until all 
+     * child CASes finish and finally returns the input CAS. 
+     * 
+     */
+	  public void stopProducingCases(String aCasReferenceId);
 }
 
