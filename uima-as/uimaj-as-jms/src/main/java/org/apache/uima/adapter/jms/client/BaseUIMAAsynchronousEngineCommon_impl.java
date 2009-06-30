@@ -892,6 +892,11 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 		serviceDelegate.cancelDelegateTimer();
 		serviceDelegate.setState(Delegate.OK_STATE);
+    //  check if the reply msg contains replyTo destination. I will be
+    //  added by the Cas Multiplier to the getMeta reply
+    if ( message.getJMSReplyTo() != null ) {
+      serviceDelegate.setFreeCasDestination(message.getJMSReplyTo());
+    }
 
 		//  Check if this is a reply for Ping sent in response to a timeout
 		if ( serviceDelegate.isAwaitingPingReply() ) {
