@@ -18,6 +18,8 @@
  */
 package org.apache.uima.adapter.jms.client;
 
+import javax.jms.Destination;
+
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.delegate.Delegate;
@@ -35,19 +37,27 @@ public class ClientServiceDelegate extends Delegate {
   private BaseUIMAAsynchronousEngineCommon_impl clientUimaAsEngine;
   private String applicationName = "UimaAsClient";
   private volatile boolean usesSynchronousAPI;
+  private Destination freeCasDestination = null;
   
-  public boolean isSynchronousAPI() {
-    return usesSynchronousAPI;
-  }
-  public void setSynchronousAPI() {
-    this.usesSynchronousAPI = true;;
-  }
   public ClientServiceDelegate(String serviceName, String anApplicationName,  BaseUIMAAsynchronousEngineCommon_impl engine ) {
     super.delegateKey = serviceName;
     clientUimaAsEngine = engine;
     if ( anApplicationName != null && anApplicationName.trim().length() > 0 ) {
       applicationName = anApplicationName;
     }
+  }
+  public boolean isSynchronousAPI() {
+    return usesSynchronousAPI;
+  }
+  public void setSynchronousAPI() {
+    this.usesSynchronousAPI = true;;
+  }
+
+  public Destination getFreeCasDestination() {
+    return freeCasDestination;
+  }
+  public void setFreeCasDestination(Destination freeCasDestination) {
+    this.freeCasDestination = freeCasDestination;
   }
   public String getComponentName() {
     return applicationName;
