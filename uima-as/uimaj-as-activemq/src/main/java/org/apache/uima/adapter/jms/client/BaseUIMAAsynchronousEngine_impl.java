@@ -20,6 +20,7 @@
 package org.apache.uima.adapter.jms.client;
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -839,6 +840,46 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	{
 		return sender.getMessageProducer(destination);
 	}
+  /**
+   * Request Uima AS client to initiate sending Stop requests to a service for all outstanding
+   * CASes awaiting reply. 
+   * 
+   */
+  public void stopProducingCases() {
+    Iterator<String> it = getCache().keySet().iterator();
+    while ( it.hasNext()) {
+      ClientRequest request = (ClientRequest)getCache().get(it.next());
+      if ( request.getCasReferenceId() != null && !request.isMetaRequest()) {
+        stopProducingCases(request.getCasReferenceId());
+      }
+    }
+  }
+  /**
+   * Request Uima AS client to initiate sending Stop request to a service for a given CAS id
+   * If the service is a Cas Multiplier, it will stop producing new CASes, will wait until all 
+   * child CASes finish and finally returns the input CAS. 
+   * 
+   */
+  public void stopProducingCases(String aCasReferenceId) {
+    try {
+      if ( serviceDelegate.getFreeCasDestination() != null ) {
+        TextMessage msg = createTextMessage();
+        msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
+        msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+        msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
+        msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.Stop);
+        msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
+        MessageProducer msgProducer = 
+          getMessageProducer(serviceDelegate.getFreeCasDestination());
+        if ( msgProducer != null ) {
+          //  Send FreeCAS message to a Cas Multiplier
+          msgProducer.send(msg);
+        }
+      }
+    } catch ( Exception e) {
+      e.printStackTrace();
+    }
+  }
 
 
 }
