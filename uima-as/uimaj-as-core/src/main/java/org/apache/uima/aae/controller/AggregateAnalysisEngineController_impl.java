@@ -1714,6 +1714,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		return false;
 	}
+	private boolean casHasExceptions(CasStateEntry casStateEntry) {
+	  return (casStateEntry.getErrors().size() > 0) ? true : false;
+	}
   private void sendReplyWithException( CacheEntry acacheEntry, CasStateEntry casStateEntry, Endpoint replyEndpoint) throws Exception {
     //boolean casProducedInThisAggregate = getComponentName().equals(cacheEntry.getCasProducerAggregateName());
     if ( casStateEntry.isSubordinate()) {
@@ -1780,8 +1783,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       CasStateEntry topAncestorCasStateEntry = getLocalCache().
         getTopCasAncestor(casStateEntry.getInputCasReferenceId());
       //  check the state
-      if ( topAncestorCasStateEntry.isFailed() && topAncestorCasStateEntry.getSubordinateCasInPlayCount() == 0) {
-        
+      if ( topAncestorCasStateEntry.isFailed() && casHasExceptions(casStateEntry) && topAncestorCasStateEntry.getSubordinateCasInPlayCount() == 0) {
         return true;
       } else {
         //  Add the id of the generated CAS to the map holding outstanding CASes. This
@@ -1790,7 +1792,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
         //  quick lookup
         cmOutstandingCASes.put(casStateEntry.getCasReferenceId(),casStateEntry.getCasReferenceId());
       }
-    } else if ( casStateEntry.isFailed()) {
+    } else if ( casStateEntry.isFailed() && casHasExceptions(casStateEntry)) {
       return true;
     }      
     return false;
@@ -1817,8 +1819,6 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 
   private void sendReplyToCollocatedClient( CacheEntry cacheEntry, CasStateEntry casStateEntry, Endpoint replyEndpoint) throws Exception {
     boolean casProducedInThisAggregate = getComponentName().equals(cacheEntry.getCasProducerAggregateName());
-    String componentName = getComponentName();
-    
     boolean isSubordinate = casStateEntry.isSubordinate();
     boolean serviceIsCM = isCasMultiplier();
     if ( sendExceptionToClient(cacheEntry, casStateEntry, replyEndpoint)  ) {
@@ -1982,6 +1982,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		}
 		catch( Exception e)
 		{
+		  e.printStackTrace();
 			//	Any error here is automatic termination
 			UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "executeFlowStep", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { e });
 			try
