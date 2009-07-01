@@ -71,7 +71,7 @@ public interface AsynchAEMessage
 	public static final int ReleaseCAS = 2005;
   public static final int Stop = 2006;
   public static final int Ping = 2007;
-	
+  public static final int ServiceInfo = 2008;
 	
 	public static final String MessageType = "MessageType";
 	public static final int Request = 3000;
