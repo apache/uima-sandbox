@@ -215,7 +215,7 @@ public class TestUimaASExtended extends BaseTestSupport
     appCtx.put(UimaAsynchronousEngine.CasPoolSize, 1 );
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
     String containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
-    spinShutdownThread(eeUimaEngine, 5000, containerId, SpringContainerDeployer.QUIESCE_AND_STOP );
+    spinShutdownThread(eeUimaEngine, 3000, containerId, SpringContainerDeployer.QUIESCE_AND_STOP );
 
     runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 2, EXCEPTION_LATCH);
     
@@ -263,6 +263,8 @@ public class TestUimaASExtended extends BaseTestSupport
     final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith1MillionDocs.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith1MillionDocs.xml");
+    deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithRemote1MillionDocsCM.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithRemote1MillionDocsCM.xml");
     Thread t = new Thread() {
       public void run()
@@ -280,7 +282,7 @@ public class TestUimaASExtended extends BaseTestSupport
       }
     };
    t.start();
-   runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
+   runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 2, PROCESS_LATCH);
   }
 
   public void testAggregateCMWithFailedRemoteDelegate() throws Exception
