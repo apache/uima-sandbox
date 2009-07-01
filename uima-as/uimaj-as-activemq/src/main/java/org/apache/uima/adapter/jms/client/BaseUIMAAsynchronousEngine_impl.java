@@ -21,6 +21,7 @@ package org.apache.uima.adapter.jms.client;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -54,6 +55,7 @@ import org.apache.uima.aae.controller.ControllerLifecycle;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.UimacppServiceController;
 import org.apache.uima.aae.delegate.Delegate;
+import org.apache.uima.aae.delegate.Delegate.DelegateEntry;
 import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
 import org.apache.uima.aae.jmx.JmxManager;
 import org.apache.uima.aae.message.AsynchAEMessage;
@@ -61,6 +63,7 @@ import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
 import org.apache.uima.adapter.jms.activemq.UimaEEAdminSpringContext;
+import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngineCommon_impl.ClientRequest;
 import org.apache.uima.adapter.jms.service.Dd2spring;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
@@ -815,9 +818,9 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 
 	    //  Initialization exception. Notify blocking thread and indicate a problem
 	    serviceInitializationException = true;
-	    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
-	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
-	    }
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
+      }
 	    synchronized(serviceMonitor)
 	    {
 	      serviceMonitor.notifyAll();
@@ -846,12 +849,17 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
    * 
    */
   public void stopProducingCases() {
-    Iterator<String> it = getCache().keySet().iterator();
-    while ( it.hasNext()) {
-      ClientRequest request = (ClientRequest)getCache().get(it.next());
-      if ( request.getCasReferenceId() != null && !request.isMetaRequest()) {
-        stopProducingCases(request.getCasReferenceId());
-      }
+    List<DelegateEntry> outstandingCasList = 
+      serviceDelegate.getDelegateCasesPendingRepy();
+    for( DelegateEntry entry : outstandingCasList) {
+        // The Cas is still being processed
+        ClientRequest clientCachedRequest =
+          (ClientRequest)clientCache.get(entry.getCasReferenceId());
+        if ( clientCachedRequest != null && 
+             !clientCachedRequest.isMetaRequest() && 
+             clientCachedRequest.getCasReferenceId() != null) {
+          stopProducingCases(clientCachedRequest);
+        }
     }
   }
   /**
@@ -861,25 +869,43 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
    * 
    */
   public void stopProducingCases(String aCasReferenceId) {
+    // The Cas is still being processed
+    ClientRequest clientCachedRequest =
+        (ClientRequest)clientCache.get(aCasReferenceId);
+    if ( clientCachedRequest != null ) {
+       stopProducingCases(clientCachedRequest);
+    }
+  }
+  private void stopProducingCases(ClientRequest clientCachedRequest) {
     try {
-      if ( serviceDelegate.getFreeCasDestination() != null ) {
+      if ( clientCachedRequest.getFreeCasNotificationQueue() != null ) {
         TextMessage msg = createTextMessage();
         msg.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
-        msg.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+        msg.setStringProperty(AsynchAEMessage.CasReference, clientCachedRequest.getCasReferenceId());
         msg.setIntProperty(AsynchAEMessage.MessageType, AsynchAEMessage.Request); 
         msg.setIntProperty(AsynchAEMessage.Command, AsynchAEMessage.Stop);
         msg.setStringProperty(UIMAMessage.ServerURI, brokerURI);
-        MessageProducer msgProducer = 
-          getMessageProducer(serviceDelegate.getFreeCasDestination());
-        if ( msgProducer != null ) {
-          //  Send FreeCAS message to a Cas Multiplier
-          msgProducer.send(msg);
+        try {
+          MessageProducer msgProducer = 
+            getMessageProducer(clientCachedRequest.getFreeCasNotificationQueue());
+          if ( msgProducer != null ) {
+            System.out.println(">>> Client Sending Stop to Service for CAS:"+clientCachedRequest.getCasReferenceId()+" Destination:"+clientCachedRequest.getFreeCasNotificationQueue() );
+            //  Send STOP message to Cas Multiplier Service
+            msgProducer.send(msg);
+          }
+        } catch( Exception ex) {
+          System.out.println("Client Unable to send STOP Request to Service. Reason:");
+          ex.printStackTrace();
+          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] {Thread.currentThread().getId(), ex});
+          }
         }
       }
     } catch ( Exception e) {
       e.printStackTrace();
+      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] {Thread.currentThread().getId(), e});
+      }
     }
   }
-
-
 }
