@@ -248,6 +248,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				 command != AsynchAEMessage.ReleaseCAS && 
          command != AsynchAEMessage.Stop && 
          command != AsynchAEMessage.Ping && 
+         command != AsynchAEMessage.ServiceInfo && 
 				 command != AsynchAEMessage.CollectionProcessComplete )
 			{
 		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
@@ -287,6 +288,7 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 				 command == AsynchAEMessage.CollectionProcessComplete ||
          command == AsynchAEMessage.Stop ||
          command == AsynchAEMessage.Ping ||
+         command == AsynchAEMessage.ServiceInfo ||
 				 command == AsynchAEMessage.ReleaseCAS)
 			{
 				//	Payload not included in GetMeta Request
@@ -448,6 +450,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
         return "Stop";
       case AsynchAEMessage.Ping:
         return "Ping";
+      case AsynchAEMessage.ServiceInfo:
+        return "ServiceInfo";
 			}
 			
 		}
