@@ -318,7 +318,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 	 * @param aMessageContext - contains a message from UIMA-AS Client
 	 * @throws AsynchAEException
 	 */
-	private void handleProcessRequestFromRemoteDelegate(MessageContext aMessageContext) throws AsynchAEException
+	private void handleProcessRequestFromRemoteClient(MessageContext aMessageContext) throws AsynchAEException
 	{
 		CacheEntry entry = null;
 		String casReferenceId = null;
@@ -407,9 +407,20 @@ public class ProcessRequestHandler_impl extends HandlerBase
 					}
 				}
 			}
-			else if ( getController().isTopLevelComponent() && getController() instanceof AggregateAnalysisEngineController )
+			else if ( getController().isTopLevelComponent() )
 			{
-				((AggregateAnalysisEngineController)getController()).addMessageOrigin(casReferenceId, aMessageContext.getEndpoint());
+			  if ( getController() instanceof AggregateAnalysisEngineController ) {
+	        ((AggregateAnalysisEngineController)getController()).addMessageOrigin(casReferenceId, aMessageContext.getEndpoint());
+			  }
+			  if ( getController().isCasMultiplier() ) {
+			    // Send an ack to the client. The ack message will include a FreeCasQueue  
+			    // to enable the client to send messages to the service processing a CAS.
+			    try {
+	          getController().getOutputChannel().sendReply(AsynchAEMessage.ServiceInfo, aMessageContext.getEndpoint(), casReferenceId);
+			    } catch (Exception e) {
+			      e.printStackTrace();
+			    }
+			  }
 			}
 			//	To prevent processing multiple messages with the same CasReferenceId, check the CAS cache
 			//	to see if the message with a given CasReferenceId is already being processed. It is, the
@@ -471,7 +482,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 			{
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-		                "handleProcessRequestWithXMI", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_duplicate_request__INFO",
+		                "handleProcessRequestFromRemoteClient", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_duplicate_request__INFO",
 		                new Object[] { casReferenceId});
         }
 			}
@@ -480,7 +491,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 		{
 			e.printStackTrace();
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleProcessRequestWithXMI", 
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleProcessRequestFromRemoteClient", 
 					UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", e);
       }
 			ErrorContext errorContext = new ErrorContext();
@@ -934,7 +945,7 @@ public class ProcessRequestHandler_impl extends HandlerBase
 					{
 						return; // 	Invalid message. Nothing to do
 					}
-					handleProcessRequestFromRemoteDelegate(messageContext);
+					handleProcessRequestFromRemoteClient(messageContext);
 				}
 				else if (AsynchAEMessage.XCASPayload == payload)
 				{
