@@ -762,6 +762,64 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		
 	}
+  public void sendReply( int aCommand, Endpoint anEndpoint, String aCasReferenceId ) throws AsynchAEException {
+    try
+    {
+      if ( aborting )
+      {
+        return;
+      }
+      anEndpoint.setReplyEndpoint(true);
+      JmsEndpointConnection_impl endpointConnection = 
+        getEndpointConnection(anEndpoint);
+
+      TextMessage tm = endpointConnection.produceTextMessage(null);
+      tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.None); 
+      populateHeaderWithResponseContext(tm, anEndpoint, aCommand);
+      tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
+
+      //  If this service is a Cas Multiplier add to the message a FreeCasQueue. 
+      //  The client may need send Stop request to that queue.
+      if ( aCommand == AsynchAEMessage.ServiceInfo && 
+           getAnalysisEngineController().isCasMultiplier() &&
+           freeCASTempQueue != null ) {
+          //  Attach a temp queue to the outgoing message. This a queue where
+          //  Free CAS notifications need to be sent from the client
+          tm.setJMSReplyTo(freeCASTempQueue);
+      }
+      endpointConnection.send(tm, 0, false); 
+      addIdleTime(tm);
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cpc_reply_sent__FINE",
+                    new Object[] { getAnalysisEngineController().getComponentName(), anEndpoint.getEndpoint()});
+      }
+    }
+    catch( JMSException e)
+    {
+      //  Unable to establish connection to the endpoint. Logit and continue
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
+                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING",
+                    new Object[] { e});
+      }
+    }
+
+    catch( ServiceShutdownException e)
+    {
+      e.printStackTrace();
+    }
+
+    catch (AsynchAEException e)
+    {
+      throw e;
+    }
+    catch ( Exception e)
+    {
+      throw new AsynchAEException(e);
+    }
+    
+  }
 
 	public void sendReply( int aCommand, Endpoint anEndpoint ) throws AsynchAEException
 	{
@@ -772,7 +830,6 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				return;
 			}
-			anEndpoint.setReplyEndpoint(true);
 			JmsEndpointConnection_impl endpointConnection = 
 				getEndpointConnection(anEndpoint);
 
