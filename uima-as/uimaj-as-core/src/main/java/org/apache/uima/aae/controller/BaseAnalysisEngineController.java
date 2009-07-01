@@ -2075,17 +2075,17 @@ implements AnalysisEngineController, EventSubscriber
           if ( casMultiplier.getEndpoint().isRemote()) {
             // Fetch the endpoint where the Free CAS notification need to go. We use this
             // queue to send Stop messages.
-            Endpoint freeCasNotificationEndpoint = casMultiplier.getNotificationEndpoint();
+            Endpoint freeCasNotificationEndpoint = casEntry.getFreeCasNotificationEndpoint(); 
             if (freeCasNotificationEndpoint != null ) {
               freeCasNotificationEndpoint.setCommand(AsynchAEMessage.Stop);
               getOutputChannel().sendRequest(AsynchAEMessage.Stop, aCasReferenceId, freeCasNotificationEndpoint);
             }
-            System.out.println(">>> Controller:"+getComponentName()+" Stopping Remote Delegate Cas Multiplier:"+casMultiplier.getKey()+" Stopping CM From Generating More CASes from CAS: "+aCasReferenceId);
+            System.out.println(">>> Instance Hashcode:"+hashCode()+" Controller:"+getComponentName()+" Stopping Remote Delegate Cas Multiplier:"+casMultiplier.getKey()+" Stopping CM From Generating More CASes from CAS: "+aCasReferenceId);
             if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
               UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stopCasMultiplier", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stopping_remote_cm_INFO", new Object[] { getComponentName(), casMultiplier.getComponentName(),aCasReferenceId });
             }
           } else {
-            System.out.println(">>> Controller:"+getComponentName()+" Stopping Collocated Delegate Cas Multiplier:"+casMultiplier.getKey());
+            System.out.println(">>> Instance Hashcode:"+hashCode()+" Controller:"+getComponentName()+" Stopping Collocated Delegate Cas Multiplier:"+casMultiplier.getKey());
             AnalysisEngineController cm = getCasMultiplierController(casMultiplier.getKey());
             cm.addAbortedCasReferenceId(aCasReferenceId);
           }
