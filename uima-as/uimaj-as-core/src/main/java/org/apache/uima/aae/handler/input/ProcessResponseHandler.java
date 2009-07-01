@@ -148,7 +148,7 @@ public class ProcessResponseHandler extends HandlerBase
 
 	}
 
-	private void handleProcessResponseFromRemoteDelegate(MessageContext aMessageContext, String aDelegateKey)
+	private void handleProcessResponseFromRemote(MessageContext aMessageContext, String aDelegateKey)
 	{
 		CAS cas = null;
 		String casReferenceId = null;
@@ -162,7 +162,7 @@ public class ProcessResponseHandler extends HandlerBase
 			{
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(),
-		                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_endpoint__WARNING",
+		                "handleProcessResponseFromRemote", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_invalid_endpoint__WARNING",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId});
         }
 				return;
@@ -210,7 +210,7 @@ public class ProcessResponseHandler extends HandlerBase
 			int totalNumberOfParallelDelegatesProcessingCas = casStateEntry.getNumberOfParallelDelegates();
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-	                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_number_parallel_delegates_FINE",
+	                "handleProcessResponseFromRemote", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_number_parallel_delegates_FINE",
 	                new Object[] { totalNumberOfParallelDelegatesProcessingCas});
       }
 			if (cas == null)
@@ -220,7 +220,7 @@ public class ProcessResponseHandler extends HandlerBase
 			if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
 			{
 				UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-		                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_rcvd_reply_FINEST",
+		                "handleProcessResponseFromRemote", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_rcvd_reply_FINEST",
 		                new Object[] { aMessageContext.getEndpoint().getEndpoint(), casReferenceId, xmi });
 			}
 			long t1 = getController().getCpuTime();
@@ -234,7 +234,7 @@ public class ProcessResponseHandler extends HandlerBase
         synchronized (cas) {
           if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
             UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-                    "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                    "handleProcessResponseFromRemote", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
                     "UIMAEE_delegate_responded_count_FINEST",
                     new Object[] { casStateEntry.howManyDelegatesResponded(), casReferenceId });
           }
@@ -313,7 +313,7 @@ public class ProcessResponseHandler extends HandlerBase
         }
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
-                "handleProcessResponseFromRemoteDelegate", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
+                "handleProcessResponseFromRemote", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE,
                 "UIMAEE_stale_reply__INFO",
                 new Object[] { getController().getComponentName(), key, casReferenceId });
         }
@@ -593,14 +593,31 @@ public class ProcessResponseHandler extends HandlerBase
 	    e.printStackTrace();
 	  }
 	}
-	
+  private void handleServiceInfoReply(MessageContext messageContext) {
+    try {
+      String casReferenceId = 
+        messageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
+      Endpoint freeCasEndpoint = messageContext.getEndpoint();
+      CasStateEntry casStateEntry = 
+        ((AggregateAnalysisEngineController)getController()).
+            getLocalCache().lookupEntry(casReferenceId);
+      if ( casStateEntry != null ) {
+        casStateEntry.setFreeCasNotificationEndpoint(freeCasEndpoint);
+      }
+    } catch( Exception e) {
+      
+    }
+    
+  }
+
 	public  void handle(Object anObjectToHandle) throws AsynchAEException
 	{
 		super.validate(anObjectToHandle);
 		MessageContext messageContext = (MessageContext) anObjectToHandle;
 		
 		if (isHandlerForMessage(messageContext, AsynchAEMessage.Response, AsynchAEMessage.Process) ||
-			isHandlerForMessage(messageContext, AsynchAEMessage.Response, AsynchAEMessage.ACK ) ||
+			  isHandlerForMessage(messageContext, AsynchAEMessage.Response, AsynchAEMessage.ACK ) ||
+        isHandlerForMessage(messageContext, AsynchAEMessage.Response, AsynchAEMessage.ServiceInfo ) ||
 		    isHandlerForMessage(messageContext, AsynchAEMessage.Response, AsynchAEMessage.CollectionProcessComplete) )
 		{
 			int payload = messageContext.getMessageIntProperty(AsynchAEMessage.Payload);
@@ -633,7 +650,7 @@ public class ProcessResponseHandler extends HandlerBase
 			}
 			else if (AsynchAEMessage.XMIPayload == payload || AsynchAEMessage.BinaryPayload == payload)
 			{
-			  handleProcessResponseFromRemoteDelegate(messageContext, key);
+			  handleProcessResponseFromRemote(messageContext, key);
 				if ( key != null )
 				{
 					resetErrorCounts(key);
@@ -663,7 +680,10 @@ public class ProcessResponseHandler extends HandlerBase
       {
         handlePingReply(messageContext);
       }
-
+      else if (AsynchAEMessage.None == payload && AsynchAEMessage.ServiceInfo == command)
+      {
+        handleServiceInfoReply(messageContext);
+      }
 			else
 			{
 				throw new AsynchAEException("Invalid Payload. Expected XMI or CasReferenceId Instead Got::" + payload);
