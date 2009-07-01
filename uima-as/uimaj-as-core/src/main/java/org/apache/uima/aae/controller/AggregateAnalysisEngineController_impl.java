@@ -953,7 +953,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
           {
             //  If the delegate CM is a remote, send a Free CAS notification 
             if ( delegateCM.getEndpoint().isRemote()) {
-              getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, entry.getCasReferenceId(), delegateCM.getNotificationEndpoint());
+              parentCasStateEntry.getFreeCasNotificationEndpoint().setCommand(AsynchAEMessage.Stop);
+              getOutputChannel().sendRequest(AsynchAEMessage.ReleaseCAS, entry.getCasReferenceId(), parentCasStateEntry.getFreeCasNotificationEndpoint());
             }
             //  Check if a request to stop generation of new CASes from the parent of
             //  this CAS has been sent to the CM. The Delegate object keeps track of
