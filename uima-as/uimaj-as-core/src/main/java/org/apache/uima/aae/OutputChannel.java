@@ -43,7 +43,9 @@ public interface OutputChannel extends Channel
 
 	public void sendReply( int aCommand, Endpoint anEndpoint ) throws AsynchAEException;
 
-	public void sendReply( CAS aCas, String anInputCasReferenceId, String aNewCasReferenceId,  Endpoint anEndpoint, long sequence ) throws AsynchAEException;
+  public void sendReply( int aCommand, Endpoint anEndpoint, String aCasReferenceId ) throws AsynchAEException;
+
+  public void sendReply( CAS aCas, String anInputCasReferenceId, String aNewCasReferenceId,  Endpoint anEndpoint, long sequence ) throws AsynchAEException;
 	
 	public void sendReply( String aCasReferenceId, Endpoint anEndpoint ) throws AsynchAEException;
 
