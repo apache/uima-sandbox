@@ -91,6 +91,7 @@ import org.apache.uima.util.impl.ProcessTrace_impl;
 import org.apache.uima.aae.client.UimaASProcessStatus;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.delegate.Delegate;
+import org.apache.uima.aae.delegate.Delegate.DelegateEntry;
 
 public abstract class BaseUIMAAsynchronousEngineCommon_impl 
 implements UimaAsynchronousEngine, MessageListener
@@ -1084,7 +1085,35 @@ implements UimaAsynchronousEngine, MessageListener
     }
 	  
 	}
-	
+	/**
+	 * Handles a ServiceInfo message returned from the Cas Multiplier. The 
+	 * primary purpose of this message is to provide the client with a dedicated
+	 * queue object where the client may send messages to the specific 
+	 * CM service instance. An example of this would be a stop request that
+	 * client needs to send to the specific Cas Multiplier.
+	 * 
+	 * @param message - message received from a service
+	 * @throws Exception
+	 */
+	protected void handleServiceInfo(Message message ) throws Exception {
+   String casReferenceId = message.getStringProperty(AsynchAEMessage.CasReference);
+   if ( message.getJMSReplyTo() != null ) {
+     List<DelegateEntry> outstandingCasList = 
+       serviceDelegate.getDelegateCasesPendingRepy();
+     for( DelegateEntry entry : outstandingCasList) {
+       if ( entry.getCasReferenceId().equals(casReferenceId)) {
+         // The Cas is still being processed
+         ClientRequest casCachedRequest =
+           (ClientRequest)clientCache.get(casReferenceId);
+         if ( casCachedRequest != null ) {
+           System.out.println("Client Received ServiceInfo Notification from CAS Multiplier For CAS: "+casReferenceId);
+           casCachedRequest.setFreeCasNotificationQueue(message.getJMSReplyTo());
+         }
+         return;
+       }
+     }
+   }
+	}
 	/**
 	 * Handles response to Process CAS request. If the message originated in a service that is running in a separate jvm (remote), 
 	 * deserialize the CAS and notify the application of the completed analysis via application listener.
@@ -1624,7 +1653,13 @@ implements UimaAsynchronousEngine, MessageListener
         }
 				handleProcessReply(message, true, null);
 			}
-//			System.out.println("#### Client Completed Processing Of the Message. Waiting For Next Message...");
+      else if (AsynchAEMessage.ServiceInfo == command)
+      {
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_received_service_info_FINEST", new Object[] { message.getStringProperty(AsynchAEMessage.MessageFrom) });
+        }
+        handleServiceInfo(message);
+      }
 		}
 		catch (Exception e)
 		{
@@ -1959,6 +1994,14 @@ implements UimaAsynchronousEngine, MessageListener
 
     private volatile boolean processException;
     
+    private Destination freeCasNotificationQueue = null;
+    
+    public Destination getFreeCasNotificationQueue() {
+      return freeCasNotificationQueue;
+    }
+    public void setFreeCasNotificationQueue(Destination freeCasNotificationQueue) {
+      this.freeCasNotificationQueue = freeCasNotificationQueue;
+    }
     public boolean isProcessException() {
       return processException;
     }
