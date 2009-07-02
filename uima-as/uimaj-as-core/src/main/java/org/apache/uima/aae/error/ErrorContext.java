@@ -52,5 +52,7 @@ public class ErrorContext
 	{
 		return contextMap.keySet().iterator();
 	}
-
+	public void remove(String key) {
+	  contextMap.remove(key);
+	}
 }
