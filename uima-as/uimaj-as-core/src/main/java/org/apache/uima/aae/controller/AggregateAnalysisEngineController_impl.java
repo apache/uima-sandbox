@@ -699,7 +699,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       iC.destroyListener(destName, key);
     }
 	}
-	public void disableDelegates(List aDelegateList) throws AsynchAEException
+  public void disableDelegates(List aDelegateList) throws AsynchAEException {
+    disableDelegates(aDelegateList, null);
+  }
+	protected void disableDelegates(List aDelegateList, String aCasReferenceId) throws AsynchAEException
 	{
 		try
 		{
@@ -744,8 +747,18 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
 	           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "disableDelegates", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { ex });
 	         }
-	         ex.printStackTrace();
-					handleAction(ErrorHandler.TERMINATE, null, null);
+           ex.printStackTrace();
+	         if ( aCasReferenceId != null ) {
+	           CasStateEntry parentCasCacheEntry = 
+	             getLocalCache().getTopCasAncestor(aCasReferenceId);
+	           if ( parentCasCacheEntry != null && aDelegateList != null && aDelegateList.size() > 0 ) {
+	             String delegateKey = (String)aDelegateList.get(0);
+	             System.out.println("Controller:"+getComponentName()+" Terminating Due to FlowController Failure While Disabling Delegate:"+delegateKey+" Cas:"+parentCasCacheEntry.getCasReferenceId());
+	             super.terminate(ex, parentCasCacheEntry.getCasReferenceId());
+	           }
+	         } else {
+	           terminate();
+	         }
 					return;
 				}
 			}
