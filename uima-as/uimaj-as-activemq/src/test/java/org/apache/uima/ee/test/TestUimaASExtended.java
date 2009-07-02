@@ -203,20 +203,33 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithFailedRemoteDelegate.xml");
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, EXCEPTION_LATCH);
   }
-
+  /**
+   * Tests service quiesce and stop support. This test sets a CasPool to 1 to 
+   * send just one CAS at a time. After the first CAS is sent, a thread
+   * is started with a timer to expire before the reply is received. When the
+   * timer expires, the client initiates quiesceAndStop on the top level 
+   * controller. As part of this, the top level controller stops its listeners
+   * on the input queue (GetMeta and Process Listeners), and registers a 
+   * callback with the InProcess cache. When the cache is empty, meaning all
+   * CASes are processed, the cache notifies the controller which then begins
+   * the service shutdown. Meanwhile, the client receives a reply for the 
+   * first CAS, and sends a second CAS. This CAS, will remain in the queue
+   * as the service has previously stopped its listeners. The client times
+   * out after 10 seconds and shuts down.  
+   * 
+   * @throws Exception
+   */
   public void testQuiesceAndStop() throws Exception {
     System.out.println("-------------- testAggregateWithFailedRemoteDelegate -------------");
     BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-    
     Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
     // Set an explicit process timeout so to test the ping on timeout
-    appCtx.put(UimaAsynchronousEngine.Timeout, 20000 );
+    appCtx.put(UimaAsynchronousEngine.Timeout, 10000 );
     appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 300 );
     appCtx.put(UimaAsynchronousEngine.CasPoolSize, 1 );
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
     String containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
-    spinShutdownThread(eeUimaEngine, 3000, containerId, SpringContainerDeployer.QUIESCE_AND_STOP );
-
+    spinShutdownThread(eeUimaEngine, 2000, containerId, SpringContainerDeployer.QUIESCE_AND_STOP );
     runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 2, EXCEPTION_LATCH);
     
   }
@@ -1155,9 +1168,7 @@ public class TestUimaASExtended extends BaseTestSupport
     System.out.println("-------------- testCancelProcessAggregateWithCollocatedMultiplier -------------");
 		BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
-		System.out.println("###############> Deploying Complex Agggregate #####################");
 		deployService(eeUimaEngine, relativePath+"/Deploy_ComplexAggregateWith1MillionDocs.xml");
-    System.out.println("###############> Deploying Complex Agggregate Deployed#####################");
 		//	Spin a thread to cancel Process after 20 seconds
 		spinShutdownThread( eeUimaEngine, 20000 );
 		runTest(null, eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1,PROCESS_LATCH);
