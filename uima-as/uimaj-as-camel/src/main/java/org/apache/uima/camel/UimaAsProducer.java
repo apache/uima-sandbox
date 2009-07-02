@@ -73,9 +73,13 @@ public class UimaAsProducer extends DefaultProducer<Exchange> implements AsyncPr
       UimaASProcessStatusImpl statusImpl = (UimaASProcessStatusImpl) aStatus;
 
       String referenceId = statusImpl.getCasReferenceId();
-
-      ExchangeAsyncCallbackPair exchangeCallbackPair = intermediateMap.remove(referenceId);
-
+      
+      ExchangeAsyncCallbackPair exchangeCallbackPair;
+      
+      synchronized (intermediateMap) {
+        exchangeCallbackPair = intermediateMap.remove(referenceId);
+      }
+      
       if (exchangeCallbackPair != null) {
         if (aStatus.isException()) {
 
