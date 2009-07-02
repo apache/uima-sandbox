@@ -387,6 +387,22 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
               delegateKey = key;
               anErrorContext.add( AsynchAEMessage.SkipPendingLists, "true");
             }
+            if (ErrorHandler.TERMINATE.equalsIgnoreCase(threshold.getAction()) ){
+              anErrorContext.add(ErrorContext.THROWABLE_ERROR, t);
+              if ( casReferenceId != null ) {
+                try {
+                  CasStateEntry casStateEntry = aController.getLocalCache().lookupEntry(casReferenceId);
+                  if ( casStateEntry != null && casStateEntry.isSubordinate()) {
+                    CasStateEntry parenCasStateEntry = aController.getLocalCache().getTopCasAncestor(casReferenceId);
+                    //  Replace Cas Id with the parent Cas Id
+                    anErrorContext.remove(AsynchAEMessage.CasReference);
+                    anErrorContext.add(AsynchAEMessage.CasReference, parenCasStateEntry.getCasReferenceId());
+                  }
+                } catch( Exception e) {}
+              }
+            
+            }
+            
 						aController.takeAction(threshold.getAction(), key, anErrorContext);
 					}
 				}
