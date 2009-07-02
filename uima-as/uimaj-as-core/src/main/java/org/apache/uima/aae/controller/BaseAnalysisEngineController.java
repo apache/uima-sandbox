@@ -1073,7 +1073,11 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			//	Propagate terminate event to the top controller and begin shutdown of this service along
 			//	with all collocated delegates (if any)
-			terminate();
+		  if ( anErrorContext.containsKey(ErrorContext.THROWABLE_ERROR) && anErrorContext.containsKey(AsynchAEMessage.CasReference)) {
+        terminate((Throwable) anErrorContext.get(ErrorContext.THROWABLE_ERROR), (String) anErrorContext.get(AsynchAEMessage.CasReference));
+		  } else {
+	      terminate();
+		  }
 		}
 		else if ( ErrorHandler.DISABLE.equalsIgnoreCase(anAction)  )
 		{
@@ -1094,7 +1098,7 @@ implements AnalysisEngineController, EventSubscriber
 						key = anEndpoint;
 						list.add(anEndpoint);
 					}
-          ((AggregateAnalysisEngineController)this).disableDelegates(list);
+          ((AggregateAnalysisEngineController_impl)this).disableDelegates(list,casReferenceId);
 
           if ( key != null && key.trim().length() > 0) {
             //  Delegate has been disabled. Cleanup Delegate's lists. Each Delegate
@@ -1769,7 +1773,10 @@ implements AnalysisEngineController, EventSubscriber
 	 * Stops input channel(s) and initiates a shutdown of all delegates ( if this is an aggregate ). At the end
 	 * sends an Exception to the client and closes an output channel.
 	 */
-	public void stop()
+	public void stop() {
+	  this.stop(null, null);
+	}
+  public void stop(Throwable cause, String aCasReferenceId)
 	{
 		if ( !isStopped() )
 		{
@@ -1815,14 +1822,15 @@ implements AnalysisEngineController, EventSubscriber
 		 * 
 		//	Send an exception to the client if this is a top level service
 		 */ 
-		if (getOutputChannel() != null && isTopLevelComponent() )
+		if (cause != null && aCasReferenceId != null && getOutputChannel() != null && isTopLevelComponent() )
 		{
-			Endpoint clientEndpoint = null;
+
+		  Endpoint clientEndpoint = null;
 			if ( ( clientEndpoint = getClientEndpoint() ) != null )
 			{
 				try
 				{
-					getOutputChannel().sendReply( new ServiceShutdownException(), null, null, clientEndpoint, clientEndpoint.getCommand());
+					getOutputChannel().sendReply( cause, aCasReferenceId, null, clientEndpoint, clientEndpoint.getCommand());
 				}
 				catch( Exception e)
 				{
@@ -1988,8 +1996,12 @@ implements AnalysisEngineController, EventSubscriber
 	 *  will be called when the InProcessCache becomes empty. Only then, the top level controller will 
 	 *  call stop() on each of a delegates (if the top level is an aggregate). 
 	 */
-	public void terminate()
-	{
+	public void terminate() {
+	  terminate(null, null );
+	}
+	
+  public void terminate( Throwable cause, String aCasReferenceId) {
+
     synchronized(stopLatch) {
       if ( stopLatch.getCount() > 0 ) {
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
@@ -2009,7 +2021,11 @@ implements AnalysisEngineController, EventSubscriber
       stopInputChannel();
       System.out.println("Controller:"+getComponentName()+" Done Stopping Main Input Channel");     
       stopCasMultipliers();
-      this.stop();
+      if ( cause != null && aCasReferenceId != null ) {
+        this.stop(cause, aCasReferenceId);
+      } else {
+        this.stop();
+      }
     }
 	}
 
