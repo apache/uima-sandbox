@@ -929,28 +929,29 @@ public abstract class BaseTestSupport extends ActiveMQSupport
       {
         timer.cancel();
         timer.purge();
-        System.out.println(">>>> runTest: Stopping UIMA EE Engine");
-        isStopping = true;
         if ( aSpringContainerId == null ) {
+          isStopping = true;
+          System.out.println(">>>> runTest: Stopping UIMA EE Engine");
           uimaEEEngine.stop();
+          isStopping = false;
+          isStopped = true;
+          System.out.println(">>>> runTest: UIMA EE Engine Stopped");
+          if (cpcLatch != null )
+            cpcLatch.countDown();
+          if ( processCountLatch != null) {
+            while (processCountLatch.getCount() > 0) {
+              processCountLatch.countDown();
+            }
+          }
         } else {
           try {
+            System.out.println(">>>> runTest: Quiescing Service And Stopping it");
             uimaEEEngine.undeploy(aSpringContainerId, stop_level);
           } catch( Exception e) {
             e.printStackTrace();
           }
         }
         
-        isStopping = false;
-        isStopped = true;
-        System.out.println(">>>> runTest: UIMA EE Engine Stopped");
-        if (cpcLatch != null )
-          cpcLatch.countDown();
-        if ( processCountLatch != null) {
-          while (processCountLatch.getCount() > 0) {
-            processCountLatch.countDown();
-          }
-        }
       }
     }, timeToRun);
     
