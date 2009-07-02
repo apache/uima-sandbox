@@ -118,6 +118,7 @@ under the License.
         <include>org.apache.uima:uimaj-as-activemq</include>
         <include>org.apache.uima:uimaj-as-core</include>
         <include>org.apache.uima:uimaj-as-jms</include>
+        <include>org.apache.uima:uimaj-as-camel</include>
       </includes>      
       <outputFileNameMapping>${artifact.artifactId}.jar</outputFileNameMapping>
       <outputDirectory>lib</outputDirectory>

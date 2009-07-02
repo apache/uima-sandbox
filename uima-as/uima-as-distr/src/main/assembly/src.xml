@@ -168,6 +168,14 @@ under the License.
       </includes>
     </fileSet>
     <fileSet>
+      <directory>../uimaj-as-camel</directory>
+      <outputDirectory>uimaj-as-camel</outputDirectory>
+      <includes>
+        <include>src/**</include>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>../uimaj-as-core</directory>
       <outputDirectory>uimaj-as-core</outputDirectory>
       <includes>
