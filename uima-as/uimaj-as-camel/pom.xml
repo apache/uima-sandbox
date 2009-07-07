@@ -77,7 +77,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Private-Package>dk.infopaq.messaging.camel.uima</Private-Package>
+						<Private-Package>org.apache.uima.camel</Private-Package>
 					</instructions>
 				</configuration>
 			</plugin>
