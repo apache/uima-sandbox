@@ -68,6 +68,7 @@ import org.apache.uima.adapter.jms.service.Dd2spring;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.internal.util.UUIDGenerator;
 import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceConfigurationException;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -474,7 +475,13 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
     super.serviceDelegate.setGetMetaTimeout(metadataTimeout);
 		try
 		{
-			jmxManager = new JmxManager("org.apache.uima");
+		  //  Generate unique identifier
+		  String uuid = UUIDGenerator.generate();
+		  //  JMX does not allow ':' in the ObjectName so replace these with underscore
+		  uuid = uuid.replaceAll(":", "_");
+      uuid = uuid.replaceAll("-", "_");
+		  applicationName += "_"+uuid;
+		  jmxManager = new JmxManager("org.apache.uima");
 			clientSideJmxStats.setApplicationName(applicationName);
 			ObjectName on = new ObjectName("org.apache.uima:name="+applicationName);
 			jmxManager.registerMBean(clientSideJmxStats, on);
