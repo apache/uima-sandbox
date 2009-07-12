@@ -92,6 +92,9 @@ public class UIMA_Service implements  ApplicationListener
     }
     System.out.println(">>> Setting defaultBrokerURL to:"+System.getProperty("defaultBrokerURL"));
     
+    if ( System.getProperty(JmsConstants.SessionTimeoutOverride) != null ) {
+      System.out.println(">>> Setting Inactivity Timeout To: "+System.getProperty(JmsConstants.SessionTimeoutOverride));
+    }
     if (deploymentDescriptors.length == 0)
 		{
 			// array of context files passed in
