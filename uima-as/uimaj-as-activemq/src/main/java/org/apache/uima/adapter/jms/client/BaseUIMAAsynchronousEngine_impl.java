@@ -280,7 +280,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
       ((TextMessage)msg).setText("");
     }
 	}
-	protected Connection getConnection( String aBrokerURI ) throws Exception
+	protected synchronized Connection getConnection( String aBrokerURI ) throws Exception
 	{
 		if (connection == null )
 		{
@@ -289,7 +289,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			// This only effects Consumer
 			addPrefetch((ActiveMQConnection)connection);
 			connection.start();
-		}
+		} 
 		return connection;
 	}
 
