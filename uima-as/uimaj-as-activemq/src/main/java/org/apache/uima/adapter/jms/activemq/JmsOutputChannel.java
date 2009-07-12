@@ -23,14 +23,17 @@ import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import javax.jms.BytesMessage;
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.TextMessage;
 import javax.management.ServiceNotFoundException;
@@ -323,13 +326,21 @@ public class JmsOutputChannel implements OutputChannel
 		
 		JmsEndpointConnection_impl endpointConnection=null;
 		
+		//  First get a Map containing destinations managed by a broker provided by the client
+		BrokerConnectionEntry brokerConnectionEntry = null;
+		if ( connectionMap.containsKey(anEndpoint.getServerURI())) {  
+		  brokerConnectionEntry = (BrokerConnectionEntry)connectionMap.get(anEndpoint.getServerURI());
+		} else {
+		  brokerConnectionEntry = new BrokerConnectionEntry();
+		  connectionMap.put(anEndpoint.getServerURI(), brokerConnectionEntry);
+		}
 		//	create a key to lookup the connection
 		String key = anEndpoint.getEndpoint()+anEndpoint.getServerURI();
 		String destination = anEndpoint.getEndpoint();
 		if ( anEndpoint.getDestination() != null && anEndpoint.getDestination() instanceof ActiveMQDestination )
 		{
 			destination = ((ActiveMQDestination)anEndpoint.getDestination()).getPhysicalName();
-		    key = destination;
+		  key = destination;
 		}
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
@@ -338,17 +349,18 @@ public class JmsOutputChannel implements OutputChannel
     }
 		
 		//	check the cache first
-		if ( !connectionMap.containsKey(key) )
-		{
+    if ( !brokerConnectionEntry.endpointExists(key) )	{
 	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                     "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_create_new_connection__FINE",
                     new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
 	    }
-			endpointConnection = new JmsEndpointConnection_impl(connectionMap, anEndpoint); //.getServerURI(), anEndpoint.getEndpoint(),anEndpoint.remove());
+      endpointConnection = new JmsEndpointConnection_impl(brokerConnectionEntry, anEndpoint); //.getServerURI(), anEndpoint.getEndpoint(),anEndpoint.remove());
+			brokerConnectionEntry.addEndpointConnection(key, endpointConnection);
+			
 			if ( System.getProperty(JmsConstants.SessionTimeoutOverride) != null)
 			{
-				try
+			  try
 				{
 					int overrideTimeoutValue = 
 					Integer.parseInt(System.getProperty(JmsConstants.SessionTimeoutOverride));
@@ -359,7 +371,8 @@ public class JmsOutputChannel implements OutputChannel
 		                    new Object[] { analysisEngineController, overrideTimeoutValue, destination, anEndpoint.getServerURI() });
 			    }
 				}
-				catch( NumberFormatException e) { /* ignore. use the default */ }
+				catch( NumberFormatException e) { 
+				/* ignore. use the default */ }
 			}
 			else
 			{
@@ -394,7 +407,7 @@ public class JmsOutputChannel implements OutputChannel
                     new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
 	    }
 			//	Retrieve connection from the connection cache
-			endpointConnection = (JmsEndpointConnection_impl)connectionMap.get(key);
+	    endpointConnection = brokerConnectionEntry.getEndpointConnection(key);
 			// check the state of the connection and re-open it if necessary
 			if ( endpointConnection != null && !endpointConnection.isOpen() )
 			{
@@ -1978,4 +1991,35 @@ public class JmsOutputChannel implements OutputChannel
 		return null;
 	}
 
+	public class BrokerConnectionEntry {
+	  private String brokerURL;
+	  private Connection connection;
+	  Map<Object, JmsEndpointConnection_impl> endpointMap = 
+	    new ConcurrentHashMap<Object, JmsEndpointConnection_impl>();
+	  
+    public String getBrokerURL() {
+      return brokerURL;
+    }
+    public void setBrokerURL(String brokerURL) {
+      this.brokerURL = brokerURL;
+    }
+    public Connection getConnection() {
+      return connection;
+    }
+    public void setConnection(Connection connection) {
+      this.connection = connection;
+    }
+	  public void addEndpointConnection(Object key, JmsEndpointConnection_impl endpointConnection) {
+	    endpointMap.put(key, endpointConnection);
+	  }
+	  public JmsEndpointConnection_impl getEndpointConnection( Object key) {
+	    return endpointMap.get(key);
+	  }
+	  public boolean endpointExists(Object key ) {
+	    return endpointMap.containsKey(key);
+	  }
+	  public void removeEndpoint(Object key) {
+	   endpointMap.remove(key); 
+	  }
+	}
 }
