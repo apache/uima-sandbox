@@ -2369,4 +2369,45 @@ implements UimaAsynchronousEngine, MessageListener
 	{
 	}
 
+	// This class is used to share JMS Connection by many instances of UIMA AS 
+	// clients deployed in the same JVM. 
+	public class SharedConnection {
+	  private Connection connection;
+	  private int clientCount;
+	  private Object mux = new Object();
+	  
+	  public Connection getConnection() {
+      return connection;
+    }
+
+    public void setConnection(Connection connection) {
+      this.connection = connection;
+    }
+
+    public  void incrementClientCount() {
+      synchronized(mux) {
+        clientCount++;
+      }
+    }
+    public void decrementClientCount() {
+      synchronized(mux) {
+        clientCount--;
+      }
+    }
+    public int getClientCount() {
+      synchronized(mux) {
+        return  clientCount;
+      }
+    }
+    public synchronized void destroy() {
+      if ( getClientCount() == 0 && connection != null ) {
+        try {
+          System.out.println("UIMA AS Client - Shared JMS Connection Closed");
+          connection.close();
+        } catch (Exception e) { /*ignore*/ }
+      } else {
+        System.out.println("UIMA AS Client - Shared JMS Connection Not Closed. Current Client Instance Count"+getClientCount());
+      }
+	  }
+	}
 }
