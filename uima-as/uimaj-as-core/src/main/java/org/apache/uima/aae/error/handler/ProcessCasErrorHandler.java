@@ -203,11 +203,6 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			return false;
 		}
 		
-    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
-				UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", t);
-    }
-		
 		String casReferenceId = null;
 		if ( anErrorContext.containsKey(AsynchAEMessage.CasReference)) 
 		{
@@ -231,9 +226,7 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 		//	Determine if the exception occured while sending a reply to the client
 		boolean isEndpointTheClient = 
 			isClient( (Endpoint) anErrorContext.get(AsynchAEMessage.Endpoint), aController, casReferenceId);
-		
-		
-		
+
 		if ( ignoreError( t, anErrorContext, isEndpointTheClient ))
 		{
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
@@ -268,6 +261,12 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
     		return true;   // handled here. This message will not processed
 		}
 
+		//  Log the exception
+		if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, getClass().getName(), "handleError", 
+        UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", t);
+    }
+    
 		String key = ""; 
 		Threshold threshold = null;
 		boolean delegateDisabled = false;
