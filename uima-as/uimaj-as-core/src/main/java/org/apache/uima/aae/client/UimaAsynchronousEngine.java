@@ -83,7 +83,7 @@ public interface UimaAsynchronousEngine
 	public static final String SaxonClasspath = "SaxonClasspath";
   public static final String UimaEeDebug = "-uimaEeDebug";
   public static final String SerializationStrategy = "SerializationStrategy";
-
+  public static final String SharedConnection = "SharedConnection";
 		
 	/**
 	 * Initializes UIMA asynchronous client using configuration parameters provided in a Map object. It creates a
