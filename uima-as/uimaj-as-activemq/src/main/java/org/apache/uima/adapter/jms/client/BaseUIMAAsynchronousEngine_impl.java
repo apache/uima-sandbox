@@ -100,6 +100,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	private String applicationName = "UimaASClient";
 	//private volatile boolean usesSharedConnection = false;
 	private static SharedConnection sharedConnection = null;
+	private Object stopMux = new Object();
 	
 	public BaseUIMAAsynchronousEngine_impl() {
         UIMAFramework.getLogger(CLASS_NAME).log(Level.INFO, "UIMA-AS version " + UIMAFramework.getVersionString());
@@ -218,62 +219,59 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	  if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST) ) {
 	    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_as_client_INFO", new Object[] {});
 	  }
-		if (!running)
-		{
-			return;
-		}
-		super.stop();
-		running = false;
-
-		try
-		{
-			if ( sender != null )
-			{
-				sender.doStop();
-			}
-			if ( initialized )
-			{
-			  try {
-	        consumerSession.close();
-	        consumer.close();
-			  } catch ( JMSException exx) {}
-	      // SharedConnection object manages a single JMS connection to the 
-	      // broker. If the client is scaled out in the same JVM, the connection
-	      // is shared by all instances of the client to reduce number of threads
-	      // in the broker. The SharedConnection object also maintains the number
-	      // of client instances to determine when it is ok to close the connection.
-	      // The connection is closed when the last client calls stop().
-	      if ( sharedConnection != null ) {
-	        // Decrement number of active clients
-	        sharedConnection.decrementClientCount();
-	        // The destroy method closes the JMS connection when the number of
-	        // clients becomes 0, otherwise it is a no-op
-	        sharedConnection.destroy();
+		
+	  synchronized(stopMux) {
+	    if (!running)
+	    {
+	      return;
+	    }
+	    super.stop();
+	    running = false;
+	    if ( super.serviceDelegate != null ) {
+	      //  Cancel all timers and purge lists
+	      super.serviceDelegate.cleanup();
+	    }
+	    try
+	    {
+        // SharedConnection object manages a single JMS connection to the 
+        // broker. If the client is scaled out in the same JVM, the connection
+        // is shared by all instances of the client to reduce number of threads
+        // in the broker. The SharedConnection object also maintains the number
+        // of client instances to determine when it is ok to close the connection.
+        // The connection is closed when the last client calls stop().
+        if ( sharedConnection != null ) {
+          // Decrement number of active clients
+          sharedConnection.decrementClientCount();
+          // The destroy method closes the JMS connection when the number of
+          // clients becomes 0, otherwise it is a no-op
+          if ( sharedConnection.destroy() ) {
+            // This needs to be done to invalidate the object for JUnit tests
+            sharedConnection = null;
+          }
+        }
+        if ( sender != null ) {
+          sender.doStop();
+        }
+        // Undeploy all containers
+        undeploy();
+        System.out.println("UIMA AS Client Undeployed All Containers");
+	      if ( initialized )
+	      {
+	        try {
+	          consumerSession.close();
+	          consumer.close();
+	        } catch ( JMSException exx) {}
 	      }
-			}
-			if ( jmxManager != null )
-			{
-				jmxManager.destroy();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			synchronized (this)
-			{
-				try
-				{
-					wait(2000); // Let asynch shutdown threads to stop
-				}
-				catch (Exception e)
-				{
-				}
-			}
-
-		}
+	      if ( jmxManager != null )
+	      {
+	        jmxManager.destroy();
+	      }
+	    }
+	    catch (Exception e)
+	    {
+	      e.printStackTrace();
+	    }
+	  }
 	}
 
 	public void setCPCMessage(Message msg) throws Exception
@@ -455,12 +453,6 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		clientSideJmxStats.setEndpointName(endpoint);
 		int casPoolSize = 1;
 
-//		if (anApplicationContext.containsKey(UimaAsynchronousEngine.ReplyWindow))
-//		{
-//			receiveWindow = ((Integer) anApplicationContext.get(UimaAsynchronousEngine.ReplyWindow)).intValue();
-//			clientSideJmxStats.setReplyWindowSize(receiveWindow);
-//		}
-
 		if (anApplicationContext.containsKey(UimaAsynchronousEngine.CasPoolSize))
 		{
 			casPoolSize = ((Integer) anApplicationContext.get(UimaAsynchronousEngine.CasPoolSize)).intValue();
@@ -637,6 +629,13 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 
 	}
 
+	public void undeploy() throws Exception {
+    Iterator containerIterator = springContainerRegistry.keySet().iterator();
+	  while(containerIterator.hasNext()) {
+	    String containerId = (String)containerIterator.next();
+	    undeploy(containerId);
+	  }
+	}
   public void undeploy(String aSpringContainerId) throws Exception {
     this.undeploy( aSpringContainerId, SpringContainerDeployer.STOP_NOW);
   }
