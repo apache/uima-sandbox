@@ -185,7 +185,7 @@ public abstract class BaseMessageSender implements Runnable,
 				while (pendingMessageList.size() == 0) {
 					// Block waiting for a message
 					try {
-						pendingMessageList.wait(0);
+						pendingMessageList.wait(100);
 					} catch (InterruptedException e) {
 					}
 					//	Check if the engine is terminating. When the client is stopping
