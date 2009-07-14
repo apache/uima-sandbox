@@ -67,10 +67,14 @@ public class ClientServiceDelegate extends Delegate {
     String casReferenceId = null;
     CAS cas = null;
     ClientRequest cachedRequest = null;
-
+    if ( !clientUimaAsEngine.running ) {
+      cancelDelegateTimer();
+      return;
+    }
     int command = ((Integer)errorContext.get(AsynchAEMessage.Command)).intValue();
     try {
       if ( e instanceof MessageTimeoutException) {
+        cancelDelegateTimer();
         switch( command ) {
           case AsynchAEMessage.Process:
             casReferenceId = (String)errorContext.get(AsynchAEMessage.CasReference);
