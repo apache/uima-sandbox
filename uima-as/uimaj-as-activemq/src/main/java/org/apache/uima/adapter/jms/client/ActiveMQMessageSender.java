@@ -116,12 +116,14 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 	 * Cleanup any jms resources used by the worker thread
 	 */
 	protected void cleanup() throws Exception {
-		if (session != null) {
-			session.close();
-		}
-		if (producer != null) {
-			producer.close();
-		}
-		producerMap.clear();
+	  try {
+	    if (session != null ) {
+	      session.close();
+	    }
+	    if (producer != null) {
+	      producer.close();
+	    }
+	    producerMap.clear();
+	  } catch( Exception e) {}
 	}
 }
