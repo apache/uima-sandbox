@@ -46,6 +46,7 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.console.command.StartCommand;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalArgumentException;
@@ -440,18 +441,6 @@ implements UimaAsynchronousEngine, MessageListener
 	    {
 	      e.printStackTrace();
 	    }
-	    finally
-	    {
-	      synchronized(this)
-	      {
-	        try
-	        {
-	          wait(2000); // Let asynch shutdown threads to stop
-	        }
-	        catch( Exception e) {}
-	      }
-
-	    }
 	  }
 	}
 	/**
@@ -548,7 +537,7 @@ implements UimaAsynchronousEngine, MessageListener
     while( running && !entry.signaled() ) {
       //  Wait until the producer is ready
       synchronized( entry.getMonitor()) {
-        entry.getMonitor().wait();
+        entry.getMonitor().wait(100);
       }
     }
     //  This may return null *if* the client is terminating
@@ -1764,7 +1753,9 @@ implements UimaAsynchronousEngine, MessageListener
     try {
       // Process reply in the send thread
       Message message = cachedRequest.getMessage();
-      deserializeAndCompleteProcessingReply(casReferenceId, message, cachedRequest, pt, false);
+      if ( message != null ) {
+        deserializeAndCompleteProcessingReply(casReferenceId, message, cachedRequest, pt, false);
+      }
     } catch (ResourceProcessException rpe) {
       throw rpe;
     } catch (Exception e) {
@@ -1777,6 +1768,9 @@ implements UimaAsynchronousEngine, MessageListener
   }
 	private void deserializeAndCompleteProcessingReply( String casReferenceId, Message message, ClientRequest cachedRequest, ProcessTrace pt, boolean doNotify ) throws Exception
 	{
+	  if ( !running ) {
+	    return;
+	  }
 		int payload = ((Integer) message.getIntProperty(AsynchAEMessage.Payload)).intValue();
 		if ( message.propertyExists(AsynchAEMessage.CasSequence) )
 		{
@@ -2399,15 +2393,20 @@ implements UimaAsynchronousEngine, MessageListener
         return  clientCount;
       }
     }
-    public synchronized void destroy() {
-      if ( getClientCount() == 0 && connection != null ) {
+    public synchronized boolean destroy() {
+      if ( getClientCount() == 0 && connection != null && !((ActiveMQConnection)connection).isClosed()) {
         try {
           System.out.println("UIMA AS Client - Shared JMS Connection Closed");
           connection.close();
-        } catch (Exception e) { /*ignore*/ }
+        } catch (Exception e) { 
+          /*ignore*/ 
+        }
+        return true;
+        
       } else {
         System.out.println("UIMA AS Client - Shared JMS Connection Not Closed. Current Client Instance Count"+getClientCount());
       }
+      return false;
 	  }
 	}
 }
