@@ -1954,15 +1954,22 @@ public class JmsOutputChannel implements OutputChannel
 				
 				String key = (String)it.next();
 				Object value = connectionMap.get(key);
-				if ( value instanceof JmsEndpointConnection_impl )
+				
+				if ( value instanceof BrokerConnectionEntry )
 				{
-					endpointConnection = (JmsEndpointConnection_impl)value;
-					endpointConnection.abort();
-		      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
-		        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
-		                    "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_forced_endpoint_close__INFO",
-		                    new Object[] {getAnalysisEngineController().getName(),endpointConnection.getEndpoint(), endpointConnection.getServerUri() });
-		      }
+				  BrokerConnectionEntry brokerConnectionEntry = (BrokerConnectionEntry)value;
+					
+				  Iterator replyEndpointIterator = brokerConnectionEntry.endpointMap.keySet().iterator();
+				  while( replyEndpointIterator.hasNext()) {
+	          endpointConnection = brokerConnectionEntry.endpointMap.get(replyEndpointIterator.next());
+	          endpointConnection.abort();
+	          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+	                        "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_forced_endpoint_close__INFO",
+	                        new Object[] {getAnalysisEngineController().getName(),endpointConnection.getEndpoint(), endpointConnection.getServerUri() });
+	          }
+				    
+				  }
 				}
 			}
       if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
