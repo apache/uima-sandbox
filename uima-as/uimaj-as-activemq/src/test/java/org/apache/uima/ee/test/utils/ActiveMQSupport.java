@@ -45,11 +45,14 @@ import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.error.handler.GetMetaErrorHandler;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.util.Level;
 
 public class ActiveMQSupport extends TestCase
 {
+  private static final Class CLASS_NAME = ActiveMQSupport.class;
+
 	protected BrokerService broker;
 	protected String uri = null;
 	protected TransportConnector  tcpConnector = null;
@@ -218,7 +221,9 @@ public class ActiveMQSupport extends TestCase
 		while (threadGroup.activeCount() > 2) {
       System.out.println("Active Thread Count:"+threadGroup.activeCount());
       Thread[] threads = new Thread[threadGroup.activeCount()];
-      threadGroup.list();
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        threadGroup.list();
+      }
       threadGroup.enumerate(threads);
       boolean foundExpectedThreads = true;
       
