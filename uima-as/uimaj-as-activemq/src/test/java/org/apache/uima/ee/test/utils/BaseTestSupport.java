@@ -608,7 +608,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 		System.out.println("runTest: Client:::::::::::::: Received:" + responseCounter + " Reply");
 
 	}
-	
+	public long getNumberOfCASesProcessed() {
+	  return responseCounter;
+	}
 	protected class UimaAsTestCallbackListener extends UimaAsBaseCallbackListener {
 	  
 	  private String casSent = null;
