@@ -219,9 +219,9 @@ public class ActiveMQSupport extends TestCase
 		  Thread.currentThread().getThreadGroup();
     //  2 Threads are expected, ReaderThread and the main
 		while (threadGroup.activeCount() > 2) {
-      System.out.println("Active Thread Count:"+threadGroup.activeCount());
       Thread[] threads = new Thread[threadGroup.activeCount()];
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        System.out.println("Active Thread Count:"+threadGroup.activeCount());
         threadGroup.list();
       }
       threadGroup.enumerate(threads);
