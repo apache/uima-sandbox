@@ -25,9 +25,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
@@ -86,7 +89,9 @@ public class TestUimaASExtended extends BaseTestSupport
 	private int getMetaRequestCount = 0;
   Object mux = new Object();
 
-	
+  public BaseTestSupport superRef = null;
+  
+
 	/**
 	 * Tests Broker startup and shutdown
 	 */
@@ -173,6 +178,7 @@ public class TestUimaASExtended extends BaseTestSupport
     } catch ( ResourceInitializationException e) {
       //  This is expected
     } catch ( Exception e) {
+      e.printStackTrace();
       fail("Expected ResourceInitializationException Instead Caught:"+e.getClass().getName());
     }
   }
@@ -235,30 +241,41 @@ public class TestUimaASExtended extends BaseTestSupport
   }
   
   public void testStopNow() throws Exception {
-    System.out.println("-------------- testAggregateWithFailedRemoteDelegate -------------");
-    BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
-    deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
-    String containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
-    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
-    // Set an explicit process timeout so to test the ping on timeout
-    appCtx.put(UimaAsynchronousEngine.Timeout, 4000 );
-    appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 300 );
-    spinShutdownThread(eeUimaEngine, 3000, containerId, SpringContainerDeployer.STOP_NOW );
-    runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, EXCEPTION_LATCH);
-    
+      System.out.println("-------------- testAggregateWithFailedRemoteDelegate -------------");
+      BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
+      deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
+      String containerId = deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotatorWithInternalCM1000Docs.xml");
+      Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue" );
+      // Set an explicit process timeout so to test the ping on timeout
+      appCtx.put(UimaAsynchronousEngine.Timeout, 4000 );
+      appCtx.put(UimaAsynchronousEngine.GetMetaTimeout, 300 );
+      spinShutdownThread(eeUimaEngine, 3000, containerId, SpringContainerDeployer.STOP_NOW );
+      runTest(appCtx,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 10, EXCEPTION_LATCH);
   }
   public void testCMAggregateClientStopRequest() throws Exception {
     System.out.println("-------------- testCMAggregateClientStopRequest -------------");
     final BaseUIMAAsynchronousEngine_impl eeUimaEngine = new BaseUIMAAsynchronousEngine_impl();
     deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithCollocated1MillionDocsCM.xml");
+    superRef = this;
+    
     Thread t = new Thread() {
       public void run()
       {
         try {
-            // at this point the top level service should show a connection error
+          //  Wait for some CASes to return from the service
+          while ( superRef.getNumberOfCASesProcessed() == 0 ) {
+            // No reply received yet so wait for 1 second and
+            // check again
             synchronized( this ) {
-              this.wait(3000);  // wait for 3 secs
+              this.wait(1000);  // wait for 1 sec
+            }
+          }
+          //  The client received at least one reply, wait 
+          // at this point the top level service should show a connection error
+            synchronized( this ) {
+           // wait for 3 seconds before stopping
+              this.wait(3000);  
             }
             eeUimaEngine.stopProducingCases();
           } catch( Exception e) {
@@ -279,13 +296,24 @@ public class TestUimaASExtended extends BaseTestSupport
     deployService(eeUimaEngine, relativePath+"/Deploy_RemoteCasMultiplierWith1MillionDocs.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithRemote1MillionDocsCM.xml");
     deployService(eeUimaEngine, relativePath+"/Deploy_CMAggregateWithRemote1MillionDocsCM.xml");
+    superRef = this;
     Thread t = new Thread() {
       public void run()
       {
         try {
-            // at this point the top level service should show a connection error
-            synchronized( mux ) {
-              mux.wait(3000);  // wait for 3 secs
+          //  Wait for some CASes to return from the service
+          while ( superRef.getNumberOfCASesProcessed() == 0 ) {
+            // No reply received yet so wait for 1 second and
+            // check again
+            synchronized( this ) {
+              this.wait(1000);  // wait for 1 sec
+            }
+          }
+          //  The client received at least one reply, wait 
+          // at this point the top level service should show a connection error
+            synchronized( this ) {
+           // wait for 3 seconds before stopping
+              this.wait(3000);  
             }
             eeUimaEngine.stopProducingCases();
           } catch( Exception e) {
