@@ -731,13 +731,9 @@ implements ExceptionListener
           } catch( Exception e) {}
           //  If using non-default TaskExecutor, stop its threads
           if ( taskExecutor != null && taskExecutor instanceof ThreadPoolTaskExecutor) {
-            boolean doShutdownTaskExecutor = true;
-            while ( ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().getActiveCount() > 0 && 
+            ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().shutdown();
+            while ( ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().getActiveCount() > 1 && 
                     !((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().isTerminated() ) {
-              if ( doShutdownTaskExecutor ) {
-                ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().shutdown();
-                doShutdownTaskExecutor = false; // shutdown once
-              }
               try {
                 ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().awaitTermination(100,TimeUnit.MILLISECONDS); 
               } catch ( Exception e){}
