@@ -66,7 +66,7 @@ public class ActiveMQSupport extends TestCase
 
 	protected void setUp() throws Exception
 	{
-		System.out.println("\nSetting Up");
+		System.out.println("\nSetting Up New Test - Thread Id:"+Thread.currentThread().getId());
 		super.setUp();
 		broker = createBroker();
 		/*
@@ -190,29 +190,19 @@ public class ActiveMQSupport extends TestCase
 		if ( broker != null )
 		{
 			System.out.println("Stopping Broker");
-			/*
-					Set set = broker.getManagementContext().getMBeanServer().queryNames(new ObjectName("uima.ee:*"), null);
-					if ( set.isEmpty())
-					{
-						System.out.println("JMX Server Query For uima.ee Domain Returned No Objects");
-					}
-					else
-					{
-						System.out.println("JMX Server Query For uima.ee Domain Returned Valid Objects");
-						
-					}
-					Iterator it = set.iterator();
-					while (it.hasNext())
-					{
-						broker.getManagementContext().getMBeanServer().unregisterMBean((ObjectName) it.next());
-					}
-			*/	
 			if ( tcpConnector != null )
 			{
-				tcpConnector.stop();
+			  tcpConnector.stop();
 				System.out.println("Broker Connector:"+tcpConnector.getUri().toString()+ " is stopped");
 			}
-			broker.stop();
+      broker.deleteAllMessages();
+      broker.getManagementContext().stop();
+      synchronized( broker ) {
+        broker.notifyAll();
+      }
+      broker.stop();
+			
+			System.out.println("Broker Has Stopped");
 			broker = null;
 		}
 		
@@ -222,6 +212,36 @@ public class ActiveMQSupport extends TestCase
 		stopBroker();
 		System.out.println("Tearing Down");
 		super.tearDown();
+		ThreadGroup threadGroup =
+		  Thread.currentThread().getThreadGroup();
+    //  2 Threads are expected, ReaderThread and the main
+		while (threadGroup.activeCount() > 2) {
+      System.out.println("Active Thread Count:"+threadGroup.activeCount());
+      Thread[] threads = new Thread[threadGroup.activeCount()];
+      threadGroup.list();
+      threadGroup.enumerate(threads);
+      boolean foundExpectedThreads = true;
+      
+      for( Thread t: threads) {
+        try {
+          String tName = t.getName();
+          //	The following is necessary to account for the main threads and
+          //  ActiveMQ Scheduler threads that dont go away when broker.stop()
+          //  is called.
+          if ( !tName.equals("main") && !tName.equals("ReaderThread") && !tName.equals("ActiveMQ Scheduler")) {
+            foundExpectedThreads = false;
+            break;   // from for
+          }
+        } catch( Exception e) {}
+      }
+      if ( foundExpectedThreads ) {
+        break; // from while
+      }
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+      }
+    }
 	}
 
 }
