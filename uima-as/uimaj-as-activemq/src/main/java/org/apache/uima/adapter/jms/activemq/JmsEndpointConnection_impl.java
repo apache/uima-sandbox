@@ -74,17 +74,13 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 
 	private BrokerConnectionEntry brokerDestinations;
 	
-	private Timer timer;
-
 	private String serverUri;
 
 	private String endpoint;
 
 	private String endpointName;
 
-    private Endpoint delegateEndpoint;
-
-	private long inactivityTimeout = 3600000;
+  private Endpoint delegateEndpoint;
 
 	private volatile boolean retryEnabled;
 
@@ -92,7 +88,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 
 	private volatile boolean connectionAborted = false;
 
-	private long connectionCreationTimestamp = 0L;
+	protected static long connectionCreationTimestamp = 0L;
 
 	private Object semaphore = new Object();
 
@@ -148,11 +144,6 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		return ((ActiveMQSession) producerSession).isRunning();
 	}
 
-	public void setInactivityTimeout(long aTimeout)
-	{
-		inactivityTimeout = aTimeout;
-	}
-	
 	private synchronized void openChannel() throws AsynchAEException, ServiceShutdownException
 	{
 		try
@@ -186,8 +177,8 @@ public class JmsEndpointConnection_impl implements ConsumerListener
         factory.setCopyMessageOnSend(false);
         Connection conn = factory.createConnection();
         brokerDestinations.setConnection(conn);
+        connectionCreationTimestamp = System.nanoTime();
       }
-			connectionCreationTimestamp = System.nanoTime();
 			producerSession = brokerDestinations.getConnection().createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
 			if ( (delegateEndpoint.getCommand() == AsynchAEMessage.Stop || isReplyEndpoint ) && delegateEndpoint.getDestination() != null )
 			{
@@ -256,14 +247,9 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	public synchronized void abort()
 	{
 		connectionAborted = true;
-		if (timer != null)
-		{
-			timer.cancel();
-			timer = null;
-		}
+		brokerDestinations.getConnectionTimer().stopTimer();
 		try {
 	    this.close();
-		  
 		} catch( Exception e) {
 		}
 	}
@@ -297,22 +283,6 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			{
 				destination = null;
 			}
-			if (brokerDestinations.getConnection() != null &&
-			    !((ActiveMQConnection)brokerDestinations.getConnection()).isClosed() )
-			{
-				try
-				{
-				  brokerDestinations.getConnection().stop();
-				  brokerDestinations.getConnection().close();
-				}
-				catch ( Exception e)
-				{
-					// Ignore this for now. Attempting to close connection that has been closed
-					//	Ignore we are shutting down
-				}
-			}
-			brokerDestinations.setConnection(null);
-
 	}
 
 	protected String getEndpoint()
@@ -424,129 +394,68 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			throw new AsynchAEException(e);
 		}
 	}
-	private long getConnectionCreationTimeout()
-	{
-		return connectionCreationTimestamp;
-	}
-    private synchronized void startTimer(long aConnectionCreationTimestamp)	
-    {
-		final long cachedConnectionCreationTimestamp = aConnectionCreationTimestamp;
-		Date timeToRun = new Date(System.currentTimeMillis() + inactivityTimeout);
-		if (timer != null)
-		{
-			timer.cancel();
-		}
-		if (controller != null)
-		{
-			timer = new Timer("Controller:" + controller.getComponentName() + ":TimerThread-JmsEndpointConnection_impl:" + endpoint + ":" + System.nanoTime());
-		}
-		else
-		{
-			timer = new Timer("TimerThread-JmsEndpointConnection_impl:" + endpoint + ":" + System.nanoTime());
-		}
-		timer.schedule(new TimerTask() {
-
-			public void run()
-			{
-        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(), "startTimer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_inactivity_timer_expired_CONFIG", new Object[] { Thread.currentThread().getName(), inactivityTimeout, endpoint });
+	
+	private boolean delayCasDelivery(int msgType, Message aMessage, int command) throws Exception {
+    
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "recoverSession", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_open_connection_to_endpoint__FINE", new Object[] { getEndpoint() });
+    }
+    openChannel();
+    // The connection has been successful. Now check if we need to create a new listener
+    // and a temp queue to receive replies. A new listener will be created only if the
+    // endpoint for the delegate is marked as FAILED. This will be the case if the listener
+    // on the reply queue for the endpoint has failed.
+    synchronized( recoveryMux ) {
+      if ( controller instanceof AggregateAnalysisEngineController ) {
+        // Using the queue name lookup the delegate key
+        String key = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(delegateEndpoint.getEndpoint());
+        if ( key != null && destination != null && !isReplyEndpoint ) {
+          // For Process Requests check the state of the delegate that is to receive
+          // the CAS. If the delegate state = TIMEOUT_STATE, push the CAS id onto
+          // delegate's list of delayed CASes. The state of the delegate was 
+          // changed to TIMEOUT when a previous CAS timed out.
+          if (msgType != AsynchAEMessage.Request && command == AsynchAEMessage.Process ) {
+            String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
+            if ( casReferenceId != null && 
+                 ((AggregateAnalysisEngineController)controller).delayCasIfDelegateInTimedOutState(casReferenceId, delegateEndpoint.getEndpoint()) ) {
+              return true;
+            }
+          }
+          // The aggregate has a master list of endpoints which are typically cloned during processing
+          // This object uses a copy of the master. When a listener fails, the status of the master
+          // endpoint is changed. To check the status, fetch the master endpoint, check its status
+          // and if marked as FAILED, create a new listener, a new temp queue and override this
+          // object endpoint copy destination property. It *IS* a new replyTo temp queue.
+          Endpoint masterEndpoint = ((AggregateAnalysisEngineController)controller).lookUpEndpoint(key, false);
+          if ( masterEndpoint.getStatus() == Endpoint.FAILED ) {
+            // Create a new Listener Object to receive replies
+            createListener(key);
+            destination = (Destination)masterEndpoint.getDestination();
+            delegateEndpoint.setDestination(destination);              
+            // Override the reply destination. A new listener has been created along with a new temp queue for replies.
+            aMessage.setJMSReplyTo(destination);
+          }
         }
-				if (connectionCreationTimestamp <= cachedConnectionCreationTimestamp)
-					{
-						try
-						{
-							close();
-						}
-						catch( Exception e) {
-						}
-						finally
-						{
-	              String key = delegateEndpoint.getEndpoint()+delegateEndpoint.getServerURI();
-	              String destination = delegateEndpoint.getEndpoint();
-	              if ( delegateEndpoint.getDestination() != null && delegateEndpoint.getDestination() instanceof ActiveMQDestination )
-	              {
-	                destination = ((ActiveMQDestination)delegateEndpoint.getDestination()).getPhysicalName();
-	                key = destination;
-	              }
-	              if ( brokerDestinations.endpointExists(key) ) {
-	                brokerDestinations.removeEndpoint(key);
-	              }
-						}
-					}
-					cancelTimer();
-			}
-		}, timeToRun);
+      }
+    }
+    return false;
+	  
 	}
-	private synchronized void cancelTimer()
-	{
-		if (timer != null)
-		{
-			timer.cancel();
-			timer.purge();
-		}
-	}
-	public  void stopTimer()
-	{
-		cancelTimer();
-		synchronized(this)
-		{
-			timer = null;
-		}
-	}
-
 	public boolean send(final Message aMessage, long msgSize, boolean startTimer) 
 	{
 		String destinationName = "";
 
 		try
 		{
-			  stopTimer();
         int msgType = aMessage.getIntProperty(AsynchAEMessage.MessageType);
         int command = aMessage.getIntProperty(AsynchAEMessage.Command);
 
 				if ( failed || brokerDestinations.getConnection() == null || producerSession == null || !((ActiveMQSession) producerSession).isRunning())
 				{
-	        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "send", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_open_connection_to_endpoint__FINE", new Object[] { getEndpoint() });
-	        }
-					openChannel();
-					// The connection has been successful. Now check if we need to create a new listener
-					// and a temp queue to receive replies. A new listener will be created only if the
-					// endpoint for the delegate is marked as FAILED. This will be the case if the listener
-					// on the reply queue for the endpoint has failed.
-					synchronized( recoveryMux ) {
-	          if ( controller instanceof AggregateAnalysisEngineController ) {
-	            // Using the queue name lookup the delegate key
-	            String key = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(delegateEndpoint.getEndpoint());
-	            if ( key != null && destination != null && !isReplyEndpoint ) {
-	              // For Process Requests check the state of the delegate that is to receive
-	              // the CAS. If the delegate state = TIMEOUT_STATE, push the CAS id onto
-	              // delegate's list of delayed CASes. The state of the delegate was 
-	              // changed to TIMEOUT when a previous CAS timed out.
-	              if (msgType != AsynchAEMessage.Request && command == AsynchAEMessage.Process ) {
-	                String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
-	                if ( casReferenceId != null && 
-	                     ((AggregateAnalysisEngineController)controller).delayCasIfDelegateInTimedOutState(casReferenceId, delegateEndpoint.getEndpoint()) ) {
-                    return true;
-	                }
-	              }
-	              // The aggregate has a master list of endpoints which are typically cloned during processing
-	              // This object uses a copy of the master. When a listener fails, the status of the master
-	              // endpoint is changed. To check the status, fetch the master endpoint, check its status
-	              // and if marked as FAILED, create a new listener, a new temp queue and override this
-	              // object endpoint copy destination property. It *IS* a new replyTo temp queue.
-	              Endpoint masterEndpoint = ((AggregateAnalysisEngineController)controller).lookUpEndpoint(key, false);
-	              if ( masterEndpoint.getStatus() == Endpoint.FAILED ) {
-	                // Create a new Listener Object to receive replies
-	                createListener(key);
-	                destination = (Destination)masterEndpoint.getDestination();
-	                delegateEndpoint.setDestination(destination);              
-	                // Override the reply destination. A new listener has been created along with a new temp queue for replies.
-	                aMessage.setJMSReplyTo(destination);
-	              }
-	            }
-	          }
-					}
+				  if ( delayCasDelivery(msgType, aMessage, command) ) {
+				    //  Return true as if the CAS was sent
+				    return true;
+				  }
 				}
 
 				//	Send a reply to a queue provided by the client
@@ -578,10 +487,14 @@ public class JmsEndpointConnection_impl implements ConsumerListener
              producer.send(aMessage);
            }
 				}
-				if (startTimer)
-				{
-					startTimer(connectionCreationTimestamp);
+				//  Starts a timer on a broker connection. Every time a new message
+				//  is sent to a destination managed by the broker the timer is 
+				//  restarted. The main purpose of the timer is to close connections
+				//  that are not used.
+				if (startTimer) {
+				  brokerDestinations.getConnectionTimer().startTimer(connectionCreationTimestamp, delegateEndpoint);
 				}
+				//  Succeeded sending the CAS
 				return true;
 		}
 		catch ( Exception e)
@@ -603,7 +516,8 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			    
 			}
 		}
-		stopTimer();
+    brokerDestinations.getConnectionTimer().stopTimer();
+    //  Failed here
 		return false;
 	}
 
@@ -678,10 +592,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 
 	protected synchronized void finalize() throws Throwable
 	{
-		if ( timer != null)
-		{
-			timer.cancel();
-		}
+    brokerDestinations.getConnectionTimer().stopTimer();
 	}
 	
 	
