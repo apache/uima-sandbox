@@ -220,12 +220,12 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_stopping_as_client_INFO", new Object[] {});
 	  }
 		
-	  synchronized(stopMux) {
 	    if (!running)
 	    {
 	      return;
 	    }
 	    super.stop();
+	    synchronized(stopMux) {
 	    running = false;
 	    if ( super.serviceDelegate != null ) {
 	      //  Cancel all timers and purge lists
