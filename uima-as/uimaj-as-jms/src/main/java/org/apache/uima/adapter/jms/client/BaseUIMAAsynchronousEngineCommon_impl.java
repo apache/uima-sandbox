@@ -2397,6 +2397,7 @@ implements UimaAsynchronousEngine, MessageListener
       if ( getClientCount() == 0 && connection != null && !((ActiveMQConnection)connection).isClosed()) {
         try {
           System.out.println("UIMA AS Client - Shared JMS Connection Closed");
+          connection.stop();
           connection.close();
         } catch (Exception e) { 
           /*ignore*/ 
