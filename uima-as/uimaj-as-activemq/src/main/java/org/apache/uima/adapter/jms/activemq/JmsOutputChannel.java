@@ -22,9 +22,12 @@ package org.apache.uima.adapter.jms.activemq;
 import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -38,6 +41,7 @@ import javax.jms.ObjectMessage;
 import javax.jms.TextMessage;
 import javax.management.ServiceNotFoundException;
 
+import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.uima.UIMAFramework;
@@ -298,6 +302,41 @@ public class JmsOutputChannel implements OutputChannel
 	    endpointConnection.send(tm, 0, false);
 	  }
 	}
+	private long getInactivityTimeout( String destination, String brokerURL ) {
+    if (System.getProperty(JmsConstants.SessionTimeoutOverride) != null) {
+      try {
+        long overrideTimeoutValue = Long.parseLong(System.getProperty(JmsConstants.SessionTimeoutOverride));
+        // endpointConnection.setInactivityTimeout(overrideTimeoutValue); // If the connection is
+        // not used within this interval it will be removed
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(
+                  Level.FINE,
+                  CLASS_NAME.getName(),
+                  "getEndpointConnection",
+                  JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                  "UIMAJMS_override_connection_timeout__FINE",
+                  new Object[] { analysisEngineController, overrideTimeoutValue, destination,
+                    brokerURL });
+        }
+        return overrideTimeoutValue;
+      } catch (NumberFormatException e) {
+        /* ignore. use the default */}
+    } else {
+      // endpointConnection.setInactivityTimeout(INACTIVITY_TIMEOUT); // If the connection is not
+      // used within this interval it will be removed
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(
+                Level.FINE,
+                CLASS_NAME.getName(),
+                "getEndpointConnection",
+                JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                "UIMAJMS_connection_timeout__FINE",
+                new Object[] { analysisEngineController, INACTIVITY_TIMEOUT, destination,
+                  brokerURL });
+      }
+    }
+    return (int)INACTIVITY_TIMEOUT;   // default
+	}
 	/**
 	 * Returns {@link JmsEndpointConnection_impl} instance bound to a destination defined in the {@link Endpoint}
 	 * The endpoint identifies the destination that should receive the message. This method refrences a cache
@@ -315,111 +354,117 @@ public class JmsOutputChannel implements OutputChannel
 	 * @throws AsynchAEException
 	 */
 	private JmsEndpointConnection_impl getEndpointConnection( Endpoint anEndpoint ) 
-	throws AsynchAEException, ServiceShutdownException, ConnectException
-	{
+	throws AsynchAEException, ServiceShutdownException, ConnectException {
 		
-		try
-		{
-			controllerLatch.await();
-		}
-		catch(InterruptedException e){}
-		
-		JmsEndpointConnection_impl endpointConnection=null;
-		
-		//  First get a Map containing destinations managed by a broker provided by the client
-		BrokerConnectionEntry brokerConnectionEntry = null;
-		if ( connectionMap.containsKey(anEndpoint.getServerURI())) {  
-		  brokerConnectionEntry = (BrokerConnectionEntry)connectionMap.get(anEndpoint.getServerURI());
-		} else {
-		  brokerConnectionEntry = new BrokerConnectionEntry();
-		  connectionMap.put(anEndpoint.getServerURI(), brokerConnectionEntry);
-		}
-		//	create a key to lookup the connection
-		String key = anEndpoint.getEndpoint()+anEndpoint.getServerURI();
-		String destination = anEndpoint.getEndpoint();
-		if ( anEndpoint.getDestination() != null && anEndpoint.getDestination() instanceof ActiveMQDestination )
-		{
-			destination = ((ActiveMQDestination)anEndpoint.getDestination()).getPhysicalName();
-		  key = destination;
-		}
-    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_acquiring_connection_to_endpoint__FINE",
-                new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
+		try {
+      controllerLatch.await();
+    } catch (InterruptedException e) {
     }
-		
-		//	check the cache first
-    if ( !brokerConnectionEntry.endpointExists(key) )	{
-	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_create_new_connection__FINE",
-                    new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
-	    }
-      endpointConnection = new JmsEndpointConnection_impl(brokerConnectionEntry, anEndpoint); //.getServerURI(), anEndpoint.getEndpoint(),anEndpoint.remove());
-			brokerConnectionEntry.addEndpointConnection(key, endpointConnection);
-			
-			if ( System.getProperty(JmsConstants.SessionTimeoutOverride) != null)
-			{
-			  try
-				{
-					int overrideTimeoutValue = 
-					Integer.parseInt(System.getProperty(JmsConstants.SessionTimeoutOverride));
-					endpointConnection.setInactivityTimeout(overrideTimeoutValue);  // If the connection is not used within this interval it will be removed
-			    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-			      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-		                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_override_connection_timeout__FINE",
-		                    new Object[] { analysisEngineController, overrideTimeoutValue, destination, anEndpoint.getServerURI() });
-			    }
-				}
-				catch( NumberFormatException e) { 
-				/* ignore. use the default */ }
-			}
-			else
-			{
-				endpointConnection.setInactivityTimeout(INACTIVITY_TIMEOUT);  // If the connection is not used within this interval it will be removed
-		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-	                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_timeout__FINE",
-	                    new Object[] { analysisEngineController, INACTIVITY_TIMEOUT, destination, anEndpoint.getServerURI() });
-		    }
-			}
-			endpointConnection.setAnalysisEngineController(getAnalysisEngineController());
-			//	Connection is not in the cache, create a new connection, initialize it and cache it
-	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_open_new_connection_to_endpoint__FINE",
-                    new Object[] { destination, anEndpoint.getServerURI() });
-	    }
-			endpointConnection.open();
-	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_opened_to_endpoint__FINE",
-                    new Object[] { getAnalysisEngineController().getComponentName(),destination, anEndpoint.getServerURI() });
-	    }
-			//	Cache the connection for future use. If not used, connections expire after 50000 millis 
-			connectionMap.put( key, endpointConnection);
-		}
-		else
-		{
-	    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_reusing_existing_connection__FINE",
-                    new Object[] { getAnalysisEngineController().getComponentName(), destination, anEndpoint.getServerURI() });
-	    }
-			//	Retrieve connection from the connection cache
-	    endpointConnection = brokerConnectionEntry.getEndpointConnection(key);
-			// check the state of the connection and re-open it if necessary
-			if ( endpointConnection != null && !endpointConnection.isOpen() )
-			{
-		    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-		      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
-	                    "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_closed_reopening_endpoint__FINE",
-	                    new Object[] { destination });
-		    }
-				endpointConnection.open();
-			}
-		}
-		return endpointConnection;
+
+    JmsEndpointConnection_impl endpointConnection = null;
+
+    // First get a Map containing destinations managed by a broker provided by the client
+    BrokerConnectionEntry brokerConnectionEntry = null;
+    if (connectionMap.containsKey(anEndpoint.getServerURI())) {
+      brokerConnectionEntry = (BrokerConnectionEntry) connectionMap.get(anEndpoint.getServerURI());
+    } else {
+      brokerConnectionEntry = new BrokerConnectionEntry();
+      connectionMap.put(anEndpoint.getServerURI(), brokerConnectionEntry);
+      ConnectionTimer connectionTimer = new ConnectionTimer(brokerConnectionEntry);
+      connectionTimer.setAnalysisEngineController(getAnalysisEngineController());
+      brokerConnectionEntry.setConnectionTimer(connectionTimer);
+    }
+    // create a key to lookup the endpointConnection object
+    String key = anEndpoint.getEndpoint() + anEndpoint.getServerURI();
+    String destination = anEndpoint.getEndpoint();
+    if (anEndpoint.getDestination() != null
+            && anEndpoint.getDestination() instanceof ActiveMQDestination) {
+      destination = ((ActiveMQDestination) anEndpoint.getDestination()).getPhysicalName();
+      key = destination;
+    }
+    if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(
+              Level.FINE,
+              CLASS_NAME.getName(),
+              "getEndpointConnection",
+              JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+              "UIMAJMS_acquiring_connection_to_endpoint__FINE",
+              new Object[] { getAnalysisEngineController().getComponentName(), destination,
+                  anEndpoint.getServerURI() });
+    }
+
+    // check the cache first
+    if (!brokerConnectionEntry.endpointExists(key)) {
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(
+                Level.FINE,
+                CLASS_NAME.getName(),
+                "getEndpointConnection",
+                JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                "UIMAJMS_create_new_connection__FINE",
+                new Object[] { getAnalysisEngineController().getComponentName(), destination,
+                    anEndpoint.getServerURI() });
+      }
+      endpointConnection = new JmsEndpointConnection_impl(brokerConnectionEntry, anEndpoint); 
+      brokerConnectionEntry.addEndpointConnection(key, endpointConnection);
+      long replyQueueInactivityTimeout = getInactivityTimeout( destination, anEndpoint.getServerURI() );
+      brokerConnectionEntry.getConnectionTimer().setInactivityTimeout(replyQueueInactivityTimeout);
+
+      endpointConnection.setAnalysisEngineController(getAnalysisEngineController());
+      // Connection is not in the cache, create a new connection, initialize it and cache it
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                "UIMAJMS_open_new_connection_to_endpoint__FINE",
+                new Object[] { destination, anEndpoint.getServerURI() });
+      }
+      
+      /**
+       * Open connection to a broker, create JMS session and MessageProducer
+       */
+      endpointConnection.open();
+      brokerConnectionEntry.getConnectionTimer()
+        .setConnectionCreationTimestamp(endpointConnection.connectionCreationTimestamp);
+      
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(
+                Level.FINE,
+                CLASS_NAME.getName(),
+                "getEndpointConnection",
+                JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                "UIMAJMS_connection_opened_to_endpoint__FINE",
+                new Object[] { getAnalysisEngineController().getComponentName(), destination,
+                    anEndpoint.getServerURI() });
+      }
+      // Cache the connection for future use. If not used, connections expire after 50000 millis
+      // connectionMap.put( key, endpointConnection);
+    } else {
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(
+                Level.FINE,
+                CLASS_NAME.getName(),
+                "getEndpointConnection",
+                JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                "UIMAJMS_reusing_existing_connection__FINE",
+                new Object[] { getAnalysisEngineController().getComponentName(), destination,
+                    anEndpoint.getServerURI() });
+      }
+      // Retrieve connection from the connection cache
+      endpointConnection = brokerConnectionEntry.getEndpointConnection(key);
+      // check the state of the connection and re-open it if necessary
+      if (endpointConnection != null && !endpointConnection.isOpen()) {
+        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+                  "getEndpointConnection", JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                  "UIMAJMS_connection_closed_reopening_endpoint__FINE",
+                  new Object[] { destination });
+        }
+        endpointConnection.open();
+        brokerConnectionEntry.getConnectionTimer()
+                .setConnectionCreationTimestamp(System.nanoTime());
+      }
+    }
+    return endpointConnection;
 	}
 
 	/**
@@ -1947,28 +1992,44 @@ public class JmsOutputChannel implements OutputChannel
 		aborting = true;
 		try
 		{
+		  //  Fetch iterator over all Broker Connections. This service may be connected
+		  //  to many brokers. Each broker connection may handle multiple sessions to
+		  //  different reply queues
 			Iterator it = connectionMap.keySet().iterator();
 			JmsEndpointConnection_impl endpointConnection=null;
-			while( it.hasNext() )
-			{
-				
+			// iterate over connections
+			while( it.hasNext() )	{
+			  // The key is the broker URL
 				String key = (String)it.next();
+				//  Fetch a connection object for a given URL
 				Object value = connectionMap.get(key);
 				
-				if ( value instanceof BrokerConnectionEntry )
-				{
+				if ( value instanceof BrokerConnectionEntry ) {
 				  BrokerConnectionEntry brokerConnectionEntry = (BrokerConnectionEntry)value;
-					
+				  //  A connection object may have many endpoint objects. There is a separate 
+				  //  endpoint object per reply queue. 
 				  Iterator replyEndpointIterator = brokerConnectionEntry.endpointMap.keySet().iterator();
+				  //  Iterate over endpoints, each representing a reply queue
 				  while( replyEndpointIterator.hasNext()) {
+				    //  Get endpoint object for a reply queue. The abort() call below
+				    //  just closes a session and a producer. The JMS Connection is closed
+				    //  outside of this while-loop when we clean up all the sessions.
 	          endpointConnection = brokerConnectionEntry.endpointMap.get(replyEndpointIterator.next());
+	          // Close the session and the producer
 	          endpointConnection.abort();
 	          if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
 	            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
 	                        "stop", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_forced_endpoint_close__INFO",
 	                        new Object[] {getAnalysisEngineController().getName(),endpointConnection.getEndpoint(), endpointConnection.getServerUri() });
 	          }
-				    
+				  }
+				  //  Cancel any pending timers and finally close the JMS Connection to the
+				  //  broker
+				  if ( brokerConnectionEntry != null && brokerConnectionEntry.getConnectionTimer() != null ) {
+				    brokerConnectionEntry.getConnectionTimer().cancelTimer();
+				    try {
+	            brokerConnectionEntry.getConnection().close();
+				    } catch ( Exception ex) { /* ignore, we are stopping */ } 
 				  }
 				}
 			}
@@ -2001,11 +2062,20 @@ public class JmsOutputChannel implements OutputChannel
 	public class BrokerConnectionEntry {
 	  private String brokerURL;
 	  private Connection connection;
+	  private ConnectionTimer connectionTimer;
+	  
 	  Map<Object, JmsEndpointConnection_impl> endpointMap = 
 	    new ConcurrentHashMap<Object, JmsEndpointConnection_impl>();
 	  
     public String getBrokerURL() {
       return brokerURL;
+    }
+    public void setConnectionTimer( ConnectionTimer aConnectionTimer ) {
+      connectionTimer = aConnectionTimer;
+    }
+    
+    public ConnectionTimer getConnectionTimer() {
+      return connectionTimer;
     }
     public void setBrokerURL(String brokerURL) {
       this.brokerURL = brokerURL;
@@ -2029,4 +2099,101 @@ public class JmsOutputChannel implements OutputChannel
 	   endpointMap.remove(key); 
 	  }
 	}
+	
+	protected class ConnectionTimer {
+    private final Class CLASS_NAME = ConnectionTimer.class;
+
+    private Timer timer;
+
+    private long inactivityTimeout;
+
+    private AnalysisEngineController controller;
+
+    private BrokerConnectionEntry brokerDestinations;
+
+    private long connectionCreationTimestamp;
+
+    public ConnectionTimer(BrokerConnectionEntry aBrokerDestinations ) {
+      brokerDestinations = aBrokerDestinations;
+    }
+    public void setInactivityTimeout( long anInactivityTimeout ) {
+      inactivityTimeout = anInactivityTimeout;
+    }
+    public void setAnalysisEngineController( AnalysisEngineController aController ) {
+      controller = aController;
+    }
+    public void setConnectionCreationTimestamp(long aConnectionCreationTimestamp) {
+      connectionCreationTimestamp = aConnectionCreationTimestamp;
+    }
+    public synchronized void startTimer(long aConnectionCreationTimestamp, final Endpoint endpoint) {
+      final long cachedConnectionCreationTimestamp = aConnectionCreationTimestamp;
+      Date timeToRun = new Date(System.currentTimeMillis() + inactivityTimeout);
+      if (timer != null) {
+        timer.cancel();
+      }
+      if (controller != null) {
+        timer = new Timer("Controller:" + controller.getComponentName()
+                + ":TimerThread-:" + endpoint + ":" + System.nanoTime());
+      } else {
+        timer = new Timer("TimerThread-:" + endpoint + ":"
+                + System.nanoTime());
+      }
+      timer.schedule(new TimerTask() {
+        public void run() {
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.CONFIG)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.CONFIG, CLASS_NAME.getName(),
+                    "startTimer", JmsConstants.JMS_LOG_RESOURCE_BUNDLE,
+                    "UIMAJMS_inactivity_timer_expired_CONFIG",
+                    new Object[] { Thread.currentThread().getName(), inactivityTimeout, endpoint });
+          }
+          if (connectionCreationTimestamp <= cachedConnectionCreationTimestamp) {
+            try {
+              if (brokerDestinations.getConnection() != null
+                      && !((ActiveMQConnection) brokerDestinations.getConnection()).isClosed()) {
+                try {
+                  brokerDestinations.getConnection().stop();
+                  brokerDestinations.getConnection().close();
+                } catch (Exception e) {
+                  // Ignore this for now. Attempting to close connection that has been closed
+                  // Ignore we are shutting down
+                }
+              }
+              brokerDestinations.setConnection(null);
+            } catch (Exception e) {
+            } finally {
+              removeDestinationFromManagedList(brokerDestinations, endpoint);
+            }
+          } 
+          cancelTimer();
+        }
+      }, timeToRun);
+    }
+
+    private void removeDestinationFromManagedList(BrokerConnectionEntry brokerDestinations,
+            Endpoint endpoint) {
+      String key = endpoint.getEndpoint() + endpoint.getServerURI();
+      String destination = endpoint.getEndpoint();
+      if (endpoint.getDestination() != null
+              && endpoint.getDestination() instanceof ActiveMQDestination) {
+        destination = ((ActiveMQDestination) endpoint.getDestination()).getPhysicalName();
+        key = destination;
+      }
+      if (brokerDestinations.endpointExists(key)) {
+        brokerDestinations.removeEndpoint(key);
+      }
+
+    }
+
+    private void cancelTimer() {
+      if (timer != null) {
+        timer.cancel();
+        timer.purge();
+      }
+    }
+
+    public synchronized void stopTimer() {
+      cancelTimer();
+      timer = null;
+    }
+  }
 }
