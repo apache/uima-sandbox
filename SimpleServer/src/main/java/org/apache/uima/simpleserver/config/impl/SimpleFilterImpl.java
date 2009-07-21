@@ -83,6 +83,9 @@ public class SimpleFilterImpl extends FilterImpl implements SimpleFilter {
       }
       }
     }
+    if (fs == null) {
+      return false;
+    }
     // If we get here, we know the stack is not empty, so get the next feature.
     String fName = stack.pop();
     Feature f = fs.getType().getFeatureByBaseName(fName);
@@ -336,8 +339,6 @@ public class SimpleFilterImpl extends FilterImpl implements SimpleFilter {
 
   private final boolean checkString(String s) {
     String value = this.getCondition().getValue();
-    // Value can not be null
-    assert (value != null);
     FilterOp op = this.getCondition().getConditionType();
     // First check for conditions that makes sense if input value is null.
     switch (op) {

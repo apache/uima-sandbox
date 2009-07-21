@@ -66,7 +66,7 @@ public class ServerTest {
     SimpleServerServlet uimaServlet = new SimpleServerServlet(true);
     File descriptorFile = JUnitExtension.getFile("desc/simpleServerTestDescriptor.xml");
     assertTrue(descriptorFile.exists());
-    File specFile = JUnitExtension.getFile("serverspec/spec1.xml");
+    File specFile = JUnitExtension.getFile("serverspec/spec01.xml");
     assertTrue(specFile.exists());
     try {
       uimaServlet.init(descriptorFile, specFile);

@@ -35,8 +35,19 @@ public class Annotator extends JTextAnnotator_ImplBase {
 
   public void process(JCas jcas, ResultSpecification _rs) {
     final String text = jcas.getDocumentText();
+    TypeWithListsAndArrays fs0 = new TypeWithListsAndArrays(jcas);
+    fs0.setStringList("foo");
+    TypeWithListsAndArrays fs1 = new TypeWithListsAndArrays(jcas);
+    fs1.setStringList(null);
     for (int i = 0; i < text.length(); i++) {
       CharacterAnnotation ca = new CharacterAnnotation(jcas, i, i+1);
+      if ((i % 2) == 0) {
+        if ((i % 4) == 0) {
+          ca.setFsFeature(fs0);
+        } else {
+          ca.setFsFeature(fs1);
+        }
+      }
       ca.setBooleanFeature((i % 10) == 0);
       ca.setByteFeature((byte) (i % Byte.MAX_VALUE));
       ca.setDoubleFeature(i);

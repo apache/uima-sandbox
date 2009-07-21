@@ -38,6 +38,7 @@ import org.apache.uima.simpleserver.config.ServerSpec;
 import org.apache.uima.simpleserver.config.TypeMap;
 import org.apache.uima.simpleserver.config.impl.XmlConfigReader;
 import org.apache.uima.simpleserver.output.Result;
+import org.apache.uima.simpleserver.output.ResultConverter;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.InvalidXMLException;
@@ -52,6 +53,8 @@ import org.junit.Test;
 public class ConfigTest {
 
   public static final String CONFIG_TEST_FILE = "stuff.xml";
+
+  private static final String encoding = "UTF-8";
 
   @Test
   public void readSampleConfig() {
@@ -76,35 +79,68 @@ public class ConfigTest {
 
   @Test
   public void testResultGeneration1() {
-    test("serverspec/spec1.xml", 290);    
+    test("01", 290);
   }
-  
+
   @Test
   public void testResultGeneration2() {
-    test("serverspec/spec2.xml", 3);
+    test("02", 3);
   }
 
   @Test
   public void testResultGeneration3() {
-    test("serverspec/spec3.xml", 1);
+    test("03", 1);
   }
 
   @Test
   public void testResultGeneration4() {
-    test("serverspec/spec4.xml", 0);
+    test("04", 0);
   }
 
   @Test
   public void testResultGeneration5() {
-    test("serverspec/spec5.xml", 10);
+    test("05", 10);
   }
 
   @Test
   public void testResultGeneration6() {
-    test("serverspec/spec6.xml", 10);
+    test("06", 10);
   }
 
-  private static final void test(String configFile, int expectedResultNumber) {
+  @Test
+  public void testResultGeneration7() {
+    test("07", 73);
+  }
+
+  @Test
+  public void testResultGeneration8() {
+    test("08", 73);
+  }
+
+  @Test
+  public void testResultGeneration9() {
+    test("09", 72);
+  }
+
+  @Test
+  public void testResultGeneration10() {
+    test("10", 290);
+  }
+
+  private static final String getConfigFileName(final String number) {
+    return "serverspec/spec" + number + ".xml";
+  }
+
+  private static final String getInlineXmlFileName(final String number) {
+    return "src/test/resources/expected/inline" + number + ".xml";
+  }
+
+  private static final String getStandoffXmlFileName(final String number) {
+    return "src/test/resources/expected/standoff" + number + ".xml";
+  }
+
+  private static final void test(String testNumber, int expectedResultNumber) {
+    final String configFile = getConfigFileName(testNumber);
     JCas cas = createTestCas();
     ServerSpec serverSpec = null;
     try {
@@ -129,6 +165,36 @@ public class ConfigTest {
     final int resultSize = result.getResultEntries().size();
     assertTrue("Expected number of results was " + expectedResultNumber + ", actual number is "
         + resultSize, (resultSize == expectedResultNumber));
+    String inlineExpected = null;
+    String standoffExpected = null;
+    final String inlineActual = ResultConverter.getInlineXML(result);
+    final String standoffActual = ResultConverter.getXMLString(result);
+    try {
+      inlineExpected = FileUtils.file2String(new File(getInlineXmlFileName(testNumber)), encoding);
+      standoffExpected = FileUtils.file2String(new File(getStandoffXmlFileName(testNumber)),
+          encoding);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    assertTrue("Expected inline output:\n" + inlineExpected + "\nbut found:\n" + inlineActual,
+        inlineActual.equals(inlineExpected));
+    assertTrue(
+        "Expected standoff output:\n" + standoffExpected + "\nbut found:\n" + standoffActual,
+        standoffActual.equals(standoffExpected));
+    // final int len = configFile.length();
+    // final String suffix = configFile.substring(len - 6, len);
+    // final String outInlineFileName = "out/inline" + suffix;
+    // final String inlineXmlContent = ResultConverter.getInlineXML(result);
+    // final String outStandoffFileName = "out/standoff" + suffix;
+    // final String standoffXmlContent = ResultConverter.getXMLString(result);
+    // System.out.println((new File(outInlineFileName)).getAbsolutePath());
+    // try {
+    // FileUtils.saveString2File(inlineXmlContent, new File(outInlineFileName), encoding);
+    // FileUtils.saveString2File(standoffXmlContent, new File(outStandoffFileName), encoding);
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // }
+
   }
 
   private static final JCas createTestCas() {
