@@ -850,7 +850,7 @@ implements AnalysisEngineController, EventSubscriber
 		{
 			EECasManager_impl cm = (EECasManager_impl) getResourceManager().getCasManager();
 			cm.setInitialCasHeapSize(anInitialCasHeapSize);
-			cm.setPoolSize(getUimaContextAdmin().getQualifiedContextName(), aComponentCasPoolSize);
+      cm.setPoolSize(getUimaContextAdmin().getUniqueName(), aComponentCasPoolSize);
 			System.out.println("Component:"+getComponentName()+" Cas Pool:"+getUimaContextAdmin().getQualifiedContextName()+" Size:"+aComponentCasPoolSize+" Cas Heap Size:"+anInitialCasHeapSize/4 +" cells");
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
