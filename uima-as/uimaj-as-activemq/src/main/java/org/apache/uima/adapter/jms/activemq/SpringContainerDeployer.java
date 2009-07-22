@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQPrefetchPolicy;
@@ -49,9 +50,9 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
   public static final int QUIESCE_AND_STOP = 1000;
   public static final int STOP_NOW = 1001;
   
-	private boolean serviceInitializationCompleted;
-	private boolean serviceInitializationException;
-	private Object serviceMonitor = new Object();
+	private volatile boolean serviceInitializationCompleted;
+	private volatile boolean serviceInitializationException;
+	private Semaphore serviceInitializationSemaphore = new Semaphore(1);  
 	private ConcurrentHashMap springContainerRegistry=null;
 	private FileSystemXmlApplicationContext context = null;
 	private Object mux = new Object();
@@ -266,11 +267,17 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	      }
 			}
 		}
-		// blocks until the top level controller sends a notification.
-		// Notification is send
-		// when either the controller successfully initialized or it failed
-		// during initialization
+		// grab the semaphore so that waitForServiceInitialization() blocks until the
+		//  semaphore is released.
 		try {
+		  serviceInitializationSemaphore.acquire();
+		} catch( InterruptedException e) {
+		} 
+		try {
+	    // blocks until the top level controller sends a notification.
+	    // Notification is send
+	    // when either the controller successfully initialized or it failed
+	    // during initialization
 			waitForServiceNotification();
 		} catch (Exception e) {
 			// Query the container for objects that implement
@@ -395,21 +402,18 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 	  }
 	}
 	protected void waitForServiceNotification() throws Exception {
-
-			synchronized (serviceMonitor) {
-				while (!serviceInitializationCompleted) {
-					if (serviceInitializationException) {
-						throw new ResourceInitializationException();
-					}
-		      if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
-		        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
-		      }
-				serviceMonitor.wait();
-				if (serviceInitializationException) {
-					throw new ResourceInitializationException();
-				}
-			}
-		}
+    if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO) ) {
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "waitForServiceNotification", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_awaiting_container_init__INFO", new Object[] {});
+    }
+    try {
+      serviceInitializationSemaphore.acquire();
+    } catch( InterruptedException e) {
+    } finally {
+      serviceInitializationSemaphore.release();
+    }
+    if (serviceInitializationException) {
+      throw new ResourceInitializationException();
+    }
 	}
 	public void notifyOnInitializationFailure(AnalysisEngineController aController, Exception e) {
 
@@ -419,18 +423,12 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
     if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING) ) {
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "notifyOnInitializationFailure", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_container_init_exception__WARNING", new Object[] {e});
     }
-		synchronized (serviceMonitor) {
-			serviceMonitor.notifyAll();
-		}
-
+    serviceInitializationSemaphore.release();
 	}
 
 	public void notifyOnInitializationSuccess(AnalysisEngineController aController) {
 		serviceInitializationCompleted = true;
-		
-		synchronized (serviceMonitor) {
-			serviceMonitor.notifyAll();
-		}
+    serviceInitializationSemaphore.release();
 	}
 	public void notifyOnInitializationFailure( Exception e)
 	{
