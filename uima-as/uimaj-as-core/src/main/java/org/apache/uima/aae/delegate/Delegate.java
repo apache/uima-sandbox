@@ -31,7 +31,6 @@ import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.ErrorContext;
 import org.apache.uima.aae.error.MessageTimeoutException;
-import org.apache.uima.aae.error.UimaASMetaRequestTimeout;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.util.Level;
 
@@ -56,9 +55,6 @@ public abstract class Delegate {
   // stores the endpoint info
   private Endpoint endpoint;
 
-  // synchronizes access to the pending CAS list
-  private Object outstandingCasListMux = new Object();
-
   // Timer object to time replies
   private Timer timer;
 
@@ -78,9 +74,6 @@ public abstract class Delegate {
   // CASes should be send to the delegate as soon as the getMeta (Ping) is received.
   private List<DelegateEntry> pendingDispatchList = new ArrayList<DelegateEntry>();
 
-  // synchronizes access to the list of CASes pending dispatch
-  private Object pendingDispatchListMux = new Object();
-  
   //  Flag that is set when getMeta reply is received
   private volatile boolean awaitingPingReply;
 
@@ -140,7 +133,7 @@ public abstract class Delegate {
    */
   public void restartTimerForOldestCasInOutstandingList() {
     DelegateEntry entry = null;
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       if (!outstandingCasList.isEmpty()) {
         //  Get the oldest entry
         entry = outstandingCasList.get(0);
@@ -181,7 +174,7 @@ public abstract class Delegate {
     addNewCasToOutstandingList(aCasReferenceId, false);
   }
   public void addNewCasToOutstandingList(String aCasReferenceId, boolean isCasGeneratingChildren ) {
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       DelegateEntry entry = null;
       if ( (entry = lookupEntry(aCasReferenceId, outstandingCasList)) == null) {
         entry = new DelegateEntry(aCasReferenceId);
@@ -204,7 +197,7 @@ public abstract class Delegate {
    * 
    */
   public void addCasToOutstandingList(String aCasReferenceId) {
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       DelegateEntry entry = null;
       // Check if the outstanding list already contains entry for the Cas Id. If it does, retry
       // logic
@@ -257,7 +250,7 @@ public abstract class Delegate {
    *          - CAS ID to add to the delayed list
    */
   public int addCasToPendingDispatchList(String aCasReferenceId) {
-    synchronized (pendingDispatchListMux) {
+    synchronized (pendingDispatchList) {
       DelegateEntry entry = null;
       // Create a new entry to be stored in the list of CASes pending
       // dispatch
@@ -319,7 +312,7 @@ public abstract class Delegate {
    * @param aCasReferenceId
    */
   public void incrementRetryCount(String aCasReferenceId) {
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       DelegateEntry entry = lookupEntry(aCasReferenceId, outstandingCasList);
       if (entry != null) {
         entry.incrementRetryCount();
@@ -344,7 +337,7 @@ public abstract class Delegate {
    *          - unique id of a CAS to be searched for
    * @return
    */
-  private synchronized DelegateEntry lookupEntry(String aCasReferenceId, List<DelegateEntry> list) {
+  private DelegateEntry lookupEntry(String aCasReferenceId, List<DelegateEntry> list) {
     for (DelegateEntry entry : list) {
       if (entry.getCasReferenceId().equals(aCasReferenceId)) {
         return entry;
@@ -364,7 +357,7 @@ public abstract class Delegate {
    * @return - ID of the oldest CAS in the list
    */
   public String removeOldestFromPendingDispatchList() {
-    synchronized (pendingDispatchListMux) {
+    synchronized (pendingDispatchList) {
       if ( pendingDispatchList.size() > 0 ) {
         String casReferenceId = pendingDispatchList.remove(0).getCasReferenceId();
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
@@ -396,7 +389,7 @@ public abstract class Delegate {
    * @return - ID of the oldest CAS in the list
    */
   public boolean removeCasFromPendingDispatchList(String aCasReferenceId) {
-    synchronized (pendingDispatchListMux) {
+    synchronized (pendingDispatchList) {
       DelegateEntry entry = lookupEntry(aCasReferenceId, pendingDispatchList);
       if (entry != null) {
         pendingDispatchList.remove(entry);
@@ -425,7 +418,7 @@ public abstract class Delegate {
    *          - id of the CAS to remove from the list
    */
   public boolean removeCasFromOutstandingList(String aCasReferenceId) {
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       DelegateEntry entry = lookupEntry(aCasReferenceId, outstandingCasList);
       if (entry != null) {
         this.removeCasFromOutstandingList(entry);
@@ -444,14 +437,14 @@ public abstract class Delegate {
    *          - id of the CAS to remove from the list
    */
   public String removeOldestCasFromOutstandingList() {
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       dumpPendingReplyList();
       return outstandingCasList.remove(0).getCasReferenceId();
     }
   }
   
   public String getOldestCasIdFromOutstandingList() {
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       return outstandingCasList.get(0).getCasReferenceId();
     }
   }
@@ -510,22 +503,22 @@ public abstract class Delegate {
    */
   public void cleanup() {
     cancelDelegateTimer();
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       outstandingCasList.clear();
     }
-    synchronized( pendingDispatchListMux) {
+    synchronized( pendingDispatchList) {
       pendingDispatchList.clear();
     }
   }
 
   public int getCasPendingReplyListSize() {
-    synchronized (outstandingCasListMux) {
+    synchronized (outstandingCasList) {
       return outstandingCasList.size();
     }
   }
 
   public int getCasPendingDispatchListSize() {
-    synchronized (pendingDispatchListMux) {
+    synchronized (pendingDispatchList) {
       return pendingDispatchList.size();
     }
   }
