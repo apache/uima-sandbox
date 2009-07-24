@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -2058,6 +2059,18 @@ public class JmsOutputChannel implements OutputChannel
 		}
 		return null;
 	}
+  public void cancelTimers() {
+    if ( connectionMap.size() > 0 ) {
+      Iterator<String> it = connectionMap.keySet().iterator();
+      while (it.hasNext() ) {
+        String key = it.next();
+        BrokerConnectionEntry ce = (BrokerConnectionEntry) connectionMap.get(key);
+        if ( ce.getConnectionTimer() != null ) {
+          ce.getConnectionTimer().cancelTimer();
+        }
+      }
+    }
+  }
 
 	public class BrokerConnectionEntry {
 	  private String brokerURL;
@@ -2133,9 +2146,9 @@ public class JmsOutputChannel implements OutputChannel
       }
       if (controller != null) {
         timer = new Timer("Controller:" + controller.getComponentName()
-                + ":TimerThread-:" + endpoint + ":" + System.nanoTime());
+                + ":Reply TimerThread-:" + endpoint + ":" + System.nanoTime());
       } else {
-        timer = new Timer("TimerThread-:" + endpoint + ":"
+        timer = new Timer("Reply TimerThread-:" + endpoint + ":"
                 + System.nanoTime());
       }
       timer.schedule(new TimerTask() {
