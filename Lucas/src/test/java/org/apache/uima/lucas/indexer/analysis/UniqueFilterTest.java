@@ -22,44 +22,45 @@ package org.apache.uima.lucas.indexer.analysis;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.uima.lucas.indexer.analysis.UniqueFilter;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 
+
+import junit.framework.TestCase;
+
 public class UniqueFilterTest extends TestCase {
 
-  public void testUniqueFilter() throws Exception {
-    Collection<Token> tokens = new ArrayList<Token>();
-    tokens.add(new Token("token1", 0, 6));
-    tokens.add(new Token("token1", 7, 13));
-    tokens.add(new Token("token2", 14, 20));
-    tokens.add(new Token("token2", 21, 27));
-    tokens.add(new Token("token3", 28, 33));
-    tokens.add(new Token("token4", 34, 40));
+	public void testUniqueFilter() throws Exception{
+		Collection<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token("token1", 0, 6));
+		tokens.add(new Token("token1", 7, 13));
+		tokens.add(new Token("token2", 14, 20));
+		tokens.add(new Token("token2", 21, 27));
+		tokens.add(new Token("token3", 28, 33));
+		tokens.add(new Token("token4", 34, 40));
+		
+		TokenStream tokenStream = new CollectionTokenStream(tokens);
+		TokenFilter filter = new UniqueFilter(tokenStream);
+		
+		Token nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 
-    TokenStream tokenStream = new CollectionTokenStream(tokens);
-    TokenFilter filter = new UniqueFilter(tokenStream);
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 
-    Token nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-
-    assertNull(filter.next());
-  }
+		assertNull(filter.next());
+	}
 }

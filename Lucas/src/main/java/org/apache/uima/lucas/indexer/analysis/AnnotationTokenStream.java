@@ -21,10 +21,8 @@ package org.apache.uima.lucas.indexer.analysis;
 
 import java.io.IOException;
 import java.text.Format;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +43,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * 
@@ -74,13 +74,11 @@ public class AnnotationTokenStream extends TokenStream {
   private Iterator<Annotation> annotationIterator; // iterates over annotations
 
   private Iterator<FeatureStructure> featureStructureIterator; // iterates over feature structures
-
-  // stored in feature arrays of an
-  // annotation
+                                                               // stored in feature arrays of an
+                                                               // annotation
 
   private Iterator<String> featureValueIterator; // iterates over the features of a feature
-
-  // structure
+                                                 // structure
 
   private Annotation currentAnnotation;
 
@@ -108,23 +106,9 @@ public class AnnotationTokenStream extends TokenStream {
    *          the type of the annotation
    * @throws CASException
    */
-  public AnnotationTokenStream(JCas cas, String sofaName, String typeName) throws CASException {
-    super();
-    jCas = cas.getView(sofaName);
-    this.featureNames = Collections.EMPTY_LIST;
-    this.featureFormats = Collections.EMPTY_MAP;
-
-    try {
-      annotationType = jCas.getTypeSystem().getType(typeName);
-      logger.debug(typeName + ", found: " + (annotationType != null));
-      logger.debug("featureNames: " + featureNames);
-      initializeIterators();
-    } catch (Exception e) {
-      IllegalArgumentException exc =
-              new IllegalArgumentException(e.getMessage() + " at type " + typeName);
-      exc.initCause(e);
-      throw exc;
-    }
+  public AnnotationTokenStream(JCas cas, String sofaName, String typeName) throws InvalidTokenSourceException {
+    this(cas, sofaName, typeName, null, Collections.EMPTY_LIST, null, 
+         Collections.EMPTY_MAP);
   }
 
   /**
@@ -144,30 +128,9 @@ public class AnnotationTokenStream extends TokenStream {
    */
 
   public AnnotationTokenStream(JCas cas, String sofaName, String typeName, String featureName,
-          Format featureFormat) throws CASException {
-    super();
-    jCas = cas.getView(sofaName);
-    this.featureNames = new ArrayList<String>();
-    if (featureFormat != null) {
-      featureFormats = new HashMap<String, Format>();
-      featureFormats.put(featureName, featureFormat);
-    } else
-      this.featureFormats = Collections.EMPTY_MAP;
-
-    featureNames.add(featureName);
-
-    try {
-      annotationType = jCas.getTypeSystem().getType(typeName);
-      logger.debug(typeName + ", found: " + (annotationType != null));
-      logger.debug("featureNames: " + featureNames);
-      initializeIterators();
-    } catch (Exception e) {
-      IllegalArgumentException exc =
-              new IllegalArgumentException(e.getMessage() + " at type " + typeName);
-      exc.initCause(e);
-      throw exc;
-    }
-
+          Format featureFormat) throws InvalidTokenSourceException {
+    this(cas, sofaName, typeName, null, Lists.newArrayList(featureName), null, 
+         Maps.immutableBiMap(featureName, featureFormat));
   }
 
   /**
@@ -192,28 +155,8 @@ public class AnnotationTokenStream extends TokenStream {
    */
   public AnnotationTokenStream(JCas cas, String sofaName, String typeName,
           List<String> featureNames, String delimiter, Map<String, Format> featureFormats)
-          throws CASException {
-    super();
-    jCas = cas.getView(sofaName);
-    this.featureNames = featureNames;
-    this.delimiter = delimiter;
-
-    if (featureFormats == null)
-      this.featureFormats = Collections.EMPTY_MAP;
-    else
-      this.featureFormats = featureFormats;
-
-    try {
-      annotationType = jCas.getTypeSystem().getType(typeName);
-      logger.debug(typeName + ", found: " + (annotationType != null));
-      logger.debug("featureNames: " + featureNames);
-      initializeIterators();
-    } catch (Exception e) {
-      IllegalArgumentException exc =
-              new IllegalArgumentException(e.getMessage() + " at type " + typeName);
-      exc.initCause(e);
-      throw exc;
-    }
+          throws InvalidTokenSourceException {
+    this(cas, sofaName, typeName, null, featureNames, delimiter, featureFormats);
   }
 
   /**
@@ -233,26 +176,8 @@ public class AnnotationTokenStream extends TokenStream {
    * @throws CASException
    */
   public AnnotationTokenStream(JCas cas, String sofaName, String typeName,
-          List<String> featureNames, Map<String, Format> featureFormats) throws CASException {
-    super();
-    jCas = cas.getView(sofaName);
-    this.featureNames = featureNames;
-    if (featureFormats == null)
-      this.featureFormats = Collections.EMPTY_MAP;
-    else
-      this.featureFormats = featureFormats;
-
-    try {
-      annotationType = jCas.getTypeSystem().getType(typeName);
-      logger.debug(typeName + ", found: " + (annotationType != null));
-      logger.debug("featureNames: " + featureNames);
-      initializeIterators();
-    } catch (Exception e) {
-      IllegalArgumentException exc =
-              new IllegalArgumentException(e.getMessage() + " at type " + typeName);
-      exc.initCause(e);
-      throw exc;
-    }
+          List<String> featureNames, Map<String, Format> featureFormats) throws InvalidTokenSourceException {
+    this(cas, sofaName, typeName, null, featureNames, null, featureFormats);
   }
 
   /**
@@ -284,28 +209,8 @@ public class AnnotationTokenStream extends TokenStream {
    * @throws CASException
    */
   public AnnotationTokenStream(JCas cas, String sofaName, String typeName, String featurePath,
-          List<String> featureNames, Map<String, Format> featureFormats) throws CASException {
-    super();
-    jCas = cas.getView(sofaName);
-    this.featurePath = featurePath;
-    this.featureNames = featureNames;
-    if (featureFormats == null)
-      this.featureFormats = Collections.EMPTY_MAP;
-    else
-      this.featureFormats = featureFormats;
-
-    try {
-      annotationType = jCas.getTypeSystem().getType(typeName);
-      logger.debug(typeName + ", found: " + (annotationType != null));
-      logger.debug("featurePath: " + featurePath);
-      logger.debug("featureNames: " + featureNames);
-      initializeIterators();
-    } catch (Exception e) {
-      IllegalArgumentException exc =
-              new IllegalArgumentException(e.getMessage() + " at type " + typeName);
-      exc.initCause(e);
-      throw exc;
-    }
+          List<String> featureNames, Map<String, Format> featureFormats) throws InvalidTokenSourceException {
+    this(cas, sofaName, typeName, featurePath, featureNames, null, featureFormats);
   }
 
   /**
@@ -339,9 +244,9 @@ public class AnnotationTokenStream extends TokenStream {
    */
   public AnnotationTokenStream(JCas cas, String sofaName, String typeName, String featurePath,
           List<String> featureNames, String delimiter, Map<String, Format> featureFormats)
-          throws CASException {
+          throws InvalidTokenSourceException {
     super();
-    jCas = cas.getView(sofaName);
+
     this.featurePath = featurePath;
     this.featureNames = featureNames;
     this.delimiter = delimiter;
@@ -349,20 +254,57 @@ public class AnnotationTokenStream extends TokenStream {
       this.featureFormats = Collections.EMPTY_MAP;
     else
       this.featureFormats = featureFormats;
+    
+    getSofaCas(cas, sofaName);
+    getTypeForName(typeName);
+    validate(annotationType, featureNames, featurePath);
+    
+    initializeIterators();
 
+  }
+
+  private void getTypeForName(String typeName) throws InvalidTokenSourceException{
+    annotationType = jCas.getTypeSystem().getType(typeName);
+    if( annotationType == null )
+      throw new InvalidTokenSourceException("Type " + typeName + " not found!");
+  }
+
+  private void getSofaCas(JCas cas, String sofaName) throws InvalidTokenSourceException {
     try {
-      annotationType = jCas.getTypeSystem().getType(typeName);
-      logger.debug(typeName + ", found: " + (annotationType != null));
-      logger.debug("featurePath: " + featurePath);
-      logger.debug("featureNames: " + featureNames);
-      initializeIterators();
-    } catch (Exception e) {
-      IllegalArgumentException exc =
-              new IllegalArgumentException(e.getMessage() + " at type " + typeName);
-      exc.initCause(e);
-      throw exc;
+      jCas = cas.getView(sofaName);
+    } catch (CASException e) {
+      throw new InvalidTokenSourceException(e);
     }
+  }
 
+  void validate(Type type, Collection<String> featureNames, String featurePath) throws InvalidTokenSourceException{
+    Type typeToValidate = findTypeWithPath(type, featurePath);
+    
+    for( String featureName: featureNames ){
+      Feature feature = typeToValidate.getFeatureByBaseName(featureName);
+      if( feature == null )
+        throw new InvalidTokenSourceException("Type " + typeToValidate.getName() + " has no feature " + featureName + ". featurePath: " + featurePath);
+    }
+  }
+  
+  private Type findTypeWithPath(Type type, String featurePath) throws InvalidTokenSourceException{
+    if( featurePath == null )
+      return type;
+    
+    String[] featurePathElements = featurePath.split("\\.");
+    Type currentType = type;
+    
+    for( String featurePathElement: featurePathElements ){
+      Feature feature = currentType.getFeatureByBaseName(featurePathElement);
+      if (feature == null)
+        throw new InvalidTokenSourceException("Type " + currentType.getName() + " has no feature " + featurePathElement);
+      
+      currentType = feature.getRange();
+      if (currentType.isArray())
+        currentType = currentType.getComponentType();
+    }
+    
+    return currentType;
   }
 
   @Override
@@ -376,8 +318,8 @@ public class AnnotationTokenStream extends TokenStream {
           featureStructureIterator = createFeatureStructureIterator(currentAnnotation, featurePath);
         }
 
-        featureValueIterator =
-                createFeatureValueIterator(featureStructureIterator.next(), featureNames);
+        featureValueIterator = createFeatureValueIterator(featureStructureIterator.next(),
+                featureNames);
       }
 
       token.setStartOffset(currentAnnotation.getBegin());
@@ -389,10 +331,9 @@ public class AnnotationTokenStream extends TokenStream {
 
     } catch (Throwable e) {
 
-      IOException ioException =
-              new IOException(e + " at type " + annotationType.getName() + " features "
-                      + featureNames + " featurePath " + featurePath + " sofa "
-                      + jCas.getViewName(), e);
+      IOException ioException = new IOException(e + " at type " + annotationType.getName()
+              + " features " + featureNames + " featurePath " + featurePath + " sofa "
+              + jCas.getViewName(), e);
       logger.error(ioException);
       throw ioException;
     }
@@ -409,9 +350,8 @@ public class AnnotationTokenStream extends TokenStream {
   }
 
   protected void initializeIterators() {
-    annotationIterator =
-            Iterators.filter(jCas.getAnnotationIndex(annotationType).iterator(),
-                    new NotNullPredicate<Annotation>());
+    annotationIterator = Iterators.filter(jCas.getAnnotationIndex(annotationType).iterator(),
+            new NotNullPredicate<Annotation>());
 
     if (!annotationIterator.hasNext()) {
       featureStructureIterator = Iterators.emptyIterator();

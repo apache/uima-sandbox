@@ -55,4 +55,5 @@ public class ReplaceFilter extends TokenFilter {
   public Map<String, String> getMapping() {
     return mapping;
   }
+
 }

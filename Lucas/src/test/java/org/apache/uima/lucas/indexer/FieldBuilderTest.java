@@ -19,13 +19,18 @@
 
 package org.apache.uima.lucas.indexer;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
 import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,11 +38,10 @@ import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Field;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.lucas.indexer.AnnotationDescription;
-import org.apache.uima.lucas.indexer.FieldBuilder;
-import org.apache.uima.lucas.indexer.FieldDescription;
 import org.apache.uima.lucas.indexer.analysis.TokenStreamConcatenator;
 import org.apache.uima.lucas.indexer.analysis.TokenStreamMerger;
+import org.apache.uima.lucas.indexer.mapping.AnnotationDescription;
+import org.apache.uima.lucas.indexer.mapping.FieldDescription;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,298 +50,351 @@ import com.google.common.collect.Lists;
 
 public class FieldBuilderTest {
 
-  private FieldBuilder fieldBuilder;
+	private FieldBuilder fieldBuilder;
+	private FieldDescription fieldDescription;
+	private AnnotationDescription annotationDescription1;
+	private AnnotationDescription annotationDescription2;
+	private JCas cas;
+	
+	private TokenStream tokenStream1;
+	private TokenStream tokenStream2;
+	private List<TokenStream> tokenStreams;
+	private FilterBuilder filterBuilder;
+	
+	@Before
+	public void setUp(){
+		annotationDescription1= new AnnotationDescription("uima.cas.Annotation");		
+		annotationDescription2= new AnnotationDescription("uima.cas.Annotation");
+		filterBuilder = createMock(FilterBuilder.class);
+		fieldBuilder = new FieldBuilder(filterBuilder);
+		cas = createMock(JCas.class);
 
-  private FieldDescription fieldDescription;
+		Collection<Token> tokens1 = new ArrayList<Token>();
+		tokens1.add(new Token("token1".toCharArray(),0,6,0,6));
+		tokens1.add(new Token("token2".toCharArray(),0,6,7,13));
+		tokens1.add(new Token("token3".toCharArray(),0,6,14,20));
 
-  private AnnotationDescription annotationDescription1;
+		Collection<Token> tokens2 = new ArrayList<Token>();
+		tokens2.add(new Token("token4".toCharArray(),0,6,0,6));
+		tokens2.add(new Token("token5".toCharArray(),0,6,7,13));
+		tokens2.add(new Token("token6".toCharArray(),0,6,14,20));
 
-  private AnnotationDescription annotationDescription2;
+		tokenStream1 = new CollectionTokenStream(tokens1);
+		tokenStream2 = new CollectionTokenStream(tokens2);
 
-  private JCas cas;
+		tokenStreams = Lists.newArrayList(tokenStream1, tokenStream2);
+		
+		fieldDescription = new FieldDescription("field1");
+		fieldDescription.getAnnotationDescriptions().add(annotationDescription1);
+		fieldDescription.getAnnotationDescriptions().add(annotationDescription2);
+		fieldDescription.setFilterDescriptions(Collections.EMPTY_LIST);
+	}
+	
+	@Test
+	public void testCreateFieldConcatenated() throws Exception{
+		
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
 
-  private TokenStream tokenStream1;
+		TokenStream tokenStream = createMock(TokenStream.class);
+		expect(filterBuilder.filter(isA(TokenStreamConcatenator.class), isA(Collection.class))).andReturn(tokenStream);
+		replay(filterBuilder);
+		
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		verify(filterBuilder);
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertEquals(tokenStream, field1.tokenStreamValue());
 
-  private TokenStream tokenStream2;
-
-  private List<TokenStream> tokenStreams;
-
-  @Before
-  public void setUp() {
-    annotationDescription1 = new AnnotationDescription("uima.cas.Annotation");
-    annotationDescription2 = new AnnotationDescription("uima.cas.Annotation");
-    fieldBuilder = new FieldBuilder();
-    cas = createMock(JCas.class);
-
-    Collection<Token> tokens1 = new ArrayList<Token>();
-    tokens1.add(new Token("token1".toCharArray(), 0, 6, 0, 6));
-    tokens1.add(new Token("token2".toCharArray(), 0, 6, 7, 13));
-    tokens1.add(new Token("token3".toCharArray(), 0, 6, 14, 20));
-
-    Collection<Token> tokens2 = new ArrayList<Token>();
-    tokens2.add(new Token("token4".toCharArray(), 0, 6, 0, 6));
-    tokens2.add(new Token("token5".toCharArray(), 0, 6, 7, 13));
-    tokens2.add(new Token("token6".toCharArray(), 0, 6, 14, 20));
-
-    tokenStream1 = new CollectionTokenStream(tokens1);
-    tokenStream2 = new CollectionTokenStream(tokens2);
-
-    tokenStreams = Lists.newArrayList(tokenStream1, tokenStream2);
-
-    fieldDescription = new FieldDescription("field1");
-    fieldDescription.getAnnotationDescriptions().add(annotationDescription1);
-    fieldDescription.getAnnotationDescriptions().add(annotationDescription2);
-  }
-
-  @Test
-  public void testCreateFieldConcatenated() throws Exception {
-
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+	}
+	
+	@Test
+	public void testCreateFieldMerged() throws Exception{
+		
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+    TokenStream tokenStream = createMock(TokenStream.class);
+    expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+    replay(filterBuilder);
+    
     Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+    verify(filterBuilder);
 
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertTrue(field1.tokenStreamValue() instanceof TokenStreamConcatenator);
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+    assertEquals(tokenStream, field1.tokenStreamValue());
+	}
 
-  }
+	@Test
+	public void testCreateFieldNoIndex() throws Exception{
+		
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO);
+		
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		
+		assertEquals(0, fields.size());
+	}
 
-  @Test
-  public void testCreateFieldMerged() throws Exception {
+	@Test
+	public void testCreateFieldNoNorms() throws Exception{
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO_NORMS);
 
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		TokenStream tokenStream = createMock(TokenStream.class);
+    expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+    replay(filterBuilder);
+		
     Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		
+    verify(filterBuilder);
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertTrue(field1.getOmitNorms());
+		assertTrue(field1.isIndexed());
+		assertFalse(field1.isStored());
+	}
+	
+	@Test
+	public void testCreateFieldNoTF() throws Exception{
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO_TF);
+		
+		TokenStream tokenStream = createMock(TokenStream.class);
+		expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+		replay(filterBuilder);
+		
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		verify(filterBuilder);
+		
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertTrue(field1.getOmitTf());
+		assertFalse(field1.getOmitNorms());
+		assertTrue(field1.isIndexed());
+		assertFalse(field1.isStored());
+	}
+	
+	@Test
+	public void testCreateFieldNoNormsTF() throws Exception{
+		
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO_NORMS_TF);
 
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertTrue(field1.tokenStreamValue() instanceof TokenStreamMerger);
-  }
+		TokenStream tokenStream = createMock(TokenStream.class);
+    expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+    replay(filterBuilder);
+		
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		verify(filterBuilder);		
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertTrue(field1.getOmitTf());
+		assertTrue(field1.getOmitNorms());
+		assertTrue(field1.isIndexed());
+		assertFalse(field1.isStored());
+	}
+	
+	@Test
+	public void testCreateFieldTermVector() throws Exception{
+		
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_YES);
+		tokenStreams.remove(1);
 
-  @Test
-  public void testCreateFieldNoIndex() throws Exception {
+    TokenStream tokenStream = createMock(TokenStream.class);
+    expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+    replay(filterBuilder);
 
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO);
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+    verify(filterBuilder);
+    
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertFalse(field1.isStoreOffsetWithTermVector());
+		assertTrue(field1.isTermVectorStored());
+		assertFalse(field1.isStorePositionWithTermVector());
+	}
+	
+	@Test
+	public void testCreateFieldTermVectorOffset() throws Exception{
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_WITH_OFFSETS);
+		tokenStreams.remove(1);
 
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+    TokenStream tokenStream = createMock(TokenStream.class);
+    expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+    replay(filterBuilder);
 
-    assertEquals(0, fields.size());
-  }
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+    verify(filterBuilder);
+    
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertTrue(field1.isStoreOffsetWithTermVector());
+		assertTrue(field1.isTermVectorStored());
+		assertFalse(field1.isStorePositionWithTermVector());
+	}
+	
+	@Test
+	public void testCreateFieldTermVectorPositions() throws Exception{
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_WITH_POSITIONS);
+		tokenStreams.remove(1);
 
-  @Test
-  public void testCreateFieldNoNorms() throws Exception {
+		TokenStream tokenStream = createMock(TokenStream.class);
+    expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+    replay(filterBuilder);
 
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO_NORMS);
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		verify(filterBuilder);
+		
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertFalse(field1.isStoreOffsetWithTermVector());
+		assertTrue(field1.isTermVectorStored());
+		assertTrue(field1.isStorePositionWithTermVector());
+	}
 
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+	@Test
+	public void testCreateFieldTermVectorOffsetPositions() throws Exception{
 
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertTrue(field1.getOmitNorms());
-    assertTrue(field1.isIndexed());
-    assertFalse(field1.isStored());
-  }
+		fieldDescription.setMerge(true);
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_WITH_POSITIONS_OFFSETS);
+		tokenStreams.remove(1);
 
-  @Test
-  public void testCreateFieldNoTF() throws Exception {
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO_TF);
+    TokenStream tokenStream = createMock(TokenStream.class);
+    expect(filterBuilder.filter(isA(TokenStreamMerger.class), isA(Collection.class))).andReturn(tokenStream);
+    replay(filterBuilder);
 
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+    verify(filterBuilder);
+    
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertTrue(field1.isStoreOffsetWithTermVector());
+		assertTrue(field1.isTermVectorStored());
+		assertTrue(field1.isStorePositionWithTermVector());
+	}
 
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertTrue(field1.getOmitTf());
-    assertFalse(field1.getOmitNorms());
-    assertTrue(field1.isIndexed());
-    assertFalse(field1.isStored());
-  }
+	
+	@Test
+	public void testCreateFieldIndexStored() throws Exception{
+		
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		fieldDescription.setStored(FieldBuilder.FIELD_STORE_YES);
+		tokenStreams.remove(1);
 
-  @Test
-  public void testCreateFieldNoNormsTF() throws Exception {
+    expect(filterBuilder.filter(isA(TokenStream.class), isA(Collection.class))).andReturn(tokenStream1);
+    replay(filterBuilder);
+		
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+    verify(filterBuilder);
+    
+		assertEquals(4, fields.size());
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertFalse(field1.isIndexed());
+		assertTrue(field1.isStored());
+		assertEquals("token1", field1.stringValue());
 
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_NO_NORMS_TF);
+		Field field2 = fieldIterator.next();
+		assertEquals("field1", field2.name());
+		assertFalse(field2.isIndexed());
+		assertTrue(field2.isStored());
+		assertEquals("token2", field2.stringValue());
 
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		Field field3 = fieldIterator.next();
+		assertEquals("field1", field3.name());
+		assertFalse(field3.isIndexed());
+		assertTrue(field3.isStored());
+		assertEquals("token3", field3.stringValue());
 
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertTrue(field1.getOmitTf());
-    assertTrue(field1.getOmitNorms());
-    assertTrue(field1.isIndexed());
-    assertFalse(field1.isStored());
-  }
+		Field field4 = fieldIterator.next();
+		assertEquals("field1", field4.name());
+		assertTrue(field4.isIndexed());
+		assertFalse(field4.isStored());
+	}
+	
+	@Test
+	public void testCreateFieldIndexStoredDelimiter() throws Exception{
+		
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		fieldDescription.setStored(FieldBuilder.FIELD_STORE_YES);
+		fieldDescription.setDelimiter(" ");
+		tokenStreams.remove(1);
+		
+    expect(filterBuilder.filter(isA(TokenStream.class), isA(Collection.class))).andReturn(tokenStream1);
+    replay(filterBuilder);
+    
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		verify(filterBuilder);
+		
+		assertEquals(2, fields.size());
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertFalse(field1.isIndexed());
+		assertTrue(field1.isStored());
+		assertEquals("token1 token2 token3", field1.stringValue());
 
-  @Test
-  public void testCreateFieldTermVector() throws Exception {
+		Field field2 = fieldIterator.next();
+		assertEquals("field1", field2.name());
+		assertTrue(field2.isIndexed());
+		assertFalse(field2.isStored());
+	}
+	
+	@Test
+	public void testCreateFieldIndexStoredCompress() throws Exception{
+		fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
+		fieldDescription.setStored(FieldBuilder.FIELD_STORE_COMPRESS);
+		tokenStreams.remove(1);
+		
+    expect(filterBuilder.filter(isA(TokenStream.class), isA(Collection.class))).andReturn(tokenStream1);
+    replay(filterBuilder);
 
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
-    fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_YES);
-    tokenStreams.remove(1);
+		Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+    verify(filterBuilder);
+    
+		assertEquals(4, fields.size());
+		Iterator<Field> fieldIterator = fields.iterator();
+		Field field1 = fieldIterator.next();
+		assertEquals("field1", field1.name());
+		assertFalse(field1.isIndexed());
+		assertTrue(field1.isStored());
+		assertTrue(field1.isCompressed());
+		assertEquals("token1", field1.stringValue());
 
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
+		Field field2 = fieldIterator.next();
+		assertEquals("field1", field2.name());
+		assertFalse(field2.isIndexed());
+		assertTrue(field2.isStored());
+		assertTrue(field2.isCompressed());
+		assertEquals("token2", field2.stringValue());
 
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertFalse(field1.isStoreOffsetWithTermVector());
-    assertTrue(field1.isTermVectorStored());
-    assertFalse(field1.isStorePositionWithTermVector());
-  }
+		Field field3 = fieldIterator.next();
+		assertEquals("field1", field3.name());
+		assertFalse(field3.isIndexed());
+		assertTrue(field3.isStored());
+		assertTrue(field3.isCompressed());
+		assertEquals("token3", field3.stringValue());
 
-  @Test
-  public void testCreateFieldTermVectorOffset() throws Exception {
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
-    fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_WITH_OFFSETS);
-    tokenStreams.remove(1);
-
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
-
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertTrue(field1.isStoreOffsetWithTermVector());
-    assertTrue(field1.isTermVectorStored());
-    assertFalse(field1.isStorePositionWithTermVector());
-  }
-
-  @Test
-  public void testCreateFieldTermVectorPositions() throws Exception {
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
-    fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_WITH_POSITIONS);
-    tokenStreams.remove(1);
-
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
-
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertFalse(field1.isStoreOffsetWithTermVector());
-    assertTrue(field1.isTermVectorStored());
-    assertTrue(field1.isStorePositionWithTermVector());
-  }
-
-  @Test
-  public void testCreateFieldTermVectorOffsetPositions() throws Exception {
-
-    fieldDescription.setMerge(true);
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
-    fieldDescription.setTermVector(FieldBuilder.FIELD_TERM_VECTOR_WITH_POSITIONS_OFFSETS);
-    tokenStreams.remove(1);
-
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
-
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertTrue(field1.isStoreOffsetWithTermVector());
-    assertTrue(field1.isTermVectorStored());
-    assertTrue(field1.isStorePositionWithTermVector());
-  }
-
-  @Test
-  public void testCreateFieldIndexStored() throws Exception {
-
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
-    fieldDescription.setStored(FieldBuilder.FIELD_STORE_YES);
-    tokenStreams.remove(1);
-
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
-
-    assertEquals(4, fields.size());
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertFalse(field1.isIndexed());
-    assertTrue(field1.isStored());
-    assertEquals("token1", field1.stringValue());
-
-    Field field2 = fieldIterator.next();
-    assertEquals("field1", field2.name());
-    assertFalse(field2.isIndexed());
-    assertTrue(field2.isStored());
-    assertEquals("token2", field2.stringValue());
-
-    Field field3 = fieldIterator.next();
-    assertEquals("field1", field3.name());
-    assertFalse(field3.isIndexed());
-    assertTrue(field3.isStored());
-    assertEquals("token3", field3.stringValue());
-
-    Field field4 = fieldIterator.next();
-    assertEquals("field1", field4.name());
-    assertTrue(field4.isIndexed());
-    assertFalse(field4.isStored());
-  }
-
-  @Test
-  public void testCreateFieldIndexStoredDelimiter() throws Exception {
-
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
-    fieldDescription.setStored(FieldBuilder.FIELD_STORE_YES);
-    fieldDescription.setDelimiter(" ");
-    tokenStreams.remove(1);
-
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
-
-    assertEquals(2, fields.size());
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertFalse(field1.isIndexed());
-    assertTrue(field1.isStored());
-    assertEquals("token1 token2 token3", field1.stringValue());
-
-    Field field2 = fieldIterator.next();
-    assertEquals("field1", field2.name());
-    assertTrue(field2.isIndexed());
-    assertFalse(field2.isStored());
-  }
-
-  @Test
-  public void testCreateFieldIndexStoredCompress() throws Exception {
-    fieldDescription.setIndex(FieldBuilder.FIELD_INDEX_YES);
-    fieldDescription.setStored(FieldBuilder.FIELD_STORE_COMPRESS);
-    tokenStreams.remove(1);
-
-    Collection<Field> fields = fieldBuilder.createFields(tokenStreams, fieldDescription);
-
-    assertEquals(4, fields.size());
-    Iterator<Field> fieldIterator = fields.iterator();
-    Field field1 = fieldIterator.next();
-    assertEquals("field1", field1.name());
-    assertFalse(field1.isIndexed());
-    assertTrue(field1.isStored());
-    assertTrue(field1.isCompressed());
-    assertEquals("token1", field1.stringValue());
-
-    Field field2 = fieldIterator.next();
-    assertEquals("field1", field2.name());
-    assertFalse(field2.isIndexed());
-    assertTrue(field2.isStored());
-    assertTrue(field2.isCompressed());
-    assertEquals("token2", field2.stringValue());
-
-    Field field3 = fieldIterator.next();
-    assertEquals("field1", field3.name());
-    assertFalse(field3.isIndexed());
-    assertTrue(field3.isStored());
-    assertTrue(field3.isCompressed());
-    assertEquals("token3", field3.stringValue());
-
-    Field field4 = fieldIterator.next();
-    assertEquals("field1", field4.name());
-    assertTrue(field4.isIndexed());
-    assertFalse(field4.isStored());
-  }
+		Field field4 = fieldIterator.next();
+		assertEquals("field1", field4.name());
+		assertTrue(field4.isIndexed());
+		assertFalse(field4.isStored());
+	}
 }

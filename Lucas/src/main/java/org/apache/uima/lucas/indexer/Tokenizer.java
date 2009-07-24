@@ -25,6 +25,7 @@ import java.io.StringReader;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.uima.lucas.indexer.mapping.AnnotationDescription;
 import org.apache.uima.lucas.indexer.util.TokenStreamStringConcatenator;
 
 public class Tokenizer {
@@ -49,8 +50,8 @@ public class Tokenizer {
           throws IOException {
     String tokenizer = description.getTokenizer();
     if (tokenizer != null && !tokenizer.equals(TOKENIZER_CAS)) {
-      String tokenStreamAsString =
-              tokenStreamStringConcatenator.tokenStreamToStringWithDelimiter(tokenStream, " ");
+      String tokenStreamAsString = tokenStreamStringConcatenator.tokenStreamToStringWithDelimiter(
+              tokenStream, " ");
       StringReader stringReader = new StringReader(tokenStreamAsString);
       if (tokenizer.equals(TOKENIZER_WHITESPACE))
         tokenStream = new WhitespaceTokenizer(stringReader);

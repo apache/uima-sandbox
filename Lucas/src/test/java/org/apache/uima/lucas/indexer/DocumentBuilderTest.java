@@ -36,31 +36,28 @@ import org.junit.Test;
 
 public class DocumentBuilderTest {
 
-  private Field field1;
+	private Field field1;
+	private Field field2;
+	private DocumentBuilder documentBuilder;
+	private Collection<Field> fields;
 
-  private Field field2;
-
-  private DocumentBuilder documentBuilder;
-
-  private Collection<Field> fields;
-
-  @Before
-  public void setUp() {
-    documentBuilder = new DocumentBuilder();
-
-    field1 = new Field("field1", createMock(TokenStream.class));
-    field2 = new Field("field2", createMock(TokenStream.class));
-    fields = new ArrayList<Field>();
-    fields.add(field1);
-    fields.add(field2);
-  }
-
-  @Test
-  public void testCreateDocument() throws CASException, IOException {
-    Document document = documentBuilder.createDocument(fields);
-
-    assertEquals(field1, document.getField("field1"));
-    assertEquals(field2, document.getField("field2"));
-  }
-
+	@Before
+	public void setUp(){
+		documentBuilder = new DocumentBuilder();
+		
+		field1 = new Field("field1", createMock(TokenStream.class));
+		field2 = new Field("field2", createMock(TokenStream.class));
+		fields = new ArrayList<Field>();		 
+		fields.add(field1);
+		fields.add(field2);
+	}
+	
+	@Test
+	public void testCreateDocument() throws CASException, IOException{
+		Document document = documentBuilder.createDocument(fields);
+		
+		assertEquals(field1, document.getField("field1"));
+		assertEquals(field2, document.getField("field2"));
+	}
+	
 }

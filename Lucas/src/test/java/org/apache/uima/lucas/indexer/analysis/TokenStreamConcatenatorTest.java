@@ -23,60 +23,61 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.uima.lucas.indexer.analysis.TokenStreamConcatenator;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 
+
+import junit.framework.TestCase;
+
 public class TokenStreamConcatenatorTest extends TestCase {
 
-  public void testNext() throws Exception {
-    Collection<TokenStream> tokenStreams = new ArrayList<TokenStream>();
-    List<Token> tokens = new ArrayList<Token>();
-    tokens.add(new Token("token1", 0, 6));
-    tokens.add(new Token("token2", 7, 13));
-    tokens.add(new Token("token3", 14, 20));
+	public void testNext() throws Exception{
+		Collection<TokenStream> tokenStreams = new ArrayList<TokenStream>();
+		List<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token("token1", 0, 6));
+		tokens.add(new Token("token2", 7, 13));
+		tokens.add(new Token("token3", 14, 20));
+		
+		TokenStream tokenStream = new CollectionTokenStream(tokens );
+		tokenStreams.add(tokenStream);
 
-    TokenStream tokenStream = new CollectionTokenStream(tokens);
-    tokenStreams.add(tokenStream);
+		tokens = new ArrayList<Token>();
+		tokens.add(new Token("token4", 21, 27));
+		tokens.add(new Token("token5", 28, 33));
+		tokens.add(new Token("token6", 34, 40));
 
-    tokens = new ArrayList<Token>();
-    tokens.add(new Token("token4", 21, 27));
-    tokens.add(new Token("token5", 28, 33));
-    tokens.add(new Token("token6", 34, 40));
-
-    tokenStream = new CollectionTokenStream(tokens);
-    tokenStreams.add(tokenStream);
-
-    TokenStreamConcatenator concatenator = new TokenStreamConcatenator(tokenStreams);
-
-    Token nextToken = concatenator.next();
-    assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token5", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token6", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-
-    concatenator.reset();
-    nextToken = concatenator.next();
-    assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token5", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    nextToken = concatenator.next();
-    assertEquals("token6", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-  }
+		tokenStream = new CollectionTokenStream(tokens );
+		tokenStreams.add(tokenStream);
+		
+		TokenStreamConcatenator concatenator = new TokenStreamConcatenator(tokenStreams);
+		
+		Token nextToken = concatenator.next();
+		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token5", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token6", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		
+		concatenator.reset();
+		nextToken = concatenator.next();
+		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token5", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = concatenator.next();
+		assertEquals("token6", new String(nextToken.termBuffer(), 0, nextToken.termLength()));		
+	}
 }

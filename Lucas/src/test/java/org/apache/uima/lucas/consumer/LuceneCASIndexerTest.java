@@ -19,146 +19,106 @@
 
 package org.apache.uima.lucas.consumer;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.easymock.EasyMock.capture;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.collection.CasConsumerDescription;
-import org.apache.uima.lucas.consumer.LuceneCASIndexer;
-import org.apache.uima.lucas.indexer.FieldDescription;
+import org.apache.uima.lucas.indexer.analysis.TokenFilterFactory;
+import org.apache.uima.lucas.indexer.mapping.FieldDescription;
+import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.util.InvalidXMLException;
 import org.apache.uima.util.XMLInputSource;
+import org.easymock.Capture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Maps;
+
 public class LuceneCASIndexerTest {
 
-  private static final String TOKEN_MAPPING_TXT = "tokenMapping.txt";
-
-  private static final String HYPERNYM_ID1 = "id1";
-
-  private static final Object HYPERNYM_ID2 = "id2";
-
-  private static final String[] STOP_WORDS = new String[] { "na", "und", "nu" };
-
+  private static final String TEST_FILTER_ANNOTATION = "testFilterAnnotation";
+  private static final String TEST_FILTER_FIELD = "testFilterField";
   private static final String FIELD_NAME = "annotation1";
+	private static final String DESCRIPTOR_FILE = "src/main/resources/LuceneCASIndexer.xml";
+	private static final String INDEX_DIRECTORY = "src/test/resources/test-index";
 
-  private static final String WRITE_LOCK = "write.lock";
+	private LuceneCASIndexer consumer;
 
-  private static final String DESCRIPTOR_FILE = "src/main/resources/LuceneCASIndexer.xml";
+	@Before
+	public void setUp() throws InvalidXMLException, IOException, ResourceInitializationException{
+		
+		  CasConsumerDescription consumerDescription = (CasConsumerDescription) UIMAFramework.getXMLParser().parseCasConsumerDescription(new XMLInputSource(DESCRIPTOR_FILE));
+		  consumer = (LuceneCASIndexer) UIMAFramework.produceCasConsumer(consumerDescription);
+	}
+	
+	@After
+	public void tearDown() throws Exception{
+		FSDirectory directory = (FSDirectory) consumer.getIndexWriter().getDirectory();
+		File directoryFile = directory.getFile();
+		consumer.destroy();
+		
+		directory = FSDirectory.getDirectory(directoryFile);
+		
+		for( String file: directory.list() )
+			directory.deleteFile(file);
 
-  private static final String INDEX_DIRECTORY = "src/test/resources/testIndex";
-
-  private LuceneCASIndexer consumer;
-
-  @Before
-  public void setUp() throws Exception {
-    CasConsumerDescription consumerDescription =
-            (CasConsumerDescription) UIMAFramework.getXMLParser().parseCasConsumerDescription(
-                    new XMLInputSource(DESCRIPTOR_FILE));
-    consumer = (LuceneCASIndexer) UIMAFramework.produceCasConsumer(consumerDescription);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-
-    FSDirectory directory = (FSDirectory) consumer.getIndexWriter().getDirectory();
-    File directoryFile = directory.getFile();
-    consumer.destroy();
-
-    directory = FSDirectory.getDirectory(directoryFile);
-
-    // directory.deleteFile(WRITE_LOCK);
-    for (String file : directory.list())
-      directory.deleteFile(file);
-
-    directory.getFile().delete();
-  }
-
-  @Test
-  public void testIndexOutDir() {
-    FSDirectory directory = (FSDirectory) consumer.getIndexWriter().getDirectory();
-
-    String path = directory.getFile().getPath();
-    assertTrue(path.contains(INDEX_DIRECTORY));
-  }
-
-  @Test
-  public void testMappingFile() {
-    Collection<FieldDescription> fieldDescriptions = consumer.getFieldDescriptions();
-    assertEquals(1, fieldDescriptions.size());
-    FieldDescription fieldDescription = fieldDescriptions.iterator().next();
-    assertEquals(FIELD_NAME, fieldDescription.getName());
-    assertEquals(2, fieldDescription.getAnnotationDescriptions().size());
-  }
-
-  @Test
-  public void testStopwordFile() {
-    String[] stopwords = consumer.getFilterBuilder().getStopwords();
-    assertArrayEquals(STOP_WORDS, stopwords);
-  }
-
-  @Test
-  public void testHypernymFile() {
-    Map<String, List<String>> hypernyms = consumer.getFilterBuilder().getHypernyms();
-    assertEquals(2, hypernyms.size());
-    assertTrue(hypernyms.containsKey(HYPERNYM_ID1));
-    assertTrue(hypernyms.containsKey(HYPERNYM_ID2));
-  }
-
-  @Test
-  public void testTokenMappingFile() {
-    Map<String, Map<String, String>> tokenMappings = consumer.getFilterBuilder().getMappings();
-    assertTrue(tokenMappings.containsKey(TOKEN_MAPPING_TXT));
-    assertEquals(2, tokenMappings.get(TOKEN_MAPPING_TXT).size());
-  }
-
-  @Test
-  public void testUniqueIndex() {
-    String hostname = getHostName();
-    String pid = getPID();
-
-    FSDirectory directory = (FSDirectory) consumer.getIndexWriter().getDirectory();
-
-    String path = directory.getFile().getPath();
-    assertTrue(path.endsWith(INDEX_DIRECTORY + "-" + hostname + "-" + pid));
-  }
-
-  @Test
-  public void testRamBufferSize() {
-    assertEquals(512, consumer.getIndexWriter().getRAMBufferSizeMB(), 0);
-  }
-
-  @Test
-  public void testCompoundFileFormat() {
-    assertTrue(consumer.getIndexWriter().getUseCompoundFile());
-  }
-
-  protected String getPID() {
-    String id = ManagementFactory.getRuntimeMXBean().getName();
-    return id.substring(0, id.indexOf("@"));
-  }
-
-  public String getHostName() {
-    InetAddress address;
-    String hostName;
-    try {
-      address = InetAddress.getLocalHost();
-      hostName = address.getHostName();
-    } catch (UnknownHostException e) {
-      throw new IllegalStateException(e);
-    }
-
-    return hostName;
-  }
+		directory.getFile().delete();
+	}
+	
+	@Test
+	public void testIndexOutDir(){
+		FSDirectory directory = (FSDirectory) consumer.getIndexWriter().getDirectory();
+		
+		String path = directory.getFile().getPath();
+		assertTrue(path.contains(INDEX_DIRECTORY));
+	}
+	
+	@Test
+	public void testMappingFile(){
+		Collection<FieldDescription> fieldDescriptions = consumer.getFieldDescriptions();
+		assertEquals(1, fieldDescriptions.size());
+		FieldDescription fieldDescription = fieldDescriptions.iterator().next();
+		assertEquals(FIELD_NAME, fieldDescription.getName());
+		assertEquals(2, fieldDescription.getAnnotationDescriptions().size());
+	}
+	
+	@Test
+	public void testPreloadResources() throws IOException{
+	  Collection<FieldDescription> fieldDescriptions = consumer.getFieldDescriptions();
+	  TokenFilterFactory testFactoryField = createMock(TokenFilterFactory.class);
+    TokenFilterFactory testFactoryAnnotation = createMock(TokenFilterFactory.class);
+    
+	  Capture<Properties> propertiesCaptureField = new Capture<Properties>();
+	  Capture<Properties> propertiesCaptureAnnotation = new Capture<Properties>();
+	  
+	  testFactoryField.preloadResources(capture(propertiesCaptureField));
+	  testFactoryAnnotation.preloadResources(capture(propertiesCaptureAnnotation));
+	  
+	  replay(testFactoryField);
+	  replay(testFactoryAnnotation);
+	  
+	  consumer.preloadResources(fieldDescriptions, Maps.immutableBiMap(TEST_FILTER_ANNOTATION, testFactoryAnnotation, 
+	                                                                   TEST_FILTER_FIELD, testFactoryField));	  
+	  verify(testFactoryField);
+	  verify(testFactoryAnnotation);
+	  
+	  Properties fieldFilterProperties = propertiesCaptureField.getValue();
+	  assertEquals("value1", fieldFilterProperties.getProperty("key1"));
+	  
+    Properties annotationFilterProperties = propertiesCaptureAnnotation.getValue();
+    assertEquals("value2", annotationFilterProperties.getProperty("key2"));
+	}
+	
 }

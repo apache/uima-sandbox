@@ -122,4 +122,5 @@ public class TokenStreamMerger extends TokenStream {
     sortedTokens.addAll(currentTokens.keySet());
     Collections.sort(sortedTokens, comparator);
   }
+
 }

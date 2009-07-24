@@ -28,47 +28,46 @@ import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.uima.lucas.indexer.AnnotationDescription;
 import org.apache.uima.lucas.indexer.Tokenizer;
+import org.apache.uima.lucas.indexer.mapping.AnnotationDescription;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 import org.junit.Before;
 import org.junit.Test;
 
+
 public class TokenizerTest {
-  private Tokenizer tokenizer;
+	private Tokenizer tokenizer;
+	private AnnotationDescription annotationDescription;
+	private TokenStream tokenStream; 
+	
+	@Before
+	public void setUp(){
+		tokenizer = new Tokenizer();
+		annotationDescription = new AnnotationDescription(null);
+		Collection<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token("token1".toCharArray(),0,6,0,6));
+		tokens.add(new Token("token2".toCharArray(),0,6,7,13));
+		tokens.add(new Token("token3".toCharArray(),0,6,14,20));
 
-  private AnnotationDescription annotationDescription;
-
-  private TokenStream tokenStream;
-
-  @Before
-  public void setUp() {
-    tokenizer = new Tokenizer();
-    annotationDescription = new AnnotationDescription(null);
-    Collection<Token> tokens = new ArrayList<Token>();
-    tokens.add(new Token("token1".toCharArray(), 0, 6, 0, 6));
-    tokens.add(new Token("token2".toCharArray(), 0, 6, 7, 13));
-    tokens.add(new Token("token3".toCharArray(), 0, 6, 14, 20));
-
-    tokenStream = new CollectionTokenStream(tokens);
-  }
-
-  @Test
-  public void testTokenizeWhiteSpace() throws Exception {
-    annotationDescription.setTokenizer(Tokenizer.TOKENIZER_WHITESPACE);
-    assertTrue(tokenizer.needsTokenization(annotationDescription));
-
-    TokenStream reTokenizedTokenStream = tokenizer.tokenize(tokenStream, annotationDescription);
-    assertTrue(reTokenizedTokenStream instanceof WhitespaceTokenizer);
-  }
-
-  @Test
-  public void testTokenizeStandard() throws Exception {
-    annotationDescription.setTokenizer(Tokenizer.TOKENIZER_STANDARD);
-    assertTrue(tokenizer.needsTokenization(annotationDescription));
-
-    TokenStream reTokenizedTokenStream = tokenizer.tokenize(tokenStream, annotationDescription);
-    assertTrue(reTokenizedTokenStream instanceof StandardTokenizer);
-  }
+		tokenStream = new CollectionTokenStream(tokens);
+	}
+	
+	@Test
+	public void testTokenizeWhiteSpace() throws Exception{
+		annotationDescription.setTokenizer(Tokenizer.TOKENIZER_WHITESPACE);
+		assertTrue(tokenizer.needsTokenization(annotationDescription));
+		
+		TokenStream reTokenizedTokenStream = tokenizer.tokenize(tokenStream, annotationDescription);
+		assertTrue(reTokenizedTokenStream instanceof WhitespaceTokenizer );
+	}
+	
+	@Test
+	public void testTokenizeStandard() throws Exception{
+		annotationDescription.setTokenizer(Tokenizer.TOKENIZER_STANDARD);
+		assertTrue(tokenizer.needsTokenization(annotationDescription));
+		
+		TokenStream reTokenizedTokenStream = tokenizer.tokenize(tokenStream, annotationDescription);
+		assertTrue(reTokenizedTokenStream instanceof StandardTokenizer );
+	}
 
 }

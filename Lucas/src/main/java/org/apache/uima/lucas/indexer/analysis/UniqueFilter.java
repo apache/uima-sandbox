@@ -72,4 +72,5 @@ public class UniqueFilter extends TokenFilter {
     input.reset();
     termTexts.clear();
   }
+
 }

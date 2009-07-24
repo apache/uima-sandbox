@@ -34,49 +34,49 @@ import org.junit.Test;
 
 public class SplitterFilterTest {
 
-  @Test
-  public void testNext() throws Exception {
-    Collection<Token> tokens = new ArrayList<Token>();
-    tokens.add(new Token("token1 token2 token3", 0, 6));
-    tokens.add(new Token("token4 token5 token6", 7, 13));
+	@Test
+	public void testNext() throws Exception{
+		Collection<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token("token1 token2 token3", 0, 6));
+		tokens.add(new Token("token4 token5 token6", 7, 13));
+		
+		TokenStream tokenStream = new CollectionTokenStream(tokens);
+		TokenFilter filter = new SplitterFilter(tokenStream, " ");
+		
+		Token nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		assertEquals(0, nextToken.startOffset());
+		assertEquals(6, nextToken.endOffset());
+		
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		assertEquals(0, nextToken.startOffset());
+		assertEquals(6, nextToken.endOffset());
+		
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		assertEquals(0, nextToken.startOffset());
+		assertEquals(6, nextToken.endOffset());
 
-    TokenStream tokenStream = new CollectionTokenStream(tokens);
-    TokenFilter filter = new SplitterFilter(tokenStream, " ");
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		assertEquals(7, nextToken.startOffset());
+		assertEquals(13, nextToken.endOffset());
 
-    Token nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    assertEquals(0, nextToken.startOffset());
-    assertEquals(6, nextToken.endOffset());
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token5", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		assertEquals(7, nextToken.startOffset());
+		assertEquals(13, nextToken.endOffset());
 
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    assertEquals(0, nextToken.startOffset());
-    assertEquals(6, nextToken.endOffset());
-
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    assertEquals(0, nextToken.startOffset());
-    assertEquals(6, nextToken.endOffset());
-
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    assertEquals(7, nextToken.startOffset());
-    assertEquals(13, nextToken.endOffset());
-
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token5", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    assertEquals(7, nextToken.startOffset());
-    assertEquals(13, nextToken.endOffset());
-
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token6", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-    assertEquals(7, nextToken.startOffset());
-    assertEquals(13, nextToken.endOffset());
-  }
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token6", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		assertEquals(7, nextToken.startOffset());
+		assertEquals(13, nextToken.endOffset());
+	}
 }

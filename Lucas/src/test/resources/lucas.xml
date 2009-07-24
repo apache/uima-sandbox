@@ -20,15 +20,27 @@
 -->
 
 <fields xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:noNamespaceSchemaLocation="lucas.xsd">
-  
-  <field name="annotation1" index="yes" termVector="no" stored="yes" merge="true">
-    <annotation type="de.julielab.jules.types.test.Annotation1">
-      <feature name="featureString"/>
-    </annotation>
-    <annotation type="de.julielab.jules.types.test.Annotation1">
-      <feature name="featureInteger" numberFormat="##"/>
-    </annotation>
-  </field>
-  
+	xsi:noNamespaceSchemaLocation="../../main/resources/lucas.xsd">
+
+	<field name="annotation1" index="yes" termVector="no" stored="yes"
+		merge="true">
+		<filters>
+			<filter name="testFilterField" key1="value1"/>
+		</filters>
+		<annotations>
+			<annotation type="de.julielab.jules.types.test.Annotation1">
+				<filters>
+					<filter name="testFilterAnnotation" key2="value2"/>
+				</filters>
+				<features>
+					<feature name="featureString" />
+				</features>
+			</annotation>
+			<annotation type="de.julielab.jules.types.test.Annotation1">
+				<features>
+					<feature name="featureInteger" numberFormat="##" />
+				</features>
+			</annotation>
+		</annotations>
+	</field>
 </fields>

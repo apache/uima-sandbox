@@ -19,9 +19,7 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,34 +31,37 @@ import org.apache.uima.lucas.indexer.analysis.PositionFilter;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 import org.junit.Test;
 
+
+
 public class PositionFilterTest {
 
-  @Test
-  public void testNext() throws Exception {
-    Collection<Token> tokens = new ArrayList<Token>();
-    tokens.add(new Token("token1", 0, 6));
-    tokens.add(new Token("token1", 7, 13));
-    tokens.add(new Token("token2", 14, 20));
-    tokens.add(new Token("token2", 21, 27));
-    tokens.add(new Token("token3", 28, 33));
-    tokens.add(new Token("token4", 34, 40));
+	@Test
+	public void testNext() throws Exception{
+		Collection<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token("token1", 0, 6));
+		tokens.add(new Token("token1", 7, 13));
+		tokens.add(new Token("token2", 14, 20));
+		tokens.add(new Token("token2", 21, 27));
+		tokens.add(new Token("token3", 28, 33));
+		tokens.add(new Token("token4", 34, 40));
+		
+		TokenStream tokenStream = new CollectionTokenStream(tokens);
+		TokenFilter filter = new PositionFilter(tokenStream, PositionFilter.FIRST_POSITION);
+		
+		Token nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		
+		nextToken = filter.next();
+		assertNull(nextToken);
 
-    TokenStream tokenStream = new CollectionTokenStream(tokens);
-    TokenFilter filter = new PositionFilter(tokenStream, PositionFilter.FIRST_POSITION);
-
-    Token nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-
-    nextToken = filter.next();
-    assertNull(nextToken);
-
-    filter = new PositionFilter(tokenStream, PositionFilter.LAST_POSITION);
-    nextToken = filter.next();
-    assertNotNull(nextToken);
-    assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
-
-    nextToken = filter.next();
-    assertNull(nextToken);
-  }
+		filter = new PositionFilter(tokenStream, PositionFilter.LAST_POSITION);
+		nextToken = filter.next();
+		assertNotNull(nextToken);
+		assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		
+		nextToken = filter.next();
+		assertNull(nextToken);
+	}
+	
 }

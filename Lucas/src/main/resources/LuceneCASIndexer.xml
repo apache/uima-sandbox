@@ -21,20 +21,13 @@
 
 <casConsumerDescription xmlns="http://uima.apache.org/resourceSpecifier">
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-  <implementationName>de.julielab.jules.consumer.LuceneCASIndexer</implementationName>
+  <implementationName>org.apache.uima.consumer.LuceneCASIndexer</implementationName>
   <processingResourceMetaData>
-    <name>LuceneCASIndexerDescriptor</name>
+    <name>LuceneCASIndexer</name>
     <description/>
-    <version>2.0</version>
-    <vendor>julielab</vendor>
+    <version>0.6</version>
+    <vendor>apache</vendor>
     <configurationParameters>
-      <configurationParameter>
-        <name>indexOutDir</name>
-        <description>defines the output directory where the index should be written</description>
-        <type>String</type>
-        <multiValued>false</multiValued>
-        <mandatory>true</mandatory>
-      </configurationParameter>
       <configurationParameter>
         <name>mappingFile</name>
         <description>path to the mapping file</description>
@@ -42,95 +35,12 @@
         <multiValued>false</multiValued>
         <mandatory>true</mandatory>
       </configurationParameter>
-      <configurationParameter>
-        <name>stopwordFile</name>
-        <type>String</type>
-        <multiValued>false</multiValued>
-        <mandatory>false</mandatory>
-      </configurationParameter>
-      <configurationParameter>
-        <name>hypernymFile</name>
-        <type>String</type>
-        <multiValued>false</multiValued>
-        <mandatory>false</mandatory>
-      </configurationParameter>
-      <configurationParameter>
-        <name>tokenMappingFile</name>
-        <description>Mapping file for replacement of  tokens.</description>
-        <type>String</type>
-        <multiValued>true</multiValued>
-        <mandatory>false</mandatory>
-      </configurationParameter>
-      <configurationParameter>
-        <name>uniqueIndex</name>
-        <type>Boolean</type>
-        <multiValued>false</multiValued>
-        <mandatory>false</mandatory>
-      </configurationParameter>
-      <configurationParameter>
-        <name>ramBufferSize</name>
-        <description>Sets the ram buffer size of the index writer. See lucene docs for further information.</description>
-        <type>Integer</type>
-        <multiValued>false</multiValued>
-        <mandatory>false</mandatory>
-      </configurationParameter>
-      <configurationParameter>
-        <name>compoundFileFormat</name>
-        <description>Determines wether the index writer should use compound file format or not.</description>
-        <type>Boolean</type>
-        <multiValued>false</multiValued>
-        <mandatory>false</mandatory>
-      </configurationParameter>
     </configurationParameters>
     <configurationParameterSettings>
       <nameValuePair>
         <name>mappingFile</name>
         <value>
           <string>src/test/resources/lucas.xml</string>
-        </value>
-      </nameValuePair>
-      <nameValuePair>
-        <name>indexOutDir</name>
-        <value>
-          <string>src/test/resources/testIndex</string>
-        </value>
-      </nameValuePair>
-      <nameValuePair>
-        <name>stopwordFile</name>
-        <value>
-          <string>src/test/resources/stopwords.txt</string>
-        </value>
-      </nameValuePair>
-      <nameValuePair>
-        <name>hypernymFile</name>
-        <value>
-          <string>src/test/resources/hypernyms.txt</string>
-        </value>
-      </nameValuePair>
-      <nameValuePair>
-        <name>tokenMappingFile</name>
-        <value>
-          <array>
-            <string>src/test/resources/tokenMapping.txt</string>
-          </array>
-        </value>
-      </nameValuePair>
-      <nameValuePair>
-        <name>uniqueIndex</name>
-        <value>
-          <boolean>true</boolean>
-        </value>
-      </nameValuePair>
-      <nameValuePair>
-        <name>ramBufferSize</name>
-        <value>
-          <integer>512</integer>
-        </value>
-      </nameValuePair>
-      <nameValuePair>
-        <name>compoundFileFormat</name>
-        <value>
-          <boolean>true</boolean>
         </value>
       </nameValuePair>
     </configurationParameterSettings>
@@ -146,9 +56,26 @@
     </capabilities>
     <operationalProperties>
       <modifiesCas>false</modifiesCas>
-      <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+      <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
       <outputsNewCASes>false</outputsNewCASes>
     </operationalProperties>
   </processingResourceMetaData>
-  <resourceManagerConfiguration/>
+  <resourceManagerConfiguration>
+    <externalResources>
+      <externalResource>
+        <name>LucasIndexWriterProvider</name>
+        <description>Provides a index writer instance.</description>
+        <fileResourceSpecifier>
+          <fileUrl>file:src/test/resources/IndexWriter.properties</fileUrl>
+        </fileResourceSpecifier>
+        <implementationName>org.apache.uima.indexer.IndexWriterProviderImpl</implementationName>
+      </externalResource>
+    </externalResources>
+    <externalResourceBindings>
+      <externalResourceBinding>
+        <key>indexWriterProvider</key>
+        <resourceName>LucasIndexWriterProvider</resourceName>
+      </externalResourceBinding>
+    </externalResourceBindings>
+  </resourceManagerConfiguration>
 </casConsumerDescription>

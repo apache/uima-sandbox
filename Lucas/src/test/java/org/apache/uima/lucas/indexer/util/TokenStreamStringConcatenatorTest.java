@@ -19,7 +19,7 @@
 
 package org.apache.uima.lucas.indexer.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,20 +31,18 @@ import org.junit.Test;
 
 public class TokenStreamStringConcatenatorTest {
 
-  @Test
-  public void testTokenStreamToStringWithDelimiter() throws Exception {
-    TokenStreamStringConcatenator tokenStreamStringConcatenator =
-            new TokenStreamStringConcatenator();
-    Collection<Token> tokens1 = new ArrayList<Token>();
-    tokens1.add(new Token("token1".toCharArray(), 0, 6, 0, 6));
-    tokens1.add(new Token("token2".toCharArray(), 0, 6, 7, 13));
-    tokens1.add(new Token("token3".toCharArray(), 0, 6, 14, 20));
+	@Test
+	public void testTokenStreamToStringWithDelimiter() throws Exception{
+		TokenStreamStringConcatenator tokenStreamStringConcatenator = new TokenStreamStringConcatenator();
+		Collection<Token> tokens1 = new ArrayList<Token>();
+		tokens1.add(new Token("token1".toCharArray(),0,6,0,6));
+		tokens1.add(new Token("token2".toCharArray(),0,6,7,13));
+		tokens1.add(new Token("token3".toCharArray(),0,6,14,20));
 
-    CollectionTokenStream tokenStream1 = new CollectionTokenStream(tokens1);
-    String concatenatedString =
-            tokenStreamStringConcatenator.tokenStreamToStringWithDelimiter(tokenStream1, " ");
-    assertEquals("token1 token2 token3", concatenatedString);
-
-  }
-
+		CollectionTokenStream tokenStream1 = new CollectionTokenStream(tokens1);
+		String concatenatedString = tokenStreamStringConcatenator.tokenStreamToStringWithDelimiter(tokenStream1, " ");
+		assertEquals("token1 token2 token3", concatenatedString);
+		
+	}
+	
 }

@@ -19,16 +19,18 @@
 
 package org.apache.uima.lucas.indexer;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.uima.cas.CASException;
 
 public class DocumentBuilder {
 
-  public Document createDocument(Collection<Field> fields) throws CASException, IOException {
+  public DocumentBuilder() {
+    super();
+  }
+
+  public Document createDocument(Collection<Field> fields) {
     Document document = new Document();
 
     for (Field field : fields)

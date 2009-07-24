@@ -26,29 +26,30 @@ import java.util.Iterator;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 
-public class CollectionTokenStream extends TokenStream {
+public class CollectionTokenStream extends TokenStream{
 
-  private Iterator<Token> tokenIterator;
+	private Iterator<Token> tokenIterator;
+	private Collection<Token> tokens;
+	
+	
+	public CollectionTokenStream(Collection<Token> tokens) {
+		super();
+		this.tokenIterator = tokens.iterator();
+		this.tokens = tokens;
+	}
 
-  private Collection<Token> tokens;
 
-  public CollectionTokenStream(Collection<Token> tokens) {
-    super();
-    this.tokenIterator = tokens.iterator();
-    this.tokens = tokens;
-  }
-
-  @Override
-  public Token next() throws IOException {
-    if (tokenIterator.hasNext())
-      return tokenIterator.next();
-    else
-      return null;
-  }
-
-  @Override
-  public void reset() throws IOException {
-    super.reset();
-    this.tokenIterator = tokens.iterator();
-  }
+	@Override
+	public Token next() throws IOException {
+		if( tokenIterator.hasNext() )
+			return tokenIterator.next();
+		else
+			return null;
+	}
+	
+	@Override
+	public void reset() throws IOException {
+		super.reset();
+		this.tokenIterator = tokens.iterator();
+	}
 }

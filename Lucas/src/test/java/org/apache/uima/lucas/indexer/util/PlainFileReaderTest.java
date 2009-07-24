@@ -28,47 +28,47 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.apache.uima.lucas.indexer.util.PlainFileReader;
 import org.junit.Before;
 import org.junit.Test;
 
 public class PlainFileReaderTest {
 
-  private BufferedReader reader;
 
-  @Before
-  public void setUp() {
-    reader = createMock(BufferedReader.class);
-  }
+	private BufferedReader reader;
+	
+	@Before
+	public void setUp(){
+		reader = createMock(BufferedReader.class);
+	}
+	
+	@Test
+	public void testReadFile() throws Exception{
+		PlainFileReader plainFileReader = new PlainFileReader(reader);
+		expect(reader.readLine()).andReturn("na");
+		expect(reader.readLine()).andReturn("und");
+		expect(reader.readLine()).andReturn("nu");
+		expect(reader.readLine()).andReturn(null);
 
-  @Test
-  public void testReadFile() throws Exception {
-    PlainFileReader plainFileReader = new PlainFileReader(reader);
-    expect(reader.readLine()).andReturn("na");
-    expect(reader.readLine()).andReturn("und");
-    expect(reader.readLine()).andReturn("nu");
-    expect(reader.readLine()).andReturn(null);
+		replay(reader);
+		
+		String[] lines = plainFileReader.readLines();
+		verify(reader);
+		
+		assertEquals(3, lines.length);
+		assertEquals("na", lines[0]);
+		assertEquals("und", lines[1]);
+		assertEquals("nu", lines[2]);
+		
+	}
+	
+	@Test
+	public void testClose() throws IOException{
+		PlainFileReader plainFileReader = new PlainFileReader(reader);
 
-    replay(reader);
-
-    String[] lines = plainFileReader.readLines();
-    verify(reader);
-
-    assertEquals(3, lines.length);
-    assertEquals("na", lines[0]);
-    assertEquals("und", lines[1]);
-    assertEquals("nu", lines[2]);
-
-  }
-
-  @Test
-  public void testClose() throws IOException {
-    PlainFileReader plainFileReader = new PlainFileReader(reader);
-
-    reader.close();
-    replay(reader);
-    plainFileReader.close();
-    verify(reader);
-  }
+		reader.close();
+		replay(reader);
+		plainFileReader.close();
+		verify(reader);
+	}
 
 }

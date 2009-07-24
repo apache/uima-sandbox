@@ -78,4 +78,5 @@ public class TokenStreamConcatenator extends TokenStream {
     else
       currentTokenStream = null;
   }
+
 }

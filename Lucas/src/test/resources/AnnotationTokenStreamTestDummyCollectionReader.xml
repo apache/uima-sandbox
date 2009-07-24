@@ -21,7 +21,7 @@
 
 <collectionReaderDescription xmlns="http://uima.apache.org/resourceSpecifier">
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-  <implementationName>de.julielab.jules.test.util.MockCollectionReader</implementationName>
+  <implementationName>org.apache.uima.indexer.test.util.MockCollectionReader</implementationName>
   <processingResourceMetaData>
     <name>MockCollectionReader Descriptor</name>
     <description>Mock collection reader. Does nothing</description>

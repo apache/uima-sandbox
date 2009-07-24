@@ -28,17 +28,24 @@ import org.apache.uima.util.Progress;
 
 public class MockCollectionReader extends CollectionReader_ImplBase {
 
-  public void getNext(CAS cas) throws IOException, CollectionException {
-  }
+	public void getNext(CAS arg0) throws IOException, CollectionException {
+		// TODO Auto-generated method stub
 
-  public void close() throws IOException {
-  }
+	}
 
-  public Progress[] getProgress() {
-    return null;
-  }
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
 
-  public boolean hasNext() throws IOException, CollectionException {
-    return false;
-  }
+	}
+
+	public Progress[] getProgress() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean hasNext() throws IOException, CollectionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -31,31 +31,34 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.uima.lucas.indexer.analysis.ReplaceFilter;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 
-public class ReplaceFilterTest extends TestCase {
 
-  public void testNext() throws Exception {
-    Map<String, String> mapping = new HashMap<String, String>();
-    mapping.put("token1", "replacement1");
-    mapping.put("token2", "replacement2");
-    mapping.put("token3", "replacement3");
 
-    Collection<Token> tokens = new ArrayList<Token>();
-    tokens.add(new Token("token1", 0, 6));
-    tokens.add(new Token("token2", 7, 13));
-    tokens.add(new Token("token3", 14, 20));
-    tokens.add(new Token("token4", 21, 27));
+public class ReplaceFilterTest extends TestCase{
 
-    TokenStream tokenStream = new CollectionTokenStream(tokens);
-    ReplaceFilter filter = new ReplaceFilter(tokenStream, mapping);
-
-    Token next = filter.next();
-    assertEquals("replacement1", new String(next.termBuffer(), 0, next.termLength()));
-    next = filter.next();
-    assertEquals("replacement2", new String(next.termBuffer(), 0, next.termLength()));
-    next = filter.next();
-    assertEquals("replacement3", new String(next.termBuffer(), 0, next.termLength()));
-    next = filter.next();
-    assertEquals("token4", new String(next.termBuffer(), 0, next.termLength()));
-
-  }
+	public void testNext() throws Exception{		
+		Map<String, String> mapping = new HashMap<String, String>();
+		mapping.put("token1", "replacement1");
+		mapping.put("token2", "replacement2");
+		mapping.put("token3", "replacement3");
+		
+		
+		Collection<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token("token1", 0, 6));
+		tokens.add(new Token("token2", 7, 13));
+		tokens.add(new Token("token3", 14, 20));
+		tokens.add(new Token("token4", 21, 27));
+		
+		TokenStream tokenStream = new CollectionTokenStream(tokens);
+		ReplaceFilter filter = new ReplaceFilter(tokenStream, mapping);
+		
+		Token next = filter.next();
+		assertEquals("replacement1", new String(next.termBuffer(), 0, next.termLength()));
+		next = filter.next();
+		assertEquals("replacement2", new String(next.termBuffer(), 0, next.termLength()));
+		next = filter.next();
+		assertEquals("replacement3", new String(next.termBuffer(), 0, next.termLength()));
+		next = filter.next();
+		assertEquals("token4", new String(next.termBuffer(), 0, next.termLength()));
+		
+	}
 }

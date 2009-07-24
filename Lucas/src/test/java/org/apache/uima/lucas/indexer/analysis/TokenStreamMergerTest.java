@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import junit.framework.TestCase;
 
 import org.apache.lucene.analysis.Token;
@@ -31,61 +32,60 @@ import org.apache.uima.lucas.indexer.analysis.TokenStreamMerger;
 import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
 
 public class TokenStreamMergerTest extends TestCase {
-  private TokenStreamMerger merger;
+	private TokenStreamMerger merger;
+	@Override
+	protected void setUp() throws Exception {
+		List<TokenStream> streams = new ArrayList<TokenStream>();
+		streams.add(new DummyTokenStream("1111", 1, 4, 0));
+		streams.add(new DummyTokenStream("2222", 2, 2, 1));
+		streams.add(new DummyTokenStream("3333", 3, 1, 2));
+		merger = new TokenStreamMerger(streams);
+	}
+	
+	public void testNext() throws IOException {
+		
+		Token currentToken = merger.next();
+		
+		assertEquals("1111", currentToken.termText());
+		assertEquals(0, currentToken.startOffset());
+		assertEquals(4, currentToken.endOffset());
+		assertEquals(1, currentToken.getPositionIncrement());
+		
+		currentToken = merger.next();		
+		assertEquals("1111", currentToken.termText());
+		assertEquals(5, currentToken.startOffset());
+		assertEquals(9, currentToken.endOffset());
+		assertEquals(1, currentToken.getPositionIncrement());
 
-  @Override
-  protected void setUp() throws Exception {
-    List<TokenStream> streams = new ArrayList<TokenStream>();
-    streams.add(new DummyTokenStream("1111", 1, 4, 0));
-    streams.add(new DummyTokenStream("2222", 2, 2, 1));
-    streams.add(new DummyTokenStream("3333", 3, 1, 2));
-    merger = new TokenStreamMerger(streams);
-  }
+		currentToken = merger.next();		
+		assertEquals("2222", currentToken.termText());
+		assertEquals(5, currentToken.startOffset());
+		assertEquals(9, currentToken.endOffset());
+		assertEquals(0, currentToken.getPositionIncrement());
 
-  public void testNext() throws IOException {
+		currentToken = merger.next();		
+		assertEquals("1111", currentToken.termText());
+		assertEquals(10, currentToken.startOffset());
+		assertEquals(14, currentToken.endOffset());
+		assertEquals(1, currentToken.getPositionIncrement());
 
-    Token currentToken = merger.next();
+		currentToken = merger.next();		
+		assertEquals("3333", currentToken.termText());
+		assertEquals(10, currentToken.startOffset());
+		assertEquals(14, currentToken.endOffset());
+		assertEquals(0, currentToken.getPositionIncrement());
 
-    assertEquals("1111", currentToken.termText());
-    assertEquals(0, currentToken.startOffset());
-    assertEquals(4, currentToken.endOffset());
-    assertEquals(1, currentToken.getPositionIncrement());
+		currentToken = merger.next();		
+		assertEquals("1111", currentToken.termText());
+		assertEquals(15, currentToken.startOffset());
+		assertEquals(19, currentToken.endOffset());
+		assertEquals(1, currentToken.getPositionIncrement());
 
-    currentToken = merger.next();
-    assertEquals("1111", currentToken.termText());
-    assertEquals(5, currentToken.startOffset());
-    assertEquals(9, currentToken.endOffset());
-    assertEquals(1, currentToken.getPositionIncrement());
-
-    currentToken = merger.next();
-    assertEquals("2222", currentToken.termText());
-    assertEquals(5, currentToken.startOffset());
-    assertEquals(9, currentToken.endOffset());
-    assertEquals(0, currentToken.getPositionIncrement());
-
-    currentToken = merger.next();
-    assertEquals("1111", currentToken.termText());
-    assertEquals(10, currentToken.startOffset());
-    assertEquals(14, currentToken.endOffset());
-    assertEquals(1, currentToken.getPositionIncrement());
-
-    currentToken = merger.next();
-    assertEquals("3333", currentToken.termText());
-    assertEquals(10, currentToken.startOffset());
-    assertEquals(14, currentToken.endOffset());
-    assertEquals(0, currentToken.getPositionIncrement());
-
-    currentToken = merger.next();
-    assertEquals("1111", currentToken.termText());
-    assertEquals(15, currentToken.startOffset());
-    assertEquals(19, currentToken.endOffset());
-    assertEquals(1, currentToken.getPositionIncrement());
-
-    currentToken = merger.next();
-    assertEquals("2222", currentToken.termText());
-    assertEquals(15, currentToken.startOffset());
-    assertEquals(19, currentToken.endOffset());
-    assertEquals(0, currentToken.getPositionIncrement());
-  }
+		currentToken = merger.next();		
+		assertEquals("2222", currentToken.termText());
+		assertEquals(15, currentToken.startOffset());
+		assertEquals(19, currentToken.endOffset());
+		assertEquals(0, currentToken.getPositionIncrement());
+	}
 
 }

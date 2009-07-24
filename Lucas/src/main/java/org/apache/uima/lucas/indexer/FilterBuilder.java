@@ -20,115 +20,141 @@
 package org.apache.uima.lucas.indexer;
 
 import java.io.IOException;
-import java.util.List;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.snowball.SnowballFilter;
-import org.apache.uima.lucas.indexer.analysis.AdditionTokenFilter;
-import org.apache.uima.lucas.indexer.analysis.HypernymTokenFilter;
-import org.apache.uima.lucas.indexer.analysis.PositionFilter;
-import org.apache.uima.lucas.indexer.analysis.ReplaceFilter;
-import org.apache.uima.lucas.indexer.analysis.SplitterFilter;
-import org.apache.uima.lucas.indexer.analysis.UniqueFilter;
-import org.apache.uima.lucas.indexer.analysis.UpperCaseTokenFilter;
+import org.apache.uima.lucas.indexer.analysis.TokenFilterFactory;
+import org.apache.uima.lucas.indexer.mapping.FilterDescription;
+import org.apache.uima.lucas.indexer.mapping.Locateable;
 
 public class FilterBuilder {
 
-  private String[] stopwords;
-
-  private Map<String, List<String>> hypernyms;
-
-  private Map<String, Map<String, String>> mappings;
-
   public static final Logger LOGGER = Logger.getLogger(FilterBuilder.class);
 
-  public static final String POSITION_FIRST = "first";
-
-  public static final String POSITION_LAST = "last";
-
-  public FilterBuilder(String[] stopwords, Map<String, List<String>> hypernyms,
-          Map<String, Map<String, String>> mappings) {
-    super();
-    this.stopwords = stopwords;
-    this.hypernyms = hypernyms;
-    this.mappings = mappings;
+  private Map<String, TokenFilterFactory> cachedFactories;
+  private Locateable currentLocateable;
+  
+  public FilterBuilder(Map<String, TokenFilterFactory> predefinedFactories) {
+    cachedFactories = predefinedFactories;
   }
 
-  public TokenStream filter(TokenStream tokenStream, AnnotationDescription description)
-          throws IOException {
+  public TokenStream filter(TokenStream tokenStream,
+          Collection<FilterDescription> filterDescriptions) throws FilterBuildingException {
 
-    String mappingFile = description.getMappingFile();
-    if (mappingFile != null) {
-      Map<String, String> mapping = mappings.get(mappingFile);
-      if (mapping == null)
-        throw new IllegalStateException(mappingFile + " not found!");
-      tokenStream = new ReplaceFilter(tokenStream, mapping);
+    TokenStream filteredTokenStream = tokenStream;
+    for (FilterDescription filterDescription : filterDescriptions) {
+      String filterName = filterDescription.getName();
+      String factoryClassName = filterDescription.getFactoryClassName();
+      String className = filterDescription.getClassName();
+      currentLocateable = filterDescription;
+      
+      // use cached factory to create filter 
+      if (filterName != null && factoryClassName == null) {
+        TokenFilterFactory tokenFilterFactory = cachedFactories.get(filterName);
+        if (tokenFilterFactory == null)
+          throw createException("No factory registered for " + filterName
+                  + ". Please provide a factory");
+        
+        filteredTokenStream = createTokenFilter(filteredTokenStream, filterDescription, tokenFilterFactory);
+      }
+      // use single argument constructor of a token filter
+      else if (className != null)
+      {
+        filteredTokenStream = createTokenFilterWithClassName(filteredTokenStream, className);
+      }
+      // use factory for creating the filter and cache it if needed
+      else if (factoryClassName != null) 
+      {
+        TokenFilterFactory tokenFilterFactory = createTokenFilterFactory(factoryClassName);
+        filteredTokenStream = createTokenFilter(filteredTokenStream, filterDescription, tokenFilterFactory);
+        if( filterDescription.isReuseFactory() ){
+          if( filterName == null )
+            throw createException("Provide a name for factory reuse ");
+          cachedFactories.put(filterName, tokenFilterFactory);
+        }
+      }
     }
 
-    // add filters
-    if (description.getPosition() != null) {
-      String position = description.getPosition();
-      if (position.equals(AnnotationDescription.FIRST_POSITION))
-        tokenStream = new PositionFilter(tokenStream, PositionFilter.FIRST_POSITION);
-      else if (position.equals(AnnotationDescription.LAST_POSITION))
-        tokenStream = new PositionFilter(tokenStream, PositionFilter.LAST_POSITION);
-    }
-
-    String prefix = description.getPrefix();
-    if (prefix != null)
-      tokenStream = new AdditionTokenFilter(tokenStream, prefix, AdditionTokenFilter.PREFIX);
-
-    String postfix = description.getPostfix();
-    if (postfix != null)
-      tokenStream = new AdditionTokenFilter(tokenStream, postfix, AdditionTokenFilter.POSTFIX);
-
-    String splitString = description.getSplitString();
-    if (splitString != null) {
-      tokenStream = new SplitterFilter(tokenStream, splitString);
-    }
-
-    if (description.getLowercase()) {
-      tokenStream = new LowerCaseFilter(tokenStream);
-    }
-
-    if (description.getUppercase()) {
-      tokenStream = new UpperCaseTokenFilter(tokenStream);
-    }
-
-    if (description.getStopwordRemove()) {
-      tokenStream = new StopFilter(tokenStream, stopwords);
-    }
-    if (description.getAddHypernyms()) {
-      if (hypernyms.size() == 0)
-        LOGGER.warn("hypernym adding activatet, but no hypernyms found!");
-
-      tokenStream = new HypernymTokenFilter(tokenStream, hypernyms);
-    }
-    String snowballFilter = description.getSnowballFilter();
-    if (snowballFilter != null) {
-      tokenStream = new SnowballFilter(tokenStream, snowballFilter);
-    }
-
-    if (description.getUnique()) {
-      tokenStream = new UniqueFilter(tokenStream);
-    }
-
-    return tokenStream;
+    return filteredTokenStream;
   }
 
-  public String[] getStopwords() {
-    return stopwords;
+  private TokenFilter createTokenFilter(TokenStream filteredTokenStream,
+          FilterDescription filterDescription, TokenFilterFactory tokenFilterFactory)
+          throws FilterBuildingException {
+    try {
+      return tokenFilterFactory.createTokenFilter(filteredTokenStream,
+              filterDescription.getProperties());
+    } catch (IOException e) {
+      throw createException("Can't build filter with description", e);
+    }
   }
 
-  public Map<String, List<String>> getHypernyms() {
-    return hypernyms;
+  private TokenFilterFactory createTokenFilterFactory(String factoryClassName)
+          throws FilterBuildingException {
+    try {
+      Class<?> clazz = Class.forName(factoryClassName);
+      Constructor<?>[] constructors = clazz.getConstructors();
+      for (Constructor<?> constructor : constructors) {
+        Class<?>[] parameters = constructor.getParameterTypes();
+        if (parameters.length == 0)
+          return (TokenFilterFactory) constructor.newInstance();
+      }
+    } catch (ClassNotFoundException e) {
+      throw createException("Can't instantiate TokenFilterFactory " + factoryClassName);
+    } catch (IllegalArgumentException e) {
+      throw createException("Can't instantiate TokenFilterFactory " + factoryClassName);
+    } catch (InstantiationException e) {
+      throw createException("Can't instantiate TokenFilterFactory " + factoryClassName);
+    } catch (IllegalAccessException e) {
+      throw createException("Can't instantiate TokenFilterFactory " + factoryClassName);
+    } catch (InvocationTargetException e) {
+      throw createException("Can't instantiate TokenFilterFactory " + factoryClassName);
+    }
+    throw new FilterBuildingException("Class " + factoryClassName + " has no public no argument constructor!");
   }
 
-  public Map<String, Map<String, String>> getMappings() {
-    return mappings;
+  private TokenFilter createTokenFilterWithClassName(TokenStream tokenStream, String className)
+          throws FilterBuildingException {
+    try {
+      Class<?> clazz = Class.forName(className);
+      Constructor<?>[] constructors = clazz.getConstructors();
+      for (Constructor<?> constructor : constructors) {
+        Class<?>[] parameters = constructor.getParameterTypes();
+        if (parameters.length == 1 && parameters[0].equals(TokenStream.class))
+          return (TokenFilter) constructor.newInstance(tokenStream);
+      }
+    } catch (ClassNotFoundException e) {
+      throw new FilterBuildingException("Can't instantiate TokenFilter " + className, e);
+    } catch (IllegalArgumentException e) {
+      throw new FilterBuildingException("Can't instantiate TokenFilter " + className, e);
+    } catch (InstantiationException e) {
+      throw new FilterBuildingException("Can't instantiate TokenFilter " + className, e);
+    } catch (IllegalAccessException e) {
+      throw new FilterBuildingException("Can't instantiate TokenFilter " + className, e);
+    } catch (InvocationTargetException e) {
+      throw new FilterBuildingException("Can't instantiate TokenFilter " + className, e);
+    }    
+    
+    throw createException("Class " + className + " has no public single argument constructor!");
   }
+
+  private FilterBuildingException createException(String message, Throwable cause){
+	 String extendedMessage = message + " at line " + currentLocateable.getLineNumber();
+	 return new FilterBuildingException(extendedMessage, cause);
+  }
+
+private FilterBuildingException createException(String message){
+	  String extendedMessage = message + " at line " + currentLocateable.getLineNumber();
+	  return new FilterBuildingException(extendedMessage);
+  }
+
+Map<String, TokenFilterFactory> getCachedFactories() {
+    return cachedFactories;
+  }
+
 }

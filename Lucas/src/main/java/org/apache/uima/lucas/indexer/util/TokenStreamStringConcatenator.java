@@ -27,13 +27,14 @@ import org.apache.lucene.analysis.TokenStream;
 public class TokenStreamStringConcatenator {
 
   /**
-   * Builds a string from the tokens that can be found in tokenStream and delimites the tokens with
-   * a given delimiter.
+   * builds a string from the tokens that can be found in tokenStream and delimites the tokens with
+   * a given delimiter
    * 
    * @param ts
    * @return a sting made of tokens
    * @throws IOException
    */
+
   public String tokenStreamToStringWithDelimiter(TokenStream ts, String delimiter)
           throws IOException {
     String tokenString = "";
@@ -41,9 +42,8 @@ public class TokenStreamStringConcatenator {
     while (true) {
       Token token = ts.next(newToken);
       if (token != null) {
-        tokenString =
-                tokenString.concat(new String(token.termBuffer(), 0, token.termLength())).concat(
-                        delimiter);
+        tokenString = tokenString.concat(new String(token.termBuffer(), 0, token.termLength()))
+                .concat(delimiter);
       } else {
         int lastIndex = tokenString.lastIndexOf(delimiter);
         if (lastIndex >= 0) {

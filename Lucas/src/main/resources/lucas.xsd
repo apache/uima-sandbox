@@ -62,44 +62,68 @@
     		<xs:enumeration value="first"/>
     		<xs:enumeration value="last"/>
   		</xs:restriction>
-	</xs:simpleType>	
+	</xs:simpleType>
+
+	<xs:element name="filters">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="filter" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="filter">
+		<xs:complexType>
+			<xs:attribute name="className" type="xs:string"/>
+			<xs:attribute name="factoryClassName" type="xs:string"/>
+			<xs:attribute name="reuseFactory" type="xs:boolean"/>
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:anyAttribute processContents="lax"/>
+		</xs:complexType>				
+	</xs:element>
+		
+	<xs:element name="features">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="feature" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	
 	<xs:element name="feature">
 		<xs:complexType>
 			<xs:attribute name="name" type="xs:string"/>
-			<xs:attribute name="uppercase" type="xs:boolean"/>
-			<xs:attribute name="lowercase" type="xs:boolean"/>
 			<xs:attribute name="numberFormat" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="annotations">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="annotation" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	
 	<xs:element name="annotation">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="feature" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="filters" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="features" minOccurs="1" maxOccurs="1"/>
 			</xs:sequence>				
 			<xs:attribute name="type" type="xs:string"/>
 			<xs:attribute name="sofa" type="xs:string"/>
 			<xs:attribute name="featurePath" type="xs:string"/>
-			<xs:attribute name="concatString" type="xs:string"/>
-			<xs:attribute name="splitString" type="xs:string"/>
-			<xs:attribute name="prefix" type="xs:string"/>
-			<xs:attribute name="uppercase" type="xs:boolean"/>
-			<xs:attribute name="lowercase" type="xs:boolean"/>
-			<xs:attribute name="stopwordRemove" type="xs:boolean"/>
-			<xs:attribute name="position" type="positionType"/>
-			<xs:attribute name="addHypernyms" type="xs:boolean"/>
-			<xs:attribute name="mappingFile" type="xs:string"/>
-			<xs:attribute name="snowballFilter" type="xs:string"/>
-			<xs:attribute name="unique" type="xs:boolean"/>
-			<xs:attribute name="tokenizer" type="tokenizerType"/>			
+			<xs:attribute name="tokenizer" type="tokenizerType"/>	
+			<xs:attribute name="featureValueDelimiterString" type="xs:string"/>		
 		</xs:complexType>
 	</xs:element>
 
 	<xs:element name="field">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="annotation" maxOccurs="unbounded"/>
+				<xs:element ref="filters" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="annotations" minOccurs="1" maxOccurs="1"/>
 			</xs:sequence>				
 			<xs:attribute name="name" type="xs:string"/>
 			<xs:attribute name="index" type="indexType"/>

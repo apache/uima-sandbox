@@ -74,4 +74,5 @@ public class SplitterFilter extends TokenFilter {
   public String getSplitString() {
     return splitString;
   }
+
 }
