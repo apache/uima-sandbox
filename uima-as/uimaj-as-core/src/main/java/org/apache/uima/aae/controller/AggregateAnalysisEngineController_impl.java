@@ -2333,7 +2333,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					XMLInputSource in1 = new XMLInputSource(bis, null);
 
 					resource = UIMAFramework.getXMLParser().parseResourceMetaData(in1);
-
+					if ( isStopped() ) {
+					  return;
+					}
 					getCasManagerWrapper().addMetadata((ProcessingResourceMetaData) resource);
 					analysisEngineMetaDataMap.put(key, (ProcessingResourceMetaData) resource);
 					
