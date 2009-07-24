@@ -52,9 +52,9 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 	private ConcurrentHashMap producerMap = new ConcurrentHashMap();
 	
 	public ActiveMQMessageSender(Connection aConnection,
-			List pendingMessageList, String aDestinationName,
+			String aDestinationName,
 			BaseUIMAAsynchronousEngineCommon_impl engine) throws Exception {
-		super(pendingMessageList, engine);
+		super(engine);
 		connection = aConnection;
 		destinationName = aDestinationName;
 	}
