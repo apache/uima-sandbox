@@ -586,7 +586,7 @@ public abstract class Delegate {
     }
     final long timeToWait = getTimeoutValueForCommand(aCommand);
     Date timeToRun = new Date(System.currentTimeMillis() + timeToWait);
-    timer = new Timer("Controller:" + getComponentName() + ":TimerThread-Endpoint_impl:" + endpoint
+    timer = new Timer("Controller:" + getComponentName() + ":Request TimerThread-Endpoint_impl:" + endpoint
             + ":" + System.nanoTime() + ":Cmd:" + aCommand);
     final Delegate delegate = this;
     timer.schedule(new TimerTask() {
