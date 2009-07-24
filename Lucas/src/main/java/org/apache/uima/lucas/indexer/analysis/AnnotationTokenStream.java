@@ -57,9 +57,6 @@ import com.google.common.collect.Maps;
  * <li>FSArray</li>
  * <li>Number types</li>
  * </ol>
- * 
- * @author landefeld
- * @version 0.2
  */
 public class AnnotationTokenStream extends TokenStream {
 
