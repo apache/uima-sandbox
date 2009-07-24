@@ -25,35 +25,28 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.Destination;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.console.command.StartCommand;
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.UIMA_IllegalArgumentException;
 import org.apache.uima.aae.AsynchAECasManager;
-import org.apache.uima.aae.AsynchAECasManager_impl;
 import org.apache.uima.aae.UIDGenerator;
-import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.UimaSerializer;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaASStatusCallbackListener;
@@ -78,11 +71,7 @@ import org.apache.uima.cas.impl.AllowPreexistingFS;
 import org.apache.uima.cas.impl.XmiSerializationSharedData;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.collection.EntityProcessStatus;
-import org.apache.uima.resource.CasDefinition;
-import org.apache.uima.resource.Resource;
-import org.apache.uima.resource.ResourceConfigurationException;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.util.Level;
@@ -90,7 +79,6 @@ import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.XMLInputSource;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 import org.apache.uima.aae.client.UimaASProcessStatus;
-import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.delegate.Delegate;
 import org.apache.uima.aae.delegate.Delegate.DelegateEntry;
 
@@ -193,8 +181,11 @@ implements UimaAsynchronousEngine, MessageListener
   
   private Object casProducerMux = new Object();
   
-	protected List pendingMessageList = new ArrayList();
+  protected BlockingQueue<PendingMessage> pendingMessageQueue = 
+    new LinkedBlockingQueue<PendingMessage>();
 	
+	// Create Semaphore that will signal when the producer object is initialized
+	protected Semaphore producerSemaphore = new Semaphore(1);
 	protected volatile boolean producerInitialized;
 	abstract public String getEndPointName() throws Exception;
   abstract protected TextMessage createTextMessage() throws Exception;
@@ -263,6 +254,10 @@ implements UimaAsynchronousEngine, MessageListener
 		collectionReader = aCollectionReader;
 	}
 		
+	private void addMessage(PendingMessage msg ) {
+    receivedCpcReply = false;
+    pendingMessageQueue.add(msg);
+	}
 	public synchronized void collectionProcessingComplete() throws ResourceProcessException
 	{
 		try
@@ -304,12 +299,9 @@ implements UimaAsynchronousEngine, MessageListener
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_started_cpc_request_timer_FINEST", new Object[] {});
       }
-			synchronized( pendingMessageList )
-			{
-			  receivedCpcReply = false;
-				pendingMessageList.add(msg);
-				pendingMessageList.notifyAll();
-			}
+      //  Add message to the pending queue
+      addMessage(msg);
+      
 
 			// Wait for CPC Reply. This blocks!
 			waitForCpcReply();
@@ -335,7 +327,7 @@ implements UimaAsynchronousEngine, MessageListener
 	  Iterator it = clientCache.keySet().iterator();
 	  while( it.hasNext() ) {
       ClientRequest entry = clientCache.get((String)it.next());
-	    if ( entry.getCAS() != null ) {
+	    if ( entry != null && entry.getCAS() != null ) {
 	      entry.getCAS().release();
 	    }
 	  }
@@ -607,13 +599,9 @@ implements UimaAsynchronousEngine, MessageListener
 		  serviceDelegate.startGetMetaRequestTimer();
 			msg.put(UimaAsynchronousEngine.GetMetaTimeout, String.valueOf(metadataTimeout));
 		}
-		synchronized( pendingMessageList )
-		{
-			pendingMessageList.add(msg);
-			pendingMessageList.notifyAll();
-		}
+    //  Add message to the pending queue
+    addMessage(msg);
 	}
-
 	protected void waitForCpcReply()
 	{
 		synchronized (endOfCollectionMonitor)
@@ -783,11 +771,8 @@ implements UimaAsynchronousEngine, MessageListener
 	        //  delegate.
 	        return casReferenceId;
 	      }
-	      synchronized( pendingMessageList )
-	      {
-	        pendingMessageList.add(msg);
-	        pendingMessageList.notifyAll();
-	      }
+	      //  Add message to the pending queue
+	      addMessage(msg);
 	      
 	      synchronized (cpcGate)
 	      {
@@ -917,7 +902,9 @@ implements UimaAsynchronousEngine, MessageListener
         while( serviceDelegate.getState() == Delegate.OK_STATE && 
                 ( casReferenceId = serviceDelegate.removeOldestFromPendingDispatchList()) != null ) {
           ClientRequest cachedRequest = (ClientRequest)clientCache.get(casReferenceId);
-          sendCAS(cachedRequest.getCAS(), cachedRequest);
+          if ( cachedRequest != null ) {
+            sendCAS(cachedRequest.getCAS(), cachedRequest);
+          }
         }
       }
       if ( serviceDelegate.getCasPendingReplyListSize() > 0) {
@@ -928,7 +915,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
     //cancelTimer(uniqueIdentifier);
 		int payload = ((Integer) message.getIntProperty(AsynchAEMessage.Payload)).intValue();
-
+		removeFromCache(uniqueIdentifier);
 		if (AsynchAEMessage.Exception == payload)
 		{
 			ProcessTrace pt = new ProcessTrace_impl();
@@ -2370,11 +2357,11 @@ implements UimaAsynchronousEngine, MessageListener
 	  private int clientCount;
 	  private Object mux = new Object();
 	  
-	  public Connection getConnection() {
+	  public synchronized Connection getConnection() {
       return connection;
     }
 
-    public void setConnection(Connection connection) {
+    public synchronized void setConnection(Connection connection) {
       this.connection = connection;
     }
 
