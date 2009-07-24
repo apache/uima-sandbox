@@ -63,5 +63,7 @@ public interface OutputChannel extends Channel
 	
 	public void stop();
 	
+	public void cancelTimers();
+	
     
 }
