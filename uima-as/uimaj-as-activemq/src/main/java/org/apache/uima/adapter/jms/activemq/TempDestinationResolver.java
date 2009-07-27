@@ -29,7 +29,6 @@ import org.springframework.jms.support.destination.DestinationResolver;
 
 public class TempDestinationResolver implements DestinationResolver
 {
-	private ActiveMQConnectionFactory factory = null;
 	private UimaDefaultMessageListenerContainer listener;
 	private Destination destination = null;
 	private Object mutex = new Object();
@@ -48,9 +47,9 @@ public class TempDestinationResolver implements DestinationResolver
 			if ( destination == null )
 			{
 				destination = session.createTemporaryQueue();
-        System.out.println(">>> Created New Temp Queue:"+destination+" Listener Hash:"+listener.hashCode());
 				if ( listener != null )
 				{
+	        System.out.println(">>> Created New Temp Queue:"+destination+" Listener Hash:"+listener.hashCode());
 					listener.setDestination(destination);
 				}
 			}
@@ -62,8 +61,11 @@ public class TempDestinationResolver implements DestinationResolver
 	{
 		listener = aListener;
 	}
-	public void setConnectionFactory( ActiveMQConnectionFactory aFactory )
-	{
-		factory = aFactory;
+	/**
+	 * called from Spring during initialization
+	 * 
+	 * @param aFactory
+	 */
+	public void setConnectionFactory( ActiveMQConnectionFactory aFactory ) {
 	}
 }
