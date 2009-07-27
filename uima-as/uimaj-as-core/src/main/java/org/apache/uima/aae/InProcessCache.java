@@ -198,28 +198,6 @@ public class InProcessCache implements InProcessCacheMBean
 	}
 	public void cancelTimers()
 	{
-		Iterator it = cache.keySet().iterator();
-		String key;
-		while( it.hasNext() )
-		{
-			key = (String)it.next();
-			CacheEntry entry = (CacheEntry)cache.get(key);
-			if ( entry != null )
-			{
-				Map em = entry.getEndpointMap();
-				if ( em != null )
-				{
-					Iterator it2 = em.keySet().iterator();
-					String endpointKey ="";
-
-					while( it2.hasNext())
-					{
-						endpointKey = (String)it2.next();
-						Endpoint end = (Endpoint)em.get(endpointKey);
-					}
-				}
-			}
-		}
 	}
 	public boolean isEmpty()
 	{
@@ -592,10 +570,6 @@ public class InProcessCache implements InProcessCacheMBean
 		
 		private DelegateStats stats;
 		
-		private int numberOfParallelDelegates = 1;
-		
-		private int howManyDelegatesResponded = 0;
-		
 		private MessageContext messageAccessor;
 
 		private OutOfTypeSystemData otsd = null;
@@ -683,7 +657,7 @@ public class InProcessCache implements InProcessCacheMBean
 			casReferenceId = aCasReferenceId;
 			try
 			{
-				if ( aMessageAccessor.propertyExists(AsynchAEMessage.CasSequence) )
+				if ( aMessageAccessor != null && aMessageAccessor.propertyExists(AsynchAEMessage.CasSequence) )
 				{
 					sequence = aMessageAccessor.getMessageLongProperty(AsynchAEMessage.CasSequence);
 				}
@@ -758,30 +732,6 @@ public class InProcessCache implements InProcessCacheMBean
 		{
 			return timeToSerializeCAS;
 		}
-/*
-		public synchronized void incrementHowManyDelegatesResponded()
-		{
-			howManyDelegatesResponded++;
-		}
-		public synchronized int howManyDelegatesResponded()
-		{
-			return howManyDelegatesResponded;
-		}
-		
-		public synchronized void resetDelegateResponded()
-		{
-			howManyDelegatesResponded = 0;
-		}
-		public void setNumberOfParallelDelegates( int aNumberOfParallelDelegates )
-		{
-			numberOfParallelDelegates = aNumberOfParallelDelegates;
-		}
-		
-		public int getNumberOfParallelDelegates()
-		{
-			return numberOfParallelDelegates;
-		}
-	*/	
 		public Endpoint getMessageOrigin()
 		{
 			//Endpoint ep = (Endpoint)originStack.pop();
@@ -809,10 +759,6 @@ public class InProcessCache implements InProcessCacheMBean
 			if ( endpointMap.containsKey(anEndpointName))
 			{
 				endpointMap.remove(anEndpointName);
-			}
-			else
-			{
-				//System.out.println("!!!!!!!!!!!!!! Unable to Remove Endpoint from cache. Endpoint Name::"+anEndpointName+" Not In Cache");
 			}
 		}
 		protected void deleteCAS()
