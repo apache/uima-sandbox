@@ -97,8 +97,7 @@ public class SpringContainerDeployer implements ControllerCallbackListener {
 		for( int i=0; i < inputChannelBeanIds.length; i++)
 		{
 			JmsInputChannel inputChannel = (JmsInputChannel)ctx.getBean(inputChannelBeanIds[i]);
-			if ( inputChannel.getName().startsWith("top_level_input_queue_service") &&
-				 inputChannel instanceof JmsInputChannel )
+			if ( inputChannel.getName().startsWith("top_level_input_queue_service") )
 			{
 			  while ( (factory = ((JmsInputChannel)inputChannel).getConnectionFactory()) == null ) {
 			    try {
