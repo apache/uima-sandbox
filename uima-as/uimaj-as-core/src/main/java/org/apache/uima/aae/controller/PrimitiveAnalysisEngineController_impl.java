@@ -449,7 +449,9 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 							  if ( casProduced != null ) {
 	                casProduced.release();
 	              }
-							} catch( Exception e) {}
+							} catch( Exception e) {
+			           System.out.println("Controller:"+getComponentName()+" Attempt to release CAS Failed");
+							}
 			        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
 			          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stopped_producing_new_cases__INFO", new Object[] { Thread.currentThread().getId(),getComponentName(),aCasReferenceId });
 			        }
@@ -789,7 +791,8 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
 		          entry.getCas().release();
 		        }
 		      } catch ( Exception e) {
-		        
+            System.out.println("Controller:"+getComponentName()+" CAS:"+casId+" Not Found In Cache");
+
 		      }
 		    }
 		    
