@@ -55,7 +55,7 @@ public class EECasManager_impl extends CasManager_impl
 		if ( initialCasHeapSize > 0 )
 		{
 			aPerformanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, 
-					new Integer((int)initialCasHeapSize).toString() );
+					Integer.valueOf((int)initialCasHeapSize).toString() );
 		}	
 		super.defineCasPool(aRequestorContextName, aMinimumSize, aPerformanceTuningSettings);
 	}
@@ -70,7 +70,7 @@ public class EECasManager_impl extends CasManager_impl
 		if ( initialCasHeapSize > 0 )
 		{
 			aPerformanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, 
-					new Integer((int)initialCasHeapSize).toString() );
+					Integer.valueOf((int)initialCasHeapSize).toString() );
 		}	
 		super.defineCasPool(aRequestorContext, aMinimumSize, aPerformanceTuningSettings);
 	}
@@ -97,9 +97,5 @@ protected void finalize() throws Throwable
 }
 
   public void cleanUp() {
-    try {
-      this.finalize();
-    } catch( Throwable t ) { t.printStackTrace();}
-    
   }
 }
