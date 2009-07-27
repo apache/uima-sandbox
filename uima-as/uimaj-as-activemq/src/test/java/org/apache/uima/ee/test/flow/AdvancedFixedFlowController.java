@@ -282,8 +282,7 @@ public class AdvancedFixedFlowController extends CasFlowController_ImplBase {
         mLogger.log(Level.FINE, "CAS " + flowId + " at final step - will"
                 + (((FinalStep) nextStep).getForceCasToBeDropped() ? "" : " not") + " be dropped");
       } else if (nextStep instanceof ParallelStep) {
-        String[] keys = (String[]) ((ParallelStep) nextStep).getAnalysisEngineKeys().toArray(
-                new String[0]);
+        ((ParallelStep) nextStep).getAnalysisEngineKeys().toArray( new String[0]);
         stepName = ((ParallelStep) nextStep).getAnalysisEngineKeys().toString();
         mLogger.log(Level.FINE, "CAS " + flowId + " sent in parallel to: " + stepName);
       }
