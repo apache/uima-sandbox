@@ -190,6 +190,10 @@ public class UimaSerializer
         xmlReader = (XMLReader) xmlReaderMap.get(Thread.currentThread().getId());
       }
     }
+    if ( xmlReader == null ) {
+      throw new ParserConfigurationException("XMLReaderMap Doesnt Contain a Reader Object for Key:"+Thread.currentThread().getId());
+    }
+
     Reader reader = new StringReader(anXmlStr);
     XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
     ContentHandler handler = deser.getXmiCasHandler(aCAS, aLenient, aSharedData, aMergePoint);
@@ -209,6 +213,9 @@ public class UimaSerializer
       } else {
         xmlReader = (XMLReader) xmlReaderMap.get(Thread.currentThread().getId());
       }
+    }
+    if ( xmlReader == null ) {
+      throw new ParserConfigurationException("XMLReaderMap Doesnt Contain a Reader Object for Key:"+Thread.currentThread().getId());
     }
     Reader reader = new StringReader(anXmlStr);
     XmiCasDeserializer deser = new XmiCasDeserializer(aCAS.getTypeSystem());
