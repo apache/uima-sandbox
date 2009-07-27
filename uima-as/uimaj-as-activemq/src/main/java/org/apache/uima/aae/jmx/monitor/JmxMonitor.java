@@ -380,6 +380,9 @@ public class JmxMonitor implements Runnable {
       try  {
         //  Fetch previous metrics for service identified by 'name'
         StatEntry entry = stats.get(name);
+        if ( entry == null ) {
+          continue;
+        }
         ServiceInfoMBean serviceInfo = entry.getServiceInfoMBeanProxy();
         CasPoolManagementImplMBean getServiceCasPoolMBeanProxy = entry.getServiceCasPoolMBeanProxy();
         boolean isRemote = serviceInfo.getBrokerURL().startsWith("tcp:");
@@ -445,7 +448,7 @@ public class JmxMonitor implements Runnable {
         serviceMetrics.setCasMultiplier(entry.getServiceInfoMBeanProxy().isCASMultiplier());
         serviceMetrics.setServiceRemote(isRemote);
         serviceMetrics.setTopLevelService(topLevel);
-        serviceMetrics.setTimestamp(uptime/1000000);
+        serviceMetrics.setTimestamp((double)uptime/1000000);
         serviceMetrics.setIdleTime(deltaIdleTime);
         serviceMetrics.setServiceName(name.getKeyProperty("name"));
         serviceMetrics.setProcessCount(processCount-entry.getLastCASCount());
