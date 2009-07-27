@@ -338,9 +338,11 @@ implements UimaAsynchronousEngine, MessageListener
     while( it.hasNext() ) {
       Long key = (Long)it.next();
       CasQueueEntry entry = threadRegistrar.get(key);
-      synchronized( entry.getMonitor() ) {
-        entry.signal();
-        entry.getMonitor().notifyAll();
+      if ( entry != null ) {
+        synchronized( entry.getMonitor() ) {
+          entry.signal();
+          entry.getMonitor().notifyAll();
+        }
       }
    }
 	}
@@ -540,7 +542,9 @@ implements UimaAsynchronousEngine, MessageListener
 	  CasQueueEntry entry = null;
 	  if ( threadRegistrar.containsKey(aThreadId ) ) {
 	   entry = threadRegistrar.get(aThreadId);
-	   entry.reset();
+	   if ( entry != null ) {
+	     entry.reset();
+	   }
 	 } else {
 	   entry = new CasQueueEntry();
 	   threadRegistrar.put(aThreadId, entry);
@@ -554,7 +558,7 @@ implements UimaAsynchronousEngine, MessageListener
 		receivedMetaReply = false;
 	}
 
-	private class CasQueueEntry {
+	private  class CasQueueEntry {
 	  private CAS cas;
 	  private Object monitor = new Object();
 	  private volatile boolean signaled = false;
@@ -1052,11 +1056,12 @@ implements UimaAsynchronousEngine, MessageListener
       //  of the reply. The message has been stored in the cache and 
       //  when the thread wakes up due to notification below, it will
       //  retrieve the reply and process it.
-      synchronized( threadMonitor.getMonitor() )
-      {
-        threadMonitor.setWasSignaled();
-        cachedRequest.setReceivedProcessCasReply();
-        threadMonitor.getMonitor().notifyAll();
+      if ( threadMonitor != null && threadMonitor.getMonitor() != null) {
+        synchronized( threadMonitor.getMonitor() )
+        {
+          threadMonitor.setWasSignaled();
+          threadMonitor.getMonitor().notifyAll();
+        }
       }
     }
 	  
@@ -1870,11 +1875,12 @@ implements UimaAsynchronousEngine, MessageListener
         {
           ThreadMonitor threadMonitor = (ThreadMonitor) threadMonitorMap.get(cachedRequest.getThreadId());
           //  Unblock the sending thread so that it can complete processing with an error
-          synchronized( threadMonitor.getMonitor() )
-          {
-            threadMonitor.setWasSignaled();
-            cachedRequest.setReceivedProcessCasReply(); // should not be needed
-            threadMonitor.getMonitor().notifyAll();
+          if ( threadMonitor != null && threadMonitor.getMonitor() != null) {
+            synchronized( threadMonitor.getMonitor() )
+            {
+              threadMonitor.setWasSignaled();
+              threadMonitor.getMonitor().notifyAll();
+            }
           }
         }
       }
@@ -1941,8 +1947,6 @@ implements UimaAsynchronousEngine, MessageListener
 
 		private String endpoint;
 
-		private volatile boolean receivedProcessCasReply = false;
-		
 		private long threadId=-1;
 		
 		private Message message;
@@ -2075,10 +2079,6 @@ implements UimaAsynchronousEngine, MessageListener
 		public long getThreadId()
 		{
 			return threadId;
-		}
-		public void setReceivedProcessCasReply()
-		{
-			receivedProcessCasReply = true;
 		}
 		public void setMetadataTimeout( int aTimeout )
 		{
