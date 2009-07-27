@@ -57,11 +57,19 @@ public class UimaVmMessage extends ConcurrentHashMap<String, Object> implements 
   }
 
   public int getIntProperty(String propertyKey) {
-    return new Integer((Integer) super.get(propertyKey)).intValue();
+    Object value = super.get(propertyKey);
+    if ( value != null ) {
+      return Integer.valueOf((Integer)value );
+    }
+    return 0;
   }
 
   public String getStringProperty(String propertyKey) {
-    return String.valueOf((String) super.get(propertyKey));
+    Object value = super.get(propertyKey);
+    if (value != null ) {
+      return (String)value;
+    }
+    return "";
   }
 
   public void addStringCargo(String aCargo) {
@@ -77,7 +85,11 @@ public class UimaVmMessage extends ConcurrentHashMap<String, Object> implements 
   }
 
   public long getLongProperty(String propertyKey) {
-    return new Long((Long) super.get(propertyKey)).longValue();
+    Object value = super.get(propertyKey);
+    if ( value != null ) {
+      return Long.valueOf((Long) value);
+    }
+    return 0;
   }
 
   public void addBooleanProperty(String aPropertyKey, boolean value) {
@@ -85,7 +97,11 @@ public class UimaVmMessage extends ConcurrentHashMap<String, Object> implements 
   }
 
   public boolean getBooleanProperty(String aPropertyKey) {
-    return ((Boolean) super.get(aPropertyKey)).booleanValue();
+    Object value = super.get(aPropertyKey);
+    if ( value != null ) {
+      return ((Boolean)value ).booleanValue();
+    }
+    return false;
   }
 
   public String toString() {
