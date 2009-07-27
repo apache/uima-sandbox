@@ -79,7 +79,12 @@ extends BaseAnalysisEngineController
 implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_implMBean
 {
 
-	private static final Class CLASS_NAME = AggregateAnalysisEngineController_impl.class;
+	/**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+  private static final Class CLASS_NAME = AggregateAnalysisEngineController_impl.class;
 
 	private static final int SERVICE_INFO_INDX = 0;
 
@@ -128,7 +133,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	private volatile boolean requestForMetaSentToRemotes = false;
 
 	private ConcurrentHashMap<String, Object[]> delegateStatMap = 
-		new ConcurrentHashMap();
+		new ConcurrentHashMap<String, Object[]>();
 	
 	public final Object parallelStepMux = new Object();
 	
@@ -509,7 +514,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	 * 
 	 * @param aFlowControllerDescriptor
 	 */
-	public void setFlowControllerDescriptor(String aFlowControllerDescriptor)
+	public synchronized void setFlowControllerDescriptor(String aFlowControllerDescriptor)
 	{
 		flowControllerDescriptor = aFlowControllerDescriptor;
 	}
@@ -704,6 +709,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
   }
 	protected void disableDelegates(List aDelegateList, String aCasReferenceId) throws AsynchAEException
 	{
+    if ( aDelegateList == null ) {
+      throw new AsynchAEException("Controller:"+getComponentName()+" Unable To Disable a Delegate. The Delegate List Provided Is Invalid (Null)");
+    }
 		try
 		{
 			Iterator it = aDelegateList.iterator();
@@ -751,7 +759,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	         if ( aCasReferenceId != null ) {
 	           CasStateEntry parentCasCacheEntry = 
 	             getLocalCache().getTopCasAncestor(aCasReferenceId);
-	           if ( parentCasCacheEntry != null && aDelegateList != null && aDelegateList.size() > 0 ) {
+	           if ( parentCasCacheEntry != null && aDelegateList.size() > 0 ) {
 	             String delegateKey = (String)aDelegateList.get(0);
 	             System.out.println("Controller:"+getComponentName()+" Terminating Due to FlowController Failure While Disabling Delegate:"+delegateKey+" Cas:"+parentCasCacheEntry.getCasReferenceId());
 	             super.terminate(ex, parentCasCacheEntry.getCasReferenceId());
@@ -915,16 +923,15 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 					throw new AsynchAEException("Flow Object Not In Flow Cache. Expected Flow Object in FlowCache for Cas Reference Id:" + anInputCasReferenceId);
 				}
 
-			}
-			catch( Exception ex)
-			{
-				//	Any error here is automatic termination
-				ex.printStackTrace();
+			} catch (Throwable t) {
+        //  Any error here is automatic termination
+        t.printStackTrace();
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { ex });
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, CLASS_NAME.getName(), "process", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_exception__WARNING", new Object[] { t });
         }
-				handleAction(ErrorHandler.TERMINATE, null, null);
-				return;
+        handleAction(ErrorHandler.TERMINATE, null, null);
+        return;
+			  
 			}
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(),
@@ -1229,7 +1236,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				}
 			}
 		}
-		catch ( Exception e)
+		catch ( Throwable e)
 		{
 			HashMap map = new HashMap();
 			map.put(AsynchAEMessage.Command, AsynchAEMessage.Process);
@@ -1317,7 +1324,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
         process( null, aCasReferenceId);
       }
 		}
-		catch ( Exception e)
+		catch ( Throwable e)
 		{
 			HashMap map = new HashMap();
 			map.put(AsynchAEMessage.Command, AsynchAEMessage.Process);
@@ -2349,8 +2356,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 						Object o = null;
 						remoteDelegateServiceInfo =
 							getDelegateServiceInfo(key);
-						if ( remoteDelegateServiceInfo != null && remoteDelegateServiceInfo instanceof PrimitiveServiceInfo &&
-							 ( o = ((ProcessingResourceMetaData) resource).getConfigurationParameterSettings().getParameterValue(AnalysisEngineController.AEInstanceCount)) != null )
+						if ( remoteDelegateServiceInfo != null &&
+						        ( o = ((ProcessingResourceMetaData) resource).getConfigurationParameterSettings().getParameterValue(AnalysisEngineController.AEInstanceCount)) != null )
 						{
 							((PrimitiveServiceInfo)remoteDelegateServiceInfo).setAnalysisEngineInstanceCount(((Integer)o).intValue());
 						}
@@ -2455,10 +2462,7 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		
 		if (disabledDelegateList.size() > 0)
 		{
-			synchronized( flowControllerContainer )
-			{
-				flowControllerContainer.removeAnalysisEngines(disabledDelegateList);
-			}
+      flowControllerContainer.removeAnalysisEngines(disabledDelegateList);
 		}
 		
 		//	Before processing CASes, send notifications to all collocated delegates to
@@ -2552,13 +2556,16 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 	  if ( isStopped() ) {
 	    return;
 	  }
+	  if ( anEndpoint == null ) {
+	    throw new AsynchAEException("Controller:"+getComponentName()+" Unable To Dispatch GetMeta Request. Provided Endpoint is Invalid (NULL)");
+	  }
 		anEndpoint.startMetadataRequestTimer();
 		anEndpoint.setController(this);
 		anEndpoint.setWaitingForResponse(true);
 		String key = lookUpDelegateKey(anEndpoint.getEndpoint());
 		if ( key != null && !delegateStatMap.containsKey(key))
 		{
-			if ( key != null && anEndpoint != null)
+			if ( key != null )
 			{
 				ServiceInfo serviceInfo = anEndpoint.getServiceInfo();
 				PrimitiveServiceInfo pServiceInfo = new PrimitiveServiceInfo();
@@ -2633,7 +2640,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
           if (parentEntry != null ) {
             parentCasReferenceId = parentEntry.getCasReferenceId();
           }
-        } catch ( Exception e) {}
+        } catch ( Exception e) {
+          System.out.println("Controller:"+getComponentName()+" Parent CAS For CAS:"+casReferenceId+" Not Found In Cache");
+        }
 				getInProcessCache().getEndpoint(anEndpoint, casReferenceId).cancelTimer();
 				Endpoint requestOrigin = cachedEntries[i].getMessageOrigin();
 				try
