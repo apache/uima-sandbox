@@ -34,17 +34,11 @@ import org.apache.uima.aae.monitor.statistics.Statistics;
 
 public class BaseMonitor implements Monitor
 {
-	private Map monitorMap = new HashMap();
-	private MBeanServerConnection server;
 	private Map thresholds = null;
 	
 
 	public BaseMonitor( String jmxServerURI ) throws Exception
 	{
-		JMXServiceURL url = new JMXServiceURL (jmxServerURI) ;
-		JMXConnector connector = JMXConnectorFactory.connect(url);
-		server =connector.getMBeanServerConnection();
-		
 	}
 
 	public void setThresholds( Map aThresholdMap)
@@ -58,12 +52,6 @@ public class BaseMonitor implements Monitor
 	
 	public void addStatistic(String aName, Statistic aStatistic, Endpoint anEndpoint)
 	{
-		
-//		if ( aStatistic.isJMXEnabled())
-//		{
-//			//server.
-//		}
-		
 	}
 
 	public Statistic getStatistic(String key)
