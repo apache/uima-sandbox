@@ -570,7 +570,7 @@ public abstract class Delegate {
    * @param aCommand
    *          - command for which the timer is started
    */
-  private void startDelegateTimer(final String aCasReferenceId, final int aCommand) {
+  private synchronized void startDelegateTimer(final String aCasReferenceId, final int aCommand) {
     //  Check if we are awaiting a Ping reply. While awaiting ping reply dont start
     //  a new timer.
     if ( isAwaitingPingReply() ) {
