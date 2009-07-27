@@ -229,7 +229,9 @@ implements AnalysisEngineController, EventSubscriber
   
   //  Set to true when stopping the service
   private volatile boolean releasedAllCASes;
-  
+  public BaseAnalysisEngineController() {
+    
+  }
 	public BaseAnalysisEngineController(AnalysisEngineController aParentController, int aComponentCasPoolSize, String anEndpointName, String aDescriptor, AsynchAECasManager aCasManager, InProcessCache anInProcessCache) throws Exception
 	{
 		this(aParentController, aComponentCasPoolSize, 0, anEndpointName, aDescriptor, aCasManager, anInProcessCache, null, null);
@@ -440,7 +442,7 @@ implements AnalysisEngineController, EventSubscriber
     if ( ManagementFactory.getPlatformMBeanServer() != null )
     {
       RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-      MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+//      MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
       OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
       //  bean.getName() should return a string that looks like this: PID@HOSTNAME
       //  where PID is the process id and the HOSTNAME is the name of the machine
@@ -764,7 +766,7 @@ implements AnalysisEngineController, EventSubscriber
 		String thisComponentName = getComponentName();
 		
 		String name = "";
-		int index = getIndex(); 
+		getIndex(); 
 		servicePerformance = new ServicePerformance(this);
 		name = jmxManagement.getJmxDomain()+key_value_list+",name="+thisComponentName+"_"+servicePerformance.getLabel();
 		
@@ -926,7 +928,10 @@ implements AnalysisEngineController, EventSubscriber
 	{
 		if ( timeSnapshotMap.containsKey(aKey) )
 		{
-			return ((Long)timeSnapshotMap.get(aKey)).longValue();
+		  Object value = timeSnapshotMap.get(aKey);
+		  if (value != null) {
+	      return ((Long)value).longValue();
+		  }
 		}
 		return 0;
 		
@@ -1173,7 +1178,9 @@ implements AnalysisEngineController, EventSubscriber
 					{
 						entry = getInProcessCache().getCacheEntryForCAS(casReferenceId);
 					}
-					catch( AsynchAEException e) {}
+					catch( AsynchAEException e) {
+	           System.out.println("Controller:"+getComponentName()+" CAS:"+casReferenceId+" Not Found In Cache");
+					}
                     CAS cas = null;
 					//	Make sure that the ErrorHandler did not drop the cache entry and the CAS
 					if ( entry != null && (( cas = entry.getCas()) != null ) )
@@ -1278,7 +1285,9 @@ implements AnalysisEngineController, EventSubscriber
 		    if ( localCache.containsKey(aCasReferenceId)) {
 		      try {
 		        localCache.lookupEntry(aCasReferenceId).setDropped(true);
-		      } catch( Exception e) {}
+		      } catch( Exception e) {
+	          System.out.println("Controller:"+getComponentName()+" CAS:"+aCasReferenceId+" Not Found In Cache");
+		      }
 	        localCache.remove(aCasReferenceId);
 		    }
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
@@ -1337,8 +1346,11 @@ implements AnalysisEngineController, EventSubscriber
 	                "getTime", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_get_time__FINE",
 	                new Object[] {aCasReferenceId, getComponentName(), anEndpointName, key  });
       }
-			long time = ((Long) statsMap.get(key)).longValue();
-			
+      long time = 0;
+      Object value = statsMap.get(key);
+      if ( value != null ) {
+        time = ((Long) value).longValue();
+      }
 			
 			synchronized(statsMap)
 			{
@@ -1785,6 +1797,9 @@ implements AnalysisEngineController, EventSubscriber
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, getClass().getName(), "stop", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_stop__INFO", new Object[] { getComponentName() });
     }
+    if ( getOutputChannel() != null ) {
+      getOutputChannel().cancelTimers();
+    }
 		if ( this instanceof PrimitiveAnalysisEngineController )
 		{
 			getControllerLatch().release();
@@ -1898,12 +1913,9 @@ implements AnalysisEngineController, EventSubscriber
     {
       timeSnapshotMap.clear();
     }
-    synchronized (unregisteredDelegateList) {
-      //TODO any reason this list needs to be cleared on Stop???
-      if ( unregisteredDelegateList != null )
-      {
+    //TODO any reason this list needs to be cleared on Stop???
+    if ( unregisteredDelegateList != null )  {
         unregisteredDelegateList.clear();
-      }
     }
     if ( casManager != null )
     {
@@ -1987,7 +1999,12 @@ implements AnalysisEngineController, EventSubscriber
     }
 	}
 	
-	
+	protected void stopDelegateTimers() {
+	  Iterator<Delegate> it = delegates.iterator();
+	  while( it.hasNext()) {
+	    it.next().cancelDelegateTimer();
+	  }
+	}
 	/**
 	 *  Using a reference to its parent, propagates the terminate event to the top level controller. 
 	 *  Typically invoked, when the error handling detects excessive errors and action=terminate. 
@@ -2017,6 +2034,8 @@ implements AnalysisEngineController, EventSubscriber
     }
     else if ( !isStopped() )
     {
+      stopDelegateTimers();
+      getOutputChannel().cancelTimers();
       //  Stop the inflow of new input CASes
       stopInputChannel();
       System.out.println("Controller:"+getComponentName()+" Done Stopping Main Input Channel");     
@@ -2047,18 +2066,19 @@ implements AnalysisEngineController, EventSubscriber
     if (this instanceof AggregateAnalysisEngineController )
     {
       Map endpoints = ((AggregateAnalysisEngineController)this).getDestinations();
-      Iterator it = endpoints.keySet().iterator();
+      Set set = endpoints.entrySet();
+      
       // Loop through all delegates and send Stop to Cas Multipliers
-      while( it.hasNext() )
-      {
-        String key = (String) it.next();
+      for( Iterator it = set.iterator(); it.hasNext();){
+        Map.Entry entry = (Map.Entry)it.next();
+        Endpoint endpoint = (Endpoint)entry.getValue();
         //  Fetch an Endpoint for the corresponding delegate key
-        Endpoint endpoint = (Endpoint) endpoints.get(key);
         //  Check if the delegate is a Cas Multiplier
         if ( endpoint != null && endpoint.isCasMultiplier()  )
         {
           //  Fetch the Delegate object corresponding to the current key
-          Delegate delegate = ((AggregateAnalysisEngineController)this).lookupDelegate(key);
+          Delegate delegate = ((AggregateAnalysisEngineController)this).lookupDelegate((String)entry.getKey());
+          
           if ( delegate != null ) {
             // Get a list of all CASes this aggregate has dispatched to the Cas Multiplier
             List<DelegateEntry> pendingList = delegate.getDelegateCasesPendingRepy();
@@ -2110,7 +2130,9 @@ implements AnalysisEngineController, EventSubscriber
       catch( Exception e) { 
         e.printStackTrace();
       } finally {
-        casMultiplier.setGeneratingChildrenFrom(aCasReferenceId, false);
+        if ( casMultiplier != null ) {
+          casMultiplier.setGeneratingChildrenFrom(aCasReferenceId, false);
+        }
       }
     }
 		
