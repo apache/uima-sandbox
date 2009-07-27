@@ -62,8 +62,6 @@ public class VmTransport implements UimaTransport {
   //  size.
   private BlockingQueue<Runnable> workQueue = null;
 
-  private VmTransport vmConnector;
-
   private UimaVmMessageDispatcher dispatcher;
 
   private UimaVmMessageListener listener;
@@ -72,9 +70,6 @@ public class VmTransport implements UimaTransport {
 
   private UimaAsContext context;
 
-  public VmTransport(UimaAsContext aContext) {
-    this( aContext, null);
-  }
   public VmTransport(UimaAsContext aContext, AnalysisEngineController aController) {
     context = aContext;
     controller = aController;
