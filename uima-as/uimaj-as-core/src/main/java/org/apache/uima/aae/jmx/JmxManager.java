@@ -189,8 +189,7 @@ public class JmxManager implements JmxManagement
 		{
 			mbeanServerClass = Class.forName("javax.management.MBeanServer");
 			objectNameClass = Class.forName("javax.management.ObjectName");
-			objectNameConstructor = objectNameClass.getConstructor(new Class[]
-			{ String.class });
+			objectNameConstructor = objectNameClass.getConstructor(new Class[]{ String.class });
 			isRegistered = mbeanServerClass.getMethod("isRegistered", new Class[]
 			{ objectNameClass });
 			registerMBean = mbeanServerClass.getMethod("registerMBean", new Class[]
@@ -198,11 +197,12 @@ public class JmxManager implements JmxManagement
 			unregisterMBean = mbeanServerClass.getMethod("unregisterMBean", new Class[]
 			{ objectNameClass });
 			jmxAvailable = true;
-		}
-		catch (Exception e)
-		{
+		} 	catch (ClassNotFoundException e){
 			// JMX not available
 			jmxAvailable = false;
+		} catch( NoSuchMethodException e) {
+      // JMX not available
+      jmxAvailable = false;
 		}
 
 		// try to get platform MBean Server (Java 1.5 only)
@@ -211,10 +211,6 @@ public class JmxManager implements JmxManagement
 			Class managementFactory = Class.forName("java.lang.management.ManagementFactory");
 			Method getPlatformMBeanServer = managementFactory.getMethod("getPlatformMBeanServer", new Class[0]);
 			platformMBeanServer = getPlatformMBeanServer.invoke(null, (Object[])null);
-			if (platformMBeanServer != null)
-			{
-				System.out.println("Got MBeanServer Started");
-			}
 		}
 		catch (Exception e)
 		{
