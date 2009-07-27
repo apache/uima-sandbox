@@ -67,7 +67,6 @@ public class DefaultTimeoutHandler extends ErrorHandlerBase implements ErrorHand
 							}
 							else
 							{
-								String casReferenceId = (String)anErrorContext.get( AsynchAEMessage.CasReference);
 								String action = getAction(Monitor.MetadataRequestTimeoutCount, endpoint.getEndpoint());
 
 								if ( ErrorHandler.DISABLE.equalsIgnoreCase(action))
