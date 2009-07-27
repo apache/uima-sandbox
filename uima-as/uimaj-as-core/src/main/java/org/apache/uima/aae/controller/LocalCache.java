@@ -3,6 +3,8 @@ package org.apache.uima.aae.controller;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.uima.UIMAFramework;
@@ -37,7 +39,7 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     String parentCasReferenceId=null;
     if ( this.containsKey(aCasReferenceId)) {
       CasStateEntry entry = (CasStateEntry)get(aCasReferenceId);
-      if ( entry.isSubordinate()) {
+      if ( entry != null && entry.isSubordinate()) {
         //  recursively call each parent until we get to the top of the 
         //  Cas hierarchy
         parentCasReferenceId = lookupInputCasReferenceId(entry.getInputCasReferenceId());
@@ -65,23 +67,25 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     int count=0;
     if ( UIMAFramework.getLogger().isLoggable(Level.FINEST) )
     {
-      Iterator it = keySet().iterator();
       StringBuffer sb = new StringBuffer("\n");
 
-      while( it.hasNext() )
-      {
-        String key = (String) it.next();
-        CasStateEntry entry = (CasStateEntry)get(key);
+      
+      for( Iterator it = entrySet().iterator(); it.hasNext();) {
+        Map.Entry entry = (Map.Entry)it.next();
+        CasStateEntry casStateEntry = (CasStateEntry)entry.getValue();
+        if ( casStateEntry == null ) {
+          continue;
+        }
         count++;
-        if ( entry.isSubordinate())
+        if ( casStateEntry.isSubordinate())
         {
-          sb.append(key+ " Number Of Child CASes In Play:"+entry.getSubordinateCasInPlayCount()+" Parent CAS id:"+entry.getInputCasReferenceId());
+          sb.append(entry.getKey()+ " Number Of Child CASes In Play:"+casStateEntry.getSubordinateCasInPlayCount()+" Parent CAS id:"+casStateEntry.getInputCasReferenceId());
         }
         else
         {
-          sb.append(key+ " *** Input CAS. Number Of Child CASes In Play:"+entry.getSubordinateCasInPlayCount());
+          sb.append(entry.getKey()+ " *** Input CAS. Number Of Child CASes In Play:"+casStateEntry.getSubordinateCasInPlayCount());
         }
-        if ( entry.isWaitingForRelease() )
+        if ( casStateEntry.isWaitingForRelease() )
         {
           sb.append(" <<< Reached Final State in Controller:"+controller.getComponentName());
         }
@@ -94,16 +98,14 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
 	  }
     else if ( UIMAFramework.getLogger().isLoggable(Level.FINE) )
     {
-      Iterator it = keySet().iterator();
-      StringBuffer sb = new StringBuffer("\n");
       int inFinalState=0;
       
-      while( it.hasNext() )
-      {
-        String key = (String) it.next();
-        CasStateEntry entry = (CasStateEntry)get(key);
+      for( Iterator it = entrySet().iterator(); it.hasNext(); ) {
+        Map.Entry entry = (Map.Entry)it.next();
+        CasStateEntry casStateEntry = (CasStateEntry)entry.getValue();
+
         count++;
-        if ( entry.isWaitingForRelease() )
+        if ( casStateEntry != null && casStateEntry.isWaitingForRelease() )
         {
           inFinalState++;
         }
