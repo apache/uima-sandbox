@@ -57,18 +57,12 @@ import org.apache.uima.util.Level;
  */
 public class SimpleCasGenerator extends CasMultiplier_ImplBase
 {
-	private String mDoc1;
-
-	private String mDoc2;
-
 	private int mCount;
 
 	private int nToGen;
     
 	private String text;
 
-	private Random gen;
-	
 	long docCount=0;
 
 	/*
@@ -116,9 +110,6 @@ public class SimpleCasGenerator extends CasMultiplier_ImplBase
       }
     }
     
-    this.mDoc1 = (String) aContext.getConfigParameterValue("StringOne");
-    this.mDoc2 = (String) aContext.getConfigParameterValue("StringTwo");
-    this.gen = new Random();
   }
 
 	/*
