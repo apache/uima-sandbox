@@ -368,6 +368,11 @@ public class JmsOutputChannel implements OutputChannel
     BrokerConnectionEntry brokerConnectionEntry = null;
     if (connectionMap.containsKey(anEndpoint.getServerURI())) {
       brokerConnectionEntry = (BrokerConnectionEntry) connectionMap.get(anEndpoint.getServerURI());
+      //  Findbugs thinks that the above may return null, perhaps due to a race condition. Add
+      //  the null check just in case
+      if ( brokerConnectionEntry == null ) {
+        throw new  AsynchAEException("Controller:"+getAnalysisEngineController().getComponentName()+" Unable to Lookup Broker Connection For URL:"+anEndpoint.getServerURI());
+      }
     } else {
       brokerConnectionEntry = new BrokerConnectionEntry();
       connectionMap.put(anEndpoint.getServerURI(), brokerConnectionEntry);
@@ -375,6 +380,7 @@ public class JmsOutputChannel implements OutputChannel
       connectionTimer.setAnalysisEngineController(getAnalysisEngineController());
       brokerConnectionEntry.setConnectionTimer(connectionTimer);
     }
+    
     // create a key to lookup the endpointConnection object
     String key = anEndpoint.getEndpoint() + anEndpoint.getServerURI();
     String destination = anEndpoint.getEndpoint();
@@ -957,6 +963,11 @@ public class JmsOutputChannel implements OutputChannel
           entry =  getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(aCasReferenceId);
 			    
 			  } catch ( Exception e ) {
+		      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+		        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
+		                    "sendReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cas_not_found__INFO",
+		                    new Object[] { getAnalysisEngineController().getComponentName(), anEndpoint.getEndpoint(), aCasReferenceId });
+		      }
 			    return;
 			  }
         if ( anEndpoint.getSerializer().equals("xmi")) {
@@ -1565,9 +1576,16 @@ public class JmsOutputChannel implements OutputChannel
 			{
 				return;
 			}
-			
+      CacheEntry entry = this.getCacheEntry(aCasReferenceId);
+      if ( entry == null ) {
+        throw new AsynchAEException("Controller:"+getAnalysisEngineController().getComponentName()+" Unable to Send Message To Remote Endpoint: "+anEndpoint.getEndpoint()+" CAS:"+aCasReferenceId+" Not In The Cache");
+      }
+
 			//	Get the connection object for a given endpoint
 			JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
+			if ( endpointConnection == null ) {
+			  throw new AsynchAEException("Controller:"+getAnalysisEngineController().getComponentName()+" Unable to Send Message To Remote Endpoint: "+anEndpoint.getEndpoint()+" Connection is Invalid. InputCasReferenceId:"+anInputCasReferenceId+" CasReferenceId:"+aCasReferenceId+" Sequece:"+sequence);
+			}
 			//	Create empty JMS Text Message
 			TextMessage tm = endpointConnection.produceTextMessage("");
 			
@@ -1584,7 +1602,6 @@ public class JmsOutputChannel implements OutputChannel
 			//	Add Cas Reference Id to the outgoing JMS Header
 			tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
 
-			CacheEntry entry = this.getCacheEntry(aCasReferenceId);
 		//	Add common properties to the JMS Header
 			if ( isRequest == true )
 			{
@@ -1664,15 +1681,22 @@ public class JmsOutputChannel implements OutputChannel
       if ( aSerializedCAS != null ) {
         msgSize = aSerializedCAS.length;
       }
+      CacheEntry entry = this.getCacheEntry(aCasReferenceId);
+      if ( entry == null ) {
+        throw new AsynchAEException("Controller:"+getAnalysisEngineController().getComponentName()+" Unable to Send Message To Remote Endpoint: "+anEndpoint.getEndpoint()+" CAS:"+aCasReferenceId+" Not In The Cache");
+      }
       //  Get the connection object for a given endpoint
       JmsEndpointConnection_impl endpointConnection = getEndpointConnection(anEndpoint);
+      if ( endpointConnection == null ) {
+        throw new AsynchAEException("Controller:"+getAnalysisEngineController().getComponentName()+" Unable to Send Message To Remote Endpoint: "+anEndpoint.getEndpoint()+" Connection is Invalid. InputCasReferenceId:"+anInputCasReferenceId+" CasReferenceId:"+aCasReferenceId+" Sequece:"+sequence);
+      }
+
       //  Create empty JMS Text Message
       BytesMessage tm = endpointConnection.produceByteMessage();
       tm.writeBytes(aSerializedCAS);
       tm.setIntProperty(AsynchAEMessage.Payload, AsynchAEMessage.BinaryPayload); 
       //  Add Cas Reference Id to the outgoing JMS Header
       tm.setStringProperty(AsynchAEMessage.CasReference, aCasReferenceId);
-      CacheEntry entry = this.getCacheEntry(aCasReferenceId);
       //  Add common properties to the JMS Header
       if ( isRequest == true )
       {
@@ -1960,7 +1984,6 @@ public class JmsOutputChannel implements OutputChannel
 		}
     CasStateEntry casStateEntry = getAnalysisEngineController().getLocalCache().lookupEntry(casReferenceId);
 		
-		CacheEntry entry = getAnalysisEngineController().getInProcessCache().getCacheEntryForCAS(casReferenceId); 
 		if ( casStateEntry.isSubordinate() )
 		{
 			//	Recurse until the top CAS reference Id is found
@@ -2065,7 +2088,7 @@ public class JmsOutputChannel implements OutputChannel
       while (it.hasNext() ) {
         String key = it.next();
         BrokerConnectionEntry ce = (BrokerConnectionEntry) connectionMap.get(key);
-        if ( ce.getConnectionTimer() != null ) {
+        if ( ce != null && ce.getConnectionTimer() != null ) {
           ce.getConnectionTimer().cancelTimer();
         }
       }
@@ -2126,6 +2149,7 @@ public class JmsOutputChannel implements OutputChannel
 
     private long connectionCreationTimestamp;
 
+    private String componentName = "";
     public ConnectionTimer(BrokerConnectionEntry aBrokerDestinations ) {
       brokerDestinations = aBrokerDestinations;
     }
@@ -2134,18 +2158,24 @@ public class JmsOutputChannel implements OutputChannel
     }
     public void setAnalysisEngineController( AnalysisEngineController aController ) {
       controller = aController;
+      if ( controller != null ) {
+        componentName = controller.getComponentName();
+      }
     }
     public void setConnectionCreationTimestamp(long aConnectionCreationTimestamp) {
       connectionCreationTimestamp = aConnectionCreationTimestamp;
     }
-    public synchronized void startTimer(long aConnectionCreationTimestamp, final Endpoint endpoint) {
+    public void startTimer(long aConnectionCreationTimestamp, final Endpoint endpoint) {
+      startTimer(aConnectionCreationTimestamp, endpoint, inactivityTimeout, componentName);
+    }
+    public synchronized void startTimer(long aConnectionCreationTimestamp, final Endpoint endpoint, long currentInactivityTimeout, String aComponentName) {
       final long cachedConnectionCreationTimestamp = aConnectionCreationTimestamp;
-      Date timeToRun = new Date(System.currentTimeMillis() + inactivityTimeout);
+      Date timeToRun = new Date(System.currentTimeMillis() + currentInactivityTimeout);
       if (timer != null) {
         timer.cancel();
       }
       if (controller != null) {
-        timer = new Timer("Controller:" + controller.getComponentName()
+        timer = new Timer("Controller:" + aComponentName
                 + ":Reply TimerThread-:" + endpoint + ":" + System.nanoTime());
       } else {
         timer = new Timer("Reply TimerThread-:" + endpoint + ":"
