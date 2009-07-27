@@ -572,7 +572,9 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
 	    UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "initialize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_as_initialized__INFO", new Object[] { super.serializationStrategy });
 		}
-
+    //  Acquire cpcReady semaphore to block sending CPC request until
+    //  ALL outstanding CASes are received.
+		super.acquireCpcReadySemaphore();
 	}
 	/**
 	 * First generates a Spring context from a given deploy descriptor and than
