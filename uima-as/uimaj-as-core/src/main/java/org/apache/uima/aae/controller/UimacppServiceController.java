@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -331,16 +332,11 @@ implements ControllerLifecycle, DisposableBean {
         throw new ResourceInitializationException( new IOException("JmxManagement object is null."));
       }
       
-      if (jmxManagement instanceof JmxManagement) {
-        mbean = new UimacppServiceManagement(jmxManagement.getJmxDomain(), commandConnection, aeDesc,
+      mbean = new UimacppServiceManagement(jmxManagement.getJmxDomain(), commandConnection, aeDesc,
             numInstances, mqHostName + " " + mqPort + "//" + mqQueueMgr,
             queueName);
-        ObjectName oname = new ObjectName(mbean.getUniqueMBeanName()); 
-        jmxManagement.registerMBean(mbean, oname); 
-      } else {
-        uimaLogger.log(Level.WARNING,"UimacppServiceController failed to register the JMX MBean.");
-        //throw new ResourceInitializationException( new IOException("JmxManagement object is invalid."));
-      }
+      ObjectName oname = new ObjectName(mbean.getUniqueMBeanName()); 
+      jmxManagement.registerMBean(mbean, oname); 
 
     } catch (IOException e) {
       throw new ResourceInitializationException(e);
@@ -531,10 +527,13 @@ implements ControllerLifecycle, DisposableBean {
     environment.put("DYLD_LIBRARY_PATH", value);
 
     //set user specified environment variables
-    Iterator<String> iter = envVarMap.keySet().iterator();
-    while (iter.hasNext()) {
-      String key = (String) iter.next();
-      value = (String) envVarMap.get(key);
+    Set set = envVarMap.entrySet();
+    
+    for( Iterator it = set.iterator(); it.hasNext(); ) {
+      Map.Entry entry = (Map.Entry)it.next();
+      String key = (String) entry.getKey();
+      value = (String) entry.getValue();
+
       if (value != null && value.length() > 0) {
         // special handling for PATH and LD_LIBRARY_PATH
         // and DYLD_LIBRARY_PATH
@@ -875,7 +874,7 @@ class LoggerHandler implements Runnable {
       level = Level.SEVERE;
     }
   
-    logMessage.trim();
+    logMessage = logMessage.trim();
     // log the message
     logger.log(level, logMessage);
     //System.out.println(logMessage);
@@ -1066,7 +1065,6 @@ class UimacppShutdownHook extends Thread {
 
   public Process uimacppProcess;
 
-  private Socket socket;
 
   private org.apache.uima.util.Logger uimaLogger;
 
@@ -1074,11 +1072,9 @@ class UimacppShutdownHook extends Thread {
       org.apache.uima.util.Logger logger) throws IOException {
     this.uimacppProcess = aprocess;
     this.uimaLogger = logger;
-    this.socket = socket;
   }
 
   public void run() {
-    int rc;
     uimaLogger.log(Level.INFO, "UimacppShutdownHook sending shutdown message.");
     uimacppProcess.destroy();
   }
