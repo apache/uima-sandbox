@@ -143,12 +143,6 @@ public class UimaASClientInfo implements
 		return applicationName;
 	}
 
-	private String format(float aValue )
-	{
-		Formatter formatter  = new Formatter();
-		formatter.format ("%,.2f ms", aValue);
-		return formatter.out().toString();
-	}
 	private String format(double aValue )
 	{
 		return String.format("%,.2f ms", aValue);
