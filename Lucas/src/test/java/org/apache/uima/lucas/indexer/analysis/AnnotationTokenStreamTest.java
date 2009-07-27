@@ -80,7 +80,7 @@ public class AnnotationTokenStreamTest {
 		annotation3.setEnd(20);
 		annotation3.addToIndexes();
 		
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1");
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1");
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -121,7 +121,7 @@ public class AnnotationTokenStreamTest {
 		annotation3.setEnd(20);
 		annotation3.addToIndexes();		
 
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", "featureString", null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureString", null);
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1Feature1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -169,7 +169,7 @@ public class AnnotationTokenStreamTest {
 		featureNames.add("featureString");
 		featureNames.add("featureInteger");
 		
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", featureNames, "_", null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", featureNames, "_", null);
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1Feature1_1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -226,7 +226,7 @@ public class AnnotationTokenStreamTest {
 		List<String> featureNames = new ArrayList<String>();
 		featureNames.add("featureStringArray");
 		
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", featureNames, null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", featureNames, null);
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1FeatureStringArray1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -320,7 +320,7 @@ public class AnnotationTokenStreamTest {
 		featureNames.add("featureStringArray");
 		
 		
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", featureNames, " ", null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", featureNames, " ", null);
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1FeatureStringArray1 token1FeatureStringArray2 token1FeatureStringArray3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -378,7 +378,7 @@ public class AnnotationTokenStreamTest {
 		List<String> featureNames = new ArrayList<String>();
 		featureNames.add("feature1");
 		
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", "featureStructure1", featureNames, null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureStructure1", featureNames, null);
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1Feature1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -397,7 +397,7 @@ public class AnnotationTokenStreamTest {
 		assertEquals(14, nextToken.startOffset());
 		assertEquals(20, nextToken.endOffset());
 		
-		annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", "featureStructure1.feature3", featureNames, null);
+		annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureStructure1.feature3", featureNames, null);
 		nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1Feature3Feature1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -502,7 +502,7 @@ public class AnnotationTokenStreamTest {
 		featureNames.add("feature1");
 		featureNames.add("feature2");
 	
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", "featureStructures1", featureNames, ", ", null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureStructures1", featureNames, ", ", null);
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1FeatureStructures1Feature10, token1FeatureStructures1Feature20", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -643,7 +643,7 @@ public class AnnotationTokenStreamTest {
 //		featureNames.add("feature2");
 //	
 //
-//		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, "org.apache.uima.indexer.types.test.Annotation1", "featureStructures1", featureNames, null);
+//		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureStructures1", featureNames, null);
 //		Token nextToken = annotationTokenStream.next();
 //		assertNotNull(nextToken);
 //		assertEquals("token1FeatureStructures1Feature10", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -768,7 +768,7 @@ public class AnnotationTokenStreamTest {
 			List<String> featureNames = new ArrayList<String>();
 			featureNames.add("feature1");
 					
-			AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", "featureStructures1", featureNames, null);
+			AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureStructures1", featureNames, null);
 			Token nextToken = annotationTokenStream.next();
 			assertNotNull(nextToken);
 			assertEquals("token1FeatureStructures1Feature10", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -927,7 +927,7 @@ public class AnnotationTokenStreamTest {
 		List<String> featureNames = new ArrayList<String>();
 		featureNames.add("feature1");
 				
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", "featureStructures1.feature3", featureNames, null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureStructures1.feature3", featureNames, null);
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
 		assertEquals("token1FeatureStructures1Feature3Feature10", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
@@ -1131,7 +1131,7 @@ public class AnnotationTokenStreamTest {
 		List<String> featureNames = new ArrayList<String>();
 		featureNames.add("feature3");
 
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1", "featureStructures1.feature3", featureNames, null);
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1", "featureStructures1.feature3", featureNames, null);
 
 		Token nextToken = annotationTokenStream.next();
 		assertNotNull(nextToken);
@@ -1314,7 +1314,7 @@ public class AnnotationTokenStreamTest {
 		annotation3.setEnd(20);
 		annotation3.addToIndexes();
 		
-		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1");
+		AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1");
 		Token nextToken = annotationTokenStream.next();
 		nextToken = annotationTokenStream.next();
 		nextToken = annotationTokenStream.next();
@@ -1342,7 +1342,7 @@ public class AnnotationTokenStreamTest {
   @Test 
 	public void testValidate() throws Exception{
     JCas cas = createCasWithText("token1 token2 token3");
-    AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1");
+    AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1");
     Type annotation1Type = (Type) cas.getTypeSystem().getType(Annotation1.class.getCanonicalName());
     annotationTokenStream.validate(annotation1Type, Lists.newArrayList("featureString"), null);    
   }
@@ -1350,7 +1350,7 @@ public class AnnotationTokenStreamTest {
   @Test(expected= InvalidTokenSourceException.class)
   public void testValidateFail() throws Exception{
     JCas cas = createCasWithText("token1 token2 token3");
-    AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation1");
+    AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation1");
     Type annotation1Type = (Type) cas.getTypeSystem().getType(Annotation1.class.getCanonicalName());
     annotationTokenStream.validate(annotation1Type, Lists.newArrayList("featureStringss"), null);    
   }
@@ -1358,6 +1358,6 @@ public class AnnotationTokenStreamTest {
   @Test(expected= InvalidTokenSourceException.class)
   public void testValidateFailWithWrongType() throws Exception{
     JCas cas = createCasWithText("token1 token2 token3");
-    AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.indexer.types.test.Annotation3");    
+    AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation3");    
   }
 }

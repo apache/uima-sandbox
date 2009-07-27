@@ -26,7 +26,7 @@
   <vendor>The Apache Software Foundation</vendor>
   <types>
     <typeDescription>
-      <name>org.apache.uima.indexer.types.test.Annotation1</name>
+      <name>org.apache.uima.lucas.indexer.types.test.Annotation1</name>
       <description/>
       <supertypeName>uima.tcas.Annotation</supertypeName>
       <features>
@@ -53,19 +53,19 @@
         <featureDescription>
           <name>featureStructure1</name>
           <description/>
-          <rangeTypeName>org.apache.uima.indexer.types.test.FeatureStructure1</rangeTypeName>
+          <rangeTypeName>org.apache.uima.lucas.indexer.types.test.FeatureStructure1</rangeTypeName>
         </featureDescription>
         <featureDescription>
           <name>featureStructures1</name>
           <description/>
           <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-          <elementType>org.apache.uima.indexer.types.test.FeatureStructure1</elementType>
+          <elementType>org.apache.uima.lucas.indexer.types.test.FeatureStructure1</elementType>
           <multipleReferencesAllowed>true</multipleReferencesAllowed>
         </featureDescription>
       </features>
     </typeDescription>
     <typeDescription>
-      <name>org.apache.uima.indexer.types.test.FeatureStructure1</name>
+      <name>org.apache.uima.lucas.indexer.types.test.FeatureStructure1</name>
       <description/>
       <supertypeName>uima.cas.TOP</supertypeName>
       <features>
@@ -82,19 +82,19 @@
         <featureDescription>
           <name>feature3</name>
           <description/>
-          <rangeTypeName>org.apache.uima.indexer.types.test.FeatureStructure2</rangeTypeName>
+          <rangeTypeName>org.apache.uima.lucas.indexer.types.test.FeatureStructure2</rangeTypeName>
         </featureDescription>
         <featureDescription>
           <name>featureStructures2</name>
           <description/>
           <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-          <elementType>org.apache.uima.indexer.types.test.FeatureStructure2</elementType>
+          <elementType>org.apache.uima.lucas.indexer.types.test.FeatureStructure2</elementType>
           <multipleReferencesAllowed>true</multipleReferencesAllowed>
         </featureDescription>
       </features>
     </typeDescription>
     <typeDescription>
-      <name>org.apache.uima.indexer.types.test.FeatureStructure2</name>
+      <name>org.apache.uima.lucas.indexer.types.test.FeatureStructure2</name>
       <description/>
       <supertypeName>uima.cas.TOP</supertypeName>
       <features>

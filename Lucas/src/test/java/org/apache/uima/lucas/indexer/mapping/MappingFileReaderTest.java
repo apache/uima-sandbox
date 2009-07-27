@@ -76,7 +76,7 @@ public class MappingFileReaderTest {
 	  assertEquals(NO, fieldDescription.getTermVector());
 	  assertEquals(YES, fieldDescription.getStored());
 	  assertEquals(true, fieldDescription.getMerge());
-	  assertEquals(6, fieldDescription.getLineNumber());
+	  assertEquals(26, fieldDescription.getLineNumber());
 	  assertEquals(16, fieldDescription.getColumnNumber());
 	  
 	  Collection<FilterDescription> filterDescriptions = fieldDescription.getFilterDescriptions();
@@ -86,7 +86,7 @@ public class MappingFileReaderTest {
 	  assertEquals(TESTFACTORY, filterDescription.getFactoryClassName());
 	  assertEquals(FACTORY_NAME, filterDescription.getName());
 	  assertTrue(filterDescription.isReuseFactory());
-	  assertEquals(9, filterDescription.getLineNumber());
+	  assertEquals(29, filterDescription.getLineNumber());
 	  assertEquals(56, filterDescription.getColumnNumber());
 	  
 	  Properties properties = filterDescription.getProperties(); 
@@ -102,7 +102,7 @@ public class MappingFileReaderTest {
 	  assertEquals(FEATURE_PATH, annotationDescription.getFeaturePath());
 	  assertEquals(VALUE_DELIMITER_STRING, annotationDescription.getFeatureValueDelimiterString());
 	  assertEquals(TOKENIZER, annotationDescription.getTokenizer());
-	  assertEquals(13, annotationDescription.getLineNumber());
+	  assertEquals(33, annotationDescription.getLineNumber());
 	  assertEquals(113, annotationDescription.getColumnNumber());
 
 	  filterDescriptions = annotationDescription.getFilterDescriptions();
@@ -112,7 +112,7 @@ public class MappingFileReaderTest {
 	  assertEquals(TESTFACTORY, filterDescription.getFactoryClassName());
 	  assertEquals(FACTORY_NAME, filterDescription.getName());
 	  assertTrue(filterDescription.isReuseFactory());
-	  assertEquals(16, filterDescription.getLineNumber());
+	  assertEquals(36, filterDescription.getLineNumber());
 	  assertEquals(58, filterDescription.getColumnNumber());
 
 	  properties = filterDescription.getProperties(); 
@@ -123,7 +123,7 @@ public class MappingFileReaderTest {
 	  FeatureDescription featureDescription = featureDescriptions.iterator().next();
 	  assertEquals(FEATURE_NAME, featureDescription.getFeatureName());
 	  assertEquals(NUMBER_FORMAT, featureDescription.getNumberFormat());
-	  assertEquals(19, featureDescription.getLineNumber());
+	  assertEquals(39, featureDescription.getLineNumber());
 	  assertEquals(57, featureDescription.getColumnNumber());
 	}
 }

@@ -1,23 +1,5 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-/* First created by JCasGen Mon Mar 09 21:09:21 CET 2009 */
+/* First created by JCasGen Sat Jul 25 21:50:44 CEST 2009 */
 package org.apache.uima.lucas.indexer.types.test;
 
 import org.apache.uima.jcas.JCas;
@@ -32,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.cas.TOP_Type;
 
 /** 
- * Updated by JCasGen Mon Mar 09 21:09:40 CET 2009
+ * Updated by JCasGen Sat Jul 25 21:50:44 CEST 2009
  * @generated */
 public class FeatureStructure1_Type extends TOP_Type {
   /** @generated */
@@ -57,7 +39,7 @@ public class FeatureStructure1_Type extends TOP_Type {
   public final static int typeIndexID = FeatureStructure1.typeIndexID;
   /** @generated 
      @modifiable */
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("org.apache.uima.indexer.types.test.FeatureStructure1");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
  
   /** @generated */
   final Feature casFeat_feature1;
@@ -66,13 +48,13 @@ public class FeatureStructure1_Type extends TOP_Type {
   /** @generated */ 
   public String getFeature1(int addr) {
         if (featOkTst && casFeat_feature1 == null)
-      jcas.throwFeatMissing("feature1", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("feature1", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     return ll_cas.ll_getStringValue(addr, casFeatCode_feature1);
   }
   /** @generated */    
   public void setFeature1(int addr, String v) {
         if (featOkTst && casFeat_feature1 == null)
-      jcas.throwFeatMissing("feature1", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("feature1", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     ll_cas.ll_setStringValue(addr, casFeatCode_feature1, v);}
     
   
@@ -84,13 +66,13 @@ public class FeatureStructure1_Type extends TOP_Type {
   /** @generated */ 
   public String getFeature2(int addr) {
         if (featOkTst && casFeat_feature2 == null)
-      jcas.throwFeatMissing("feature2", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("feature2", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     return ll_cas.ll_getStringValue(addr, casFeatCode_feature2);
   }
   /** @generated */    
   public void setFeature2(int addr, String v) {
         if (featOkTst && casFeat_feature2 == null)
-      jcas.throwFeatMissing("feature2", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("feature2", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     ll_cas.ll_setStringValue(addr, casFeatCode_feature2, v);}
     
   
@@ -102,13 +84,13 @@ public class FeatureStructure1_Type extends TOP_Type {
   /** @generated */ 
   public int getFeature3(int addr) {
         if (featOkTst && casFeat_feature3 == null)
-      jcas.throwFeatMissing("feature3", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("feature3", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     return ll_cas.ll_getRefValue(addr, casFeatCode_feature3);
   }
   /** @generated */    
   public void setFeature3(int addr, int v) {
         if (featOkTst && casFeat_feature3 == null)
-      jcas.throwFeatMissing("feature3", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("feature3", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     ll_cas.ll_setRefValue(addr, casFeatCode_feature3, v);}
     
   
@@ -120,29 +102,29 @@ public class FeatureStructure1_Type extends TOP_Type {
   /** @generated */ 
   public int getFeatureStructures2(int addr) {
         if (featOkTst && casFeat_featureStructures2 == null)
-      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     return ll_cas.ll_getRefValue(addr, casFeatCode_featureStructures2);
   }
   /** @generated */    
   public void setFeatureStructures2(int addr, int v) {
         if (featOkTst && casFeat_featureStructures2 == null)
-      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     ll_cas.ll_setRefValue(addr, casFeatCode_featureStructures2, v);}
     
    /** @generated */
   public int getFeatureStructures2(int addr, int i) {
         if (featOkTst && casFeat_featureStructures2 == null)
-      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     if (lowLevelTypeChecks)
       return ll_cas.ll_getRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_featureStructures2), i, true);
     jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_featureStructures2), i);
-  return ll_cas.ll_getRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_featureStructures2), i);
+	return ll_cas.ll_getRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_featureStructures2), i);
   }
    
   /** @generated */ 
   public void setFeatureStructures2(int addr, int i, int v) {
         if (featOkTst && casFeat_featureStructures2 == null)
-      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.indexer.types.test.FeatureStructure1");
+      jcas.throwFeatMissing("featureStructures2", "org.apache.uima.lucas.indexer.types.test.FeatureStructure1");
     if (lowLevelTypeChecks)
       ll_cas.ll_setRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_featureStructures2), i, v, true);
     jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_featureStructures2), i);
@@ -167,7 +149,7 @@ public class FeatureStructure1_Type extends TOP_Type {
     casFeatCode_feature2  = (null == casFeat_feature2) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_feature2).getCode();
 
  
-    casFeat_feature3 = jcas.getRequiredFeatureDE(casType, "feature3", "org.apache.uima.indexer.types.test.FeatureStructure2", featOkTst);
+    casFeat_feature3 = jcas.getRequiredFeatureDE(casType, "feature3", "org.apache.uima.lucas.indexer.types.test.FeatureStructure2", featOkTst);
     casFeatCode_feature3  = (null == casFeat_feature3) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_feature3).getCode();
 
  

@@ -38,7 +38,7 @@ public class DefaultFilterFactoryRegistryTest {
   @Test
   public void testGetDefaultFilterFactories() {
     Map<String, TokenFilterFactory> registry = defaultFilterFactoryRegistry.getDefaultRegistry();
-    assertEquals(12, registry.size());
+    assertEquals(11, registry.size());
     
     TokenFilterFactory filterFactory = registry.get(DefaultFilterFactoryRegistry.ADDITION_FILTER_FACTORY_NAME);
     assertEquals(AdditionFilterFactory.class, filterFactory.getClass());
