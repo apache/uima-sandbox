@@ -68,9 +68,9 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 
 	private static final Class CLASS_NAME = JmsInputChannel.class;
 	
-	private final CountDownLatch msgHandlerLatch = new CountDownLatch(1);
+	private transient final CountDownLatch msgHandlerLatch = new CountDownLatch(1);
 
-	private final CountDownLatch controllerLatch = new CountDownLatch(1);
+	private transient final CountDownLatch controllerLatch = new CountDownLatch(1);
 	//	Reference to the first Message Handler in the Chain. 
 	private transient Handler handler;
 	//	The name of the queue this Listener is expecting to receive messages from
@@ -883,6 +883,14 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
       failedListenerMap.get(aDelegateKey);
     UimaDefaultMessageListenerContainer newListener = 
       new UimaDefaultMessageListenerContainer();
+    if ( failedListener == null ) {
+      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "createListener",
+                JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_failed_to_create_listener__INFO",
+                new Object[] { getController().getComponentName(), aDelegateKey });
+      }
+      return;
+    }
     ActiveMQConnectionFactory f = new ActiveMQConnectionFactory(failedListener.getBrokerUrl());
     newListener.setConnectionFactory(f);
     newListener.setMessageListener(this);
