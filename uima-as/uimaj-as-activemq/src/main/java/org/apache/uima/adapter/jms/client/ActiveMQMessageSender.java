@@ -124,6 +124,9 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 	      producer.close();
 	    }
 	    producerMap.clear();
-	  } catch( Exception e) {}
+	  } catch( Exception e) {
+	    System.out.println("JMS Exception While Closing Session - Ignoring");
+	    // Ignore we are shutting down
+	  }
 	}
 }
