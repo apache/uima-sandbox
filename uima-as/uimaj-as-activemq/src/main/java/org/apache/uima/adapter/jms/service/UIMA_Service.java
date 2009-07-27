@@ -60,8 +60,6 @@ public class UIMA_Service implements  ApplicationListener
 
 		String[] springConfigFileArray =
 		{};
-		String[] deployedDescriptors =
-		{};
 		String[] deploymentDescriptors =
 		{};
 		int nbrOfArgs = args.length;
@@ -99,13 +97,11 @@ public class UIMA_Service implements  ApplicationListener
 		{
 			// array of context files passed in
 			springConfigFileArray = args;
-			deployedDescriptors = args;
 		}
 		else
 		{
 			// create a String array of spring context files
 			springConfigFileArray = new String[deploymentDescriptors.length];
-			deployedDescriptors = new String[deploymentDescriptors.length];
 
 			Dd2spring aDd2Spring = new Dd2spring();
 			for (int dd = 0; dd < deploymentDescriptors.length; dd++)
@@ -132,7 +128,6 @@ public class UIMA_Service implements  ApplicationListener
 					byte[] bytes = new byte[(int) afile.length()];
 					fis.read(bytes);
 					deployDescriptor = new String(bytes);
-					deployedDescriptors[dd] = deployDescriptor;
 					// Log Deployment Descriptor
 					UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "main", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_deploy_desc__FINEST", new Object[]
 					{ deployDescriptor });
