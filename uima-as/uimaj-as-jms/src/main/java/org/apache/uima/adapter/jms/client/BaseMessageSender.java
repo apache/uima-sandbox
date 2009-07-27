@@ -130,15 +130,6 @@ public abstract class BaseMessageSender implements Runnable,
 	}
 
 	/**
-	 * Signals any object that waits for the worker thread to initialize
-	 */
-	private void signal() {
-		synchronized (this) {
-			this.notifyAll();
-		}
-	}
-
-	/**
 	 * Initializes jms message producer and starts the main thread. This thread
 	 * waits for messages enqueued by application threads. The application
 	 * thread adds a jms message to the pendingMessageList 'queue' and signals
