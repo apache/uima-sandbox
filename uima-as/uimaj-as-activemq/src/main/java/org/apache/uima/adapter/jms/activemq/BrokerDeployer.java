@@ -44,13 +44,12 @@ public class BrokerDeployer implements ApplicationListener
     private static final int BASE_JMX_PORT = 1200;
     private static final int MAX_PORT_THRESHOLD = 200;
     
-	private static BrokerService service;
+	private static BrokerService service = new BrokerService();
 	private Object semaphore = new Object();
 	private long maxBrokerMemory=0;
 	private String brokerURI;
 	private TransportConnector  tcpConnector = null;
 	private TransportConnector  httpConnector = null;
-//	private UsageListener usageListener = null;
 
 	public BrokerDeployer(long maxMemoryinBytes) throws Exception
 	{
@@ -70,15 +69,6 @@ public class BrokerDeployer implements ApplicationListener
 	public void startInternalBroker() throws Exception
 	{
 		TransportConnector  connector = null;
-		if ( service != null && service.isStarted() )
-		{
-			return;
-		}
-		try
-		{
-			service = new BrokerService();
-		}
-		catch( Exception e ){}
 		
 		if (maxBrokerMemory > 0 )
 		{
