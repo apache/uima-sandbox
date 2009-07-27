@@ -12,7 +12,11 @@ public class UimaAsContext extends ConcurrentHashMap {
   }
   
   public int getConcurrentConsumerCount() {
-    return new Integer( (Integer)get(CONSUMER_COUNT_KEY )).intValue();
+    Object value = get(CONSUMER_COUNT_KEY);
+    if ( value != null ) {
+      return Integer.valueOf((Integer) value);
+    }
+    return 0;
   }
   
 
