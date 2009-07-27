@@ -98,7 +98,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	
 	private Object recoveryMux = new Object();
 	
-	
+	private String componentName = "";
 	
   public JmsEndpointConnection_impl(BrokerConnectionEntry aBrokerDestinationMap, Endpoint anEndpoint)
 	{
@@ -122,6 +122,9 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	public synchronized void setAnalysisEngineController(AnalysisEngineController aController)
 	{
 		controller = aController;
+		if ( controller != null ) {
+	    componentName = controller.getComponentName();
+		}
 	}
 
 	public boolean isRetryEnabled()
@@ -143,31 +146,32 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 		}
 		return ((ActiveMQSession) producerSession).isRunning();
 	}
+  private void openChannel() throws AsynchAEException, ServiceShutdownException {
+    openChannel(getServerUri(), componentName, endpoint, controller);
+  }
 
-	private synchronized void openChannel() throws AsynchAEException, ServiceShutdownException
+	private synchronized void openChannel(String brokerUri, String aComponentName, String anEndpointName,  AnalysisEngineController aController) throws AsynchAEException, ServiceShutdownException
 	{
 		try
 		{
-			String brokerUri = getServerUri();
-			
 			//	If replying to http request, reply to a queue managed by this service broker using tcp protocol
-			if ( isReplyEndpoint && brokerUri.startsWith("http") && controller != null && controller.getInputChannel() != null )
+			if ( isReplyEndpoint && brokerUri.startsWith("http") && aController != null && aController.getInputChannel() != null )
 			{
-				org.apache.uima.aae.InputChannel iC = controller.getInputChannel(controller.getName());
-				if ( ( brokerUri == null || brokerUri.trim().length() == 0 ) && iC != null )
+				org.apache.uima.aae.InputChannel iC = aController.getInputChannel(aController.getName());
+				if ( ( brokerUri.trim().length() == 0 ) && iC != null )
 				{
 					brokerUri = iC.getServiceInfo().getBrokerURL();
 				}
 				
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "open", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_override_connection_to_endpoint__FINE", new Object[] { controller.getComponentName(), getEndpoint(), controller.getInputChannel().getServerUri() });
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "open", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_override_connection_to_endpoint__FINE", new Object[] { aComponentName, getEndpoint(), aController.getInputChannel().getServerUri() });
         }
 			}
 
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_activemq_open__FINE",
-	                new Object[] { endpoint, serverUri });
+	                new Object[] { anEndpointName, brokerUri });
       }
       
       if ( brokerDestinations.getConnection() == null ) {
@@ -183,12 +187,12 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			if ( (delegateEndpoint.getCommand() == AsynchAEMessage.Stop || isReplyEndpoint ) && delegateEndpoint.getDestination() != null )
 			{
 				producer = producerSession.createProducer(null); 
-				if ( controller != null )
+				if ( aController != null )
 				{
 	        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 			                "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_temp_conn_starting__FINE",
-			                new Object[] { controller.getComponentName(), endpoint, serverUri });
+			                new Object[] { aComponentName, anEndpointName, brokerUri });
 	        }
 				}
 			}
@@ -201,7 +205,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
 	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 		                "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_conn_starting__FINE",
-		                new Object[] { controller.getComponentName(), endpoint, serverUri });
+		                new Object[] { aComponentName, anEndpointName, brokerUri });
 	        }
 				}
 			}
@@ -215,9 +219,9 @@ public class JmsEndpointConnection_impl implements ConsumerListener
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
           UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
 	                "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_conn_started__FINE",
-	                new Object[] { endpoint, serverUri });
+	                new Object[] { endpoint, brokerUri });
           if ( controller.getInputChannel() != null ) {
-            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_open_to_endpoint__FINE", new Object[] { controller.getComponentName(), getEndpoint(), serverUri });
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "openChannel", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_connection_open_to_endpoint__FINE", new Object[] { aComponentName, getEndpoint(), brokerUri });
           }
         }
 			}
@@ -230,12 +234,15 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			throw new AsynchAEException(e);
 		}
 	}
-	public synchronized void open() throws AsynchAEException, ServiceShutdownException
+	public synchronized void open() throws AsynchAEException, ServiceShutdownException {
+	  open( delegateEndpoint.getEndpoint(), serverUri);
+	}
+  public synchronized void open(String brokerUri, String anEndpointName) throws AsynchAEException, ServiceShutdownException
 	{
     if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
       UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
                 "open", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_open__FINE",
-                new Object[] { endpoint, serverUri });
+                new Object[] { anEndpointName, brokerUri });
     }
 		if ( !connectionAborted )
 		{
@@ -405,10 +412,11 @@ public class JmsEndpointConnection_impl implements ConsumerListener
     // and a temp queue to receive replies. A new listener will be created only if the
     // endpoint for the delegate is marked as FAILED. This will be the case if the listener
     // on the reply queue for the endpoint has failed.
+    String endpointName = delegateEndpoint.getEndpoint();
     synchronized( recoveryMux ) {
       if ( controller instanceof AggregateAnalysisEngineController ) {
         // Using the queue name lookup the delegate key
-        String key = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(delegateEndpoint.getEndpoint());
+        String key = ((AggregateAnalysisEngineController)controller).lookUpDelegateKey(endpointName);
         if ( key != null && destination != null && !isReplyEndpoint ) {
           // For Process Requests check the state of the delegate that is to receive
           // the CAS. If the delegate state = TIMEOUT_STATE, push the CAS id onto
@@ -417,7 +425,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
           if (msgType != AsynchAEMessage.Request && command == AsynchAEMessage.Process ) {
             String casReferenceId = aMessage.getStringProperty(AsynchAEMessage.CasReference);
             if ( casReferenceId != null && 
-                 ((AggregateAnalysisEngineController)controller).delayCasIfDelegateInTimedOutState(casReferenceId, delegateEndpoint.getEndpoint()) ) {
+                 ((AggregateAnalysisEngineController)controller).delayCasIfDelegateInTimedOutState(casReferenceId, endpointName) ) {
               return true;
             }
           }
@@ -510,7 +518,7 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			    handleJmsException( (JMSException)e );
 			  } else {
 	        if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleJmsException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] { controller.getComponentName(), e});
+	          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleJmsException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] { componentName, e});
 	        }
 			  }
 			    
@@ -530,9 +538,9 @@ public class JmsEndpointConnection_impl implements ConsumerListener
       String type="Text";
       if ( aMessage instanceof BytesMessage ) {
         type = "Binary";
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "logMessageSize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_size__FINE", new Object[] { controller.getComponentName(), isReply==true?"Reply":"Request", "Binary", destinationName,msgSize});
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "logMessageSize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_size__FINE", new Object[] { componentName, isReply==true?"Reply":"Request", "Binary", destinationName,msgSize});
       } else if ( aMessage instanceof TextMessage ) {
-        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "logMessageSize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_size__FINE", new Object[] { controller.getComponentName(), isReply==true?"Reply":"Request", "XMI", destinationName,msgSize});
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(), "logMessageSize", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_msg_size__FINE", new Object[] { componentName, isReply==true?"Reply":"Request", "XMI", destinationName,msgSize});
       }
     }
 	}
@@ -567,11 +575,11 @@ public class JmsEndpointConnection_impl implements ConsumerListener
         }
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
                 "handleJmsException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_send_failed_deleted_queue_INFO",
-                new Object[] { controller.getName(), destName});
+                new Object[] { componentName, destName});
         return;
       } else {
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
-          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleJmsException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] { controller.getComponentName(), ex});
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleJmsException", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_exception__WARNING", new Object[] {componentName, ex});
         }
         ex.printStackTrace();
       }
