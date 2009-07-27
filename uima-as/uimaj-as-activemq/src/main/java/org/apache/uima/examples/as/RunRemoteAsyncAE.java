@@ -102,7 +102,7 @@ public class RunRemoteAsyncAE {
   /**
    * Start time of the processing - used to compute elapsed time.
    */
-  private static long mStartTime;
+  private static long mStartTime = System.nanoTime()/1000000;
 
   private UimaAsynchronousEngine uimaEEEngine = null;
 
@@ -234,7 +234,7 @@ public class RunRemoteAsyncAE {
 
     // Add the Cas Pool Size and initial FS heap size
     appCtx.put(UimaAsynchronousEngine.CasPoolSize, casPoolSize);
-    appCtx.put(UIMAFramework.CAS_INITIAL_HEAP_SIZE, new Integer(fsHeapSize/4).toString());
+    appCtx.put(UIMAFramework.CAS_INITIAL_HEAP_SIZE, Integer.valueOf(fsHeapSize/4).toString());
 
     //initialize
     uimaEEEngine.initialize(appCtx);
@@ -243,7 +243,6 @@ public class RunRemoteAsyncAE {
     if (logCas) {
         System.out.println("\nService-IPaddr\tSent\tDuration");
       }
-    mStartTime = System.nanoTime()/1000000;
     if (collectionReaderDescriptor != null) {
       uimaEEEngine.process();
     } else {
@@ -382,38 +381,48 @@ public class RunRemoteAsyncAE {
      *          EntityProcessStatus that holds the status of all the events for aEntity
      */
     public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
-      if (aStatus != null && aStatus.isException()) {
-        System.err.println("Error on process CAS call to remote service:");
-        List exceptions = aStatus.getExceptions();
-        for (int i = 0; i < exceptions.size(); i++) {
-          ((Throwable) exceptions.get(i)).printStackTrace();
-        }
-        if (!ignoreErrors) {
-          System.err.println("Terminating Client...");
-          // uimaEEEngine.stop();  TODO: Does not seem to work
-          // return;
-          System.exit(1);
-        }
-      }
-      
-      if (logCas) {
-        String ip = "no IP";
-        List eList = aStatus.getProcessTrace().getEventsByComponentName("UimaEE",false);
-        for (int e=0; e<eList.size(); e++) {
-          ProcessTraceEvent event = (ProcessTraceEvent)eList.get(e);
-          if (event.getDescription().equals("Service IP")) {
-            ip = event.getResultMessage();
+      if (aStatus != null ) {
+        if ( aStatus.isException() ) {
+          System.err.println("Error on process CAS call to remote service:");
+          List exceptions = aStatus.getExceptions();
+          for (int i = 0; i < exceptions.size(); i++) {
+            ((Throwable) exceptions.get(i)).printStackTrace();
+          }
+          if (!ignoreErrors) {
+            System.err.println("Terminating Client...");
+            // uimaEEEngine.stop();  TODO: Does not seem to work
+            // return;
+            System.exit(1);
           }
         }
-          long current = System.nanoTime()/1000000 - mStartTime;
-          long start = ((Long)casMap.get(((UimaASProcessStatus)aStatus).getCasReferenceId())).longValue();
-          System.out.println(ip + "\t" + start + "\t" + (current-start));
-      }
-      else {
-        System.out.print(".");
-          if (0 == (entityCount+1) % 50) {
-            System.out.print((entityCount+1) + " processed\n");
+        if (logCas) {
+          String ip = "no IP";
+          List eList = aStatus.getProcessTrace().getEventsByComponentName("UimaEE",false);
+          for (int e=0; e<eList.size(); e++) {
+            ProcessTraceEvent event = (ProcessTraceEvent)eList.get(e);
+            if (event.getDescription().equals("Service IP")) {
+              ip = event.getResultMessage();
+            }
           }
+          String casId = ((UimaASProcessStatus)aStatus).getCasReferenceId();
+          if (  casId != null ) {
+              long current = System.nanoTime()/1000000 - mStartTime;
+              if ( casMap.containsKey(casId) ) {
+                Object value = casMap.get(casId);
+                if ( value != null && value instanceof Long ) {
+                  long start = ((Long)value).longValue();
+                  System.out.println(ip + "\t" + start + "\t" + (current-start));
+                }
+              }
+          }
+            
+        }
+        else {
+          System.out.print(".");
+            if (0 == (entityCount+1) % 50) {
+              System.out.print((entityCount+1) + " processed\n");
+            }
+        }
       }
       
       //if output dir specified, dump CAS to XMI
@@ -471,7 +480,7 @@ public class RunRemoteAsyncAE {
     }
     public void onBeforeMessageSend(UimaASProcessStatus status) {
       long current = System.nanoTime()/1000000 - mStartTime;
-      casMap.put(status.getCasReferenceId(), new Long(current));
+      casMap.put(status.getCasReferenceId(), current);
     }
 
   }
