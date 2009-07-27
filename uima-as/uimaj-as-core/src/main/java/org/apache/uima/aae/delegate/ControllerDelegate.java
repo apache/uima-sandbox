@@ -39,12 +39,9 @@ public class ControllerDelegate extends Delegate {
     return controller.getComponentName();
   }
   public void handleError(Exception e, ErrorContext errorContext) {
-    if (controller != null) {
-      //delegate.setState(Delegate.TIMEOUT_STATE);
-      if (controller != null && controller.getErrorHandlerChain() != null) {
+    if (controller != null &&  controller.getErrorHandlerChain() != null) {
         // Handle Timeout
         controller.getErrorHandlerChain().handle(e, errorContext, controller);
-      }
     }
   }
 }
