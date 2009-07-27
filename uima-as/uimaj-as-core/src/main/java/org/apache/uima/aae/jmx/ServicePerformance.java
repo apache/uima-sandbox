@@ -161,10 +161,8 @@ public class ServicePerformance implements ServicePerformanceMBean
 		}
 	}
 	
-	public double getAnalysisTime()
+	public synchronized double getAnalysisTime()
 	{
-//		return (double)analysisTime/(double)1000000;
-		
 		if ( controller != null )
 		{
 			return ((double)controller.getAnalysisTime()/(double) 1000000);
@@ -181,7 +179,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 		
 	}
 	
-	public long getRawAnalysisTime()
+	public synchronized long getRawAnalysisTime()
 	{
     if ( controller != null )
     {
