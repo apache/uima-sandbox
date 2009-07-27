@@ -28,6 +28,7 @@ import org.apache.uima.aae.UIMAEE_Constants;
 import org.apache.uima.aae.InProcessCache.CacheEntry;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
 import org.apache.uima.aae.controller.AnalysisEngineController;
+import org.apache.uima.aae.controller.Controller;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.controller.LocalCache.CasStateEntry;
 import org.apache.uima.aae.delegate.Delegate;
@@ -439,7 +440,9 @@ public class ProcessCasErrorHandler extends ErrorHandlerBase implements ErrorHan
 			}
 
 		}
-		catch( Exception e) {}
+		catch( Exception e) {
+      System.out.println("Controller:"+aController.getComponentName()+" CAS:"+casReferenceId+" Not Found In Cache");
+		}
 		//	Determine where to send the message
 		Endpoint endpoint = getDestination(aController, anErrorContext);
 		//	If the error happened during a parallel step, treat the exception as response from the delegate
