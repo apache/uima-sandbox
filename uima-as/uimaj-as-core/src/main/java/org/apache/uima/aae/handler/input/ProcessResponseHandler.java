@@ -204,6 +204,8 @@ public class ProcessResponseHandler extends HandlerBase
         casStateEntry.setReplyReceived();
         //  Set the key of the delegate that returned the CAS
         casStateEntry.setLastDelegate(delegate);
+      } else {
+        return;  // Cache Entry Not found
       }
 			
 			cas = cacheEntry.getCas();  
@@ -455,7 +457,9 @@ public class ProcessResponseHandler extends HandlerBase
 				LongNumericStatistic stat = getController().getMonitor().getLongNumericStatistic(delegateKey, Monitor.ProcessCount);
 				stat.increment();
 			}
-			catch( Exception e) {}
+			catch( Exception e) {
+			  System.out.println("Controller:"+getController().getComponentName()+" Unable To Find DelegateKey For Endpoint:"+endpoint.getEndpoint());
+			}
 		}
 		
 	}
@@ -594,8 +598,10 @@ public class ProcessResponseHandler extends HandlerBase
 	  }
 	}
   private void handleServiceInfoReply(MessageContext messageContext) {
+
+    String casReferenceId = null; 
     try {
-      String casReferenceId = 
+      casReferenceId = 
         messageContext.getMessageStringProperty(AsynchAEMessage.CasReference);
       Endpoint freeCasEndpoint = messageContext.getEndpoint();
       CasStateEntry casStateEntry = 
@@ -605,7 +611,7 @@ public class ProcessResponseHandler extends HandlerBase
         casStateEntry.setFreeCasNotificationEndpoint(freeCasEndpoint);
       }
     } catch( Exception e) {
-      
+      System.out.println("Controller:"+getController().getComponentName()+" CAS:"+casReferenceId+" Not Found In Cache");
     }
     
   }
