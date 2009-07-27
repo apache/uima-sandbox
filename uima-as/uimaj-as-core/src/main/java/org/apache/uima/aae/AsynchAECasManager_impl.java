@@ -80,8 +80,8 @@ public class AsynchAECasManager_impl implements AsynchAECasManager {
   public void initialize(int aCasPoolSize, String aContextName) throws Exception {
     Properties performanceTuningSettings = new Properties();
     if (initialHeapSize > 0) {
-      performanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, new Integer(
-              (int) initialHeapSize).toString());
+      performanceTuningSettings.setProperty(UIMAFramework.CAS_INITIAL_HEAP_SIZE, 
+              Integer.valueOf((int) initialHeapSize).toString());
     }
     initialize(aCasPoolSize, aContextName, performanceTuningSettings);
   }
