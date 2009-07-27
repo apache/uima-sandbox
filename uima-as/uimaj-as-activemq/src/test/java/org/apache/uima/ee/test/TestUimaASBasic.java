@@ -86,7 +86,7 @@ public class TestUimaASBasic extends BaseTestSupport
 
 		try
 		{
-			initialize(eeUimaEngine, appCtx);
+      initialize(eeUimaEngine, appCtx);
 			waitUntilInitialized();
 			System.out.println("First Initialize Call Completed");
 			eeUimaEngine.initialize(appCtx);
@@ -105,7 +105,13 @@ public class TestUimaASBasic extends BaseTestSupport
 		}
 		catch( ServiceShutdownException e)
 		{
+		  e.printStackTrace();
 			//	expected
+		}
+		catch( Throwable e)
+		{
+      e.printStackTrace();
+		  
 		}
 		finally
 		{
@@ -160,7 +166,7 @@ public class TestUimaASBasic extends BaseTestSupport
 	 * @throws Exception
 	 */
 	
-	public void GetMetaRetry() throws Exception
+	public void getMetaRetry() throws Exception
 	{
 		getMetaCountLatch = new CountDownLatch(MaxGetMetaRetryCount);
         Connection connection = getConnection();
