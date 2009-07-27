@@ -36,7 +36,6 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 	private long counter = 0;
   private long countDown = 0;
 	int errorFrequency = 0;
-	int cpcDelay = 1;
 	int processDelay = 0;
   int finalCount = 0;
   
@@ -58,7 +57,7 @@ public class NoOpAnnotator extends CasAnnotator_ImplBase
 		
 		if ( getContext().getConfigParameterValue("CpCDelay") != null )
 		{
-			cpcDelay = ((Integer)getContext().getConfigParameterValue("CpCDelay")).intValue();
+			//cpcDelay = ((Integer)getContext().getConfigParameterValue("CpCDelay")).intValue();
 		}
 		if ( getContext().getConfigParameterValue("ProcessDelay") != null )
 		{
