@@ -857,6 +857,7 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 		}
 		catch (Exception e)
 		{
+		  e.printStackTrace();
 		}
 	}
 	public void setReleaseCASMessage(TextMessage msg, String aCasReferenceId)
