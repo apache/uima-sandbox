@@ -21,7 +21,7 @@
 
 <casConsumerDescription xmlns="http://uima.apache.org/resourceSpecifier">
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-  <implementationName>org.apache.uima.consumer.LuceneCASIndexer</implementationName>
+  <implementationName>org.apache.uima.lucas.consumer.LuceneCASIndexer</implementationName>
   <processingResourceMetaData>
     <name>LuceneCASIndexer</name>
     <description/>
@@ -68,7 +68,7 @@
         <fileResourceSpecifier>
           <fileUrl>file:src/test/resources/IndexWriter.properties</fileUrl>
         </fileResourceSpecifier>
-        <implementationName>org.apache.uima.indexer.IndexWriterProviderImpl</implementationName>
+        <implementationName>org.apache.uima.lucas.indexer.IndexWriterProviderImpl</implementationName>
       </externalResource>
     </externalResources>
     <externalResourceBindings>
