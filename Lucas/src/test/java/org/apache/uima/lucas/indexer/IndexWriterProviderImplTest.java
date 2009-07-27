@@ -44,59 +44,68 @@ import org.junit.Test;
 
 public class IndexWriterProviderImplTest {
 
-  private static final String TEST_INDEX = "src/test/resources/test-index";
-  private static final String RESOURCES_TEST_INDEX_PROPERTIES = "src/test/resources/IndexWriter.properties";
+  private static final String fileSep = System.getProperty("file.separator");
+
+  private static final String TEST_INDEX = "src" + fileSep + "test" + fileSep + "resources"
+      + fileSep + "test-index";
+
+  private static final String RESOURCES_TEST_INDEX_PROPERTIES = "src" + fileSep + "test" + fileSep
+      + "resources" + fileSep + "IndexWriter.properties";
+
   private IndexWriterProviderImpl indexWriterProviderImpl;
+
   private DataResource dataResource;
+
   private InputStream propertiesInputStream;
-  
+
   @Before
-  public void setUp() throws IOException{
+  public void setUp() throws IOException {
     indexWriterProviderImpl = new IndexWriterProviderImpl();
     dataResource = createMock(DataResource.class);
     FileInputStream fileInputStream = new FileInputStream(RESOURCES_TEST_INDEX_PROPERTIES);
     propertiesInputStream = new BufferedInputStream(fileInputStream);
   }
-  
+
   @After
-  public void tearDown() throws Exception{
-    
+  public void tearDown() throws Exception {
+
     FSDirectory directory = (FSDirectory) indexWriterProviderImpl.getIndexWriter().getDirectory();
     File directoryFile = directory.getFile();
-    
+
     directory = FSDirectory.getDirectory(directoryFile);
     IndexWriter.unlock(directory);
-    
-    for( String file: directory.list() )
+
+    for (String file : directory.list())
       directory.deleteFile(file);
 
     directory.getFile().delete();
   }
-  
+
   @Test
-  public void testLoadData() throws IOException, ResourceInitializationException{
-    
+  public void testLoadData() throws IOException, ResourceInitializationException {
+
     expect(dataResource.getInputStream()).andReturn(propertiesInputStream);
     replay(dataResource);
-    
+
     indexWriterProviderImpl.load(dataResource);
     IndexWriter indexWriter = indexWriterProviderImpl.getIndexWriter();
     FSDirectory fsDirectory = (FSDirectory) indexWriter.getDirectory();
-    
+
     String hostname = getHostName();
     String pid = getPID();
-    
-    assertTrue(fsDirectory.getFile().getAbsolutePath().endsWith(TEST_INDEX +"-"+hostname+"-"+pid));
+
+    assertTrue(fsDirectory.getFile().getAbsolutePath().endsWith(
+        TEST_INDEX + "-" + hostname + "-" + pid));
     assertEquals(513, indexWriter.getRAMBufferSizeMB(), 0.5);
     assertEquals(9999, indexWriter.getMaxFieldLength(), 0.5);
   }
-   
-  protected String getPID(){
+
+  protected String getPID() {
     String id = ManagementFactory.getRuntimeMXBean().getName();
-    return id.substring(0, id.indexOf("@") );   
+    return id.substring(0, id.indexOf("@"));
   }
-  
-  public String getHostName(){
+
+  public String getHostName() {
     InetAddress address;
     String hostName;
     try {
@@ -104,7 +113,7 @@ public class IndexWriterProviderImplTest {
       hostName = address.getHostName();
     } catch (UnknownHostException e) {
       throw new IllegalStateException(e);
-    }       
+    }
     return hostName;
   }
 }
