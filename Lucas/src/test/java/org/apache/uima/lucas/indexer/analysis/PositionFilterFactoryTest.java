@@ -31,7 +31,6 @@ import org.junit.Test;
 
 public class PositionFilterFactoryTest {
 
-  private static final String FIRST = "first";
   private TokenFilterFactory positionFilterFactory;
   private TokenStream tokenStream;
   

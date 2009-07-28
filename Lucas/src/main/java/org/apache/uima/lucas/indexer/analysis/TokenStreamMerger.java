@@ -69,8 +69,9 @@ public class TokenStreamMerger extends TokenStream {
   }
 
   private void init() throws IOException {
-    for (TokenStream stream : streams) {
-      Token token = stream.next();
+    Token token = new Token();
+	for (TokenStream stream : streams) {
+      token = stream.next(token);
       if (token != null)
         currentTokens.put(token, stream);
     }
@@ -111,11 +112,14 @@ public class TokenStreamMerger extends TokenStream {
   }
 
   private void rebuildSortedTokens() throws IOException {
-    for (TokenStream stream : streams)
+    Token token = new Token();
+	for (TokenStream stream : streams)
       if (!currentTokens.values().contains(stream)) {
-        Token token = stream.next();
+        token = stream.next(token);
         if (token != null)
           currentTokens.put(token, stream);
+        else
+            break;
       }
 
     sortedTokens.clear();

@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.uima.lucas.indexer.util.TokenFactory;
 
 public class DummyTokenStream extends TokenStream{
 	private int count = 0;
@@ -54,7 +55,7 @@ public class DummyTokenStream extends TokenStream{
 		if( number <= count / distance )
 			return null;
 										
-		Token token = new Token(tokenValue, begin, end);			
+		Token token = TokenFactory.newToken(tokenValue, begin, end);			
 
 		count += distance;
 		begin+= distance* (tokenValue.length() + 1);

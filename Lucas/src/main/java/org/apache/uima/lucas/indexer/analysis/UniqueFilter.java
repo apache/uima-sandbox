@@ -46,14 +46,14 @@ public class UniqueFilter extends TokenFilter {
   }
 
   @Override
-  public Token next() throws IOException {
-    currentToken = input.next();
+  public Token next(Token inputToken) throws IOException {
+    currentToken = input.next(inputToken);
     if (currentToken == null)
       return null;
 
     String termText = new String(currentToken.termBuffer(), 0, currentToken.termLength());
     while (termTexts.contains(termText)) {
-      currentToken = input.next();
+      currentToken = input.next(inputToken);
       if (currentToken != null)
         termText = new String(currentToken.termBuffer(), 0, currentToken.termLength());
       else

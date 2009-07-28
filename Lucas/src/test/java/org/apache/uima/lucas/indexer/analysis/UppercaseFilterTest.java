@@ -28,30 +28,31 @@ import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.uima.lucas.indexer.analysis.UpperCaseFilter;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
-
+import static org.apache.uima.lucas.indexer.util.TokenFactory.*;
 
 public class UppercaseFilterTest extends TestCase {
 
 	public void testNext() throws Exception{
 		List<Token> tokens = new ArrayList<Token>();
-		tokens.add(new Token("token1", 0, 6));
-		tokens.add(new Token("token2", 7, 13));
-		tokens.add(new Token("token3", 14, 20));
+		tokens.add(newToken("token1", 0, 6));
+		tokens.add(newToken("token2", 7, 13));
+		tokens.add(newToken("token3", 14, 20));
 		
 		TokenStream tokenStream = new CollectionTokenStream(tokens );
 		
 		UpperCaseFilter upperCaseTokenFilter = new UpperCaseFilter(tokenStream);
 		
-		Token next = upperCaseTokenFilter.next();
+		Token next = new Token(); 
+		upperCaseTokenFilter.next(next);
 		
 		String nextString = new String(next.termBuffer(), 0, next.termLength());
 		assertEquals("TOKEN1", nextString);
 
-		next = upperCaseTokenFilter.next();		
+		next = upperCaseTokenFilter.next(next);		
 		nextString = new String(next.termBuffer(), 0, next.termLength());
 		assertEquals("TOKEN2", nextString);
 
-		next = upperCaseTokenFilter.next();		
+		next = upperCaseTokenFilter.next(next);		
 		nextString = new String(next.termBuffer(), 0, next.termLength());
 		assertEquals("TOKEN3", nextString);
 

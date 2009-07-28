@@ -35,8 +35,8 @@ public class UpperCaseFilter extends TokenFilter {
   }
 
   @Override
-  public Token next() throws IOException {
-    Token nextToken = input.next();
+  public Token next(Token inputToken) throws IOException {
+    Token nextToken = input.next(inputToken);
     if (nextToken == null)
       return null;
 

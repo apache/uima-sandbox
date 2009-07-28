@@ -61,24 +61,24 @@ public class HypernymFilter extends TokenFilter {
   }
 
   @Override
-  public Token next() throws IOException {
+  public Token next(Token nextToken) throws IOException {
     if (currentHypernymIndex >= 0 && currentHypernymIndex < currentHypernyms.size()) {
-      Token hypernymToken = new Token(currentHypernyms.get(currentHypernymIndex), inputToken
+      nextToken.reinit(currentHypernyms.get(currentHypernymIndex), inputToken
               .startOffset(), inputToken.endOffset());
-      hypernymToken.setPositionIncrement(0);
+      nextToken.setPositionIncrement(0);
       logger
-              .debug("adding hypernym " + hypernymToken.termText() + " for :"
-                      + inputToken.termText());
+              .debug("adding hypernym " + nextToken.term() + " for :"
+                      + inputToken.term());
       currentHypernymIndex++;
-      return hypernymToken;
+      return nextToken;
     } else if (currentHypernymIndex >= 0 && currentHypernymIndex == currentHypernyms.size()) {
       currentHypernymIndex = -1;
       currentHypernyms = null;
     }
 
-    inputToken = tokenStream.next();
+    inputToken = tokenStream.next(nextToken);
     if (inputToken != null) {
-      currentHypernyms = hypernyms.get(inputToken.termText());
+      currentHypernyms = hypernyms.get(inputToken.term());
       if (currentHypernyms != null)
         currentHypernymIndex = 0;
     }

@@ -31,49 +31,51 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.uima.lucas.indexer.analysis.SplitterFilter;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 import org.junit.Test;
+import static org.apache.uima.lucas.indexer.util.TokenFactory.*;
 
 public class SplitterFilterTest {
 
 	@Test
 	public void testNext() throws Exception{
 		Collection<Token> tokens = new ArrayList<Token>();
-		tokens.add(new Token("token1 token2 token3", 0, 6));
-		tokens.add(new Token("token4 token5 token6", 7, 13));
+		tokens.add(newToken("token1 token2 token3", 0, 6));
+		tokens.add(newToken("token4 token5 token6", 7, 13));
 		
 		TokenStream tokenStream = new CollectionTokenStream(tokens);
 		TokenFilter filter = new SplitterFilter(tokenStream, " ");
 		
-		Token nextToken = filter.next();
+		Token nextToken = new Token(); 
+		filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		assertEquals(0, nextToken.startOffset());
 		assertEquals(6, nextToken.endOffset());
 		
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		assertEquals(0, nextToken.startOffset());
 		assertEquals(6, nextToken.endOffset());
 		
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		assertEquals(0, nextToken.startOffset());
 		assertEquals(6, nextToken.endOffset());
 
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		assertEquals(7, nextToken.startOffset());
 		assertEquals(13, nextToken.endOffset());
 
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token5", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		assertEquals(7, nextToken.startOffset());
 		assertEquals(13, nextToken.endOffset());
 
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token6", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		assertEquals(7, nextToken.startOffset());

@@ -28,45 +28,47 @@ import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-
+import static org.apache.uima.lucas.indexer.util.TokenFactory.*;
+;
 public class AdditionFilterTest {
 
 	@Test
 	public void testNext() throws Exception{		
 		Collection<Token> tokens = new ArrayList<Token>();
-		tokens.add(new Token("token1", 0, 6));
-		tokens.add(new Token("token2", 7, 13));
-		tokens.add(new Token("token3", 14, 20));
-		tokens.add(new Token("token4", 21, 27));
+		tokens.add(newToken("token1", 0, 6));
+		tokens.add(newToken("token2", 7, 13));
+		tokens.add(newToken("token3", 14, 20));
+		tokens.add(newToken("token4", 21, 27));
 		
 		TokenStream tokenStream = new CollectionTokenStream(tokens);
 		AdditionFilter filter = new AdditionFilter(tokenStream, "prefix_", AdditionFilter.PREFIX);
 		
-		Token next = filter.next();
-		assertEquals("prefix_token1", new String(next.termBuffer(), 0, next.termLength()));
-		next = filter.next();
-		assertEquals("prefix_token2", new String(next.termBuffer(), 0, next.termLength()));
-		next = filter.next();
-		assertEquals("prefix_token3", new String(next.termBuffer(), 0, next.termLength()));
-		next = filter.next();
-		assertEquals("prefix_token4", new String(next.termBuffer(), 0, next.termLength()));		
+		Token nextToken = new Token();
+		filter.next(nextToken);
+		assertEquals("prefix_token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = filter.next(nextToken);
+		assertEquals("prefix_token2", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = filter.next(nextToken);
+		assertEquals("prefix_token3", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = filter.next(nextToken);
+		assertEquals("prefix_token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));		
 
 		tokens = new ArrayList<Token>();
-		tokens.add(new Token("token1", 0, 6));
-		tokens.add(new Token("token2", 7, 13));
-		tokens.add(new Token("token3", 14, 20));
-		tokens.add(new Token("token4", 21, 27));
+		tokens.add(newToken("token1", 0, 6));
+		tokens.add(newToken("token2", 7, 13));
+		tokens.add(newToken("token3", 14, 20));
+		tokens.add(newToken("token4", 21, 27));
 		
 		tokenStream = new CollectionTokenStream(tokens);
 		filter = new AdditionFilter(tokenStream, "_postfix", AdditionFilter.POSTFIX);
 		
-		next = filter.next();
-		assertEquals("token1_postfix", new String(next.termBuffer(), 0, next.termLength()));
-		next = filter.next();
-		assertEquals("token2_postfix", new String(next.termBuffer(), 0, next.termLength()));
-		next = filter.next();
-		assertEquals("token3_postfix", new String(next.termBuffer(), 0, next.termLength()));
-		next = filter.next();
-		assertEquals("token4_postfix", new String(next.termBuffer(), 0, next.termLength()));				
+		nextToken = filter.next(nextToken);
+		assertEquals("token1_postfix", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = filter.next(nextToken);
+		assertEquals("token2_postfix", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = filter.next(nextToken);
+		assertEquals("token3_postfix", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
+		nextToken = filter.next(nextToken);
+		assertEquals("token4_postfix", new String(nextToken.termBuffer(), 0, nextToken.termLength()));				
 	}
 }

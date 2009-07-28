@@ -27,46 +27,46 @@ import org.apache.lucene.analysis.TokenStream;
 
 public class PositionFilter extends TokenFilter {
 
-  public final static Integer FIRST_POSITION = 0;
+	public final static Integer FIRST_POSITION = 0;
 
-  public final static Integer LAST_POSITION = 1;
+	public final static Integer LAST_POSITION = 1;
 
-  private TokenStream input;
+	private TokenStream input;
 
-  private Token token;
+	private Token token;
 
-  private Integer position;
+	private Integer position;
 
-  public PositionFilter(TokenStream input, Integer position) {
-    super(input);
-    this.input = input;
-    this.position = position;
-  }
+	public PositionFilter(TokenStream input, Integer position) {
+		super(input);
+		this.input = input;
+		this.position = position;
+	}
 
-  @Override
-  public Token next() throws IOException {
-    Token newToken = input.next();
+	@Override
+	public Token next(Token nextToken) throws IOException {
+		Token newToken = input.next(nextToken);
 
-    if (position.equals(FIRST_POSITION)) {
-      if (token != null)
-        return null;
-      else {
-        token = newToken;
-        return newToken;
-      }
-    } else if (position.equals(LAST_POSITION)) {
-      Token lastToken = null;
-      while (newToken != null) {
-        lastToken = newToken;
-        newToken = input.next();
-      }
-      return lastToken;
-    } else
-      return newToken;
-  }
+		if (position.equals(FIRST_POSITION)) {
+			if (token != null)
+				return null;
+			else {
+				token = newToken;
+				return newToken;
+			}
+		} else if (position.equals(LAST_POSITION)) {
+			Token lastToken = null;
+			while (newToken != null) {
+				lastToken = newToken;
+				newToken = input.next(nextToken);
+			}
+			return lastToken;
+		} else
+			return newToken;
+	}
 
-  public Integer getPosition() {
-    return position;
-  }
+	public Integer getPosition() {
+		return position;
+	}
 
 }

@@ -30,7 +30,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.uima.lucas.indexer.analysis.PositionFilter;
 import org.apache.uima.lucas.indexer.test.util.CollectionTokenStream;
 import org.junit.Test;
-
+import static org.apache.uima.lucas.indexer.util.TokenFactory.*;
 
 
 public class PositionFilterTest {
@@ -38,29 +38,31 @@ public class PositionFilterTest {
 	@Test
 	public void testNext() throws Exception{
 		Collection<Token> tokens = new ArrayList<Token>();
-		tokens.add(new Token("token1", 0, 6));
-		tokens.add(new Token("token1", 7, 13));
-		tokens.add(new Token("token2", 14, 20));
-		tokens.add(new Token("token2", 21, 27));
-		tokens.add(new Token("token3", 28, 33));
-		tokens.add(new Token("token4", 34, 40));
+		tokens.add(newToken("token1", 0, 6));
+		tokens.add(newToken("token1", 7, 13));
+		tokens.add(newToken("token2", 14, 20));
+		tokens.add(newToken("token2", 21, 27));
+		tokens.add(newToken("token3", 28, 33));
+		tokens.add(newToken("token4", 34, 40));
 		
 		TokenStream tokenStream = new CollectionTokenStream(tokens);
 		TokenFilter filter = new PositionFilter(tokenStream, PositionFilter.FIRST_POSITION);
 		
-		Token nextToken = filter.next();
+		Token nextToken = new Token(); 
+		filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token1", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNull(nextToken);
 
+		nextToken = new Token();
 		filter = new PositionFilter(tokenStream, PositionFilter.LAST_POSITION);
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNotNull(nextToken);
 		assertEquals("token4", new String(nextToken.termBuffer(), 0, nextToken.termLength()));
 		
-		nextToken = filter.next();
+		nextToken = filter.next(nextToken);
 		assertNull(nextToken);
 	}
 	

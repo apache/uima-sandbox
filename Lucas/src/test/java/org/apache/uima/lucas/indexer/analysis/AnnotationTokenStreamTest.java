@@ -1358,6 +1358,6 @@ public class AnnotationTokenStreamTest {
   @Test(expected= InvalidTokenSourceException.class)
   public void testValidateFailWithWrongType() throws Exception{
     JCas cas = createCasWithText("token1 token2 token3");
-    AnnotationTokenStream annotationTokenStream = new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation3");    
+    new AnnotationTokenStream(cas, CAS.NAME_DEFAULT_SOFA, "org.apache.uima.lucas.indexer.types.test.Annotation3");    
   }
 }

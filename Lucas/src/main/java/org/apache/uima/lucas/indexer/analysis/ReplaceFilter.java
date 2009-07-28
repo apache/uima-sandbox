@@ -39,8 +39,8 @@ public class ReplaceFilter extends TokenFilter {
   }
 
   @Override
-  public Token next() throws IOException {
-    Token token = input.next();
+  public Token next(Token inputToken) throws IOException {
+    Token token = input.next(inputToken);
     if (token == null)
       return null;
 

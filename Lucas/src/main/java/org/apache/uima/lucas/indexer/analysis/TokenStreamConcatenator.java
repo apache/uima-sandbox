@@ -48,18 +48,18 @@ public class TokenStreamConcatenator extends TokenStream {
   }
 
   @Override
-  public Token next() throws IOException {
+  public Token next(Token inputToken) throws IOException {
     if (currentTokenStream == null)
       if (tokenStreamIterator.hasNext())
         currentTokenStream = tokenStreamIterator.next();
       else
         return null;
 
-    Token nextToken = currentTokenStream.next();
+    Token nextToken = currentTokenStream.next(inputToken);
     while (nextToken == null) {
       if (tokenStreamIterator.hasNext()) {
         currentTokenStream = tokenStreamIterator.next();
-        nextToken = currentTokenStream.next();
+        nextToken = currentTokenStream.next(inputToken);
       } else
         return null;
     }

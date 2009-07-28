@@ -46,43 +46,43 @@ public class TokenStreamMergerTest extends TestCase {
 		
 		Token currentToken = merger.next();
 		
-		assertEquals("1111", currentToken.termText());
+		assertEquals("1111", currentToken.term());
 		assertEquals(0, currentToken.startOffset());
 		assertEquals(4, currentToken.endOffset());
 		assertEquals(1, currentToken.getPositionIncrement());
 		
 		currentToken = merger.next();		
-		assertEquals("1111", currentToken.termText());
+		assertEquals("1111", currentToken.term());
 		assertEquals(5, currentToken.startOffset());
 		assertEquals(9, currentToken.endOffset());
 		assertEquals(1, currentToken.getPositionIncrement());
 
 		currentToken = merger.next();		
-		assertEquals("2222", currentToken.termText());
+		assertEquals("2222", currentToken.term());
 		assertEquals(5, currentToken.startOffset());
 		assertEquals(9, currentToken.endOffset());
 		assertEquals(0, currentToken.getPositionIncrement());
 
 		currentToken = merger.next();		
-		assertEquals("1111", currentToken.termText());
+		assertEquals("1111", currentToken.term());
 		assertEquals(10, currentToken.startOffset());
 		assertEquals(14, currentToken.endOffset());
 		assertEquals(1, currentToken.getPositionIncrement());
 
 		currentToken = merger.next();		
-		assertEquals("3333", currentToken.termText());
+		assertEquals("3333", currentToken.term());
 		assertEquals(10, currentToken.startOffset());
 		assertEquals(14, currentToken.endOffset());
 		assertEquals(0, currentToken.getPositionIncrement());
 
 		currentToken = merger.next();		
-		assertEquals("1111", currentToken.termText());
+		assertEquals("1111", currentToken.term());
 		assertEquals(15, currentToken.startOffset());
 		assertEquals(19, currentToken.endOffset());
 		assertEquals(1, currentToken.getPositionIncrement());
 
 		currentToken = merger.next();		
-		assertEquals("2222", currentToken.termText());
+		assertEquals("2222", currentToken.term());
 		assertEquals(15, currentToken.startOffset());
 		assertEquals(19, currentToken.endOffset());
 		assertEquals(0, currentToken.getPositionIncrement());

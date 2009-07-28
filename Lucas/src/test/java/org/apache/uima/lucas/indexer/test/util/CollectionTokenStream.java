@@ -40,9 +40,12 @@ public class CollectionTokenStream extends TokenStream{
 
 
 	@Override
-	public Token next() throws IOException {
-		if( tokenIterator.hasNext() )
-			return tokenIterator.next();
+	public Token next(Token nextToken) throws IOException {
+		if( tokenIterator.hasNext() ){
+			Token nextCollectionToken = tokenIterator.next();
+			nextToken.reinit(nextCollectionToken);
+			return nextToken;
+		}
 		else
 			return null;
 	}
