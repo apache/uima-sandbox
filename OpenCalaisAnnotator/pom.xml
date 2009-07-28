@@ -24,7 +24,7 @@
 	<artifactId>OpenCalaisAnnotator</artifactId>
 	<packaging>jar</packaging>
 	<version>2.3.0-incubating-SNAPSHOT</version>
-	<name>OpenCalais UIMA Annotator Wrapper</name>
+	<name>Apache UIMA OpenCalais Annotator Wrapper</name>
 	<url>http://incubator.apache.org/uima</url>
 	<dependencies>
 		<dependency>
