@@ -248,7 +248,7 @@ public class AnnotationTokenStream extends TokenStream {
     this.featureNames = featureNames;
     this.delimiter = delimiter;
     if (featureFormats == null)
-      this.featureFormats = Collections.EMPTY_MAP;
+      this.featureFormats = Collections.emptyMap();
     else
       this.featureFormats = featureFormats;
     
@@ -480,7 +480,7 @@ public class AnnotationTokenStream extends TokenStream {
   public void reset() {
     featureStructureIterator = null;
     currentAnnotation = null;
-    featureFormats = Collections.EMPTY_MAP;
+    featureFormats = Collections.emptyMap();
     initializeIterators();
   }
 
