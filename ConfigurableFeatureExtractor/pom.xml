@@ -23,7 +23,7 @@
 	<groupId>org.apache.uima</groupId>
 	<artifactId>ConfigurableFeatureExtractor</artifactId>
 	<packaging>jar</packaging>
-	<version>2.3-incubating-SNAPSHOT</version>
+	<version>2.3.0-incubating-SNAPSHOT</version>
 	<name>Apache UIMA Java Tool - ConfigurableFeatureExtractor</name>
 	<url>http://incubator.apache.org/uima</url>
 	<dependencies>
