@@ -188,8 +188,9 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-					</execution>		          				
-					<execution>
+					</execution>
+					<!-- next is omitted until build_documentation.xml is available 7/2009 -->		          				
+					<!--execution>
 						<phase>package</phase>
 						<configuration>
 							<tasks>
@@ -199,7 +200,7 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-					</execution>
+					</execution-->
 				</executions>
 			</plugin>
               
