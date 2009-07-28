@@ -754,7 +754,7 @@ implements UimaAsynchronousEngine, MessageListener
 	      }
         // Incremented number of outstanding CASes sent to a service. When a reply comes
         // this counter is decremented
-        long outstandingCasCount = outstandingCasRequests.incrementAndGet();
+        outstandingCasRequests.incrementAndGet();
 	      //  Add message to the pending queue
 	      addMessage(msg);
 	    }
@@ -1630,10 +1630,12 @@ implements UimaAsynchronousEngine, MessageListener
     //  Once the semaphore is acquired and the CAS is dispatched
     //  the thread will block in trying to acquire the semaphore again
     //  below.
-    try {
-      threadMonitor.getMonitor().acquire();
-    } catch( InterruptedException e) {
-      System.out.println("UIMA AS Client Received Interrrupt While Acquiring Monitor Semaphore in sendAndReceive()");
+    if (threadMonitor != null && threadMonitor.getMonitor() != null) {
+      try {
+        threadMonitor.getMonitor().acquire();
+      } catch( InterruptedException e) {
+        System.out.println("UIMA AS Client Received Interrrupt While Acquiring Monitor Semaphore in sendAndReceive()");
+      }
     }
     // send CAS. This call does not block. Instead we will block the sending thread below.
     casReferenceId = sendCAS(aCAS, cachedRequest);
@@ -1873,7 +1875,6 @@ implements UimaAsynchronousEngine, MessageListener
 
 		private String endpoint;
 
-		private volatile boolean receivedProcessCasReply = false;
 		private long threadId=-1;
 		
 		private Message message;
@@ -2009,7 +2010,6 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 		public void setReceivedProcessCasReply()
 		{
-			receivedProcessCasReply = true;
 		}
 		public void setMetadataTimeout( int aTimeout )
 		{
