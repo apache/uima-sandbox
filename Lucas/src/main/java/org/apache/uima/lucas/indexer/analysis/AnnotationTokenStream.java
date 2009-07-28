@@ -306,34 +306,24 @@ public class AnnotationTokenStream extends TokenStream {
 
   @Override
   public Token next(Token token) throws IOException {
-    try {
-      while (!featureValueIterator.hasNext()) {
-        while (!featureStructureIterator.hasNext()) {
-          if (!annotationIterator.hasNext())
-            return null;
-          currentAnnotation = (Annotation) annotationIterator.next();
-          featureStructureIterator = createFeatureStructureIterator(currentAnnotation, featurePath);
-        }
-
-        featureValueIterator = createFeatureValueIterator(featureStructureIterator.next(),
-                featureNames);
+    while (!featureValueIterator.hasNext()) {
+      while (!featureStructureIterator.hasNext()) {
+        if (!annotationIterator.hasNext())
+          return null;
+        currentAnnotation = (Annotation) annotationIterator.next();
+        featureStructureIterator = createFeatureStructureIterator(currentAnnotation, featurePath);
       }
 
-      token.setStartOffset(currentAnnotation.getBegin());
-      token.setEndOffset(currentAnnotation.getEnd());
-
-      char[] value = featureValueIterator.next().toCharArray();
-      token.setTermBuffer(value, 0, value.length);
-      return token;
-
-    } catch (Throwable e) {
-
-      IOException ioException = new IOException(e + " at type " + annotationType.getName()
-              + " features " + featureNames + " featurePath " + featurePath + " sofa "
-              + jCas.getViewName(), e);
-      logger.error(ioException);
-      throw ioException;
+      featureValueIterator = createFeatureValueIterator(featureStructureIterator.next(),
+              featureNames);
     }
+
+    token.setStartOffset(currentAnnotation.getBegin());
+    token.setEndOffset(currentAnnotation.getEnd());
+
+    char[] value = featureValueIterator.next().toCharArray();
+    token.setTermBuffer(value, 0, value.length);
+    return token;
   }
 
   /*
