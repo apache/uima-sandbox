@@ -521,6 +521,13 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 	      sharedConnection.incrementClientCount();
 	    }
 			running = true;
+			// Acquire GetMeta Semaphore Before Sending a GetMeta Request. This will force
+			// the client to block in waitForMetadataReply() until GetMeta reply is received
+			try {
+	      getMetaSemaphore.acquire();
+	    } catch( InterruptedException e) {
+	     System.out.println("UIMA AS Client Interrupted While Waiting On GetMetaSemaphore"); 
+	    }
 			sendMetaRequest();
 			waitForMetadataReply();
 			if (abort || !running)
