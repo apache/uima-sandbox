@@ -71,7 +71,7 @@ under the License.
   <listitem>
   <para>Tomcat or some other servlet container installed.  Installing Tomcat is a breeze, see 
   <ulink url="http://tomcat.apache.org/"></ulink>.  For the purposes of this documentation, we have
-  used Apache Tomcat 6.0.16, but other versions should work just as well if they're not too old.</para>
+  used Apache Tomcat 6.0.20, but other versions should work just as well if they're not too old.</para>
   </listitem>
   <listitem>
   <para>The latest Apache UIMA release, plus the Apache UIMA sandbox add-ons.  See
@@ -82,7 +82,7 @@ under the License.
   <para>Doing all this from Eclipse is convenient, but not required.  If you work with Eclipse, it is
   useful to use the Web Tools Platform.  Alternatively, just install the J2EE development
   version of Eclipse.  The screenshots for this documentation were done with the J2EE development
-  version of Eclipse 3.3.1.1.</para>
+  version of Eclipse 3.5.0 (Galileo).</para>
   </listitem>
   </itemizedlist>
   
@@ -131,26 +131,14 @@ under the License.
   </screenshot>
 
   <para>
-  	Finally, you can select other project facets for your project. The
-  	default should be fine.
+  	Hit finish next, accepting default settings for the rest of the project setup.
   </para>
 
-  <screenshot>
-    <mediaobject>
-        <imageobject>
-            <imagedata scale="100" format="JPG"
-                fileref="&imgroot;new-web-project3.jpg" />
-        </imageobject>
-        <textobject>
-            <phrase>New project dialog: no other facets are necessary</phrase>
-        </textobject>
-    </mediaobject>
-  </screenshot>
 
   <para>
   We'll now describe what jar files you need to package in your WAR file for the application
   to run.  Note that these are jars that you will need for each and every UIMA service you
-  deploy.  So if deploy several different services into the same servlet container, you can
+  deploy.  So if you deploy several different services into the same servlet container, you can
   also copy those jars to the shared lib directory of your servlet container: you then don't
   have to deploy them with each UIMA service.  However, for the purposes of this example, we
   <emphasis>will</emphasis> deploy the common jars with the WAR file.
@@ -347,10 +335,6 @@ Below is list of the required files from the SimpleServer project.
   Programmatic access to the service is described on the info page.  You can also
   look at the unit tests in the source code for how to use Apache's HttpClient
   to call UIMA simple services.  
-  </para>
-  
-  <para>
-  TODO: describe service spec (output filtering and mapping), detailed reference... 
   </para>
   
   </section>
