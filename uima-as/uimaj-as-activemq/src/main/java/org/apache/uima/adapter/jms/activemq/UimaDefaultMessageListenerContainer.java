@@ -27,12 +27,13 @@ import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
-import javax.jms.MessageListener;
 import javax.jms.TemporaryQueue;
+
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQPrefetchPolicy;
@@ -78,7 +79,7 @@ implements ExceptionListener
   private int cc=0;
   //	stores message listener plugged in by Spring
   private Object ml=null;
-  //	if cc > 0, a new listener will be injected between
+  //	A new listener will be injected between
   //	spring and JmsInputChannel Pojo Listener. This 
   //	listener purpose is to increment number of children for
   //	an input CAS. 
@@ -288,6 +289,7 @@ implements ExceptionListener
 	 */
 	protected void handleListenerSetupFailure( Throwable t, boolean alreadyHandled )
 	{
+	  
 	  // If shutdown already, nothing to do
 	  if ( awaitingShutdown ) {
       return;
@@ -436,7 +438,7 @@ implements ExceptionListener
 	public void afterPropertiesSet()
 	{
 	  if ( endpoint != null ) {
-	    // Endpoint has been plagged in from spring xml. This means this is a listener
+	    // Endpoint has been plugged in from spring xml. This means this is a listener
 	    // for a reply queue. We need to rewire things a bit. First make Spring use
 	    // one thread to make sure we receive messages in order. To fix a race condition
 	    // where a parent CAS is processed first instead of its last child, we need to
@@ -448,40 +450,41 @@ implements ExceptionListener
 	    // on its parent resulted in CAS Not Found In Cache Exception.
       //  Make sure Spring uses one thread
 	    super.setConcurrentConsumers(1);
-	    if ( cc > 1 ) {
-	      try {
-	        concurrentListener = new ConcurrentMessageListener(cc, ml);
-	        super.setMessageListener(concurrentListener);
-	      } catch( Exception e) {
-	        e.printStackTrace();
-	        return;
-	      }
-	    } else {
-	      super.setMessageListener(ml);
+	    try {
+	      concurrentListener = new ConcurrentMessageListener(cc, ml);
+	      super.setMessageListener(concurrentListener);
+	    } catch( Exception e) {
+	      e.printStackTrace();
+	      return;
 	    }
 	  } else {
       super.setMessageListener(ml);
       super.setConcurrentConsumers(cc);
 	  }
+	  String messageSelector = __listenerRef.getMessageSelector();
+	  if (messageSelector == null ) {
+	    messageSelector = ":";
+	  }
+	  String listenerName = "ListenerGroup";
 	  
+	    if (isActiveMQDestination()) {
+	      listenerName +=":"+ ((ActiveMQDestination) getDestination()).getPhysicalName()+":"+messageSelector;
+      }
 	  
-	  
-	  
-	  
-	  Thread t = new Thread() {
+      Thread t = new Thread( threadGroup, new Runnable() {
 	    public void run() {
         Destination destination = __listenerRef.getDestination();
-	      try {
-	        // Wait until the connection factory is injected by Spring
-	        while (connectionFactory == null) {
-	          try {
-	            Thread.sleep(50);
-	          } catch ( InterruptedException ex) {}
-	        }
+        try {
+          // Wait until the connection factory is injected by Spring
+          while (connectionFactory == null) {
+            try {
+              Thread.sleep(50);
+            } catch ( InterruptedException ex) {}
+          }
           System.setProperty("BrokerURI", ((ActiveMQConnectionFactory) connectionFactory)
                   .getBrokerURL());
-	        boolean done = false;
-	        //  Wait for controller to be injected by Uima AS
+          boolean done = false;
+          //  Wait for controller to be injected by Uima AS
           if (isActiveMQDestination() && !isGetMetaListener()
                   && !((ActiveMQDestination) destination).isTemporary()) {
             System.out.println("Waiting For Controller. Destination::" + destination
@@ -516,19 +519,15 @@ implements ExceptionListener
           if ( concurrentListener != null ) {
             concurrentListener.setAnalysisEngineController(controller);
           }
-          
-          
-          
-          
-          
-	      } catch ( Exception e ) {
-	        e.printStackTrace();
-	        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
-	                "afterPropertiesSet", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
-	                new Object[] { destination, getBrokerUrl(), e });
-	      }
+        } catch ( Exception e ) {
+          e.printStackTrace();
+          UIMAFramework.getLogger(CLASS_NAME).logrb(Level.WARNING, this.getClass().getName(),
+                  "afterPropertiesSet", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_jms_listener_failed_WARNING",
+                  new Object[] { destination, getBrokerUrl(), e });
+        }
 	    }
-	  };
+	  }
+	  );
 	  t.start();
 	}
 	/**
@@ -579,7 +578,7 @@ implements ExceptionListener
 	 */
 	public void setConnectionFactory(ConnectionFactory aConnectionFactory) {
 	  connectionFactory = aConnectionFactory;
-    if (connectionFactory instanceof ActiveMQConnectionFactory) {
+ 	  if (connectionFactory instanceof ActiveMQConnectionFactory) {
       String brokerURL = ((ActiveMQConnectionFactory) connectionFactory).getBrokerURL();
       if (brokerURL != null) {
         //  http connections should not turn off inactivity timeout. The broker doesnt
@@ -749,7 +748,7 @@ implements ExceptionListener
           if ( UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST) ) {
             threadGroup.getParent().list();
           }
-          System.out.println(">>>>> Thread:"+Thread.currentThread().getId()+ " ThreadGroupDestroyer waiting for threads to stop. Active thread count:"+threadGroup.activeCount());
+          System.out.println(">>>>> Thread:"+Thread.currentThread().getId()+ " ThreadGroupDestroyer waiting for threads to stop. Active thread count:"+threadGroup.activeCount()+" Active thread group count:"+threadGroup.activeGroupCount());
           //  Wait until all threads are accounted for
           while (threadGroup.activeCount() > 0) {
             try {
