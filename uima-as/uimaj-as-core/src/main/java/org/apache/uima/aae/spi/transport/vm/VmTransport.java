@@ -39,6 +39,7 @@ import org.apache.uima.aae.error.UimaSpiException;
 import org.apache.uima.aae.message.AsynchAEMessage;
 import org.apache.uima.aae.message.UIMAMessage;
 import org.apache.uima.aae.spi.transport.SpiListener;
+import org.apache.uima.aae.spi.transport.UimaMessage;
 import org.apache.uima.aae.spi.transport.UimaMessageDispatcher;
 import org.apache.uima.aae.spi.transport.UimaMessageListener;
 import org.apache.uima.aae.spi.transport.UimaTransport;
@@ -111,19 +112,12 @@ public class VmTransport implements UimaTransport {
   public void stopIt() throws UimaSpiException {
     executor.purge();
     executor.shutdownNow();
+    workQueue.clear();
     Set <Entry<String, UimaVmMessageDispatcher>> set = dispatchers.entrySet();
     for( Entry<String, UimaVmMessageDispatcher> entry: set) {
       UimaVmMessageDispatcher dispatcher = entry.getValue();
       dispatcher.stop();
     }
-    while( !executor.isShutdown()) {
-      Thread.currentThread().getThreadGroup().list();
-      synchronized(this) {
-        try {
-          this.wait(50);
-        } catch( InterruptedException e) {break;}
-      }
-    } 
     if ( executor.isShutdown() && threadGroup.activeCount() == 0) {
       try {
         threadGroup.destroy();
