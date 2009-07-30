@@ -149,7 +149,7 @@ public class ServicePerformance implements ServicePerformanceMBean
 	{
 	  analysisTime = anAnalysisTime;
 	}
-	public void incrementAnalysisTime( long anAnalysisTime )
+	public synchronized void incrementAnalysisTime( long anAnalysisTime )
 	{
 		synchronized(sem)
 		{
