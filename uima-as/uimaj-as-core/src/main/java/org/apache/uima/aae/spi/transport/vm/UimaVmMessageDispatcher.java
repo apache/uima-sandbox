@@ -58,6 +58,9 @@ public class UimaVmMessageDispatcher implements UimaMessageDispatcher {
    * provided by the Executor.
    */
   public void dispatch(final UimaMessage message) {
+    if ( executor.isShutdown() || executor.isTerminating() || executor.isShutdown() ) {
+      return; 
+    }
     executor.execute(new Runnable() {
       public void run() {
 
