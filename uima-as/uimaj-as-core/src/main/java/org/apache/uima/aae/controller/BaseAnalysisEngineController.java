@@ -1775,6 +1775,10 @@ implements AnalysisEngineController, EventSubscriber
 	    for( Entry<String, UimaTransport> entry: set ) {
 	      UimaTransport transport = entry.getValue();
 	      try {
+	        
+	        UimaMessage message = 
+	          transport.produceMessage(AsynchAEMessage.Stop,AsynchAEMessage.Request,getName());
+	        transport.getUimaMessageDispatcher(entry.getKey()).dispatch(message);
 	        transport.stopIt();
 	        System.out.println(">>> Controller:"+getComponentName()+" Stopped Transport For:"+entry.getKey());
 	      } catch ( Exception e) {e.printStackTrace();}
@@ -1802,7 +1806,8 @@ implements AnalysisEngineController, EventSubscriber
     }
 		if ( this instanceof PrimitiveAnalysisEngineController )
 		{
-			getControllerLatch().release();
+
+		  getControllerLatch().release();
 			//	Stops the input channel of this service
       stopInputChannels(InputChannel.CloseAllChannels);
 		}
@@ -2019,6 +2024,7 @@ implements AnalysisEngineController, EventSubscriber
 	
   public void terminate( Throwable cause, String aCasReferenceId) {
 
+    
     synchronized(stopLatch) {
       if ( stopLatch.getCount() > 0 ) {
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
@@ -2082,9 +2088,11 @@ implements AnalysisEngineController, EventSubscriber
           if ( delegate != null ) {
             // Get a list of all CASes this aggregate has dispatched to the Cas Multiplier
             List<DelegateEntry> pendingList = delegate.getDelegateCasesPendingRepy();
-            try {
+            if ( pendingList != null ) {
+              Iterator<DelegateEntry> it2 = pendingList.iterator();
               // For each CAS pending reply send a Stop message to the CM
-              for( DelegateEntry delegateEntry : pendingList ) {
+              while( it2.hasNext() ) {
+                DelegateEntry delegateEntry = it2.next();
                 if ( endpoint.isRemote() ) {
                   stopCasMultiplier(delegate, delegateEntry.getCasReferenceId());
                 } else {
@@ -2092,8 +2100,6 @@ implements AnalysisEngineController, EventSubscriber
                   delegateCasMultiplier.addAbortedCasReferenceId(delegateEntry.getCasReferenceId());
                 }
               }
-            } catch ( Exception exx) {
-              exx.printStackTrace();
             }
           }
         }
