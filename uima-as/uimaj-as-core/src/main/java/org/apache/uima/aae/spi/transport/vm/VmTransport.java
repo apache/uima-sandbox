@@ -111,11 +111,25 @@ public class VmTransport implements UimaTransport {
   public void stopIt() throws UimaSpiException {
     executor.purge();
     executor.shutdownNow();
-    
     Set <Entry<String, UimaVmMessageDispatcher>> set = dispatchers.entrySet();
     for( Entry<String, UimaVmMessageDispatcher> entry: set) {
       UimaVmMessageDispatcher dispatcher = entry.getValue();
       dispatcher.stop();
+    }
+    while( !executor.isShutdown()) {
+      Thread.currentThread().getThreadGroup().list();
+      synchronized(this) {
+        try {
+          this.wait(50);
+        } catch( InterruptedException e) {break;}
+      }
+    } 
+    if ( executor.isShutdown() && threadGroup.activeCount() == 0) {
+      try {
+        threadGroup.destroy();
+      } catch ( Exception e) {
+        System.out.println("Thread Group:"+threadGroup.getName()+ " Still Has Active Threads. Current Count:"+threadGroup.activeCount());
+      }
     }
   }
   public void destroy() {
