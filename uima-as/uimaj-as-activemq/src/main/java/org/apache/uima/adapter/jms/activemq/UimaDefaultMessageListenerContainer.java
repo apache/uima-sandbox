@@ -450,6 +450,7 @@ implements ExceptionListener
 	    // on its parent resulted in CAS Not Found In Cache Exception.
       //  Make sure Spring uses one thread
 	    super.setConcurrentConsumers(1);
+      if (cc > 1) {
 	    try {
 	      concurrentListener = new ConcurrentMessageListener(cc, ml);
 	      super.setMessageListener(concurrentListener);
@@ -459,20 +460,13 @@ implements ExceptionListener
 	    }
 	  } else {
       super.setMessageListener(ml);
+	  }
+    } else {
+      super.setMessageListener(ml);
       super.setConcurrentConsumers(cc);
-	  }
-	  String messageSelector = __listenerRef.getMessageSelector();
-	  if (messageSelector == null ) {
-	    messageSelector = ":";
-	  }
-	  String listenerName = "ListenerGroup";
-	  
-	    if (isActiveMQDestination()) {
-	      listenerName +=":"+ ((ActiveMQDestination) getDestination()).getPhysicalName()+":"+messageSelector;
-      }
-	  
-      Thread t = new Thread( threadGroup, new Runnable() {
-	    public void run() {
+    }
+    Thread t = new Thread(threadGroup, new Runnable() {
+      public void run() {
         Destination destination = __listenerRef.getDestination();
         try {
           // Wait until the connection factory is injected by Spring
