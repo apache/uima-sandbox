@@ -722,6 +722,10 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 				//  if the the current delegate is remote, destroy its listener
         if ( endpoint != null && endpoint.isRemote() )
 				{
+          Delegate delegate = lookupDelegate(key);
+          if ( delegate != null ) {
+            delegate.cancelDelegateTimer();
+          }
           stopListener( key, endpoint);
           endpoint.setStatus(Endpoint.DISABLED);
 				}
