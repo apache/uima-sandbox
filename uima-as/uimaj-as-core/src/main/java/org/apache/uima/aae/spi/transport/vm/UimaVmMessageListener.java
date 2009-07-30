@@ -73,6 +73,9 @@ public class UimaVmMessageListener implements UimaMessageListener {
     int requestType = 0;
     try {
       latch.await();
+      if ( controller != null && controller.equals(controller.isStopped() ) ) {
+        return; // throw away the message, we are stopping
+      }
       if (UimaMessageValidator.isValidMessage(aMessage, controller)) {
         MessageContext msgContext = aMessage.toMessageContext(controller.getName());
         if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
@@ -88,9 +91,12 @@ public class UimaVmMessageListener implements UimaMessageListener {
           // want to change it once
           concurrentThreads.put(Thread.currentThread().getId(), Thread.currentThread().getName());
         }
+        requestType = aMessage.getIntProperty(AsynchAEMessage.Command);
+        if ( requestType == AsynchAEMessage.Stop ) {
+          return;
+        }
         // Determine if this message is a request and either GetMeta, CPC, or Process
         doCheckpoint = isCheckpointWorthy(aMessage);
-        requestType = aMessage.getIntProperty(AsynchAEMessage.Command);
         // Checkpoint
         if (doCheckpoint) {
           controller.beginProcess(requestType);
@@ -98,6 +104,8 @@ public class UimaVmMessageListener implements UimaMessageListener {
         //  Process the message.
         handler.handle(msgContext);
       }
+    } catch( InterruptedException e) {
+      System.out.println("VMTransport Latch Interrupted - Processor is Stopping");
     } catch (Exception e) {
       e.printStackTrace();
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.WARNING)) {
