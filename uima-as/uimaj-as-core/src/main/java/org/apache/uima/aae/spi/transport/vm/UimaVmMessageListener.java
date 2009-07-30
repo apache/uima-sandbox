@@ -73,7 +73,7 @@ public class UimaVmMessageListener implements UimaMessageListener {
     int requestType = 0;
     try {
       latch.await();
-      if ( controller != null && controller.equals(controller.isStopped() ) ) {
+      if ( controller != null && controller.isStopped()) {
         return; // throw away the message, we are stopping
       }
       if (UimaMessageValidator.isValidMessage(aMessage, controller)) {
