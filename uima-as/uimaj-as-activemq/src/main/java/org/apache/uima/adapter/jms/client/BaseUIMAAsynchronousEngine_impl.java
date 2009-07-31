@@ -295,8 +295,8 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
 			// This only effects Consumer
 			addPrefetch((ActiveMQConnection)connection);
 			connection.start();
-			sharedConnection = new SharedConnection();
-			sharedConnection.setConnection(connection);
+			sharedConnection = new SharedConnection(connection);
+//			sharedConnection.setConnection(connection);
 		} 
 	}
 
