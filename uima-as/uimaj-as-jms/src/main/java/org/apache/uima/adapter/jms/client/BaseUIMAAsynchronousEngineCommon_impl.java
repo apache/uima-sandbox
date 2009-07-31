@@ -2264,7 +2264,12 @@ implements UimaAsynchronousEngine, MessageListener
 	public class SharedConnection {
 	  private Connection connection;
 	  private int clientCount;
-	  private Object mux = new Object();
+	  
+    public SharedConnection(Connection connection) {
+      this.connection = connection;
+    }
+
+    private Object mux = new Object();
 	  
 	  public synchronized Connection getConnection() {
       return connection;
