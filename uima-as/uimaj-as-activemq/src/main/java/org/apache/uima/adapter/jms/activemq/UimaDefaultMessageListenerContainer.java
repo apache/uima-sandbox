@@ -89,6 +89,7 @@ implements ExceptionListener
   public UimaDefaultMessageListenerContainer()
 	{
 		super();
+		UIMAFramework.getLogger(CLASS_NAME).setLevel(Level.WARNING);
 		__listenerRef = this;
     setRecoveryInterval(5);
 		setAcceptMessagesWhileStopping(false);
@@ -563,8 +564,7 @@ implements ExceptionListener
 	{
     return ((ActiveMQConnectionFactory)connectionFactory).getBrokerURL();
 	}
-	/**
-	 * Overrides specified Connection Factory. Need to append maxInactivityDuration=0 to the 
+	/* Overrides specified Connection Factory. Need to append maxInactivityDuration=0 to the 
 	 * broker URL. The Connection Factory is immutable thus we need to intercept the one
 	 * provided in the deployment descriptor and create a new one with rewritten Broker URL. 
 	 * We will inject the prefetch policy to the new CF based on what is found in the CF
