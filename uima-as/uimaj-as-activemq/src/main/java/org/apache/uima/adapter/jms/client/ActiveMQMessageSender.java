@@ -18,7 +18,7 @@
  */
 package org.apache.uima.adapter.jms.client;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -26,13 +26,10 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.command.ActiveMQDestination;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Initializes JMS session and creates JMS MessageProducer to be used for
@@ -49,7 +46,8 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 	private Session session = null;
 	private MessageProducer producer = null;
 	private String destinationName = null;
-	private ConcurrentHashMap producerMap = new ConcurrentHashMap();
+	private ConcurrentHashMap<Destination, MessageProducer> producerMap = 
+	  new ConcurrentHashMap<Destination,MessageProducer>();
 	
 	public ActiveMQMessageSender(Connection aConnection,
 			String aDestinationName,
