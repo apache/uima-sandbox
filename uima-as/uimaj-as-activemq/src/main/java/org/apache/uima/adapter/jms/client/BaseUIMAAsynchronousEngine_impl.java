@@ -960,7 +960,10 @@ public class BaseUIMAAsynchronousEngine_impl extends BaseUIMAAsynchronousEngineC
             System.out.println(">>> Client Sending Stop to Service for CAS:"+clientCachedRequest.getCasReferenceId()+" Destination:"+clientCachedRequest.getFreeCasNotificationQueue() );
             //  Send STOP message to Cas Multiplier Service
             msgProducer.send(msg);
+          } else {
+            System.out.println(">>> UIMA AS Client Unable to Send Stop To Service. Message Producer Not Initialized");
           }
+          
         } catch( Exception ex) {
           System.out.println("Client Unable to send STOP Request to Service. Reason:");
           ex.printStackTrace();
