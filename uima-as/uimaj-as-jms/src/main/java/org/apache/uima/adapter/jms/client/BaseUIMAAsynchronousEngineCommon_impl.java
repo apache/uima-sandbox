@@ -553,7 +553,7 @@ implements UimaAsynchronousEngine, MessageListener
 	protected void reset() {
 	}
 
-	private  class CasQueueEntry {
+	private static class CasQueueEntry {
 	  private CAS cas;
 	  private Semaphore semaphore = new Semaphore(1);
     public CAS getCas() {
@@ -2217,7 +2217,7 @@ implements UimaAsynchronousEngine, MessageListener
 		}
 	}
 
-	protected class ThreadMonitor
+	protected static class ThreadMonitor
 	{
 		private long threadId;
 		private Semaphore monitor = new Semaphore(1);
@@ -2261,7 +2261,7 @@ implements UimaAsynchronousEngine, MessageListener
 
 	// This class is used to share JMS Connection by many instances of UIMA AS 
 	// clients deployed in the same JVM. 
-	public class SharedConnection {
+	public static class SharedConnection {
 	  private Connection connection;
 	  private int clientCount;
 	  
