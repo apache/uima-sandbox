@@ -20,6 +20,7 @@
 
 package org.apache.uima.aae.controller;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.uima.UimaContext;
@@ -447,5 +448,13 @@ public abstract class AnalysisEngineControllerAdapter implements AnalysisEngineC
     
 
   }
-
+  public void addEndpointToDoNotProcessList( String anEndpointName ) {
+  }
+  
+  public boolean isEndpointOnDontProcessList( String anEndpointName) {
+    return false;
+  }
+  public void cleanup() {
+    
+  }
 }
