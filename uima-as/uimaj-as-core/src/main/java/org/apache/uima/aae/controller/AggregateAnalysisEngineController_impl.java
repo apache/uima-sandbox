@@ -2468,7 +2468,9 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
 		{
       flowControllerContainer.removeAnalysisEngines(disabledDelegateList);
 		}
-		
+		//  start a cleanup thread
+		((BaseAnalysisEngineController)this).startServiceCleanupThread(30000);  // sleep for 30 secs
+
 		//	Before processing CASes, send notifications to all collocated delegates to
 		//	complete initialization. Currently this call forces all collocated Cas Multiplier delegates
 		//	to initialize their internal Cas Pools. CM Cas Pool is lazily initialized on 
@@ -2479,6 +2481,8 @@ implements AggregateAnalysisEngineController, AggregateAnalysisEngineController_
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "completeInitialization", UIMAEE_Constants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_initialized_controller__INFO",new Object[] { getComponentName() });
       }
+      
+      
 		// Open latch to allow messages to be processed. The
 		// latch was closed to prevent messages from entering
 		// the controller before it is initialized.
