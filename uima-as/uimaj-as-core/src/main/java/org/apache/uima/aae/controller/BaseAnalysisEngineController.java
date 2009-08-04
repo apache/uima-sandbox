@@ -2843,7 +2843,7 @@ implements AnalysisEngineController, EventSubscriber
 	   * Invoked by a cleaner thread this method removed entries from a DoNotProcess 
 	   * list that are older than 30 minutes.
 	   */
-	  public void cleanup() {
+	  public void evictExpiredEntries() {
 	    try {
 	      for( Iterator<DoNotProcessEntry> it = doNotProcessList.iterator(); it.hasNext();){
 	        DoNotProcessEntry entry = it.next();
@@ -2858,7 +2858,7 @@ implements AnalysisEngineController, EventSubscriber
 	  // An entry for the DoNotProcess list. Holds endpoints that are no longer
 	  // reachable. Each entry expires in 30 minutes of its creation and is
 	  // subsequently removed from the list.
-	  private class DoNotProcessEntry {
+	  private static class DoNotProcessEntry {
 	    private long timeToLive;
 	    private String endpointName;
 	    private long entryTime;
@@ -2881,7 +2881,7 @@ implements AnalysisEngineController, EventSubscriber
 	  }
 	  
 	  // Cleanup thread 
-	  protected class UimaAsServiceCleanupThread implements Runnable { 
+	  protected static class UimaAsServiceCleanupThread implements Runnable { 
 	   
 	    private AnalysisEngineController controller;
 	    
@@ -2890,7 +2890,7 @@ implements AnalysisEngineController, EventSubscriber
 	    }
 	    
 	    public void run() {
-	      controller.cleanup();
+	      controller.evictExpiredEntries();
 	    }
 	  }
 

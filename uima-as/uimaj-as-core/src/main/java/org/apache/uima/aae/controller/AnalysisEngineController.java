@@ -214,5 +214,5 @@ public interface AnalysisEngineController extends ControllerLifecycle
   
   public boolean isEndpointOnDontProcessList( String anEndpointName);
   
-  public void cleanup();
+  public void evictExpiredEntries();
 }

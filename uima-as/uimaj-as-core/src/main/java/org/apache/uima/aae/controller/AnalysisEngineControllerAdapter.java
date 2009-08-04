@@ -454,7 +454,7 @@ public abstract class AnalysisEngineControllerAdapter implements AnalysisEngineC
   public boolean isEndpointOnDontProcessList( String anEndpointName) {
     return false;
   }
-  public void cleanup() {
+  public void evictExpiredEntries() {
     
   }
 }
