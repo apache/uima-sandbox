@@ -60,7 +60,7 @@ public class ErrorResultBaseImpl implements ErrorResult
 		wasDisabled = disabled;
 		if ( wasTerminated || wasDisabled )
 		{
-			TD td = ((ErrorResultTDsImpl)resultTDs).new TDImpl(aComponentKeyPath, wasTerminated, wasDisabled );
+			TD td = new TDImpl(aComponentKeyPath, wasTerminated, wasDisabled );
 			resultTDs.add(td);
 		}
 	}
