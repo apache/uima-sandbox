@@ -557,6 +557,8 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 		catch( InterruptedException e) {}
 		long idleTime = 0;
 
+		
+		
 		boolean doCheckpoint = false;
 		
 		String eN = endpointName;
@@ -593,7 +595,27 @@ implements InputChannel, JmsInputChannelMBean, SessionAwareMessageListener
 			if ( validMessage(aMessage) )
 			{
 				String command = decodeIntToString(AsynchAEMessage.Command, aMessage.getIntProperty(AsynchAEMessage.Command) );
+				//  Request or Response
 				String messageType =  decodeIntToString(AsynchAEMessage.MessageType, aMessage.getIntProperty(AsynchAEMessage.MessageType) );
+				//  Check if the request message contains a reply destination known to have
+				//  been deleted. This could be the case if the client has been shutdown after
+				//  sending requests. Previous attempt to deliver a reply failed and the client's
+				//  reply endpoint was placed on the DoNotProcess List. For optimization, all
+				//  requests from a dead client will be dropped. 
+        if ( aMessage.getIntProperty(AsynchAEMessage.MessageType) == AsynchAEMessage.Request &&
+                messageContext != null && 
+                messageContext.getEndpoint() != null && 
+                  messageContext.getEndpoint().getDestination() != null &&
+                    getController().isEndpointOnDontProcessList(messageContext.getEndpoint().getDestination().toString())) {
+          if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.INFO)) {
+            UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(),
+                        "onMessage", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAEE_dropping_msg_client_is_dead__INFO",
+                        new Object[] { controller.getComponentName(),messageContext.getEndpoint().getDestination(), casRefId });
+          }
+          return;
+        }
+
+				
 				if ( ackMessageNow(aMessage))
 				{
 					aMessage.acknowledge();
