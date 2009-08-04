@@ -716,7 +716,7 @@ public abstract class Delegate {
    * 
    * 
    */
-  public class DelegateEntry {
+  public static class DelegateEntry {
     private String casReferenceId;
 
     private int command;
