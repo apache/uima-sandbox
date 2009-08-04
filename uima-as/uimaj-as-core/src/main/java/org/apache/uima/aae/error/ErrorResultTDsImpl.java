@@ -55,7 +55,7 @@ public class ErrorResultTDsImpl implements ErrorResultTDs
 		return list.iterator();
 	}
 
-	public class TDImpl implements TD
+	public static class TDImpl implements TD
 	{
 		/**
 		 * 
