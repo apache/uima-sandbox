@@ -29,6 +29,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.uima.aae.UIDGenerator;
 import org.apache.uima.aae.UimaAsContext;
 import org.apache.uima.aae.UimaAsThreadFactory;
 import org.apache.uima.aae.controller.AggregateAnalysisEngineController;
@@ -73,8 +74,9 @@ public class VmTransport implements UimaTransport {
 
   public VmTransport(UimaAsContext aContext, AnalysisEngineController aController) {
     context = aContext;
+    UIDGenerator idGenerator = new UIDGenerator();
     controller = aController;
-    threadGroup = new ThreadGroup("VmThreadGroup_"+controller.getComponentName());
+    threadGroup = new ThreadGroup("VmThreadGroup"+idGenerator.nextId()+"_"+controller.getComponentName());
   }
 
   public void addSpiListener(SpiListener listener) {
@@ -118,18 +120,33 @@ public class VmTransport implements UimaTransport {
       UimaVmMessageDispatcher dispatcher = entry.getValue();
       dispatcher.stop();
     }
-    if ( executor.isShutdown() && threadGroup.activeCount() == 0) {
-      try {
-        threadGroup.destroy();
-      } catch ( Exception e) {
-        System.out.println("Thread Group:"+threadGroup.getName()+ " Still Has Active Threads. Current Count:"+threadGroup.activeCount());
+    new Thread(threadGroup.getParent(),threadGroup.getName()+":Reaper") {
+      public void run() {
+        while ( threadGroup.activeCount() > 0) {
+          synchronized(this) {
+            try {
+              threadGroup.list();
+              wait(1000);
+            } catch( InterruptedException ex) {
+              
+            }
+          }
+        }
+        try {
+          threadGroup.destroy();
+        } catch ( Exception e) {
+        } finally {
+          threadGroup = null;
+        }
       }
-    }
+    }.start();
   }
   public void destroy() {
     try {
       stopIt();
-    } catch ( Exception e) { e.printStackTrace();}
+    } catch ( Exception e) {
+      
+    }
   }
 
   protected ThreadPoolExecutor getExecutorInstance() {
