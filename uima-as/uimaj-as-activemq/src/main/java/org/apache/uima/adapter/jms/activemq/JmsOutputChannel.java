@@ -2149,7 +2149,7 @@ public class JmsOutputChannel implements OutputChannel
     }
   }
 
-	public class BrokerConnectionEntry {
+	public static class BrokerConnectionEntry {
 	  private String brokerURL;
 	  private Connection connection;
 	  private ConnectionTimer connectionTimer;
