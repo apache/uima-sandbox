@@ -2665,7 +2665,7 @@ implements AnalysisEngineController, EventSubscriber
 				}
 			}
 		}
-		private class AnalysisThreadState
+		private static class AnalysisThreadState
 		{
 			private long threadId;
 			
