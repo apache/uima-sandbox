@@ -243,6 +243,7 @@ extends BaseAnalysisEngineController implements PrimitiveAnalysisEngineControlle
           }
         }
       }
+      ((BaseAnalysisEngineController)this).startServiceCleanupThread(30000);  // sleep for 30 secs
 		}
 		catch ( AsynchAEException e)
 		{
