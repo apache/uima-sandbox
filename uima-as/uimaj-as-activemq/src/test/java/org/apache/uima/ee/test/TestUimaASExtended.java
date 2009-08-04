@@ -25,42 +25,28 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import javax.jms.Connection;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
-import javax.management.QueryExp;
-import javax.resource.ResourceException;
 
 import junit.framework.Assert;
 
 import org.apache.activemq.ActiveMQMessageConsumer;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.command.ActiveMQDestination;
-import org.apache.activemq.console.command.StartCommand;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.aae.UimaClassFactory;
 import org.apache.uima.aae.client.UimaASProcessStatus;
-import org.apache.uima.aae.client.UimaASStatusCallbackListener;
 import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
-import org.apache.uima.aae.controller.Controller;
-import org.apache.uima.aae.controller.ControllerMBean;
 import org.apache.uima.aae.controller.Endpoint;
 import org.apache.uima.aae.error.ServiceShutdownException;
-import org.apache.uima.aae.jmx.JmxManager;
 import org.apache.uima.adapter.jms.JmsConstants;
 import org.apache.uima.adapter.jms.activemq.JmsOutputChannel;
 import org.apache.uima.adapter.jms.activemq.SpringContainerDeployer;
@@ -164,6 +150,29 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
     runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue", 0, EXCEPTION_LATCH);
 	}
+	
+  /**
+   * Tests sending CPC request from a client that does not send CASes to a service
+   * 
+   * @throws Exception
+   */
+  public void testCpCWithNoCASesSent() throws Exception
+  {
+    System.out.println("-------------- testCpCWithNoCASesSent -------------");
+    //  Instantiate Uima EE Client
+    BaseUIMAAsynchronousEngine_impl uimaAsEngine = new BaseUIMAAsynchronousEngine_impl();
+    //  Deploy Uima EE Primitive Service 
+    deployService(uimaAsEngine, relativePath+"/Deploy_PersonTitleAnnotator.xml");
+    Map<String, Object> appCtx = buildContext( String.valueOf(broker.getMasterConnectorURI()),"PersonTitleAnnotatorQueue" );
+    initialize(uimaAsEngine, appCtx);
+    waitUntilInitialized();
+    
+    for( int i=0; i < 10; i++ ) {
+      System.out.println("UIMA AS Client Sending CPC Request to a Service");
+      uimaAsEngine.collectionProcessingComplete();
+    }
+    uimaAsEngine.stop();
+  }
   /**
    * Tests handling of ResourceInitializationException that happens in a collocated primitive
    * 
