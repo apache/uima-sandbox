@@ -550,7 +550,7 @@ public class InProcessCache implements InProcessCacheMBean
 		return casRefEntry;
 	}
 	
-	public class CacheEntry
+	public static class CacheEntry
 	{
 		public static final int FINAL_STATE = 1;
 		
