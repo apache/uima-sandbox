@@ -157,7 +157,7 @@ public class LocalCache extends ConcurrentHashMap<String, LocalCache.CasStateEnt
     return casStateEntry;
   }
 
-  public class CasStateEntry {
+  public static class CasStateEntry {
     
     private String casReferenceId;
     private volatile boolean waitingForRealease;
