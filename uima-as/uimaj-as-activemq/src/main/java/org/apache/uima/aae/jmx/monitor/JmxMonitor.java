@@ -600,7 +600,7 @@ public class JmxMonitor implements Runnable {
 		System.out.println(msg);
 	}
 
-	private class StatEntry
+	private static class StatEntry
 	{
 		ServicePerformanceMBean servicePerformanceMBeanProxy;
 		ServiceInfoMBean serviceInfoMBeanProxy;
