@@ -186,7 +186,7 @@ implements UimaEEAdminContext, ApplicationListener
 		return isShutdown;
 	}
 
-	protected class ListenerEntry
+	protected static class ListenerEntry
 	{
 		private boolean stopped = false;
 		private UimaDefaultMessageListenerContainer listenerContainer = null;
