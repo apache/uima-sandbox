@@ -141,7 +141,9 @@ implements UimaAsynchronousEngine, MessageListener
 	// error.
 	protected AtomicLong outstandingCasRequests = new AtomicLong();
 
-	protected ConcurrentHashMap springContainerRegistry = new ConcurrentHashMap();
+  protected AtomicLong totalCasRequestsSentBetweenCpCs = new AtomicLong();
+
+  protected ConcurrentHashMap springContainerRegistry = new ConcurrentHashMap();
 
 	protected MessageConsumer consumer = null;
 
@@ -272,6 +274,15 @@ implements UimaAsynchronousEngine, MessageListener
 		  if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
 	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_app_cpc_request_FINEST", new Object[] {});
 		  }
+		  
+		  //  If the client was initialized but never sent any CASes its cpcReadySemaphore 
+		  //  must be first explicitly released to enable the code to send CPC to a service.
+		  //  The semaphore is initially acquired in the initialize(Map) method and typically
+		  //  released when the number of CASes sent equals the number of CASes received. Since
+		  //  no CASes were sent we must do the release here to be able to continue.
+		  if ( totalCasRequestsSentBetweenCpCs.get() == 0 ) {
+		    cpcReadySemaphore.release();
+		  }
       //  The cpcReadySemaphore was initially acquired in the initialize() method
       //  so below we wait until ALL CASes are processed. Once all
 		  //  CASes are received the semaphore will be released
@@ -313,6 +324,7 @@ implements UimaAsynchronousEngine, MessageListener
       } 
 			// Wait for CPC Reply. This blocks on the cpcReplySemaphore
 			waitForCpcReply();
+			totalCasRequestsSentBetweenCpCs.set(0); // reset number of CASes sent to a service
 			cancelTimer(uniqueIdentifier);
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_cancelled_cpc_request_timer_FINEST", new Object[] {});
@@ -755,6 +767,9 @@ implements UimaAsynchronousEngine, MessageListener
         // Incremented number of outstanding CASes sent to a service. When a reply comes
         // this counter is decremented
         outstandingCasRequests.incrementAndGet();
+        //  Increment total number of CASes sent to a service. This is reset
+        //  on CPC
+        totalCasRequestsSentBetweenCpCs.incrementAndGet();
 	      //  Add message to the pending queue
 	      addMessage(msg);
 	    }
