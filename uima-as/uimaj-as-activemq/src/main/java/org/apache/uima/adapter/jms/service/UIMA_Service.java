@@ -25,6 +25,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.UimaContext;
+import org.apache.uima.UimaContextAdmin;
+import org.apache.uima.aae.controller.AnalysisEngineController;
 import org.apache.uima.aae.jmx.monitor.BasicUimaJmxMonitorListener;
 import org.apache.uima.aae.jmx.monitor.JmxMonitor;
 import org.apache.uima.aae.jmx.monitor.JmxMonitorListener;
@@ -406,6 +409,11 @@ public class UIMA_Service implements  ApplicationListener
 			//	the container is fully initialized and all UIMA-AS components are succefully
 			//	deployed.
 			SpringContainerDeployer serviceDeployer = service.deploy( contextFiles );
+			
+			if ( serviceDeployer == null ) {
+			  System.out.println(">>> Failed to Deploy UIMA Service. Check Logs for Details");
+			  System.exit(1);
+			}
 			//	Check if we should start an optional JMX-based monitor that will provide service metrics
 			//	The monitor is enabled by existence of -Djmx.monitor.frequency=<number> parameter. By default
 			//	the monitor is not enabled.
@@ -416,18 +424,29 @@ public class UIMA_Service implements  ApplicationListener
 				//	If the monitor fails to initialize the service is not effected. 
 				service.startMonitor(Long.parseLong(monitorCheckpointFrequency));
 			}
-			boolean stopped = false;
-			while(!stopped) {
-			  System.out.println("Enter 'q' to quiesce and stop the service or 's' to stop it now:");
-			  int c = System.in.read();
-			  if ( c == 's') {
-			    stopped = true;
-			    serviceDeployer.undeploy(SpringContainerDeployer.STOP_NOW);
-			  } else if ( c == 'q') {
-          stopped = true;
-			    serviceDeployer.undeploy(SpringContainerDeployer.QUIESCE_AND_STOP);
-			  }
-			}
+      AnalysisEngineController topLevelControllor = 
+        serviceDeployer.getTopLevelController();
+      if ( topLevelControllor != null ) {
+        System.out.println("Enter 'q' to quiesce and stop the service or 's' to stop it now:");
+      //  Loop forever or until the service is stopped  
+      while(!topLevelControllor.isStopped()) {
+          if ( System.in.available() > 0 ) {
+            int c = System.in.read();
+            if ( c == 's') {
+              serviceDeployer.undeploy(SpringContainerDeployer.STOP_NOW);
+            } else if ( c == 'q') {
+              serviceDeployer.undeploy(SpringContainerDeployer.QUIESCE_AND_STOP);
+            } else if ( Character.isLetter(c) || Character.isDigit(c)) {
+              System.out.println("Enter 'q' to quiesce and stop the service or 's' to stop it now:");
+            }
+          } 
+          //  This is a polling loop. Sleep for 1 sec
+          try {
+            Thread.sleep(1000); 
+          } catch( InterruptedException ex) {
+          }
+        }  // while
+      }
 		}
 		catch( Exception e)
 		{
