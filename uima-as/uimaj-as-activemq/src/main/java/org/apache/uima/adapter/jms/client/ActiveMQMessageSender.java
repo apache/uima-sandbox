@@ -56,7 +56,7 @@ public class ActiveMQMessageSender extends BaseMessageSender {
 		connection = aConnection;
 		destinationName = aDestinationName;
 	}
-	public MessageProducer getMessageProducer(Destination destination) throws Exception {
+	public synchronized MessageProducer getMessageProducer(Destination destination) throws Exception {
 		if ( producerMap.containsKey(destination))
 		{
 			return (MessageProducer) producerMap.get(destination);
