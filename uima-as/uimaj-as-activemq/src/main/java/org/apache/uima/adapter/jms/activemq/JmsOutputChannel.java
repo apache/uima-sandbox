@@ -412,12 +412,11 @@ public class JmsOutputChannel implements OutputChannel
                 new Object[] { getAnalysisEngineController().getComponentName(), destination,
                     anEndpoint.getServerURI() });
       }
-      endpointConnection = new JmsEndpointConnection_impl(brokerConnectionEntry, anEndpoint); 
+      endpointConnection = new JmsEndpointConnection_impl(brokerConnectionEntry, anEndpoint, getAnalysisEngineController()); 
       brokerConnectionEntry.addEndpointConnection(key, endpointConnection);
       long replyQueueInactivityTimeout = getInactivityTimeout( destination, anEndpoint.getServerURI() );
       brokerConnectionEntry.getConnectionTimer().setInactivityTimeout(replyQueueInactivityTimeout);
 
-      endpointConnection.setAnalysisEngineController(getAnalysisEngineController());
       // Connection is not in the cache, create a new connection, initialize it and cache it
       if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
         UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINE, CLASS_NAME.getName(),
