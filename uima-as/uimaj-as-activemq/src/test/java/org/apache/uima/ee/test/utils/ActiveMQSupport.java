@@ -272,7 +272,7 @@ public class ActiveMQSupport extends TestCase
                         !tName.equals("BrokerThreadGroup") && 
                             !tName.startsWith("ActiveMQ")) {
             foundExpectedThreads = false;
-            System.out.println("----- Hung Thread Name:"+tName);
+            System.out.println("----- Waiting For Thread Name:"+tName+" To Stop");
             break;   // from for
           }
         } catch( Exception e) {}
