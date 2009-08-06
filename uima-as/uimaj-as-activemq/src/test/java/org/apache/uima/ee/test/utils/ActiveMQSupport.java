@@ -266,12 +266,13 @@ public class ActiveMQSupport extends TestCase
           //	The following is necessary to account for the AMQ threads
           //  Any threads not named in the list below will cause a wait 
           //  and retry until all non-amq threads are stopped
-          if ( !tName.equals("main") && 
-                  !tName.equals("timer-0") && 
+          if ( !tName.startsWith("main") && 
+                  !tName.equalsIgnoreCase("timer-0") && 
                     !tName.equals("ReaderThread") && 
                         !tName.equals("BrokerThreadGroup") && 
                             !tName.startsWith("ActiveMQ")) {
             foundExpectedThreads = false;
+            System.out.println("----- Hung Thread Name:"+tName);
             break;   // from for
           }
         } catch( Exception e) {}
