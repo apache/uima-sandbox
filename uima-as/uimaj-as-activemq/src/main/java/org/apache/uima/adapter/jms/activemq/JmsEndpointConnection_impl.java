@@ -88,13 +88,14 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 	
 	private Object recoveryMux = new Object();
 	
-	private String componentName = "";
+	private final String componentName;
 	
-  public JmsEndpointConnection_impl(BrokerConnectionEntry aBrokerDestinationMap, Endpoint anEndpoint)
+  public JmsEndpointConnection_impl(BrokerConnectionEntry aBrokerDestinationMap, Endpoint anEndpoint, AnalysisEngineController aController)
 	{
     brokerDestinations = aBrokerDestinationMap;
 		serverUri = anEndpoint.getServerURI();
     isReplyEndpoint = anEndpoint.isReplyEndpoint();
+    controller = aController;
 
     if ( ( anEndpoint.getCommand() == AsynchAEMessage.Stop || isReplyEndpoint ) && 
 			 anEndpoint.getDestination() != null && 
@@ -107,17 +108,11 @@ public class JmsEndpointConnection_impl implements ConsumerListener
 			endpoint = anEndpoint.getEndpoint();
 		}
 		anEndpoint.remove();
+		componentName = controller.getComponentName();
 		delegateEndpoint = anEndpoint;
 	}
-	public synchronized void setAnalysisEngineController(AnalysisEngineController aController)
-	{
-		controller = aController;
-		if ( controller != null ) {
-	    componentName = controller.getComponentName();
-		}
-	}
 
-	public boolean isRetryEnabled()
+  public boolean isRetryEnabled()
 	{
 		return retryEnabled;
 	}
