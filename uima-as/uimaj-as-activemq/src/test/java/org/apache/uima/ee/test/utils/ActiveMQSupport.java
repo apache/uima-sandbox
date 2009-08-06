@@ -23,8 +23,12 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Semaphore;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -37,6 +41,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.Connector;
+import org.apache.activemq.broker.TransportConnection;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.region.policy.IndividualDeadLetterStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
@@ -53,8 +58,9 @@ public class ActiveMQSupport extends TestCase
 {
   private static final Class CLASS_NAME = ActiveMQSupport.class;
 
-	protected BrokerService broker;
+	protected static BrokerService broker;
 	protected String uri = null;
+	protected static ThreadGroup brokerThreadGroup = null;
 	protected TransportConnector  tcpConnector = null;
 	protected static final String relativePath = 
 		"src"+System.getProperty("file.separator")+
@@ -66,32 +72,65 @@ public class ActiveMQSupport extends TestCase
 		"test"+System.getProperty("file.separator")+
 		"resources"+System.getProperty("file.separator")+
 		"data";
+  private static Thread brokerThread = null;
+	private TransportConnector httpConnector = null;
 
-	protected void setUp() throws Exception
+  public Semaphore brokerSemaphore = new Semaphore(1);
+
+	
+	protected synchronized void setUp() throws Exception
 	{
 		System.out.println("\nSetting Up New Test - Thread Id:"+Thread.currentThread().getId());
-		super.setUp();
-		broker = createBroker();
-		/*
-		 * ObjectName on = broker.getBrokerObjectName(); if (
-		 * broker.getManagementContext().getMBeanServer().isRegistered(on)) {
-		 * broker.getManagementContext().getMBeanServer().unregisterMBean(on); }
-		 */
-		// broker.getManagementContext().createCustomComponentMBeanName("org.apache.uima.ee.test.broker",
-		// "TestBroker");//setJmxDomainName("org.apache.uima.ee.test.broker");
-		broker.start();
-		broker.setMasterConnectorURI(uri);
+    super.setUp();
+    if ( brokerThreadGroup == null ) {
+      brokerThreadGroup = new ThreadGroup("BrokerThreadGroup");
+      
+      //  Acquire a semaphore to force this thread to wait until the broker
+      //  starts and initializes
+      brokerSemaphore.acquire();
+      
+      brokerThread = new Thread(brokerThreadGroup,"BrokerThread") {
+        public void run() {
+          try {
+            broker = createBroker();
+            broker.start();
+            broker.setMasterConnectorURI(uri);
+            brokerSemaphore.release();   // broker started
+          } catch( Exception e ) {
+            e.printStackTrace();
+          }
+        }
+      };
+      
+      brokerThread.start();
+      try {
+        //  wait for the broker to start and initialize. The semaphore is released
+        //  in the run method above
+        brokerSemaphore.acquire();
+      } finally {
+        brokerSemaphore.release();
+      }
+    } else {
+      //  Remove messages from all queues
+      broker.deleteAllMessages();
+      //  Remove old queues
+      ActiveMQDestination[] destinations = broker.getDestinations();
+      if ( destinations != null ) {
+        for( int i=0; i < destinations.length; i++) {
+          broker.removeDestination(destinations[i]);
+        }
+      }
+    }
 	}
 
 	protected String addHttpConnector(int aDefaultPort) throws Exception
 	{
-		TransportConnector connector = null;
 		try
 		{
 			String httpURI = generateInternalURI("http", aDefaultPort);
-			connector = broker.addConnector(httpURI);
-			System.out.println("Adding HTTP Connector:" + connector.getConnectUri());
-			connector.start();
+			httpConnector = broker.addConnector(httpURI);
+			System.out.println("Adding HTTP Connector:" + httpConnector.getConnectUri());
+			httpConnector.start();
 			return httpURI;
 		}
 		catch( Exception e)
@@ -100,7 +139,9 @@ public class ActiveMQSupport extends TestCase
 			throw e;
 		}
 	}
-
+	protected void removeHttpConnector() throws Exception {
+	  httpConnector.stop();
+	}
 	private String generateInternalURI(String aProtocol, int aDefaultPort) throws Exception
 	{
 		boolean success = false;
@@ -155,7 +196,7 @@ public class ActiveMQSupport extends TestCase
 		return createConnectionFactory().createConnection();
 	}
 
-	protected BrokerService createBroker() throws Exception {
+	public BrokerService createBroker() throws Exception {
 	  return createBroker(8118, true);
 	}
   protected BrokerService createBroker(int port, boolean useJmx) throws Exception {
@@ -190,50 +231,46 @@ public class ActiveMQSupport extends TestCase
 	}
 	protected void stopBroker() throws Exception
 	{
-		if ( broker != null )
-		{
-			System.out.println("Stopping Broker");
-			if ( tcpConnector != null )
-			{
-			  tcpConnector.stop();
-				System.out.println("Broker Connector:"+tcpConnector.getUri().toString()+ " is stopped");
-			}
-      broker.deleteAllMessages();
-      broker.getManagementContext().stop();
-      synchronized( broker ) {
-        broker.notifyAll();
+    if ( broker != null )
+    {
+      System.out.println(">>> Stopping Broker");
+      if ( tcpConnector != null )
+      {
+        tcpConnector.stop();
+        System.out.println("Broker Connector:"+tcpConnector.getUri().toString()+ " is stopped");
       }
+      broker.deleteAllMessages();
       broker.stop();
-			
-			System.out.println("Broker Has Stopped");
-			broker = null;
-		}
-		
+      System.out.println(">>> Broker Stopped");
+    }
 	}
-	protected void tearDown() throws Exception
+	protected synchronized void tearDown() throws Exception
 	{
-		stopBroker();
-		System.out.println("Tearing Down");
-		super.tearDown();
+    System.out.println("Tearing Down - Collecting All Threads and Waiting For Them to Stop ...");
+    super.tearDown();
+		System.out.println("Tearing Down - Collecting All Threads and Waiting For Them to Stop ...");
 		ThreadGroup threadGroup =
 		  Thread.currentThread().getThreadGroup();
-    //  2 Threads are expected, ReaderThread and the main
-		while (threadGroup.activeCount() > 2) {
+    threadGroup.list();
+    //  Wait unit all non-amq threads stop
+		while (brokerThreadGroup.activeCount() > 0) {
       Thread[] threads = new Thread[threadGroup.activeCount()];
-      if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINE)) {
-        System.out.println("Active Thread Count:"+threadGroup.activeCount());
-        threadGroup.list();
-      }
+      System.out.println("Active Thread Count:"+threadGroup.activeCount()+" Active ThreadGroup Count:"+threadGroup.activeGroupCount());
+      threadGroup.list();
       threadGroup.enumerate(threads);
       boolean foundExpectedThreads = true;
       
       for( Thread t: threads) {
         try {
           String tName = t.getName();
-          //	The following is necessary to account for the main threads and
-          //  ActiveMQ Scheduler threads that dont go away when broker.stop()
-          //  is called.
-          if ( !tName.equals("main") && !tName.equals("ReaderThread") && !tName.equals("ActiveMQ Scheduler")) {
+          //	The following is necessary to account for the AMQ threads
+          //  Any threads not named in the list below will cause a wait 
+          //  and retry until all non-amq threads are stopped
+          if ( !tName.equals("main") && 
+                  !tName.equals("timer-0") && 
+                    !tName.equals("ReaderThread") && 
+                        !tName.equals("BrokerThreadGroup") && 
+                            !tName.startsWith("ActiveMQ")) {
             foundExpectedThreads = false;
             break;   // from for
           }
@@ -242,8 +279,11 @@ public class ActiveMQSupport extends TestCase
       if ( foundExpectedThreads ) {
         break; // from while
       }
+      Object syncMonitor = new Object();
       try {
-        Thread.sleep(500);
+        synchronized( syncMonitor ) {
+          syncMonitor.wait(500);
+        }
       } catch (InterruptedException e) {
       }
     }
