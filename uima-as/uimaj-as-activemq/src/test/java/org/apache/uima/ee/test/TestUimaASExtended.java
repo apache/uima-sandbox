@@ -73,11 +73,12 @@ public class TestUimaASExtended extends BaseTestSupport
     private static final String primitiveServiceQueue1 = "NoOpAnnotatorQueue";
 	private static final String PrimitiveDescriptor1 = "resources/descriptors/analysis_engine/NoOpAnnotator.xml";
 	private int getMetaRequestCount = 0;
-  Object mux = new Object();
 
   public BaseTestSupport superRef = null;
   
 
+  
+  
 	/**
 	 * Tests Broker startup and shutdown
 	 */
@@ -1314,6 +1315,8 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_NoOpAnnotator.xml");
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,httpURI,"NoOpAnnotatorQueue", 1, CPC_LATCH );
+		//  Remove the HTTP Connector
+		removeHttpConnector();
 	}
 	public void testClientHttpTunnellingToAggregate() throws Exception
 	{
@@ -1327,10 +1330,14 @@ public class TestUimaASExtended extends BaseTestSupport
 		deployService(eeUimaEngine, relativePath+"/Deploy_AggregateAnnotator.xml");
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine,httpURI,"TopLevelTaeQueue", 1, CPC_LATCH );
+    //  Remove the HTTP Connector
+    removeHttpConnector();
 	}
 	public void testClientHttpTunnellingWithDoubleByteText() throws Exception
 	{
     System.out.println("-------------- testClientHttpTunnellingWithDoubleByteText -------------");
+    
+    BufferedReader in = null;
     try
 		{
 			File file = new File(relativeDataPath+"/DoubleByteText.txt");
@@ -1356,7 +1363,7 @@ public class TestUimaASExtended extends BaseTestSupport
 				
 				InputStream fis = new FileInputStream(file);
 				Reader rd = new InputStreamReader(fis, "UTF-8");
-				BufferedReader in = new BufferedReader(rd);
+				in = new BufferedReader(rd);
 				//	Set the double-byte text. This is what will be sent to the service
         String line = in.readLine();
 				super.setDoubleByteText(line);
@@ -1373,6 +1380,12 @@ public class TestUimaASExtended extends BaseTestSupport
 			//	Double-Byte Text file not present. Continue on with the next test
       e.printStackTrace();
       fail("Could not complete test");
+		} finally {
+		  if ( in != null ) {
+		    in.close();
+		  }
+		  //  Remove the HTTP Connector
+	    removeHttpConnector();
 		}
 	}
 	
@@ -1390,6 +1403,8 @@ public class TestUimaASExtended extends BaseTestSupport
 		
 		//	Initialize and run the Test. Wait for a completion and cleanup resources.
 		runTest(null,eeUimaEngine, String.valueOf(broker.getMasterConnectorURI()), "TopLevelTaeQueue", 10, CPC_LATCH );
+    //  Remove the HTTP Connector
+    removeHttpConnector();
 	}
 	/**
 	   * Tests exception thrown in the Uima EE Client when the Collection Reader is added after
@@ -1710,6 +1725,7 @@ public class TestUimaASExtended extends BaseTestSupport
     try {
       deployService(eeUimaEngine, relativePath+"/Deploy_SyncAggregateWithJmsService.xml");
     } catch( ResourceInitializationException e ) {
+      System.out.println("Received Expected ResourceInitializationException");
       return;
     } 
     Assert.fail("Expected ResourceInitializationException Not Thrown. Instead Got Clean Run");
@@ -1727,6 +1743,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	      deployService(eeUimaEngine, relativePath+"/Deploy_AggregateWithParallelFlow.xml");
 	      runTest(null,eeUimaEngine,String.valueOf(broker.getMasterConnectorURI()),"TopLevelTaeQueue", 1, PROCESS_LATCH);
 	    }
+	    super.stopBroker();
 	  }	
   private Exception getCause( Throwable e) {
     Exception cause = (Exception)e;
@@ -1747,7 +1764,7 @@ public class TestUimaASExtended extends BaseTestSupport
 	 * @throws Exception
 	 */
 	
-	public void GetMetaRetry() throws Exception
+	public void getMetaRetry() throws Exception
 	{
 		getMetaCountLatch = new CountDownLatch(MaxGetMetaRetryCount);
         Connection connection = getConnection();
@@ -1828,16 +1845,13 @@ public class TestUimaASExtended extends BaseTestSupport
 		return directory.delete();
 	}
 
-    private class TestListener extends UimaAsBaseCallbackListener implements Runnable
+    private static class TestListener extends UimaAsBaseCallbackListener implements Runnable
     {
     	private String casReferenceId = null;
-    	private TestUimaASExtended tester;
-    	private boolean running = false;
     	private Object monitor = new Object();
     	
     	public TestListener(TestUimaASExtended aTester)
     	{
-    		tester = aTester;
     	}
     	
 
@@ -1887,7 +1901,6 @@ public class TestUimaASExtended extends BaseTestSupport
 		}
 		public void doStop()
 		{
-			running = false;
 		}
     	public void run()
     	{
