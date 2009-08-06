@@ -356,11 +356,9 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 
   protected void runCrTest(BaseUIMAAsynchronousEngine_impl aUimaEeEngine, int howMany) throws Exception
   {
-    Thread t = null;
     engine = aUimaEeEngine;
-    
     final AtomicBoolean ctrlMonitor = new AtomicBoolean();
-    t = spinMonitorThread(ctrlMonitor, howMany, PROCESS_LATCH);
+    spinMonitorThread(ctrlMonitor, howMany, PROCESS_LATCH);
     aUimaEeEngine.process();
     waitOnMonitor(ctrlMonitor);
   }
@@ -434,6 +432,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 			{
 				// Wait until the monitor thread(s) start.
 				waitOnMonitor(ctrlMonitor);
+				
+				long startTime = System.currentTimeMillis();
 				if (!isStopped)
 				{
 					// Send an in CAS to the top level service
@@ -443,7 +443,8 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 				if (t2 != null)
 				{
 					t2.join();
-
+	        long endTime = System.currentTimeMillis();
+	        System.out.println(">>>> Total Time in Service:" + (endTime-startTime));
 					if (!serviceShutdownException && !isStopped && !unexpectedException)
 					{
 						System.out.println("runTest: Sending CPC");
@@ -574,11 +575,11 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 			if (cas == null) {
 			  if (isStopping) {
 			    System.out.println(">> runTest: stopping after sending "+i+" of "+howMany+" CASes");
-			    return;
 			  }
 			  else {
 			    System.out.println(">>>> ERROR! sendCas: "+(i+1)+"-th CAS is null?");
 			  }
+        return;
 			}
 			if ( doubleByteText != null )
 			{
@@ -614,7 +615,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
 	protected class UimaAsTestCallbackListener extends UimaAsBaseCallbackListener {
 	  
 	  private String casSent = null;
-    public void onBeforeMessageSend(UimaASProcessStatus status) {
+    public synchronized void onBeforeMessageSend(UimaASProcessStatus status) {
       casSent = status.getCasReferenceId();
       System.out.println("runTest: Received onBeforeMessageSend() Notification With CAS:"+status.getCasReferenceId());
     }
@@ -653,6 +654,7 @@ public abstract class BaseTestSupport extends ActiveMQSupport
           System.out.println("runTest: Received Reply from CAS "+casReferenceId+" (Parent "+parentCasReferenceId
                   +") Containing "+list.size()+" Exception(s)");
         }
+	      
 	      for( int i=0; i < list.size(); i++)
 	      {
 	        Exception e = (Exception)list.get(i);
