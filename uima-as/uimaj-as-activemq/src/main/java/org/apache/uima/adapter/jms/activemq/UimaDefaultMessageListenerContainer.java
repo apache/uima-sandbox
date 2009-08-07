@@ -746,6 +746,31 @@ implements ExceptionListener
           //  Wait until all threads are accounted for
           while (threadGroup.activeCount() > 0) {
             try {
+              Thread[] threads = new Thread[threadGroup.activeCount()];
+              System.out.println("Active Thread Count:" + threadGroup.activeCount()
+                      + " Active ThreadGroup Count:" + threadGroup.activeGroupCount());
+              threadGroup.enumerate(threads);
+              boolean foundExpectedThreads = true;
+
+              for (Thread t : threads) {
+                try {
+                  String tName = t.getName();
+                  // The following is necessary to account for the AMQ threads
+                  // Any threads not named in the list below will cause a wait
+                  // and retry until all non-amq threads are stopped
+                  if (!tName.startsWith("main") && !tName.equalsIgnoreCase("timer-0")
+                          && !tName.equals("ReaderThread") && !tName.equals("BrokerThreadGroup")
+                          && !tName.startsWith("ActiveMQ")) {
+                    foundExpectedThreads = false;
+                    System.out.println("----- Waiting For Thread:" + tName + " To Stop");
+                    break; // from for
+                  }
+                } catch (Exception e) {
+                }
+              }
+              if (foundExpectedThreads) {
+                break; // from while
+              }
               Thread.sleep(100);
             } catch (InterruptedException e) {
             }
