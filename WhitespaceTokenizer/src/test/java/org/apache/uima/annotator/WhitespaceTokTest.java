@@ -83,5 +83,22 @@ public class WhitespaceTokTest extends TestCase
     File outputFile = new File(JUnitExtension.getFile("englishRef.txt").getParent(), "englishRef_testoutput.txt") ;
     AnnotatorTester.checkResult(cas, tofs, JUnitExtension.getFile("englishRef.txt"), outputFile);   
   }
+  
+  public void testAnnotatorTabs() throws Exception {
+    // retrieve Annotator sample text
+    String text = AnnotatorTester.readFileContent(JUnitExtension.getFile("tabs.txt"), "UTF-8");
+
+    // execute sample text
+    CAS cas = this.annotTester.performTest(text, "en");
+
+    // define result interested in
+    String[] tofs = { "org.apache.uima.TokenAnnotation", "org.apache.uima.SentenceAnnotation" };
+
+    // compare results
+    File outputFile = new File(JUnitExtension.getFile("tabsRef.txt").getParent(),
+        "tabsRef_testoutput.txt");
+    AnnotatorTester.checkResult(cas, tofs, JUnitExtension.getFile("tabsRef.txt"), outputFile);
+  }
+  
 
 }

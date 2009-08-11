@@ -244,57 +244,66 @@ public class WhitespaceTokenizer extends CasAnnotator_ImplBase {
     * 
     * @return returns the character type of the given character
     */
-   private static int getCharacterType(char character) {
+  private static int getCharacterType(char character) {
 
-      switch (Character.getType(character)) {
+    switch (Character.getType(character)) {
 
-      // letter characters
-      case Character.UPPERCASE_LETTER:
-      case Character.LOWERCASE_LETTER:
-      case Character.TITLECASE_LETTER:
-      case Character.MODIFIER_LETTER:
-      case Character.OTHER_LETTER:
-      case Character.NON_SPACING_MARK:
-      case Character.ENCLOSING_MARK:
-      case Character.COMBINING_SPACING_MARK:
-      case Character.PRIVATE_USE:
-      case Character.SURROGATE:
-      case Character.MODIFIER_SYMBOL:
-         return CH_LETTER;
+    // letter characters
+    case Character.UPPERCASE_LETTER:
+    case Character.LOWERCASE_LETTER:
+    case Character.TITLECASE_LETTER:
+    case Character.MODIFIER_LETTER:
+    case Character.OTHER_LETTER:
+    case Character.NON_SPACING_MARK:
+    case Character.ENCLOSING_MARK:
+    case Character.COMBINING_SPACING_MARK:
+    case Character.PRIVATE_USE:
+    case Character.SURROGATE:
+    case Character.MODIFIER_SYMBOL:
+      return CH_LETTER;
 
-         // number characters
-      case Character.DECIMAL_DIGIT_NUMBER:
-      case Character.LETTER_NUMBER:
-      case Character.OTHER_NUMBER:
-         return CH_NUMBER;
+      // number characters
+    case Character.DECIMAL_DIGIT_NUMBER:
+    case Character.LETTER_NUMBER:
+    case Character.OTHER_NUMBER:
+      return CH_NUMBER;
 
-         // whitespace characters
-      case Character.SPACE_SEPARATOR:
-      //case Character.CONNECTOR_PUNCTUATION:
-         return CH_WHITESPACE;
+      // whitespace characters
+    case Character.SPACE_SEPARATOR:
+      // case Character.CONNECTOR_PUNCTUATION:
+      return CH_WHITESPACE;
 
-      case Character.DASH_PUNCTUATION:
-      case Character.START_PUNCTUATION:
-      case Character.END_PUNCTUATION:
-      case Character.OTHER_PUNCTUATION:
-         return CH_PUNCTUATION;
+    case Character.DASH_PUNCTUATION:
+    case Character.START_PUNCTUATION:
+    case Character.END_PUNCTUATION:
+    case Character.OTHER_PUNCTUATION:
+      return CH_PUNCTUATION;
 
-      case Character.LINE_SEPARATOR:
-      case Character.PARAGRAPH_SEPARATOR:
-         return CH_NEWLINE;
+    case Character.LINE_SEPARATOR:
+    case Character.PARAGRAPH_SEPARATOR:
+      return CH_NEWLINE;
 
-      case Character.CONTROL:
-         if (character == '\n' || character == '\r') {
-            return CH_NEWLINE;
-         } else {
-            return CH_SPECIAL;
-         }
-
-      default:
-         return CH_SPECIAL;
+    case Character.CONTROL:
+      if (character == '\n' || character == '\r') {
+        return CH_NEWLINE;
+      } else {
+        // tab is in the char category CONTROL
+        if (Character.isWhitespace(character)) {
+          return CH_WHITESPACE;
+        }
+        return CH_SPECIAL;
       }
 
-   }
+    default:
+      // the isWhitespace test is slightly more expensive than the above switch,
+      // so it is placed here to avoid performance impact.
+      // Also, calling code has explicit tests for CH_NEWLINE, and this test should not swallow those
+      if (Character.isWhitespace(character)) {
+        return CH_WHITESPACE;
+      }
+      return CH_SPECIAL;
+    }
+  }
 
    @Override
    public void typeSystemInit(TypeSystem typeSystem)

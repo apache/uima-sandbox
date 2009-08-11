@@ -4,14 +4,7 @@ SentenceAnnotation(0,212): 							    Apache License
 
    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
-   1.
-TokenAnnotation(0,1): 	
-TokenAnnotation(1,2): 	
-TokenAnnotation(2,3): 	
-TokenAnnotation(3,4): 	
-TokenAnnotation(4,5): 	
-TokenAnnotation(5,6): 	
-TokenAnnotation(6,7): 	
+   1. 	
 TokenAnnotation(11,17): Apache
 TokenAnnotation(18,25): License
 TokenAnnotation(54,61): Version
