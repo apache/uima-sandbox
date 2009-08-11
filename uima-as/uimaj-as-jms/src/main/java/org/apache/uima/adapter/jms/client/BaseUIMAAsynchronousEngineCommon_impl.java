@@ -274,7 +274,8 @@ implements UimaAsynchronousEngine, MessageListener
 		  if (UIMAFramework.getLogger(CLASS_NAME).isLoggable(Level.FINEST)) {
 	      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.FINEST, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_app_cpc_request_FINEST", new Object[] {});
 		  }
-		  
+      UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "collectionProcessingComplete", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_in_cpc_INFO",
+              new Object[] { outstandingCasRequests.get(), totalCasRequestsSentBetweenCpCs.get() });
 		  //  If the client was initialized but never sent any CASes its cpcReadySemaphore 
 		  //  must be first explicitly released to enable the code to send CPC to a service.
 		  //  The semaphore is initially acquired in the initialize(Map) method and typically
@@ -1104,6 +1105,8 @@ implements UimaAsynchronousEngine, MessageListener
       {
         // Received a reply, decrement number of outstanding CASes
         long outstandingCasCount = outstandingCasRequests.decrementAndGet();
+        UIMAFramework.getLogger(CLASS_NAME).logrb(Level.INFO, CLASS_NAME.getName(), "handleProcessReply", JmsConstants.JMS_LOG_RESOURCE_BUNDLE, "UIMAJMS_handling_process_reply_INFO",
+                new Object[] { message.getStringProperty(AsynchAEMessage.CasReference), outstandingCasCount, totalCasRequestsSentBetweenCpCs });
         if ( outstandingCasCount == 0) {
           cpcReadySemaphore.release();
         } 
