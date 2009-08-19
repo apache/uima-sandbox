@@ -27,26 +27,27 @@
 	<version>2.3.0-incubating-SNAPSHOT</version>
 	<name>Apache UIMA Java Annotator - Snowball Annotator</name>
 	<url>http://incubator.apache.org/uima</url>
+  
+    <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>uimaj</artifactId>
+    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../uimaj</relativePath>
+  </parent>
+  
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-core</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-test-util</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
-
 	</dependencies>
 	<build>
 		<finalName>uima-an-snowball</finalName>
@@ -56,11 +57,5 @@
 			</resource>
 		</resources>
 	</build>
-	<repositories>
-      <repository>
-        <id>ApacheIncubatorRepository</id>
-        <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-      </repository>
-  </repositories>
 	
 </project>
