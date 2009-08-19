@@ -24,8 +24,15 @@
   <groupId>org.apache.uima</groupId>
   <artifactId>SandboxDistr</artifactId>
   <packaging>pom</packaging>
-  <version>2.3.0-incubating-SNAPSHOT</version>
+  <version>${uimaj-release-version}</version>
   <name>Apache UIMA Sandbox distribution build</name>
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>uimaj</artifactId>
+    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../uimaj</relativePath>
+  </parent>
+  
   <url>http://incubator.apache.org/uima</url>
   <description>Components and tooling for the UIMA SDK</description>
   <licenses>
@@ -43,20 +50,20 @@
     <url>http://www.apache.org/</url>
   </organization>
 
-  <dependencies>
-  </dependencies>
- 
-  <reporting>
-  </reporting>
-
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.uima</groupId>
+          <artifactId>PearPackagingMavenPlugin</artifactId>
+          <version>${uimaj-release-version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>  
+  </build>
+  
   <modules>
     <module>./annotator-package</module>
   </modules>
-  
-  <repositories>
-    <repository>
-      <id>eclipsePlugins</id>
-      <url>http://repo1.maven.org/eclipse</url>
-    </repository>
-  </repositories>
+ 
 </project>
