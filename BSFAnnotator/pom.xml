@@ -23,33 +23,29 @@
 	<groupId>org.apache.uima</groupId>
 	<artifactId>BSFAnnotator</artifactId>
 	<packaging>jar</packaging>
-	<version>2.3.0-incubating-SNAPSHOT</version>
+	<version>${uimaj-release-version}</version>
 	<name>Apache UIMA Java Annotator - BSFAnnotator</name>
 	<url>http://incubator.apache.org/uima</url>
+  
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>uimaj</artifactId>
+    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../uimaj</relativePath>
+  </parent>
+  
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-core</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.uima</groupId>
-			<artifactId>PearPackagingMavenPlugin</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>package</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-test-util</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>local.bsf.dependency</groupId>
@@ -63,14 +59,7 @@
 			<artifactId>beanshell</artifactId>
 			<version>2.0b4</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/lib/bsh.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>local.bsf.dependency</groupId>
-			<artifactId>beanshell-bsf</artifactId>
-			<version>2.0b4</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/bsh-bsf.jar</systemPath>
+			<systemPath>${basedir}/lib/bsh-1.3.0.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>local.bsf.dependency</groupId>
@@ -93,8 +82,8 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/commons-logging-api-1.1.jar</systemPath>
 		</dependency>
-		
 	</dependencies>
+  
 	<build>
 		<finalName>uimaj-an-bsf</finalName>
 		<resources>
@@ -105,53 +94,5 @@
 				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
-		<plugins>
-		<!-- 
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<tasks>
-								<ant antfile="build_documentation.xml" target="copyDocs"/>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
- 			<plugin>
-				<groupId>org.apache.uima</groupId>
-		  		<artifactId>PearPackagingMavenPlugin</artifactId>
-				<extensions>true</extensions>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-						  <classpath>$main_root/lib/jsr173_1.0_api.jar;$main_root/lib/xmltypes.jar;$main_root/lib/xbean.jar</classpath>
-						  <mainComponentDesc>desc/RegExAnnotator.xml</mainComponentDesc>
-						  <componentId>RegExAnnotator</componentId>
-						  <mainComponentDir>${basedir}</mainComponentDir>
-						  <targetDir>${basedir}/target</targetDir>
-						</configuration>
-						<goals>
-							<goal>package</goal>
-						</goals>
-					</execution>	
-				</executions>
-			</plugin>
-			 -->
-		</plugins>
 	</build>
-	<repositories>
-		<repository>
-			<id>ApacheIncubatorRepository</id>
-			<url>
-				http://people.apache.org/repo/m2-incubating-repository/
-			</url>
-		</repository>
-	</repositories>
 </project>

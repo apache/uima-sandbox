@@ -14,5 +14,27 @@ This software also includes:
       http://www.mozilla.org/rhino/, available under MPL 1.1/GPL 2.0 license.  Distributed here
       under the MPL 1.1, see LICENSE.txt.
       
+The Jar files in the /lib directory were obtained from, and are licensed as follows:
+ 
+   > bsf.jar: Apache 2 license; Comes from http://apache.crihan.fr/dist/jakarta/bsf/binaries/bsf-bin-2.4.0.zip
+
+   > bsh-1.3.0.jar: Dual licensed under both the SPL (Sun Public License) and LGPL => SPL is in the list of
+       acceptable licenses available here: http://www.apache.org/legal/3party.html
+       From http://www.beanshell.org/bsh-1.3.0.jar (also now
+            contains the bsh-bsf.jar classes)
+
+   > commons-logging-api-1.1.jar: Apache 2 license; Comes from
+     http://archive.apache.org/dist/commons/logging/binaries/commons-logging-1.1.zip
+
+   > js.jar Dual licensed under both the MPL 1.1 and GPL => MPL is in the list of
+       acceptable licenses available here: http://www.apache.org/legal/3party.html
+       From ftp://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip
+
+   > log4j-1.2.15.jar Apache 2 license; Comes from
+       http://www.apache.org/dyn/closer.cgi/logging/log4j/1.2.15/apache-log4j-1.2.15.zip
+
+
+
+      
 
        
