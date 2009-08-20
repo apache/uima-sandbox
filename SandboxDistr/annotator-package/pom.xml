@@ -24,11 +24,17 @@
   <groupId>org.apache.uima</groupId>
   <artifactId>SandboxAnnotatorPackage</artifactId>
   <packaging>pom</packaging>
-  <version>2.3.0-incubating-SNAPSHOT</version>
+  <version>${uimaj-release-version}</version>
   <name>Apache UIMA Sandbox Annotator Add-Ons</name>
   <url>http://incubator.apache.org/uima</url>
   <description>Annotator components for the UIMA SDK</description>
-  <licenses>
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>SandboxDistr</artifactId>
+    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>..</relativePath>
+  </parent>
+    <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
@@ -42,61 +48,39 @@
     <name>The Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
   </organization>
-  
-  <dependencies>
-  </dependencies>
- 
+   
   <build>
-    <pluginManagement>
-      <plugins>
-        <!-- Require v2.1 of assembly plugin because v2.2 doesn't seem to correctly unpack zip files.
-        It creates an extra top-level directory with the same name as the zip file. -->
-        <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.1</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
-     <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-     </plugin>
-  	 <plugin>
-		<artifactId>maven-assembly-plugin</artifactId>
-		<configuration>
-			<descriptors>
-				<descriptor>assembly/bin.xml</descriptor>
-				<descriptor>assembly/src.xml</descriptor>
-			</descriptors>
-			<finalName>uimaj-annotator-addons-${pom.version}</finalName>
+  	  <plugin>
+		    <artifactId>maven-assembly-plugin</artifactId>
+     	  <configuration>
+			    <descriptors>
+				    <descriptor>assembly/bin.xml</descriptor>
+				    <descriptor>assembly/src.xml</descriptor>
+			    </descriptors>
+			    <finalName>uimaj-annotator-addons-${project.version}</finalName>
 	        <tarLongFileMode>gnu</tarLongFileMode>
-		</configuration>
-	 </plugin>
+		    </configuration>
+	    </plugin>
     </plugins>
   </build>
   
-  <reporting>
-  </reporting>
-  
   <modules>
-    <module>../../PearPackagingMavenPlugin</module>
     <module>../../PearPackagingAntTask</module>
     <module>../../RegularExpressionAnnotator</module>
     <module>../../DictionaryAnnotator</module>
     <module>../../WhitespaceTokenizer</module>
     <module>../../Tagger</module>
     <module>../../SimpleServer</module>
+    <!--module>../../SimpleUimaAsService</module>  skip this - requires uima-as to have been built -->
+    <module>../../SnowballAnnotator</module>
+    <module>../../ConceptMapper</module>
+    <module>../../ConfigurableFeatureExtractor</module>
+    <module>../../FsVariables</module>
+    <module>../../Lucas</module>
+    <module>../../OpenCalaisAnnotator</module>
+    <module>../../TikaAnnotator</module>
+    <module>../../BSFAnnotator</module>
   </modules>
    
-  <repositories>
-    <repository>
-      <id>eclipsePlugins</id>
-      <url>http://repo1.maven.org/eclipse</url>
-    </repository>
-  </repositories>
 </project>
