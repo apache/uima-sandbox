@@ -23,12 +23,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.uima</groupId>
   <artifactId>SandboxDistr</artifactId>
+  <!-- version cannot be a ${xxx} form for Parent poms -->
+  <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->  <name>Apache UIMA Sandbox distribution build</name>
   <packaging>pom</packaging>
-  <version>${uimaj-release-version}</version>
-  <name>Apache UIMA Sandbox distribution build</name>
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>uimaj</artifactId>
+    <!-- version cannot be a ${xxx} form -->
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>../uimaj</relativePath>
   </parent>
@@ -50,6 +51,14 @@
     <url>http://www.apache.org/</url>
   </organization>
 
+  <dependencies>
+    <dependency>
+      <groupId>ant-contrib</groupId>
+      <artifactId>ant-contrib</artifactId>
+      <version>1.0b3</version>
+    </dependency>
+  </dependencies>
+  
   <build>
     <pluginManagement>
       <plugins>
@@ -59,7 +68,47 @@
           <version>${uimaj-release-version}</version>
         </plugin>
       </plugins>
-    </pluginManagement>  
+    </pluginManagement>
+    
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>maybe build documentation</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+                <!-- set up ant-contrib extensions -->
+                <typedef resource="net/sf/antcontrib/antlib.xml">
+                  <classpath refid="maven.dependency.classpath"/>
+                </typedef>
+                <!--echo message="pom.xml: maven-antrun-plugin"></echo>
+                <tstamp>
+                  <format locale="en" property="TODAY_UK"
+                          pattern="d-MMM-yyyy"></format>
+                </tstamp>
+                <echo>pom.xml: timestamp ${TODAY_UK}</echo-->
+                
+                <if>
+                  <available file="build_documentation.xml"></available>
+                  <then>
+                    <ant antfile="build_documentation.xml"/> 
+                  </then>
+                  <else>
+                    <echo message="No build_documentation.xml - skipping"/>
+                  </else>
+                </if> 
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+      
   </build>
   
   <modules>

@@ -24,13 +24,15 @@
   <groupId>org.apache.uima</groupId>
   <artifactId>SandboxAnnotatorPackage</artifactId>
   <packaging>pom</packaging>
-  <version>${uimaj-release-version}</version>
+  <!-- version cannot be a ${xxx} form for parent POMs -->
+  <version>2.3.0-incubating-SNAPSHOT</version>
   <name>Apache UIMA Sandbox Annotator Add-Ons</name>
   <url>http://incubator.apache.org/uima</url>
   <description>Annotator components for the UIMA SDK</description>
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>SandboxDistr</artifactId>
+    <!-- version cannot be a ${xxx} form -->
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>..</relativePath>
   </parent>
