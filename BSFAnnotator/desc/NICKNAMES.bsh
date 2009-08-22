@@ -10,18 +10,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import org.apache.uima.analysis_engine.ResultSpecification;
-import org.apache.uima.analysis_engine.annotator.AnnotatorConfigurationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorContext;
-import org.apache.uima.analysis_engine.annotator.AnnotatorInitializationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorProcessException;
-import org.apache.uima.analysis_engine.annotator.JTextAnnotator_ImplBase;
-import org.apache.uima.annotator.bsf.types.Firstname;
-import org.apache.uima.annotator.bsf.types.Nickname;
-import org.apache.uima.annotator.bsf.types.Token;
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.apache.uima.annotator.bsf.types.Firstname;
+import org.apache.uima.annotator.bsf.types.Nickname;
+import org.apache.uima.annotator.bsf.types.Token;
+
 	/**
 	 * Initialisation of global variables
 	 */
@@ -39,8 +38,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 	 *            a list of output types and features that this annotator should
 	 *            produce.
 	 */
-	public void process(JCas jcas, ResultSpecification rs)
-      throws AnnotatorProcessException {
+	public void process(JCas jcas)
+      throws AnalysisEngineProcessException {
 	  // iterates on the existing token that have been created by the previous
 		// annotators
 	  ArrayList annots = new ArrayList();
@@ -85,11 +84,9 @@ import org.apache.uima.jcas.tcas.Annotation;
 	 *            annotator. This includes configuration parameters, logging and
 	 *            instrumentation services, and access to external analysis
 	 *            resources.
-	 * @see com.ibm.uima.analysis_engine.annotator.BaseAnnotator#initialize(com.ibm.uima.analysis_engine.annotator.AnnotatorContext)
 	 */
-	public void initialize(AnnotatorContext aContext)
-			throws AnnotatorInitializationException,
-			AnnotatorConfigurationException {
+	public void initialize(UimaContext aContext)
+			throws ResourceInitializationException {
 		// List of Firstnames => Nickname
 		String[] name_list = { "Aaron,Erin", "Aaron,Ron",
 				"Aaron,Ronnie", "Abel,Ab", "Abel,Abe", "Abel,Eb", "Abel,Ebbie",
@@ -463,17 +460,16 @@ import org.apache.uima.jcas.tcas.Annotation;
 		String source = (String) aContext.getConfigParameterValue("SourceFile");
 		
 		  nicknames = new HashMap();
+		  ArrayList nicks = null;
 		  for (int i=0; i < name_list.length; i++) {
 			  String name2nick = name_list[i];
 			  String[] names = name2nick.split(",");
 			  if (!nicknames.containsKey(names[0])) {
 				  nicknames.put(names[0], new ArrayList());
 			  }
-			  ArrayList nicks = (ArrayList)nicknames.get(names[1]);
-			  if (nicks == null) {
-				  nicks = new ArrayList();
-				  nicknames.put(names[1], nicks);
+			  if (!nicknames.containsKey(names[1])) {
+				  nicknames.put(names[1], new ArrayList());
 			  }
-			  nicks.add(names[0]);
+			  ((List)(nicknames.get(names[1]))).add(names[0]);
 		  }
 	}

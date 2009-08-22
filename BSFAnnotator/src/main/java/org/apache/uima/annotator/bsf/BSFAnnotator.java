@@ -26,20 +26,18 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.bsf.BSFEngine;
 import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 import org.apache.bsf.util.IOUtils;
-import org.apache.uima.analysis_engine.ResultSpecification;
-import org.apache.uima.analysis_engine.annotator.AnnotatorConfigurationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorContext;
-import org.apache.uima.analysis_engine.annotator.AnnotatorContextException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorInitializationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorProcessException;
-import org.apache.uima.analysis_engine.annotator.JTextAnnotator_ImplBase;
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Logger;
 
 /**
@@ -48,7 +46,7 @@ import org.apache.uima.util.Logger;
  * containing the script's source file to execute.
  * <p>
  */
-public class BSFAnnotator extends JTextAnnotator_ImplBase {
+public class BSFAnnotator extends JCasAnnotator_ImplBase {
 
 	public static final String MESSAGE_DIGEST = "org.apache.uima.annotator.bsf.BSFAnnotatorMessages";
 
@@ -63,18 +61,12 @@ public class BSFAnnotator extends JTextAnnotator_ImplBase {
 	String scriptFileName;
 
 
-	/**
-	 * Initializes the annotator by compiling the script.
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#initialize(org.apache.uima.analysis_engine.annotator.AnnotatorContext)
-	 */
-	public void initialize(AnnotatorContext aContext)
-			throws AnnotatorInitializationException,
-			AnnotatorConfigurationException {
-		super.initialize(aContext);
+    /**
+     * Initializes the annotator by compiling the script.
+     */
+    public void initialize(UimaContext aContext)
+        throws ResourceInitializationException {
+        super.initialize(aContext);
 		// Initialize a BSF manager and do some 'cooking' to adapt the class loader
 		manager = new BSFManager();
 		ClassLoader classLoader = this.getClass().getClassLoader();
@@ -91,7 +83,7 @@ public class BSFAnnotator extends JTextAnnotator_ImplBase {
 			// get UIMA datapath and tokenize it into its elements
 			StringTokenizer tokenizer = new StringTokenizer(aContext
 					.getDataPath(), PATH_SEPARATOR);
-			ArrayList datapathElements = new ArrayList();
+			List<File> datapathElements = new ArrayList<File>();
 			while (tokenizer.hasMoreTokens()) {
 				// add datapath elements to the 'datapathElements' array list
 				datapathElements.add(new File(tokenizer.nextToken()));
@@ -113,9 +105,7 @@ public class BSFAnnotator extends JTextAnnotator_ImplBase {
 				}
 			}
 			reader = new FileReader(scriptFile);
-		} catch (AnnotatorContextException ex) {
-		    throw new AnnotatorInitializationException(ex);
-	    } catch (FileNotFoundException fnfe) {
+		} catch (FileNotFoundException fnfe) {
 			throw new BSFAnnotatorConfigurationException(
 					"bsf_annotator_resource_not_found",
 					new Object[] { scriptFileName }, fnfe);
@@ -172,19 +162,13 @@ public class BSFAnnotator extends JTextAnnotator_ImplBase {
 	/**
 	 * Call the process function implemented in the script
 	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.uima.analysis_engine.annotator.JTextAnnotator#process(org.apache.uima.jcas.JCas,
-	 *      org.apache.uima.analysis_engine.ResultSpecification)
-	 */
-	public void process(JCas jcas, ResultSpecification result)
-			throws AnnotatorProcessException {
-		
+    public void process(JCas jcas)
+    throws AnalysisEngineProcessException {
+	
 		String methodName = null;
 		try {
 			methodName = "process";
-			engine.call(null, methodName, new Object[] { jcas, result });
+			engine.call(null, methodName, new Object[] { jcas });
 		} catch (BSFException bsfe) {
 			Throwable cause = bsfe.getTargetException();
 			if (cause == null) cause = bsfe;
@@ -199,7 +183,7 @@ public class BSFAnnotator extends JTextAnnotator_ImplBase {
 	 * @return
 	 */
 	private File resolveRelativeFilePath(String fileName,
-			ArrayList datapathElements) {
+			List<File> datapathElements) {
 		URL url;
 		// try to use the class loader to load the file resource
 		if ((url = this.getClass().getClassLoader().getResource(fileName)) != null) {
@@ -209,9 +193,8 @@ public class BSFAnnotator extends JTextAnnotator_ImplBase {
 				return null;
 			}
 			// try to use the datapath to load the file resource
-			for (int i = 0; i < datapathElements.size(); i++) {
-				File testFile = new File((File) datapathElements.get(i),
-						fileName);
+			for (File dataPathDir : datapathElements) {
+				File testFile = new File(dataPathDir, fileName);
 				if (testFile.exists()) {
 					return testFile;
 				}

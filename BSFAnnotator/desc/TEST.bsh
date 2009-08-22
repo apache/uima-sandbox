@@ -5,13 +5,10 @@
  * @version 1.0 
  */
 
-import org.apache.uima.analysis_engine.ResultSpecification;
-import org.apache.uima.analysis_engine.annotator.AnnotatorConfigurationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorContext;
-import org.apache.uima.analysis_engine.annotator.AnnotatorContextException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorInitializationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorProcessException;
-import org.apache.uima.analysis_engine.annotator.JTextAnnotator_ImplBase;
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
@@ -35,9 +32,8 @@ Pattern matchPattern;
  *                 This includes configuration parameters, logging and instrumentation services, and access to external analysis resources. 
  * @see com.ibm.uima.analysis_engine.annotator.BaseAnnotator#initialize(com.ibm.uima.analysis_engine.annotator.AnnotatorContext)
  */ 
-public void initialize(AnnotatorContext aContext)
-			throws AnnotatorInitializationException,
-			AnnotatorConfigurationException {
+	public void initialize(UimaContext aContext)
+			throws ResourceInitializationException {
 			
 			String source = (String) aContext.getConfigParameterValue("SourceFile");
 			String regexp = (String) aContext.getConfigParameterValue("Regexp");
@@ -52,8 +48,8 @@ public void initialize(AnnotatorContext aContext)
  * @param jcas contains the document to be analyzed and may contain other metadata about that document.
  * @param rs a list of output types and features that this annotator should produce. 
  */  
-public void process(JCas jcas, ResultSpecification rs)
-      throws AnnotatorProcessException {
+	public void process(JCas jcas)
+      throws AnalysisEngineProcessException {
       
       // Looking for regexp in the document text and storing start/end indexes in arrays
       String text = jcas.getDocumentText();

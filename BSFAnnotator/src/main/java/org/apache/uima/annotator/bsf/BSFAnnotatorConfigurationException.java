@@ -18,15 +18,20 @@
  */
 package org.apache.uima.annotator.bsf;
 
-import org.apache.uima.analysis_engine.annotator.AnnotatorConfigurationException;
+import org.apache.uima.resource.ResourceInitializationException;
 
 /**
  * 
  *
  */
-public class BSFAnnotatorConfigurationException extends AnnotatorConfigurationException {
+public class BSFAnnotatorConfigurationException extends ResourceInitializationException {
 
    /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
     * Creates a new exception with a the specified message.
     * 
     * @param aMessageKey

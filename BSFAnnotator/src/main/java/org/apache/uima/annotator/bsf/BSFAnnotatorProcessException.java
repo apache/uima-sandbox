@@ -18,16 +18,21 @@
  */
 package org.apache.uima.annotator.bsf;
 
-import org.apache.uima.analysis_engine.annotator.AnnotatorProcessException;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 
 /**
  * 
  * 
  */
-public class BSFAnnotatorProcessException extends AnnotatorProcessException {
+public class BSFAnnotatorProcessException extends AnalysisEngineProcessException {
 
 
    /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
     * Creates a new exception with a the specified message.
     * 
     * @param aMessageKey
