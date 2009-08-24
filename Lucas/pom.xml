@@ -28,29 +28,20 @@
 	<name>Apache UIMA - Lucene CAS Indexer</name>
 	<version>2.3.0-incubating-SNAPSHOT</version>
 	<description>Writes information contained in CAS objects to fields of a Lucene search index; mapping is done in a mapping file.</description>
-	<url>http://incubator.apache.org/uima</url>
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<scm>
-		<url>http://svn.apache.org/viewvc/incubator/uima</url>
-	</scm>
+  
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>uimaj</artifactId>
+    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../uimaj</relativePath>
+  </parent>
+
 	<properties>
 		<componentId>LuceneCASIndexer</componentId>
 	</properties>
+  
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -189,7 +180,6 @@
 			<plugin>
 				<groupId>org.apache.uima</groupId>
 				<artifactId>PearPackagingMavenPlugin</artifactId>
-				<version>2.3.0-incubating-SNAPSHOT</version>
 				<extensions>true</extensions>
 				<executions>
 					<execution>
@@ -216,18 +206,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-
-			</plugin>
 		</plugins>
 	</build>
+  
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
@@ -247,8 +228,6 @@
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-core</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
