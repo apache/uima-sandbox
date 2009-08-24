@@ -29,9 +29,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>uimaj</artifactId>
+    <artifactId>SandboxDistr</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../uimaj</relativePath>
+    <relativePath>../SandboxDistr</relativePath>
   </parent>
 
 	<dependencies>
