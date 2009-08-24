@@ -47,6 +47,7 @@
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
 		</dependency>
+    
 		<dependency>
 			<groupId>local.bsf.dependency</groupId>
 			<artifactId>bsf</artifactId>
@@ -86,13 +87,5 @@
   
 	<build>
 		<finalName>uimaj-an-bsf</finalName>
-		<resources>
-			<resource>
-				<directory>desc</directory>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
 	</build>
 </project>
