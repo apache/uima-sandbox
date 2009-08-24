@@ -199,3 +199,11 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+   
+   ------------------------------------------------------------------------
+   Snowball license (from http://snowball.tartarus.org/license.php):
+   
+     All the software given out on this Snowball site is covered by the BSD License 
+     (see http://www.opensource.org/licenses/bsd-license.html ), 
+     with Copyright (c) 2001, Dr Martin Porter, 
+     and (for the Java developments) Copyright (c) 2002, Richard Boulton. 
