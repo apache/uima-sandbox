@@ -25,10 +25,12 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.reset;
 import static org.easymock.classextension.EasyMock.verify;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Properties;
 
 import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.uima.lucas.indexer.util.PlainFileReader;
 import org.apache.uima.lucas.indexer.util.PlainFileReaderFactory;
@@ -36,12 +38,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class StopwordFilterFactoryTest {
-	  private static final String TEST_FILE_1 = "src/test/resources/ReplaceFilterFactoryTest1.txt";
+	  private static final String TRUE = "true";
+    private static final String TEST_FILE_1 = "src/test/resources/ReplaceFilterFactoryTest1.txt";
 	  private StopwordFilterFactory stopwordFilterFactory;
 	  private PlainFileReaderFactory plainFileReaderFactory;
 	  private PlainFileReader plainFileReader;
 	  private TokenStream tokenStream;
 	  private String[] lines;
+    private Properties properties;
 	  
 	  @Before
 	  public void setUp(){
@@ -49,17 +53,17 @@ public class StopwordFilterFactoryTest {
 		plainFileReader= createMock(PlainFileReader.class);
 	    stopwordFilterFactory = new StopwordFilterFactory(plainFileReaderFactory);
 	    tokenStream = createMock(TokenStream.class);
-	    lines = new String[]{};
+	    lines = new String[]{"WORD"};
+	    properties = new Properties();
+        properties.setProperty(StopwordFilterFactory.FILE_PATH_PARAMETER, TEST_FILE_1);
+        properties.setProperty(StopwordFilterFactory.IGRNORE_CASE_PARAMETER, TRUE);
 	  }
 	  
 	  @Test
-	  public void testCreateTokenFilter() throws Exception{
-	    Properties properties = new Properties();
-	    properties.setProperty(StopwordFilterFactory.FILE_PATH_PARAMETER, TEST_FILE_1);
-	    
+	  public void testCreateTokenFilter() throws Exception{	    
 	    expect(plainFileReaderFactory.createPlainFileReader(TEST_FILE_1)).andReturn(plainFileReader);
 	    expect(plainFileReader.readLines()).andReturn(lines);
-	    replay(plainFileReaderFactory);
+        replay(plainFileReaderFactory);
 	    replay(plainFileReader);
 	    
 	    StopFilter stopFilter = (StopFilter) stopwordFilterFactory.createTokenFilter(tokenStream, properties);
@@ -69,6 +73,7 @@ public class StopwordFilterFactoryTest {
 	    
 	    reset(plainFileReaderFactory);
 	    reset(plainFileReader);
+	    
 	    replay(plainFileReaderFactory);
 	    replay(plainFileReader);
 	    
@@ -76,6 +81,25 @@ public class StopwordFilterFactoryTest {
 	    stopFilter = (StopFilter) stopwordFilterFactory.createTokenFilter(tokenStream, properties);
 	    verify(plainFileReaderFactory);
 	    verify(plainFileReader);
+	  }
+
+	  @Test
+	  public void testIgnoreCase() throws Exception{
+	        expect(plainFileReaderFactory.createPlainFileReader(TEST_FILE_1)).andReturn(plainFileReader);
+	        expect(plainFileReader.readLines()).andReturn(lines);
+	        replay(plainFileReaderFactory);
+	        replay(plainFileReader);
+	        
+	        StopFilter stopFilter = (StopFilter) stopwordFilterFactory.createTokenFilter(tokenStream, properties);
+	        Token reusableToken = new Token(0, 5);
+	        reusableToken.setTermBuffer("word");
+	        expect(tokenStream.next(reusableToken)).andReturn(reusableToken);
+	        expect(tokenStream.next(reusableToken)).andReturn(null);
+	        replay(tokenStream);
+
+	        Token resultToken = stopFilter.next(reusableToken);
+	        assertNull(resultToken);
+	        verify(tokenStream);
 	  }
 	  
 	  @Test

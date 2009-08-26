@@ -32,8 +32,10 @@ import org.apache.uima.lucas.indexer.util.PlainFileReaderFactory;
 
 public class StopwordFilterFactory implements TokenFilterFactory {
 
-	public static final String FILE_PATH_PARAMETER = "filePath";
-	
+  private static final String TRUE = "true";
+  private static final String FALSE = "false";
+  public static final String FILE_PATH_PARAMETER = "filePath";
+  public static final String IGRNORE_CASE_PARAMETER = "ignoreCase";
   private PlainFileReaderFactory plainFileReaderFactory;
   private Map<String, String[]> cachedStopwords;
   private static Logger LOGGER = Logger.getLogger(StopwordFilterFactory.class);
@@ -47,9 +49,12 @@ public class StopwordFilterFactory implements TokenFilterFactory {
 			Properties properties) throws IOException {
 	  
 	  String filePath = properties.getProperty(FILE_PATH_PARAMETER);
-    String[] stopwords = getStopwords(filePath );
+	  String ignoreCase = properties.getProperty(IGRNORE_CASE_PARAMETER);
+	  ignoreCase = ignoreCase == null ? FALSE : ignoreCase;
+	  
+	  String[] stopwords = getStopwords(filePath );
     
-		return new StopFilter(tokenStream, stopwords);
+		return new StopFilter(tokenStream, stopwords, ignoreCase.equals(TRUE));
 	}
 
 	private String[] getStopwords(String filePath) throws IOException {

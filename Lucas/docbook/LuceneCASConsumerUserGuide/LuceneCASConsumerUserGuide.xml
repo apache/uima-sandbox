@@ -1339,6 +1339,15 @@
 										single stopword.
 							</entry>
 								</row>
+								<row>
+									<entry>ignoreCase</entry>
+									<entry>boolean</entry>
+									<entry>false</entry>
+									<entry>no</entry>
+									<entry>
+										Defines if the stop filter ignores the case of stop words.
+							</entry>
+								</row>								
 							</tbody>
 						</tgroup>
 					</table>
