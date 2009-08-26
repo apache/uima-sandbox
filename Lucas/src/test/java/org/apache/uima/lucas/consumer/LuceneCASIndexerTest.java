@@ -44,7 +44,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableBiMap;
 
 public class LuceneCASIndexerTest {
 
@@ -117,7 +117,7 @@ public class LuceneCASIndexerTest {
     replay(testFactoryField);
     replay(testFactoryAnnotation);
 
-    consumer.preloadResources(fieldDescriptions, Maps.immutableBiMap(TEST_FILTER_ANNOTATION,
+    consumer.preloadResources(fieldDescriptions, ImmutableBiMap.of(TEST_FILTER_ANNOTATION,
         testFactoryAnnotation, TEST_FILTER_FIELD, testFactoryField));
     verify(testFactoryField);
     verify(testFactoryAnnotation);

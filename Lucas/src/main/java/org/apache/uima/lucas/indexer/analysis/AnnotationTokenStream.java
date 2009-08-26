@@ -42,9 +42,9 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * 
@@ -104,8 +104,8 @@ public class AnnotationTokenStream extends TokenStream {
    * @throws CASException
    */
   public AnnotationTokenStream(JCas cas, String sofaName, String typeName) throws InvalidTokenSourceException {
-    this(cas, sofaName, typeName, null, Collections.EMPTY_LIST, null, 
-         Collections.EMPTY_MAP);
+    this(cas, sofaName, typeName, null, Collections.<String>emptyList(), null, 
+         Collections.<String, Format>emptyMap());
   }
 
   /**
@@ -127,7 +127,7 @@ public class AnnotationTokenStream extends TokenStream {
   public AnnotationTokenStream(JCas cas, String sofaName, String typeName, String featureName,
           Format featureFormat) throws InvalidTokenSourceException {
     this(cas, sofaName, typeName, null, Lists.newArrayList(featureName), null, 
-         Maps.immutableBiMap(featureName, featureFormat));
+         featureFormat != null ? ImmutableBiMap.of(featureName, featureFormat): Collections.<String, Format>emptyMap());
   }
 
   /**
