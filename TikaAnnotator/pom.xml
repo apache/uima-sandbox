@@ -46,9 +46,15 @@
     
     <dependency>
       <groupId>org.apache.tika</groupId>
-      <artifactId>tika</artifactId>
-      <version>0.2</version>
+      <artifactId>tika-core</artifactId>
+      <version>0.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-parsers</artifactId>
+      <version>0.4</version>
+    </dependency>
+    
   </dependencies>
   
 	<build>
