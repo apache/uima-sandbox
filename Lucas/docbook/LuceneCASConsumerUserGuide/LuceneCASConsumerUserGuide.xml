@@ -1377,58 +1377,6 @@
 				<para>Turns the text of each token into lower case.</para>
 				<programlisting><![CDATA[<filter name="lowercase"/>]]></programlisting>
 			</section>
-			<section id="sandbox.luceneCasConsumer.mapping.reference.filters.uea">
-				<title>
-					UEA Stemmer Filter
-				</title>
-				<para>
-					Integration of the
-					<ulink
-						url="http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming">UEA lite stemmer</ulink>
-					.
-				</para>
-				<programlisting><![CDATA[<filter name="uea-stemmer" maxWordLength="30" maxAcronymLength="15"/>]]></programlisting>
-				<para>
-					<table>
-						<title>UEA stemmer filter attributes</title>
-						<tgroup cols="5">
-							<thead>
-								<row>
-									<entry>name</entry>
-									<entry>allowed values</entry>
-									<entry>default value</entry>
-									<entry>mandatory</entry>
-									<entry>description</entry>
-								</row>
-							</thead>
-							<tbody>
-								<row>
-									<entry>maxWordLength</entry>
-									<entry>integer</entry>
-									<entry>20</entry>
-									<entry>no</entry>
-									<entry>
-										See
-										<ulink
-											url="http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming">UEA lite stemmer documentation</ulink>
-									</entry>
-								</row>
-								<row>
-									<entry>maxAcronymLength</entry>
-									<entry>integer</entry>
-									<entry>8</entry>
-									<entry>no</entry>
-									<entry>
-										See
-										<ulink
-											url="http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming">UEA lite stemmer documentation</ulink>
-									</entry>
-								</row>
-							</tbody>
-						</tgroup>
-					</table>
-				</para>
-			</section>
 		</section>
 	</chapter>
 	<chapter id="sandbox.luceneCasConsumer.indexwriter">
