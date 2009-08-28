@@ -94,10 +94,14 @@ public class IndexWriterProviderImplTest {
     String hostname = getHostName();
     String pid = getPID();
 
-    assertTrue(fsDirectory.getFile().getAbsolutePath().endsWith(
+    String writerPath = fsDirectory.getFile().getAbsolutePath();
+    assertTrue(writerPath.contains(
         TEST_INDEX + "-" + hostname + "-" + pid));
     assertEquals(513, indexWriter.getRAMBufferSizeMB(), 0.5);
     assertEquals(9999, indexWriter.getMaxFieldLength(), 0.5);
+    
+    String random = writerPath.substring(writerPath.lastIndexOf("-")+1);
+    assertTrue(random.matches("\\d+"));
   }
 
   protected String getPID() {

@@ -23,7 +23,10 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Random;
+import java.util.Set;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.CorruptIndexException;
@@ -41,6 +44,9 @@ public class IndexWriterProviderImpl implements IndexWriterProvider, SharedResou
   public static final String INDEX_PATH_PROPERTY = "indexPath";
   public static final String MAX_FIELD_LENGTH_PROPERTY = "maxFieldLength";
   private static final String UNIQUE_INDEX_PROPERTY = "uniqueIndex";
+
+  private static Set<Integer> randomNumbers = new HashSet<Integer>();
+
   public IndexWriter indexWriter;
 
   public IndexWriter getIndexWriter() {
@@ -88,8 +94,20 @@ public class IndexWriterProviderImpl implements IndexWriterProvider, SharedResou
     return properties.getProperty(INDEX_PATH_PROPERTY);
   }
   
+
+  private synchronized int createRandom() {
+          Random randomGenerator = new Random();
+          int randomInt = randomGenerator.nextInt(1000000);
+          while (randomNumbers.contains(randomInt)) {
+              randomInt = randomGenerator.nextInt(1000000);
+          }
+          randomNumbers.add(randomInt);
+          return randomInt;
+      }
+
   private String createUniqueIndexPath(String indexPath){
-    String uniqueIndexPath = indexPath + "-" + getHostName() + "-" + getPID();
+    String uniqueIndexPath = indexPath + "-" + getHostName() + "-" + getPID() + 
+                             "-" + createRandom();
     return uniqueIndexPath;
   }
 
