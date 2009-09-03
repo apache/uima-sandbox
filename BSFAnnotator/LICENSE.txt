@@ -203,6 +203,8 @@
    limitations under the License.
 
 
+For bsh-1.3.0.jar:
+
 ------------------------------- Sun Public License, v. 1.0 ---------------------------------
 
 1. Definitions.
@@ -711,6 +713,9 @@
         Original Code Source Code for Your Modifications.]
         
         
+        
+For bsf.jar:
+
 ------------------------------ MPL 1.1 -------------------------------------------------
 
                           MOZILLA PUBLIC LICENSE
