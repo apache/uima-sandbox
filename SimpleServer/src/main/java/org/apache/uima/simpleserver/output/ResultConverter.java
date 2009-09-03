@@ -77,12 +77,13 @@ public class ResultConverter {
       transformer.setOutputProperty(OutputKeys.METHOD, "xml");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
 
       StringWriter stringWriter = new StringWriter();
       StreamResult streamResult = new StreamResult(stringWriter);
       transformer.transform(source, streamResult);
 
-      return stringWriter.toString();
+      return stringWriter.toString().replace(" standalone=\"no\"", "");
     } catch (Throwable t) {
       throw new RuntimeException("XML output failed", t);
     }
