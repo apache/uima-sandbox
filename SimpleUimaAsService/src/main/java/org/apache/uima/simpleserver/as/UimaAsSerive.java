@@ -20,7 +20,6 @@ package org.apache.uima.simpleserver.as;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -37,12 +36,9 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.collection.EntityProcessStatus;
-import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.simpleserver.Service;
-import org.apache.uima.simpleserver.SimpleServerException;
 import org.apache.uima.simpleserver.output.Result;
-import org.apache.xmlbeans.XmlException;
 
 public class UimaAsSerive extends Service {
 
