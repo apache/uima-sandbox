@@ -29,154 +29,14 @@
 	<version>2.3.0-incubating-SNAPSHOT</version>
 	<description>Writes information contained in CAS objects to fields of a Lucene search index; mapping is done in a mapping file.</description>
   
-  <parent>
+   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>uimaj</artifactId>
+    <artifactId>SandboxDistr</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../uimaj</relativePath>
-  </parent>
-
-	<properties>
-		<componentId>LuceneCASIndexer</componentId>
-	</properties>
-  
+    <relativePath>../SandboxDistr</relativePath>
+   </parent>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>jar</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-					<execution>
-						<id>test-jar</id>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<!-- Copy the dependencies to the lib folder for the PEAR to copy -->
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<stripVersion>true</stripVersion>
-							<outputDirectory>${basedir}/lib</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-							<includeScope>runtime</includeScope>
-							<excludeScope>test</excludeScope>
-							<excludeArtifactIds>uimaj-core</excludeArtifactIds>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<!-- Clean the libraries after packaging -->
-					<execution>
-						<id>CleanLib</id>
-						<phase>clean</phase>
-						<configuration>
-							<tasks>
-								<delete dir="lib" deleteOnExit="true" quiet="true"
-									failOnError="false">
-									<fileset dir="lib" includes="*.jar" />
-								</delete>
-								<delete dir="doc" deleteOnExit="true" quiet="true"
-									failOnError="false">
-									<fileset dir="doc" />
-								</delete>
-								<delete dir="desc" deleteOnExit="true" quiet="true"
-									failOnError="false">
-									<fileset dir="desc" />
-								</delete>
-								<delete dir="resources" deleteOnExit="true" quiet="true"
-									failOnError="false">
-									<fileset dir="resources" />
-								</delete>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>BuildDownloadSite</id>
-						<phase>site</phase>
-						<configuration>
-							<tasks>
-								<mkdir dir="${project.build.directory}/site/downloads" />
-								<copy todir="${project.build.directory}/site/downloads">
-									<fileset dir="${basedir}/src/main/resources/" />
-									<fileset dir="${project.build.directory}/" includes="*.jar" />
-									<fileset dir="${project.build.directory}/" includes="*.pear" />
-								</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-
-					<execution>
-						<id>BuildPearDirectories</id>
-						<phase>package</phase>
-						<configuration>
-							<tasks>
-								<mkdir dir="${basedir}/desc" />
-								<copy file="${basedir}/src/main/resources/${componentId}.xml"
-									todir="${basedir}/desc/" />
-								<mkdir dir="${basedir}/doc" />
-								<!--
-									<copy todir="${basedir}/doc"> <fileset
-									dir="${project.build.directory}/site/"/> </copy>
-								-->
-								<copy todir="${basedir}/doc/downloads">
-									<fileset dir="${basedir}/src/main/resources/" />
-								</copy>
-								<mkdir dir="${basedir}/resources" />
-								<copy todir="${basedir}/resources">
-									<fileset dir="${basedir}/src/test/resources/" />
-								</copy>
-								<replace file="${basedir}/desc/${componentId}.xml"
-									token="src/test/" value="" />
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<tasks>
-								<ant antfile="build_documentation.xml" target="copyDocs" />
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+	 <plugins>
 			<plugin>
 				<groupId>org.apache.uima</groupId>
 				<artifactId>PearPackagingMavenPlugin</artifactId>
@@ -187,7 +47,7 @@
 						<configuration>
 							<classpath>
 								<!-- PEAR file component classpath settings -->
-								$main_root/lib/cglib-nodep-2.1_3.jar;$main_root/lib/google-collect-snapshot-20080530.jar;$main_root/lib/log4j-1.2.14.jar;$main_root/lib/lucene-core-2.4.0.jar;$main_root/lib/lucene-snowball-2.4.0.jar
+								$main_root/lib/google-collections-0.9.jar;$main_root/lib/log4j-1.2.14.jar;$main_root/lib/lucene-core-2.4.1.jar;$main_root/lib/lucene-snowball-2.4.1.jar
 							</classpath>
 
 							<mainComponentDesc>
@@ -206,9 +66,12 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+	 </plugins>
 	</build>
-  
+	<properties>
+		<componentId>LuceneCASIndexer</componentId>
+	</properties>
+ 
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
