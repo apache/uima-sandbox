@@ -202,6 +202,8 @@
    
 ==========================================================================================
 
+For org.tartarus.snowball package:
+
    Snowball license (from http://snowball.tartarus.org/license.php):
    
      All the software given out on this Snowball site is covered by the BSD License 
