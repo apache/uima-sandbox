@@ -6,13 +6,10 @@ The Apache Software Foundation (http://www.apache.org/).
 
 This software also includes:
 
-    - Beanshell 1.3.0, lightweight Scripting for Java, from http://www.beanshell.org/,
-      licensed under the Sun Public License/LGPL.  Distributed here under the
-      SPL, see LICENSE.txt.
+    - Beanshell 1.3.0, lightweight Scripting for Java, from http://www.beanshell.org/
 
     - Rhino, the open-source implementation of JavaScript written entirely in Java, from 
-      http://www.mozilla.org/rhino/, available under MPL 1.1/GPL 2.0 license.  Distributed here
-      under the MPL 1.1, see LICENSE.txt.
+      http://www.mozilla.org/rhino/
       
 
 
