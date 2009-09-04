@@ -119,11 +119,14 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 					.readFieldDescriptionsFromFile(mappingFile);
 		} catch (IOException e) {
 			throw new ResourceInitializationException(e);
+		} catch (ParserConfigurationException e) {
+                  throw new ResourceInitializationException(e);
+		} catch (SAXException e) {
+		  throw new ResourceInitializationException(e);
 		}
 	}
 
-	private MappingFileReader createMappingFileReader() throws IOException{
-		try {
+	private MappingFileReader createMappingFileReader() throws ParserConfigurationException, SAXException, IOException{
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			Map<String, ElementMapper<?>> elementMappers = new HashMap<String, ElementMapper<?>>();
 			elementMappers.put(MappingFileReader.ANNOTATION, new AnnotationMapper());
@@ -131,12 +134,6 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 			elementMappers.put(MappingFileReader.FIELD, new FieldMapper());
 			elementMappers.put(MappingFileReader.FEATURE, new FeatureMapper());			
 			return new MappingFileReader(parser, elementMappers);
-			
-		} catch (ParserConfigurationException e) {
-			throw new IOException("Can't build SAXParser", e);
-		} catch (SAXException e) {
-			throw new IOException("Can't build SAXParser", e);
-		}
 	}
 
 	private void getIndexWriterInstance()

@@ -64,18 +64,18 @@ public class MappingFileReader extends DefaultHandler {
 	}
 
 	public Collection<FieldDescription> readFieldDescriptionsFromFile(
-			File mappingFile) throws IOException {
+			File mappingFile) throws IOException, SAXException {
 
 		parseFile(mappingFile);
 		return fieldDescriptions;
 	}
 
-	private void parseFile(File mappingFile) throws IOException {
-		try {
+	private void parseFile(File mappingFile) throws IOException, SAXException {
+//		try {
 			parser.parse(mappingFile, this);
-		} catch (SAXException e) {
-			throw new IOException(e);
-		}
+//		} catch (SAXException e) {
+//			throw new IOException(e);
+//		}
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 public class MappingFileReaderTest {
 
@@ -66,7 +67,7 @@ public class MappingFileReaderTest {
   }
   
 	@Test
-	public void testCreateFieldDescriptions() throws IOException{
+	public void testCreateFieldDescriptions() throws IOException, SAXException{
 	  Collection<FieldDescription> fieldDescriptions = mappingFileReader.readFieldDescriptionsFromFile(new File(MAPPING_FILE));
 	  assertEquals(1, fieldDescriptions.size());
 
