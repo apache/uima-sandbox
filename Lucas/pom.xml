@@ -247,13 +247,5 @@
 			<version>0.9</version>
 		</dependency>
 	</dependencies>
-
-	<distributionManagement>
-		<repository>
-			<id>login</id>
-			<url>scp://login.coling.uni-jena.de/var/lib/maven/coling</url>
-		</repository>
-	</distributionManagement>
-
 </project>
 
