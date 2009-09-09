@@ -36,6 +36,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.lucas.indexer.analysis.TokenFilterFactory;
 import org.apache.uima.lucas.indexer.mapping.FieldDescription;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -108,31 +110,40 @@ public class LuceneCASIndexerTest {
     assertEquals(2, fieldDescription.getAnnotationDescriptions().size());
   }
 
+//  @Test
+//  public void testPreloadResources() throws IOException {
+//    Collection<FieldDescription> fieldDescriptions = luceneCASIndexer.getFieldDescriptions();
+//    TokenFilterFactory testFactoryField = createMock(TokenFilterFactory.class);
+//    TokenFilterFactory testFactoryAnnotation = createMock(TokenFilterFactory.class);
+//
+//    Capture<Properties> propertiesCaptureField = new Capture<Properties>();
+//    Capture<Properties> propertiesCaptureAnnotation = new Capture<Properties>();
+//
+//    testFactoryField.preloadResources(capture(propertiesCaptureField));
+//    testFactoryAnnotation.preloadResources(capture(propertiesCaptureAnnotation));
+//
+//    replay(testFactoryField);
+//    replay(testFactoryAnnotation);
+//
+//    luceneCASIndexer.preloadResources(fieldDescriptions, ImmutableBiMap.of(TEST_FILTER_ANNOTATION,
+//        testFactoryAnnotation, TEST_FILTER_FIELD, testFactoryField));
+//    verify(testFactoryField);
+//    verify(testFactoryAnnotation);
+//
+//    Properties fieldFilterProperties = propertiesCaptureField.getValue();
+//    assertEquals("value1", fieldFilterProperties.getProperty("key1"));
+//
+//    Properties annotationFilterProperties = propertiesCaptureAnnotation.getValue();
+//    assertEquals("value2", annotationFilterProperties.getProperty("key2"));
+//  }
+
   @Test
-  public void testPreloadResources() throws IOException {
-    Collection<FieldDescription> fieldDescriptions = luceneCASIndexer.getFieldDescriptions();
-    TokenFilterFactory testFactoryField = createMock(TokenFilterFactory.class);
-    TokenFilterFactory testFactoryAnnotation = createMock(TokenFilterFactory.class);
-
-    Capture<Properties> propertiesCaptureField = new Capture<Properties>();
-    Capture<Properties> propertiesCaptureAnnotation = new Capture<Properties>();
-
-    testFactoryField.preloadResources(capture(propertiesCaptureField));
-    testFactoryAnnotation.preloadResources(capture(propertiesCaptureAnnotation));
-
-    replay(testFactoryField);
-    replay(testFactoryAnnotation);
-
-    luceneCASIndexer.preloadResources(fieldDescriptions, ImmutableBiMap.of(TEST_FILTER_ANNOTATION,
-        testFactoryAnnotation, TEST_FILTER_FIELD, testFactoryField));
-    verify(testFactoryField);
-    verify(testFactoryAnnotation);
-
-    Properties fieldFilterProperties = propertiesCaptureField.getValue();
-    assertEquals("value1", fieldFilterProperties.getProperty("key1"));
-
-    Properties annotationFilterProperties = propertiesCaptureAnnotation.getValue();
-    assertEquals("value2", annotationFilterProperties.getProperty("key2"));
+  public void testIndexOneDocument() throws ResourceInitializationException,
+          AnalysisEngineProcessException {
+    CAS cas = analysisEngine.newCAS();
+    cas.setDocumentText("test document text");
+    analysisEngine.process(cas);
+    
+    
   }
-
 }

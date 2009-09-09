@@ -25,12 +25,12 @@
 	<field name="annotation1" index="yes" termVector="no" stored="yes"
 		merge="true">
 		<filters>
-			<filter name="testFilterField" key1="value1"/>
+			<filter name="uppercase" />
 		</filters>
 		<annotations>
 			<annotation type="org.apache.uima.lucas.indexer.types.test.Annotation1">
 				<filters>
-					<filter name="testFilterAnnotation" key2="value2"/>
+					<filter name="uppercase"/>
 				</filters>
 				<features>
 					<feature name="featureString" />
