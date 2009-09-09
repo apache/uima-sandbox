@@ -28,7 +28,7 @@
 			<filter name="testFilterField" key1="value1"/>
 		</filters>
 		<annotations>
-			<annotation type="de.julielab.jules.types.test.Annotation1">
+			<annotation type="org.apache.uima.lucas.indexer.types.test.Annotation1">
 				<filters>
 					<filter name="testFilterAnnotation" key2="value2"/>
 				</filters>
@@ -36,7 +36,7 @@
 					<feature name="featureString" />
 				</features>
 			</annotation>
-			<annotation type="de.julielab.jules.types.test.Annotation1">
+			<annotation type="org.apache.uima.lucas.indexer.types.test.Annotation1">
 				<features>
 					<feature name="featureInteger" numberFormat="##" />
 				</features>

@@ -45,7 +45,9 @@
         </value>
       </nameValuePair>
     </configurationParameterSettings>
-    <typeSystemDescription/>
+    <typeSystemDescription>
+    	<import location="AnnotationTokenStreamTestTypeSystem.xml"/>
+    </typeSystemDescription>
     <typePriorities/>
     <fsIndexCollection/>
     <capabilities>
