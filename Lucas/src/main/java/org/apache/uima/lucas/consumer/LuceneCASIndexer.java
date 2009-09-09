@@ -36,9 +36,10 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
-import org.apache.uima.collection.CasConsumer_ImplBase;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.lucas.indexer.AnnotationTokenStreamBuilder;
 import org.apache.uima.lucas.indexer.AnnotationTokenStreamBuildingException;
@@ -62,14 +63,13 @@ import org.apache.uima.lucas.indexer.mapping.FilterMapper;
 import org.apache.uima.lucas.indexer.mapping.MappingFileReader;
 import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.ResourceProcessException;
 import org.xml.sax.SAXException;
 
 /**
  * Reads CAS object and writes the particular information in fields of a Lucene index.
  * requires a mapping file
  */
-public class LuceneCASIndexer extends CasConsumer_ImplBase {
+public class LuceneCASIndexer extends CasAnnotator_ImplBase {
 
 	private static final String RESOURCE_INDEX_WRITER_PROVIDER = "indexWriterProvider";
 
@@ -78,15 +78,15 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 
 	public final static String PARAM_MAPPINGFILE = "mappingFile";
 
-	private IndexWriter indexWriter;
+	protected IndexWriter indexWriter;
 
-	private Collection<FieldDescription> fieldDescriptions;
+	protected Collection<FieldDescription> fieldDescriptions;
 
 	private DocumentBuilder documentBuilder;
 
 	private FieldBuilder fieldBuilder;
 
-	private FilterBuilder filterBuilder;
+	protected FilterBuilder filterBuilder;
 
 	private AnnotationTokenStreamBuilder annotationTokenStreamBuilder;
 
@@ -97,7 +97,10 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 	/**
 	 * initializes the analyzer
 	 */
-	public void initialize() throws ResourceInitializationException {
+  @Override
+  public void initialize(UimaContext aContext) throws ResourceInitializationException {
+    super.initialize(aContext);
+    
 		createFieldDescriptions();
 		getIndexWriterInstance();
 		createFilterBuilderWithPreloadedResources();
@@ -110,7 +113,7 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 
 	private void createFieldDescriptions()
 			throws ResourceInitializationException {
-		String mappingFilePath = (String) getConfigParameterValue(PARAM_MAPPINGFILE);
+		String mappingFilePath = (String) getContext().getConfigParameterValue(PARAM_MAPPINGFILE);
 
 		try {
 			MappingFileReader indexMappingFileReader = createMappingFileReader();
@@ -138,7 +141,7 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 
 	private void getIndexWriterInstance()
 			throws ResourceInitializationException {
-		UimaContext uimaContext = getUimaContext();
+		UimaContext uimaContext = getContext();
 		IndexWriterProvider indexWriterProvider;
 		try {
 			indexWriterProvider = (IndexWriterProvider) uimaContext
@@ -189,7 +192,7 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 		}
 	}
 
-	public void processCas(CAS cas) throws ResourceProcessException {
+	public void process(CAS cas) throws AnalysisEngineProcessException {
 
 		try {
 			JCas jCas = cas.getJCas();
@@ -226,19 +229,19 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 
 		} catch (AnnotationTokenStreamBuildingException e) {
 			logger.error("processCas(CAS)", e);
-			throw new ResourceProcessException(e);
+			throw new AnalysisEngineProcessException(e);
 		} catch (IOException e) {
 			logger.error("processCas(CAS)", e);
-			throw new ResourceProcessException(e);
+			throw new AnalysisEngineProcessException(e);
 		} catch (FieldBuildingException e) {
 			logger.error("processCas(CAS)", e);
-			throw new ResourceProcessException(e);
+			throw new AnalysisEngineProcessException(e);
 		} catch (FilterBuildingException e) {
 			logger.error("processCas(CAS)", e);
-			throw new ResourceProcessException(e);
+			throw new AnalysisEngineProcessException(e);
 		} catch (CASException e) {
 			logger.error("processCas(CAS)", e);
-			throw new ResourceProcessException(e);
+			throw new AnalysisEngineProcessException(e);
 		}
 	}
 
@@ -257,18 +260,6 @@ public class LuceneCASIndexer extends CasConsumer_ImplBase {
 		} catch (IOException e) {
 			logger.error("exception while closing index", e);
 		}
-	}
-
-	FilterBuilder getFilterBuilder() {
-		return filterBuilder;
-	}
-
-	Collection<FieldDescription> getFieldDescriptions() {
-		return fieldDescriptions;
-	}
-
-	IndexWriter getIndexWriter() {
-		return indexWriter;
 	}
 
 }

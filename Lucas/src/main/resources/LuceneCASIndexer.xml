@@ -19,9 +19,10 @@
    under the License.    
 -->
 
-<casConsumerDescription xmlns="http://uima.apache.org/resourceSpecifier">
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <primitive>true</primitive>
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-  <implementationName>org.apache.uima.lucas.consumer.LuceneCASIndexer</implementationName>
+  <annotatorImplementationName>org.apache.uima.lucas.consumer.TestableLuceneCASIndexer</annotatorImplementationName>
   <processingResourceMetaData>
     <name>LuceneCASIndexer</name>
     <description/>
@@ -78,4 +79,4 @@
       </externalResourceBinding>
     </externalResourceBindings>
   </resourceManagerConfiguration>
-</casConsumerDescription>
+</analysisEngineDescription>

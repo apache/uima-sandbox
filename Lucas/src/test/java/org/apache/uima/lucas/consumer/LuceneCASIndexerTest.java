@@ -25,6 +25,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,8 @@ import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
 import org.apache.uima.UIMAFramework;
-import org.apache.uima.collection.CasConsumerDescription;
+import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.lucas.indexer.analysis.TokenFilterFactory;
 import org.apache.uima.lucas.indexer.mapping.FieldDescription;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -61,21 +63,25 @@ public class LuceneCASIndexerTest {
   private static final String INDEX_DIRECTORY = "src" + pathSep
       + "test" + pathSep + "resources" + pathSep + "test-index";
 
-  private LuceneCASIndexer consumer;
+  private AnalysisEngine analysisEngine;
+    
+  private TestableLuceneCASIndexer luceneCASIndexer;
 
   @Before
   public void setUp() throws InvalidXMLException, IOException, ResourceInitializationException {
-
-    CasConsumerDescription consumerDescription = (CasConsumerDescription) UIMAFramework
-        .getXMLParser().parseCasConsumerDescription(new XMLInputSource(DESCRIPTOR_FILE));
-    consumer = (LuceneCASIndexer) UIMAFramework.produceCasConsumer(consumerDescription);
+    
+    AnalysisEngineDescription analysisEngineDescription = (AnalysisEngineDescription) UIMAFramework
+    .getXMLParser().parseAnalysisEngineDescription(new XMLInputSource(DESCRIPTOR_FILE));
+    analysisEngine = UIMAFramework.produceAnalysisEngine(analysisEngineDescription);
+    luceneCASIndexer = TestableLuceneCASIndexer.instance;
+    assertNotNull(luceneCASIndexer);
   }
 
   @After
   public void tearDown() throws Exception {
-    FSDirectory directory = (FSDirectory) consumer.getIndexWriter().getDirectory();
+    FSDirectory directory = (FSDirectory) luceneCASIndexer.getIndexWriter().getDirectory();
     File directoryFile = directory.getFile();
-    consumer.destroy();
+    luceneCASIndexer.destroy();
 
     directory = FSDirectory.getDirectory(directoryFile);
 
@@ -87,7 +93,7 @@ public class LuceneCASIndexerTest {
 
   @Test
   public void testIndexOutDir() {
-    FSDirectory directory = (FSDirectory) consumer.getIndexWriter().getDirectory();
+    FSDirectory directory = (FSDirectory) luceneCASIndexer.getIndexWriter().getDirectory();
 
     String path = directory.getFile().getPath();
     assertTrue(path.contains(INDEX_DIRECTORY));
@@ -95,7 +101,7 @@ public class LuceneCASIndexerTest {
 
   @Test
   public void testMappingFile() {
-    Collection<FieldDescription> fieldDescriptions = consumer.getFieldDescriptions();
+    Collection<FieldDescription> fieldDescriptions = luceneCASIndexer.getFieldDescriptions();
     assertEquals(1, fieldDescriptions.size());
     FieldDescription fieldDescription = fieldDescriptions.iterator().next();
     assertEquals(FIELD_NAME, fieldDescription.getName());
@@ -104,7 +110,7 @@ public class LuceneCASIndexerTest {
 
   @Test
   public void testPreloadResources() throws IOException {
-    Collection<FieldDescription> fieldDescriptions = consumer.getFieldDescriptions();
+    Collection<FieldDescription> fieldDescriptions = luceneCASIndexer.getFieldDescriptions();
     TokenFilterFactory testFactoryField = createMock(TokenFilterFactory.class);
     TokenFilterFactory testFactoryAnnotation = createMock(TokenFilterFactory.class);
 
@@ -117,7 +123,7 @@ public class LuceneCASIndexerTest {
     replay(testFactoryField);
     replay(testFactoryAnnotation);
 
-    consumer.preloadResources(fieldDescriptions, ImmutableBiMap.of(TEST_FILTER_ANNOTATION,
+    luceneCASIndexer.preloadResources(fieldDescriptions, ImmutableBiMap.of(TEST_FILTER_ANNOTATION,
         testFactoryAnnotation, TEST_FILTER_FIELD, testFactoryField));
     verify(testFactoryField);
     verify(testFactoryAnnotation);

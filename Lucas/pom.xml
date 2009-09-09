@@ -36,37 +36,46 @@
     <relativePath>../SandboxDistr</relativePath>
    </parent>
 	<build>
-	 <plugins>
-			<plugin>
-				<groupId>org.apache.uima</groupId>
-				<artifactId>PearPackagingMavenPlugin</artifactId>
-				<extensions>true</extensions>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<classpath>
-								<!-- PEAR file component classpath settings -->
-								$main_root/lib/google-collections-0.9.jar;$main_root/lib/log4j-1.2.14.jar;$main_root/lib/lucene-core-2.4.1.jar;$main_root/lib/lucene-snowball-2.4.1.jar
-							</classpath>
+	<plugins>
+		<plugin>
+			<groupId>org.apache.uima</groupId>
+			<artifactId>PearPackagingMavenPlugin</artifactId>
+			<extensions>true</extensions>
+			<executions>
+				<execution>
+					<phase>package</phase>
+					<configuration>
+						<classpath>
+							<!-- PEAR file component classpath settings -->
+							$main_root/lib/google-collections-0.9.jar;$main_root/lib/log4j-1.2.14.jar;$main_root/lib/lucene-core-2.4.1.jar;$main_root/lib/lucene-snowball-2.4.1.jar
+						</classpath>
 
-							<mainComponentDesc>
-								<!-- PEAR file main component descriptor -->
-								desc/${componentId}.xml
-							</mainComponentDesc>
+						<mainComponentDesc>
+							<!-- PEAR file main component descriptor -->
+							desc/${componentId}.xml
+						</mainComponentDesc>
 
-							<componentId>
-								<!-- PEAR file component ID -->
-								${componentId}
-							</componentId>
-						</configuration>
-						<goals>
-							<goal>package</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-	 </plugins>
+						<componentId>
+							<!-- PEAR file component ID -->
+							${componentId}
+						</componentId>
+					</configuration>
+					<goals>
+						<goal>package</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<configuration>
+				<excludes>
+					<exclude>**/TestableLuceneCASIndexer.java</exclude>
+				</excludes>
+			</configuration>
+		</plugin>
+	</plugins>
 	</build>
 	<properties>
 		<componentId>LuceneCASIndexer</componentId>
@@ -111,4 +120,3 @@
 		</dependency>
 	</dependencies>
 </project>
-

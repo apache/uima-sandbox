@@ -19,13 +19,14 @@
    under the License.    
 -->
 
-<casConsumerDescription xmlns="http://uima.apache.org/resourceSpecifier">
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <primitive>true</primitive>
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-  <implementationName>org.apache.uima.lucas.consumer.LuceneCASIndexer</implementationName>
+  <annotatorImplementationName>org.apache.uima.lucas.consumer.LuceneCASIndexer</annotatorImplementationName>
   <processingResourceMetaData>
     <name>LuceneCASIndexer</name>
     <description/>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>0.6</version>
     <vendor>apache</vendor>
     <configurationParameters>
       <configurationParameter>
@@ -40,7 +41,7 @@
       <nameValuePair>
         <name>mappingFile</name>
         <value>
-          <string>lucas.xml</string>
+          <string>src/test/resources/lucas.xml</string>
         </value>
       </nameValuePair>
     </configurationParameterSettings>
@@ -66,7 +67,7 @@
         <name>LucasIndexWriterProvider</name>
         <description>Provides a index writer instance.</description>
         <fileResourceSpecifier>
-          <fileUrl>file:IndexWriter.properties</fileUrl>
+          <fileUrl>file:src/test/resources/IndexWriter.properties</fileUrl>
         </fileResourceSpecifier>
         <implementationName>org.apache.uima.lucas.indexer.IndexWriterProviderImpl</implementationName>
       </externalResource>
@@ -78,4 +79,4 @@
       </externalResourceBinding>
     </externalResourceBindings>
   </resourceManagerConfiguration>
-</casConsumerDescription>
+</analysisEngineDescription>
