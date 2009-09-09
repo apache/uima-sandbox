@@ -58,7 +58,7 @@ public class LuceneCASIndexerTest {
 
   private static final String FIELD_NAME = "annotation1";
 
-  private static final String DESCRIPTOR_FILE = "src/main/resources/LuceneCASIndexer.xml";
+  private static final String DESCRIPTOR_FILE = "src/test/resources/LuceneCASIndexer.xml";
 
   private static final String INDEX_DIRECTORY = "src" + pathSep
       + "test" + pathSep + "resources" + pathSep + "test-index";
