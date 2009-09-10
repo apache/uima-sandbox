@@ -54,9 +54,9 @@ public class LuceneCASIndexerTest {
 
   private static final String pathSep = System.getProperty("file.separator");
 
-  private static final String TEST_FILTER_ANNOTATION = "testFilterAnnotation";
+  private static final String TEST_FILTER_ANNOTATION = "stopwords";
 
-  private static final String TEST_FILTER_FIELD = "testFilterField";
+  private static final String TEST_FILTER_FIELD = "hypernyms";
 
   private static final String FIELD_NAME = "annotation1";
 
@@ -81,6 +81,9 @@ public class LuceneCASIndexerTest {
 
   @After
   public void tearDown() throws Exception {
+    if (luceneCASIndexer == null)
+        return;
+    
     FSDirectory directory = (FSDirectory) luceneCASIndexer.getIndexWriter().getDirectory();
     File directoryFile = directory.getFile();
     luceneCASIndexer.destroy();
@@ -110,32 +113,32 @@ public class LuceneCASIndexerTest {
     assertEquals(2, fieldDescription.getAnnotationDescriptions().size());
   }
 
-//  @Test
-//  public void testPreloadResources() throws IOException {
-//    Collection<FieldDescription> fieldDescriptions = luceneCASIndexer.getFieldDescriptions();
-//    TokenFilterFactory testFactoryField = createMock(TokenFilterFactory.class);
-//    TokenFilterFactory testFactoryAnnotation = createMock(TokenFilterFactory.class);
-//
-//    Capture<Properties> propertiesCaptureField = new Capture<Properties>();
-//    Capture<Properties> propertiesCaptureAnnotation = new Capture<Properties>();
-//
-//    testFactoryField.preloadResources(capture(propertiesCaptureField));
-//    testFactoryAnnotation.preloadResources(capture(propertiesCaptureAnnotation));
-//
-//    replay(testFactoryField);
-//    replay(testFactoryAnnotation);
-//
-//    luceneCASIndexer.preloadResources(fieldDescriptions, ImmutableBiMap.of(TEST_FILTER_ANNOTATION,
-//        testFactoryAnnotation, TEST_FILTER_FIELD, testFactoryField));
-//    verify(testFactoryField);
-//    verify(testFactoryAnnotation);
-//
-//    Properties fieldFilterProperties = propertiesCaptureField.getValue();
-//    assertEquals("value1", fieldFilterProperties.getProperty("key1"));
-//
-//    Properties annotationFilterProperties = propertiesCaptureAnnotation.getValue();
-//    assertEquals("value2", annotationFilterProperties.getProperty("key2"));
-//  }
+  @Test
+  public void testPreloadResources() throws IOException {
+    Collection<FieldDescription> fieldDescriptions = luceneCASIndexer.getFieldDescriptions();
+    TokenFilterFactory testFactoryField = createMock(TokenFilterFactory.class);
+    TokenFilterFactory testFactoryAnnotation = createMock(TokenFilterFactory.class);
+
+    Capture<Properties> propertiesCaptureField = new Capture<Properties>();
+    Capture<Properties> propertiesCaptureAnnotation = new Capture<Properties>();
+
+    testFactoryField.preloadResources(capture(propertiesCaptureField));
+    testFactoryAnnotation.preloadResources(capture(propertiesCaptureAnnotation));
+
+    replay(testFactoryField);
+    replay(testFactoryAnnotation);
+
+    luceneCASIndexer.preloadResources(fieldDescriptions, ImmutableBiMap.of(TEST_FILTER_ANNOTATION,
+        testFactoryAnnotation, TEST_FILTER_FIELD, testFactoryField));
+    verify(testFactoryField);
+    verify(testFactoryAnnotation);
+
+    Properties fieldFilterProperties = propertiesCaptureField.getValue();
+    assertEquals("src/test/resources/hypernyms.txt", fieldFilterProperties.getProperty("filePath"));
+
+    Properties annotationFilterProperties = propertiesCaptureAnnotation.getValue();
+    assertEquals("src/test/resources/stopwords.txt", annotationFilterProperties.getProperty("filePath"));
+  }
 
   @Test
   public void testIndexOneDocument() throws ResourceInitializationException,

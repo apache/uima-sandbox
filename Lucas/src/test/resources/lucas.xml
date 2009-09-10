@@ -25,12 +25,12 @@
 	<field name="annotation1" index="yes" termVector="no" stored="yes"
 		merge="true">
 		<filters>
-			<filter name="uppercase" />
+			<filter name="hypernyms" filePath="src/test/resources/hypernyms.txt"/>
 		</filters>
 		<annotations>
 			<annotation type="org.apache.uima.lucas.indexer.types.test.Annotation1">
 				<filters>
-					<filter name="uppercase"/>
+					<filter name="stopwords" filePath="src/test/resources/stopwords.txt"/>
 				</filters>
 				<features>
 					<feature name="featureString" />
