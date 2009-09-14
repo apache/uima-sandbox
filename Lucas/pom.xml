@@ -24,7 +24,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.uima</groupId>
-	<artifactId>lucas</artifactId>
+	<artifactId>Lucas</artifactId>
 	<name>Apache UIMA - Lucene CAS Indexer</name>
 	<version>2.3.0-incubating-SNAPSHOT</version>
 	<description>Writes information contained in CAS objects to fields of a Lucene search index; mapping is done in a mapping file.</description>
