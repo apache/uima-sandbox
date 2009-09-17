@@ -47,17 +47,35 @@
       <groupId>org.apache.xmlbeans</groupId>
       <artifactId>xmlbeans</artifactId>
       <version>2.4.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>common</artifactId>
       <version>2.3.0-v200706262000</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.core</groupId>
+          <artifactId>runtime</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>runtime</artifactId>
+      <version>3.3.100-v20070530</version> 
+      <scope>runtime</scope>
+    </dependency>
+    <!--dependency>
       <groupId>org.eclipse.emf.commonj</groupId>
       <artifactId>sdo</artifactId>
       <version>2.3.0-v200706262000</version>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>org.eclipse.emf.ecore</groupId>
       <artifactId>xmi</artifactId>
@@ -69,7 +87,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.eclipse.emf.ecore</groupId>
       <artifactId>sdo</artifactId>
       <version>2.3.0-v200706262000</version>
@@ -91,7 +109,7 @@
           <artifactId>change</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>ecore</artifactId>
@@ -107,5 +125,87 @@
   
 	<build>
 		<finalName>uima-tool-configurableFeatureExtractor</finalName>
+
+    <!-- next causes failure in eclipse:eclipse goal, so is
+         commented out and replaced with the maven-resources-plugin -->
+    <!--resources>
+      <resource>
+        <targetPath>${project.build.directory}/pearPackaging/desc</targetPath>
+        <directory>src/main/resources/descriptors</directory>
+      </resource>
+    </resources-->
+
+    <plugins>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals><goal>copy-resources</goal></goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/pearPackaging/desc</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources/descriptors</directory>
+                  <!--includes><include>**/*.*</include></includes-->
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- needs to run before the next two plugins
+           during the packaging phase.
+           Put here only to "schedule" its running -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <!-- Copy the dependencies to the lib folder for the PEAR to copy -->
+          <execution>
+            <id>copy-dependencies-to-PEAR-lib</id>
+            <goals><goal>copy-dependencies</goal></goals>
+            <!-- needs to run after the jar is built
+                 and before the pear packager is run -->
+            <phase>package</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/pearPackaging/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+              <excludeScope>test</excludeScope>
+              <excludeArtifactIds>uimaj-core</excludeArtifactIds>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>PearPackagingMavenPlugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <!-- needs to run after the jar is built, after the 
+                 dependency-plugin above has run -->
+            <phase>package</phase>
+            <configuration>
+              <mainComponentDesc>desc/cas_consumers/UIMAFeatureConsumer.xml</mainComponentDesc>
+              <componentId>${artifactId}</componentId>
+            </configuration>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+           
+    </plugins>
 	</build>
 </project>
