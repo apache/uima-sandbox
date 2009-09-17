@@ -32,17 +32,12 @@ import org.apache.uima.tools.cfe.config.ObjectPathFeatureValuesXML;
 import org.apache.uima.tools.cfe.config.PatternFeatureValuesXML;
 import org.apache.uima.tools.cfe.config.RangeFeatureValuesXML;
 import org.apache.uima.tools.cfe.config.SingleFeatureMatcherXML;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.sdo.impl.EDataObjectImpl;
 
 /**
  * <!-- begin-user-doc -->

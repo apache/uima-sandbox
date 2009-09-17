@@ -27,11 +27,8 @@ package org.apache.uima.tools.cfe.config.impl;
 
 import org.apache.uima.tools.cfe.config.ConfigPackage;
 import org.apache.uima.tools.cfe.config.FeatureObjectMatcherXML;
-
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**

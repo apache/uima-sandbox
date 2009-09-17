@@ -25,14 +25,24 @@
  */
 package org.apache.uima.tools.cfe.config.impl;
 
-import org.apache.uima.tools.cfe.config.*;
-
+import org.apache.uima.tools.cfe.config.BitsetFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.CFEDescriptorXML;
+import org.apache.uima.tools.cfe.config.ConfigFactory;
+import org.apache.uima.tools.cfe.config.ConfigPackage;
+import org.apache.uima.tools.cfe.config.DocumentRoot;
+import org.apache.uima.tools.cfe.config.EnumFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.FeatureObjectMatcherXML;
+import org.apache.uima.tools.cfe.config.GroupFeatureMatcherXML;
+import org.apache.uima.tools.cfe.config.ObjectPathFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.PartialObjectMatcherXML;
+import org.apache.uima.tools.cfe.config.PatternFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.RangeFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.SingleFeatureMatcherXML;
+import org.apache.uima.tools.cfe.config.TargetAnnotationXML;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
-
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
 /**

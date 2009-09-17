@@ -25,31 +25,17 @@
  */
 package org.apache.uima.tools.cfe.config.impl;
 
-import commonj.sdo.Sequence;
-
-import java.util.Map;
-
 import org.apache.uima.tools.cfe.config.CFEDescriptorXML;
 import org.apache.uima.tools.cfe.config.ConfigPackage;
 import org.apache.uima.tools.cfe.config.DocumentRoot;
-
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EMap;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.impl.EStringToStringMapEntryImpl;
-
-import org.eclipse.emf.ecore.sdo.impl.EDataObjectImpl;
-
-import org.eclipse.emf.ecore.sdo.util.BasicESequence;
-import org.eclipse.emf.ecore.sdo.util.ESequence;
-
 import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
