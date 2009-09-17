@@ -26,7 +26,17 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.uima.tools.cfe.config.xmlBeans.*;
+import org.apache.uima.tools.cfe.config.xmlBeans.BitsetFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.CFEDescriptorXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.EnumFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.FeatureObjectMatcherXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.GroupFeatureMatcherXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.ObjectPathFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.PartialObjectMatcherXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.PatternFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.RangeFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.SingleFeatureMatcherXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.TargetAnnotationXML;
 import org.apache.xmlbeans.XmlException;
 
 public class CFEConfigFromXML_XMLBeans

@@ -28,9 +28,7 @@ package org.apache.uima.tools.cfe.config.util;
 import java.util.Map;
 
 import org.apache.uima.tools.cfe.config.ConfigPackage;
-
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.util.XMLProcessor;
 

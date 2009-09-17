@@ -21,15 +21,15 @@
 /* First created by JCasGen Tue Mar 18 14:49:11 EDT 2008 */
 package org.apache.uima.tools.cfe;
 
-import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.JCasRegistry;
+import org.apache.uima.cas.Feature;
+import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.CASImpl;
 import org.apache.uima.cas.impl.FSGenerator;
-import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.impl.TypeImpl;
-import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.FeatureImpl;
-import org.apache.uima.cas.Feature;
+import org.apache.uima.cas.impl.TypeImpl;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** Annotation that contains truth(if available) and assigned senses

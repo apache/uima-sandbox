@@ -26,16 +26,15 @@
 package org.apache.uima.tools.cfe.config.util;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
-
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.EObject;
+import java.io.OutputStream;
 
 import org.apache.uima.tools.cfe.config.ConfigFactory;
 import org.apache.uima.tools.cfe.config.ConfigPackage;
 import org.apache.uima.tools.cfe.config.DocumentRoot;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 
 /**
  * The utility class for loading and storing SDO instances as XML files.

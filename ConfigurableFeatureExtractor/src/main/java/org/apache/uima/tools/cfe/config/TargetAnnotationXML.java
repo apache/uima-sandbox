@@ -27,7 +27,6 @@ package org.apache.uima.tools.cfe.config;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import java.util.List;
 
 /**
  * <!-- begin-user-doc -->

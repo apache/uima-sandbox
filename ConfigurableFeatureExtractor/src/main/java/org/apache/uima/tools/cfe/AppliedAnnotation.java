@@ -22,10 +22,9 @@
 /* First created by JCasGen Tue Mar 18 14:49:11 EDT 2008 */
 package org.apache.uima.tools.cfe;
 
-import org.apache.uima.jcas.JCas; 
+import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.TOP_Type;
-
 import org.apache.uima.jcas.tcas.Annotation;
 
 
