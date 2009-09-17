@@ -26,16 +26,11 @@
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../SandboxDocs/src/docbook/book_info.xml"/>
 	<chapter id="_Overview">
 		<title>
-			<anchor id="_Toc208133977" />
 			Overview
-			<phrase role="_unknown" />
 		</title>
 		<section id="_Motivation">
 			<title>
-				<anchor id="_Toc207095658" />
-				<anchor id="_Toc208133978" />
 				Motivation
-				<phrase role="_unknown" />
 			</title>
 			<para role="Normal">Feature extraction, the extraction of
 				information from data sources, is a common task frequently required
@@ -93,27 +88,17 @@
 				which are the values of the attribute Index for the words <code>car</code> and
 				<code>finish</code>.
 			</para>
-			<para role="Normal">
-				<phrase role="GEN_SHAPE">
-					<phrase lang="en">
-						<inlinemediaobject>
-							<imageobject>
-								<imagedata width="628px" depth="181px" fileref="../images/CFE_UG/CFE_UG-1.jpg" />
-							</imageobject>
-						</inlinemediaobject>
-					</phrase>
-					<inlinemediaobject>
-						<imageobject>
-							<imagedata width="624px" depth="181px" fileref="../images/CFE_UG/CFE_UG-2.jpg" />
-						</imageobject>
-					</inlinemediaobject>
-				</phrase>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="../images/CFE_UG/CFE_UG-1.jpg" />
+					</imageobject>
+				</inlinemediaobject>
 			</para>
-			<para role="LREC Caption"/>
 			<para role="LREC Caption">
-				<phrase lang="en">Figure 1: Annotated text sample</phrase>
+				Figure 1: Annotated text sample
 			</para>
-			<para role="Normal"/>
+			
 			<para role="Normal">While Figure 1 shows a fairly simple example of
 				annotations types associated with some text, real world applications
 				could have quite sophisticated annotation types, storing various
@@ -125,40 +110,16 @@
 				a class hierarchy on the left and sample instance of this class
 				structure on the right.
 			</para>
-			<para role="Normal" />
-			<para role="Normal">
-				<phrase role="GEN_SHAPE">
-					<phrase lang="en">
-						<inlinemediaobject>
-							<imageobject>
-								<imagedata width="244px" depth="151px" fileref="../images/CFE_UG/CFE_UG-3.jpg" />
-							</imageobject>
-						</inlinemediaobject>
-					</phrase>
-					<inlinemediaobject>
-						<imageobject>
-							<imagedata width="244px" depth="152px" fileref="../images/CFE_UG/CFE_UG-4.jpg" />
-						</imageobject>
-					</inlinemediaobject>
-					<phrase lang="en">
-						<inlinemediaobject>
-							<imageobject>
-								<imagedata width="344px" depth="122px" fileref="../images/CFE_UG/CFE_UG-5.jpg" />
-							</imageobject>
-						</inlinemediaobject>
-					</phrase>
-					<inlinemediaobject>
-						<imageobject>
-							<imagedata width="345px" depth="123px" fileref="../images/CFE_UG/CFE_UG-6.jpg" />
-						</imageobject>
-					</inlinemediaobject>
-				</phrase>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="../images/CFE_UG/CFE_UG-3.jpg" />
+					</imageobject>
+				</inlinemediaobject>
 			</para>
-			<para role="Normal"/>
 			<para role="LREC Caption">
-				<phrase lang="en">Figure 2: Composite object sample</phrase>
+				Figure 2: Composite object sample
 			</para>
-			<para role="LREC Caption"/>
 			<para role="Normal">
 				If a requirement is to extract the number of cylinders of the car***s
 				engine, then the application needs to find any object(s) that represent
@@ -168,19 +129,13 @@
 				desired destination, such as a text file or a database.
 			</para>
 		</section>
-		<section id="_Approaches to feature extraction">
+		<section id="_Approaches_to_feature_extraction">
 			<title>
-				<anchor id="_Toc207095659" />
-				<anchor id="_Toc208133979" />
 				Approaches to feature extraction
-				<phrase role="_unknown" />
 			</title>
-			<section id="_Custom CAS Consumers">
+			<section id="_Custom_CAS_Consumers">
 				<title>
-					<anchor id="_Toc207095660" />
-					<anchor id="_Toc208133980" />
 					Custom CAS Consumers
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					When working with UIMA, feature extraction is usually implemented by
@@ -198,12 +153,9 @@
 					support, such as maintenance, evolution, bug fixing, reusability etc.
 				</para>
 			</section>
-			<section id="_CFE approach">
+			<section id="_CFE_approach">
 				<title>
-					<anchor id="_Toc207095661" />
-					<anchor id="_Toc208133981" />
 					CFE approach
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal" />
 				<para role="Normal">
@@ -220,13 +172,9 @@
 					and semantics are defined further in this guide.</para>
 			</section>
 		</section>
-		<section id="_CFE Basics">
+		<section id="_CFE_Basics">
 			<title>
-				<anchor id="_CFE_Basics" />
-				<anchor id="_Toc207095662" />
-				<anchor id="_Toc208133982" />
 				CFE Basics
-				<phrase role="_unknown" />
 			</title>
 			<para role="Normal">The feat1re extraction process involves three
 				major steps:</para>
@@ -280,16 +228,11 @@
 	</chapter>
 	<chapter id="_Components">
 		<title>
-			<anchor id="_Toc208133983" />
 			Components
-			<phrase role="_unknown" />
 		</title>
-		<section id="_FESL XSD">
+		<section id="_FESL_XSD">
 			<title>
-				<anchor id="_Toc207095663" />
-				<anchor id="_Toc208133984" />
 				FESL XSD
-				<phrase role="_unknown" />
 			</title>
 			<para role="Normal">
 				The specification for FESL is written in XSD format and stored in the
@@ -298,12 +241,9 @@
 				help to provide more efficient editing of FESL configuration files.
 			</para>
 		</section>
-		<section id="_Source Code">
+		<section id="_Source_Code">
 			<title>
-				<anchor id="_Toc207095664" />
-				<anchor id="_Toc208133985" />
 				Source Code
-				<phrase role="_unknown" />
 			</title>
 			<para role="Normal">CFE is implemented in Java 5.0 for Apache UIMA, and
 				resides in the org.apache.uima.cfe package. CFE is dependent on
@@ -315,10 +255,7 @@
 		</section>
 		<section id="_Descriptors">
 			<title>
-				<anchor id="_Toc207095665" />
-				<anchor id="_Toc208133986" />
 				Descriptors
-				<phrase lang="en" />
 			</title>
 			<para role="Normal">
 				A sample descriptor file that defines a type system for machine learning
@@ -331,18 +268,13 @@
 			</para>
 		</section>
 	</chapter>
-	<chapter id="_Configuration Files">
+	<chapter id="_Configuration_Files">
 		<title>
-			<anchor id="_Toc208133987"/>
 			Configuration Files
-			<phrase role="_unknown"/>
 		</title>
-		<section id="_Common notations and tags">
+		<section id="_Common_notations_and_tags">
 			<title>
-				<anchor id="_Toc207095666" />
-				<anchor id="_Toc208133988" />
 				Common notations and tags
-				<phrase role="_unknown" />
 			</title>
 			<para role="Normal">
 				CFE configuration files are written using FESL semantic rules, as defined
@@ -351,13 +283,9 @@
 				be extracted. There are several common notations and tags that are used
 				in different elements of FESL
 			</para>
-			<section id="_Feature path">
+			<section id="_Feature_path">
 				<title>
-					<anchor id="Feature_path" />
-					<anchor id="_Toc207095667" />
-					<anchor id="_Toc208133989" />
 					Feature path
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					A "feature path" is a mechanism used by FESL to identify a particular
@@ -377,12 +305,9 @@
 					complex object types.
 				</para>
 			</section>
-			<section id="_Full path and partial path">
+			<section id="_Full_path_and_partial_path">
 				<title>
-					<anchor id="_Toc207095668" />
-					<anchor id="_Toc208133990" />
 					Full path and partial path
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					There are two different ways of using feature path notation to identify
@@ -422,19 +347,15 @@
 					computer's file system.
 				</para>
 			</section>
-			<section id="_TAM and FAM">
+			<section id="_TAM_and_FAM">
 				<title>
-					<anchor id="TAM_and_FAM" />
-					<anchor id="_Toc207095669" />
-					<anchor id="_Toc208133991" />
 					TAM and FAM
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					Each FESL rule is represented by a1 XML element with the tag
 					<emphasis>targetAnnotation</emphasis>
 					, as specified in the XSD by the
-					<link linkend="TargetAnnotationXML">
+					<link linkend="_TargetAnnotationXML">
 						<phrase role="Hyperlink2">TargetAnnotationXML</phrase>
 					</link>
 					type. Each element of this type is a composition of:
@@ -447,7 +368,7 @@
 							) that is denoted by an XML element with the tag
 							<emphasis>targetAnnotationMatcher</emphasis>
 							, of the type
-							<link linkend="PartialObjectMatcherXML">
+							<link linkend="_PartialObjectMatcherXML">
 								<emphasis>PartialObjectMatcherXML
 								</emphasis>
 							</link>
@@ -459,7 +380,7 @@
 							<emphasis>FAM</emphasis>
 							) denoted by XML elements with the tag featureAnnotationMaachers,
 							of the type
-							<link linkend="FeatureObjectMatcherXML">
+							<link linkend="_FeatureObjectMatcherXML">
 								<emphasis>FeatureObjectMatcherXML</emphasis>
 							</link>
 						</para>
@@ -478,20 +399,17 @@
 					<emphasis>FA</emphasis>
 					s. The criteria for the search and the features to be extracted are
 					specified using the
-					<link linkend="Feature_path">
+					<link linkend="_Feature_path">
 						<phrase role="Hyperlink1">feature path</phrase>
 					</link>
-					notation, as explained earlier. The XML tags rlpresenting the
+					notation, as explained earlier. The XML tags representing the
 					matchers are detailed below.
 					<phrase role="system1"> </phrase>
 				</para>
 			</section>
 			<section id="_Arrays">
 				<title>
-					<anchor id="_Toc207095670" />
-					<anchor id="_Toc208133992" />
 					Arrays
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					Since UIMA annotations may have arrays as attributes, FESL provides the
@@ -570,13 +488,9 @@
 					an order.
 				</para>
 			</section>
-			<section id="_Parent tag">
+			<section id="_Parent_tag">
 				<title>
-					<anchor id="Parent_tag" />
-					<anchor id="_Toc207095671" />
-					<anchor id="_Toc208133993" />
 					Parent tag
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					The parent tag is used to access a specific element of a feature path of
@@ -595,13 +509,9 @@
 					the sections that detail FESL syntax, below.
 				</para>
 			</section>
-			<section id="_Null values">
+			<section id="_Null_values">
 				<title>
-					<anchor id="Null_values" />
-					<anchor id="_Toc207095672" />
-					<anchor id="_Toc208133994" />
 					Null values
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					CFE allows comparing feature values for equality to null. The root XML
@@ -612,13 +522,9 @@
 					attribute.
 				</para>
 			</section>
-			<section id="_Implicit TA exclusion">
+			<section id="_Implicit_TA_exclusion">
 				<title>
-					<anchor id="Implicit_TA_exclusion" />
-					<anchor id="_Toc207095673" />
-					<anchor id="_Toc208133995" />
 					Implicit TA exclusion
-					<phrase role="_unknown" />
 				</title>
 				<para role="Normal">
 					While all FAM specifications for a single TAM are independent from
@@ -630,7 +536,7 @@
 					FESL. This rule only applies to TAMs that use the
 					<emphasis>fullPath</emphasis>
 					attribute in their specification (see
-					<link linkend="PartialObjectMatcherXML">
+					<link linkend="_PartialObjectMatcherXML">
 						<phrase role="Hyperlink1">
 							<emphasis>PartialObjectMatcherXML</emphasis>
 						</phrase>
@@ -667,10 +573,8 @@
 				</para>
 			</section>
 		</section>
-		<section id="_FESL Elements">
+		<section id="_FESL_Elements">
 			<title>
-				<anchor id="_Toc207095674"/>
-				<anchor id="_Toc208133996"/>
 				FESL Elements
 			</title>
 			<para role="Normal">
@@ -680,10 +584,7 @@
 			</para>
 			<section id="_BitsetFeaturaValuesXML">
 				<title>
-					<anchor id="_Toc207095675"/>
-					<anchor id="_Toc208133997"/>
 					BitsetFeaturaValuesXML
-					<phrase role="_unknown"/>
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
 		            <listitem>
@@ -693,13 +594,13 @@
               			<para role="Normal">Attribute: exact_match[0..1]: boolean: default false</para>
               		</listitem>
               	</itemizedlist>
-              	<para role="Normal"/>
-           		<mediaobject>
-           			<imageobject>
-           				<imagedata width="102px" depth="42px" fileref="../images/CFE_UG/CFE_UG-7.jpg" align="center"/>
-           			</imageobject>
-				</mediaobject>
-              	<para role="Normal"/>
+              	<para>
+	           		<inlinemediaobject>
+	           			<imageobject>
+	           				<imagedata fileref="../images/CFE_UG/CFE_UG-7.jpg" align="center"/>
+	           			</imageobject>
+					</inlinemediaobject>
+				</para>
               	<para role="Normal">
               		The specification enables comparing a feature value to an integer
               		bitmask. The feature value is considered to be matched if it is of an
@@ -722,7 +623,7 @@
           		<para role="Normal">Example:</para>
           		<para role="Normal">&lt;bitsetFeatureValues bitmask="3" exact_match="false" /&gt;</para>
           		<para role="Normal">&lt;bitsetFeatureValues bitmask="3" exact_match="true" /&gt;</para>
-          		<para role="Normal"/>
+          		
           		<para role="Normal">
 	       			The first line of the example specifies a test whether either of the two
 	       			less significant bits of a feature value is set. To be successful, the
@@ -731,10 +632,7 @@
           	</section>
 			<section id="_EnumFeatureValuesXML">
 				<title>
-					<anchor id="_Toc207095676"/>
-					<anchor id="_Toc208133998"/>
 					EnumFeatureValuesXML
-					<phrase role="_unknown"/>
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
@@ -744,13 +642,13 @@
 						<para role="Normal">Element: values[0..*]: String</para>
 					</listitem>
 				</itemizedlist>
-				<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="131px" depth="41px" fileref="../images/CFE_UG/CFE_UG-8.jpg" align="center"/>
-					</imageobject>
-				</mediaobject>
-				<para role="Normal"/>
+	          	<para>
+	           		<inlinemediaobject>
+	           			<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-8.jpg" align="center"/>
+	           			</imageobject>
+					</inlinemediaobject>
+				</para>
 				<para role="Normal">
 					EnumFeatureValuesXML element allow to test if a feature value belongs to
 					a finite set of values. According to EnumFeatureValuesXML specification,
@@ -760,13 +658,13 @@
 					members of the values element is case sensitive. The FESL fragment below
 					shows how to specify such a comparison:
 				</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">&lt;enumFeatureValues caseSensitive="true"&gt;</para>
 				<para role="Normal">&lt;values&gt;red&lt;/values&gt;</para>
 				<para role="Normal">&lt;values&gt;green&lt;/values&gt;</para>
 				<para role="Normal">&lt;values&gt;blue&lt;/values&gt;</para>
 				<para role="Normal">&lt;/enumFeatureValees&gt;</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">
 					This fragment specifies a case sensitive comparison of a feature value to
 					a set of strings: <code>red</code>, <code>green</code> and <code>blue</code>.
@@ -790,22 +688,20 @@
 			</section>
 			<section id="_ObjectPathFeatureValue">
 				<title>
-					<anchor id="_Toc207095677"/>
-					<anchor id="_Toc208133999"/>
 					ObjectPathFeatureValuesXML
-					<phrase role="_unknown"/>
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
             		<listitem>
 						<para role="Normal">Attribute: objectPath[1]: String</para>
 					</listitem>
 				</itemizedlist>
-              	<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="115px" depth="35px" fileref="../images/CFE_UG/CFE_UG-9.jpg" align="center"/>
-					</imageobject>
-				</mediaobject>
+	          	<para>
+	           		<inlinemediaobject>
+	           			<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-9.jpg" align="center"/>
+	           			</imageobject>
+					</inlinemediaobject>
+				</para>
 				<para role="Normal">
 					According to ObjectPathFeatureValuesXML specification, the
 					<link linkend="_CFE_Basics">TA</link>
@@ -814,11 +710,11 @@
 						<phrase role="Hyperlink1">FA</phrase>
 					</link>
 					itself (depending on whether this element is in
-					<link linkend="TAM_and_FAM">
+					<link linkend="_TAM_and_FAM">
 						<phrase role="Hyperlink1">TAM</phrase>
 					</link>
 					or in
-					<link linkend="TAM_and_FAM">
+					<link linkend="_TAM_and_FAM">
 						<phrase role="Hyperlink1">FAM</phrase>
 					</link>)
 					is tested whether it is at the location defined by the objectPath. This
@@ -832,30 +728,27 @@
 					instance, can be used to check if an instance of a WheelAnnotation
 					belongs to an instance CarAnnotation:
 				</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">
 					&lt;objectFeatureValues objectPath="org.apache.uima.cfe.sample.CarAnotation:Wheels:toArray"b&gt;
 				</para>
 			</section>
 			<section id="_PatternFeatureValuesXM">	
 				<title>
-					<anchor id="_Toc207095678"/>
-					<anchor id="_Toc208134000"/>
 					PatternFeatureValuesXML
-					<phrase role="_unknown"/>
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
 	            	<listitem>
 	              		<para role="Normal">Attribute: pattern[1]: String</para>
 	            	</listitem>
 				</itemizedlist>
-              	<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="103px" depth="34px" fileref="../images/CFE_UG/CFE_UG-10.jpg" align="left"/>
-					</imageobject>
-				</mediaobject>
-				<para role="Normal"/>
+	          	<para>
+	           		<inlinemediaobject>
+	           			<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-10.jpg" align="center"/>
+	           			</imageobject>
+					</inlinemediaobject>
+				</para>
 				<para role="Normal">
 					The PatternFeatureValuesXML element enables comparing a feature value
 					against a regular expression specified by the pattern attribute using
@@ -866,15 +759,12 @@
 					The FESL fragment below defines a test that checks if a feature value
 					conforms to the hex number format:
 				</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">&lt;patternFeatureValues pattern="(0[Xx][0-9A-Fa-f]+)" /&gt;</para>
 			</section>
 			<section id="_RangeFeatureValuesXML">
 				<title>
-					<anchor id="_Toc207095679"/>
-					<anchor id="_Toc208134001"/>
 					RangeFeatureValuesXML
-					<phrase role="_unknown"/>
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
 		            <listitem>
@@ -890,12 +780,11 @@
 		              <para role="Normal">Attribute: upperBoundaryInclusive[0..1]: boolean default false</para>
 		            </listitem>
 	          	</itemizedlist>
-	          	<para role="Normal"/>
-	          	<mediaobject>
-	          		<imageobject>
-	          			<imagedata width="168px" depth="76px" fileref="../images/CFE_UG/CFE_UG-11.jpg" align="center"/>
-	          		</imageobject>
-	          	</mediaobject>
+                <mediaobject>
+                  <imageobject>
+              <imagedata fileref="../images/CFE_UG/CFE_UG-11.jpg" align="center"/>
+                  </imageobject>
+          </mediaobject>
 	          	<para role="Normal">
 	          		According to RangeFeatureValuesXML specification the fea:ure value is
 	          		evaluated whether it is of a Comparable type and belongs to the interval
@@ -906,14 +795,12 @@
 	          		value is in the numeric range between 1 and 5, including 1 and excluding
 	          		5:
 	          	</para>
-	          	<para role="Normal"/>
+	          	
 	          	<para role="Normal">
 	          		&lt;rangeFeatureValues lowerBoundary="1.8" upperBoundaryInclusive="true" upperBoundary="3.0" /&gt;</para>
 			</section>
 			<section id="_SingleFeatureMatcherXML">
 				<title>
-					<anchor id="_Toc207095680"/>
-					<anchor id="_Toc208134002"/>
 					SingleFeatureMatcherXML
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
@@ -950,13 +837,16 @@
 						</itemizedlist>
 					</listitem>
 				</itemizedlist>
-              	<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="508px" depth="293px" fileref="../images/CFE_UG/CFE_UG-12.jpg" align="center"/>
-					</imageobject>
-				</mediaobject>
-				<para role="Normal"/>
+              	
+              	
+				<para>
+					<inlinemediaobject>
+						<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-12.jpg" align="center"/>
+						</imageobject>
+					</inlinemediaobject>
+				</para>
+              	
 				<para role="Normal">
 					The SingleFeatureMatcherXML defines rules for matching of a feature value
 					to the featureValues element. The featureValues can be one of the
@@ -999,14 +889,14 @@
 					FESL fragment below defines a test that checks if a value of the Size
 					attribute is in a range defined by rangeFeatureVilues element:
 				</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">&lt;featureMatchers featurePath="Size" featureTypeName="java.lang.Float"&gt;</para>
 				<para role="Normal">&lt;rangeFeatureValues lowerBoundary="1.8" upperBoundaryInclusive="true" upperBoundary="3.0"/&gt;</para>
 				<para role="Normal">&lt;/featureMatchers&gt;</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">
 					In addition it is allowed to use the parent tag (see
-					<link linkend="Parent_tag">
+					<link linkend="_Parent_tag">
 						<phrase role="Hyperlink1">Parent tag</phrase>
 					</link>)
 					in the featurePath attribute. A sample in the PartialObjectMatcherXML
@@ -1015,8 +905,6 @@
 			</section>
 			<section id="_GroupFeatureMatcherXML">
 				<title>
-					<anchor id="_Toc207095681"/>
-					<anchor id="_Toc208134003"/>
 					GroupFeatureMatcherXML
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
@@ -1027,13 +915,13 @@
 						<para role="Normal">Element: featureMatchers[1..*]: SingleFeatureMatcherXML</para>
 					</listitem>
 				</itemizedlist>
-              	<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="553px" depth="153px" fileref="../images/CFE_UG/CFE_UG-13.jpg" align="center"/>
-					</imageobject>
-				</mediaobject>
-              	<para role="Normal"/>
+              	<para>
+					<inlinemediaobject>
+						<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-13.jpg" align="center"/>
+						</imageobject>
+					</inlinemediaobject>
+              	</para>
 				<para role="Normal">
 					This is a specification for matching a group of features. It can be applied
 					to both types of annotations, TAs and FAs. Each element in featureMatchers is
@@ -1069,7 +957,7 @@
 					successful is a car is ether red, green or blue and it does not have 1 or 3
 					wheels:
 				</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">&lt;groupFeatureMatchers&gt;</para>
 				<para role="Normal">	&lt;featureMatchers featurePath="Color" featureTypeName="java.lang.Stting"&gt; </para>
 				<para role="Normal">		&lt;enumFeatureValues caseSensitive="true"&gt; </para>
@@ -1086,12 +974,9 @@
 				<para role="Normal">	&lt;/featureMatchers&gt;</para>
 				<para role="Normal">&lt;grougFeatureMatchers&gt;</para>
 			</section>
-			<section id="PartialObjectMatcherXML">
+			<section id="_PartialObjectMatcherXML">
 				<title>
-					<anchor id="_Toc207095682"/>
-					<anchor id="_Toc208134004"/>
 					PartialObjectMatcherXML
-					<phrase role="_unknown"/>
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
@@ -1105,14 +990,14 @@
 							Element: groupFeatureMatchers[0..*]: GroupFeatureMatcherXML
 						</para>
 					</listitem>
-				</itemizedlist><para role="Normal"/>
-              	<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="553px" depth="69px" fileref="../images/CFE_UG/CFE_UG-14.jpg" align="center"/>
-					</imageobject>
-				</mediaobject>
-              	<para role="Normal"/>
+				</itemizedlist>
+              	<para>
+					<inlinemediaobject>
+						<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-14.jpg" align="center"/>
+						</imageobject>
+					</inlinemediaobject>
+              	</para>
 				<para role="Normal">
 					This is a base specification for an annotation matcher that will search
 					annotations of a type specified by annotationTypeName located on a path
@@ -1128,7 +1013,7 @@
 					successful or if no groupFeatureMatchers is given, then the annotation is
 					considered to be successfully evaluated. The fullPath attribute should be
 					specified using syntax described in the
-					<link linkend="Feature_path">
+					<link linkend="_Feature_path">
 						<phrase role="Hyperlink2">feature path</phrase>
 					</link>
 					section above, with the exception that it can not contain any parent tags.
@@ -1142,12 +1027,11 @@
 					According to a class diagram in Figure 2, the FESL fragment below defines
 					rules for the task. It should be noted that the second feature matcher
 					uses the
-					<link linkend="Parent_tag">
+					<link linkend="_Parent_tag">
 						<phrase role="Hyperlink2">parent tag</phrase>
 					</link> notation to access a value of the CarAnnotation's attribute Color:
 				</para>
-				<para role="Normal"/>
-				<para role="Normal"/>
+				
 				<para role="Normal">&lt;targetAnnotatiotMatcher annotationTypeName="EngineAnnotation" fullPath="CarAnnotation:EngineAnnotation" &gt;</para>
 				<para role="Normal">	&lt;groupFeatureMatchers&gt;</para>
 				<para role="Normal">		&lt;featureMatchers featurePath="Size" featureTypeName="java.lang.Float"&gt;</para>
@@ -1165,10 +1049,7 @@
 			</section>
 			<section id="_FeatureObjectMatcherXML">
 				<title>
-					<anchor id="FeatureObjectMatcherXML"/>
-					<anchor id="_Toc207095683"/>
-					<anchor id="_Toc208134005"/>
-					FeatureObjectMatcherXML<phrase role="_unknown"/>
+					FeatureObjectMatcherXML
 				</title>
 				<para role="Normal">extends PartialAnnotationMatcherXML<emphasis> </emphasis></para>
 				<itemizedlist mark="disc" spacing="normal">
@@ -1194,13 +1075,14 @@
 						<para role="Normal">Attribute: distance[0..1]: boolean: default false</para>
 					</listitem>
 				</itemizedlist>
-              	<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="246px" depth="223px" fileref="../images/CFE_UG/CFE_UG-15.jpg" align="center"/>
-					</imageobject>
-				</mediaobject>
-              	<para role="Normal"/>
+              	
+				<para>
+					<inlinemediaobject>
+						<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-15.jpg" align="center"/>
+						</imageobject>
+					</inlinemediaobject>
+              	</para>
 				<para role="Normal">
 					The FeatureObjectMatcherXML element contains rules that specify how
 					FeatureAnnotations (FA) should be located and which features should be
@@ -1213,9 +1095,7 @@
 					</listitem>
 					<listitem>
 						<para role="Normal">
-							a direction for the search relative to
-							<phrase lang="en">?</phrase>
-							corresponding Target Annotation (TA).
+							a direction for the search relative to a  corresponding Target Annotation (TA).
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -1276,7 +1156,7 @@
 					number of cylinders from engines of cars whose wheels diameter is at
 					least 20.0":
 				</para>
-				<para role="Normal"/>
+				
 				<para role="Normal">&lt;targetAnnotationMatcher annotationTypeName="EngineAnnotation" fullPath="CarAnnotation:EngineAnnotation" &gt;</para>
 				<para role="Normal">	&lt;groupFeatureMatchers&gt;</para>
 				<para role="Normal">		&lt;featureMatchers featurePath="Size" featureTypeName="java.lang.Float"&gt;</para>
@@ -1300,11 +1180,8 @@
 				<para role="Normal">      &lt;groupFeatureMatchers&gt;</para>
 				<para role="Normal">&lt;/featureAnnotationMatcher&gt;</para>
 			</section>
-			<section id="_TargetAntotationXML">
+			<section id="_TargetAnnotationXML">
 				<title>
-					<anchor id="TargetAnnotationXML"/>
-					<anchor id="_Toc207095684"/>
-					<anchor id="_Toc208134006"/>
 					TargetAntotationXML
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
@@ -1323,13 +1200,13 @@
 						</para>
 					</listitem>
 				</itemizedlist>
-              	<para role="Normal"/>
-				<mediaobject>
-					<imageobject>
-						<imagedata width="539px" depth="188px" fileref="../images/CFE_UG/CFE_UG-16.jpg" align="center"/>
-					</imageobject>
-				</mediaobject>
-				<para role="Normal"/>
+              	<para>
+					<inlinemediaobject>
+						<imageobject>
+							<imagedata fileref="../images/CFE_UG/CFE_UG-16.jpg" align="center"/>
+						</imageobject>
+					</inlinemediaobject>
+				</para>
 				<para role="Normal">
 					This is a root specification for a class (group) of annotations of all
 					extracted instances, which are assigned the same label (className) in the
@@ -1354,19 +1231,13 @@
 				</para>
 			</section>
 		</section>
-		<section id="_Configuration file sample">
+		<section id="_Configuration_file_sample">
 			<title>
-				<anchor id="_Toc207095685"/>
-				<anchor id="_Toc208134007"/>
 				Configuration file sample
-				<phrase role="_unknown"/>
 			</title>
-			<section id="_Task definition">
+			<section id="_Task_definition">
 				<title>
-					<anchor id="_Toc207095686"/>
-					<anchor id="_Toc208134008"/>
 					Task definition
-					<phrase role="_unknown"/>
 				</title>
 				<para role="Normal">
 					The sample configuration file below has been created for extracting
@@ -1438,14 +1309,11 @@
 			</section>
 			<section id="_Implementation">
 				<title>
-					<anchor id="_Toc207095687"/>
-					<anchor id="_Toc208134009"/>
 					Implementation
-					<phrase role="_unknown"/>
 				</title>
 				<para role="Normal">Line 1		- a standard XML declaration that defines the XML version of the document and its encoding</para>
 				<para role="Normal">Line 2, 87	- FESL root element that references the schema and defines global variables, such as nullValueImage (see
-					<link linkend="Null_values">
+					<link linkend="_Null_values">
 						<phrase role="Hyperlink1">Null values</phrase>
 					</link>)
 				</para>
@@ -1542,7 +1410,7 @@
 					to one of these values, evaluation of the enclosing feature matcher is
 					successful; if the feature value is null it will be converted to the
 					string defined by
-					<link linkend="Null_values">
+					<link linkend="_Null_values">
 					<phrase role="Hyperlink1">nullValueImage</phrase>
 					</link>
 					(<code>null</code> as set in line 2 of this sample) and as <code>null</code> is one of the
@@ -1560,7 +1428,7 @@
 				<para role="Normal">Line 35		- sets the fullPath attribute to
 	            	org.apache.uima.cfe.sample.NamedEntity:Tokens:toArray that can be
 	            	translated as <code>any token of a named entity</code>, but because of
-	            	<link linkend="Implicit_TA_exclusion">
+	            	<link linkend="_Implicit_TA_exclusion">
 						<phrase role="Hyperlink1">implicit TA exclusion</phrase>
 				</link>
 					, the TAs that were matched for first tokens of named entities by the
@@ -1577,7 +1445,7 @@
 				<para role="Normal">Line 66		- only defines a type of TAs that should be
 					processed by the corresponding TAM without fullPath attribute. Such a
 					notation can be translated as <code>all tokens</code>, but because of the
-					<link linkend="Implicit_TA_exclusion">
+					<link linkend="_Implicit_TA_exclusion">
 						<phrase role="Hyperlink1">implicit TA exclusion</phrase>
 					</link>
 					, the TAs, which were matched for tokens of named entities by rules
@@ -1585,7 +1453,7 @@
 					will be evaluated by rules for this TAM. So, the actual translation will
 					be <code>all tokens other than tokens of named entities</code>
 				</para>
-				<para role="Normal"/>
+				
 				<orderedlist numeration="arabic" spacing="compact">
 					<listitem>
 						<simpara role="Normal">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</simpara>
@@ -1907,17 +1775,14 @@
 			</section>
 		</section>
 	</chapter>
-	<chapter id="_Using CFE for evaluation">
+	<chapter id="_Using_CFE_for_evaluation">
 		<title>
-			<anchor id="_Toc208134010"/>
 			Using CFE for evaluation
 		</title>
 		<para role="Normal">
-			<phrase lang="en">
-				Comparison of results produced by a pipeline of UIMA annotators to a
-				<code>gold standard</code> or results of two different NLP systems is a frequent
-				task. With CFE this task can be automated.
-			</phrase>
+			Comparison of results produced by a pipeline of UIMA annotators to a
+			<code>gold standard</code> or results of two different NLP systems is a frequent
+			task. With CFE this task can be automated.
 		</para>
 		<para role="Normal">
 			The paper "CFE a system for testing, evaluation and machine learning of
