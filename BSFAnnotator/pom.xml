@@ -29,9 +29,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>uimaj</artifactId>
+    <artifactId>SandboxDistr</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../uimaj</relativePath>
+    <relativePath>../SandboxDistr</relativePath>
   </parent>
   
 	<dependencies>
@@ -49,43 +49,35 @@
 		</dependency>
     
 		<dependency>
-			<groupId>local.bsf.dependency</groupId>
+			<groupId>bsf</groupId>
 			<artifactId>bsf</artifactId>
 			<version>2.4.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/bsf.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>local.bsf.dependency</groupId>
-			<artifactId>beanshell</artifactId>
+			<groupId>org.beanshell</groupId>
+			<artifactId>bsh</artifactId>
 			<version>2.0b4</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/bsh-1.3.0.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>local.bsf.dependency</groupId>
-			<artifactId>Rhino</artifactId>
+			<groupId>rhino</groupId>
+			<artifactId>js</artifactId>
 			<version>1.6R7</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/js.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>local.bsf.dependency</groupId>
+			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.15</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/log4j-1.2.15.jar</systemPath>
+      <!-- don't use 1.2.15 - google:
+        Resolving log4j 1.2.15 dependency problems in Maven using exclusions -->
+			<version>1.2.14</version>
 		</dependency>
 		<dependency>
-			<groupId>local.bsf.dependency</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/commons-logging-api-1.1.jar</systemPath>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging-api</artifactId>
+			<version>1.0.4</version>
 		</dependency>
 	</dependencies>
   
 	<build>
-		<finalName>uimaj-an-bsf</finalName>
+		<finalName>uimaj-an-bsf</finalName>    
 	</build>
 </project>
