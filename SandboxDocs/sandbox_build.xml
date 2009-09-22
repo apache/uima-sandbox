@@ -30,31 +30,38 @@
   <property name="target.dir" value="${basedir}/target"/>
   <property name="styles.dir" value="${basedir}/../SandboxDocs/src/styles"/>
   <property name="skip.html-chunked" value="true"/>	
-  <property name="doc.target.dir" value="${basedir}/doc"/>
-	
+  <property name="doc.target.dir" value="${basedir}/target/bin/${artifactId}/docs"/>
+  
   <import file="${basedir}/../uima-docbook-tool/build/build-docbook.xml"/>  
   
 	<target name="copyDocs" depends="all">
-		<!-- create directory if they do not exist -->
+    <delete dir="${doc.target.dir}" quiet="true"/>
 		<mkdir dir="${doc.target.dir}"/>
 		<mkdir dir="${doc.target.dir}/html"/>
 		<mkdir dir="${doc.target.dir}/pdf"/>
-		
-		<!-- delte old content -->
-	  	<delete includeemptydirs="true">
-	      <fileset dir="${basedir}/doc/html"/>
-	  	  <fileset dir="${basedir}/doc/pdf"/>
-	    </delete>
-			
+					
 		<!-- copy HTML documentation -->
-		<copy todir="${basedir}/doc/html">
+		<copy todir="${doc.target.dir}/html">
 			<fileset dir="${target.dir}/" includes="images/**,${book_name}/**" excludes="**/*.pdf*"/>
 		</copy>
 
 		<!-- copy PDF documentation -->
-		<copy todir="${basedir}/doc/pdf">
+		<copy todir="${doc.target.dir}/pdf">
 			<fileset dir="${target.dir}/${book_name}" includes="*.pdf"/>
 		</copy>
+    
+    <!-- copy to source dir to save for website use -->
+    <!-- delete dir="${basedir}/docs"/ -->  <!-- dangerous? -->
+    <copy todir="${basedir}">
+      <fileset dir="${basedir}/target/bin/${artifactId}" includes="docs/**"/>
+    </copy>
+    
+    <!-- copy to pear -->
+    <!-- pear convention is that the dir is named doc, not docs -->
+    <copy todir="${basedir}/target/pearPackaging/doc">
+      <fileset dir="${basedir}/target/bin/${artifactId}/docs" includes="**"/>
+    </copy>
+    
 	</target>
 
 </project>
