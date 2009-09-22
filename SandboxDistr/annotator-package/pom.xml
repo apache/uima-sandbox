@@ -25,34 +25,19 @@
   <artifactId>SandboxAnnotatorPackage</artifactId>
   <packaging>pom</packaging>
   <!-- version cannot be a ${xxx} form for parent POMs -->
-  <version>2.3.0-incubating-SNAPSHOT</version>
+  <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
   <name>Apache UIMA Sandbox Annotator Add-Ons</name>
   <url>http://incubator.apache.org/uima</url>
   <description>Annotator components for the UIMA SDK</description>
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
+    <artifactId>uimaj</artifactId> <!-- don't need to build this project as a sandbox proj -->
     <!-- version cannot be a ${xxx} form -->
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>..</relativePath>
   </parent>
-  
-  <!--licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses-->
-  <!--scm>
-    <url>http://svn.apache.org/viewvc/incubator/uima</url>
-  </scm-->
-  <!--organization>
-    <name>The Apache Software Foundation</name>
-    <url>http://www.apache.org/</url>
-  </organization-->
-   
+     
   <build>
     <plugins>
   	  <plugin>
@@ -70,21 +55,22 @@
   </build>
   
   <modules>
-    <module>../../PearPackagingAntTask</module>
-    <module>../../RegularExpressionAnnotator</module>
-    <module>../../DictionaryAnnotator</module>
-    <module>../../WhitespaceTokenizer</module>
-    <module>../../Tagger</module>
-    <module>../../SimpleServer</module>
-    <!--module>../../SimpleUimaAsService</module>  skip this - requires uima-as to have been built -->
-    <module>../../SnowballAnnotator</module>
+    <!-- alphabetical order for ease of maintenance -->
+    <module>../../BSFAnnotator</module>
     <module>../../ConceptMapper</module>
     <module>../../ConfigurableFeatureExtractor</module>
+    <module>../../DictionaryAnnotator</module>
     <module>../../FsVariables</module>
     <module>../../Lucas</module>
     <module>../../OpenCalaisAnnotator</module>
+    <module>../../PearPackagingAntTask</module>
+    <module>../../RegularExpressionAnnotator</module>
+    <module>../../SimpleServer</module>
+    <!--module>../../SimpleUimaAsService</module>  skip this - requires uima-as to have been built -->
+    <module>../../SnowballAnnotator</module>
+    <module>../../Tagger</module>
     <module>../../TikaAnnotator</module>
-    <module>../../BSFAnnotator</module>
+    <module>../../WhitespaceTokenizer</module>
   </modules>
    
 </project>

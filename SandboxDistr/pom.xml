@@ -17,6 +17,10 @@
    under the License.    
 -->
 
+<!--
+  This is the parent POM of all Sandbox projects
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -27,6 +31,7 @@
   <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
   <name>Apache UIMA Sandbox distribution build</name>
   <packaging>pom</packaging>
+  <description>Components and tooling for the UIMA SDK</description>
   
   <parent>
     <groupId>org.apache.uima</groupId>
@@ -34,57 +39,310 @@
     <!-- version cannot be a ${xxx} form -->
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>../uimaj</relativePath>
-  </parent>
-  
-  <url>http://incubator.apache.org/uima</url>
-  <description>Components and tooling for the UIMA SDK</description>
-  
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.uima</groupId>
-          <artifactId>PearPackagingMavenPlugin</artifactId>
-          <version>${uimaj-release-version}</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+  </parent>  
+
+  <!-- dependency jar management:
+       Sandbox projects often ship with additional jars from 3rd party providers.
+       The mechanism to make this happen is:
+         1) have the project's POM declare the dependencies 
+         2) at project build time the dependencies and their dependencies (recursively) are
+            fetched from maven repos and put into
+              target/bin/<artifactId>/lib
+         3) This lib/ dir is included in the bin distribution build
+            
+         2) If the child pom is preparing a PEAR, the lib dir is included in the 
+            PEAR 
+  -->
+       
+  <dependencyManagement>
+    <dependencies>
+      <!-- switch uima jars scope to provided to 
+           prevent the dependency plugin from including them -->
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-adapter-vinci</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-adapter-soap</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-core</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-cpe</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-examples</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-bootstrap</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-tools</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>uimaj-document-annotation</artifactId>
+        <version>${uimaj-release-version}</version>
+        <scope>provided</scope>
+      </dependency>    
+    </dependencies>
+  </dependencyManagement>
     
-    <plugins>
-      
+  <build>
+
+    <!-- Common operations done while building all sandbox projects 
+           - build the docs (if build_documentation.xml exists)
+           - build the target/bin and target/src dirs used by later assembly steps
+             - these dirs are layed out as follows:
+               target/bin/artifactId
+                   LIC/NOT/DIS files
+                   readme's  (if exist)
+                   pear file (if exist)
+                   docs      (if exist) for html and pdf
+                   resources (if exist)
+                   desc      (if exist) sample descriptors
+                   lib                  holds all jars including main one excluding -sources jar
+                                            
+               target/src/artifactId
+                   LIC/NOT/DIS for source
+                   pom.xml
+                   build_documentation.xml (if exists)
+                   src/main, src/test both code & resources
+                   resources (if exist)
+                   docbook
+                   [other special files per project]
+                   
+    -->
+
+    <!-- this resources spec is intended to be executed in each
+         child project.  It will also be executed in this project,
+         if this project is run, but the target/ is not used from this
+         project.
+         
+         The annotator-package subproject (which is not a parent, but an aggregator)
+         will build the proper assembly from these parts.
+    -->
+    <!-- Instead of copying resources using the <resources> element (which works),
+         we use the maven-resources-plugin instead because:
+           There is no inheritance for the <resources> element - if
+           a child project has such an element, it always overrides all 
+           parents 
+    --> 
+    
+    <plugins>  
+            <!-- populate the lib dir with all needed dependencies
+           that will be distributed with this component
+            
+           Runs during process-resources -->
+                   
       <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <inherited>true</inherited>
         <executions>
+          <!-- Copy the dependencies to the target/bin folder for the PEAR to copy -->
           <execution>
-            <id>build documentation</id>
-            <phase>package</phase>
+            <id>copy dependencies to lib</id>
+            <goals><goal>copy-dependencies</goal></goals>
+            <phase>process-resources</phase>
             <configuration>
-              <tasks>
-                <!-- set up ant-contrib extensions -->
-                <typedef resource="net/sf/antcontrib/antlib.xml">
-                  <classpath refid="maven.dependency.classpath"/>
-                </typedef>
-                  
-                <if>
-                  <available file="build_documentation.xml"></available>
-                  <then>
-                    <ant antfile="build_documentation.xml"/> 
-                  </then>
-                  <else>
-                    <echo message="build_documentation.xml missing - skipping"/>
-                  </else>
-                </if> 
-              </tasks>
+              <outputDirectory>target/bin/${artifactId}/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+              <excludeScope>test</excludeScope>
             </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy standard sandbox resources to bin</id>
+            <goals><goal>copy-resources</goal></goals>
+            <phase>process-resources</phase>  <!-- required -->
+            <configuration>
+              <outputDirectory>${project.build.directory}/bin/${artifactId}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>.</directory>
+                  <includes>
+                    <include>readme*</include>
+                    <include>README*</include>
+                    <include>LICENSE*</include>
+                    <include>NOTICE*</include>
+                    <include>DISCLAIMER*</include>
+                    <include>desc/**</include>
+                    <include>resources/**</include>
+                    <include>lib/**</include>
+                  </includes>     
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          
+          <execution>
+            <id>copy standard sandbox target jar to bin</id>
+            <goals><goal>copy-resources</goal></goals>
+            <phase>pre-integration-test</phase>  <!-- a phase after jar -->
+            <configuration>
+              <outputDirectory>${project.build.directory}/bin/${artifactId}/lib</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}</directory>
+                  <includes><include>*.jar</include></includes>
+                  <excludes><exclude>*-sources.jar</exclude></excludes>     
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>copy standard sandbox target pear and docs to bin</id>
+            <goals><goal>copy-resources</goal></goals>
+            <phase>pre-integration-test</phase>  <!-- a phase after pear packager -->
+            <configuration>
+              <outputDirectory>${project.build.directory}/bin/${artifactId}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>*.pear</include>
+                    <include>docs/**</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>          
+
+          <execution>
+            <id>copy standard sandbox resources to src</id>
+            <goals><goal>copy-resources</goal></goals>  
+            <phase>process-resources</phase>  <!-- required -->
+            <configuration>
+              <outputDirectory>${project.build.directory}/src/${artifactId}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>.</directory>
+                  <includes>
+                    <!-- these license/notice files are the not the plain versions, 
+                         they are the same as the bin version even though
+                         we're not shipping the 3rd party jars, because
+                         maven will silently fetch them -->
+                    <include>LICENSE*</include>
+                    <include>NOTICE*</include>
+                    <include>DISCLAIMER*</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <directory>.</directory>
+                  <includes>
+                    <!-- these license/notice files are the not the plain versions, 
+                         they are the same as the bin version even though
+                         we're not shipping the 3rd party jars, because
+                         maven will silently fetch them -->
+                    <include>readme*</include>
+                    <include>README*</include>
+                    <include>LICENSE*</include>
+                    <include>NOTICE*</include>
+                    <include>DISCLAIMER*</include>
+                    
+                    <include>desc/**</include>
+                    <include>resources/**</include>
+                    <include>lib/**</include>
+                    
+                    <!-- include of directories must specify the ** pattern to get the files -->
+                    <!-- include paths cannot have .. -->
+                    <include>docbook/**</include>
+                    <include>src/**</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+              
+          <!-- add the contents of desc if it exists to the jar.  
+               This puts the WhitespaceTokenizer.xml file into the Jar
+               and makes it easier for users to run this, without installing a pear. 
+               The Tagger project uses this technique, for instance -->
+          <execution>
+            <id>copy desc so its contents can be found in Jar</id>
+            <goals><goal>copy-resources</goal></goals>
+            <phase>process-resources</phase>  <!-- required -->
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>desc</directory>
+                  <includes><include>**</include></includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+                   
+        </executions>
+      </plugin>  
+
     </plugins>
       
   </build>
+  
+  <!-- conditional execution -->
+  
+  <profiles>
+    
+    <!-- Build the docbook documentation conditioned on the
+         existance of the build_documentation.xml file -->
+    <profile>
+      <id>buildDocs</id>      
+      <activation>
+        <file><exists>build_documentation.xml</exists></file>
+      </activation>
+      
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build documentation</id>
+                <phase>package</phase>
+                <configuration>
+                  <tasks>
+                    <ant antfile="build_documentation.xml" target="copyDocs"/> 
+                  </tasks>
+                </configuration>
+                <goals><goal>run</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+        </plugins>
+      </build>
+    </profile>    
+    
+  </profiles>
   
   <modules>
     <module>./annotator-package</module>
