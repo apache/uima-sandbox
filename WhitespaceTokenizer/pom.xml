@@ -29,9 +29,9 @@
 
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
+    <artifactId>SandboxDistr-pearBuilder</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr</relativePath>
+    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
   </parent>
   
 	<dependencies>
@@ -52,16 +52,22 @@
 	<build>
 		<finalName>uima-an-wst</finalName>
     
-    <resources>
+    <!-- add the contents of desc to the jar.  
+         This puts the WhitespaceTokenizer.xml file into the Jar
+         and makes it easier for users to run this, without installing a pear. 
+         The Tagger project uses this technique, for instance -->
+    
+    <!--resources>
       <resource>
-        <!-- test case for Tagger expects to find the desc on the classpath -->
         <directory>desc</directory>
       </resource>
       <resource>
         <directory>src/main/resources</directory>
       </resource>
-    </resources>
+    </resources-->
     
+    <!-- add desc to resources 
+         test case for Tagger expects to find the desc on the classpath -->
 		<testResources>
 			<testResource>
 				<directory>desc</directory>
@@ -72,7 +78,19 @@
 		</testResources>
 
 		<plugins>
-			<plugin>
+      <!-- build pear plugin, most settings inherited from parent POM -->      
+      <plugin>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>PearPackagingMavenPlugin</artifactId>
+        <executions><execution>
+          <id>buildPear</id>
+          <configuration>
+            <mainComponentDesc>desc/WhitespaceTokenizer.xml</mainComponentDesc> 
+          </configuration>
+        </execution></executions>
+      </plugin>              
+      
+			<!--plugin>
 				<groupId>org.apache.uima</groupId>
 				<artifactId>PearPackagingMavenPlugin</artifactId>
 				<extensions>true</extensions>
@@ -92,7 +110,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin-->
 		</plugins>
 	</build>
 </project>
