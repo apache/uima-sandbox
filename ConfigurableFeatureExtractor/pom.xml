@@ -28,12 +28,13 @@
 
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>uimaj</artifactId>
+    <artifactId>SandboxDistr-pearBuilder</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../uimaj</relativePath>
+    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
   </parent>
-
+    
   <dependencies>
+    <!-- dependencies checked using the dependency plugin dependency:analyze - no issues 9/2009 -->
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-core</artifactId>
@@ -47,82 +48,29 @@
       <groupId>org.apache.xmlbeans</groupId>
       <artifactId>xmlbeans</artifactId>
       <version>2.4.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>stax</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.emf.ecore</groupId>
+      <artifactId>xmi</artifactId>
+      <version>2.3.0-v200706262000</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>common</artifactId>
       <version>2.3.0-v200706262000</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.core</groupId>
-          <artifactId>runtime</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.core</groupId>
-      <artifactId>runtime</artifactId>
-      <version>3.3.100-v20070530</version> 
-      <scope>runtime</scope>
-    </dependency>
-    <!--dependency>
-      <groupId>org.eclipse.emf.commonj</groupId>
-      <artifactId>sdo</artifactId>
-      <version>2.3.0-v200706262000</version>
-    </dependency-->
-    <dependency>
-      <groupId>org.eclipse.emf.ecore</groupId>
-      <artifactId>xmi</artifactId>
-      <version>2.3.0-v200706262000</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.emf</groupId>
-          <artifactId>ecore</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!--dependency>
-      <groupId>org.eclipse.emf.ecore</groupId>
-      <artifactId>sdo</artifactId>
-      <version>2.3.0-v200706262000</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.emf</groupId>
-          <artifactId>ecore</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.eclipse.emf.commonj</groupId>
-          <artifactId>sdo</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.eclipse.emf.ecore</groupId>
-          <artifactId>xmi</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.eclipse.emf.ecore</groupId>
-          <artifactId>change</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency-->
     <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>ecore</artifactId>
       <version>2.3.0-v200706262000</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.emf</groupId>
-          <artifactId>common</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>stax</groupId>
+      <artifactId>stax-api</artifactId>
+      <version>1.0.1</version>
     </dependency>
   </dependencies>
-  
+    
 	<build>
 		<finalName>uima-tool-configurableFeatureExtractor</finalName>
 
@@ -136,7 +84,7 @@
     </resources-->
 
     <plugins>
-      
+      <!-- copy resources for the PEAR -->      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -149,63 +97,39 @@
               <resources>
                 <resource>
                   <directory>src/main/resources/descriptors</directory>
-                  <!--includes><include>**/*.*</include></includes-->
                 </resource>
               </resources>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      
-      <!-- needs to run before the next two plugins
-           during the packaging phase.
-           Put here only to "schedule" its running -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      
+ 
+      <!-- exclude some artifacts from dependencies not used by this application -->     
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
-          <!-- Copy the dependencies to the lib folder for the PEAR to copy -->
           <execution>
-            <id>copy-dependencies-to-PEAR-lib</id>
-            <goals><goal>copy-dependencies</goal></goals>
-            <!-- needs to run after the jar is built
-                 and before the pear packager is run -->
-            <phase>package</phase>
+            <id>copy dependencies to lib</id>
             <configuration>
-              <outputDirectory>${project.build.directory}/pearPackaging/lib</outputDirectory>
-              <includeScope>runtime</includeScope>
-              <excludeScope>test</excludeScope>
-              <excludeArtifactIds>uimaj-core</excludeArtifactIds>
+              <excludeArtifactIds>osgi,jobs,registry,preferences,contenttype,app</excludeArtifactIds>              
             </configuration>
           </execution>
         </executions>
       </plugin>
-      
+
+      <!-- build pear plugin, most settings inherited from parent POM -->      
       <plugin>
         <groupId>org.apache.uima</groupId>
         <artifactId>PearPackagingMavenPlugin</artifactId>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <!-- needs to run after the jar is built, after the 
-                 dependency-plugin above has run -->
-            <phase>package</phase>
-            <configuration>
-              <mainComponentDesc>desc/cas_consumers/UIMAFeatureConsumer.xml</mainComponentDesc>
-              <componentId>${artifactId}</componentId>
-            </configuration>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-           
+        <executions><execution>
+          <id>buildPear</id>
+          <configuration>
+            <mainComponentDesc>desc/cas_consumers/UIMAFeatureConsumer.xml</mainComponentDesc> 
+          </configuration>
+        </execution></executions>
+      </plugin>              
+    
     </plugins>
 	</build>
 </project>

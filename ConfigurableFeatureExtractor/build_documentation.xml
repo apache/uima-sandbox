@@ -24,6 +24,7 @@
 <project name="Using CFE" default="all" basedir=".">
   
   <property name="book_name" value="CFE_UG"/>
+  <property name="artifactId" value="ConfigurableFeatureExtractor"/>
 	
   <import file="${basedir}/../SandboxDocs/sandbox_build.xml"/>  
   
