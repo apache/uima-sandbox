@@ -27,7 +27,7 @@
 	<version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
 	<name>Apache UIMA Simple Server</name>
 
-    <parent>
+  <parent>
 		<groupId>org.apache.uima</groupId>
 		<artifactId>SandboxDistr</artifactId>
 		<version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
@@ -48,44 +48,55 @@
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.uima.xmlbeans</groupId>
-			<artifactId>uima-simple-server-xbean</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/uima-simple-server-xbean.jar</systemPath>
-		</dependency>
+
+    <dependency>
+      <groupId>org.apache.uima.xmlbeans</groupId>
+      <artifactId>uima-simple-server-xbean</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/uima-simple-server-xbean.jar</systemPath>
+    </dependency>
+        
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <!--dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jsr173_api</artifactId>
+      <version>1.0</version>
+    </dependency-->
+    
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
 			<scope>test</scope>
 		</dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
+    
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.8</version>
+      <scope>provided</scope>
 		</dependency>
+    
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.0-alpha2</version>
+      <scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlbeans</groupId>
-			<artifactId>xmlbeans</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jsr173_api</artifactId>
-			<version>1.0</version>
-		</dependency>
+    
+    
 	</dependencies>
 	<build>
 		<finalName>uima-simple-server</finalName>
