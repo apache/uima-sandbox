@@ -24,6 +24,7 @@
 <project name="HMM Tagger User's Guide" default="all" basedir=".">
   
   <property name="book_name" value="hmmTaggerUsersGuide"/>
+  <property name="artifactId" value="Tagger"/>
 	
   <import file="${basedir}/../SandboxDocs/sandbox_build.xml"/>  
   

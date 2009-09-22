@@ -29,9 +29,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
+    <artifactId>SandboxDistr-pearBuilder</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr</relativePath>
+    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
   </parent>
   
 	<dependencies>
@@ -55,18 +55,26 @@
       <scope>test</scope>
 		</dependency>
 	</dependencies>
+  
   <build>
     <finalName>uima-an-tagger</finalName>
+    
+    <!-- don't use resources from normal spot, and
+         use resources from proj/resources -->
     <resources>
       <resource>
         <directory>resources</directory>
       </resource>
     </resources>
+    
+    <!-- don't use test resources from normal spot, and
+         use resources from proj/desc -->
     <testResources>
       <testResource>
         <directory>desc</directory>
       </testResource>
     </testResources>
+    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -75,7 +83,20 @@
           <argLine>-Xmx500M</argLine>
         </configuration>
       </plugin>
+  
+      <!-- build pear plugin, most settings inherited from parent POM -->      
       <plugin>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>PearPackagingMavenPlugin</artifactId>
+        <executions><execution>
+          <id>buildPear</id>
+          <configuration>
+            <mainComponentDesc>desc/HmmTagger.xml</mainComponentDesc> 
+          </configuration>
+        </execution></executions>
+      </plugin>              
+      
+      <!--plugin>
         <groupId>org.apache.uima</groupId>
         <artifactId>PearPackagingMavenPlugin</artifactId>
         <extensions>true</extensions>
@@ -92,8 +113,8 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin-->
     </plugins>
   </build>
-  </project>
+</project>
 
