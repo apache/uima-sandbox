@@ -24,6 +24,7 @@
 <project name="Apache UIMA Lucene CAS Consumer Documentation" default="all" basedir=".">
   
   <property name="book_name" value="LuceneCASConsumerUserGuide"/>
+  <property name="artifactId" value="Lucas"/>
 	
   <import file="${basedir}/../SandboxDocs/sandbox_build.xml"/>  
   

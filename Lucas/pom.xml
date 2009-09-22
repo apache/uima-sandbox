@@ -25,58 +25,73 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.uima</groupId>
 	<artifactId>Lucas</artifactId>
-	<name>Apache UIMA - Lucene CAS Indexer</name>
+	<name>Apache UIMA Lucene CAS Indexer</name>
 	<version>2.3.0-incubating-SNAPSHOT</version>
 	<description>Writes information contained in CAS objects to fields of a Lucene search index; mapping is done in a mapping file.</description>
   
-   <parent>
+  <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
+    <artifactId>SandboxDistr-pearBuilder</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr</relativePath>
-   </parent>
+    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
+  </parent>
+  
 	<build>
-	<plugins>
-		<plugin>
-			<groupId>org.apache.uima</groupId>
-			<artifactId>PearPackagingMavenPlugin</artifactId>
-			<extensions>true</extensions>
-			<executions>
-				<execution>
-					<phase>package</phase>
-					<configuration>
-						<classpath>
-							<!-- PEAR file component classpath settings -->
-							$main_root/lib/google-collections-0.9.jar;$main_root/lib/log4j-1.2.14.jar;$main_root/lib/lucene-core-2.4.1.jar;$main_root/lib/lucene-snowball-2.4.1.jar
-						</classpath>
-
-						<mainComponentDesc>
-							<!-- PEAR file main component descriptor -->
-							desc/${componentId}.xml
-						</mainComponentDesc>
-
-						<componentId>
-							<!-- PEAR file component ID -->
-							${componentId}
-						</componentId>
-					</configuration>
-					<goals>
-						<goal>package</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-			<configuration>
-				<excludes>
-					<exclude>**/TestableLuceneCASIndexer.java</exclude>
-				</excludes>
-			</configuration>
-		</plugin>
-	</plugins>
+    <plugins>
+      
+      <!-- build pear plugin, most settings inherited from parent POM -->      
+      <plugin>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>PearPackagingMavenPlugin</artifactId>
+        <executions><execution>
+          <id>buildPear</id>
+          <configuration>
+            <mainComponentDesc>desc/LuceneCASIndexer.xml</mainComponentDesc> 
+          </configuration>
+        </execution></executions>
+      </plugin>              
+    
+      
+      <!--plugin>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>PearPackagingMavenPlugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <configuration>
+              <classpath>
+                $main_root/lib/google-collections-0.9.jar;$main_root/lib/log4j-1.2.14.jar;$main_root/lib/lucene-core-2.4.1.jar;$main_root/lib/lucene-snowball-2.4.1.jar
+              </classpath>
+  
+              <mainComponentDesc>
+                desc/${componentId}.xml
+              </mainComponentDesc>
+  
+              <componentId>
+                ${componentId}
+              </componentId>
+            </configuration>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin-->
+      
+      <!-- disable some tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/TestableLuceneCASIndexer.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
 	</build>
+  
 	<properties>
 		<componentId>LuceneCASIndexer</componentId>
 	</properties>
@@ -90,6 +105,7 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+      <!-- 1.2.15 has problems -->
 			<version>1.2.14</version>
 		</dependency>
 		<dependency>
