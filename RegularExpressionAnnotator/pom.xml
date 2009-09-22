@@ -28,9 +28,9 @@
     
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
+    <artifactId>SandboxDistr-pearBuilder</artifactId>
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr</relativePath>
+    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
   </parent>
   
 	<dependencies>
@@ -53,7 +53,12 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/regex_annot_xml_types.jar</systemPath>
 		</dependency>
-		<dependency>
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+		<!--dependency>
 			<groupId>local.xmlbeans.dependency</groupId>
 			<artifactId>xsdbeans</artifactId>
 			<version>2.2</version>
@@ -66,7 +71,7 @@
 			<version>2.2</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/jsr173_1.0_api.jar</systemPath>
-		</dependency>
+		</dependency-->
     
     <dependency>
       <groupId>commons-io</groupId>
@@ -80,7 +85,19 @@
 		<finalName>uima-an-regex</finalName>
      
 		<plugins>
- 			<plugin>
+      <!-- build pear plugin, most settings inherited from parent POM -->      
+      <plugin>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>PearPackagingMavenPlugin</artifactId>
+        <executions><execution>
+          <id>buildPear</id>
+          <configuration>
+            <mainComponentDesc>desc/RegExAnnotator.xml</mainComponentDesc> 
+          </configuration>
+        </execution></executions>
+      </plugin>              
+      
+ 			<!--plugin>
 				<groupId>org.apache.uima</groupId>
 		  	<artifactId>PearPackagingMavenPlugin</artifactId>
 				<extensions>true</extensions>
@@ -98,7 +115,7 @@
 						</goals>
 					</execution>	
 				</executions>
-			</plugin>
+			</plugin-->
 		</plugins>
 	</build>
 </project>

@@ -24,6 +24,7 @@
 <project name="Apache UIMA Regular Expression Annotator Documentation" default="all" basedir=".">
   
   <property name="book_name" value="RegexAnnotatorUserGuide"/>
+  <property name="artifactId" value="RegularExpressionAnnotator"/>
 	
   <import file="${basedir}/../SandboxDocs/sandbox_build.xml"/>  
   
