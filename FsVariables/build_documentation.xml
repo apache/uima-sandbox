@@ -24,6 +24,7 @@
 <project name="FsVariables User Guide" default="all" basedir=".">
   
   <property name="book_name" value="FsVariablesUserGuide"/>
+  <property name="artifactId" value="FsVariables"/>
 	
   <import file="${basedir}/../SandboxDocs/sandbox_build.xml"/>  
   

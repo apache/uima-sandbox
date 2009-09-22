@@ -51,6 +51,8 @@
   
 	<build>
 		<finalName>uimaj-fsvars</finalName>
+    
+    <!-- add the desc dir to the default test resources -->
 		<testResources>
 			<testResource>
 				<directory>desc</directory>
