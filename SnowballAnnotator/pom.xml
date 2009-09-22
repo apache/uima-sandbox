@@ -54,6 +54,7 @@
   
 	<build>
 		<finalName>uima-an-snowball</finalName>
+    <!-- add desc to test resources -->
 		<testResources>
 			<testResource>
 				<directory>desc</directory>
