@@ -53,11 +53,43 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
       <version>0.4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>pdfbox</groupId>
+          <artifactId>pdfbox</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
   </dependencies>
   
 	<build>
 		<finalName>uima-an-tika</finalName>
+    
+    <plugins>
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>src/main/java/org/apache/uima/tika/AttributeFS.java</exclude> <!-- generated -->
+                <exclude>src/main/java/org/apache/uima/tika/AttributeFS_Type.java</exclude> <!-- generated -->
+                <exclude>src/main/java/org/apache/uima/tika/FeatureValue.java</exclude> <!-- generated -->
+                <exclude>src/main/java/org/apache/uima/tika/FeatureValue_Type.java</exclude> <!-- generated -->
+                <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation.java</exclude> <!-- generated -->
+                <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation_Type.java</exclude> <!-- generated -->
+                <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation.java</exclude> <!-- generated -->
+                <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation_Type.java</exclude> <!-- generated -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>            
+    </plugins>
+
 	</build>
 </project>
