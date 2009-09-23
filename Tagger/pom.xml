@@ -96,24 +96,23 @@
         </execution></executions>
       </plugin>              
       
-      <!--plugin>
-        <groupId>org.apache.uima</groupId>
-        <artifactId>PearPackagingMavenPlugin</artifactId>
-        <extensions>true</extensions>
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
         <executions>
           <execution>
-            <phase>package</phase>
+            <id>default-cli</id>
             <configuration>
-              <classpath>$main_root/resources;$main_root/desc</classpath>
-              <mainComponentDesc>desc/HmmTagger.xml</mainComponentDesc>
-              <componentId>HmmPosTagger</componentId>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+                <exclude>src/test/resources/moby-tag-list.txt</exclude> <!-- test data -->
+              </excludes>
             </configuration>
-            <goals>
-              <goal>package</goal>
-            </goals>
           </execution>
         </executions>
-      </plugin-->
+      </plugin>      
+      
     </plugins>
   </build>
 </project>
