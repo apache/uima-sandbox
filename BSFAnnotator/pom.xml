@@ -78,6 +78,27 @@
 	</dependencies>
   
 	<build>
-		<finalName>uimaj-an-bsf</finalName>    
+		<finalName>uimaj-an-bsf</finalName> 
+      <plugins>
+        <!-- Release Audit Tool checks -->
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>src/main/java/org/apache/uima/annotator/bsf/types/*.java</exclude>
+                  <exclude>src/test/resources/Nicknames.txt</exclude>
+                  <exclude>src/test/resources/NicknamesRef.txt</exclude>
+                  <exclude>src/test/resources/testdoc.txt</exclude>
+                  <exclude>src/test/resources/testdocRef.txt</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
 	</build>
 </project>

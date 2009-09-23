@@ -89,6 +89,27 @@
           </excludes>
         </configuration>
       </plugin>
+      
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+                <exclude>src/test/java/org/apache/uima/lucas/indexer/types/test/*.java</exclude> <!-- generated -->
+                <exclude>src/test/resources/hypernyms.txt</exclude> <!-- test data -->
+                <exclude>src/test/resources/stopwords.txt</exclude> <!-- test data -->
+                <exclude>src/test/resources/tokenMapping.txt</exclude> <!-- test data -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
     </plugins>
 	</build>
   

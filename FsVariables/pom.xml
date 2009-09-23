@@ -61,6 +61,25 @@
         <directory>src/test/resources</directory>
       </testResource>
  		</testResources>
+    
+    <plugins>
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>
 	</build>
   
 </project>
