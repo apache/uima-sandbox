@@ -97,6 +97,25 @@
         </execution></executions>
       </plugin>              
       
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+                <exclude>src/test/resources/*/*Ref.txt</exclude>
+                <exclude>src/test/resources/conceptSyntax/syntaxCheckRefOutput.txt</exclude>
+                <exclude>src/test/resources/setFeatureValues/featureValuesRef?.txt</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
  			<!--plugin>
 				<groupId>org.apache.uima</groupId>
 		  	<artifactId>PearPackagingMavenPlugin</artifactId>

@@ -63,8 +63,23 @@
           </configuration>
         </execution></executions>
       </plugin>              
-    </plugins>
     
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>   
 	</build>
   
 </project>
