@@ -84,6 +84,22 @@
     </resources-->
 
     <plugins>
+
+      <!-- generate XML parser from .xsd file -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xmlbeans-maven-plugin</artifactId>
+        <version>2.3.3</version>
+        <executions>
+          <execution>
+            <goals><goal>xmlbeans</goal></goals>
+            <configuration>
+              <schemaDirectory>src/main/java/org/apache/uima/tools/cfe</schemaDirectory>
+            </configuration>        
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- copy resources for the PEAR -->      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -130,6 +146,22 @@
         </execution></executions>
       </plugin>              
     
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
     </plugins>
 	</build>
 </project>
