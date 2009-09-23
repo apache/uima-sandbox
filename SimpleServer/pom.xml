@@ -49,13 +49,13 @@
 			<artifactId>uimaj-component-test-util</artifactId>
 		</dependency>
 
-    <dependency>
+    <!--dependency>
       <groupId>org.apache.uima.xmlbeans</groupId>
       <artifactId>uima-simple-server-xbean</artifactId>
       <version>1.0</version>
       <scope>system</scope>
       <systemPath>${basedir}/lib/uima-simple-server-xbean.jar</systemPath>
-    </dependency>
+    </dependency-->
         
     <dependency>
       <groupId>org.apache.xmlbeans</groupId>
@@ -101,52 +101,40 @@
 	<build>
 		<finalName>uima-simple-server</finalName>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Project-Title>Apache UIMA</Project-Title>
-							<Implementation-Title>${pom.name}</Implementation-Title>
-							<Implementation-Version>${pom.version}</Implementation-Version>
-							<Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
-							<Implementation-Url>${pom.url}</Implementation-Url>
-							<Implementation-License>http://www.apache.org/licenses/LICENSE-2.0.txt</Implementation-License>
-							<Build-Date>${buildNumber}</Build-Date>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/distribution.xml</descriptor>
-					</descriptors>
-					<archive>
-						<manifestEntries>
-							<Project-Title>Apache UIMA</Project-Title>
-							<Implementation-Title>${pom.name}</Implementation-Title>
-							<Implementation-Version>${pom.version}</Implementation-Version>
-							<Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
-							<Implementation-Url>${pom.url}</Implementation-Url>
-							<Implementation-License>http://www.apache.org/licenses/LICENSE-2.0.txt</Implementation-License>
-							<Build-Date>${buildNumber}</Build-Date>
-						</manifestEntries>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+      
+      <!-- generate XML parser from .xsd file -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xmlbeans-maven-plugin</artifactId>
+        <version>2.3.3</version>
+        <executions>
+          <execution>
+            <goals><goal>xmlbeans</goal></goals>
+            <configuration>
+              <schemaDirectory>src/main/resources</schemaDirectory>
+            </configuration>        
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+                <exclude>src/test/resources/expected/*.xml</exclude> <!-- test data -->
+                <exclude>src/test/resources/test.txt</exclude> <!-- test data -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
 		</plugins>
 	</build>
 </project>
