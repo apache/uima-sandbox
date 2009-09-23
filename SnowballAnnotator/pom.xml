@@ -63,6 +63,26 @@
         <directory>src/test/resources</directory>
       </testResource>
 		</testResources>
+    
+    <plugins>
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>src/main/java/org/tartarus/snowball/*.java</exclude> <!-- copied from Snowball source under license -->
+                <exclude>src/main/java/org/tartarus/snowball/ext/*.java</exclude> <!-- copied from Snowball source under license -->
+                <exclude>src/test/resources/englishRef.txt</exclude> <!-- test data -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>      
+    </plugins>
 	</build>
 	
 </project>
