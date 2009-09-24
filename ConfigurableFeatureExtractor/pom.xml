@@ -48,6 +48,17 @@
       <groupId>org.apache.xmlbeans</groupId>
       <artifactId>xmlbeans</artifactId>
       <version>2.4.0</version>
+      <exclusions>
+        <exclusion> <!-- licensing issues, use geronimo instead -->
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.emf.ecore</groupId>
@@ -64,11 +75,11 @@
       <artifactId>ecore</artifactId>
       <version>2.3.0-v200706262000</version>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>stax</groupId>
       <artifactId>stax-api</artifactId>
       <version>1.0.1</version>
-    </dependency>
+    </dependency-->
   </dependencies>
     
 	<build>

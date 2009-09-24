@@ -91,8 +91,14 @@ xmlbeans-2.4.0.jar
   Notice File has several notices in it, but nothing that states the notices
     need to be copied to a project which includes it.
   License: Apache v2
-  xmlbeans depends on stax:stax-api, but this dependency is "excluded", and
-    stax-api jar is not distributed with this project.  The API is now part of Java.
+  xmlbeans depends on stax:stax-api
+  
+ 
+  stax:stax-api dependency replaced with
+  org.apache.geronimo.specs:geronimo-stax-api_1.0_spec
+  version 1.0.1  
+  see https://issues.apache.org/jira/browse/LEGAL-42
+
   
 
 

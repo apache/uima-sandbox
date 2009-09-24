@@ -53,11 +53,24 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/regex_annot_xml_types.jar</systemPath>
 		</dependency>
+    
     <dependency>
       <groupId>org.apache.xmlbeans</groupId>
       <artifactId>xmlbeans</artifactId>
       <version>2.4.0</version>
+      <exclusions>
+        <exclusion> <!-- licensing issues, use geronimo instead -->
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    
 		<!--dependency>
 			<groupId>local.xmlbeans.dependency</groupId>
 			<artifactId>xsdbeans</artifactId>
