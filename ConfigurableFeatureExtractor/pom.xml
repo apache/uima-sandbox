@@ -105,7 +105,7 @@
           <execution>
             <goals><goal>xmlbeans</goal></goals>
             <configuration>
-              <schemaDirectory>src/main/java/org/apache/uima/tools/cfe</schemaDirectory>
+              <schemaDirectory>src/main/xsdForXMLBeans</schemaDirectory>
             </configuration>        
           </execution>
         </executions>
@@ -167,6 +167,7 @@
             <configuration>
               <excludes>
                 <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+                <exclude>cfeModelGen/*</exclude> <!-- generated EMF model files -->
               </excludes>
             </configuration>
           </execution>
