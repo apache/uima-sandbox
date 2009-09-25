@@ -335,6 +335,22 @@
                 </configuration>
                 <goals><goal>run</goal></goals>
               </execution>
+              
+              <execution>
+                <id>CleanDocs</id>
+                <phase>clean</phase>
+                <configuration>
+                  <tasks>
+                    <delete quiet="true" failOnError="false">
+                      <!-- just remove the files, keep the directories, because
+                           these are checked into SVN and it can't handle the removal
+                           of the directory .svn files-->
+                      <fileset dir="docs" includes="**" excludes="**/.svn/**/*"/>
+                    </delete> 
+                  </tasks>
+                </configuration>
+                <goals><goal>run</goal></goals>
+              </execution>
             </executions>
           </plugin>
           

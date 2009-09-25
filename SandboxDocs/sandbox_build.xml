@@ -35,11 +35,7 @@
   <import file="${basedir}/../uima-docbook-tool/build/build-docbook.xml"/>  
   
 	<target name="copyDocs" depends="all">
-    <delete dir="${doc.target.dir}" quiet="true"/>
-		<mkdir dir="${doc.target.dir}"/>
-		<mkdir dir="${doc.target.dir}/html"/>
-		<mkdir dir="${doc.target.dir}/pdf"/>
-					
+    					
 		<!-- copy HTML documentation -->
 		<copy todir="${doc.target.dir}/html">
 			<fileset dir="${target.dir}/" includes="images/**,${book_name}/**" excludes="**/*.pdf*"/>
@@ -51,9 +47,13 @@
 		</copy>
     
     <!-- copy to source dir to save for website use -->
-    <!-- delete dir="${basedir}/docs"/ -->  <!-- dangerous? -->
-    <copy todir="${basedir}">
-      <fileset dir="${basedir}/target/bin/${artifactId}" includes="docs/**"/>
+    <!-- note: the form where the todir is just the basedir, and the
+               fileset dir is one dir level higher and
+               there is an include="docs/**" seems to fail to
+               copy the some files.  The form below seems to work better. 
+               Don't know why, but I think there's some interaction with SVN. -->
+    <copy todir="${basedir}/docs">
+      <fileset dir="${basedir}/target/bin/${artifactId}/docs"/>
     </copy>
     
     <!-- copy to pear -->
