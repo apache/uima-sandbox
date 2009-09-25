@@ -1,9 +1,12 @@
+     Apache UIMA Annotator Package Version 2.3.0 README for Source Distribution
+     --------------------------------------------------------------------------
+
 For general instructions about building the Apache UIMA Sandbox projects 
 from the sources, please refer to:
 http://incubator.apache.org/uima/svn.html#building.with.maven
 
 The Sandbox project is set up to be buildable only in conjuction with the
-base UIMA project (uimaj).  Both must be placed in the same parent directory.
+base UIMA project.  Both must be placed in the same parent directory.
 The individual projects of both source distributions (for example, uimaj-distr, and
 SandboxDistr) will then end up in the same parent directory.  This arrangement, 
 which differs from the usual Maven conventions, is adopted because
@@ -14,7 +17,7 @@ base UIMA projects on which the sandbox depends, if you are building a level whi
 released.  
 
 To build the Sandbox projects,
-  cd to the SandboxDistr package project, and do mvn install
+  cd to SandboxDistr/annotator-package, and do mvn install
 
 To work with eclipse additionally:
   issue the command: mvn eclipse:eclipse
