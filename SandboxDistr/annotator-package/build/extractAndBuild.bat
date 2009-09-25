@@ -22,28 +22,34 @@ REM Run with -notest to skip the unit tests
 @echo on
 
 @if "%~1"=="" goto usage
+@if not "%4"=="" goto usage
 @if "%~1"=="trunk" goto trunk
-@set level=tags/%~1
-@set leveldir=%~1
+@set leveldir=sandbox-%~1-%~2
+@set svnloc=tags/sandbox-%1/%leveldir%
 @goto checkargs
 
 @:trunk
-@set level=trunk
 @set leveldir=trunk
+@set svnloc=trunk
 @goto checkargs
 
 @:checkargs
 @set jvmarg=
 @set mvnCommand=clean install
-@if not "%3"=="" goto usage
-@if "%~2"=="" goto execute
-@if "%~2"=="-notest" goto notest
+@if "%~3"=="" goto execute
+@if "%~3"=="-notest" goto notest
+@if "%~3"=="-deploy" goto deploy
 @goto usage
 
 @:usage
 @echo off
-echo Usage: extractAndBuild.bat level [-notest]
+echo Run this command in the same directory where all the base uima projects live.
+echo Running this command in a directory produces an extract as a subdirectory of that directory;
+echo   whose contents are then copied into this directory (required for the build)
+echo Usage: extractAndBuild.bat level release-candidate [-notest] [-deploy]
 echo            (-notest and -deploy cannot be used together)
+echo  Examples of the 1st 2 arguments, level release-candidate, are  trunk trunk   or  2.2.2  01
+echo  If trunk, use the word "trunk" for the 2nd argument, e.g. extractAndBuild.bat trunk trunk 
 @echo on
 @goto exit
 
@@ -51,12 +57,18 @@ echo            (-notest and -deploy cannot be used together)
 @set jvmarg="-Dmaven.test.skip=true"
 @goto execute
 
+@:deploy
+@set jvmarg="-DsignArtifacts=true"
+@set mvnCommand=clean deploy
+@goto execute
+
 @:execute
-svn checkout -r HEAD http://svn.apache.org/repos/asf/incubator/uima/sandbox/%level%
-cd %leveldir%
+svn checkout -r HEAD http://svn.apache.org/repos/asf/incubator/uima/sandbox/%svnloc%
+xcopy %leveldir%\* . /E
+rmdir /S %leveldir%
 cd SandboxDistr
 call mvn %jvmarg%  -Duima.build.date="%date% %time%" %mvnCommand%
 cd annotator-package
-call mvn clean assembly:assembly
+call mvn -N clean assembly:assembly
 
 @:exit
