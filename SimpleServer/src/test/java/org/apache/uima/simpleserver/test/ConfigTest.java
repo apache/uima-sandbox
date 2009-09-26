@@ -39,6 +39,7 @@ import org.apache.uima.simpleserver.config.TypeMap;
 import org.apache.uima.simpleserver.config.impl.XmlConfigReader;
 import org.apache.uima.simpleserver.output.Result;
 import org.apache.uima.simpleserver.output.ResultConverter;
+import org.apache.uima.test.junit_extension.FileCompare;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.InvalidXMLException;
@@ -177,10 +178,10 @@ public class ConfigTest {
       e.printStackTrace();
     }
     assertTrue("Expected inline output:\n" + inlineExpected + "\nbut found:\n" + inlineActual,
-        inlineActual.equals(inlineExpected));
+        FileCompare.compareStrings(inlineActual, inlineExpected));
     assertTrue(
         "Expected standoff output:\n" + standoffExpected + "\nbut found:\n" + standoffActual,
-        standoffActual.equals(standoffExpected));
+        FileCompare.compareStrings(standoffActual, standoffExpected));
     // final int len = configFile.length();
     // final String suffix = configFile.substring(len - 6, len);
     // final String outInlineFileName = "out/inline" + suffix;
