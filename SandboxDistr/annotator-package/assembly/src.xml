@@ -93,59 +93,59 @@
     <!-- Add files for all the Sandbox components being released -->  
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
-      <directory>../../BSFAnnotator/target/src</directory>
+      <directory>../../BSFAnnotator/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
-      <directory>../../ConceptMapper/target/src</directory>
+      <directory>../../ConceptMapper/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
-      <directory>../../ConfigurableFeatureExtractor/target/src</directory>
+      <directory>../../ConfigurableFeatureExtractor/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
-      <directory>../../DictionaryAnnotator/target/src</directory>
+      <directory>../../DictionaryAnnotator/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons</outputDirectory>
-      <directory>../../FsVariables/target/src</directory>
+      <directory>../../FsVariables/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
-      <directory>../../Lucas/target/src</directory>
+      <directory>../../Lucas/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
-      <directory>../../OpenCalaisAnnotator/target/src</directory>
+      <directory>../../OpenCalaisAnnotator/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons</outputDirectory>
-      <directory>../../PearPackagingAntTask/target/src</directory>
+      <directory>../../PearPackagingAntTask/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
-      <directory>../../RegularExpressionAnnotator/target/src</directory>
+      <directory>../../RegularExpressionAnnotator/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons</outputDirectory>
-      <directory>../../SimpleServer/target/src</directory>
+      <directory>../../SimpleServer/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
-      <directory>../../SnowballAnnotator/target/src</directory>
+      <directory>../../SnowballAnnotator/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
-      <directory>../../Tagger/target/src</directory>
+      <directory>../../Tagger/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
-      <directory>../../TikaAnnotator/target/src</directory>
+      <directory>../../TikaAnnotator/target/assembly-src</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
-      <directory>../../WhitespaceTokenizer/target/src</directory>
+      <directory>../../WhitespaceTokenizer/target/assembly-src</directory>
     </fileSet>    
 		
 	</fileSets>
