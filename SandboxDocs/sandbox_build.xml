@@ -30,7 +30,7 @@
   <property name="target.dir" value="${basedir}/target"/>
   <property name="styles.dir" value="${basedir}/../SandboxDocs/src/styles"/>
   <property name="skip.html-chunked" value="true"/>	
-  <property name="doc.target.dir" value="${basedir}/target/bin/${artifactId}/docs"/>
+  <property name="doc.target.dir" value="${basedir}/target/assembly-bin/${artifactId}/docs"/>
   
   <import file="${basedir}/../uima-docbook-tool/build/build-docbook.xml"/>  
   
@@ -53,13 +53,13 @@
                copy the some files.  The form below seems to work better. 
                Don't know why, but I think there's some interaction with SVN. -->
     <copy todir="${basedir}/docs">
-      <fileset dir="${basedir}/target/bin/${artifactId}/docs"/>
+      <fileset dir="${doc.target.dir}"/>
     </copy>
     
     <!-- copy to pear -->
     <!-- pear convention is that the dir is named doc, not docs -->
     <copy todir="${basedir}/target/pearPackaging/doc">
-      <fileset dir="${basedir}/target/bin/${artifactId}/docs" includes="**"/>
+      <fileset dir="${doc.target.dir}"/>
     </copy>
     
 	</target>
