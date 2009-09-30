@@ -61,7 +61,7 @@ public interface ConfigPackage extends EPackage
    * <!-- end-user-doc -->
      * @generated
      */
-  String eNS_URI = "http://www.apache.org/uima/cfe/config";
+  String eNS_URI = "http://www.apache.org/uima/tools/cfe/config";
 
   /**
      * The package namespace name.

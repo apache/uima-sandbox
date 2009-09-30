@@ -77,8 +77,12 @@
     <capabilities>
       <capability>
         <inputs/>
-        <outputs/>
-        <languagesSupported/>
+        <outputs>
+          <type allAnnotatorFeatures="true">example.PersonTitle</type>
+        </outputs>
+        <languagesSupported>
+          <language>en</language>
+        </languagesSupported>
       </capability>
     </capabilities>
     <operationalProperties>

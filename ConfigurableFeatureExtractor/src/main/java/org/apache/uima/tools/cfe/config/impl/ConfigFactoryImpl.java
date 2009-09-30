@@ -63,7 +63,7 @@ public class ConfigFactoryImpl extends EFactoryImpl implements ConfigFactory
   {
         try
         {
-            ConfigFactory theConfigFactory = (ConfigFactory)EPackage.Registry.INSTANCE.getEFactory("http://www.apache.org/uima/cfe/config"); 
+            ConfigFactory theConfigFactory = (ConfigFactory)EPackage.Registry.INSTANCE.getEFactory("http://www.apache.org/uima/tools/cfe/config"); 
             if (theConfigFactory != null)
             {
                 return theConfigFactory;

@@ -36,6 +36,7 @@ import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.analysis_engine.metadata.FixedFlow;
 import org.apache.uima.analysis_engine.metadata.SofaMapping;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.examples.SourceDocumentInformation;
 import org.apache.uima.pear.tools.PackageBrowser;
 import org.apache.uima.pear.tools.PackageInstaller;
 import org.apache.uima.pear.util.FileUtil;
@@ -44,6 +45,7 @@ import org.apache.uima.resource.metadata.Capability;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.resource.metadata.Import;
 import org.apache.uima.resource.metadata.MetaDataObject;
+import org.apache.uima.test.junit_extension.FileCompare;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.XMLInputSource;
@@ -95,8 +97,21 @@ public class CFEtest extends TestCase {
     ae.setConfigParameterValue("ConfigurationFile", configFile.getAbsolutePath());
     ae.reconfigure();
     CAS cas = ae.newCAS();
-    String document = FileUtils.file2String(JUnitExtension.getFile("someTestData.txt"));
+    File docFile = JUnitExtension.getFile("testData.txt");
+    String document = FileUtils.file2String(docFile);
     cas.setDocumentText(document);
-    ae.process(cas);    
+    cas.setDocumentLanguage("en");
+    
+    SourceDocumentInformation sdi_ann = new SourceDocumentInformation(cas.getJCas(), 0, document.length());
+    sdi_ann.setUri(docFile.toURI().toString());
+    sdi_ann.addToIndexes();
+    ae.process(cas); 
+    
+    File outFile = new File("tempTestOut/testData.txt.fve");
+    File outFileRef = JUnitExtension.getFile("testDataRef.txt.fve");
+    
+    assertTrue(FileCompare.compare(outFile, outFileRef));
+    outFile.delete();
+    new File("tempTestOut").delete();
   }
 }

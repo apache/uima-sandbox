@@ -90,6 +90,7 @@ public class UIMAFeatureConsumer
             for (Iterator<ComparableArray> it = m_uimaFM.m_featureImages.keySet().iterator(); it.hasNext();) {
                 fos.write((m_uimaFM.m_featureImages.get(it.next()) + "\n").getBytes());
             }
+            fos.close();
         } 
         catch (Exception e) {
             throw new ResourceProcessException(e);

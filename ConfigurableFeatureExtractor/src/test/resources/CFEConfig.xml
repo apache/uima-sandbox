@@ -20,7 +20,7 @@
    ***************************************************************
    -->
   <tns:CFEConfig xmlns:tns="http://www.apache.org/uima/tools/cfe/config" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.apache.org/uima/tools/cfe/config CFEConfig.xsd ">
-  <tns:targetAnnotations className="Military_Person" enclosingAnnotation="uima.tt.DocumentAnnotation">
+  <tns:targetAnnotations className="Military_Person" enclosingAnnotation="org.apache.uima.jcas.tcas.DocumentAnnotation">
     <tns:targetAnnotationMatcher annotationTypeName="example.PersonTitle">
       <tns:groupFeatureMatchers>
         <tns:featureMatchers featurePath="Kind">
