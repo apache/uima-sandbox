@@ -24,71 +24,88 @@
 		<format>zip</format>
 	</formats>
 
-	<includeBaseDirectory>false</includeBaseDirectory>
+	<includeBaseDirectory>true</includeBaseDirectory>
+  <baseDirectory>apache-uima/addons</baseDirectory> <!-- so it is unzippable over base - needs same name -->
+  
 
 	<fileSets>
 	<!-- copy license, notice, disclaimer, readme, release notes files -->
 		<fileSet>
-			<directory>./readme</directory>
-			<outputDirectory>/apache-uima/addons/</outputDirectory>
+			<directory>readme</directory>
+			<outputDirectory/>
+      <fileMode>644</fileMode>
 		</fileSet>
 
     <!-- Add files for all the Sandbox components being released -->	
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>annotator</outputDirectory>            
       <directory>../../BSFAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>annotator</outputDirectory>            
       <directory>../../ConceptMapper/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>annotator</outputDirectory>            
       <directory>../../ConfigurableFeatureExtractor/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>annotator</outputDirectory>
       <directory>../../DictionaryAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons</outputDirectory>
+      <outputDirectory/>
       <directory>../../FsVariables/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>annotator</outputDirectory>            
       <directory>../../Lucas/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>annotator</outputDirectory>
       <directory>../../OpenCalaisAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons</outputDirectory>
+      <outputDirectory/>
       <directory>../../PearPackagingAntTask/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>annotator</outputDirectory>            
       <directory>../../RegularExpressionAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons</outputDirectory>
+      <outputDirectory/>
       <directory>../../SimpleServer/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>annotator</outputDirectory>
       <directory>../../SnowballAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>annotator</outputDirectory>
       <directory>../../Tagger/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>annotator</outputDirectory>
       <directory>../../TikaAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>
 		<fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>annotator</outputDirectory>
 			<directory>../../WhitespaceTokenizer/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
     </fileSet>		
 	</fileSets>
 </assembly>

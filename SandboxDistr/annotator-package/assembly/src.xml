@@ -32,15 +32,20 @@
       <!-- copy license and notice files -->
     <fileSet>
       <directory>./readme_src/</directory>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory/>
+      <excludes>
+        <exclude>**/*.sh</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+
+    <fileSet>
+      <directory>./readme_src/</directory>
+      <outputDirectory/>
       <includes>
-        <include>LICENSE</include>
-        <include>NOTICE</include>
-        <include>README</include>
-        <include>DISCLAIMER</include>
-        <include>addSourceToJars.bat</include>
-        <include>addSourceToJars.sh</include>
+        <include>**/*.sh</include>
       </includes>
+      <fileMode>755</fileMode>
     </fileSet>
     
     <fileSet>
@@ -50,6 +55,7 @@
         <include>RELEASE_NOTES</include>
         <include>RELEASE_NOTES.html</include>
       </includes>
+      <fileMode>644</fileMode>
     </fileSet>
     
     
@@ -61,6 +67,7 @@
         <exclude>annotator-package/target/**</exclude>
         <exclude>.project</exclude>
       </excludes>
+      <fileMode>644</fileMode>
    	</fileSet>
 
 	<!-- Add files for the SandboxDocs -->
@@ -71,6 +78,7 @@
         <include>src/**</include>
         <include>sandbox_build.xml</include>
       </includes>
+      <fileMode>644</fileMode>
   </fileSet>
 
 	<!-- Add files for the uima-docbook-tool -->
@@ -88,64 +96,79 @@
         <include>README</include>
         <include>README.FIRST</include>
       </includes>
+      <fileMode>644</fileMode>
     </fileSet>
 	
     <!-- Add files for all the Sandbox components being released -->  
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
       <directory>../../BSFAnnotator/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
       <directory>../../ConceptMapper/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
       <directory>../../ConfigurableFeatureExtractor/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
       <directory>../../DictionaryAnnotator/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons</outputDirectory>
       <directory>../../FsVariables/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
       <directory>../../Lucas/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
       <directory>../../OpenCalaisAnnotator/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons</outputDirectory>
       <directory>../../PearPackagingAntTask/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
       <directory>../../RegularExpressionAnnotator/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons</outputDirectory>
       <directory>../../SimpleServer/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
       <directory>../../SnowballAnnotator/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
       <directory>../../Tagger/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
       <directory>../../TikaAnnotator/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
       <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
       <directory>../../WhitespaceTokenizer/target/assembly-src</directory>
+      <fileMode>644</fileMode>
     </fileSet>    
 		
 	</fileSets>
