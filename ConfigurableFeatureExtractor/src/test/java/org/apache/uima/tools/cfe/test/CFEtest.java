@@ -20,36 +20,19 @@
 package org.apache.uima.tools.cfe.test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
-import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
-import org.apache.uima.analysis_engine.metadata.FixedFlow;
-import org.apache.uima.analysis_engine.metadata.SofaMapping;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.examples.SourceDocumentInformation;
-import org.apache.uima.pear.tools.PackageBrowser;
-import org.apache.uima.pear.tools.PackageInstaller;
 import org.apache.uima.pear.util.FileUtil;
-import org.apache.uima.resource.ResourceSpecifier;
-import org.apache.uima.resource.metadata.Capability;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
-import org.apache.uima.resource.metadata.Import;
-import org.apache.uima.resource.metadata.MetaDataObject;
 import org.apache.uima.test.junit_extension.FileCompare;
 import org.apache.uima.test.junit_extension.JUnitExtension;
 import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.XMLInputSource;
-import org.apache.uima.util.XMLParser;
 
 /**
  * The CFE tests installs a pear file

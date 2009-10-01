@@ -58,7 +58,7 @@ public class ObjectPathFeatureValues extends CollectionFeatureValues<MatchedValu
         TargetObjectMatcher tom = new TargetObjectMatcher(m_object_type_name, m_object_path, false);
 
         Class<? extends Annotation> cls_ann = UIMAAnnotationUtils.getAnnotationClass(tom.getRootClass());
-        for (FSIterator root_ann_it = FeatureConstrainedIterator.getEnclosedIterator(jcas, cls_ann, enclosing); root_ann_it.hasNext();) {
+        for (FSIterator<? extends Annotation> root_ann_it = FeatureConstrainedIterator.getEnclosedIterator(jcas, cls_ann, enclosing); root_ann_it.hasNext();) {
             List<MatchedValue> mfvs = tom.getFeatureValues(new AnnotationMatchedValue((Annotation)root_ann_it.next(), new ArrayList<Object>()));
             // exclude prioritized models (previously specified in config file)
             if (null != previosly_matched_objects) {

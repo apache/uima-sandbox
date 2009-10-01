@@ -178,13 +178,13 @@ public class UIMAAnnotationUtils
     }
 
     
-    static public FSIterator fsIterator (JCas jcas, Class<? extends Annotation> cls_ann)
+    static public FSIterator<? extends Annotation> fsIterator (JCas jcas, Class<? extends Annotation> cls_ann)
     throws IllegalArgumentException,
            SecurityException,
            IllegalAccessException,
            NoSuchFieldException
     {
-        AnnotationIndex ind = jcas.getJFSIndexRepository().getAnnotationIndex(UIMAAnnotationUtils.getTypeIndexId(cls_ann));
+        AnnotationIndex<? extends Annotation> ind = jcas.getJFSIndexRepository().getAnnotationIndex(UIMAAnnotationUtils.getTypeIndexId(cls_ann));
         
         return ind.iterator();
     }

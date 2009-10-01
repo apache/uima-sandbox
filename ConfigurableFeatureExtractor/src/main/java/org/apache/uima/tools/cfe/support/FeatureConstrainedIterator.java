@@ -78,10 +78,10 @@ public class FeatureConstrainedIterator
             }
         }
         
-        FSIterator createFilteredIterator (JCas jcas, FSMatchConstraint constraint)
+        FSIterator<? extends Annotation> createFilteredIterator (JCas jcas, FSMatchConstraint constraint)
         {
             JFSIndexRepository idxs = jcas.getJFSIndexRepository ();
-            AnnotationIndex sdi_ind = (AnnotationIndex)idxs.getAnnotationIndex(m_typeId);
+            AnnotationIndex<? extends Annotation> sdi_ind = idxs.getAnnotationIndex(m_typeId);
             return jcas.createFilteredIterator(sdi_ind.iterator(), constraint);
         }
     }
@@ -98,10 +98,10 @@ public class FeatureConstrainedIterator
             super(jcas, UIMAAnnotationUtils.getTypeIndexId(enclosed), null);
         }
         
-        FSIterator createSubiterator (JCas jcas, AnnotationFS enclosing)
+        FSIterator<? extends Annotation> createSubiterator (JCas jcas, AnnotationFS enclosing)
         {
             JFSIndexRepository idxs = jcas.getJFSIndexRepository ();
-            AnnotationIndex sdi_ind = (AnnotationIndex)idxs.getAnnotationIndex(m_typeId);
+            AnnotationIndex<? extends Annotation> sdi_ind = idxs.getAnnotationIndex(m_typeId);
             return sdi_ind.subiterator(enclosing);
         }
     }
@@ -211,10 +211,10 @@ public class FeatureConstrainedIterator
     }
     
     
-    static public FSIterator getEnclosedIterator(JCas                           jcas,
-                                                 Class<? extends Annotation>    enclosed,
-                                                 int                            begin,
-                                                 int                            end)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas                           jcas,
+                                                                       Class<? extends Annotation>    enclosed,
+                                                                       int                            begin,
+                                                                       int                            end)
         throws IllegalArgumentException,
                SecurityException,
                ClassNotFoundException,
@@ -224,10 +224,10 @@ public class FeatureConstrainedIterator
         return getEnclosedIterator(jcas, enclosed, begin, begin, end, end);
     }
 
-    static public FSIterator getEnclosedIterator(JCas   jcas,
-                                                 int[]  typeIds,
-                                                 int    begin,
-                                                 int    end)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas   jcas,
+                                                                       int[]  typeIds,
+                                                                       int    begin,
+                                                                       int    end)
         throws IllegalArgumentException,
                SecurityException,
                ClassNotFoundException,
@@ -237,12 +237,12 @@ public class FeatureConstrainedIterator
         return getEnclosedIterator(jcas, typeIds, begin, begin, end, end);
     }
 
-    static public FSIterator getEnclosedIterator(JCas                           jcas,
-                                                 Class<? extends Annotation>    enclosed,
-                                                 int                            begin_lower,
-                                                 int                            begin_upper,
-                                                 int                            end_lower,
-                                                 int                            end_upper)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas                           jcas,
+                                                                       Class<? extends Annotation>    enclosed,
+                                                                       int                            begin_lower,
+                                                                       int                            begin_upper,
+                                                                       int                            end_lower,
+                                                                       int                            end_upper)
     throws IllegalArgumentException,
            SecurityException,
            ClassNotFoundException,
@@ -255,12 +255,12 @@ public class FeatureConstrainedIterator
     }
     
     
-    static public FSIterator getEnclosedIterator(JCas   jcas,
-                                                 int[]  enclosedTypes,
-                                                 int    begin_lower,
-                                                 int    begin_upper,
-                                                 int    end_lower,
-                                                 int    end_upper)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas   jcas,
+                                                                       int[]  enclosedTypes,
+                                                                       int    begin_lower,
+                                                                       int    begin_upper,
+                                                                       int    end_lower,
+                                                                       int    end_upper)
     throws IllegalArgumentException,
            SecurityException,
            ClassNotFoundException,
@@ -282,9 +282,9 @@ public class FeatureConstrainedIterator
     }
     
     
-    static public FSIterator getEnclosedIterator(JCas                           jcas,
-                                                 Class<? extends Annotation>    enclosed,
-                                                 Annotation                     enclosing)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas                           jcas,
+                                                                       Class<? extends Annotation>    enclosed,
+                                                                       Annotation                     enclosing)
     throws IllegalArgumentException, 
            SecurityException,
            ClassNotFoundException,
@@ -299,9 +299,9 @@ public class FeatureConstrainedIterator
         return scd.createSubiterator(jcas, enclosing);
     }
     
-    static public FSIterator getEnclosedIterator(JCas jcas,
-                                                 String enclosed_name,
-                                                 Annotation enclosing)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas jcas,
+                                                                       String enclosed_name,
+                                                                       Annotation enclosing)
         throws IllegalArgumentException,
                SecurityException,
                ClassNotFoundException,
@@ -311,9 +311,9 @@ public class FeatureConstrainedIterator
         return getEnclosedIterator(jcas, UIMAAnnotationUtils.forName(enclosed_name), enclosing);
     }
     
-    static public FSIterator getEnclosedIterator(JCas jcas,
-                                                 int[] typeIds,
-                                                 Annotation enclosing)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas jcas,
+                                                                       int[] typeIds,
+                                                                       Annotation enclosing)
         throws IllegalArgumentException,
                SecurityException,
                ClassNotFoundException,
@@ -323,10 +323,10 @@ public class FeatureConstrainedIterator
         return getEnclosedIterator(jcas, typeIds, enclosing.getBegin(), enclosing.getEnd());
     }
     
-    static public FSIterator getLeftIterator (JCas                          jcas,
-                                              Class<? extends Annotation>   feat_ann_class,
-                                              Annotation                    enclosing,
-                                              Annotation                    target)
+    static public FSIterator<? extends Annotation> getLeftIterator (JCas                          jcas,
+                                                                    Class<? extends Annotation>   feat_ann_class,
+                                                                    Annotation                    enclosing,
+                                                                    Annotation                    target)
     throws IllegalArgumentException,
            SecurityException,
            ClassNotFoundException,
@@ -336,15 +336,15 @@ public class FeatureConstrainedIterator
         int begin = enclosing.getBegin();
         int end = target.getBegin();
         
-        FSIterator it = FeatureConstrainedIterator.getEnclosedIterator(jcas, feat_ann_class, begin, end);
+        FSIterator<? extends Annotation> it = FeatureConstrainedIterator.getEnclosedIterator(jcas, feat_ann_class, begin, end);
         it.moveToLast();
         return it;
     }
     
-    static public FSIterator getLeftIterator (JCas          jcas,
-                                              int[]         typeIds,
-                                              Annotation    enclosing,
-                                              Annotation    target)
+    static public FSIterator<? extends Annotation> getLeftIterator (JCas          jcas,
+                                                                    int[]         typeIds,
+                                                                    Annotation    enclosing,
+                                                                    Annotation    target)
     throws IllegalArgumentException,
            SecurityException,
            ClassNotFoundException,
@@ -354,15 +354,15 @@ public class FeatureConstrainedIterator
         int begin = enclosing.getBegin();
         int end = target.getBegin();
         
-        FSIterator it = FeatureConstrainedIterator.getEnclosedIterator(jcas, typeIds, begin, end);
+        FSIterator<? extends Annotation> it = FeatureConstrainedIterator.getEnclosedIterator(jcas, typeIds, begin, end);
         it.moveToLast();
         return it;
     }
     
-    static public FSIterator getRightIterator (JCas                         jcas,
-                                               Class<? extends Annotation>  feat_ann_class,
-                                               Annotation                   enclosing,
-                                               Annotation                   target)
+    static public FSIterator<? extends Annotation> getRightIterator (JCas                         jcas,
+                                                                     Class<? extends Annotation>  feat_ann_class,
+                                                                     Annotation                   enclosing,
+                                                                     Annotation                   target)
     throws IllegalArgumentException,
            SecurityException,
            ClassNotFoundException,
@@ -375,14 +375,14 @@ public class FeatureConstrainedIterator
         return FeatureConstrainedIterator.getEnclosedIterator(jcas, feat_ann_class, begin, end);
     }
     
-    static public FSIterator getEnclosedIterator(JCas                           jcas,
-                                                 Class<? extends Annotation>    enclosed,
-                                                 int                            begin_lower,
-                                                 int                            begin_upper,
-                                                 int                            end_lower,
-                                                 int                            end_upper,
-                                                 String                         feat_name,
-                                                 Object[]                       values)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas                           jcas,
+                                                                       Class<? extends Annotation>    enclosed,
+                                                                       int                            begin_lower,
+                                                                       int                            begin_upper,
+                                                                       int                            end_lower,
+                                                                       int                            end_upper,
+                                                                       String                         feat_name,
+                                                                       Object[]                       values)
         throws IllegalArgumentException,
                SecurityException,
                ClassNotFoundException,
@@ -400,12 +400,12 @@ public class FeatureConstrainedIterator
     }
 
     
-    static public FSIterator getEnclosedIterator(JCas                           jcas,
-                                                 Class<? extends Annotation>    enclosed,
-                                                 int                            begin,
-                                                 int                            end,
-                                                 String                         feat_name,
-                                                 Object[]                       values)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas                           jcas,
+                                                                       Class<? extends Annotation>    enclosed,
+                                                                       int                            begin,
+                                                                       int                            end,
+                                                                       String                         feat_name,
+                                                                       Object[]                       values)
         throws IllegalArgumentException,
                SecurityException,
                ClassNotFoundException,
@@ -415,11 +415,11 @@ public class FeatureConstrainedIterator
         return getEnclosedIterator(jcas, enclosed, begin, begin, end, end, feat_name,values);
     }
 
-    static public FSIterator getEnclosedIterator(JCas                           jcas,
-                                                 Class<? extends Annotation>    enclosed,
-                                                 Annotation                     enclosing,
-                                                 String                         feat_name,
-                                                 Object[]                       values)
+    static public FSIterator<? extends Annotation> getEnclosedIterator(JCas                           jcas,
+                                                                       Class<? extends Annotation>    enclosed,
+                                                                       Annotation                     enclosing,
+                                                                       String                         feat_name,
+                                                                       Object[]                       values)
         throws IllegalArgumentException,
                SecurityException,
                ClassNotFoundException,
@@ -464,9 +464,9 @@ public class FeatureConstrainedIterator
         return null;
     }
     
-    static public FSIterator getSameOffsetIterator (JCas                        jcas,
-                                                    Class<? extends Annotation> enclosed_class,
-                                                    Annotation                  enclosing)
+    static public FSIterator<? extends Annotation> getSameOffsetIterator (JCas                        jcas,
+                                                                          Class<? extends Annotation> enclosed_class,
+                                                                          Annotation                  enclosing)
     throws IllegalArgumentException,
            SecurityException,
            ClassNotFoundException,
@@ -478,11 +478,11 @@ public class FeatureConstrainedIterator
                                    enclosing.getEnd() - 1, enclosing.getEnd()); 
     }
     
-    static public FSIterator getSameOffsetIterator (JCas                        jcas,
-                                                    Class<? extends Annotation> enclosed_class,
-                                                    Annotation                  enclosing,
-                                                    String                      feat_name,
-                                                    Object[]                    values)
+    static public FSIterator<? extends Annotation> getSameOffsetIterator (JCas                        jcas,
+                                                                          Class<? extends Annotation> enclosed_class,
+                                                                          Annotation                  enclosing,
+                                                                          String                      feat_name,
+                                                                          Object[]                    values)
     throws IllegalArgumentException, SecurityException, ClassNotFoundException, IllegalAccessException, NoSuchFieldException
     {
         return getEnclosedIterator(jcas, enclosed_class,

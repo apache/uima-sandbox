@@ -76,7 +76,9 @@ public class ConfigResourceUtil
   private void initialize()
   {
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("xml", new ConfigResourceFactoryImpl());
+    @SuppressWarnings("unused")
     ConfigPackage pkg = ConfigPackage.eINSTANCE;   
+    @SuppressWarnings("unused")
     ConfigFactory factory = ConfigFactory.eINSTANCE;
   }
 

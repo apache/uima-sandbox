@@ -367,7 +367,7 @@ public abstract class CommonFeatureMatcher
            InvocationTargetException
     {
         Class<? extends Annotation> ann_cls = UIMAAnnotationUtils.getAnnotationClass(fom.getMatcherClass()); 
-        FSIterator ann_it = FeatureConstrainedIterator.getEnclosedIterator(
+        FSIterator<? extends Annotation> ann_it = FeatureConstrainedIterator.getEnclosedIterator(
                 jcas, ann_cls, begin_lower, begin_upper, end_lower, end_upper);
         if (!advance_right) {
             ann_it.moveToLast();

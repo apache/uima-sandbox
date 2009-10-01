@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.uima.tools.cfe.config.xmlBeans.BitsetFeatureValuesXML;
+import org.apache.uima.tools.cfe.config.xmlBeans.CFEConfigDocument;
 import org.apache.uima.tools.cfe.config.xmlBeans.CFEDescriptorXML;
 import org.apache.uima.tools.cfe.config.xmlBeans.EnumFeatureValuesXML;
 import org.apache.uima.tools.cfe.config.xmlBeans.FeatureObjectMatcherXML;
@@ -45,7 +46,8 @@ public class CFEConfigFromXML_XMLBeans
     
     public CFEConfigFromXML_XMLBeans (String path) throws XmlException, IOException
     {
-        m_CFEDescriptor = CFEDescriptorXML.Factory.parse(new File(path));
+        CFEConfigDocument doc = CFEConfigDocument.Factory.parse(new File(path));
+        m_CFEDescriptor = doc.getCFEConfig();
     }
     
     EnumFeatureValues getEnumFeatureValues(EnumFeatureValuesXML efvs_xml)
