@@ -61,17 +61,9 @@
 	      <version>2.3.0-incubating-SNAPSHOT</version>
 	      <scope>compile</scope>
 	    </dependency>
-	    <dependency>
-			<groupId>xmlbeans</groupId>
-			<artifactId>xbean</artifactId>
-			<version>2.2.0</version>
-			<scope>compile</scope>
-			<optional>true</optional>
-		</dependency>
 	</dependencies>
 	<build>
 		<finalName>simple-uima-as-service</finalName>
-		<resources></resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -81,68 +73,6 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			<plugin>
-		        <groupId>org.codehaus.mojo</groupId>
-		        <artifactId>buildnumber-maven-plugin</artifactId>
-		        <executions>
-		          <execution>
-		            <phase>process-classes</phase>
-		            <goals>
-		              <goal>create</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		        <configuration>
-		          <format>{0,date,yyyy-MM-dd HH:mm:ss}</format>
-		          <items>
-		            <item>timestamp</item>
-		          </items>
-		        </configuration>
-	      	</plugin>
-      
-      		<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>CopyLicenseNoticeDisclaimer</id>
-						<phase>process-resources</phase>
-						<configuration>
-							<tasks>                    
-                				<copy todir="target/classes/META-INF">
-                  					<fileset dir="." includes="LICENSE.txt NOTICE.txt DISCLAIMER"/>
-                				</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-				</executions>
-			</plugin>
-              
-	        <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-jar-plugin</artifactId>
-		        <configuration>
-		          <archive>
-		            <manifestEntries>
-		              <Project-Title>Apache UIMA</Project-Title>
-		              <Implementation-Title>${pom.name}</Implementation-Title>
-		              <Implementation-Version>${pom.version}</Implementation-Version>
-		              <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
-		              <Implementation-Url>${pom.url}</Implementation-Url>
-					        <Implementation-License>http://www.apache.org/licenses/LICENSE-2.0.txt</Implementation-License>
-		              <Build-Date>${buildNumber}</Build-Date>
-		            </manifestEntries>
-		          </archive>
-		        </configuration>
-      		</plugin> 
 			
 		</plugins>
 	</build>
