@@ -177,6 +177,7 @@
       
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
+        <inherited>true</inherited>
         <executions>
           <execution>
             <id>copy standard sandbox resources to assembly-bin</id>
@@ -304,62 +305,65 @@
         </executions>
       </plugin>  
 
-    </plugins>
-      
-  </build>
-  
-  <!-- conditional execution -->
-  
-  <profiles>
-    
-    <!-- Build the docbook documentation conditioned on the
-         existance of the build_documentation.xml file -->
-    <profile>
-      <id>buildDocs</id>      
-      <activation>
-        <file><exists>build_documentation.xml</exists></file>
-      </activation>
-      
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build documentation</id>
-                <phase>package</phase>
-                <configuration>
-                  <tasks>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build documentation</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+                <!-- set up ant-contrib extensions -->
+                <typedef resource="net/sf/antcontrib/antlib.xml">
+                  <classpath refid="maven.dependency.classpath"/>
+                </typedef>
+                  
+                <if>
+                  <available file="build_documentation.xml"></available>
+                  <then>
                     <ant antfile="build_documentation.xml" target="copyDocs"/> 
-                  </tasks>
-                </configuration>
-                <goals><goal>run</goal></goals>
-              </execution>
-              
-              <execution>
-                <id>CleanDocs</id>
-                <phase>clean</phase>
-                <configuration>
-                  <tasks>
+                  </then>
+                  <else>
+                    <echo message="build_documentation.xml missing - skipping"/>
+                  </else>
+                </if> 
+              </tasks>
+            </configuration>
+            <goals><goal>run</goal></goals>
+          </execution>
+          
+          <execution>
+            <id>CleanDocs</id>
+            <phase>clean</phase>
+            <configuration>
+              <tasks>
+                <!-- set up ant-contrib extensions -->
+                <typedef resource="net/sf/antcontrib/antlib.xml">
+                  <classpath refid="maven.dependency.classpath"/>
+                </typedef>
+                  
+                <if>
+                  <available file="build_documentation.xml"></available>
+                  <then>
                     <delete quiet="true" failOnError="false">
                       <!-- just remove the files, keep the directories, because
                            these are checked into SVN and it can't handle the removal
                            of the directory .svn files-->
                       <fileset dir="docs" includes="**" excludes="**/.svn/**/*"/>
-                    </delete> 
-                  </tasks>
-                </configuration>
-                <goals><goal>run</goal></goals>
-              </execution>
-            </executions>
-          </plugin>
-          
-        </plugins>
-      </build>
-    </profile>    
+                    </delete>
+                  </then>
+                </if>   
+              </tasks>
+            </configuration>
+            <goals><goal>run</goal></goals>
+          </execution>    
+        </executions>
+      </plugin>
+      
+    </plugins>
+      
+  </build>
     
-  </profiles>
-  
   <modules>
     <!-- alphabetical order for ease of maintenance -->
     <module>../BSFAnnotator</module>
@@ -372,7 +376,6 @@
     <module>../PearPackagingAntTask</module>
     <module>../RegularExpressionAnnotator</module>
     <module>../SimpleServer</module>
-    <!--module>../SimpleUimaAsService</module>  skip this - requires uima-as to have been built -->
     <module>../SnowballAnnotator</module>
     <module>../Tagger</module>
     <module>../TikaAnnotator</module>
