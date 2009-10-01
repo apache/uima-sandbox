@@ -38,7 +38,7 @@ import org.apache.uima.util.XMLInputSource;
  * The CFE tests installs a pear file
  */
 
-public class CFEtest extends TestCase {
+public class CFETest extends TestCase {
 
   // Temporary working directory, used to install the pear package
   private File tempInstallDir = null;
