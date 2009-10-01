@@ -46,13 +46,13 @@
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>local.xmlbeans.dependency</groupId>
 			<artifactId>generated-xmltypes</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/regex_annot_xml_types.jar</systemPath>
-		</dependency>
+		</dependency-->
     
     <dependency>
       <groupId>org.apache.xmlbeans</groupId>
@@ -83,6 +83,22 @@
 		<finalName>uima-an-regex</finalName>
      
 		<plugins>
+      
+      <!-- generate XML parser from .xsd file -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xmlbeans-maven-plugin</artifactId>
+        <version>2.3.3</version>
+        <executions>
+          <execution>
+            <goals><goal>xmlbeans</goal></goals>
+            <configuration>
+              <schemaDirectory>resources</schemaDirectory>
+            </configuration>        
+          </execution>
+        </executions>
+      </plugin>
+      
       <!-- build pear plugin, most settings inherited from parent POM -->      
       <plugin>
         <groupId>org.apache.uima</groupId>
