@@ -35,7 +35,7 @@
     <artifactId>uimaj</artifactId> <!-- don't need to build this project as a sandbox proj -->
     <!-- version cannot be a ${xxx} form -->
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>..</relativePath>
+    <relativePath>../../uimaj</relativePath>
   </parent>
      
   <build>
@@ -53,24 +53,5 @@
 	    </plugin>
     </plugins>
   </build>
-  
-  <modules>
-    <!-- alphabetical order for ease of maintenance -->
-    <module>../../BSFAnnotator</module>
-    <module>../../ConceptMapper</module>
-    <module>../../ConfigurableFeatureExtractor</module>
-    <module>../../DictionaryAnnotator</module>
-    <module>../../FsVariables</module>
-    <module>../../Lucas</module>
-    <module>../../OpenCalaisAnnotator</module>
-    <module>../../PearPackagingAntTask</module>
-    <module>../../RegularExpressionAnnotator</module>
-    <module>../../SimpleServer</module>
-    <!--module>../../SimpleUimaAsService</module>  skip this - requires uima-as to have been built -->
-    <module>../../SnowballAnnotator</module>
-    <module>../../Tagger</module>
-    <module>../../TikaAnnotator</module>
-    <module>../../WhitespaceTokenizer</module>
-  </modules>
-   
+     
 </project>
