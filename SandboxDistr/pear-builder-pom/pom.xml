@@ -82,7 +82,7 @@
               <outputDirectory>${project.build.directory}/pearPackaging</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${project.build.directory}/bin/${artifactId}</directory>
+                  <directory>${project.build.directory}/assembly-bin/${artifactId}</directory>
                   <includes><include>lib/**</include></includes>
                 </resource>
                 <resource>
