@@ -38,6 +38,7 @@
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-core</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-jxpath</groupId>
@@ -79,13 +80,15 @@
     </dependency>
 
     <!-- testing resources -->
-    <dependency>
+    <!-- uimaj-core is already "provided" and this seems to let it be 
+         available for testing
+         If you make it test scope, it removes it from the 'provided'
+         category and the main code won't compile -->
+    <!--dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-core</artifactId>
-      <!-- next scope has to be compile, not runtime, 
-           because classes needed for compiling the base -->
-      <scope>compile</scope>
-    </dependency>
+      <scope>test</scope>
+    </dependency-->
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-test-util</artifactId>
