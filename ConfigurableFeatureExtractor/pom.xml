@@ -82,7 +82,9 @@
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-core</artifactId>
-      <scope>test</scope>
+      <!-- next scope has to be compile, not runtime, 
+           because classes needed for compiling the base -->
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.uima</groupId>
@@ -199,7 +201,9 @@
               <excludes>
                 <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
                 <exclude>cfeModelGen/*</exclude> <!-- generated EMF model files -->
-                <exclude>src/test/resources/testData.txt</exclude>
+                <exclude>src/test/resources/testData*.txt*</exclude> <!-- test data -->
+                <exclude>src/test/java/example/PersonTitle*.java</exclude> <!-- generated -->
+                <exclude>src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated -->
               </excludes>
             </configuration>
           </execution>
