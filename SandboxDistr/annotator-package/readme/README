@@ -27,7 +27,8 @@ Finally, there is an addon to the base UIMA:
  - FsVariables
  
 Each component has a separate LICENSE and NOTICE files;  some also 
-have Readme and other documentation (in docs/). 
+have Readme and other documentation (in docs/). Documentation
+is also available on the UIMA website, in the Sandbox area. 
 
 Disclaimer
 -----------
