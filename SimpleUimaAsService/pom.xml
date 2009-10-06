@@ -25,35 +25,20 @@
 	<version>2.3.0-incubating-SNAPSHOT</version>
 	<name>Apache UIMA Simple AS Service</name>
 	<url>http://incubator.apache.org/uima</url>
+	
+	<parent>
+		<groupId>org.apache.uima</groupId>
+		<artifactId>SandboxDistr</artifactId>
+		<version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+		<relativePath>../SandboxDistr</relativePath>
+	</parent>
+	
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.uima</groupId>
-			<artifactId>uimaj-core</artifactId>
-			<version>2.3.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.4</version>
-		</dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-        	<groupId>org.apache.uima</groupId>
-        	<artifactId>uimaj-as-core</artifactId>
-        	<version>2.3.0-incubating-SNAPSHOT</version>
-        	<scope>compile</scope>
-        </dependency>
         <dependency>
         	<groupId>org.apache.uima</groupId>
         	<artifactId>uimaj-as-activemq</artifactId>
         	<version>2.3.0-incubating-SNAPSHOT</version>
-        	<scope>compile</scope>
+        	<scope>provided</scope>
         </dependency>
         <dependency>
 	      <groupId>org.apache.uima</groupId>
@@ -64,86 +49,6 @@
 	</dependencies>
 	<build>
 		<finalName>simple-uima-as-service</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-			<plugin>
-		        <groupId>org.codehaus.mojo</groupId>
-		        <artifactId>buildnumber-maven-plugin</artifactId>
-		        <executions>
-		          <execution>
-		            <phase>process-classes</phase>
-		            <goals>
-		              <goal>create</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		        <configuration>
-		          <format>{0,date,yyyy-MM-dd HH:mm:ss}</format>
-		          <items>
-		            <item>timestamp</item>
-		          </items>
-		        </configuration>
-	      	</plugin>
-      
-      		<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>CopyLicenseNoticeDisclaimer</id>
-						<phase>process-resources</phase>
-						<configuration>
-							<tasks>                    
-                				<copy todir="target/classes/META-INF">
-                  					<fileset dir="." includes="LICENSE.txt NOTICE.txt DISCLAIMER"/>
-                				</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-				</executions>
-			</plugin>
-              
-	        <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-jar-plugin</artifactId>
-		        <configuration>
-		          <archive>
-		            <manifestEntries>
-		              <Project-Title>Apache UIMA</Project-Title>
-		              <Implementation-Title>${pom.name}</Implementation-Title>
-		              <Implementation-Version>${pom.version}</Implementation-Version>
-		              <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
-		              <Implementation-Url>${pom.url}</Implementation-Url>
-					        <Implementation-License>http://www.apache.org/licenses/LICENSE-2.0.txt</Implementation-License>
-		              <Build-Date>${buildNumber}</Build-Date>
-		            </manifestEntries>
-		          </archive>
-		        </configuration>
-      		</plugin> 
-			
-		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>ApacheIncubatorRepository</id>
-			<url>http://people.apache.org/repo/m2-incubating-repository/</url>
-		</repository>
-	</repositories>
 </project>
 
