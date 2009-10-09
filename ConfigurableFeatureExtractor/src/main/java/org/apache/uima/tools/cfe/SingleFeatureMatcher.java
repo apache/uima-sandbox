@@ -102,25 +102,6 @@ public class SingleFeatureMatcher
         this(feat_class_name, full_feat_path, exclude, quiet, new PatternFeatureValues(pattern));
     }
 
-    public boolean equals(Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof SingleFeatureMatcher)) {
-            return false;
-        }
-        SingleFeatureMatcher other = (SingleFeatureMatcher)obj;
-        if (!m_feature_matcher.equals(other.m_feature_matcher) ||
-            ((null == m_feature_values) && (null != other.m_feature_values)) ||
-            ((null != m_feature_values) && !m_feature_values.equals(other.m_feature_values)) ||
-            (m_exclude != other.m_exclude)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
-
     public boolean matches (MatchedValue mv, List<MatchedValue> matchedValues)
     throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
     {

@@ -46,24 +46,6 @@ public class TargetAnnotationDescriptor
         m_priorityOrder = priorityOrder;
    }
     
-    public boolean equals(Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof TargetAnnotationDescriptor)) {
-            return false;
-        }
-        TargetAnnotationDescriptor other = (TargetAnnotationDescriptor)obj;
-        if (!m_class_name.equals(other.m_class_name) ||
-            !m_enclosing_annotation_name.equals(other.m_enclosing_annotation_name) ||
-            !m_target_annotation_matcher.equals(other.m_target_annotation_matcher) ||
-            !m_feature_annotation_matchers.equals(other.m_feature_annotation_matchers)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
     String getClassName ()
     {
         return m_class_name;

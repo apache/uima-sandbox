@@ -88,20 +88,21 @@ public class OffsetDiff
         public String printImage()
         {
             ++m_printed;
-            String image = m_toks[0] + "|" + m_toks[1];
+            StringBuilder image = new StringBuilder(m_toks[0] + "|" + m_toks[1]);
             for (int i = 2; i < m_toks.length; ++i) {
-                image += "|" + m_toks[i];
+                image.append("|");
+                image.append(m_toks[i]);
             }
-            return image;
+            return image.toString();
         }
         
         String printNullImage()
         {
-            String image = "|"; // for begin/end
+            StringBuilder image = new StringBuilder("|"); // for begin/end
             for (int i = 2; i < m_toks.length; ++i) {
-                image += "|";
+                image.append("|");
             }
-            return image;
+            return image.toString();
         }
 
         public int compare (Span other)
@@ -293,8 +294,8 @@ public class OffsetDiff
         File fs = new File(filename);
         if (fs.exists()) {
             int cnt = 0;
-            BufferedReader in = new BufferedReader(new FileReader(fs));
             try {
+                BufferedReader in = new BufferedReader(new FileReader(fs));
                 while (null != (line = in.readLine())) {
                     cnt++;
                     if (line.startsWith("#")) {
@@ -305,8 +306,9 @@ public class OffsetDiff
                         result.add(s);
                     }        
                 }
+                in.close();
             }
-            catch (Exception e) {
+            catch (IOException e) {
                 System.err.println(filename + ": failed to read " + cnt +" line"); 
             }
         }

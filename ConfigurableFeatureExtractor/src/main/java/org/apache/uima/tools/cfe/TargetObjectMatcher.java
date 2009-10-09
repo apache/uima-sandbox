@@ -43,23 +43,7 @@ public class TargetObjectMatcher
     static private final String KEYWORD_SORT = "sort";
     
     
-    public boolean equals (Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof TargetObjectMatcher)) {
-            return false;
-        }
-        TargetObjectMatcher other = (TargetObjectMatcher)obj;
-        if (!m_root_class.equals(other.m_root_class) ||
-            !isTargetClassMatches(other.m_target_class, true) ||
-            !m_target_path_tokens.equals(other.m_target_path_tokens)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-    
+
     private TargetObjectMatcher (Class<?> target_class, String[] full_target_path_tokens, boolean delimit_array_values)
     throws ClassNotFoundException
     {
@@ -112,14 +96,14 @@ public class TargetObjectMatcher
 
     String getFeaturePathImage ()
     {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < m_target_path_tokens.length; ++i) {
             if (0 != i) {
-                result += "_";
+                result.append("_");
             }
-            result += m_target_path_tokens[i];
+            result.append(m_target_path_tokens[i]);
         }
-        return result;
+        return result.toString();
     }
 
     boolean isDetached()

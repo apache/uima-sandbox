@@ -61,10 +61,12 @@ public class UIMAFeatureMatcher extends CommonFeatureMatcher
         for (Iterator<MatchedAnnotationDescriptor> feat_it = features.iterator(); feat_it.hasNext();) {
             MatchedAnnotationDescriptor mad = feat_it.next();
             ComparableArray key = new ComparableArray(
-                new Integer[] {new Integer(mad.m_feature_mv.getAnnotation().getEnd()),
-                               new Integer(mad.m_feature_mv.getAnnotation().getBegin()),
-                               new Integer(mad.m_orderIndex),
-                               new Integer(m_featureImages.size())});
+                new Integer[] {
+                        Integer.valueOf(mad.m_feature_mv.getAnnotation().getEnd()),
+                        Integer.valueOf(mad.m_feature_mv.getAnnotation().getBegin()),
+                        Integer.valueOf(mad.m_orderIndex),
+                        Integer.valueOf(m_featureImages.size())
+                 });
             
             String feature = make_UIMA_feature(mad, make_image(mad, trg));
             m_featureImages.put(key, group_label + m_fieldSeparator + feature);

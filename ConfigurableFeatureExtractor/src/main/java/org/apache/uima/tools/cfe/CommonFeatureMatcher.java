@@ -154,9 +154,10 @@ public abstract class CommonFeatureMatcher
             AnnotationMatchedValue trg_mv = it.next();
             Map<String, Collection<MatchedAnnotationDescriptor>> target_feature_groups =
                 m_feature_annotations.get(trg_mv);
-            for (Iterator<String> sf_it = target_feature_groups.keySet().iterator(); sf_it.hasNext();) {
-                String class_label = sf_it.next();
-                Collection<MatchedAnnotationDescriptor> features = target_feature_groups.get(class_label);
+            
+            for (Map.Entry<String, Collection<MatchedAnnotationDescriptor>> entry : target_feature_groups.entrySet()) {
+                String class_label = entry.getKey();
+                Collection<MatchedAnnotationDescriptor> features = entry.getValue();
                 processFeatureGroup(jcas, trg_mv.getAnnotation(), class_label, features);
             }
         }

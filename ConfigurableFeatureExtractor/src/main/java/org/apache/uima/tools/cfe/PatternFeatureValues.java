@@ -30,21 +30,6 @@ public class PatternFeatureValues implements FeatureValues
         m_pattern = Pattern.compile(pattern);
     }
     
-    public boolean equals(Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof PatternFeatureValues)) {
-            return false;
-        }
-        PatternFeatureValues other = (PatternFeatureValues)obj;
-        if (m_pattern == other.m_pattern) {
-            return super.equals(obj);
-        }
-        return false;
-    }
-
     public boolean matches (Object feature)
     {
         return m_pattern.matcher(getFeatureImage(feature)).find();

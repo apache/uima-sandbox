@@ -35,7 +35,7 @@ public class MatchedSingleFeatureMatcher
     
     String getFeatureImage(boolean feat_name, String[] value_separators)
     {
-        String result = "";
+        StringBuffer result = new StringBuffer("");
         ArrayDelimiterObject max_level = null;
         if (!m_values.isEmpty()) {
             // first element must be max_level
@@ -50,15 +50,17 @@ public class MatchedSingleFeatureMatcher
             if (obj instanceof ArrayDelimiterObject) {
                 ArrayDelimiterObject ado = (ArrayDelimiterObject)obj; 
                 int ind = Math.min(max_level.m_level - ado.m_level, value_separators.length - 1);
-                result += value_separators[ind];
+                result.append(value_separators[ind]);
             }
             else {
-                result += m_matcher.m_feature_values.getFeatureImage(obj);
+                result.append(m_matcher.m_feature_values.getFeatureImage(obj));
             }
         }
         if (feat_name) {
-            result = m_matcher.m_feature_matcher.getFeaturePathImage() + value_separators[0] + result;
+            return m_matcher.m_feature_matcher.getFeaturePathImage() + value_separators[0] + result;
         }
-        return result;
+        else {
+            return result.toString();
+        }
     }
 }

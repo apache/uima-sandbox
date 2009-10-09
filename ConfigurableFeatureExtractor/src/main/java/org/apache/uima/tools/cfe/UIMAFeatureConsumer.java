@@ -21,6 +21,7 @@ package org.apache.uima.tools.cfe;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.uima.cas.CAS;
@@ -83,7 +84,10 @@ public class UIMAFeatureConsumer
             File f = new File(m_outdir);
             if (!f.exists()) {
                 System.err.println("Directory " + m_outdir + " does not exist, creating");
-                f.mkdirs();
+                if (!f.mkdirs()) {
+                    throw new IOException(
+                            String.format("failed to create an output directory \"%s\"", m_outdir));
+                }
             }
             
             FileOutputStream fos = new FileOutputStream(m_outdir + "/" + docId + ".fve");

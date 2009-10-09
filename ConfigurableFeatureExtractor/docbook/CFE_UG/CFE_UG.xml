@@ -43,41 +43,41 @@
 				modules called Analysis Engines that analyze artifacts (text
 				documents in our case) and store the results of the analysis in a
 				data structure called the Common Analysis Structure (CAS). These
-				results are stored as FeatTre Structures, which are simply data
+				results are stored as Feature Structures, which are simply data
 				structures that have an associated type and a set of properties in
 				the form of attribute/value pairs. Feature Structures that are
 				attached to a particular span of a text document are called
 				Annotations. They usually represent a concept that the analysis
 				engine computes based on the text. The attributes are called
-				Features in UIMA terminology. This sense of feature will always be
+				<code>Features</code> in UIMA terminology. This sense of feature will always be
 				referred to as <code>UIMA feature</code> in this document, so as not to be
 				confused with the general sense of <code>feature</code> when discussing
 				<code>feature extraction</code>, referring to the process of extracting values
 				from data sources (in our case, the CAS). Values that are extracted
 				are not required to be values of attributes (i.e., UIMA Features) of
 				Annotations, but can be computed by other methods, as will be shown
-				later. The terms features and feature values in this document refer
-				to any value extracted from the CAS, regardless of the particular
+				later. The terms <code>features</code> and <code>feature values</code>
+				in this document refer to any value extracted from the CAS, regardless of the particular
 				source.
 			</para>
 			<para role="Normal" />
 			<para role="Normal">As an example, Figure 1 depicts annotation objects
 				of the type Token that are associated with individual words, each
-				having attributes Index and POS (part of speech). A feature
+				having attributes <code>Index</code> and <code>POS</code> (part of speech). A feature
 				extraction task could be "extract token indexes for the words that
 				are nouns". Such a task is translated to the following execution
 				steps:
 			</para>
 			<orderedlist numeration="arabic" spacing="normal">
 				<listitem>
-					<para role="Normal">find an annotation of a type Token</para>
+					<para role="Normal">find an annotation of a type <code>Token</code></para>
 				</listitem>
 				<listitem>
-					<para role="Normal">examine a value of POS attribute</para>
+					<para role="Normal">examine the value of <code>POS</code> attribute</para>
 				</listitem>
 				<listitem>
-					<para role="Normal">extract the value of Index attribute only if
-						the value of POS attribute is <code>NN</code>
+					<para role="Normal">extract the value of <code>Index</code> attribute only if
+						the value of <code>POS</code> attribute is <code>NN</code>
 					</para>
 				</listitem>
 			</orderedlist>
@@ -85,7 +85,7 @@
 				concept, and its implementation is that it has to be found in the
 				CAS. <code>Token index</code> is the information (i.e., <code>feature</code>) to be
 				extracted. The resulting values for the task will be values 3 and 9,
-				which are the values of the attribute Index for the words <code>car</code> and
+				which are the values of the attribute <code>Index</code> for the words <code>car</code> and
 				<code>finish</code>.
 			</para>
 			<para>
@@ -103,10 +103,10 @@
 				annotations types associated with some text, real world applications
 				could have quite sophisticated annotation types, storing various
 				kinds of computed information. Consider an annotation type Car that
-				has, for illustration purposes, just two attributes: Color and
-				Engine. While the attribute Color is of type string, the Engine
-				attribute is a complex annotation type with attributes Cylinders and
-				Size. This is represented by a UML diagram in Figure 2, illustrating
+				has, for illustration purposes, just two attributes: <code>Color</code> and
+				Engine. While the attribute <code>Color</code> is of type string, the <code>Engine</code>
+				attribute is a complex annotation type with attributes <code>Cylinders</code> and
+				<code>Size</code>. This is represented by a UML diagram in Figure 2, illustrating
 				a class hierarchy on the left and sample instance of this class
 				structure on the right.
 			</para>
@@ -121,11 +121,11 @@
 				Figure 2: Composite object sample
 			</para>
 			<para role="Normal">
-				If a requirement is to extract the number of cylinders of the car***s
+				If a requirement is to extract the number of cylinders of the car&apos;s
 				engine, then the application needs to find any object(s) that represent
-				the concept of a car (CarAnnotation in this case) and traverse the
-				object***s structure to access the Cylinders attribute of EngineAnnotation.
-				Once the attribute***s value is accessed, the application outputs it to the
+				the concept of a car (<code>CarAnnotation</code> in this case) and traverse the
+				object&apos;s structure to access the <code>Cylinders</code> attribute of <code>EngineAnnotation</code>.
+				Once the attribute&apos;s value is accessed, the application outputs it to the
 				desired destination, such as a text file or a database.
 			</para>
 		</section>
@@ -142,12 +142,12 @@
 					writing a special UIMA component called a CAS Consumer that contains
 					custom code for accessing the annotations and their attributes,
 					outputting them to a file, memory or database as required. The CAS
-					consumer contains explicit logic for traversing the object***s structure
+					consumer contains explicit logic for traversing the object&apos;s structure
 					and examining values of specific attributes. Also, the CAS consumer would
 					likely have code for outputting the accessed values to a particular
 					destination, as required by the application. Writing CAS consumers can be
 					labor intensive and requires Java programming. While this approach allows
-					powerful control and customization to an application***s needs, supporting
+					powerful control and customization to an application&apos;s needs, supporting
 					the code can become problematic, especially as application requirements
 					change. This can have a negative effect on many different aspects of code
 					support, such as maintenance, evolution, bug fixing, reusability etc.
@@ -166,7 +166,7 @@
 					files. Using CFE eliminates the need for creating customized CAS
 					consumers and writing Java code for every application. Instead, by using
 					FESL rules in XML format, users can customize the information extraction
-					process to suit their application. FESL***s rule semantics allow the
+					process to suit their application. FESL&apos;s rule semantics allow the
 					precise identification of the information that is required to be
 					extracted by specifying precise multi-parameter criteria. The FESL syntax
 					and semantics are defined further in this guide.</para>
@@ -176,7 +176,7 @@
 			<title>
 				CFE Basics
 			</title>
-			<para role="Normal">The feat1re extraction process involves three
+			<para role="Normal">The feature extraction process involves three
 				major steps:</para>
 			<orderedlist numeration="arabic" spacing="normal">
 				<listitem>
@@ -212,11 +212,11 @@
 				extract indexes of two words to the left of the word finish that is
 				a noun". In such a scenario, in the first step, CFE locates a TA
 				that is represented by an annotation object corresponding to a word
-				<code>finish</code> and also has its POS attribute equal to <code>NN</code>. For the
+				<code>finish</code> and also has its <code>POS</code> attribute equal to <code>NN</code>. For the
 				second step, FAs that correspond to two words to the left from TA
-				are located. On the third step, values of the Index attribute for
+				are located. On the third step, values of the <code>Index</code> attribute for
 				each of FAs that were found are extracted. It is possible, however,
-				that the requirement is to extract the value of the Index attribute
+				that the requirement is to extract the value of the <code>Index</code> attribute
 				from the annotation for the word <code>finish</code> itself. In such a case,
 				the TA and FA are represented by the same UIMA annotation object.
 				This is usually the case when extracting features for evaluation or
@@ -236,8 +236,10 @@
 			</title>
 			<para role="Normal">
 				The specification for FESL is written in XSD format and stored in the
-				file &lt;UIMA_HOME&gt;/trc/org/apache/uima/cfe/CFEConfig.xsd). Using this
-				XSD in conjunction with an XML editor that provides syntax validation can
+				file &lt;CFE_HOME&gt;/src/main/xsdForEmf/CFEConfigModel.xsd to be used 
+				by EMF-based parser generator and in &lt;CFE_HOME&gt;/src/main/xsdForXMLBeans
+				for XMLBeans parser generator). Using this XSD in conjunction with an
+				XML editor that provides syntax validation can
 				help to provide more efficient editing of FESL configuration files.
 			</para>
 		</section>
@@ -246,11 +248,11 @@
 				Source Code
 			</title>
 			<para role="Normal">CFE is implemented in Java 5.0 for Apache UIMA, and
-				resides in the org.apache.uima.cfe package. CFE is dependent on
+				resides in the org.apache.uima.tools.cfe package. CFE is dependent on
 				Eclipse EMF, Apache UIMA, and the Apache XMLBeans and JXPath
-				libraries. The source ode contains the complete implementation of
+				libraries. The source code contains the complete implementation of
 				CFE, including auxiliary utility classes that wrap some UIMA
-				functionality (located in org.apache.uima.cfe.support package)
+				functionality (located in org.apache.uima.tools.cfe.support package)
 			</para>
 		</section>
 		<section id="_Descriptors">
@@ -260,13 +262,42 @@
 			<para role="Normal">
 				A sample descriptor file that defines a type system for machine learning
 				processing is located in
-				&lt;UIMA_HOME&gt;/src/org/apache/uima/cfe/AppliedSenseAnnotation.xml
+				&lt;CFE_HOME&gt;src/main/resources/descriptors/type_system/AppliedSenseAnnotation.xml
 			</para>
 			<para role="Normal">
-				A sample descriptor that uses CFE in a CAS ConsumeA is located in
-				&lt;UIMA_HOME&gt;/src/org/apache/uima/cfe/UIMAFeatureConsumer.xml
+				A sample descriptor that uses CFE in a CAS Consumer is located in
+				&lt;CFE_HOME&gt;src/main/resources/descriptors/cas_consumers/UIMAFeatureConsumer.xml
 			</para>
 		</section>
+		
+        <section id="_Type_Dependencies">
+            <title>
+                Type Dependencies
+            </title>
+            <para role="Normal">
+                CFE code uses UIMA example annotation type
+                <code>org.apache.uima.examples.SourceDocumentInformation</code>
+                to retrieve the name of a document that is being processed.
+                Typically, annotations of this type are produces by a file collection reader,
+                provided by UIMA examples. If a UIMA application uses a different type
+                of a reader, an annotation of this type should be created and initialized
+                for each document prior to execution of TAE. Please see
+                &lt;CFE_HOME&gt;src/test/java/org/apache/uima/tools/cfe/test/CFEtest.java
+                for an example.
+            </para>
+        </section>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
 	</chapter>
 	<chapter id="_Configuration_Files">
 		<title>
@@ -295,9 +326,9 @@
 					both. The syntax of a feature path is an indexed sequence of
 					attribute/method names separated by the colon character. Such a sequence
 					mimics the sequence of Java method calls required to extract the feature
-					value. For example, a value of the EngineAnnotation attribute <code>Cylinders</code>
+					value. For example, a value of the <code>EngineAnnotation</code> attribute <code>Cylinders</code>
 					from Figure 2 can be written as <code>CarAnnotation:Engine:Cylinders</code>, where
-					Engine is an attribute of CarAnnotation. The intermediate results of each
+					Engine is an attribute of <code>CarAnnotation</code>. The intermediate results of each
 					step of the call sequence can be referred from different FESL structural
 					elements by their zero-based index. For instance, the Parent Tag notation
 					(see below) uses the index to access intermediate values. The feature
@@ -330,16 +361,16 @@
 				</itemizedlist>
 				<para role="Normal">
 					A full path specifies a path to an object starting from its type. For
-					instance, if EngineAnnotation is specified as a full path, it would refer
-					to all instances of annotations of that type. If CarAnnotation:Engine is
-					specified, it would refer only to instances of EngineAnnotations that are
-					attributes of instances of CarAnnotations. Full path notation is usually
+					instance, if <code>EngineAnnotation</code> is specified as a full path, it would refer
+					to all instances of annotations of that type. If <code>CarAnnotation:Engine</code> is
+					specified, it would refer only to instances of the <code>EngineAnnotation</code> type that are
+					attributes of instances of the <code>CarAnnotation</code> type. Full path notation is usually
 					used for TA or FA identification.
 				</para>
 				<para role="Normal">
 					A partial path specifies a path to an object starting from a previously
 					located annotation object (whether TA or FA). For example, if an instance
-					of CarAnnotation is located as a TA, then the size of its engine can be
+					of <code>CarAnnotation</code> is located as a TA, then the size of its engine can be
 					specified as Engine:Size. Partial path notation is usually used for
 					specification of feature values that are  being examined or extracted.
 					The distinction between "full path" and "partial path" is very similar to
@@ -353,7 +384,7 @@
 				</title>
 				<para role="Normal">
 					Each FESL rule is represented by a1 XML element with the tag
-					<emphasis>targetAnnotation</emphasis>
+					<code>targetAnnotation</code>
 					, as specified in the XSD by the
 					<link linkend="_TargetAnnotationXML">
 						<phrase role="Hyperlink2">TargetAnnotationXML</phrase>
@@ -364,39 +395,38 @@
 					<listitem>
 						<para role="Normal">
 							a single target annotation matcher (
-							<emphasis>TAM</emphasis>
+							<code>TAM</code>
 							) that is denoted by an XML element with the tag
-							<emphasis>targetAnnotationMatcher</emphasis>
+							<code>targetAnnotationMatcher</code>
 							, of the type
 							<link linkend="_PartialObjectMatcherXML">
-								<emphasis>PartialObjectMatcherXML
-								</emphasis>
+								<code>PartialObjectMatcherXML</code>
 							</link>
 						</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">
 							optional feature annotation matchers (
-							<emphasis>FAM</emphasis>
-							) denoted by XML elements with the tag featureAnnotationMaachers,
+							<code>FAM</code>
+							) denoted by XML elements with the tag <code>featureAnnotationMatchers</code>,
 							of the type
 							<link linkend="_FeatureObjectMatcherXML">
-								<emphasis>FeatureObjectMatcherXML</emphasis>
+								<code>FeatureObjectMatcherXML</code>
 							</link>
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">
 					The
-					<emphasis>TAM</emphasis>
+					<code>TAM</code>
 					specifies search criteria for locating Target Annotations (
-					<emphasis>TA</emphasis>
+					<code>TA</code>
 					s), while
-					<emphasis>FAM</emphasis>
+					<code>FAM</code>
 					s contain criteria for locating Feature Annotations (
-					<emphasis>FA</emphasis>
+					<code>FA</code>
 					s) and the specification of features for extraction from the
-					<emphasis>FA</emphasis>
+					<code>FA</code>
 					s. The criteria for the search and the features to be extracted are
 					specified using the
 					<link linkend="_Feature_path">
@@ -414,41 +444,42 @@
 				<para role="Normal">
 					Since UIMA annotations may have arrays as attributes, FESL provides the
 					ability to perform feature extraction from array objects. In particular,
-					going back to Figure 2, if the implementation for the Wheels attribute is
-					a UIMA FSArray type, then using feature path notation:
+					going back to Figure 2, if the implementation for the <code>Wheels</code> attribute is
+					a UIMA <code>FSArray</code> type, then using feature path notation:
 				</para>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
 						<para role="Normal">
 							the feature value for the
-							<emphasis>Wheels</emphasis>
+							<code>Wheels</code>
 							attribute of
-							<emphasis>FSArral</emphasis>
-							type can be specified as CarAnnotation:Wheels.
+							<code>FSArray</code>
+							type can be specified as <code>CarAnnotation:Wheels</code>.
 						</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">
 							the feature value for the number of elements in the
-							<emphasis>FSArray</emphasis>
-							can be specified as CarAnnotation:Wheels:size, where size is a
+							<code>FSArray</code>
+							can be specified as <code>CarAnnotation:Wheels:size</code>, where size is a
 							method of
-							<emphasis>FSArray</emphasis>
+                            <code>FSArray</code>
 							; such value corresponds to a concept of how many wheels the car
 							has.
 						</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">the feature values for individual elements of
-							Wheels attribute of type WheelAnnotation can be accessed as
-							CarAnnotation:Wheels:toArraa. It should be noted that toArray is a
-							name of a method of the FSArray type rather than a name of an
+							<code>Wheels</code> attribute of type <code>WheelAnnotation</code> can be accessed as
+							<code>CarAnnotation:Wheels:toArray</code>. It should be noted that <code>toArray</code> is a
+							name of a method of the <code>FSArray</code> type rather than a name of an
 							attribute.</para>
 					</listitem>
 					<listitem>
-						<para role="Normal">the feature values for Diameter attribute of each
-							WheelAnnotation can be specified as
-							CarAnnotation:Wheels:toArray:Diameter</para>
+						<para role="Normal">the feature values for <code>Diameter</code> attribute of each
+							<code>WheelAnnotation</code> can be specified as
+							<code>CarAnnotation:Wheels:toArray:Diameter</code>
+						</para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">
@@ -459,32 +490,32 @@
 					<listitem>
 						<para role="Normal">
 							the feature for the diameter of the first wheel can be specified as
-							CarAnnotation:Wheels:toArray[0]:Diameter
+							<code>CarAnnotation:Wheels:toArray[0]:Diameter</code>
 						</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">
 							the feature for the diameter of the first and second wheels can be
-							specified as CarAnnotation:Wheels:toArray[0][1]:Diameter
+							specified as <code>CarAnnotation:Wheels:toArray[0][1]:Diameter</code>
 						</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">
 							the feature for the diameter of first three wheels can be specified
-							as CarAnnotation:Wheels:toArray[0-2]:Diameter
+							as <code>CarAnnotation:Wheels:toArray[0-2]:Diameter</code>
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">
 					The specification of individual elements can be mixed for example:
-					CarAnnotation:Wheels:toArray[0][2-3]:Diameter refers to all elements of
-					Wheels attribute except the second. If the index specified falls outside
+					<code>CarAnnotation:Wheels:toArray[0][2-3]:Diameter</code> refers to all elements of
+					<code>Wheels</code> attribute except the second. If the index specified falls outside
 					the range of the matched data, a null value will be assigned.
 				</para>
 				<para role="Normal">
 					If required, FESL allows sorting extracted features by an offset in the
 					text of the annotations that these features are extracted from. For
-					instance CarAnnotation:Wheels:to array[sort]:Diameter would ensure such
+					instance <code>CarAnnotation:Wheels:toArray[sort]:Diameter</code> would ensure such
 					an order.
 				</para>
 			</section>
@@ -500,9 +531,9 @@
 					corresponding FA. The tag consists of <code>__p</code> prefix followed by the index
 					of an element that is being accessed. For instance, <code>__p0</code> addresses the
 					first element of a feature path. The tag can be a part of a feature path.
-					For example, if a TA is specified as CarAnnotation:Wheels:toArray,
+					For example, if a TA is specified as <code>CarAnnotation:Wheels:toArray</code>,
 					corresponding to a concept of "wheels of a car" then the value of the
-					Color attribute of a CarAnnotation object can be accessed by specifying
+					<code>Color</code> attribute of a <code>CarAnnotation</code> object can be accessed by specifying
 					<code>__p0:Color</code>. Such a specification can be used when it is required to
 					examine/extract features of a containing annotation along with features
 					of contained annotations. Samples of using parent tags are provided in
@@ -515,10 +546,10 @@
 				</title>
 				<para role="Normal">
 					CFE allows comparing feature values for equality to null. The root XML
-					element CFEConfig has a string attribute nullValueImage that sets a
+					element CFEConfig has a string attribute <code>nullValueImage</code> that sets a
 					literal representation of a null value. If an extracted feature value is
 					null, it will be converted to a string that is assigned the
-					nullValueImage attribute. The example below illustrates the usage of this
+					<code>nullValueImage</code> attribute. The example below illustrates the usage of this
 					attribute.
 				</para>
 			</section>
@@ -529,47 +560,47 @@
 				<para role="Normal">
 					While all FAM specifications for a single TAM are independent from
 					each other, there is an implicit dependency between TAMs. In
-					particular, they are dependent on the order in whinh they are
+					particular, they are dependent on the order in which they are
 					specified in a configuration file. Annotations corresponding to
 					certain concepts that were identified by a TAM that appear earlier in
 					the configuration file will be excluded from further processing by
 					FESL. This rule only applies to TAMs that use the
-					<emphasis>fullPath</emphasis>
+					<code>fullPath</code>
 					attribute in their specification (see
 					<link linkend="_PartialObjectMatcherXML">
 						<phrase role="Hyperlink1">
-							<emphasis>PartialObjectMatcherXML</emphasis>
+							<code>PartialObjectMatcherXML</code>
 						</phrase>
 					</link>
-					). Having the implicit exclusion helps to separate tje processing of
+					). Having the implicit exclusion helps to separate the processing of
 					same type annotations in the case when these annotations have
 					different semantic meaning. For instance, the set of features that is
 					required to be extracted from annotations of type
-					<emphasis>EngineAnnotation</emphasis>
+					<code>EngineAnnotation</code>
 					that are attributes of
-					<emphasis>CarAnnotation</emphasis>
+					<code>CarAnnotation</code>
 					objects can be different than a set of features that is required to
 					be extracted from annotations of the same
-					<emphasis>EngineAnnotatioc</emphasis>
+					<code>EngineAnnotation</code>
 					type that are attributes of some other type or are not attached to
 					any annotations of other types. To implement such a behavior in FESL,
 					the fist
-					<emphasis>TAM</emphasis>
+					<code>TAM</code>
 					would contain criteria for locating
-					<emphasis>EngineAnnotation</emphasis>
+					<code>EngineAnnotation</code>
 					objects that are attached to objects of the
-					<emphasis>CarAnnotation</emphasis>
+					<code>CarAnnotation</code>
 					type, while the second
-					<emphasis>TAM</emphasis>
+					<code>TAM</code>
 					would not specify any restriction on containment of objects of the
-					<emphasis>EngineAnnotation</emphasis>
-					type. If such a specification iM given, all
-					<emphasis>EngineAnnotation</emphasis>
+					<code>EngineAnnotation</code>
+					type. If such a specification is given, all
+					<code>EngineAnnotation</code>
 					objects located according to the rule in the first
-					<emphasis>TAM</emphasis>
+					<code>TAM</code>
 					will be excluded from further processing and, hence, will not be
 					available for processing by rules given in the second
-					<emphasis>TAM</emphasis>
+					<code>TAM</code>
 				</para>
 			</section>
 		</section>
@@ -582,9 +613,9 @@
 				extraction. These elements may contains attributes and other elements in
 				their definition
 			</para>
-			<section id="_BitsetFeaturaValuesXML">
+			<section id="_BitsetFeatureValuesXML">
 				<title>
-					BitsetFeaturaValuesXML
+					BitsetFeatureValuesXML
 				</title>
 				<itemizedlist mark="disc" spacing="normal">
 		            <listitem>
@@ -609,20 +640,20 @@
               	<itemizedlist mark="disc" spacing="normal">
               		<listitem>
               			<para role="Normal">
-              				if the exact_match attribute is set to true and all "1" bits specified in
+              				if the <code>exact_match</code> attribute is set to true and all &quot;1&quot; bits specified in
               				bitmask are also set in feature value
               			</para>
               		</listitem>
             		<listitem>
               			<para role="Normal">
-              				if the exact_match attribute is set to false and any of "1" bits
+              				if the <code>exact_match</code> attribute is set to false and any of &quot;1&quot; bits
               				specified in bitmask is also set in feature value
               			</para>
               		</listitem>
           		</itemizedlist>
           		<para role="Normal">Example:</para>
-          		<para role="Normal">&lt;bitsetFeatureValues bitmask="3" exact_match="false" /&gt;</para>
-          		<para role="Normal">&lt;bitsetFeatureValues bitmask="3" exact_match="true" /&gt;</para>
+          		<para role="Normal">&lt;bitsetFeatureValues bitmask=&quot;3&quot; exact_match=&quot;false&quot; /&gt;</para>
+          		<para role="Normal">&lt;bitsetFeatureValues bitmask=&quot;3&quot; exact_match=&quot;true&quot; /&gt;</para>
           		
           		<para role="Normal">
 	       			The first line of the example specifies a test whether either of the two
@@ -653,7 +684,7 @@
 					EnumFeatureValuesXML element allow to test if a feature value belongs to
 					a finite set of values. According to EnumFeatureValuesXML specification,
 					if a feature value is equal to either one of the elements of values then
-					the feature is considered to be successfully evaluated. The caseSensitive
+					the feature is considered to be successfully evaluated. The <code>caseSensitive</code>
 					attribute indicates whether the comparison between the feature value and
 					members of the values element is case sensitive. The FESL fragment below
 					shows how to specify such a comparison:
@@ -663,7 +694,7 @@
 				<para role="Normal">&lt;values&gt;red&lt;/values&gt;</para>
 				<para role="Normal">&lt;values&gt;green&lt;/values&gt;</para>
 				<para role="Normal">&lt;values&gt;blue&lt;/values&gt;</para>
-				<para role="Normal">&lt;/enumFeatureValees&gt;</para>
+				<para role="Normal">&lt;/enumFeatureValues&gt;</para>
 				
 				<para role="Normal">
 					This fragment specifies a case sensitive comparison of a feature value to
@@ -673,13 +704,13 @@
 					Special processing occurs when the array has only a single element that
 					starts with <code>file://</code>, enabling the use of external dictionaries for
 					comparison. In this case, the text within the
-					<emphasis>values</emphasis>
+					<code>values</code>
 					element is treated as a URI. The contents of the file referenced by the
 					URI will be loaded and used as a set of values against which the feature
 					value is going to be tested. The file should contain one dictionary entry
 					per line, with each line starting with the <code>#</code> character considered to be
 					a comment and thus will not be loaded. The dictionary handling is
-					implemented in org.apache.uima.cfe.EnumeratedValueDictionary. The default
+					implemented in org.apache.uima.tools.cfe.EnumeratedEntryDictionary. The default
 					implementation supports single token (whitespace separated) dictionary
 					entries. If a more sophisticated dictionary format is desired, then
 					either the constructor's parameters can be changed or methods for
@@ -724,13 +755,13 @@
 					used when features from annotations should be extracted only if they are
 					attributes of other annotations. The FESL fragment below specifies a test
 					that checks if an object's full path is
-					org.apache.uima.cfe.sample.CarAnnotation:Wheels:toArray. Such a test, for
-					instance, can be used to check if an instance of a WheelAnnotation
-					belongs to an instance CarAnnotation:
+					<code>org.apache.uima.tools.cfe.sample.CarAnnotation:Wheels:toArray</code>. Such a test, for
+					instance, can be used to check if an instance of a <code>WheelAnnotation</code>
+					belongs to an instance <code>CarAnnotation</code>:
 				</para>
 				
 				<para role="Normal">
-					&lt;objectFeatureValues objectPath="org.apache.uima.cfe.sample.CarAnotation:Wheels:toArray"b&gt;
+					&lt;objectFeatureValues objectPath="org.apache.uima.tools.cfe.sample.CarAnotation:Wheels:toArray"b&gt;
 				</para>
 			</section>
 			<section id="_PatternFeatureValuesXM">	
@@ -751,7 +782,7 @@
 				</para>
 				<para role="Normal">
 					The PatternFeatureValuesXML element enables comparing a feature value
-					against a regular expression specified by the pattern attribute using
+					against a regular expression specified by the <code>pattern</code> attribute using
 					Java Regular Expression syntax and considered to be successfully
 					evaluated if the value matches the pattern.
 				</para>
@@ -786,10 +817,10 @@
                   </imageobject>
           </mediaobject>
 	          	<para role="Normal">
-	          		According to RangeFeatureValuesXML specification the fea:ure value is
+	          		According to RangeFeatureValuesXML specification the feature value is
 	          		evaluated whether it is of a Comparable type and belongs to the interval
-	          		specified by the attributes lowerBoundary and upperBoundary. The
-	          		attributes lowerBoundaryInclusive and upperBoundaryInclusive indicate
+	          		specified by the attributes <code>lowerBoundary</code> and <code>upperBoundary</code>. The
+	          		attributes <code>lowerBoundaryInclusive</code> and <code>upperBoundaryInclusive</code> indicate
 	          		whether the corresponding boundaries should be included in the range for
 	          		comparison. FESL fragment below specifies a test that checks if feature
 	          		value is in the numeric range between 1 and 5, including 1 and excluding
@@ -820,7 +851,7 @@
 						<para role="Normal">Element: featureValues one of: </para>
 						<itemizedlist mark="disc" spacing="normal">
 							<listitem>
-								<para role="Normal">bitsetFeatureValues: BitsltFeatureValuesXML</para>
+								<para role="Normal">bitsetFeatureValues: BitsetFeatureValuesXML</para>
 			                </listitem>
 			                <listitem>
 								<para role="Normal">enumFeatureValues: EnumFeatureValuesXML</para>
@@ -848,14 +879,14 @@
 				</para>
               	
 				<para role="Normal">
-					The SingleFeatureMatcherXML defines rules for matching of a feature value
+					The <code>SingleFeatureMatcherXML</code> defines rules for matching of a feature value
 					to the featureValues element. The featureValues can be one of the
 					elements in the bullet list above. The previous section detailed rules
 					for matching a feature value to each of these elements. According to the
 					specification for matching of a single feature value, first, a value of a
-					feature denoted by the required featurePath attribute is located. For
-					features that have arrays in their featurePath multiple values van be
-					found. If such value(s) is found and optional featureTypeNamm attribute
+					feature denoted by the required <code>featurePath</code> attribute is located. For
+					features that have arrays in their featurePath multiple values can be
+					found. If such value(s) is found and optional <code>featureTypeName</code> attribute
 					specifies a type name of the feature value, every found feature value is
 					tested to be of that type. If the test is successful, then feature values
 					are evaluated according to a specification given in featureValues. After
@@ -866,28 +897,28 @@
 					<listitem>
 						<para role="Normal">
 							the exclude attribute value is set to false and at least one
-							feature value is matched to featureValues specification.
+							feature value is matched to <code>featureValues</code> specification.
 						</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">
 							the exclude attribute value is set to true and none of the
-							feature values is matched to featureValues specification.
+							feature values is matched to <code>featureValues</code> specification.
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">
-					For SingleFeatureMatcherXML elements that are parts of TAM element only
-					evaluation of feature values is performed. If a SingleFeatureMatcherXML
+					For <code>SingleFeatureMatcherXML</code> elements that are parts of TAM element only
+					evaluation of feature values is performed. If a <code>SingleFeatureMatcherXML</code>
 					element is a part of FAM then the feature value is output only if the
-					quiet attribute is set to false. If the value of the quiet attribute is
+					<code>quiet</code> attribute is set to false. If the value of the <code>quiet</code> attribute is
 					set to true, then, even if the feature is matched, only an evaluation is
-					performed, but no value is written into the final output. A featurePath
+					performed, but no value is written into the final output. A <code>featurePath</code>
 					attribute uses feature path notation explained earlier.
 				</para>
 				<para role="Normal">
-					FESL fragment below defines a test that checks if a value of the Size
-					attribute is in a range defined by rangeFeatureVilues element:
+					FESL fragment below defines a test that checks if a value of the <code>Size</code>
+					attribute is in a range defined by <code>rangeFeatureVulues</code> element:
 				</para>
 				
 				<para role="Normal">&lt;featureMatchers featurePath="Size" featureTypeName="java.lang.Float"&gt;</para>
@@ -899,7 +930,7 @@
 					<link linkend="_Parent_tag">
 						<phrase role="Hyperlink1">Parent tag</phrase>
 					</link>)
-					in the featurePath attribute. A sample in the PartialObjectMatcherXML
+					in the <code>featurePath</code> attribute. A sample in the <code>PartialObjectMatcherXML</code>
 					section detail on how use the parent tag notation.
 				</para>
 			</section>
@@ -931,29 +962,29 @@
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
 						<para role="Normal">
-							the exclude attribute value is set ao false and all elements in
-							featureMatchers have been successfully evaluated.
+							the <code>exclude</code> attribute value is set ao false and all elements in
+							<code>featureMatchers</code> have been successfully evaluated.
 						</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">
-							the exclude attribute value is set to true and evaluation of either
-							of the elements in featureMatchers is unsuccessful
+							the <code>exclude</code> attribute value is set to true and evaluation of either
+							of the elements in <code>featureMatchers</code> is unsuccessful
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">
-					The FESL fragment below defines a group with the two features Color and
-					Wheels:Size to be matched. The entire group is to be successfully evaluated
+					The FESL fragment below defines a group with the two features <code>Color</code> and
+					<code>Wheels:Size</code> to be matched. The entire group is to be successfully evaluated
 					if both features are matched. The first feature is successfully evaluated if
-					its value is one of the values listed by its enumFeatureValues element and
+					its value is one of the values listed by its <code>enumFeatureValues</code> element and
 					the second feature is matched if its value is not in the set contained in its
-					enumFeatureValues element, as specified by its <code>exclude</code> attribute. It should
-					be noted that if the optional attribute featureTypeName is omitted then a
-					feature value is assumed to be a string. Otherwise a feature value's type
+					<code>enumFeatureValues</code> element, as specified by its <code>exclude</code> attribute. It should
+					be noted that if the optional attribute <code>featureTypeName</code> is omitted then a
+					feature value is assumed to be of a string type. Otherwise a feature value's type
 					will be evaluated if it is the same or derived from the type specified by the
-					featureTypeName attribute. Assuming the groupFeatureMatcher is specified for
-					the CarAnnotation type, the test defined by a FESL fragment below is
+					<code>featureTypeName</code> attribute. Assuming the <code>groupFeatureMatcher</code> is specified for
+					the <code>CarAnnotation</code> type, the test defined by a FESL fragment below is
 					successful is a car is ether red, green or blue and it does not have 1 or 3
 					wheels:
 				</para>
@@ -972,7 +1003,7 @@
 				<para role="Normal">			&lt;values&gt;3&lt;/values&gt;</para>
 				<para role="Normal">		&lt;/enumFeatureValues&gt;</para>
 				<para role="Normal">	&lt;/featureMatchers&gt;</para>
-				<para role="Normal">&lt;grougFeatureMatchers&gt;</para>
+				<para role="Normal">&lt;groupFeatureMatchers&gt;</para>
 			</section>
 			<section id="_PartialObjectMatcherXML">
 				<title>
@@ -1000,44 +1031,44 @@
               	</para>
 				<para role="Normal">
 					This is a base specification for an annotation matcher that will search
-					annotations of a type specified by annotationTypeName located on a path
-					specified by fullPath. If fullPath is omitted or just contains the type
-					name of an annotation (same as annotationTypeName attribute) then all
+					annotations of a type specified by <code>annotationTypeName</code> located on a path
+					specified by <code>fullPath</code>. If <code>fullPath</code> is omitted or just contains the type
+					name of an annotation (same as <code>annotationTypeName</code> attribute) then all
 					instances of that type are considered for further feature value
-					evaluation. If fullPath contains a path to an object from an attribute of
-					a different object, then only instances of annotationTypeName that
+					evaluation. If <code>fullPath</code> contains a path to an object from an attribute of
+					a different object, then only instances of <code>annotationTypeName</code> that
 					located on that path will be considered for further evaluation Once an
 					annotation is successfully evaluated to match a type/path, its features
 					are evaluated according to specification given in all elements of
-					groupFeatureMatchers. If evaluation of any groupFeatureMatchers is
-					successful or if no groupFeatureMatchers is given, then the annotation is
-					considered to be successfully evaluated. The fullPath attribute should be
+					<code>groupFeatureMatchers</code>. If evaluation of any <code>groupFeatureMatchers</code> is
+					successful or if no <code>groupFeatureMatchers</code> is given, then the annotation is
+					considered to be successfully evaluated. The <code>fullPath</code> attribute should be
 					specified using syntax described in the
 					<link linkend="_Feature_path">
 						<phrase role="Hyperlink2">feature path</phrase>
 					</link>
 					section above, with the exception that it can not contain any parent tags.
-					For instance, a specification where a value of the fullPath attribute is
-					CarAnnotation:Engine and a value of the annotationTypeName is
-					EngineAnnotation would  address only engines that are car engines.
-					PartialAnnotationMatcherXML is used to specify search rules in TAM
+					For instance, a specification where a value of the <code>fullPath</code> attribute is
+					<code>CarAnnotation:Engine</code> and a value of the <code>annotationTypeName</code> is
+					<code>EngineAnnotation</code> would  address only engines that are car engines.
+					<code>PartialAnnotationMatcherXML</code> is used to specify search rules in TAM
 					specifications. To illustrate the use of parent tag notation let's
-					consider an example where it is required to identify engines of a blues
-					car that have a size more than 1.8 l but not greater then 3.0 l.
+					consider an example where it is required to identify engines of blue
+					cars that have a size more than 1.8 l but not greater then 3.0 l.
 					According to a class diagram in Figure 2, the FESL fragment below defines
 					rules for the task. It should be noted that the second feature matcher
 					uses the
 					<link linkend="_Parent_tag">
 						<phrase role="Hyperlink2">parent tag</phrase>
-					</link> notation to access a value of the CarAnnotation's attribute Color:
+					</link> notation to access a value of the <code>CarAnnotation</code>&apos;s attribute <code>Color</code>:
 				</para>
 				
-				<para role="Normal">&lt;targetAnnotatiotMatcher annotationTypeName="EngineAnnotation" fullPath="CarAnnotation:EngineAnnotation" &gt;</para>
+				<para role="Normal">&lt;targetAnnotationMatcher annotationTypeName="EngineAnnotation" fullPath="CarAnnotation:EngineAnnotation" &gt;</para>
 				<para role="Normal">	&lt;groupFeatureMatchers&gt;</para>
 				<para role="Normal">		&lt;featureMatchers featurePath="Size" featureTypeName="java.lang.Float"&gt;</para>
 				<para role="Normal">			&lt;rangeFeatureValues lowerBoundary="1.8" upperBoundaryInclusive="true" upperBoundary="3.0"/&gt;</para>
 				<para role="Normal">            &lt;/featureMatchers&gt;</para>
-				<para role="Normal">            &lt;featureMatchers featurePath="__p0:Color" featureTypeName="java.lang.String"e</para>
+				<para role="Normal">            &lt;featureMatchers featurePath="__p0:Color" featureTypeName="java.lang.String"</para>
 				<para role="Normal">				&lt;enumFeatureValues caseSensitive="true"&gt;</para>
 				<para role="Normal">					&lt;values&gt;red&lt;/values&gt;</para>
 				<para role="Normal">					&lt;values&gt;green&lt;/values&gt;</para>
@@ -1051,7 +1082,7 @@
 				<title>
 					FeatureObjectMatcherXML
 				</title>
-				<para role="Normal">extends PartialAnnotationMatcherXML<emphasis> </emphasis></para>
+				<para role="Normal">extends <code>PartialAnnotationMatcherXML</code></para>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
 						<para role="Normal">Attribute: windowsizeLeft[0..1]: Integer: default 0</para>
@@ -1084,10 +1115,10 @@
 					</inlinemediaobject>
               	</para>
 				<para role="Normal">
-					The FeatureObjectMatcherXML element contains rules that specify how
-					FeatureAnnotations (FA) should be located and which features should be
+					The <code>FeatureObjectMatcherXML</code> element contains rules that specify how
+					<code>FeatureAnnotations</code> (FA) should be located and which features should be
 					extracted from them. It inherits its properties from
-					PartialObjectMatcherXML. In addition it has semantics for specifying:
+					<code>PartialObjectMatcherXML</code>. In addition it has semantics for specifying:
 				</para>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
@@ -1100,8 +1131,8 @@
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">
-					It is done by using boolean attributes windowsizeLeft, windowsizeInside,
-					windowsizeRight, windowsizeEnclosed and the bitmask windowFlags attribute
+					It is done by using boolean attributes <code>windowsizeLeft</code>, <code>windowsizeInside</code>,
+					<code>windowsizeRight</code>, <code>windowsizeEnclosed</code> and the bitmask <code>windowFlags</code> attribute
 					that indicate FA's search rules:
 				</para>
 				<itemizedlist mark="disc" spacing="normal">
@@ -1112,7 +1143,7 @@
 						<para role="Normal">windowsizeRight	- a size of the search window to the right from TA</para>
 					</listitem>
 					<listitem>
-						<para role="Normal">windosizeInside	- a size of the search window within TA boundaries; if the value of this attribute is 1, then the TA is considered to be an FA at the same time</para>
+						<para role="Normal">windowsizeInside	- a size of the search window within TA boundaries; if the value of this attribute is 1, then the TA is considered to be an FA at the same time</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">windowFlags		- more precise criteria for search window; the value if this attribute is a bitmask with a combination of the following values:</para>
@@ -1144,11 +1175,11 @@
 					both of these attributes are set to true and the FA is a first annotation
 					of required type to the left from TA, then the generated feature value
 					will start with the prefix <code>L1</code>. If the values are set to false, then the
-					feature value***s prefix will be <code>X0</code>. This allows generating unique
+					feature value&apos;s prefix will be <code>X0</code>. This allows generating unique
 					feature names for model building and evaluation for machine learning.
 				</para>
 				<para role="Normal">
-					FeatureObjectMatcherXML is used to specify search rules in FAM
+					<code>FeatureObjectMatcherXML</code> is used to specify search rules in FAM
 					specifications.
 				</para>
 				<para role="Normal">
@@ -1162,7 +1193,7 @@
 				<para role="Normal">		&lt;featureMatchers featurePath="Size" featureTypeName="java.lang.Float"&gt;</para>
 				<para role="Normal">			&lt;rangeFeatureValues lowerBoundary="1.8" upperBoundaryInclusive="true" upperBoundary="3.0"/&gt;</para>
 				<para role="Normal">		&lt;/featureMatchers&gt;</para>
-				<para role="Normal">		&lt;featureMatchers featurePath="__p0:Color" featareTypeName="java.lang.String"&gt;</para>
+				<para role="Normal">		&lt;featureMatchers featurePath="__p0:Color" featureTypeName="java.lang.String"&gt;</para>
 				<para role="Normal">			&lt;enumFeatureValues caseSensitive="true"&gt;</para>
 				<para role="Normal">				&lt;values&gt;red&lt;/values&gt;</para>
 				<para role="Normal">				&lt;values&gt;green&lt;/values&gt;</para>
@@ -1171,7 +1202,7 @@
 				<para role="Normal">		&lt;/featureMatcher&gt;</para>
 				<para role="Normal">	&lt;groupFeatureMatchers&gt;</para>
 				<para role="Normal">&lt;/targetAnnotationMatcher&gt;</para>
-				<para role="Normal">&lt;featureAnnotationMatcher annotationTypeName="EngineAnnotation" fullPath="CarAnnotation:EngineAnnotation" windowsizeInsdde=1 &gt;</para>
+				<para role="Normal">&lt;featureAnnotationMatcher annotationTypeName="EngineAnnotation" fullPath="CarAnnotation:EngineAnnotation" windowsizeInside=1 &gt;</para>
 				<para role="Normal">	&lt;groupFeatureMatchers&gt;</para>
 				<para role="Normal">		&lt;featureMatchers featurePath="__p0:Wheels:toArray:Diameter" featureTypeName="java.lang.Float" quiet="true" &gt;</para>
 				<para role="Normal">			&lt;rangeFeatureValues lowerBoundary="20.0" lowerBoundaryInclusive="true"/&gt;</para>
@@ -1214,11 +1245,11 @@
 					curly brackets or a combination of the two (i.e.
 					<code>SomeText_{__p0:SomeProperty}</code>). If using a feature path in a class name
 					label it is required to use the parent tag notation. In such a case the
-					parent tag refers to the TA specified by the targetAnnotationMatcher
+					parent tag refers to the TA specified by the <code>targetAnnotationMatcher</code>
 					element. Annotations that belong to the group are searched within a span
-					of enclosingAnnotation according to the specification given in the
-					targetAnnotationMatcher (TAM) and features from matched annotations are
-					extracted according to specification given in featureAnnotationMatchers
+					of <code>enclosingAnnotation</code> according to the specification given in the
+					<code>targetAnnotationMatcher</code> (TAM) and features from matched annotations are
+					extracted according to specification given in <code>featureAnnotationMatchers</code>
 					(FAM). In general, the annotation that features are extracted from could
 					be different from annotations that are matched during the search This is
 					useful when extracting features for machine learning model building and
@@ -1246,22 +1277,22 @@
 				</para>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
-						<para role="Normal">org.apache.uima.cfe.sample.Sentence	- type that marks a sentence</para>
+						<para role="Normal">org.apache.uima.tools.cfe.sample.Sentence	- type that marks a sentence</para>
 					</listitem>
 					<listitem>
-						<para role="Normal">org.apache.uima.cfe.sample.Token	- type that marks a token with features:</para>
+						<para role="Normal">org.apache.uima.tools.cfe.sample.Token	- type that marks a token with features:</para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">pennTag: String         - POS tag of a token</para>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
-						<para role="Normal">org.apache.uima.cfe.sample.NamedEntity - named entity type with features:</para>
+						<para role="Normal">org.apache.uima.tools.cfe.sample.NamedEntity - named entity type with features:</para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">Code: String            - specific code assigned to a named entity</para>
 				<para role="Normal">SemanticClass: String   - semantic class of a named entity</para>
-				<para role="Normal">Tokens: FSArray         - array of org.apache.uima.cfe.sample.Token annotations, ordered by their offset, that are included in the named entity</para>
-				<para role="Normal">The classificatiop task is defined as follows:</para>
+				<para role="Normal">Tokens: FSArray         - array of org.apache.uima.tools.cfe.sample.Token annotations, ordered by their offset, that are included in the named entity</para>
+				<para role="Normal">The classification task is defined as follows:</para>
 				<orderedlist numeration="loweralpha" spacing="normal">
 					<listitem>
 						<para role="Normal">
@@ -1318,12 +1349,12 @@
 					</link>)
 				</para>
 				<para role="Normal">Line 3-32	- rules for extracting features for first tokens of named entities.</para>
-				<para role="Normal">Line 3		- extracted features for those tokens are assigned a composite label that includes prefix <code>CMBegin_</code> pl s a value of a <code>Code</code> attribute of the first element of the TA***s path. The search for FA is going to be performed within boundaries of enclosing org.apache.uima.cfe.sample.Sentence annotation</para>
+				<para role="Normal">Line 3		- extracted features for those tokens are assigned a composite label that includes prefix <code>CMBegin_</code> pl s a value of a <code>Code</code> attribute of the first element of the TA&apos;s path. The search for FA is going to be performed within boundaries of enclosing org.apache.uima.tools.cfe.sample.Sentence annotation</para>
 				<para role="Normal">Line 4-12	- TAM that defines rules for identifying the fist TA</para>
-				<para role="Normal">Line 4		- defines TA***s type (org.apache.uima.cfe.sample.Token) and a full path to it (org.apache.uima.cfe.sample.NamedEntity:Tokens:toArray[0]). According to this path notion, the CFE will:</para>
+				<para role="Normal">Line 4		- defines TA&apos;s type (org.apache.uima.tools.cfe.sample.Token) and a full path to it (org.apache.uima.tools.cfe.sample.NamedEntity:Tokens:toArray[0]). According to this path notion, the CFE will:</para>
 				<itemizedlist mark="disc" spacing="normal">
 					<listitem>
-						<para role="Normal">search for annotations of type org.apache.uima.cfe.sample.NamedEntity</para>
+						<para role="Normal">search for annotations of type org.apache.uima.tools.cfe.sample.NamedEntity</para>
 					</listitem>
 					<listitem>
 						<para role="Normal">
@@ -1333,7 +1364,7 @@
 						</para>
 					</listitem>
 					<listitem>
-						<para role="Normal">if the resulted array is not empty, it***s first element will be considered to be a TA </para>
+						<para role="Normal">if the resulted array is not empty, its first element will be considered to be a TA </para>
 					</listitem>
 				</itemizedlist>
 				<para role="Normal">Line 5-11	- defines rules for matching a group of features for TA</para>
@@ -1341,12 +1372,12 @@
 				<para role="Normal">Line 6		- defines that the feature value is of the type
 					java.lang.String and has the feature the path __p0:SemanticClass, which
 					translates to a value of the attribute SemanticClass of the first element of
-					the TA***s path (org.apache.uima.cfe.sample.NamedEntity)
+					the TA&apos;s path (org.apache.uima.tools.cfe.sample.NamedEntity)
 				</para>
 				<para role="Normal">Line 7-9	- defines an explicit list of values that the feature value should be in</para>
 				<para role="Normal">Line 8		- defines the value <code>Car Maker</code> as the only possible value for the feature </para>
 				<para role="Normal">Line 13-17	- FAM that defines rules for identifying first FA and its feature extraction</para>
-				<para role="Normal">Line 13		- defines FA***s type to be org.apache.uima.cfe.sample.Token;
+				<para role="Normal">Line 13		- defines FA&apos;s type to be org.apache.uima.tools.cfe.sample.Token;
 					the attribute windowsizeInside with the value 1 tells CFE to extract features from TA
 					itself (TA=FA) and setting orientation and distance attributes to true tells CFE to
 					include position information into the generated feature value
@@ -1354,12 +1385,12 @@
 				<para role="Normal">Line 14-16 	- defines rules for matching a group of features for the first FA.</para>
 				<para role="Normal">Line 15		- defines rules for matching the only feature for
 					this group of the type java.lang.String and with feature path coveredText that
-					eventually will be translated by CFE to a method call of a org.apache.uima.cfe.sample.Token
+					eventually will be translated by CFE to a method call of a org.apache.uima.tools.cfe.sample.Token
 					annotation object; according to this specification the feature value will be
 					unconditionally extracted
 				</para>
 	            <para role="Normal">Line 18-31	- FAM that defines rules for identifying second type of FA and its feature extraction</para>
-				<para role="Normal">Line 18		- defines FA***s type to be org.apache.uima.cfe.sample.Token;
+				<para role="Normal">Line 18		- defines FA&apos;s type to be org.apache.uima.tools.cfe.sample.Token;
 					the attributes windowsizeLeft and windowsizeRight with the values 5 tell CFE
 					to extract features from 5 nearest annotations of this type to the left and
 					to the right from TA and having orientation and distance attributes set to
@@ -1369,15 +1400,15 @@
 				<para role="Normal">Line 19-30	- defines rules for matching a group of features for the second FA.</para>
 				<para role="Normal">Line 20		- defines rules for matching the first feature of
 					the group to be of the type java.lang.String and with the feature path
-					covetedText that eventually will be translated by CFE to a method call of a
-					org.apache.uima.cfe.sample.Token annotation object; according to this
+					coveredText that eventually will be translated by CFE to a method call of a
+					org.apache.uima.tools.cfe.sample.Token annotation object; according to this
 					specification the feature value will be unconditionally extracted
 				</para>
 				<para role="Normal">Line 21-29	- define rules for matching the second feature of the group</para>
 				<para role="Normal">Line 21		- defines rules for matching the second feature
 					of the group to be of the type java.lang.String and with the feature path
-					pennTag that eventually will be translated by CFE to getPennTag method call
-					of a org.apache.uima.cfe.sample.Token annotation object; according to this
+					pennTag that eventually will be translated by CFE to <code>getPennTag</code> method call
+					of a org.apache.uima.tools.cfe.sample.Token annotation object; according to this
 					specification the feature will be evaluated against
 					<phrase role="Hyperlink1">enumFeatureValues</phrase>
 					and, as the exclude attribute is set to true:
@@ -1398,11 +1429,11 @@
 						</para>
 					</listitem>
 				</itemizedlist>
-				<para role="Normal">As
+				<para role="Normal">As the
 					<phrase role="Hyperlink1">quiet</phrase>
 					attribute is set to true, the feature value extracted by the second
 					matcher will not be added to the generated for this FA output </para>
-				<para role="Normal">Lint 22-28	- defines an explicit list of values that the
+				<para role="Normal">Line 22-28	- defines an explicit list of values that the
 					value of the second feature should be in
 	            </para>
 				<para role="Normal">Line 23-27	- defines values <code>IN</code>, <code>CC</code>, <code>DT</code>, <code>CD</code>, <code>null</code>
@@ -1414,7 +1445,7 @@
 					<phrase role="Hyperlink1">nullValueImage</phrase>
 					</link>
 					(<code>null</code> as set in line 2 of this sample) and as <code>null</code> is one of the
-					list***s elements, it will be successfully evaluated.
+					list&apos;s elements, it will be successfully evaluated.
 				</para>
 				<para role="Normal">Line 34-63	- rules for extracting features for all tokens
 					of named entities except the first. These rules are the same as the rules
@@ -1423,10 +1454,10 @@
 				</para>
 				<para role="Normal">Line 34		- defines that TAs matched by these rules will
 					be assigned a composite label that includes prefix <code>CMInside_</code> plus a
-					value of the <code>Code</code> attribute of a first element of the TA***s path
+					value of the <code>Code</code> attribute of a first element of the TA&apos;s path
 				</para>
 				<para role="Normal">Line 35		- sets the fullPath attribute to
-	            	org.apache.uima.cfe.sample.NamedEntity:Tokens:toArray that can be
+	            	org.apache.uima.tools.cfe.sample.NamedEntity:Tokens:toArray that can be
 	            	translated as <code>any token of a named entity</code>, but because of
 	            	<link linkend="_Implicit_TA_exclusion">
 						<phrase role="Hyperlink1">implicit TA exclusion</phrase>
@@ -1440,7 +1471,7 @@
 					defined for previous categories with the following exceptions:
 				</para>
 				<para role="Normal">Line 65		- defines that TAs matched by the enclosed
-					rules will be assmgned the string label <code>Other_token</code>
+					rules will be assigned the string label <code>Other_token</code>
 				</para>
 				<para role="Normal">Line 66		- only defines a type of TAs that should be
 					processed by the corresponding TAM without fullPath attribute. Such a
@@ -1451,10 +1482,12 @@
 					, the TAs, which were matched for tokens of named entities by rules
 					defined by the previous TAMs, are not included into the set of TAs that
 					will be evaluated by rules for this TAM. So, the actual translation will
-					be <code>all tokens other than tokens of named entities</code>
+					be <code>all tokens other than tokens of named entities.</code>
 				</para>
 				
 				<orderedlist numeration="arabic" spacing="compact">
+          <?dbfo label-width="1.5em" ?>
+          
 					<listitem>
 						<simpara role="Normal">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</simpara>
 					</listitem>
@@ -1466,14 +1499,14 @@
 						</simpara>
 					</listitem>
 					<listitem>
-						<simpara role="Normal">	&lt;tns:targetAnnotations clcssName="CMBegin_{__p0:Code}"
-							enclosingAnnotation="org.apache.uima.cfe.sample.Sentence"&gt;
+						<simpara role="Normal">	&lt;tns:targetAnnotations className="CMBegin_{__p0:Code}"
+							enclosingAnnotation="org.apache.uima.tools.cfe.sample.Sentence"&gt;
 						</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:targetAnnotationMatcher 
-							annotationTypeName="org.apache.uima.cfe.sample.Token"
-							fullPath="org.apache.uima.cfe.sample.NamedEntity:Tokens:toArray[0]"&gt;
+							annotationTypeName="org.apache.uima.tools.cfe.sample.Token"
+							fullPath="org.apache.uima.tools.cfe.sample.NamedEntity:Tokens:toArray[0]"&gt;
 						</simpara>
 					</listitem>
 					<listitem>
@@ -1484,7 +1517,7 @@
 							featureTypeName="java.lang.String"&gt;</simpara>
 					</listitem>
 					<listitem>
-						<simpara role="Normal">					&lt;tnstenumFeatureValues&gt;</simpara>
+						<simpara role="Normal">					&lt;tns:enumFeatureValues&gt;</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">						&lt;tns:values&gt;Car Maker&lt;/tns:values&gt;</simpara>
@@ -1503,7 +1536,7 @@
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:featureAnnotationMatchers annotationTypeName=
-							"org.apache.uima.cfe.sample.Token" windowsizeInside="1"
+							"org.apache.uima.tools.cfe.sample.Token" windowsizeInside="1"
 							 orientation="true" distance="true"&gt;
 						</simpara>
 					</listitem>
@@ -1522,7 +1555,7 @@
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:featureAnnotationMatchers annotationTypeName=
-							"org.apache.uima.cfe.sample.Token" windowsizeLeft="5"
+							"org.apache.uima.tools.cfe.sample.Token" windowsizeLeft="5"
 							windowsizeRight="5" orientation="true" distance="true"&gt;
 						</simpara>
 					</listitem>
@@ -1577,13 +1610,13 @@
 					</listitem>
 					<listitem>
 						<simpara role="Normal">	&lt;tns:targetAnnotations className="CMInside_{__p0:Code}"
-							enclosingAnnotation="org.apache.uima.cfe.sample.Sentence"&gt;
+							enclosingAnnotation="org.apache.uima.tools.cfe.sample.Sentence"&gt;
 						</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:targetAnnotationMatcher 
-							annotationTypeName="org.apache.uima.cfe.sample.Token"
-							fullPath="org.apache.uima.cfe.sample.NamedEntity:Tokens:toArray"&gt;
+							annotationTypeName="org.apache.uima.tools.cfe.sample.Token"
+							fullPath="org.apache.uima.tools.cfe.sample.NamedEntity:Tokens:toArray"&gt;
 						</simpara>
 					</listitem>
 					<listitem>
@@ -1614,7 +1647,7 @@
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:featureAnnotationMatchers
-							annotationTypeName="org.apache.uima.cfe.sample.Token"
+							annotationTypeName="org.apache.uima.tools.cfe.sample.Token"
 							windowsizeInside="1" orientation="true" distance="true"&gt;
 						</simpara>
 					</listitem>
@@ -1634,12 +1667,12 @@
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:featureAnnotationMatchers
-							annotationTypeName="org.apache.uima.cfe.sample.Token" windowsizeLeft="5"
+							annotationTypeName="org.apache.uima.tools.cfe.sample.Token" windowsizeLeft="5"
 							windowsizeRight="5" orientation="true" distance="true"&gt;
 						</simpara>
 					</listitem>
 					<listitem>
-						<simpara role="Normal">			&lt;tns:groupFeatureMatch rs&gt;</simpara>
+						<simpara role="Normal">			&lt;tns:groupFeatureMatchers&gt;</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">				&lt;tns:featureMatchers
@@ -1667,7 +1700,7 @@
 						<simpara role="Normal">						&lt;tns:values&gt;CD&lt;/tns:values&gt;</simpara>
 					</listitem>
 					<listitem>
-						<simpara role="Normal">						&lt;tns:values&gt;null&lt;/tns:value &gt;</simpara>
+						<simpara role="Normal">						&lt;tns:values&gt;null&lt;/tns:values&gt;</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">					&lt;/tns:enumFeatureValues&gt;</simpara>
@@ -1689,17 +1722,17 @@
 					</listitem>
 					<listitem>
 						<simpara role="Normal">	&lt;tns:targetAnnotations className="Other_token"
-							enclosingAnnotation="org.apache.uima.cfe.sample.Sentence"&gt;
+							enclosingAnnotation="org.apache.uima.tools.cfe.sample.Sentence"&gt;
 						</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:targetAnnotationMatcher
-							annotationTypeName="org.apache.uima.cfe.sample.Token"/&gt;
+							annotationTypeName="org.apache.uima.tools.cfe.sample.Token"/&gt;
 						</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:featureAnnotationMatchers
-							annoeationTypeName="org.apache.uima.cfe.sample.Token"
+							annotationTypeName="org.apache.uima.tools.cfe.sample.Token"
 							windowsizeInside="1" orientation="true" distance="true"&gt;
 						</simpara>
 					</listitem>
@@ -1718,7 +1751,7 @@
 					</listitem>
 					<listitem>
 						<simpara role="Normal">		&lt;tns:featureAnnotationMatchers
-							annotationTypeName="org.apache.uima.cfe.sample.Token"
+							annotationTypeName="org.apache.uima.tools.cfe.sample.Token"
 							windowsizeLeft="c" windowsizeRight="5" orientation="true" distance="true"&gt;
 						</simpara>
 					</listitem>
@@ -1742,7 +1775,7 @@
 						<simpara role="Normal">						&lt;tns:values&gt;IN&lt;/tns:values&gt;</simpara>
 					</listitem>
 					<listitem>
-						<simpara role="Normal">						&lt;tns:values&gt;CC&lt;/tns:ealues&gt;</simpara>
+						<simpara role="Normal">						&lt;tns:values&gt;CC&lt;/tns:values&gt;</simpara>
 					</listitem>
 					<listitem>
 						<simpara role="Normal">						&lt;tns:values&gt;DT&lt;/tns:values&gt;</simpara>
@@ -1786,7 +1819,7 @@
 		</para>
 		<para role="Normal">
 			The paper "CFE a system for testing, evaluation and machine learning of
-			UIMA based applications" by Sominsky, Coden and Tanenblatt details on the
+			UIMA based applications" by Sominsky, Coden and Tanenblatt describes details of the
 			evaluation process.
 		</para>
 	</chapter>

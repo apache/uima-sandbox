@@ -71,6 +71,7 @@ public abstract class SimpleFileBasedDictionary<T> extends FileBasedDictionary<T
             }
             addLine(columns, cnt);
         }
+        bufReader.close();
     }
     
     public void save () throws IOException
@@ -79,6 +80,7 @@ public abstract class SimpleFileBasedDictionary<T> extends FileBasedDictionary<T
         for (Iterator<String> it = m_storage.keySet().iterator(); it.hasNext();) {
             ps.println(make_line(it.next()));
         }
+        ps.close();
     }
 
     protected void addEntry (String key, T value, int linenum)

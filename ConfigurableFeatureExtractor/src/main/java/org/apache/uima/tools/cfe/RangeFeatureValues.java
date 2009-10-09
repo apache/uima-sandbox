@@ -38,27 +38,7 @@ public class RangeFeatureValues implements FeatureValues
         m_upper_boundary = ub;
         m_upper_boundary_inclusive = ubi;
     }
-    
-    public boolean equals(Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof RangeFeatureValues)) {
-            return false;
-        }
-        RangeFeatureValues other = (RangeFeatureValues)obj;
-        if (!m_lower_boundary.equals(other.m_lower_boundary) ||
-            (m_lower_boundary_inclusive != other.m_lower_boundary_inclusive) ||
-            !m_upper_boundary.equals(other.m_upper_boundary) ||
-            (m_upper_boundary_inclusive != other.m_upper_boundary_inclusive)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-    
-    
-    
+
     public boolean matches (Object feature)
     {
         if (!(feature instanceof Number)) {

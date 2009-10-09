@@ -72,24 +72,7 @@ public class ObjectPathFeatureValues extends CollectionFeatureValues<MatchedValu
         }
     }
     
-    public boolean equals(Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof ObjectPathFeatureValues)) {
-            return false;
-        }
-        ObjectPathFeatureValues other = (ObjectPathFeatureValues)obj;
-        if (!m_object_path.equals(other.m_object_path)) {
-            return false;
-        }
-        if (!m_values.equals(other.m_values)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-    
+
     public String getFeatureImage (Object feature)
     {
         return m_object_type_name + "," + m_object_path;

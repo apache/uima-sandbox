@@ -641,15 +641,15 @@ public Object eGet(int featureID, boolean resolve, boolean coreType)
             case ConfigPackage.FEATURE_OBJECT_MATCHER_XML__ORIENTATION:
                 return isOrientation() ? Boolean.TRUE : Boolean.FALSE;
             case ConfigPackage.FEATURE_OBJECT_MATCHER_XML__WINDOW_FLAGS:
-                return new Integer(getWindowFlags());
+                return Integer.valueOf(getWindowFlags());
             case ConfigPackage.FEATURE_OBJECT_MATCHER_XML__WINDOWSIZE_ENCLOSED:
-                return new Integer(getWindowsizeEnclosed());
+                return Integer.valueOf(getWindowsizeEnclosed());
             case ConfigPackage.FEATURE_OBJECT_MATCHER_XML__WINDOWSIZE_INSIDE:
-                return new Integer(getWindowsizeInside());
+                return Integer.valueOf(getWindowsizeInside());
             case ConfigPackage.FEATURE_OBJECT_MATCHER_XML__WINDOWSIZE_LEFT:
-                return new Integer(getWindowsizeLeft());
+                return Integer.valueOf(getWindowsizeLeft());
             case ConfigPackage.FEATURE_OBJECT_MATCHER_XML__WINDOWSIZE_RIGHT:
-                return new Integer(getWindowsizeRight());
+                return Integer.valueOf(getWindowsizeRight());
         }
         return super.eGet(featureID, resolve, coreType);
     }
@@ -762,7 +762,7 @@ public String toString()
   {
         if (eIsProxy()) return super.toString();
 
-        StringBuffer result = new StringBuffer(super.toString());
+        StringBuilder result = new StringBuilder(super.toString());
         result.append(" (distance: ");
         if (distanceESet) result.append(distance); else result.append("<unset>");
         result.append(", orientation: ");

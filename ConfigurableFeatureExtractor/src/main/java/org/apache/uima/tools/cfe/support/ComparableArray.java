@@ -28,7 +28,7 @@ public class ComparableArray implements Comparable
         m_src = src;
     }
     
-    int compare(Comparable[] ia1, Comparable[] ia2)
+    private int compare(Comparable[] ia1, Comparable[] ia2)
     {
         if (ia1 == ia2) {
             return 0;
@@ -50,20 +50,44 @@ public class ComparableArray implements Comparable
     
     public int compareTo (Object other)
     {
-        return compare(m_src, ((ComparableArray)other).m_src);
+        if (null == other) {
+            return 1;
+        }
+
+        if (other instanceof ComparableArray) {
+            return compare(m_src, ((ComparableArray)other).m_src);
+        }
+        throw new ClassCastException("Cannot compare ComparableArray to object of type " + 
+            other.getClass().getName());
     }
+    
+    public  boolean equals (Object other)
+    {
+        return 0 == compareTo(other);
+    }
+    
+    public int hashCode()
+    {
+        int result = 0;
+        result += Math.min(m_src.length, 9) * m_src.length;
+        for (int i = 0; i < m_src.length; ++i) {
+            result += Math.min(m_src.length, 9) * m_src[i].hashCode();
+        }
+        return result;
+    }
+
     
     public String toString ()
     {
+        assert (null != m_src);
+        
         StringBuffer result = new StringBuffer(m_src.length * 8);
         result.append("[");
-        if (null != m_src) {
-            for (int i = 0; i < m_src.length; ++i) {
-                if (0 != i) {
-                    result.append(",");
-                }  
-                result.append(m_src[i]);
-            }
+        for (int i = 0; i < m_src.length; ++i) {
+            if (0 != i) {
+                result.append(",");
+            }  
+            result.append(m_src[i]);
         }
         result.append("]");
         return result.toString();

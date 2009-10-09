@@ -38,21 +38,6 @@ public class GroupFeatureMatcher
         m_single_feature_matchers.addAll(sfms);
     }
     
-    public boolean equals(Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof GroupFeatureMatcher)) {
-            return false;
-        }
-        GroupFeatureMatcher other = (GroupFeatureMatcher)obj;
-        if (!m_single_feature_matchers.equals(other.m_single_feature_matchers)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
     public void addMatcher (String  feat_class,
                             String  feat_path,
                             boolean exclude,

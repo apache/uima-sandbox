@@ -40,7 +40,9 @@ public class PartialObjectMatcher
         else {
             m_full_path = full_path;
         }
-        m_group_feature_matchers.addAll(gfms);
+        if (null != gfms) {
+            m_group_feature_matchers.addAll(gfms);
+        }
     }
 
     protected PartialObjectMatcher(String class_name, String full_annotation_path)
@@ -49,23 +51,6 @@ public class PartialObjectMatcher
         this(class_name, full_annotation_path, new ArrayList<GroupFeatureMatcher>());
     }
     
-    public boolean equals(Object obj)
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof PartialObjectMatcher)) {
-            return false;
-        }
-        PartialObjectMatcher other = (PartialObjectMatcher)obj;
-        if (!m_matcher_class.equals(other.m_matcher_class) ||
-            !m_full_path.equals(other.m_full_path) ||
-            !m_group_feature_matchers.equals(other.m_group_feature_matchers)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
     String getObjectPath ()
     {
         return m_full_path;
