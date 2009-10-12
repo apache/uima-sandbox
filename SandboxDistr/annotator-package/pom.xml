@@ -32,25 +32,79 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>uimaj</artifactId> <!-- don't need to build this project as a sandbox proj -->
+    <artifactId>uima-common-distribution</artifactId> <!-- don't need to build this project as a sandbox proj -->
     <!-- version cannot be a ${xxx} form -->
     <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../../uimaj</relativePath>
+    <relativePath>../../uimaj/distr-superPom</relativePath>
   </parent>
+   
+  <properties>
+    <!-- property used in multiple places in distr-superPom -->
+    <assemblyFinalName>uimaj-annotator-addons-${uimaj-release-version}</assemblyFinalName>
+  </properties>
      
   <build>
     <plugins>
-  	  <plugin>
-		    <artifactId>maven-assembly-plugin</artifactId>
-     	  <configuration>
-			    <descriptors>
-				    <descriptor>assembly/bin.xml</descriptor>
-				    <descriptor>assembly/src.xml</descriptor>
-			    </descriptors>
-			    <finalName>uimaj-annotator-addons-${project.version}</finalName>
-	        <tarLongFileMode>gnu</tarLongFileMode>
-		    </configuration>
-	    </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+      </plugin>
+      
+      <!-- run Release Audit Tool (RAT) on src and bin distrs -->       
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>rat-check-src</id>
+            <configuration>              
+              <excludes>
+                <exclude>apache-uima/addons/annotator/BSFAnnotator/src/main/java/org/apache/uima/annotator/bsf/types/*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/BSFAnnotator/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/ConceptMapper/src/main/java/org/apache/uima/conceptMapper/DictTerm*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/ConceptMapper/src/main/java/org/apache/uima/conceptMapper/support/tokenizer/TokenAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/ConceptMapper/src/main/java/uima/tt/TokenAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/ConfigurableFeatureExtractor/src/test/java/example/PersonTitle*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/ConfigurableFeatureExtractor/src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/ConfigurableFeatureExtractor/src/test/resources/testData*txt*</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/DictionaryAnnotatorTestFilterFeaturePath/dictionaryAnnotFeaturePathTestRef.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.xml</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/dictInput.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/WhitespaceTokenizer.pear</exclude> <!-- test data -->                
+                <exclude>apache-uima/addons/annotator/Lucas/src/test/java/org/apache/uima/lucas/indexer/types/test/*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/Lucas/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/RegularExpressionAnnotator/src/test/resources/*/*Ref*.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/SnowballAnnotator/src/main/java/org/tartarus/snowball/**</exclude> <!-- included under license -->
+                <exclude>apache-uima/addons/annotator/SnowballAnnotator/src/test/resources/englishRef.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/Tagger/src/test/resources/moby-tag-list.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/AttributeFS*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/FeatureValue*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/MarkupAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/SourceDocumentAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>apache-uima/addons/annotator/WhitespaceTokenizer/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/SimpleServer/src/test/resources/expected/*.xml</exclude> <!-- test data -->
+                <exclude>apache-uima/addons/SimpleServer/src/test/resources/test.txt</exclude> <!-- test data -->
+                <exclude>RELEASE_NOTES.html</exclude> <!-- release notes -->
+                <exclude>SandboxDistr/annotator-package/readme/RELEASE_NOTES.html</exclude> <!-- release notes -->
+                <exclude>SandboxDocs/src/olink/**</exclude> <!-- generated cross-ref database for docbook -->
+                <exclude>SandboxDocs/src/styles/titlepage/titlepage-*.xsl</exclude> <!-- generated file -->
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>rat-check-bin</id>
+            <configuration>
+              <excludes>
+                <exclude>addons/annotator/*/docs/html/images/*.svg</exclude> <!-- generated image files -->
+                <exclude>addons/*/docs/html/images/*.svg</exclude> <!-- generated image files -->
+                <exclude>addons/annotator/*/*.pear</exclude> <!-- generated binary file -->
+                <exclude>addons/RELEASE_NOTES.html</exclude> <!-- release notes -->
+              </excludes>
+            </configuration>
+          </execution>  
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
      
