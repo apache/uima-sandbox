@@ -23,13 +23,13 @@
 	<groupId>org.apache.uima</groupId>
 	<artifactId>TikaAnnotator</artifactId>
 	<packaging>jar</packaging>
-	<version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+	<version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
 	<name>Apache UIMA TikaAnnotator</name>
 
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>SandboxDistr</artifactId>
-    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>../uimaj</relativePath>
   </parent>
   

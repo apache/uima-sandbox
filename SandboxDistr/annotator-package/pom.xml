@@ -25,7 +25,7 @@
   <artifactId>SandboxAnnotatorPackage</artifactId>
   <packaging>pom</packaging>
   <!-- version cannot be a ${xxx} form for parent POMs -->
-  <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+  <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
   <name>Apache UIMA Sandbox Annotator Add-Ons</name>
   <url>http://incubator.apache.org/uima</url>
   <description>Annotator components for the UIMA SDK</description>
@@ -34,7 +34,7 @@
     <groupId>org.apache.uima</groupId>
     <artifactId>uima-common-distribution</artifactId> <!-- don't need to build this project as a sandbox proj -->
     <!-- version cannot be a ${xxx} form -->
-    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>../../uimaj/distr-superPom</relativePath>
   </parent>
    

@@ -24,13 +24,13 @@
 	<groupId>org.apache.uima</groupId>
 	<artifactId>FsVariables</artifactId>
 	<packaging>jar</packaging>
-	<version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+	<version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
 	<name>Apache UIMA FS Variables Package</name>
   
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>SandboxDistr</artifactId>
-    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>../SandboxDistr</relativePath>
   </parent>
 
