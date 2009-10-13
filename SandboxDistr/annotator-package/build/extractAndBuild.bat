@@ -69,6 +69,6 @@ rmdir /S %leveldir%
 cd SandboxDistr
 call mvn %jvmarg%  -Duima.build.date="%date% %time%" %mvnCommand%
 cd annotator-package
-call mvn clean assembly:assembly
+call mvn clean install
 
 @:exit
