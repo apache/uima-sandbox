@@ -65,7 +65,8 @@
       <outputDirectory>/SandboxDistr</outputDirectory>
       <excludes>
         <exclude>annotator-package/target/**</exclude>
-        <exclude>.project</exclude>
+        <exclude>.*</exclude>
+        <exclude>target</exclude>
       </excludes>
       <fileMode>644</fileMode>
    	</fileSet>
@@ -81,8 +82,11 @@
       <fileMode>644</fileMode>
   </fileSet>
 
+  <!-- Sandbox requires the base uima to build
+       so don't include the uima-docbook-tool
+       it's redundant -->
 	<!-- Add files for the uima-docbook-tool -->
-    <fileSet>
+    <!--fileSet>
       <directory>../../uima-docbook-tool</directory>
       <outputDirectory>/uima-docbook-tool</outputDirectory>
       <includes>
@@ -97,76 +101,76 @@
         <include>README.FIRST</include>
       </includes>
       <fileMode>644</fileMode>
-    </fileSet>
+    </fileSet-->
 	
     <!-- Add files for all the Sandbox components being released -->  
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>/</outputDirectory>            
       <directory>../../BSFAnnotator/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>/</outputDirectory>            
       <directory>../../ConceptMapper/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>/</outputDirectory>            
       <directory>../../ConfigurableFeatureExtractor/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../DictionaryAnnotator/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../FsVariables/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>/</outputDirectory>            
       <directory>../../Lucas/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../OpenCalaisAnnotator/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../PearPackagingAntTask/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>            
+      <outputDirectory>/</outputDirectory>            
       <directory>../../RegularExpressionAnnotator/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../SimpleServer/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../SnowballAnnotator/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../Tagger/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../TikaAnnotator/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>
     <fileSet>
-      <outputDirectory>/apache-uima/addons/annotator</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <directory>../../WhitespaceTokenizer/target/assembly-src</directory>
       <fileMode>644</fileMode>
     </fileSet>    

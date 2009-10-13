@@ -58,32 +58,32 @@
             <id>rat-check-src</id>
             <configuration>              
               <excludes>
-                <exclude>apache-uima/addons/annotator/BSFAnnotator/src/main/java/org/apache/uima/annotator/bsf/types/*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/BSFAnnotator/src/test/resources/*.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/ConceptMapper/src/main/java/org/apache/uima/conceptMapper/DictTerm*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/ConceptMapper/src/main/java/org/apache/uima/conceptMapper/support/tokenizer/TokenAnnotation*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/ConceptMapper/src/main/java/uima/tt/TokenAnnotation*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/ConfigurableFeatureExtractor/src/test/java/example/PersonTitle*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/ConfigurableFeatureExtractor/src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/ConfigurableFeatureExtractor/src/test/resources/testData*txt*</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/DictionaryAnnotatorTestFilterFeaturePath/dictionaryAnnotFeaturePathTestRef.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.xml</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/dictInput.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/WhitespaceTokenizer.pear</exclude> <!-- test data -->                
-                <exclude>apache-uima/addons/annotator/Lucas/src/test/java/org/apache/uima/lucas/indexer/types/test/*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/Lucas/src/test/resources/*.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/RegularExpressionAnnotator/src/test/resources/*/*Ref*.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/SnowballAnnotator/src/main/java/org/tartarus/snowball/**</exclude> <!-- included under license -->
-                <exclude>apache-uima/addons/annotator/SnowballAnnotator/src/test/resources/englishRef.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/Tagger/src/test/resources/moby-tag-list.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/AttributeFS*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/FeatureValue*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/MarkupAnnotation*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/TikaAnnotator/src/main/java/org/apache/uima/tika/SourceDocumentAnnotation*.java</exclude> <!-- generated classes -->
-                <exclude>apache-uima/addons/annotator/WhitespaceTokenizer/src/test/resources/*.txt</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/SimpleServer/src/test/resources/expected/*.xml</exclude> <!-- test data -->
-                <exclude>apache-uima/addons/SimpleServer/src/test/resources/test.txt</exclude> <!-- test data -->
+                <exclude>BSFAnnotator/src/main/java/org/apache/uima/annotator/bsf/types/*.java</exclude> <!-- generated classes -->
+                <exclude>BSFAnnotator/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>ConceptMapper/src/main/java/org/apache/uima/conceptMapper/DictTerm*.java</exclude> <!-- generated classes -->
+                <exclude>ConceptMapper/src/main/java/org/apache/uima/conceptMapper/support/tokenizer/TokenAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>ConceptMapper/src/main/java/uima/tt/TokenAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>ConfigurableFeatureExtractor/src/test/java/example/PersonTitle*.java</exclude> <!-- generated classes -->
+                <exclude>ConfigurableFeatureExtractor/src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated classes -->
+                <exclude>ConfigurableFeatureExtractor/src/test/resources/testData*txt*</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/DictionaryAnnotatorTestFilterFeaturePath/dictionaryAnnotFeaturePathTestRef.txt</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.txt</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.xml</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/dictInput.txt</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/WhitespaceTokenizer.pear</exclude> <!-- test data -->                
+                <exclude>Lucas/src/test/java/org/apache/uima/lucas/indexer/types/test/*.java</exclude> <!-- generated classes -->
+                <exclude>Lucas/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>RegularExpressionAnnotator/src/test/resources/*/*Ref*.txt</exclude> <!-- test data -->
+                <exclude>SnowballAnnotator/src/main/java/org/tartarus/snowball/**</exclude> <!-- included under license -->
+                <exclude>SnowballAnnotator/src/test/resources/englishRef.txt</exclude> <!-- test data -->
+                <exclude>Tagger/src/test/resources/moby-tag-list.txt</exclude> <!-- test data -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/AttributeFS*.java</exclude> <!-- generated classes -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/FeatureValue*.java</exclude> <!-- generated classes -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/MarkupAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/SourceDocumentAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>WhitespaceTokenizer/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>SimpleServer/src/test/resources/expected/*.xml</exclude> <!-- test data -->
+                <exclude>SimpleServer/src/test/resources/test.txt</exclude> <!-- test data -->
                 <exclude>RELEASE_NOTES.html</exclude> <!-- release notes -->
                 <exclude>SandboxDistr/annotator-package/readme/RELEASE_NOTES.html</exclude> <!-- release notes -->
                 <exclude>SandboxDocs/src/olink/**</exclude> <!-- generated cross-ref database for docbook -->

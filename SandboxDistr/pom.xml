@@ -251,23 +251,13 @@
                          they are the same as the assembly-bin version even though
                          we're not shipping the 3rd party jars, because
                          maven will silently fetch them -->
-                    <include>LICENSE*</include>
-                    <include>NOTICE*</include>
-                    <include>DISCLAIMER*</include>
-                  </includes>
-                </resource>
-                <resource>
-                  <directory>.</directory>
-                  <includes>
-                    <!-- these license/notice files are the not the plain versions, 
-                         they are the same as the assembly-bin version even though
-                         we're not shipping the 3rd party jars, because
-                         maven will silently fetch them -->
                     <include>readme*</include>
                     <include>README*</include>
                     <include>LICENSE*</include>
                     <include>NOTICE*</include>
                     <include>DISCLAIMER*</include>
+                    
+                    <include>pom.xml</include>
                     
                     <include>desc/**</include>
                     <include>resources/**</include>
