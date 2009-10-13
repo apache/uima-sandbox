@@ -23,7 +23,7 @@
 	<groupId>org.apache.uima</groupId>
 	<artifactId>RegularExpressionAnnotator</artifactId>
 	<packaging>jar</packaging>
-	<version>2.3.0-incubating-SNAPSHOT</version>
+	<version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
 	<name>Apache UIMA RegularExpressionAnnotator</name>
     
   <parent>

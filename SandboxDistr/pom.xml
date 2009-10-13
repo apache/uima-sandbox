@@ -373,6 +373,7 @@
     <module>../FsVariables</module>
     <module>../Lucas</module>
     <module>../OpenCalaisAnnotator</module>
+    <module>pear-builder-pom</module>
     <module>../PearPackagingAntTask</module>
     <module>../RegularExpressionAnnotator</module>
     <module>../SimpleServer</module>

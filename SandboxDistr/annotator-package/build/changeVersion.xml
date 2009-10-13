@@ -77,6 +77,8 @@
        OpenCalaisAnnotator/pom.xml,
        PearPackagingAntTask/pom.xml,
        RegularExpressionAnnotator/pom.xml,
+       SandboxDistr/annotator-package/pom.xml,
+       SandboxDistr/pear-builder-pom/pom.xml,
        SimpleServer/pom.xml,
        SnowballAnnotator/pom.xml,
        Tagger/pom.xml,

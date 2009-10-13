@@ -28,7 +28,7 @@
   <groupId>org.apache.uima</groupId>
   <artifactId>SandboxDistr-pearBuilder</artifactId>
   <!-- version cannot be a ${xxx} form for Parent poms -->
-  <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+  <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
   <name>Apache UIMA Sandbox distribution pear builder</name>
   <packaging>pom</packaging>
   <description>Common approach to building PEARs for Sandbox annotator projects</description>
@@ -37,7 +37,7 @@
     <groupId>org.apache.uima</groupId>
     <artifactId>SandboxDistr</artifactId>
     <!-- version cannot be a ${xxx} form -->
-    <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
     <relativePath>..</relativePath>
   </parent>  
     
@@ -50,7 +50,7 @@
         <plugin>
           <groupId>org.apache.uima</groupId>
           <artifactId>PearPackagingMavenPlugin</artifactId>
-          <version>2.3.0-incubating-SNAPSHOT</version> <!-- this comment is a flag for changeVersion -->
+          <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
           <extensions>true</extensions>        
           <executions><execution>
               <id>buildPear</id>
