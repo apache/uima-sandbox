@@ -46,7 +46,7 @@ public class RRMFeatureMatcher extends CommonFeatureMatcher
 
     protected String featureWindowImage (MatchedAnnotationDescriptor mad)
     {
-        StringBuffer buf = new StringBuffer("W");
+        StringBuilder buf = new StringBuilder("W");
         if (mad.m_feature_matcher.m_windowsizeLeft > 0) {
             buf.append("L" + mad.m_feature_matcher.m_windowsizeLeft); 
         }
@@ -110,7 +110,7 @@ public class RRMFeatureMatcher extends CommonFeatureMatcher
         if (suffix.indexOf(" ") >= 0) {
             System.err.println("ERROR: \"" + suffix + "\"" + "has spaces"); 
         }
-        StringBuffer feature = new StringBuffer();
+        StringBuilder feature = new StringBuilder();
         
         Pattern pat = Pattern.compile("\\W");
         Matcher mat = pat.matcher(suffix);
@@ -120,7 +120,7 @@ public class RRMFeatureMatcher extends CommonFeatureMatcher
             int gstart = mat.start();
             feature.append(suffix.substring(start, gstart));
             start = mat.end();  
-            StringBuffer replaced = new StringBuffer(); 
+            StringBuilder replaced = new StringBuilder(); 
             String group = mat.group();
             for (int i = 0; i < group.length(); ++i) {
                 replaced.append("__CHAR" + (int)group.charAt(i) + "__");
@@ -129,7 +129,7 @@ public class RRMFeatureMatcher extends CommonFeatureMatcher
         }
         feature.append(suffix.substring(start));
         
-        StringBuffer strBuf = new StringBuffer();
+        StringBuilder strBuf = new StringBuilder();
         if (mad.m_feature_matcher.m_orientation || mad.m_feature_matcher.m_distance) {
             strBuf.append(make_image_position(mad));
             strBuf.append(m_fieldSeparator);

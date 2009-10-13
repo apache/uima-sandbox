@@ -142,6 +142,7 @@
             <goals><goal>xmlbeans</goal></goals>
             <configuration>
               <schemaDirectory>src/main/xsdForXMLBeans</schemaDirectory>
+              <javaSource>1.5</javaSource>
             </configuration>        
           </execution>
         </executions>

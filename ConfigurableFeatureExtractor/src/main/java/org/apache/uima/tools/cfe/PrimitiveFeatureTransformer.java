@@ -31,7 +31,7 @@ public class PrimitiveFeatureTransformer implements FeatureValueConverter, Featu
     
     static public String capitalize (String str)
     {
-        StringBuffer strBuf = new StringBuffer(str);
+        StringBuilder strBuf = new StringBuilder(str);
         
         if (strBuf.length() > 1) {
             if (Character.isLetter(strBuf.charAt(0))) {

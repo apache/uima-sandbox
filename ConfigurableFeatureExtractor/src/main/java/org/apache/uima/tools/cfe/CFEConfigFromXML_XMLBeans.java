@@ -53,10 +53,10 @@ public class CFEConfigFromXML_XMLBeans
     EnumFeatureValues getEnumFeatureValues(EnumFeatureValuesXML efvs_xml)
     throws IOException, URISyntaxException
     {
-        String[] vals = efvs_xml.getValuesArray();
+        List<String> vals = efvs_xml.getValuesList();
 
-        if ((1 == vals.length) && (vals[0]).startsWith("file://")) {
-            return new EnumFeatureValues(new URI((String)vals[0]).getPath(), efvs_xml.getCaseSensitive());
+        if ((1 == vals.size()) && (vals.get(0).startsWith("file://"))) {
+            return new EnumFeatureValues(new URI(vals.get(0)).getPath(), efvs_xml.getCaseSensitive());
         }
         return new EnumFeatureValues(vals, efvs_xml.getCaseSensitive());
     }
@@ -139,11 +139,11 @@ public class CFEConfigFromXML_XMLBeans
     GroupFeatureMatcher getGroupFeatureMatcher(GroupFeatureMatcherXML gfm_xml, String obj_class_name)
     throws SecurityException, NoSuchMethodException, ClassNotFoundException, IOException, URISyntaxException
     {
-        SingleFeatureMatcherXML[] fms_xml = gfm_xml.getFeatureMatchersArray();
+        List<SingleFeatureMatcherXML> fms_xml = gfm_xml.getFeatureMatchersList();
         List<SingleFeatureMatcher> sfms = new ArrayList<SingleFeatureMatcher>();
 
-        for (int i = 0; i < fms_xml.length; ++i) {
-            sfms.add(getSingleFeatureMatcher(fms_xml[i], obj_class_name));
+        for (SingleFeatureMatcherXML fm_xml : fms_xml) {
+            sfms.add(getSingleFeatureMatcher(fm_xml, obj_class_name));
         }
         return new GroupFeatureMatcher(sfms, gfm_xml.getExclude()); 
     }
@@ -151,11 +151,11 @@ public class CFEConfigFromXML_XMLBeans
     PartialObjectMatcher getPartialObjectMatcher(PartialObjectMatcherXML pom_xml)
     throws SecurityException, NoSuchMethodException, IOException, URISyntaxException, ClassNotFoundException
     {
-        GroupFeatureMatcherXML[] gfms_xml = pom_xml.getGroupFeatureMatchersArray();
+        List<GroupFeatureMatcherXML> gfms_xml = pom_xml.getGroupFeatureMatchersList();
         List<GroupFeatureMatcher> gfms = new ArrayList<GroupFeatureMatcher>();
         
-        for (int i = 0; i < gfms_xml.length; ++i) {
-            gfms.add(getGroupFeatureMatcher(gfms_xml[i], pom_xml.getAnnotationTypeName()));
+        for (GroupFeatureMatcherXML gfm_xml : gfms_xml) {
+            gfms.add(getGroupFeatureMatcher(gfm_xml, pom_xml.getAnnotationTypeName()));
         }
         return new PartialObjectMatcher(pom_xml.getAnnotationTypeName(), pom_xml.getFullPath(), gfms); 
     }
@@ -163,11 +163,11 @@ public class CFEConfigFromXML_XMLBeans
     FeatureObjectMatcher getFeatureObjectMatcher(FeatureObjectMatcherXML fom_xml)
     throws SecurityException, NoSuchMethodException, IOException, ClassNotFoundException, URISyntaxException
     {
-        GroupFeatureMatcherXML[] gfms_xml = fom_xml.getGroupFeatureMatchersArray();
+        List<GroupFeatureMatcherXML> gfms_xml = fom_xml.getGroupFeatureMatchersList();
         List<GroupFeatureMatcher> gfms = new ArrayList<GroupFeatureMatcher>();
 
-        for (int i = 0; i < gfms_xml.length; ++i) {
-            gfms.add(getGroupFeatureMatcher(gfms_xml[i], fom_xml.getAnnotationTypeName()));
+        for (GroupFeatureMatcherXML gfm_xml : gfms_xml) {
+            gfms.add(getGroupFeatureMatcher(gfm_xml, fom_xml.getAnnotationTypeName()));
         }
         return new FeatureObjectMatcher(fom_xml.getAnnotationTypeName(), fom_xml.getFullPath(), gfms, 
                                         fom_xml.getWindowsizeLeft(),
@@ -183,11 +183,11 @@ public class CFEConfigFromXML_XMLBeans
     throws SecurityException, NoSuchMethodException, IOException, ClassNotFoundException, URISyntaxException
     {
         PartialObjectMatcher ta_matcher = getPartialObjectMatcher(ta_xml.getTargetAnnotationMatcher());
-        FeatureObjectMatcherXML[] fams_xml = ta_xml.getFeatureAnnotationMatchersArray();
+        List<FeatureObjectMatcherXML> fams_xml = ta_xml.getFeatureAnnotationMatchersList();
         
         List<FeatureObjectMatcher> fams = new ArrayList<FeatureObjectMatcher>();
-        for (int i = 0; i < fams_xml.length; ++i) {
-            fams.add(getFeatureObjectMatcher(fams_xml[i]));
+        for (FeatureObjectMatcherXML fam_xml : fams_xml) {
+            fams.add(getFeatureObjectMatcher(fam_xml));
         }
         return new TargetAnnotationDescriptor(ta_xml.getClassName(),
                                               ta_xml.getEnclosingAnnotation(),
@@ -200,9 +200,9 @@ public class CFEConfigFromXML_XMLBeans
     throws SecurityException, NoSuchMethodException, IOException, ClassNotFoundException, URISyntaxException
     {
         List<TargetAnnotationDescriptor> result = new ArrayList<TargetAnnotationDescriptor>();
-        TargetAnnotationXML[] tans = m_CFEDescriptor.getTargetAnnotationsArray();
-        for (int i = 0; i < tans.length; ++i) {
-            result.add(getTargetAnnotationDescriptor(tans[i], result.size() + 1));
+        List<TargetAnnotationXML> tans = m_CFEDescriptor.getTargetAnnotationsList();
+        for (TargetAnnotationXML tan_xml : tans) {
+            result.add(getTargetAnnotationDescriptor(tan_xml, result.size() + 1));
         }
         return result;
     }

@@ -81,7 +81,7 @@ public class ComparableArray implements Comparable
     {
         assert (null != m_src);
         
-        StringBuffer result = new StringBuffer(m_src.length * 8);
+        StringBuilder result = new StringBuilder(m_src.length * 8);
         result.append("[");
         for (int i = 0; i < m_src.length; ++i) {
             if (0 != i) {

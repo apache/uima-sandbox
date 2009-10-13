@@ -35,7 +35,7 @@ public class MatchedSingleFeatureMatcher
     
     String getFeatureImage(boolean feat_name, String[] value_separators)
     {
-        StringBuffer result = new StringBuffer("");
+        StringBuilder result = new StringBuilder();
         ArrayDelimiterObject max_level = null;
         if (!m_values.isEmpty()) {
             // first element must be max_level

@@ -166,7 +166,7 @@ public abstract class CommonFeatureMatcher
     
     protected static String make_image_position (MatchedAnnotationDescriptor mad)
     {
-        StringBuffer strBuf = new StringBuffer("");
+        StringBuilder strBuf = new StringBuilder();
         if (mad.m_feature_matcher.m_orientation) {
             strBuf.append((CONSTANT_LEFTLEFT == mad.m_direction) ? "L" :
                             (CONSTANT_LEFTINSIDE == mad.m_direction) ? "LI" :
@@ -185,7 +185,7 @@ public abstract class CommonFeatureMatcher
     protected String make_image (MatchedAnnotationDescriptor mad, Annotation trg)
     throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
     {
-        StringBuffer sb = new StringBuffer(mad.m_sfms_with_values.size() * 20);
+        StringBuilder sb = new StringBuilder(mad.m_sfms_with_values.size() * 20);
         
         if (m_isAnnotationName) {
             String[] name_toks = mad.m_feature_mv.m_matchedObject.getClass().getName().split("\\.");
@@ -218,7 +218,7 @@ public abstract class CommonFeatureMatcher
     {
         Matcher m = m_featname_pattern.matcher(class_label);
         
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         int class_label_ind = 0;
         
         while (m.find()) {
@@ -231,7 +231,7 @@ public abstract class CommonFeatureMatcher
             class_label_ind = end + 1;
             TargetObjectMatcher tom = new TargetObjectMatcher((Class<?>)null, trg_mv.m_matchedObject.getClass().getName() + ":" + featname, false);
             List<MatchedValue> vals = tom.getFeatureValues(trg_mv);
-            StringBuffer feat_image = new StringBuffer();
+            StringBuilder feat_image = new StringBuilder();
             for (Iterator<MatchedValue> it = vals.iterator(); it.hasNext();){
                 feat_image.append(it.next().m_matchedObject);
                 if (it.hasNext()) {

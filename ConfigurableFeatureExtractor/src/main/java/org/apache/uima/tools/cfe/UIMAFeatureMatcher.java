@@ -78,7 +78,7 @@ public class UIMAFeatureMatcher extends CommonFeatureMatcher
     String make_UIMA_feature (MatchedAnnotationDescriptor   mad,
                               String                        other_fields)
     {
-        StringBuffer stBuff = new StringBuffer();
+        StringBuilder stBuff = new StringBuilder();
         if (mad.m_feature_matcher.m_orientation || mad.m_feature_matcher.m_distance) {
             stBuff.append(make_image_position(mad));
             stBuff.append(m_fieldSeparator);
