@@ -65,7 +65,7 @@ echo  If trunk, use the word "trunk" for the 2nd argument, e.g. extractAndBuild.
 @:execute
 svn checkout -r HEAD http://svn.apache.org/repos/asf/incubator/uima/sandbox/%svnloc%
 xcopy %leveldir%\* . /E
-rmdir /S %leveldir%
+rmdir /S /Q %leveldir%
 cd SandboxDistr
 call mvn %jvmarg%  -Duima.build.date="%date% %time%" %mvnCommand%
 cd annotator-package
