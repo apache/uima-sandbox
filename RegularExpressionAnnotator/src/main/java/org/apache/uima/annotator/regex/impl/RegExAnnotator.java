@@ -284,7 +284,6 @@ public class RegExAnnotator extends CasAnnotator_ImplBase {
           continue;
         }
         for (File file : files) {
-          System.out.println("Found file: " + file.getAbsolutePath());
           InputStream stream;
           try {
             stream = new BufferedInputStream(new FileInputStream(file));
