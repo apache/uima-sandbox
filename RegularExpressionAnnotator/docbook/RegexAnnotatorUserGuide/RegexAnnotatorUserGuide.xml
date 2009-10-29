@@ -1104,7 +1104,10 @@ public class CustomNormalizer
 								- This parameter is modeled as array of Strings and contains 
 								the concept files the annotator should use. The concept files
 								must be specified using a relative path that is available in the
-								UIMA datapath or in the classpath.
+								UIMA datapath or in the classpath.  When you use the UIMA datapath,
+								you can use wildcard expressions such as <code>rules/*.rule</code>.
+								These kinds of wildcard expressions will not work when rule files
+								are discovered via the classpath.
 								<programlisting><emphasis><![CDATA[<nameValuePair>
   <name>ConceptFiles</name>
   <value>
