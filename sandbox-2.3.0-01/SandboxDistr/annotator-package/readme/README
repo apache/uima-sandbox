@@ -1,0 +1,42 @@
+            
+            Apache UIMA Annotator Package Version 2.3.0 README
+     ----------------------------------------------------------------
+
+The Apache UIMA annotator package is an add-on package for the base UIMA release.
+The add-on package contains annotator components developed for Apache UIMA. The 
+add-on package fits the Apache UIMA directory structure and adds a directory 
+called "addons/annotator" that contains the following annotator components:
+ - DictionaryAnnotator
+ - RegularExpressionAnnotator
+ - Tagger
+ - WhitespaceTokenizer
+ - Bean Scripting Framework (BSF) BSFAnnotator
+ - ConceptMapper
+ - ConfigurableFeatureExtractor
+ - Lucas - an interface to using UIMA with Lucene
+ - OpenCalaisAnnotator - an sample annotator using the OpenCalais Service
+ - SnowballAnnotator - an annotator making use of the snowball stemmers
+ - TikaAnnotator - an annotator using the Tika project text extractors
+ 
+Additionally the package contains some components to package annotators 
+and for accessing annotators as simple REST service. These are:
+ - PearPackagingAntTask
+ - SimpleServer
+
+Finally, there is an addon to the base UIMA:
+ - FsVariables
+ 
+Each component has a separate LICENSE and NOTICE files;  some also 
+have Readme and other documentation (in docs/). Documentation
+is also available on the UIMA website, in the Sandbox area. 
+
+Disclaimer
+-----------
+
+Apache UIMA is an effort undergoing incubation at The Apache Software
+Foundation (ASF). Incubation is required of all newly accepted projects
+until a further review indicates that the infrastructure, communications,
+and decision making process have stabilized in a manner consistent with
+other successful ASF projects. While incubation status is not necessarily
+a reflection of the completeness or stability of the code, it does
+indicate that the project has yet to be fully endorsed by the ASF.
