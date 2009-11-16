@@ -1,0 +1,357 @@
+<html>
+<head>
+  <title>Apache UIMA Sandbox v2.3.0 Release Notes</title>
+</head>
+<body>
+<h1>Apache UIMA Sandbox v2.3.0 Release Notes</h1>
+
+<h2>Contents</h2>
+<p>
+<a href="#what.is.uima">1. What is UIMA?</a><br/>
+<a href="#what.is.annot.package">2. What is the Apache UIMA annotator package?</a><br>
+<a href="#major.changes">3. Major Changes in this Release</a><br/>
+<a href="#get.involved">4. How to Get Involved</a><br/>
+<a href="#report.issues">5. How to Report Issues</a><br/>
+<a href="#list.issues">6. List of JIRA Issues Fixed in this Release</a>
+</p>  
+   
+<h2><a name="what.is.uima">1. What is UIMA?</a></h2>
+
+     <p>
+  			Unstructured Information Management applications are
+				software systems that analyze large volumes of
+				unstructured information in order to discover knowledge
+				that is relevant to an end user. UIMA is a framework and
+				SDK for developing such applications. An example UIM
+				application might ingest plain text and identify
+				entities, such as persons, places, organizations; or
+				relations, such as works-for or located-at. UIMA enables
+				such an application to be decomposed into components,
+				for example "language identification" -&gt; "language
+				specific segmentation" -&gt; "sentence boundary
+				detection" -&gt; "entity detection (person/place names
+				etc.)". Each component must implement interfaces defined
+				by the framework and must provide self-describing
+				metadata via XML descriptor files. The framework manages
+				these components and the data flow between them.
+				Components are written in Java or C++; the data that
+				flows between components is designed for efficient
+				mapping between these languages. UIMA additionally
+				provides capabilities to wrap components as network
+				services, and can scale to very large volumes by
+				replicating processing pipelines over a cluster of
+				networked nodes.
+			</p>
+                                                <p>
+				Apache UIMA is an Apache-licensed open source
+				implementation of the UIMA specification (that
+				specification is, in turn, being developed concurrently
+				by a technical committee within
+				<a href="http://www.oasis-open.org">OASIS</a>
+				, a standards organization). We invite and encourage you
+				to participate in both the implementation and
+				specification efforts.
+			</p>
+                                                <p>
+				UIMA is a component framework for analysing unstructured
+				content such as text, audio and video. It comprises an
+				SDK and tooling for composing and running analytic
+				components written in Java and C++, with some support
+				for Perl, Python and TCL.
+			</p>
+
+<h2><a name="what.is.annot.package">2. What is the Apache UIMA annotator package?</a></h2>
+<p>
+The Apache UIMA annotator package is an add-on package for the base UIMA release.
+The add-on package contains annotator components developed for Apache UIMA. The 
+add-on package fits the Apache UIMA directory structure and adds a directory 
+called "addons/annotator" that contains the following annotator components: <br>
+ - DictionaryAnnotator <br>
+ - RegularExpressionAnnotator <br>
+ - Tagger<br>
+ - WhitespaceTokenizer<br>
+ - DictionaryAnnotator<br>
+ - RegularExpressionAnnotator<br>
+ - Tagger<br>
+ - WhitespaceTokenizer<br>
+ - Bean Scripting Framework (BSF) BSFAnnotator<br>
+ - ConceptMapper<br>
+ - ConfigurableFeatureExtractor<br>
+ - Lucas - an interface to using UIMA with Lucene<br>
+ - OpenCalaisAnnotator - an sample annotator using the OpenCalais Service<br>
+ - SnowballAnnotator - an annotator making use of the snowball stemmers<br>
+ - TikaAnnotator - an annotator using the Tika project text extractors<br>
+</p><p> 
+Additionally the package contains some components to package annotators 
+and for accessing annotators as simple REST service. These are:<br>
+ - PearPackagingAntTask<br>
+ - SimpleServer
+</p><p>
+Finally, there is an addon to the base UIMA:
+ - FsVariables
+</p><p>
+Each component has a separate LICENSE and NOTICE files;  some also 
+have Readme and other documentation (in docs/). Documentation
+is also available on the UIMA website, in the Sandbox area.   
+</p> 
+
+<h2><a name="major.changes">3. Major Changes in this Release</a></h2>
+<p>
+The Apache UIMA annotator package release version 2.3.0 adds the  is the first release 
+following components to the previously released ocmponents:<br>
+ - Bean Scripting Framework (BSF) BSFAnnotator<br>
+ - ConceptMapper<br>
+ - ConfigurableFeatureExtractor<br>
+ - Lucas - an interface to using UIMA with Lucene<br>
+ - OpenCalaisAnnotator - an sample annotator using the OpenCalais Service<br>
+ - SnowballAnnotator - an annotator making use of the snowball stemmers<br>
+ - TikaAnnotator - an annotator using the Tika project text extractors<br>
+</p>
+<p>
+  The PearPackagingMavenPlugin is moved to the base UIMA release package.
+</p><p>
+The XMLBean support is migrated to version 2.4.0, and all of the projects
+now use the maven xmlbeans plugin to generate the XML parsers.
+</p><p> 
+Finally, there is an addon to the base UIMA:<br>
+ - FsVariables
+</p>
+  
+<p>
+For a list of all JIRA issues fixed with the current Sandbox release, 
+please refer to chapter <a href="#list.issues">6. List of JIRA Issues Fixed in this Release</a>. 
+</p> 
+  
+  
+<h2><a name="get.involved">4. How to Get Involved</a></h2>
+<p>
+The Apache UIMA project really needs and appreciates any contributions, 
+including documentation help, source code and feedback.  If you are interested
+in contributing, please visit 
+<a href="http://incubator.apache.org/uima/get-involved.html">
+  http://incubator.apache.org/uima/get-involved.html</a>.
+</p>
+  
+<h2><a name="report.issues">5. How to Report Issues</a></h2>
+<p>
+The Apache UIMA project uses JIRA for issue tracking.  Please report any 
+issues you find at 
+<a href="http://issues.apache.org/jira/browse/uima">http://issues.apache.org/jira/browse/uima</a>
+</p>
+  
+<h2><a name="list.issues">6. List of JIRA Issues Fixed in this Release</a></h2>
+
+
+        Release Notes - UIMA - Version 2.3S
+        
+<h2>        Bug
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-860'>UIMA-860</a>] -         Add source-style LICENSE and NOTICE files at &quot;root&quot;s of UIMA
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-990'>UIMA-990</a>] -         change POM description for annotator package POMs
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1003'>UIMA-1003</a>] -         update PearPackagingMavenPlugin dependency scope
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1004'>UIMA-1004</a>] -         update SimpleServer try out form 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1069'>UIMA-1069</a>] -         Model file is not loaded correctly if tagger is deployed more than once in same AE
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1071'>UIMA-1071</a>] -         http connector fails with some Java implementations
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1085'>UIMA-1085</a>] -         Fix Sandbox NOTICE files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1106'>UIMA-1106</a>] -         update OpenCalaisAnnotator with correct encodings
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1108'>UIMA-1108</a>] -         correct character offset for OpenCalais annotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1154'>UIMA-1154</a>] -         UIMA-AS extended tests hang when running with IBM JVM 1.6 service release 1
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1193'>UIMA-1193</a>] -         Tagger throws occasional NPE
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1264'>UIMA-1264</a>] -         Regex annotator goes into infinite loop on patterns that match the empty string
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1374'>UIMA-1374</a>] -         TikaAnnotator source code does not compile because of incorrect package declarations
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1378'>UIMA-1378</a>] -         Build of uimaj-examples project fails
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1379'>UIMA-1379</a>] -         Type system namespace should be org.apache.uima.tika, not just org.apache.uima
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1384'>UIMA-1384</a>] -         WhitespaceTokenizer pom still references UIMA 2.2.2
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1385'>UIMA-1385</a>] -         Regex annotator does not close concept file input stream after reading
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1392'>UIMA-1392</a>] -         OpenCalaisAnnotator's annotations have truncated 'coveredText' field
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1403'>UIMA-1403</a>] -         Lucas: many test cases fail
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1446'>UIMA-1446</a>] -         org.apache.uima.simpleserver.config.impl.SimpleFilterImpl.match() can cause a null pointer exception
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1447'>UIMA-1447</a>] -         Tabulations are annotated as tokens after a space
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1456'>UIMA-1456</a>] -         SimpleServer: sample config file does not work
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1457'>UIMA-1457</a>] -         SimpleServer: docs need updating for Tomcat 6
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1460'>UIMA-1460</a>] -         AnnotationTokenStream.next(Token) should not catch Throwable
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1462'>UIMA-1462</a>] -         SimpleUimaAsService has checked in SimpleServer libraries as binaries
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1464'>UIMA-1464</a>] -         SimpleServer NOTICE file missing JSR 173 attribution
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1528'>UIMA-1528</a>] -         The documentation describes still the UEAStemmer, which was removed from the distribution
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1530'>UIMA-1530</a>] -         Index naming is not unique in multithreaded scenarios
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1533'>UIMA-1533</a>] -         Lucas generated test-sources jar missing license, notice, disclaimer
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1535'>UIMA-1535</a>] -         Lucas POM issues
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1546'>UIMA-1546</a>] -         Fix sandbox notice and license files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1547'>UIMA-1547</a>] -         XML problems with simple server test cases
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1551'>UIMA-1551</a>] -         Lucas PearPackagingMavenPlugin PEAR classpath is incorrect
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1552'>UIMA-1552</a>] -         Lucas: does not compile with Java 1.5
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1554'>UIMA-1554</a>] -         Fix CFE notice and license file
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1557'>UIMA-1557</a>] -         LuceneCASIndexer.xml should be in src/test/resources
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1558'>UIMA-1558</a>] -         LuceneCASIndexerTest fails if the created LuceneCASIndexer procsess a CAS
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1571'>UIMA-1571</a>] -         FsVariables book_name should be FsVariablesUserGuide instead of fsVariablesUserGuide
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1572'>UIMA-1572</a>] -         Lucas artifactId does not match folder name in svn
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1582'>UIMA-1582</a>] -         SimpleServer ConfigTest fails
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1595'>UIMA-1595</a>] -         Change build of Sandbox RegExpr to use xmlbean maven plugin, and delete its lib dir
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1596'>UIMA-1596</a>] -         fix sandbox build - use of &lt;profile&gt; for conditional not working for child projects
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1597'>UIMA-1597</a>] -         in sandbox common build, change needed to use assembly-bin instead of bin
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1605'>UIMA-1605</a>] -         Fixed Findbugs issues
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1609'>UIMA-1609</a>] -         binary assembly wrongly including FOP files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1615'>UIMA-1615</a>] -         make build-from-sources work
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1639'>UIMA-1639</a>] -         Fixed bugs which disabled compiled dicts, static dict attributes
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1663'>UIMA-1663</a>] -         All directories in UIMA distribution should be 755
+</li>
+</ul>
+    
+<h2>        Improvement
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-991'>UIMA-991</a>] -         fix Sandbox documentation to avoid overflowing the footer on even pages
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-992'>UIMA-992</a>] -         update dictionary annotator build documentation - how to create XML Beans jar
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1005'>UIMA-1005</a>] -         create ant build for XMLBeans class generation
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1016'>UIMA-1016</a>] -         allow URLs as dictionary files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1301'>UIMA-1301</a>] -         Update documentation, log problems when dictionary entries don't load, remove diagnostic message during dictionary loading
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1336'>UIMA-1336</a>] -         allow multiple dictionary entries to match against a single string
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1370'>UIMA-1370</a>] -         Lucas: add the usual suspects to svnignore
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1372'>UIMA-1372</a>] -         Improve description of ConceptMapper on UIMA sandbox components web page
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1455'>UIMA-1455</a>] -         Lucas should not use deprecated lucene API
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1486'>UIMA-1486</a>] -         Lucas should not depend on google collections snapshot version
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1498'>UIMA-1498</a>] -         if an exception is rethrown, the original exception is not currently passed through
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1501'>UIMA-1501</a>] -         more refactoring and updating - parent POMs
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1506'>UIMA-1506</a>] -         update Bean Scripting Framework Annotator with info about licenses and documentation
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1517'>UIMA-1517</a>] -         Don't set executable bits on non-executables, when building assemblies
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1527'>UIMA-1527</a>] -         Upgrade Tika Annotator for 2.3.0 release
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1529'>UIMA-1529</a>] -         Lucas depends on lucene 2.4.0, it should be lucene 2.4.1
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1537'>UIMA-1537</a>] -         License Notice Disclaimer copying
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1538'>UIMA-1538</a>] -         Common Build Step: build source Jars for java Jars
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1550'>UIMA-1550</a>] -         Remove the uni-jena.de repository from lucas pom
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1556'>UIMA-1556</a>] -         The LucasCasIndexer should be an Analysis Engine and not a CasConsumer
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1559'>UIMA-1559</a>] -         lucas.xsd exists 3 times in different places
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1567'>UIMA-1567</a>] -         Maven build: add &lt;prerequisites&gt; to uimaj to specify minimum Maven release level
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1583'>UIMA-1583</a>] -         Regularize Sandbox builds and assembly
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1585'>UIMA-1585</a>] -         Run RAT on projects, fix missing licenses, add RAT running to POM, document exclusions
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1586'>UIMA-1586</a>] -         CFE - XMLBeans - use maven plugin to generate the parser
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1587'>UIMA-1587</a>] -         replace stax jar with better licensed geronimo version
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1589'>UIMA-1589</a>] -         CFE - add Readme describing how to regenerate the EMF generated files
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1590'>UIMA-1590</a>] -         fix extractAndBuild scripts
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1594'>UIMA-1594</a>] -         make sandbox assembly build like base and uima-as builds
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1610'>UIMA-1610</a>] -         add a changeVersion build tool to handle changes needed in sandbox release 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1613'>UIMA-1613</a>] -         run Rat consistently for all maven assemblies
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1642'>UIMA-1642</a>] -         Regex rule file parameter should allow wildcard expressions when using the datapath to locate rule files
+</li>
+</ul>
+    
+<h2>        New Feature
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-880'>UIMA-880</a>] -         Make PEAR installation path configurable in web.xml
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1021'>UIMA-1021</a>] -         implement OpenCalais service wrapper annotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1033'>UIMA-1033</a>] -         ConceptMapper--a highly configurable, token-based dictionary lookup UIMA component
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1065'>UIMA-1065</a>] -         CFE - configurable feature extrator for UIMA annotation comparison, evaluation, testing, generation of machine learning features
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1095'>UIMA-1095</a>] -         Implement a Tika Annotator
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1299'>UIMA-1299</a>] -         Contribution of Lucene CAS Indexer
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1371'>UIMA-1371</a>] -         Performance improvement: remove reliance on Property class and excess String building to reduce in-memory dictionary size.
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1526'>UIMA-1526</a>] -         The adaptor of the lucene stop word filter dosn't support the case sensitive flag
+</li>
+</ul>
+                
+<h2>        Task
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1361'>UIMA-1361</a>] -         Lucas: Convert documentation into docbook format
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1461'>UIMA-1461</a>] -         update sandbox POMs to 2.3.0-incubating-SNAPSHOT version
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1614'>UIMA-1614</a>] -         update 2.3.0-incubating-SNAPSHOT to drop the snapshot in prep for release
+</li>
+</ul>
+            
+<h2>        Wish
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/UIMA-1469'>UIMA-1469</a>] -         Add Lucas to the sandbox home page
+</li>
+</ul>
+                        
+</body>
+</html>
