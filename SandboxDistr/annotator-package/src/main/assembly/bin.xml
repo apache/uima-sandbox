@@ -34,6 +34,7 @@
 			<directory>readme</directory>
 			<outputDirectory/>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
 		</fileSet>
 
     <!-- Add files for all the Sandbox components being released -->	
@@ -41,71 +42,85 @@
       <outputDirectory>annotator</outputDirectory>            
       <directory>../../BSFAnnotator/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>            
       <directory>../../ConceptMapper/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>            
       <directory>../../ConfigurableFeatureExtractor/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>
       <directory>../../DictionaryAnnotator/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory/>
       <directory>../../FsVariables/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>            
       <directory>../../Lucas/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>
       <directory>../../OpenCalaisAnnotator/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory/>
       <directory>../../PearPackagingAntTask/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>            
       <directory>../../RegularExpressionAnnotator/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory/>
       <directory>../../SimpleServer/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>
       <directory>../../SnowballAnnotator/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>
       <directory>../../Tagger/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
     <fileSet>
       <outputDirectory>annotator</outputDirectory>
       <directory>../../TikaAnnotator/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
 		<fileSet>
       <outputDirectory>annotator</outputDirectory>
 			<directory>../../WhitespaceTokenizer/target/assembly-bin</directory>
       <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>		
 	</fileSets>
 </assembly>
