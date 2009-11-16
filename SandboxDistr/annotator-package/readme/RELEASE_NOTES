@@ -114,6 +114,7 @@ issues you find at http://issues.apache.org/jira/browse/uima.
 
 Release Notes - UIMA - Version 2.3S
 
+
 ** Bug
     * [UIMA-860] - Add source-style LICENSE and NOTICE files at "root"s of UIMA
     * [UIMA-990] - change POM description for annotator package POMs
@@ -162,6 +163,7 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1609] - binary assembly wrongly including FOP files
     * [UIMA-1615] - make build-from-sources work
     * [UIMA-1639] - Fixed bugs which disabled compiled dicts, static dict attributes
+    * [UIMA-1663] - All directories in UIMA distribution should be 755
 
 ** Improvement
     * [UIMA-991] - fix Sandbox documentation to avoid overflowing the footer on even pages
@@ -219,5 +221,4 @@ Release Notes - UIMA - Version 2.3S
 
 ** Wish
     * [UIMA-1469] - Add Lucas to the sandbox home page
-
 
