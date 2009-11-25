@@ -112,6 +112,7 @@ issues you find at http://issues.apache.org/jira/browse/uima.
 
 6. List of JIRA Issues Fixed in this Release
 
+
 Release Notes - UIMA - Version 2.3S
 
 
@@ -164,6 +165,7 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1615] - make build-from-sources work
     * [UIMA-1639] - Fixed bugs which disabled compiled dicts, static dict attributes
     * [UIMA-1663] - All directories in UIMA distribution should be 755
+    * [UIMA-1676] - Regex: pear install.xml is missing 2 of the 3 jar files
 
 ** Improvement
     * [UIMA-991] - fix Sandbox documentation to avoid overflowing the footer on even pages
@@ -221,4 +223,3 @@ Release Notes - UIMA - Version 2.3S
 
 ** Wish
     * [UIMA-1469] - Add Lucas to the sandbox home page
-
