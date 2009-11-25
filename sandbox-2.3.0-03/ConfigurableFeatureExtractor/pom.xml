@@ -1,0 +1,219 @@
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.    
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.uima</groupId>
+	<artifactId>ConfigurableFeatureExtractor</artifactId>
+	<packaging>jar</packaging>
+	<version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
+	<name>Apache UIMA Java Tool - ConfigurableFeatureExtractor</name>
+
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>SandboxDistr-pearBuilder</artifactId>
+    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
+  </parent>
+    
+  <dependencies>
+    <!-- dependencies checked using the dependency plugin dependency:analyze - no issues 9/2009 -->
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-jxpath</groupId>
+      <artifactId>commons-jxpath</artifactId>
+      <version>1.3</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>2.4.0</version>
+      <exclusions>
+        <exclusion> <!-- licensing issues, use geronimo instead -->
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.emf.ecore</groupId>
+      <artifactId>xmi</artifactId>
+      <version>2.3.0-v200706262000</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.emf</groupId>
+      <artifactId>common</artifactId>
+      <version>2.3.0-v200706262000</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.emf</groupId>
+      <artifactId>ecore</artifactId>
+      <version>2.3.0-v200706262000</version>
+    </dependency>
+
+    <!-- testing resources -->
+    <!-- uimaj-core is already "provided" and this seems to let it be 
+         available for testing
+         If you make it test scope, it removes it from the 'provided'
+         category and the main code won't compile -->
+    <!--dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-core</artifactId>
+      <scope>test</scope>
+    </dependency-->
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-component-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-examples</artifactId>
+      <scope>test</scope>
+    </dependency> 
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-document-annotation</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.0</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+    
+	<build>
+		<finalName>uima-tool-configurableFeatureExtractor</finalName>
+
+    <!-- next causes failure in eclipse:eclipse goal, so is
+         commented out and replaced with the maven-resources-plugin -->
+    <!--resources>
+      <resource>
+        <targetPath>${project.build.directory}/pearPackaging/desc</targetPath>
+        <directory>src/main/resources/descriptors</directory>
+      </resource>
+    </resources-->
+
+    <plugins>
+
+      <!-- generate XML parser from .xsd file -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xmlbeans-maven-plugin</artifactId>
+        <version>2.3.3</version>
+        <executions>
+          <execution>
+            <goals><goal>xmlbeans</goal></goals>
+            <configuration>
+              <schemaDirectory>src/main/xsdForXMLBeans</schemaDirectory>
+              <javaSource>1.5</javaSource>
+            </configuration>        
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- copy resources for the PEAR -->      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals><goal>copy-resources</goal></goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/pearPackaging/desc</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources/descriptors</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+ 
+      <!-- exclude some artifacts from dependencies not used by this application -->     
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy dependencies to lib</id>
+            <configuration>
+              <excludeArtifactIds>osgi,jobs,registry,preferences,contenttype,app</excludeArtifactIds>              
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- build pear plugin, most settings inherited from parent POM -->      
+      <plugin>
+        <groupId>org.apache.uima</groupId>
+        <artifactId>PearPackagingMavenPlugin</artifactId>
+        <executions><execution>
+          <id>buildPear</id>
+          <configuration>
+            <mainComponentDesc>desc/cas_consumers/UIMAFeatureConsumer.xml</mainComponentDesc> 
+          </configuration>
+        </execution></executions>
+      </plugin>              
+    
+      <!-- Release Audit Tool checks -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+                <exclude>cfeModelGen/*</exclude> <!-- generated EMF model files -->
+                <exclude>src/test/resources/testData*.txt*</exclude> <!-- test data -->
+                <exclude>src/test/java/example/PersonTitle*.java</exclude> <!-- generated -->
+                <exclude>src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>
+	</build>
+</project>

@@ -1,0 +1,225 @@
+	                    Apache UIMA Sandbox v2.3.0
+                               Release Notes
+   -----------------------------------------------------------------------
+
+CONTENTS
+1. What is the UIMA?
+2. What is the Apache UIMA annotator package?
+3. Major Changes in this Release
+4. How to Get Involved
+5. How to Report Issues
+6. List of JIRA Issues Fixed in this Release   
+   
+   
+1. What is UIMA?
+
+Unstructured Information Management applications are software systems that 
+analyze large volumes of unstructured information in order to discover knowledge
+that is relevant to an end user. UIMA is a framework and SDK for developing such
+applications. An example UIM application might ingest plain text and identify 
+entities, such as persons, places, organizations; or relations, such as 
+works-for or located-at. UIMA enables such an application to be decomposed into 
+components, for example "language identification" -> 
+"language specific segmentation" -> "sentence boundary detection" -> 
+"entity detection (person/place names etc.)". Each component must implement 
+interfaces defined by the framework and must provide self-describing metadata 
+via XML descriptor files. The framework manages these components and the data 
+flow between them. Components are written in Java or C++; the data that 
+flows between components is designed for efficient mapping between these 
+languages. UIMA additionally provides capabilities to wrap components as 
+network services, and can scale to very large volumes by replicating processing 
+pipelines over a cluster of networked nodes.
+
+Apache UIMA is an Apache-licensed open source implementation of the UIMA 
+specification (that specification is, in turn, being developed concurrently by 
+a technical committee within OASIS , a standards organization). We invite and 
+encourage you to participate in both the implementation and specification 
+efforts.
+
+UIMA is a component framework for analysing unstructured content such as text, 
+audio and video. It comprises an SDK and tooling for composing and running 
+analytic components written in Java and C++, with some support for Perl, 
+Python and TCL.
+
+2. What is the Apache UIMA annotator package?
+
+The Apache UIMA annotator package is an add-on package for the base UIMA release.
+The add-on package contains annotator components developed for Apache UIMA. The 
+add-on package fits the Apache UIMA directory structure and adds a directory 
+called "addons/annotator" that contains the following annotator components:
+ - DictionaryAnnotator
+ - RegularExpressionAnnotator
+ - Tagger
+ - WhitespaceTokenizer
+ - Bean Scripting Framework (BSF) BSFAnnotator
+ - ConceptMapper
+ - ConfigurableFeatureExtractor
+ - Lucas - an interface to using UIMA with Lucene
+ - OpenCalaisAnnotator - an sample annotator using the OpenCalais Service
+ - SnowballAnnotator - an annotator making use of the snowball stemmers
+ - TikaAnnotator - an annotator using the Tika project text extractors
+ 
+Additionally the package contains some components to package annotators 
+and for accessing annotators as simple REST service. These are:
+ - PearPackagingAntTask
+ - SimpleServer
+
+Finally, there is an addon to the base UIMA:
+ - FsVariables
+ 
+Each component has a separate LICENSE and NOTICE files;  some also 
+have Readme and other documentation (in docs/). Documentation
+is also available on the UIMA website, in the Sandbox area. 
+
+
+3. Major Changes in this Release
+
+The Apache UIMA annotator package release version 2.3.0 adds the  is the first release 
+following components to the previously released ocmponents:
+
+ - Bean Scripting Framework (BSF) BSFAnnotator
+ - ConceptMapper
+ - ConfigurableFeatureExtractor
+ - Lucas - an interface to using UIMA with Lucene
+ - OpenCalaisAnnotator - an sample annotator using the OpenCalais Service
+ - SnowballAnnotator - an annotator making use of the snowball stemmers
+ - TikaAnnotator - an annotator using the Tika project text extractors
+
+The PearPackagingMavenPlugin is moved to the base UIMA release package.
+
+The XMLBean support is migrated to version 2.4.0, and all of the projects
+now use the maven xmlbeans plugin to generate the XML parsers.
+ 
+Finally, there is an addon to the base UIMA:
+ - FsVariables
+ 
+For a list of all JIRA issues fixed with the current Sandbox release, 
+please refer to section 6. "List of JIRA Issues Fixed in this Release". 
+
+
+4. How to Get Involved
+
+The Apache UIMA project really needs and appreciates any contributions, 
+including documentation help, source code and feedback.  If you are interested
+in contributing, please visit http://incubator.apache.org/uima/get-involved.html.
+
+
+5. How to Report Issues
+
+The Apache UIMA project uses JIRA for issue tracking.  Please report any 
+issues you find at http://issues.apache.org/jira/browse/uima.
+
+
+6. List of JIRA Issues Fixed in this Release
+
+
+Release Notes - UIMA - Version 2.3S
+
+
+** Bug
+    * [UIMA-860] - Add source-style LICENSE and NOTICE files at "root"s of UIMA
+    * [UIMA-990] - change POM description for annotator package POMs
+    * [UIMA-1003] - update PearPackagingMavenPlugin dependency scope
+    * [UIMA-1004] - update SimpleServer try out form 
+    * [UIMA-1069] - Model file is not loaded correctly if tagger is deployed more than once in same AE
+    * [UIMA-1071] - http connector fails with some Java implementations
+    * [UIMA-1085] - Fix Sandbox NOTICE files
+    * [UIMA-1106] - update OpenCalaisAnnotator with correct encodings
+    * [UIMA-1108] - correct character offset for OpenCalais annotator
+    * [UIMA-1154] - UIMA-AS extended tests hang when running with IBM JVM 1.6 service release 1
+    * [UIMA-1193] - Tagger throws occasional NPE
+    * [UIMA-1264] - Regex annotator goes into infinite loop on patterns that match the empty string
+    * [UIMA-1374] - TikaAnnotator source code does not compile because of incorrect package declarations
+    * [UIMA-1378] - Build of uimaj-examples project fails
+    * [UIMA-1379] - Type system namespace should be org.apache.uima.tika, not just org.apache.uima
+    * [UIMA-1384] - WhitespaceTokenizer pom still references UIMA 2.2.2
+    * [UIMA-1385] - Regex annotator does not close concept file input stream after reading
+    * [UIMA-1392] - OpenCalaisAnnotator's annotations have truncated 'coveredText' field
+    * [UIMA-1403] - Lucas: many test cases fail
+    * [UIMA-1446] - org.apache.uima.simpleserver.config.impl.SimpleFilterImpl.match() can cause a null pointer exception
+    * [UIMA-1447] - Tabulations are annotated as tokens after a space
+    * [UIMA-1456] - SimpleServer: sample config file does not work
+    * [UIMA-1457] - SimpleServer: docs need updating for Tomcat 6
+    * [UIMA-1460] - AnnotationTokenStream.next(Token) should not catch Throwable
+    * [UIMA-1462] - SimpleUimaAsService has checked in SimpleServer libraries as binaries
+    * [UIMA-1464] - SimpleServer NOTICE file missing JSR 173 attribution
+    * [UIMA-1528] - The documentation describes still the UEAStemmer, which was removed from the distribution
+    * [UIMA-1530] - Index naming is not unique in multithreaded scenarios
+    * [UIMA-1533] - Lucas generated test-sources jar missing license, notice, disclaimer
+    * [UIMA-1535] - Lucas POM issues
+    * [UIMA-1546] - Fix sandbox notice and license files
+    * [UIMA-1547] - XML problems with simple server test cases
+    * [UIMA-1551] - Lucas PearPackagingMavenPlugin PEAR classpath is incorrect
+    * [UIMA-1552] - Lucas: does not compile with Java 1.5
+    * [UIMA-1554] - Fix CFE notice and license file
+    * [UIMA-1557] - LuceneCASIndexer.xml should be in src/test/resources
+    * [UIMA-1558] - LuceneCASIndexerTest fails if the created LuceneCASIndexer procsess a CAS
+    * [UIMA-1571] - FsVariables book_name should be FsVariablesUserGuide instead of fsVariablesUserGuide
+    * [UIMA-1572] - Lucas artifactId does not match folder name in svn
+    * [UIMA-1582] - SimpleServer ConfigTest fails
+    * [UIMA-1595] - Change build of Sandbox RegExpr to use xmlbean maven plugin, and delete its lib dir
+    * [UIMA-1596] - fix sandbox build - use of <profile> for conditional not working for child projects
+    * [UIMA-1597] - in sandbox common build, change needed to use assembly-bin instead of bin
+    * [UIMA-1605] - Fixed Findbugs issues
+    * [UIMA-1609] - binary assembly wrongly including FOP files
+    * [UIMA-1615] - make build-from-sources work
+    * [UIMA-1639] - Fixed bugs which disabled compiled dicts, static dict attributes
+    * [UIMA-1663] - All directories in UIMA distribution should be 755
+    * [UIMA-1676] - Regex: pear install.xml is missing 2 of the 3 jar files
+
+** Improvement
+    * [UIMA-991] - fix Sandbox documentation to avoid overflowing the footer on even pages
+    * [UIMA-992] - update dictionary annotator build documentation - how to create XML Beans jar
+    * [UIMA-1005] - create ant build for XMLBeans class generation
+    * [UIMA-1016] - allow URLs as dictionary files
+    * [UIMA-1301] - Update documentation, log problems when dictionary entries don't load, remove diagnostic message during dictionary loading
+    * [UIMA-1336] - allow multiple dictionary entries to match against a single string
+    * [UIMA-1370] - Lucas: add the usual suspects to svnignore
+    * [UIMA-1372] - Improve description of ConceptMapper on UIMA sandbox components web page
+    * [UIMA-1455] - Lucas should not use deprecated lucene API
+    * [UIMA-1486] - Lucas should not depend on google collections snapshot version
+    * [UIMA-1498] - if an exception is rethrown, the original exception is not currently passed through
+    * [UIMA-1501] - more refactoring and updating - parent POMs
+    * [UIMA-1506] - update Bean Scripting Framework Annotator with info about licenses and documentation
+    * [UIMA-1517] - Don't set executable bits on non-executables, when building assemblies
+    * [UIMA-1527] - Upgrade Tika Annotator for 2.3.0 release
+    * [UIMA-1529] - Lucas depends on lucene 2.4.0, it should be lucene 2.4.1
+    * [UIMA-1537] - License Notice Disclaimer copying
+    * [UIMA-1538] - Common Build Step: build source Jars for java Jars
+    * [UIMA-1550] - Remove the uni-jena.de repository from lucas pom
+    * [UIMA-1556] - The LucasCasIndexer should be an Analysis Engine and not a CasConsumer
+    * [UIMA-1559] - lucas.xsd exists 3 times in different places
+    * [UIMA-1567] - Maven build: add <prerequisites> to uimaj to specify minimum Maven release level
+    * [UIMA-1583] - Regularize Sandbox builds and assembly
+    * [UIMA-1585] - Run RAT on projects, fix missing licenses, add RAT running to POM, document exclusions
+    * [UIMA-1586] - CFE - XMLBeans - use maven plugin to generate the parser
+    * [UIMA-1587] - replace stax jar with better licensed geronimo version
+    * [UIMA-1589] - CFE - add Readme describing how to regenerate the EMF generated files
+    * [UIMA-1590] - fix extractAndBuild scripts
+    * [UIMA-1594] - make sandbox assembly build like base and uima-as builds
+    * [UIMA-1610] - add a changeVersion build tool to handle changes needed in sandbox release 
+    * [UIMA-1613] - run Rat consistently for all maven assemblies
+    * [UIMA-1642] - Regex rule file parameter should allow wildcard expressions when using the datapath to locate rule files
+
+** New Feature
+    * [UIMA-880] - Make PEAR installation path configurable in web.xml
+    * [UIMA-1021] - implement OpenCalais service wrapper annotator
+    * [UIMA-1033] - ConceptMapper--a highly configurable, token-based dictionary lookup UIMA component
+    * [UIMA-1065] - CFE - configurable feature extrator for UIMA annotation comparison, evaluation, testing, generation of machine learning features
+    * [UIMA-1095] - Implement a Tika Annotator
+    * [UIMA-1299] - Contribution of Lucene CAS Indexer
+    * [UIMA-1371] - Performance improvement: remove reliance on Property class and excess String building to reduce in-memory dictionary size.
+    * [UIMA-1526] - The adaptor of the lucene stop word filter dosn't support the case sensitive flag
+
+
+
+
+** Task
+    * [UIMA-1361] - Lucas: Convert documentation into docbook format
+    * [UIMA-1461] - update sandbox POMs to 2.3.0-incubating-SNAPSHOT version
+    * [UIMA-1614] - update 2.3.0-incubating-SNAPSHOT to drop the snapshot in prep for release
+
+
+
+** Wish
+    * [UIMA-1469] - Add Lucas to the sandbox home page
