@@ -203,6 +203,7 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1613] - run Rat consistently for all maven assemblies
     * [UIMA-1642] - Regex rule file parameter should allow wildcard expressions when using the datapath to locate rule files
     * [UIMA-1689] - fix some miscompares between svn export and source-distribution
+    * [UIMA-1691] - change checkout to export in extract and build scripts
 
 ** New Feature
     * [UIMA-880] - Make PEAR installation path configurable in web.xml
