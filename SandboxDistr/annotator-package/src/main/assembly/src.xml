@@ -80,6 +80,9 @@
         <include>src/**</include>
         <include>sandbox_build.xml</include>
       </includes>
+      <excludes>
+        <exclude>src/olink/**</exclude> <!-- not in svn -->
+      </excludes>
       <fileMode>644</fileMode>
   </fileSet>
 

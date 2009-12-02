@@ -256,17 +256,18 @@
                     <include>LICENSE*</include>
                     <include>NOTICE*</include>
                     <include>DISCLAIMER*</include>
-                    
-                    <include>pom.xml</include>
-                    
+                    <include>*.xml</include>  <!-- pom.xml, builders for some things -->
                     <include>desc/**</include>
+                    <include>metadata/**</include>  <!-- pear naming conventions -->
                     <include>resources/**</include>
                     <include>lib/**</include>
+                    <!--include>docs/**</include-->
                     
                     <!-- include of directories must specify the ** pattern to get the files -->
                     <!-- include paths cannot have .. -->
                     <include>docbook/**</include>
                     <include>src/**</include>
+                    <include>*.properties</include> <!-- tagger.properties, etc -->                    
                   </includes>
                 </resource>
               </resources>
