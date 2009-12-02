@@ -112,7 +112,6 @@ issues you find at http://issues.apache.org/jira/browse/uima.
 
 6. List of JIRA Issues Fixed in this Release
 
-
 Release Notes - UIMA - Version 2.3S
 
 
@@ -166,6 +165,9 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1639] - Fixed bugs which disabled compiled dicts, static dict attributes
     * [UIMA-1663] - All directories in UIMA distribution should be 755
     * [UIMA-1676] - Regex: pear install.xml is missing 2 of the 3 jar files
+    * [UIMA-1683] - fix copyright notice in the NOTICE files
+    * [UIMA-1686] - add licenses from some Sandbox projects to overall Sandbox license
+    * [UIMA-1687] - correct top-level svn license/notice files
 
 ** Improvement
     * [UIMA-991] - fix Sandbox documentation to avoid overflowing the footer on even pages
@@ -200,6 +202,7 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1610] - add a changeVersion build tool to handle changes needed in sandbox release 
     * [UIMA-1613] - run Rat consistently for all maven assemblies
     * [UIMA-1642] - Regex rule file parameter should allow wildcard expressions when using the datapath to locate rule files
+    * [UIMA-1689] - fix some miscompares between svn export and source-distribution
 
 ** New Feature
     * [UIMA-880] - Make PEAR installation path configurable in web.xml
