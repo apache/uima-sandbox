@@ -63,7 +63,7 @@ echo  If trunk, use the word "trunk" for the 2nd argument, e.g. extractAndBuild.
 @goto execute
 
 @:execute
-svn checkout -r HEAD http://svn.apache.org/repos/asf/incubator/uima/sandbox/%svnloc%
+svn export -r HEAD http://svn.apache.org/repos/asf/incubator/uima/sandbox/%svnloc%
 xcopy %leveldir%\* . /E
 rmdir /S /Q %leveldir%
 cd SandboxDistr
