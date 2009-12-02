@@ -131,7 +131,6 @@
     </resources-->
 
     <plugins>
-
       <!-- generate XML parser from .xsd file -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -148,11 +147,11 @@
         </executions>
       </plugin>
 
-      <!-- copy resources for the PEAR -->      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
+          <!-- copy resources for the PEAR -->      
           <execution>
             <goals><goal>copy-resources</goal></goals>
             <phase>process-resources</phase>
@@ -161,6 +160,23 @@
               <resources>
                 <resource>
                   <directory>src/main/resources/descriptors</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <!-- copy non-typical resources for src assembly -->      
+          <execution>
+            <id>copy special resources to assembly-src</id>
+            <goals><goal>copy-resources</goal></goals>  
+            <phase>process-resources</phase>  <!-- required -->
+            <configuration>
+              <outputDirectory>${project.build.directory}/assembly-src/${artifactId}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>.</directory>
+                  <includes>
+                    <include>cfeModelGen/**</include>
+                  </includes>
                 </resource>
               </resources>
             </configuration>
