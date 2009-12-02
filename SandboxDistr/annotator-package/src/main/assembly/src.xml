@@ -67,6 +67,7 @@
         <exclude>annotator-package/target/**</exclude>
         <exclude>.*</exclude>
         <exclude>target</exclude>
+        <exclude>pear-builder-pom/target/**</exclude>
       </excludes>
       <fileMode>644</fileMode>
    	</fileSet>
