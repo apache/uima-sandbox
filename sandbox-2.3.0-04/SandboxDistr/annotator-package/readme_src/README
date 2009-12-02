@@ -1,0 +1,72 @@
+     Apache UIMA Annotator Package Version 2.3.0 README for Source Distribution
+     --------------------------------------------------------------------------
+
+For general instructions about building the Apache UIMA Sandbox projects 
+from the sources, please refer to:
+http://incubator.apache.org/uima/svn.html#building.with.maven
+
+The Sandbox project is set up to be buildable only in conjuction with the
+base UIMA project.  Both must be placed in the same parent directory.
+The individual projects of both source distributions (for example, uimaj-distr, and
+SandboxDistr) will then end up in the same parent directory.  This arrangement, 
+which differs from the usual Maven conventions, is adopted because
+the Eclipse workspace needs to have all projects at a single hierarchical level.
+
+Before building the Sandbox projects, you need to build the
+base UIMA projects on which the sandbox depends, if you are building a level which is not already
+released.  
+
+To build the Sandbox projects,
+  cd to SandboxDistr/annotator-package, and do mvn install
+
+To work with eclipse additionally:
+  issue the command: mvn eclipse:eclipse
+  
+To build the distribution
+  checkout the sandbox projects, and move them (if necessary) into
+  the same directory as the uima base checkout.
+  
+  first build the Sandbox projects:
+    cd SandboxDistr/annotator-package
+    mvn install 
+  then do mvn -N assembly:assembly
+
+-------------------------
+Using source files with distributed JARS
+
+For debugging, many IDEs allow associating source code with Java
+class files.  This can be done for these components in several ways.
+
+The easiest way is to build your project using Maven, and get the
+uima artifacts from the incubator maven repository, which as of the
+2.3.0 release includes the sources.  
+
+Alternatively, you can put the sources into 
+the Jar files, or you can create a big archive of all the sources and
+tell the IDE to use this archive to find the source files.
+
+  Adding sources to Jar files
+  ---------------------------
+If you have installed both the Apache UIMA Sandbox package binary 
+distribution and the Apache UIMA Sandbox source distribution, 
+you can run the addSourceJars.bat (or .sh) script to add the 
+source code to the Jar files in the UIMA_HOME/lib directory.  
+
+  Creating one archive with all the source files
+  ----------------------------------------------
+If you have installed the base UIMA sources as well, into the same
+parent directory, you can run the script in the base UIMA directory
+packageAllJavaSourcesIntoJar to package all the sources, including
+both the base and Sandbox, into one Jar.  This Jar may be then
+specified to Eclipse, for instance, as the location of sources.
+
+DISCLAIMER
+
+Apache UIMA is an effort undergoing incubation at The Apache Software
+Foundation (ASF). Incubation is required of all newly accepted projects
+until a further review indicates that the infrastructure, communications,
+and decision making process have stabilized in a manner consistent with
+other successful ASF projects. While incubation status is not necessarily
+a reflection of the completeness or stability of the code, it does
+indicate that the project has yet to be fully endorsed by the ASF.
+
