@@ -66,6 +66,7 @@
                 <exclude>ConfigurableFeatureExtractor/src/test/java/example/PersonTitle*.java</exclude> <!-- generated classes -->
                 <exclude>ConfigurableFeatureExtractor/src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated classes -->
                 <exclude>ConfigurableFeatureExtractor/src/test/resources/testData*txt*</exclude> <!-- test data -->
+                <exclude>ConfigurableFeatureExtractor/cfeModelGen/*</exclude> <!-- generated EMF model files -->
                 <exclude>DictionaryAnnotator/src/test/resources/DictionaryAnnotatorTestFilterFeaturePath/dictionaryAnnotFeaturePathTestRef.txt</exclude> <!-- test data -->
                 <exclude>DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.txt</exclude> <!-- test data -->
                 <exclude>DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.xml</exclude> <!-- test data -->
