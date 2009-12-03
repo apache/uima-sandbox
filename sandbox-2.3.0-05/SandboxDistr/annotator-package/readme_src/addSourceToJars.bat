@@ -1,0 +1,43 @@
+@echo off
+
+REM   Licensed to the Apache Software Foundation (ASF) under one
+REM   or more contributor license agreements.  See the NOTICE file
+REM   distributed with this work for additional information
+REM   regarding copyright ownership.  The ASF licenses this file
+REM   to you under the Apache License, Version 2.0 (the
+REM   "License"); you may not use this file except in compliance
+REM   with the License.  You may obtain a copy of the License at
+REM
+REM    http://www.apache.org/licenses/LICENSE-2.0
+REM
+REM   Unless required by applicable law or agreed to in writing,
+REM   software distributed under the License is distributed on an
+REM   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+REM   KIND, either express or implied.  See the License for the
+REM   specific language governing permissions and limitations
+REM   under the License.
+
+@echo on
+
+cd PearPackagingMavenPlugin\src\main\java
+jar -uvf %UIMA_HOME%\addons\PearPackagingMavenPlugin\lib\uima-pear-maven-plugin.jar *
+
+cd ..\..\..\..\PearPackagingAntTask\src\main\java
+jar -uvf %UIMA_HOME%\addons\PearPackagingAntTask\lib\uima-pear-ant-task.jar *
+
+cd ..\..\..\..\RegularExpressionAnnotator\src\main\java
+jar -uvf %UIMA_HOME%\addons\annotator\RegularExpressionAnnotator\lib\uima-an-regex.jar *
+
+cd ..\..\..\..\DictionaryAnnotator\src\main\java
+jar -uvf %UIMA_HOME%\addons\annotator\DictionaryAnnotator\lib\uima-an-dictionary.jar *
+
+cd ..\..\..\..\WhitespaceTokenizer\src\main\java
+jar -uvf %UIMA_HOME%\addons\annotator\WhitespaceTokenizer\lib\uima-an-wst.jar *
+
+cd ..\..\..\..\Tagger\src\main\java
+jar -uvf %UIMA_HOME%\addons\annotator\Tagger\lib\uima-an-tagger.jar *
+
+cd ..\..\..\..\SimpleServer\src\main\java
+jar -uvf %UIMA_HOME%\addons\SimpleServer\lib\uima-simple-server.jar *
+
+cd ..\..\..\..

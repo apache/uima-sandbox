@@ -1,0 +1,112 @@
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.    
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.uima</groupId>
+  <artifactId>SandboxAnnotatorPackage</artifactId>
+  <packaging>pom</packaging>
+  <!-- version cannot be a ${xxx} form for parent POMs -->
+  <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
+  <name>Apache UIMA Sandbox Annotator Add-Ons</name>
+  <url>http://incubator.apache.org/uima</url>
+  <description>Annotator components for the UIMA SDK</description>
+  
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>uima-common-distribution</artifactId> <!-- don't need to build this project as a sandbox proj -->
+    <!-- version cannot be a ${xxx} form -->
+    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>../../uimaj/distr-superPom</relativePath>
+  </parent>
+   
+  <properties>
+    <!-- property used in multiple places in distr-superPom -->
+    <assemblyFinalName>uimaj-annotator-addons-${uimaj-release-version}</assemblyFinalName>
+  </properties>
+     
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+      </plugin>
+      
+      <!-- run Release Audit Tool (RAT) on src and bin distrs -->       
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>rat-check-src</id>
+            <configuration>              
+              <excludes>
+                <exclude>BSFAnnotator/src/main/java/org/apache/uima/annotator/bsf/types/*.java</exclude> <!-- generated classes -->
+                <exclude>BSFAnnotator/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>ConceptMapper/src/main/java/org/apache/uima/conceptMapper/DictTerm*.java</exclude> <!-- generated classes -->
+                <exclude>ConceptMapper/src/main/java/org/apache/uima/conceptMapper/support/tokenizer/TokenAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>ConceptMapper/src/main/java/uima/tt/TokenAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>ConfigurableFeatureExtractor/src/test/java/example/PersonTitle*.java</exclude> <!-- generated classes -->
+                <exclude>ConfigurableFeatureExtractor/src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated classes -->
+                <exclude>ConfigurableFeatureExtractor/src/test/resources/testData*txt*</exclude> <!-- test data -->
+                <exclude>ConfigurableFeatureExtractor/cfeModelGen/*</exclude> <!-- generated EMF model files -->
+                <exclude>DictionaryAnnotator/src/test/resources/DictionaryAnnotatorTestFilterFeaturePath/dictionaryAnnotFeaturePathTestRef.txt</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.txt</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/Dictionary*Test*/*Ref.xml</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/dictInput.txt</exclude> <!-- test data -->
+                <exclude>DictionaryAnnotator/src/test/resources/DictionaryCreatorTest/WhitespaceTokenizer.pear</exclude> <!-- test data -->                
+                <exclude>Lucas/src/test/java/org/apache/uima/lucas/indexer/types/test/*.java</exclude> <!-- generated classes -->
+                <exclude>Lucas/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>RegularExpressionAnnotator/src/test/resources/*/*Ref*.txt</exclude> <!-- test data -->
+                <exclude>SnowballAnnotator/src/main/java/org/tartarus/snowball/**</exclude> <!-- included under license -->
+                <exclude>SnowballAnnotator/src/test/resources/englishRef.txt</exclude> <!-- test data -->
+                <exclude>Tagger/src/test/resources/moby-tag-list.txt</exclude> <!-- test data -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/AttributeFS*.java</exclude> <!-- generated classes -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/FeatureValue*.java</exclude> <!-- generated classes -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/MarkupAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>TikaAnnotator/src/main/java/org/apache/uima/tika/SourceDocumentAnnotation*.java</exclude> <!-- generated classes -->
+                <exclude>WhitespaceTokenizer/src/test/resources/*.txt</exclude> <!-- test data -->
+                <exclude>SimpleServer/src/test/resources/expected/*.xml</exclude> <!-- test data -->
+                <exclude>SimpleServer/src/test/resources/test.txt</exclude> <!-- test data -->
+                <exclude>RELEASE_NOTES.html</exclude> <!-- release notes -->
+                <exclude>SandboxDistr/annotator-package/readme/RELEASE_NOTES.html</exclude> <!-- release notes -->
+                <exclude>SandboxDocs/src/olink/**</exclude> <!-- generated cross-ref database for docbook -->
+                <exclude>SandboxDocs/src/styles/titlepage/titlepage-*.xsl</exclude> <!-- generated file -->
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>rat-check-bin</id>
+            <configuration>
+              <excludes>
+                <exclude>addons/annotator/*/docs/html/images/*.svg</exclude> <!-- generated image files -->
+                <exclude>addons/*/docs/html/images/*.svg</exclude> <!-- generated image files -->
+                <exclude>addons/annotator/*/*.pear</exclude> <!-- generated binary file -->
+                <exclude>addons/RELEASE_NOTES.html</exclude> <!-- release notes -->
+              </excludes>
+            </configuration>
+          </execution>  
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+     
+</project>

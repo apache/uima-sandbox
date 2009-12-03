@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!--
+   ***************************************************************
+   * Licensed to the Apache Software Foundation (ASF) under one
+   * or more contributor license agreements.  See the NOTICE file
+   * distributed with this work for additional information
+   * regarding copyright ownership.  The ASF licenses this file
+   * to you under the Apache License, Version 2.0 (the
+   * "License"); you may not use this file except in compliance
+   * with the License.  You may obtain a copy of the License at
+         *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing,
+   * software distributed under the License is distributed on an
+   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   * KIND, either express or implied.  See the License for the
+   * specific language governing permissions and limitations
+   * under the License.
+   ***************************************************************
+   -->
+
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>true</primitive>
+  <annotatorImplementationName>org.apache.uima.annotator.calais_groovy.RdfProcessor</annotatorImplementationName>
+  <analysisEngineMetaData>
+    <name>CalaisRdfProcessor</name>
+    <description>Processes the RDF returned from a query to openCalais, and produces entities, relations, and instances of those as annotations and Feature Structures  in the CAS</description>
+    <version>1.0</version>
+    <vendor/>
+    <configurationParameters/>
+    <configurationParameterSettings/>
+    <typeSystemDescription>
+      <imports>
+        <import location="CalaisTypes.xml"/>
+      </imports>
+    </typeSystemDescription>
+    <typePriorities/>
+    <fsIndexCollection>
+      <imports>
+        <import location="CalaisIndexRdfText.xml"/>
+      </imports>
+    </fsIndexCollection>
+    <capabilities>
+      <capability>
+        <inputs>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.RdfText</type>
+        </inputs>
+        <outputs>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.URL</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Technology</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.TVShow</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.StockSplit</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.SportsGame</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.SportsEvent</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.RelationInstance</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.Relation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Region</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.Quotation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.PublishedMedium</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.ProvinceOrState</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Product</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.PhoneNumber</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.PersonProfessionalPast</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.PersonProfessional</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.PersonPoliticalPast</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.PersonPolitical</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.PersonEducation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Person</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Organization</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.NaturalFeature</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.NaturalDisaster</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.MusicGroup</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.MusicAlbum</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Movie</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.Merger</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.MedicalCondition</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.ManagementChange</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.JointVenture</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.Instance</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.IndustryTerm</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.IPO</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Holiday</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.FaxNumber</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.FamilyRelation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Facility</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.EntityInstance</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.Entity</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.EntertainmentAwardEvent</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.EmailAddress</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Currency</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CreditRating</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Country</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Continent</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.ConferenceCall</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyTechnology</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyReorganization</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyMeeting</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyLocation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyLegalIssues</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyInvestment</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyEarningsGuidance</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyEarningsAnnouncement</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyCustomer</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.CompanyAffiliates</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Company</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.City</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.Buybacks</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.BusinessRelation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.Base</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.Bankruptcy</type>
+          <type allAnnotatorFeatures="true">uima.tcas.Annotation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.entity.Anniversary</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.AnalystRecommendation</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.AnalystEarningsEstimate</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.Alliance</type>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.relation.Acquisition</type>
+        </outputs>
+        <languagesSupported/>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </analysisEngineMetaData>
+  <resourceManagerConfiguration/>
+</analysisEngineDescription>

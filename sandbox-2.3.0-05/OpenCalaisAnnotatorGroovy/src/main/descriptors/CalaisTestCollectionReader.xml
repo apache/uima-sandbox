@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collectionReaderDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <implementationName>org.apache.uima.annotator.calais_groovy.CalaisTestCollectionReader</implementationName>
+  <processingResourceMetaData>
+    <name>CalaisTestCollectionReader</name>
+    <description>Reads RDF results stored in a directory, sets up sofa and rdftext</description>
+    <version>1.0</version>
+    <vendor/>
+    <configurationParameters>
+      <configurationParameter>
+        <name>InputDirectory</name>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>ThisMany</name>
+        <type>Integer</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>InputDirectory</name>
+        <value>
+          <string>data/wikinews</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>ThisMany</name>
+        <value>
+          <integer>1</integer>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+    <typeSystemDescription>
+      <imports>
+        <import location="CalaisTypes.xml"/>
+        <import name="org.apache.uima.examples.SourceDocumentInformation"/>
+      </imports>
+    </typeSystemDescription>
+    <typePriorities/>
+    <fsIndexCollection>
+      <imports>
+        <import location="CalaisIndexRdfText.xml"/>
+      </imports>
+    </fsIndexCollection>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs>
+          <type allAnnotatorFeatures="true">org.apache.uima.calaisType.RdfText</type>
+        </outputs>
+        <languagesSupported/>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+      <outputsNewCASes>true</outputsNewCASes>
+    </operationalProperties>
+  </processingResourceMetaData>
+  <resourceManagerConfiguration/>
+</collectionReaderDescription>
