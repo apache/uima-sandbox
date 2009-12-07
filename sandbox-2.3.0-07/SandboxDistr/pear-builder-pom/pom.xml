@@ -1,0 +1,107 @@
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.    
+-->
+
+<!--
+  This is the parent POM for Sandbox project building pears
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.uima</groupId>
+  <artifactId>SandboxDistr-pearBuilder</artifactId>
+  <!-- version cannot be a ${xxx} form for Parent poms -->
+  <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
+  <name>Apache UIMA Sandbox distribution pear builder</name>
+  <packaging>pom</packaging>
+  <description>Common approach to building PEARs for Sandbox annotator projects</description>
+  
+  <parent>
+    <groupId>org.apache.uima</groupId>
+    <artifactId>SandboxDistr</artifactId>
+    <!-- version cannot be a ${xxx} form -->
+    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
+    <relativePath>..</relativePath>
+  </parent>  
+    
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- this is in plugin management, rather than in plugins, to make this
+             pom "buildable" so it can be installed.  Otherwise, build of this pom
+             fails trying to execute the pear packager -->
+        <plugin>
+          <groupId>org.apache.uima</groupId>
+          <artifactId>PearPackagingMavenPlugin</artifactId>
+          <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
+          <extensions>true</extensions>        
+          <executions><execution>
+              <id>buildPear</id>
+              <goals><goal>package</goal></goals>
+                 <!-- needs to run after the jar is built
+                      before the assembly is done -->
+              <phase>package</phase>
+              <configuration> 
+                <datapath>$main_root/resources</datapath>
+                <componentId>${artifactId}</componentId>
+              </configuration>
+            </execution></executions>
+        </plugin>              
+      </plugins>
+    </pluginManagement>
+    
+    <plugins>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <!-- copy the bin/artifactId/lib to the pearPackaging/lib -->
+          <execution>
+            <id>copy bin/artifactId/lib and LIC/NOT/DIS/RDME to target/pearPackaging</id>
+            <goals><goal>copy-resources</goal></goals>
+            <phase>compile</phase>  <!-- run after dependency plugin runs
+                                      before pear packager runs -->
+            <configuration>
+              <outputDirectory>${project.build.directory}/pearPackaging</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/assembly-bin/${artifactId}</directory>
+                  <includes><include>lib/**</include></includes>
+                </resource>
+                <resource>
+                  <directory>.</directory>
+                  <includes>
+                    <include>readme*</include>
+                    <include>README*</include>
+                    <include>LICENSE*</include>
+                    <include>NOTICE*</include>
+                    <include>DISCLAIMER*</include>
+                  </includes>     
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>  
+      </plugin>
+       
+    </plugins>
+  </build>      
+ 
+</project>
