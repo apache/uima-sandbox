@@ -125,7 +125,6 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1085] - Fix Sandbox NOTICE files
     * [UIMA-1106] - update OpenCalaisAnnotator with correct encodings
     * [UIMA-1108] - correct character offset for OpenCalais annotator
-    * [UIMA-1154] - UIMA-AS extended tests hang when running with IBM JVM 1.6 service release 1
     * [UIMA-1193] - Tagger throws occasional NPE
     * [UIMA-1264] - Regex annotator goes into infinite loop on patterns that match the empty string
     * [UIMA-1374] - TikaAnnotator source code does not compile because of incorrect package declarations
@@ -155,6 +154,7 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1558] - LuceneCASIndexerTest fails if the created LuceneCASIndexer procsess a CAS
     * [UIMA-1571] - FsVariables book_name should be FsVariablesUserGuide instead of fsVariablesUserGuide
     * [UIMA-1572] - Lucas artifactId does not match folder name in svn
+    * [UIMA-1577] - Do pear packaging with dependencies included for CFE
     * [UIMA-1582] - SimpleServer ConfigTest fails
     * [UIMA-1595] - Change build of Sandbox RegExpr to use xmlbean maven plugin, and delete its lib dir
     * [UIMA-1596] - fix sandbox build - use of <profile> for conditional not working for child projects
@@ -166,6 +166,7 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1663] - All directories in UIMA distribution should be 755
     * [UIMA-1676] - Regex: pear install.xml is missing 2 of the 3 jar files
     * [UIMA-1683] - fix copyright notice in the NOTICE files
+    * [UIMA-1685] - Sandbox licenses has uima-as licenses, but those are now moved out into a separate entity
     * [UIMA-1686] - add licenses from some Sandbox projects to overall Sandbox license
     * [UIMA-1687] - correct top-level svn license/notice files
 
@@ -184,6 +185,7 @@ Release Notes - UIMA - Version 2.3S
     * [UIMA-1501] - more refactoring and updating - parent POMs
     * [UIMA-1506] - update Bean Scripting Framework Annotator with info about licenses and documentation
     * [UIMA-1517] - Don't set executable bits on non-executables, when building assemblies
+    * [UIMA-1518] - improve SandboxDistr assembly
     * [UIMA-1527] - Upgrade Tika Annotator for 2.3.0 release
     * [UIMA-1529] - Lucas depends on lucene 2.4.0, it should be lucene 2.4.1
     * [UIMA-1537] - License Notice Disclaimer copying
