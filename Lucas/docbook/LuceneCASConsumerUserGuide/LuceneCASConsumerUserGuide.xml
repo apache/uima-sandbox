@@ -1433,4 +1433,76 @@
 			</itemizedlist>
 		</para>
 	</chapter>
+	<chapter id="sandbox.luceneCasConsumer.prospectiveSearch">
+		<title>Prospective Search</title>
+		<para>
+		Prospective search is a search method where a set of search queries are given first
+		and then searched against a stream of documents. A search query divides the document
+		stream into a sub-stream which only contains these document which match the query.
+		Users usually define a number of search queries and then subscribe to the resulting
+		sub-streams. An example for prospective search is a news feed which is monitored for certain terms,
+		each time a term occurs a mail notification is send.
+		</para>
+		<para>
+		The user must provide a set of search queries via a <code>SearchQueryProvider</code>,
+		these search queries are then search against the processed CAS as defined in the mapping file,
+		if a match occurs a feature structure is inserted into the CAS. Optionally highlighting is 
+		supported, annotations for the matchtng text areas are created and linked to the
+		feature structure.
+		</para>
+		<para>
+		The implementation uses the Lucene
+		<ulink url="http://lucene.apache.org/java/2_4_1/api/contrib-memory/org/apache/lucene/index/memory/MemoryIndex.html">MemoryIndex</ulink>
+		which is a fast one document in memory index. For performance notes please consult the javadoc
+		of the <code>MemoryIndex</code> class.
+		</para>
+		<section id="sandbox.luceneCasConsumer.prospectiveSearch.searchQueryProvider">
+			<title>Search Query Provider</title>
+			<para>
+			The Search Query Provider provides the Perspective Search Analysis Engine
+			with a set of search queries which should be monitored. A search
+			query is a combination of a Lucene query and an id. The id is later needed
+			to map a match to a specific search query. A user usually has a set of
+			search queries which should be monitored, since there is no standardized
+			way to access the search queries the user must implement the <code>SearchQueryProvider</code>
+			interface and configure the thread-safe implementation as shared resource object.
+			An example for such an implementation could be a search query provider which reads
+			search queries form a database or a web service.
+			</para>
+		</section>
+		<section id="sandbox.luceneCasConsumer.prospectiveSearch.searchResults">
+			<title>Search Results</title>
+			<para>
+			The search results are written to the CAS, for each match one Search Result
+			feature structure is inserted into the CAS. The Search Result feature structure contains
+			the id and optionally links to an array of annotations which mark the matching
+			text in the CAS.
+			</para>
+			<para>
+			The Search Result type must be mapped to a defined type 
+			in the analysis engine descriptor with the following configuration
+			parameters:
+			<itemizedlist>
+				<listitem>
+					<para>
+					<code>String org.apache.uima.lucas.SearchResult</code> 
+					- Maps the search result type to an actual type in the type system.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+					<code>String org.apache.uima.lucas.SearchResultIdFeature</code> 
+					- A long id feature, identifies the matching search query.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<code>String org.apache.uima.lucas.SearchResulMatchingTextFeature</code>
+						- An optional <code>ArrayFS</code> feature, links to annotations which mark the matching text.
+					</para>
+				</listitem>
+			</itemizedlist>
+			</para>
+		</section>
+	</chapter>
 </book>

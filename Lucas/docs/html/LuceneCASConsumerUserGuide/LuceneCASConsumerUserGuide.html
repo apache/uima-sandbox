@@ -2,7 +2,7 @@
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
    <title>Apache UIMA Lucene CAS Indexer Documentation</title><link rel="stylesheet" href="css/stylesheet-html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.72.0"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en" id="d0e2"><div class="titlepage"><div><div><h1 class="title"><a name="d0e2"></a>
 		Apache UIMA Lucene CAS Indexer Documentation
-	</h1></div><div><div class="authorgroup"><h3 class="corpauthor">Authors: The Apache UIMA Development Community</h3></div></div><div><span class="productname">Apache UIMA Sandbox<br></span></div><div><p class="releaseinfo">Version 2.3.0</p></div><div><p class="copyright">Copyright &copy; 2008, 2009 The Apache Software Foundation</p></div><div><div class="legalnotice"><a name="d0e15"></a><p> </p><p><b>Incubation Notice and Disclaimer.&nbsp;</b>Apache UIMA is an effort undergoing incubation at the Apache Software Foundation (ASF). 
+	</h1></div><div><div class="authorgroup"><h3 class="corpauthor">Authors: The Apache UIMA Development Community</h3></div></div><div><span class="productname">Apache UIMA Sandbox<br></span></div><div><p class="releaseinfo">Version 2.3.0</p></div><div><p class="copyright">Copyright &copy; 2008, 2010 The Apache Software Foundation</p></div><div><div class="legalnotice"><a name="d0e15"></a><p> </p><p><b>Incubation Notice and Disclaimer.&nbsp;</b>Apache UIMA is an effort undergoing incubation at the Apache Software Foundation (ASF). 
           Incubation is required of all newly accepted projects until a further review indicates that 
           the infrastructure, communications, and decision making process have stabilized in a manner 
           consistent with other successful ASF projects. While incubation status is not necessarily 
@@ -58,7 +58,7 @@
 				</a></span></dt><dt><span class="section"><a href="#sandbox.luceneCasConsumer.mapping.reference.filters.lowercase">2.3.11. 
 					Lower Case Filter
 				</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#sandbox.luceneCasConsumer.indexwriter">3. Index Writer Configuration</a></span></dt><dt><span class="chapter"><a href="#sandbox.luceneCasConsumer.descriptor">4. Descriptor Parameters
-		</a></span></dt></dl></div><div class="preface" lang="en" id="d0e54"><div class="titlepage"><div><div><h2 class="title"><a name="d0e54"></a>Introduction</h2></div></div></div><p>
+		</a></span></dt><dt><span class="chapter"><a href="#sandbox.luceneCasConsumer.prospectiveSearch">5. Prospective Search</a></span></dt><dd><dl><dt><span class="section"><a href="#sandbox.luceneCasConsumer.prospectiveSearch.searchQueryProvider">5.1. Search Query Provider</a></span></dt><dt><span class="section"><a href="#sandbox.luceneCasConsumer.prospectiveSearch.searchResults">5.2. Search Results</a></span></dt></dl></dd></dl></div><div class="preface" lang="en" id="d0e54"><div class="titlepage"><div><div><h2 class="title"><a name="d0e54"></a>Introduction</h2></div></div></div><p>
 			The Lucene CAS Indexer (Lucas) is a UIMA CAS consumer that
 			stores CAS
 			data in a Lucene index. Lucas allows to exploit the results
@@ -799,4 +799,51 @@
 		</h2></div></div></div><p>
 			Because Lucas is configured by the mapping file, the descriptor has only one parameter:
 			</p><div class="itemizedlist"><ul type="disc"><li><p><code class="code">mappingFile</code> - the file path to the mapping file.</p></li></ul></div><p>
-		</p></div></div></body></html>
+		</p></div><div class="chapter" lang="en" id="sandbox.luceneCasConsumer.prospectiveSearch"><div class="titlepage"><div><div><h2 class="title"><a name="sandbox.luceneCasConsumer.prospectiveSearch"></a>Chapter&nbsp;5.&nbsp;Prospective Search</h2></div></div></div><p>
+		Prospective search is a search method where a set of search queries are given first
+		and then searched against a stream of documents. A search query divides the document
+		stream into a sub-stream which only contains these document which match the query.
+		Users usually define a number of search queries and then subscribe to the resulting
+		sub-streams. An example for prospective search is a news feed which is monitored for certain terms,
+		each time a term occurs a mail notification is send.
+		</p><p>
+		The user must provide a set of search queries via a <code class="code">SearchQueryProvider</code>,
+		these search queries are then search against the processed CAS as defined in the mapping file,
+		if a match occurs a feature structure is inserted into the CAS. Optionally highlighting is 
+		supported, annotations for the matchtng text areas are created and linked to the
+		feature structure.
+		</p><p>
+		The implementation uses the Lucene
+		<a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://lucene.apache.org/java/2_4_1/api/contrib-memory/org/apache/lucene/index/memory/MemoryIndex.html" target="_top">MemoryIndex</a>
+		which is a fast one document in memory index. For performance notes please consult the javadoc
+		of the <code class="code">MemoryIndex</code> class.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sandbox.luceneCasConsumer.prospectiveSearch.searchQueryProvider"></a>5.1.&nbsp;Search Query Provider</h2></div></div></div><p>
+			The Search Query Provider provides the Perspective Search Analysis Engine
+			with a set of search queries which should be monitored. A search
+			query is a combination of a Lucene query and an id. The id is later needed
+			to map a match to a specific search query. A user usually has a set of
+			search queries which should be monitored, since there is no standardized
+			way to access the search queries the user must implement the <code class="code">SearchQueryProvider</code>
+			interface and configure the thread-safe implementation as shared resource object.
+			An example for such an implementation could be a search query provider which reads
+			search queries form a database or a web service.
+			</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sandbox.luceneCasConsumer.prospectiveSearch.searchResults"></a>5.2.&nbsp;Search Results</h2></div></div></div><p>
+			The search results are written to the CAS, for each match one Search Result
+			feature structure is inserted into the CAS. The Search Result feature structure contains
+			the id and optionally links to an array of annotations which mark the matching
+			text in the CAS.
+			</p><p>
+			The Search Result type must be mapped to a defined type 
+			in the analysis engine descriptor with the following configuration
+			parameters:
+			</p><div class="itemizedlist"><ul type="disc"><li><p>
+					<code class="code">String org.apache.uima.lucas.SearchResult</code> 
+					- Maps the search result type to an actual type in the type system.
+					</p></li><li><p>
+					<code class="code">String org.apache.uima.lucas.SearchResultIdFeature</code> 
+					- A long id feature, identifies the matching search query.
+					</p></li><li><p>
+						<code class="code">String org.apache.uima.lucas.SearchResulMatchingTextFeature</code>
+						- An optional <code class="code">ArrayFS</code> feature, links to annotations which mark the matching text.
+					</p></li></ul></div><p>
+			</p></div></div></div></body></html>

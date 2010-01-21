@@ -19,10 +19,13 @@
 
 package org.apache.uima.lucas.consumer;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.uima.lucas.indexer.FilterBuilder;
+import org.apache.uima.lucas.indexer.analysis.TokenFilterFactory;
 import org.apache.uima.lucas.indexer.mapping.FieldDescription;
 
 public class TestableLuceneCASIndexer extends LuceneCASIndexer {
@@ -44,4 +47,10 @@ public class TestableLuceneCASIndexer extends LuceneCASIndexer {
   IndexWriter getIndexWriter() {
     return indexWriter;
   }
+  
+  public void preloadResources(Collection<FieldDescription> fieldDescriptions,
+          Map<String, TokenFilterFactory> defaultFilterFactoryRegistry)
+          throws IOException {
+		super.preloadResources(fieldDescriptions, defaultFilterFactoryRegistry);
+	}
 }
