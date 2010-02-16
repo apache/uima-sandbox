@@ -131,9 +131,9 @@ public abstract class LuceneDocumentAE extends CasAnnotator_ImplBase {
 			return new MappingFileReader(parser, elementMappers);
 			
 		} catch (ParserConfigurationException e) {
-			throw new IOException("Can't build SAXParser", e);
+			throw new IOException("Can't build SAXParser: " + e.getMessage());
 		} catch (SAXException e) {
-			throw new IOException("Can't build SAXParser", e);
+			throw new IOException("Can't build SAXParser: " + e.getMessage());
 		}
 	}
 
