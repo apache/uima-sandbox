@@ -26,11 +26,12 @@ import java.util.List;
 import org.apache.uima.alchemy.ts.microformats.MicroformatFS;
 import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.jcas.JCas;
-import org.junit.Test;
+import org.junit.Ignore;
 
+@Ignore
 public class URLMicroformatsAnnotatorTest {
 
-  @Test
+  
   public void testAnnotator() {
     String url = "http://www.semanticuniverse.com/articles-entity-extraction-and-semantic-web.html";
     String xmlPath = "desc/URLMicroformatsAEDescriptor.xml";

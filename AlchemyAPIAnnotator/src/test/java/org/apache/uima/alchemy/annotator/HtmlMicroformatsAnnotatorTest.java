@@ -26,11 +26,11 @@ import java.util.List;
 import org.apache.uima.alchemy.ts.microformats.MicroformatFS;
 import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.jcas.JCas;
-import org.junit.Test;
+import org.junit.Ignore;
 
+@Ignore
 public class HtmlMicroformatsAnnotatorTest {
 
-  @Test
   public void testAnnotator() {
     String doc = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head profile=\"http://www.w3.org/2006/03/hcard\"><body>"
             + "<div class=\"vcard\"><a class=\" fn\">Dan McCreary</a>    <!-- fn is a full name --> <div class=\"org\">Syntactica</div>"

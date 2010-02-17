@@ -18,6 +18,15 @@
  */
 package org.apache.uima.alchemy.annotator;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
 import org.apache.commons.lang.Validate;
 import org.apache.uima.UimaContext;
 import org.apache.uima.alchemy.annotator.exception.AlchemyCallFailedException;
@@ -31,13 +40,6 @@ import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 
 public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
 

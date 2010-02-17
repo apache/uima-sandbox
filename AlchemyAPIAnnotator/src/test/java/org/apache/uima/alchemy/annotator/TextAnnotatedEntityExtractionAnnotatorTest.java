@@ -27,7 +27,6 @@ import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * 
@@ -38,7 +37,6 @@ import org.junit.Test;
 @Ignore
 public class TextAnnotatedEntityExtractionAnnotatorTest {
 
-  @Test
   public void testAnnotator() {
     String doc = "Eight US soldiers die in attacks in south Afghanistan [this quad parentesis], making October the deadliest month for the US in the war there";
     String xmlPath = "desc/TextAnnotatedEntityExtractionAEDescriptor.xml";

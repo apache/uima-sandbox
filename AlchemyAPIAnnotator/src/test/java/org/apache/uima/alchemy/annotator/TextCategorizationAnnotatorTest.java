@@ -26,11 +26,11 @@ import java.util.List;
 import org.apache.uima.alchemy.ts.categorization.Category;
 import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.jcas.JCas;
-import org.junit.Test;
+import org.junit.Ignore;
 
+@Ignore
 public class TextCategorizationAnnotatorTest {
 
-  @Test
   public void testAnnotator() {
     String doc = "Eight US soldiers die in attacks in south Afghanistan, making October the deadliest month for the US in the war there";
     String xmlPath = "desc/TextCategorizationAEDescriptor.xml";
