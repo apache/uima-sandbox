@@ -82,6 +82,9 @@
           <execution>
             <id>default-cli</id>
             <configuration>
+              <excludes>
+                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
+              </excludes>
             </configuration>
           </execution>
         </executions>
