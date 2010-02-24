@@ -28,8 +28,6 @@ import org.apache.uima.jcas.cas.TOP_Type;
 
 /**
  * Updated by JCasGen Sun Nov 15 23:15:42 CET 2009 XML source:
- * /Users/tommasoteofili/Documents/workspaces
- * /uima_workspace/alchemy-annotator/src/main/resources/TextRankedEntityExtractionAEDescriptor.xml
  * 
  * @generated
  */

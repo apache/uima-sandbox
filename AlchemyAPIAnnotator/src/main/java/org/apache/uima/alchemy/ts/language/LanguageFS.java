@@ -28,8 +28,6 @@ import org.apache.uima.jcas.cas.TOP;
 
 /**
  * Updated by JCasGen Sun Jan 24 22:11:51 CET 2010 XML source:
- * /Users/tommaso/Documents/workspaces/tesi_ws
- * /alchemy-annotator/src/main/resources/TextLanguageDetectionAEDescriptor.xml
  * 
  * @generated
  */

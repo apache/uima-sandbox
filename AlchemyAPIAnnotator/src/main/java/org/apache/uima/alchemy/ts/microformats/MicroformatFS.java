@@ -28,8 +28,6 @@ import org.apache.uima.jcas.cas.TOP;
 
 /**
  * Updated by JCasGen Sun Jan 24 22:12:30 CET 2010 XML source:
- * /Users/tommaso/Documents/workspaces/tesi_ws
- * /alchemy-annotator/src/main/resources/URLMicroformatsAEDescriptor.xml
  * 
  * @generated
  */

@@ -26,8 +26,6 @@ import org.apache.uima.jcas.cas.TOP_Type;
 
 /**
  * Updated by JCasGen Wed Nov 04 23:56:24 CET 2009 XML source:
- * /Users/tommaso/Documents/workspaces/uima_ws
- * /alchemy-annotator/src/main/resources/TextCategorizationAEDescriptor.xml
  * 
  * @generated
  */

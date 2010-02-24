@@ -28,8 +28,6 @@ import org.apache.uima.jcas.cas.TOP;
 
 /**
  * Updated by JCasGen Thu Jan 14 17:54:41 CET 2010 XML source:
- * /Users/tommasoteofili/Documents/workspaces
- * /sourcesense_workspace/alchemy-annotator/src/main/resources/TextKeywordExtractionAEDescriptor.xml
  * 
  * @generated
  */

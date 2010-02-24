@@ -28,8 +28,6 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 /**
  * Updated by JCasGen Sat Jan 09 18:51:22 CET 2010 XML source:
- * /Users/tommaso/Documents/workspaces/uima_ws
- * /alchemy-annotator/src/main/resources/TextAnnotatedEntityExtractionAEDescriptor.xml
  * 
  * @generated
  */
