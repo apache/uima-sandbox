@@ -36,7 +36,7 @@
     <para>
       The AlchemyAPI Annotator is a set of annotators that wrap the
       AlchemyAPI
-      ( http://www.alchemyapi.com )
+      ( <ulink url="http://www.alchemyapi.com">http://www.alchemyapi.com</ulink>)
       services provided by
       Orchestr8 ( http://www.orchestr8.net ).
     </para>
@@ -288,8 +288,8 @@
 
         To see the complete list of supported
         entity types see here:
-        <link linkend="http://www.alchemyapi.com/api/entity/types.html">
-          http://www.alchemyapi.com/api/entity/types.html</link>
+        <ulink url="http://www.alchemyapi.com/api/entity/types.html">
+          http://www.alchemyapi.com/api/entity/types.html</ulink>
 
         This service also expose 'entity disambiguation' mechanism to
         resolve detected companies, locations, and people to a unique
@@ -330,13 +330,18 @@
     <section id="sandbox.alchemyapi.annotatedEntitiesExtraction">
       <title>Annotated Entities Extraction</title>
       <para>
-        This service is somehow some enhancement of the Ranked
+        This service is somehow an enhancement of the Ranked
         Entities
         Extraction service, with annotation of piece of text
         relating to
         extracted entities.
 
-        Annotator and descriptor still live but are not available for free API keys.
+        <note>
+          <para>Annotator and descriptor still
+            live but the service
+            underneath is not available for free API
+            keys.</para>
+        </note>
       </para>
     </section>
   </chapter>
@@ -348,11 +353,66 @@
     </para>
     <section id="Common+Parameters">
       <title>Common Parameters</title>
-      <para>TBD</para>
+      <para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <emphasis>apikey</emphasis>
+              : this parameter contains the (free or not) API key string
+              needed to be able to call AlchemyAPI services.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <emphasis>output</emphasis>
+              : this parameter contains one of xml,json,rdf,rel-tag
+              respectively to specify the desired output in XML, JSON,
+              RDF
+              or MicroFormat formats.
+              Beware that each AE wrapping an
+              AlchemyAPI service has a set of supported output formats
+              that is a subset of the previous list.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </para>
     </section>
     <section id="Specific+Parameters">
       <title>Service Specific Parameters</title>
-      <para>TBD</para>
+      <para>
+        <emphasis>Entity Extraction Text</emphasis>
+        :
+        see
+        <ulink url="http://www.alchemyapi.com/api/entity/textc.html">here</ulink>
+      </para>
+
+      <para>
+        <emphasis>Text Categorization</emphasis>
+        :
+        see
+        <ulink url="http://www.alchemyapi.com/api/categ/textc.html">here</ulink>
+      </para>
+
+      <para>
+        <emphasis>Text Keyword/Term Extraction</emphasis>
+        :
+        see
+        <ulink url="http://www.alchemyapi.com/api/keyword/textc.html">here</ulink>
+      </para>
+
+      <para>
+        <emphasis>HTML Micrformats Extraction</emphasis>
+        :
+        see
+        <ulink url="http://www.alchemyapi.com/api/mformat/htmlc.html">here</ulink>
+      </para>
+
+      <para>
+        <emphasis>URL Micrformats Extraction</emphasis>
+        :
+        see
+        <ulink url="http://www.alchemyapi.com/api/mformat/urls.html">here</ulink>
+      </para>
     </section>
   </chapter>
 </book>
