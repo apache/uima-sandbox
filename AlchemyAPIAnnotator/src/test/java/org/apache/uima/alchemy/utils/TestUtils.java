@@ -18,12 +18,9 @@
  */
 package org.apache.uima.alchemy.utils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.FeatureStructure;
@@ -36,16 +33,23 @@ import org.apache.uima.util.ProcessTraceEvent;
 import org.apache.uima.util.XMLInputSource;
 import org.junit.Ignore;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 @Ignore
 public class TestUtils {
 
   /**
    * get an AE from a path of the descriptor
+   *
    * @param filePath
    * @return
    * @throws IOException
    * @throws InvalidXMLException
    * @throws ResourceInitializationException
+   *
    */
   public static AnalysisEngine getAE(String filePath) throws IOException, InvalidXMLException,
           ResourceInitializationException {
@@ -61,12 +65,67 @@ public class TestUtils {
   }
 
   /**
+   * get an analysis engine give path and runtime configuration parameters
+   * @param xmlPath
+   * @param parameterSettings
+   * @return
+   * @throws ResourceInitializationException
+   */
+  public static AnalysisEngine getAE(String xmlPath, Map<String, Object> parameterSettings) throws ResourceInitializationException {
+    AnalysisEngine ae = null;
+    try {
+      XMLInputSource in = new XMLInputSource(xmlPath);
+
+      // override descriptor's configuration parameters
+      AnalysisEngineDescription desc = UIMAFramework.getXMLParser().parseAnalysisEngineDescription(in);
+      for (String parameter : parameterSettings.keySet()) {
+        desc.getAnalysisEngineMetaData().getConfigurationParameterSettings().setParameterValue(parameter, parameterSettings.get(parameter));
+      }
+
+      // create AE here
+      ae = UIMAFramework.produceAnalysisEngine(desc);
+
+    } catch (Exception e) {
+      throw new ResourceInitializationException(e);
+    }
+
+    return ae;
+  }
+
+  /**
+   * get an analysis engine given a path and a mocked implementation name to override the annotator class
+   * @param xmlPath
+   * @param implementationName
+   * @return
+   * @throws ResourceInitializationException
+   */
+  public static AnalysisEngine getAEWithMockedImplementation(String xmlPath, String implementationName) throws ResourceInitializationException {
+    AnalysisEngine ae = null;
+    try {
+      XMLInputSource in = new XMLInputSource(xmlPath);
+
+      AnalysisEngineDescription desc = UIMAFramework.getXMLParser().parseAnalysisEngineDescription(in);
+      desc.setAnnotatorImplementationName(implementationName);
+
+      // create AE here
+      ae = UIMAFramework.produceAnalysisEngine(desc);
+
+    } catch (Exception e) {
+      throw new ResourceInitializationException(e);
+    }
+
+    return ae;
+  }
+
+  /**
    * executes an AE on a document
+   *
    * @param ae
    * @param docText
    * @return
    * @throws AnalysisEngineProcessException
    * @throws ResourceInitializationException
+   *
    */
   public static JCas executeAE(AnalysisEngine ae, String docText)
           throws AnalysisEngineProcessException, ResourceInitializationException {
@@ -85,14 +144,15 @@ public class TestUtils {
     }
     return jcas;
   }
-  
-  /** 
+
+  /**
    * get all FeatureStructures of a type from the CAS
+   *
    * @param type
    * @param cas
    * @return
    */
-  public static List<? extends FeatureStructure> getAllFSofType(int type,JCas cas) {
+  public static List<? extends FeatureStructure> getAllFSofType(int type, JCas cas) {
     List<FeatureStructure> featureStructures = new ArrayList<FeatureStructure>();
     for (FSIterator<FeatureStructure> it = cas.getFSIndexRepository().getAllIndexedFS(cas.getCasType(type)); it.hasNext();) {
       featureStructures.add(it.next());

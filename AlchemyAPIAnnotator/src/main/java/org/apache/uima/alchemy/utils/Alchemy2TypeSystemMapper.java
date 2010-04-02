@@ -19,16 +19,7 @@
 package org.apache.uima.alchemy.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.uima.alchemy.digester.domain.AnnotatedResults;
-import org.apache.uima.alchemy.digester.domain.CategorizationResults;
-import org.apache.uima.alchemy.digester.domain.EntitiesResults;
-import org.apache.uima.alchemy.digester.domain.Entity;
-import org.apache.uima.alchemy.digester.domain.Keyword;
-import org.apache.uima.alchemy.digester.domain.KeywordResults;
-import org.apache.uima.alchemy.digester.domain.LanguageDetectionResults;
-import org.apache.uima.alchemy.digester.domain.Microformat;
-import org.apache.uima.alchemy.digester.domain.MicroformatsResults;
-import org.apache.uima.alchemy.digester.domain.Results;
+import org.apache.uima.alchemy.digester.domain.*;
 import org.apache.uima.alchemy.ts.categorization.Category;
 import org.apache.uima.alchemy.ts.entity.AlchemyAnnotation;
 import org.apache.uima.alchemy.ts.keywords.KeywordFS;
@@ -100,7 +91,7 @@ public class Alchemy2TypeSystemMapper {
             quotationsFeatureStructure.set(i, quotation);
             i++;
           }
-          fs.setFeatureValue(type.getFeatureByBaseName("quotatiotans"), quotationsFeatureStructure);
+          fs.setFeatureValue(type.getFeatureByBaseName("quotations"), quotationsFeatureStructure);
         }
         aJCas.addFsToIndexes(fs);
       } catch (Exception e) {

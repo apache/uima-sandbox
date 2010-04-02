@@ -18,31 +18,49 @@
  */
 package org.apache.uima.alchemy.annotator;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
+import org.apache.uima.alchemy.annotator.mocked.MockedTextRankedEntityAnnotator;
 import org.apache.uima.alchemy.ts.entity.Country;
 import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.jcas.JCas;
-import org.junit.Ignore;
+import org.junit.Test;
 
-@Ignore
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class TextRankedEntityExtractionAnnotatorTest {
+  private static final String DOC = "Eight US soldiers die in attacks in south Afghanistan, making October the deadliest month for the US in the war there";
+  private static final String XML_PATH = "desc/TextRankedEntityExtractionAEDescriptor.xml";
 
-  
-  public void testAnnotator() {
-    String doc = "Eight US soldiers die in attacks in south Afghanistan, making October the deadliest month for the US in the war there";
-    String xmlPath = "desc/TextRankedEntityExtractionAEDescriptor.xml";
+  @Test
+  public void annotatorIntegrationTest() {
     try {
-      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(xmlPath), doc);
+      Map<String,Object> parameterSettings = new HashMap<String, Object>();
+      parameterSettings.put("apikey","04490000a72fe7ec5cb3497f14e77f338c86f2fe");
+      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(XML_PATH,parameterSettings), DOC);
       List<Country> entities = (List<Country>) TestUtils.getAllFSofType(Country.type, resultingCAS);
+      assertTrue(entities!=null);
       assertTrue(entities.size()==2);
     } catch (Exception e) {
       e.printStackTrace();
-      fail();
+      fail(e.toString());
     }
   }
-
+  @Test
+  public void mockedAnnotatorTest() {
+    try {
+      String mockedAnnotatorName = MockedTextRankedEntityAnnotator.class.getName();
+      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAEWithMockedImplementation(XML_PATH,mockedAnnotatorName), DOC);
+      List<Country> entities = (List<Country>) TestUtils.getAllFSofType(Country.type, resultingCAS);
+      assertTrue(entities!=null);
+      assertTrue(entities.size()==1);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      fail(e.toString());
+    }
+  }
 }

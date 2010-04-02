@@ -18,15 +18,6 @@
  */
 package org.apache.uima.alchemy.annotator;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-
 import org.apache.commons.lang.Validate;
 import org.apache.uima.UimaContext;
 import org.apache.uima.alchemy.annotator.exception.AlchemyCallFailedException;
@@ -40,6 +31,12 @@ import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
 
@@ -98,16 +95,22 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
   public void process(JCas aJCas) throws AnalysisEngineProcessException {
     // initialize service parameters
     initializeRuntimeParameters(aJCas);
+    URLConnection connection = null;
     try {
       // open connection and send data
-      URLConnection connection = this.alchemyService.openConnection();
-      connection.setDoOutput(true);
-      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection
-              .getOutputStream(), "UTF-8"));
-      writer.write(this.serviceParams);
+      connection = this.alchemyService.openConnection();
 
-      writer.flush();
-      writer.close();
+      if (connection instanceof HttpURLConnection) {
+        connection.setDoOutput(true);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection
+              .getOutputStream(), "UTF-8"));
+        writer.write(this.serviceParams);
+
+        writer.flush();
+        writer.close();
+      }
+
+      connection.connect();
 
       InputStream bufByteIn = parseOutput(connection);
 
@@ -129,6 +132,10 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
       }
     } catch (Exception e) {
       throw new AnalysisEngineProcessException(e);
+    } finally {
+      if (connection != null && connection instanceof HttpURLConnection) {
+        ((HttpURLConnection) connection).disconnect();
+      }
     }
 
   }

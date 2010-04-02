@@ -18,30 +18,49 @@
  */
 package org.apache.uima.alchemy.annotator;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
+import org.apache.uima.alchemy.annotator.mocked.MockedMicroformatsAnnotator;
 import org.apache.uima.alchemy.ts.microformats.MicroformatFS;
 import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.jcas.JCas;
-import org.junit.Ignore;
+import org.junit.Test;
 
-@Ignore
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class URLMicroformatsAnnotatorTest {
+  private static final String URL = "http://microformats.org/wiki/hcard";
+  private static final String XML_PATH = "desc/URLMicroformatsAEDescriptor.xml";
 
-  
-  public void testAnnotator() {
-    String url = "http://www.semanticuniverse.com/articles-entity-extraction-and-semantic-web.html";
-    String xmlPath = "desc/URLMicroformatsAEDescriptor.xml";
+  @Test
+  public void annotatorIntegrationTest() {
     try {
-      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(xmlPath), url);
+      Map<String,Object> parameterSettings = new HashMap<String, Object>();
+      parameterSettings.put("apikey","04490000a72fe7ec5cb3497f14e77f338c86f2fe");
+      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(XML_PATH,parameterSettings), URL);
       List<MicroformatFS> microformats = (List<MicroformatFS>) TestUtils.getAllFSofType(MicroformatFS.type, resultingCAS);
+      assertTrue(microformats!=null);
+      assertTrue(microformats.size()==7);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.toString());
+    }
+  }
+
+  @Test
+  public void mockedAnnotatorTest() {
+    try {
+      String mockedAnnotatorName = MockedMicroformatsAnnotator.class.getName();
+      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAEWithMockedImplementation(XML_PATH,mockedAnnotatorName), URL);
+      List<MicroformatFS> microformats = (List<MicroformatFS>) TestUtils.getAllFSofType(MicroformatFS.type, resultingCAS);
+      assertTrue(microformats!=null);
       assertTrue(microformats.size()==2);
     } catch (Exception e) {
       e.printStackTrace();
-      fail();
+      fail(e.toString());
     }
   }
 
