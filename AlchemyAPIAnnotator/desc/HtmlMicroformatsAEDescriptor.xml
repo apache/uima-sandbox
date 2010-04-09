@@ -24,7 +24,7 @@
   <primitive>true</primitive>
   <annotatorImplementationName>org.apache.uima.alchemy.annotator.HtmlMicroformatsAnnotator</annotatorImplementationName>
   <analysisEngineMetaData>
-    <name>TextAnnotatedEntityExtractionAEDescriptor</name>
+    <name>HtmlMicroformatsAEDescriptorAEDescriptor</name>
     <description/>
     <version>1.0</version>
     <vendor/>
