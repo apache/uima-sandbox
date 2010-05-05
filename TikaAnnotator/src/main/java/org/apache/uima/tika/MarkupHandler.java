@@ -143,8 +143,11 @@ public class MarkupHandler implements ContentHandler {
 		// set the text 
 		cas.setDocumentText(this.textBuffer.toString());
 		
-		Type markupType = cas.getTypeSystem().getType("org.apache.uima.MarkupAnnotation");
-		Type attributeType = cas.getTypeSystem().getType("org.apache.uima.AttributeFS");
+		Type markupType = cas.getTypeSystem().getType("org.apache.uima.tika.MarkupAnnotation");
+		Type attributeType = cas.getTypeSystem().getType("org.apache.uima.tika.AttributeFS");
+		if (attributeType == null) {
+		    throw new RuntimeException("Can't find type org.apache.uima.tika.AttributeFS");
+		}
 		
 		JCas jcas;
 		try {
