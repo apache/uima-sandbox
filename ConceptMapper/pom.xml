@@ -19,23 +19,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.uima</groupId>
-  <artifactId>ConceptMapper</artifactId>
-  <packaging>jar</packaging>
-  <version>${uimaj-release-version}</version>
-  <name>Apache UIMA Java Annotator - ConceptMapper</name>
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
-    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr</relativePath>
+    <artifactId>parent-pom-annotator</artifactId>
+    <version>1-SNAPSHOT</version>
+    <relativePath/>
   </parent>
   
+  <artifactId>ConceptMapper</artifactId>
+  <version>2.3.1-SNAPSHOT</version>
+  <name>UIMA Annotator: ${project.artifactId}</name>
+  <description>Extracts concepts from a CAS</description>
+    
   <dependencies>
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-core</artifactId>
+      <version>2.3.1-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   
