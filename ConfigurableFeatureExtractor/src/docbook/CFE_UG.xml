@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY imgroot "../images">
-<!ENTITY % xinclude SYSTEM "../../../uima-docbook-tool/xinclude.mod">
-]>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+<!ENTITY imgroot "images/CFE_UG">]>
 <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
@@ -23,7 +21,7 @@
 -->
 <book lang="en">
 	<title>CFE User Guide</title>
-	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../SandboxDocs/src/docbook/book_info.xml"/>
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../target/docbook-shared/common_book_info.xml"/>
 	<chapter id="_Overview">
 		<title>
 			Overview

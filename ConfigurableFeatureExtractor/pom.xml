@@ -20,24 +20,55 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.uima</groupId>
-	<artifactId>ConfigurableFeatureExtractor</artifactId>
-	<packaging>jar</packaging>
-	<version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-	<name>Apache UIMA Java Tool - ConfigurableFeatureExtractor</name>
-
+  
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr-pearBuilder</artifactId>
-    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
+    <artifactId>parent-pom-annotator</artifactId>
+    <version>1-SNAPSHOT</version>
+    <relativePath/>
   </parent>
+
+	<artifactId>ConfigurableFeatureExtractor</artifactId>
+	<version>2.3.1-SNAPSHOT</version>
+	<name>Apache UIMA Java Tool - ConfigurableFeatureExtractor</name>
+  <description>Extracts Features specified in a feature-specification language, from a CAS</description>
+  <url>http://incubator.apache.org/uima</url>
+
+  <!-- Special inheritance note
+       even though the <scm> element that follows is exactly the 
+       same as those in super poms, it cannot be inherited because 
+       there is some special code that computes the connection elements
+       from the chain of parent poms, if this is omitted. 
+       
+       Keeping this a bit factored allows cutting/pasting the <scm>
+       element, and just changing the following two properties -->  
+  <scm>
+    <connection>
+      scm:svn:http://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </connection>
+    <developerConnection>
+      scm:svn:https://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </developerConnection>
+    <url>
+      http://svn.apache.org/viewvc/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </url>
+  </scm>
+  
+  <properties>
+    <uimaScmRoot>sandbox</uimaScmRoot>
+    <uimaScmProject>${project.artifactId}</uimaScmProject>
+    <uimaDependencyVersion>2.3.0-incubating</uimaDependencyVersion>
+    <pearMainDescriptor>desc/cas_consumers/UIMAFeatureConsumer.xml</pearMainDescriptor>
+    <bookNameRoot>CFE_UG.xml</bookNameRoot>
+  </properties>
+
     
   <dependencies>
     <!-- dependencies checked using the dependency plugin dependency:analyze - no issues 9/2009 -->
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-core</artifactId>
+      <version>${uimaDependencyVersion}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -92,21 +123,25 @@
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-component-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-examples</artifactId>
+      <version>${uimaDependencyVersion}</version>
       <scope>test</scope>
     </dependency> 
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-document-annotation</artifactId>
+      <version>${uimaDependencyVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -170,7 +205,7 @@
             <goals><goal>copy-resources</goal></goals>  
             <phase>process-resources</phase>  <!-- required -->
             <configuration>
-              <outputDirectory>${project.build.directory}/assembly-src/${artifactId}</outputDirectory>
+              <outputDirectory>${project.build.directory}/assembly-src/${project.artifactId}</outputDirectory>
               <resources>
                 <resource>
                   <directory>.</directory>
@@ -185,7 +220,7 @@
       </plugin>
  
       <!-- exclude some artifacts from dependencies not used by this application -->     
-      <plugin>
+      <!--plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -196,10 +231,10 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin-->
 
       <!-- build pear plugin, most settings inherited from parent POM -->      
-      <plugin>
+      <!--plugin>
         <groupId>org.apache.uima</groupId>
         <artifactId>PearPackagingMavenPlugin</artifactId>
         <executions><execution>
@@ -208,7 +243,7 @@
             <mainComponentDesc>desc/cas_consumers/UIMAFeatureConsumer.xml</mainComponentDesc> 
           </configuration>
         </execution></executions>
-      </plugin>              
+      </plugin-->              
     
       <!-- Release Audit Tool checks -->
       <plugin>
