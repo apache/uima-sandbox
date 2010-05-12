@@ -30,7 +30,7 @@
 
 	<artifactId>ConfigurableFeatureExtractor</artifactId>
 	<version>2.3.1-SNAPSHOT</version>
-	<name>Apache UIMA Java Tool - ConfigurableFeatureExtractor</name>
+	<name>UIMA Annotator: ${project.artifactId}</name>
   <description>Extracts Features specified in a feature-specification language, from a CAS</description>
   <url>http://incubator.apache.org/uima</url>
 
@@ -57,9 +57,9 @@
   <properties>
     <uimaScmRoot>sandbox</uimaScmRoot>
     <uimaScmProject>${project.artifactId}</uimaScmProject>
-    <uimaDependencyVersion>2.3.0-incubating</uimaDependencyVersion>
+    <uimaDependencyVersion>2.3.1-SNAPSHOT</uimaDependencyVersion>
     <pearMainDescriptor>desc/cas_consumers/UIMAFeatureConsumer.xml</pearMainDescriptor>
-    <bookNameRoot>CFE_UG.xml</bookNameRoot>
+    <bookNameRoot>CFE_UG</bookNameRoot>
   </properties>
 
     
@@ -254,7 +254,6 @@
             <id>default-cli</id>
             <configuration>
               <excludes>
-                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
                 <exclude>cfeModelGen/*</exclude> <!-- generated EMF model files -->
                 <exclude>src/test/resources/testData*.txt*</exclude> <!-- test data -->
                 <exclude>src/test/java/example/PersonTitle*.java</exclude> <!-- generated -->
