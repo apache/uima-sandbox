@@ -19,11 +19,9 @@
    under the License.    
 -->
 
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY imgroot "./images/" >
-<!ENTITY % xinclude SYSTEM "../../../uima-docbook-tool/xinclude.mod">
-  %xinclude;
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+<!ENTITY imgroot "images/" >
 ]>
 
 <book lang="en">
@@ -33,7 +31,7 @@
 	</title>
 
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
-		href="../../../SandboxDocs/src/docbook/book_info.xml" />
+		href="../../target/docbook-shared/common_book_info.xml" />
 
 	<preface>
 		<title>Introduction</title>
