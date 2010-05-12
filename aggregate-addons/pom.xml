@@ -32,7 +32,7 @@
 	<artifactId>aggregate-addons</artifactId>
 	<packaging>pom</packaging>
 	<version>2.3.1-SNAPSHOT</version>
-	<name>UIMA Aggregate: ${project.artifactId}: UIMA Base</name>
+	<name>UIMA Aggregate: ${project.artifactId}</name>
   <description>A convenience aggregate for the UIMA addons</description>
   <url>${uimaWebsiteUrl}</url>
 
@@ -62,7 +62,7 @@
   </properties>
   
   <modules>
-    <module>../alchemy-annotator</module>
+    <module>../AlchemyAPIAnnotator</module>
     <module>../BSFAnnotator</module>
     <module>../ConceptMapper</module>
     <module>../ConfigurableFeatureExtractor</module>
