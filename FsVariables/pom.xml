@@ -21,31 +21,65 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.uima</groupId>
-	<artifactId>FsVariables</artifactId>
-	<packaging>jar</packaging>
-	<version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-	<name>Apache UIMA FS Variables Package</name>
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
-    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr</relativePath>
+    <artifactId>parent-pom-single-project</artifactId>
+    <version>1-SNAPSHOT</version>
+    <relativePath/>
   </parent>
+  
+	<artifactId>FsVariables</artifactId>
+	<version>2.3.1-SNAPSHOT</version>
+	<name>UIMA Addon: ${project.artifactId}</name>
+  <description>Adds capability to base UIMA framework for conveniently creating and accessing named FeatureStructure instances in the CAS</description>
+  <url>http://incubator.apache.org/uima</url>
 
+  <!-- Special inheritance note
+       even though the <scm> element that follows is exactly the 
+       same as those in super poms, it cannot be inherited because 
+       there is some special code that computes the connection elements
+       from the chain of parent poms, if this is omitted. 
+       
+       Keeping this a bit factored allows cutting/pasting the <scm>
+       element, and just changing the following two properties -->  
+  <scm>
+    <connection>
+      scm:svn:http://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </connection>
+    <developerConnection>
+      scm:svn:https://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </developerConnection>
+    <url>
+      http://svn.apache.org/viewvc/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </url>
+  </scm>
+  
+  <properties>
+    <uimaScmRoot>sandbox</uimaScmRoot>
+    <uimaScmProject>${project.artifactId}</uimaScmProject>
+    <uimaDependencyVersion>2.3.1-SNAPSHOT</uimaDependencyVersion>
+    <bookNameRoot>fsVariablesUserGuide</bookNameRoot>
+  </properties>
+        
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-core</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>provided</scope>
 		</dependency>
 	</dependencies>
   
@@ -55,31 +89,13 @@
     <!-- add the desc dir to the default test resources -->
 		<testResources>
 			<testResource>
-				<directory>desc</directory>
+				<directory>src/asm/desc</directory>
 			</testResource>
       <testResource>
         <directory>src/test/resources</directory>
       </testResource>
  		</testResources>
     
-    <plugins>
-      <!-- Release Audit Tool checks -->
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-cli</id>
-            <configuration>
-              <excludes>
-                <exclude>docs/html/images/*.svg</exclude> <!-- generated image files for docbook -->
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-    </plugins>
 	</build>
   
 </project>
