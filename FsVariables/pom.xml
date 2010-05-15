@@ -33,7 +33,7 @@
 	<version>2.3.1-SNAPSHOT</version>
 	<name>UIMA Addon: ${project.artifactId}</name>
   <description>Adds capability to base UIMA framework for conveniently creating and accessing named FeatureStructure instances in the CAS</description>
-  <url>http://incubator.apache.org/uima</url>
+<url>${uimaWebsiteUrl}</url>
 
   <!-- Special inheritance note
        even though the <scm> element that follows is exactly the 

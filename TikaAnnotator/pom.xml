@@ -31,7 +31,7 @@
 	<artifactId>TikaAnnotator</artifactId>
 	<version>2.3.1-SNAPSHOT</version>
   <name>UIMA Annotator: ${project.artifactId}</name>
-  <url>http://incubator.apache.org/uima</url>
+<url>${uimaWebsiteUrl}</url>
   
   <!-- Special inheritance note
        even though the <scm> element that follows is exactly the 

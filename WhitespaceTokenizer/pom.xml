@@ -33,7 +33,7 @@
 	<version>2.3.1-SNAPSHOT</version>
   <name>UIMA Annotator: ${project.artifactId}</name>
   <description>A simple white-space annotator to identify Tokens in text using whitespace as the delimiters</description>
-  <url>http://incubator.apache.org/uima</url>
+<url>${uimaWebsiteUrl}</url>
 
   <!-- Special inheritance note
        even though the <scm> element that follows is exactly the 

@@ -28,7 +28,7 @@
   <version>2.3.1-SNAPSHOT</version>
   <name>UIMA Annotator: ${project.artifactId}</name>
   <description>A UIMA set of AEs that wrap Alchemy API services from Orchestr8</description>
-  <url>http://incubator.apache.org/uima</url>
+  <url>${uimaWebsiteUrl}</url>
 
   <!-- Special inheritance note
        even though the <scm> element that follows is exactly the 
