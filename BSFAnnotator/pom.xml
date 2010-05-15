@@ -16,36 +16,74 @@
 	specific language governing permissions and limitations
 	under the License.    
 -->
+
+<!-- packaged as a single project.
+     PEAR packaging not appropriate, because user needs to define own type system, etc.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.uima</groupId>
-	<artifactId>BSFAnnotator</artifactId>
-	<packaging>jar</packaging>
-	<version>${uimaj-release-version}</version>
-	<name>Apache UIMA Java Annotator - BSFAnnotator</name>
-	<url>http://incubator.apache.org/uima</url>
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr</artifactId>
-    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr</relativePath>
+    <artifactId>parent-pom-single-project</artifactId>
+    <version>1-SNAPSHOT</version>
+    <relativePath/>
   </parent>
+
+	<artifactId>BSFAnnotator</artifactId>
+	<packaging>jar</packaging>
+	<version>2.3.1-SNAPSHOT</version>
+	<name>UIMA Annotator: ${project.artifactId}</name>
+  <description>Annotator to run scripts using Apache's Bean Scripting Framework</description>
+  <url>${uimaWebsiteUrl}</url>
+
+  <!-- Special inheritance note
+       even though the <scm> element that follows is exactly the 
+       same as those in super poms, it cannot be inherited because 
+       there is some special code that computes the connection elements
+       from the chain of parent poms, if this is omitted. 
+       
+       Keeping this a bit factored allows cutting/pasting the <scm>
+       element, and just changing the following two properties -->  
+  <scm>
+    <connection>
+      scm:svn:http://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </connection>
+    <developerConnection>
+      scm:svn:https://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </developerConnection>
+    <url>
+      http://svn.apache.org/viewvc/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </url>
+  </scm>
+  
+  <properties>
+    <uimaScmRoot>sandbox</uimaScmRoot>
+    <uimaScmProject>${project.artifactId}</uimaScmProject>
+    <uimaDependencyVersion>2.3.1-SNAPSHOT</uimaDependencyVersion>
+  </properties>
   
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-core</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>test</scope>
 		</dependency>
     
 		<dependency>

@@ -16,101 +16,92 @@
 	specific language governing permissions and limitations
 	under the License.    
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.uima</groupId>
-	<artifactId>WhitespaceTokenizer</artifactId>
-	<packaging>jar</packaging>
-	<version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-	<name>Apache UIMA Java Annotator - WhitespaceTokenizer</name>
-
+  
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>SandboxDistr-pearBuilder</artifactId>
-    <version>2.3.0-incubating</version> <!-- this comment is a flag for changeVersion -->
-    <relativePath>../SandboxDistr/pear-builder-pom</relativePath>
+    <artifactId>parent-pom-annotator</artifactId>
+    <version>1-SNAPSHOT</version>
+    <relativePath/>
   </parent>
+  
+	<artifactId>WhitespaceTokenizer</artifactId>
+	<packaging>jar</packaging>
+	<version>2.3.1-SNAPSHOT</version>
+  <name>UIMA Annotator: ${project.artifactId}</name>
+  <description>A simple white-space annotator to identify Tokens in text using whitespace as the delimiters</description>
+<url>${uimaWebsiteUrl}</url>
+
+  <!-- Special inheritance note
+       even though the <scm> element that follows is exactly the 
+       same as those in super poms, it cannot be inherited because 
+       there is some special code that computes the connection elements
+       from the chain of parent poms, if this is omitted. 
+       
+       Keeping this a bit factored allows cutting/pasting the <scm>
+       element, and just changing the following two properties -->  
+  <scm>
+    <connection>
+      scm:svn:http://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </connection>
+    <developerConnection>
+      scm:svn:https://svn.apache.org/repos/asf/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </developerConnection>
+    <url>
+      http://svn.apache.org/viewvc/uima/${uimaScmRoot}/trunk/${uimaScmProject}
+    </url>
+  </scm>
+  
+  <properties>
+    <uimaScmRoot>sandbox</uimaScmRoot>
+    <uimaScmProject>${project.artifactId}</uimaScmProject>
+    <uimaDependencyVersion>2.3.1-SNAPSHOT</uimaDependencyVersion>
+    <pearMainDescriptor>desc/${project.artifactId}.xml</pearMainDescriptor>
+  </properties>
   
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-core</artifactId>
-		</dependency>
+	    <version>${uimaDependencyVersion}</version>
+      <scope>provided</scope>
+  	</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimaj-component-test-util</artifactId>
+      <version>${uimaDependencyVersion}</version>
+      <scope>test</scope>
 		</dependency>
 	</dependencies>
   
 	<build>
 		<finalName>uima-an-wst</finalName>
-    
-    <!-- add the contents of desc to the jar.  
-         This puts the WhitespaceTokenizer.xml file into the Jar
-         and makes it easier for users to run this, without installing a pear. 
-         The Tagger project uses this technique, for instance -->
-    
-    <!--resources>
-      <resource>
-        <directory>desc</directory>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources-->
-    
-    <!-- add desc to resources 
-         test case for Tagger expects to find the desc on the classpath -->
-		<testResources>
-			<testResource>
-				<directory>desc</directory>
-			</testResource>
-      <testResource>
-        <directory>src/test/resources</directory>
-      </testResource>
-		</testResources>
-
-		<plugins>
-      <!-- build pear plugin, most settings inherited from parent POM -->      
+    <plugins>
       <plugin>
-        <groupId>org.apache.uima</groupId>
-        <artifactId>PearPackagingMavenPlugin</artifactId>
-        <executions><execution>
-          <id>buildPear</id>
-          <configuration>
-            <mainComponentDesc>desc/WhitespaceTokenizer.xml</mainComponentDesc> 
-          </configuration>
-        </execution></executions>
-      </plugin>              
-      
-			<!--plugin>
-				<groupId>org.apache.uima</groupId>
-				<artifactId>PearPackagingMavenPlugin</artifactId>
-				<extensions>true</extensions>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<mainComponentDesc>
-								desc/WhitespaceTokenizer.xml
-							</mainComponentDesc>
-							<componentId>
-								WhitespaceTokenizer
-							</componentId>
-						</configuration>
-						<goals>
-							<goal>package</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin-->
-		</plugins>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <configuration>
+              <excludes>
+                <exclude>src/test/resources/tabs*.txt</exclude> <!-- test data -->
+                <exclude>src/test/resources/testdoc*.txt</exclude> <!-- test data -->
+              </excludes>              
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>   
+    </plugins>
+        
 	</build>
 </project>
