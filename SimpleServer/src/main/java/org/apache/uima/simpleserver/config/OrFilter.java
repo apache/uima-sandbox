@@ -27,7 +27,7 @@ import java.util.List;
 public interface OrFilter extends Filter {
 
   /**
-   * @param readFilter
+   * @param filter
    */
   void addFilter(Filter filter);
   

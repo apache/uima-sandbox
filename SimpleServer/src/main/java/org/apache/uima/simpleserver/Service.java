@@ -126,7 +126,7 @@ public class Service {
    *                The PEAR file.
    * @param pearInstallationDir
    *                The installation directory for the PEAR.
-   * @param resultSpecXMLFile
+   * @param serviceSpecFile
    *                Service specification file.
    * @throws XmlException
    *                 If service spec is not valid XML.

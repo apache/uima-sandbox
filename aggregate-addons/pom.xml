@@ -78,4 +78,8 @@
     <module>../TikaAnnotator</module>
     <module>../WhitespaceTokenizer</module>    
   </modules>  
+  
+  <profiles>
+
+  </profiles>
 </project>

@@ -99,12 +99,13 @@ public class AnnotationTokenStream extends TokenStream {
    * 
    * @param jCas
    *          the jCas
+   * @param sofaName the name of the subject of analysis (sofa)
    * @param typeName
    *          the type of the annotation
    * @throws CASException
    */
-  public AnnotationTokenStream(JCas cas, String sofaName, String typeName) throws InvalidTokenSourceException {
-    this(cas, sofaName, typeName, null, Collections.<String>emptyList(), null, 
+  public AnnotationTokenStream(JCas jCas, String sofaName, String typeName) throws InvalidTokenSourceException {
+    this(jCas, sofaName, typeName, null, Collections.<String>emptyList(), null, 
          Collections.<String, Format>emptyMap());
   }
 
@@ -115,18 +116,19 @@ public class AnnotationTokenStream extends TokenStream {
    * 
    * @param jCas
    *          the JCas object
-   * @param type
+   * @param sofaName the name of the subject of analysis (sofa)
+   * @param typeName
    *          the type of the annotation
    * @param featureName
    *          the name of the feature from which the token text is build
    * @param featureFormat
    *          optional format object to convert feature values to strings
-   * @throws CASException
+   * @throws InvalidTokenSourceException
    */
 
-  public AnnotationTokenStream(JCas cas, String sofaName, String typeName, String featureName,
+  public AnnotationTokenStream(JCas jCas, String sofaName, String typeName, String featureName,
           Format featureFormat) throws InvalidTokenSourceException {
-    this(cas, sofaName, typeName, null, Lists.newArrayList(featureName), null, 
+    this(jCas, sofaName, typeName, null, Lists.newArrayList(featureName), null, 
          featureFormat != null ? ImmutableBiMap.of(featureName, featureFormat): Collections.<String, Format>emptyMap());
   }
 
@@ -138,7 +140,8 @@ public class AnnotationTokenStream extends TokenStream {
    * 
    * @param jCas
    *          the JCas object
-   * @param type
+   * @param sofaName the name of the Subject Of Analysis (sofa)
+   * @param typeName
    *          the type of the annotation
    * @param featureNames
    *          the name of the feature from which the token text is build
@@ -148,12 +151,12 @@ public class AnnotationTokenStream extends TokenStream {
    * @param featureFormats
    *          optional map of format objects to convert feature values to strings - the key must be
    *          the feature name
-   * @throws CASException
+   * @throws InvalidTokenSourceException
    */
-  public AnnotationTokenStream(JCas cas, String sofaName, String typeName,
+  public AnnotationTokenStream(JCas jCas, String sofaName, String typeName,
           List<String> featureNames, String delimiter, Map<String, Format> featureFormats)
           throws InvalidTokenSourceException {
-    this(cas, sofaName, typeName, null, featureNames, delimiter, featureFormats);
+    this(jCas, sofaName, typeName, null, featureNames, delimiter, featureFormats);
   }
 
   /**
@@ -163,18 +166,19 @@ public class AnnotationTokenStream extends TokenStream {
    * 
    * @param jCas
    *          the JCas object
-   * @param type
+   * @param sofaName the name of the Subject Of Analysis (sofa)
+   * @param typeName
    *          the type of the annotation
    * @param featureNames
    *          the name of the feature from which the token text is build
    * @param featureFormats
    *          optional map of format objects to convert feature values to strings - the key must be
    *          the feature name
-   * @throws CASException
+   * @throws InvalidTokenSourceException
    */
-  public AnnotationTokenStream(JCas cas, String sofaName, String typeName,
+  public AnnotationTokenStream(JCas jCas, String sofaName, String typeName,
           List<String> featureNames, Map<String, Format> featureFormats) throws InvalidTokenSourceException {
-    this(cas, sofaName, typeName, null, featureNames, null, featureFormats);
+    this(jCas, sofaName, typeName, null, featureNames, null, featureFormats);
   }
 
   /**
@@ -189,7 +193,8 @@ public class AnnotationTokenStream extends TokenStream {
    * 
    * @param jCas
    *          the JCas object
-   * @param type
+   * @param sofaName the name of the Subject of Analysis (sofa)
+   * @param typeName
    *          the type of the annotation
    * @param featurePath
    *          the path to the feature structures which features should be used for tokens Path
@@ -197,17 +202,14 @@ public class AnnotationTokenStream extends TokenStream {
    *          &quot;affiliation.address.country&quot;
    * @param featureNames
    *          the name of the feature from which the token text is build
-   * @param delimiter
-   *          a delimiter for concatenating the different feature values of an annotation object. If
-   *          null a white space will be used.
    * @param featureFormats
    *          optional map of format objects to convert feature values to strings - the key must be
    *          the feature name
-   * @throws CASException
+   * @throws InvalidTokenSourceException
    */
-  public AnnotationTokenStream(JCas cas, String sofaName, String typeName, String featurePath,
+  public AnnotationTokenStream(JCas jCas, String sofaName, String typeName, String featurePath,
           List<String> featureNames, Map<String, Format> featureFormats) throws InvalidTokenSourceException {
-    this(cas, sofaName, typeName, featurePath, featureNames, null, featureFormats);
+    this(jCas, sofaName, typeName, featurePath, featureNames, null, featureFormats);
   }
 
   /**
@@ -223,7 +225,8 @@ public class AnnotationTokenStream extends TokenStream {
    * 
    * @param jCas
    *          the JCas object
-   * @param type
+   * @param sofaName the name of the Subject of Analysis (sofa)
+   * @param typeName
    *          the type of the annotation
    * @param featurePath
    *          the path to the feature structures which features should be used for tokens Path
@@ -237,9 +240,9 @@ public class AnnotationTokenStream extends TokenStream {
    * @param featureFormats
    *          optional map of format objects to convert feature values to strings - the key must be
    *          the feature name
-   * @throws CASException
+   * @throws InvalidTokenSourceException
    */
-  public AnnotationTokenStream(JCas cas, String sofaName, String typeName, String featurePath,
+  public AnnotationTokenStream(JCas jCas, String sofaName, String typeName, String featurePath,
           List<String> featureNames, String delimiter, Map<String, Format> featureFormats)
           throws InvalidTokenSourceException {
     super();
@@ -252,7 +255,7 @@ public class AnnotationTokenStream extends TokenStream {
     else
       this.featureFormats = featureFormats;
     
-    getSofaCas(cas, sofaName);
+    getSofaCas(jCas, sofaName);
     getTypeForName(typeName);
     validate(annotationType, featureNames, featurePath);
     

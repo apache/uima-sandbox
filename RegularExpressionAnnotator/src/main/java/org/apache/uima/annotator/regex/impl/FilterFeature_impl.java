@@ -40,7 +40,7 @@ public class FilterFeature_impl implements FilterFeature {
    private Pattern pattern;
 
    /**
-    * @param featurePath
+    * @param featurePathString
     * @param patternStr
     */
    public FilterFeature_impl(String featurePathString, String patternStr) {

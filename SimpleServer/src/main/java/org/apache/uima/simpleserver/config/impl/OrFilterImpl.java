@@ -35,9 +35,6 @@ public class OrFilterImpl extends FilterImpl implements OrFilter {
   
   private final List<Filter> filters = new ArrayList<Filter>();
 
-  /**
-   * @param type
-   */
   public OrFilterImpl() {
     super(Filter.FilterType.OR);
   }

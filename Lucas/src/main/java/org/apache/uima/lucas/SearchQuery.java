@@ -32,14 +32,14 @@ public interface SearchQuery {
 	/**
 	 * Id of the search query.
 	 * 
-	 * @return
+	 * @return Id of the search query.
 	 */
 	long id();
 	
 	/**
 	 * The Lucene query.
 	 * 
-	 * @return
+	 * @return The Lucene query.
 	 */
 	Query query();
 }

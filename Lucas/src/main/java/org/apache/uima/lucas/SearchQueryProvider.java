@@ -40,7 +40,7 @@ public interface SearchQueryProvider {
 	 * Note: The implementation must be thread safe.
 	 * 
 	 * @param cas
-	 * @return
+	 * @return all {@link SearchQuery}s for the given <code>CAS</code>.
 	 * @throws AnalysisEngineProcessException
 	 */
 	Collection<SearchQuery> getSearchQueries(CAS cas) throws AnalysisEngineProcessException;

@@ -35,9 +35,6 @@ public class AndFilterImpl extends FilterImpl implements AndFilter {
   
   private final List<Filter> filters = new ArrayList<Filter>();
 
-  /**
-   * @param type
-   */
   public AndFilterImpl() {
     super(Filter.FilterType.AND);
   }
