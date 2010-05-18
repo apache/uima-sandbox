@@ -66,12 +66,14 @@ public class Viterbi {
   /**
    * @param N
    * @param sentence
-   * @param pos_s
+   * @param suffix_tree
+   * @param suffix_tree_cap
    * @param transition_probs
    * @param word_probs
    * @param lambdas2
-   *          , lambdas3
-   * @return
+   * @param lambdas3
+   * @param theta
+   * @return the viterbi path
    */
   @SuppressWarnings("unchecked")
   public static List process(int N, List<String> sentence,

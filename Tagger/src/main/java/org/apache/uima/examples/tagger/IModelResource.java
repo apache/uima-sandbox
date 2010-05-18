@@ -27,10 +27,6 @@ import org.apache.uima.examples.tagger.trainAndTest.ModelGeneration;
  */
 public interface IModelResource {
   
-  /**
-   * Obtain an input stream for this resource.
-   * @return
-   */
   ModelGeneration getModel();
 
 }

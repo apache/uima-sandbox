@@ -18,6 +18,8 @@
  */
 package org.apache.uima.annotator.bsf;
 
+import java.text.MessageFormat;
+
 import org.apache.uima.resource.ResourceInitializationException;
 
 /**
@@ -37,7 +39,7 @@ public class BSFAnnotatorConfigurationException extends ResourceInitializationEx
     * @param aMessageKey
     *          an identifier that maps to the message for this exception. The message may contain
     *          placeholders for arguments as defined by the
-    *          {@link java.text.MessageFormat MessageFormat} class.
+    *          {@link MessageFormat} class.
     * @param aArguments
     *          The arguments to the message. <code>null</code> may be used if the message has no
     *          arguments.
@@ -53,7 +55,7 @@ public class BSFAnnotatorConfigurationException extends ResourceInitializationEx
     * @param aMessageKey
     *          an identifier that maps to the message for this exception. The message may contain
     *          placeholders for arguments as defined by the
-    *          {@link java.text.MessageFormat MessageFormat} class.
+    *          {@link MessageFormat} class.
     * @param aArguments
     *          The arguments to the message. <code>null</code> may be used if the message has no
     *          arguments.

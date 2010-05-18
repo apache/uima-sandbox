@@ -33,7 +33,8 @@ import org.apache.uima.resource.ResourceInitializationException;
  * 
  * Known implementations: {@link HMMTagger} using {@link Viterbi} algorithm 
  * to compute the most probable path of parts of speech for a given sequence of tokens
- * @see Viterbi, HMMTagger
+ * @see Viterbi
+ * @see HMMTagger
  */
 
 
@@ -48,7 +49,7 @@ public interface Tagger {
   
   /**
    * Trains a new model for tagger, if a training is defined in {@code tagger.properties} file
-   * @see ModelGenerator  
+   * @see org.apache.uima.examples.tagger.trainAndTest#ModelGeneration 
    */
   
    
