@@ -120,7 +120,7 @@ public class SimpleServerServlet extends HttpServlet {
             + "containing a list of found entities");
     options.put("inline", "returns inline-xml containing the analyzed "
             + "text in which all found entities are represented by tags");
-    options.put("csv", "returns the found entities in a comma-separated list");
+//    options.put("csv", "returns the found entities in a comma-separated list"); // Jira 1795
     this.servletPOSTParamOptions.put(MODE_PARAMETER, options);
 
     this.servletPOSTParameters.put("lang", "This parameter sets the language "
