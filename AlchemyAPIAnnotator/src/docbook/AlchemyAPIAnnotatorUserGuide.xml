@@ -34,7 +34,7 @@
       AlchemyAPI
       ( <ulink url="http://www.alchemyapi.com">http://www.alchemyapi.com</ulink>)
       services provided by
-      Orchestr8 ( http://www.orchestr8.net ).
+      Orchestr8 ( <ulink url="http://www.orchestr8.net">http://www.orchestr8.net</ulink> ).
     </para>
     <para>
       To use AlchemyAPI Annotator, choose which service you want to
@@ -168,102 +168,296 @@
         <itemizedlist>
           <listitem>
             <para>Afrikaans ISO-639-3: afr</para>
+          </listitem>
+          <listitem>
             <para>Albanian ISO-639-3: sqi</para>
+          </listitem>
+          <listitem>
             <para>Amharic ISO-639-3: amh</para>
+          </listitem>
+          <listitem>
             <para>Amuzgo Guerrero ISO-639-3: amu</para>
+          </listitem>
+          <listitem>
             <para>Arabic ISO-639-3: ara</para>
+          </listitem>
+          <listitem>
             <para>Armenian ISO-639-3: hye</para>
+          </listitem>
+          <listitem>
             <para>Azerbaijani ISO-639-3: aze</para>
+          </listitem>
+          <listitem>
             <para>Basque ISO-639-3: eus</para>
+          </listitem>
+          <listitem>
             <para>Breton ISO-639-3: bre</para>
+          </listitem>
+          <listitem>
             <para>Bulgarian ISO-639-3: bul</para>
+          </listitem>
+          <listitem>
             <para>Catalan ISO-639-3: cat</para>
+          </listitem>
+          <listitem>
             <para>Cebuano ISO-639-3: ceb</para>
+          </listitem>
+          <listitem>
             <para>Central K'iche' ISO-639-3: qut</para>
+          </listitem>
+          <listitem>
             <para>Central Mam ISO-639-3: mvc</para>
+          </listitem>
+          <listitem>
             <para>Chamorro ISO-639-3: cha</para>
+          </listitem>
+          <listitem>
             <para>Cherokee ISO-639-3: chr</para>
+          </listitem>
+          <listitem>
             <para>Chinese ISO-639-3: zho</para>
+          </listitem>
+          <listitem>
             <para>Comaltepec Chinantec ISO-639-3: cco</para>
+          </listitem>
+          <listitem>
             <para>Comaltepec Chinantec ISO-639-3: cco</para>
+          </listitem>
+          <listitem>
             <para>Croatian ISO-639-3: hrv</para>
+          </listitem>
+          <listitem>
             <para>Cubulco Achi' ISO-639-3: acc</para>
+          </listitem>
+          <listitem>
             <para>Czech ISO-639-3: ces</para>
+          </listitem>
+          <listitem>
             <para>Dakota ISO-639-3: dak</para>
+          </listitem>
+          <listitem>
             <para>Danish ISO-639-3: dan</para>
+          </listitem>
+          <listitem>
             <para>Dutch ISO-639-3: nld</para>
+          </listitem>
+          <listitem>
             <para>English ISO-639-3: eng</para>
+          </listitem>
+          <listitem>
             <para>Esperanto ISO-639-3: epo</para>
+          </listitem>
+          <listitem>
             <para>Estonian ISO-639-3: est</para>
+          </listitem>
+          <listitem>
             <para>Faroese ISO-639-3: fao</para>
+          </listitem>
+          <listitem>
             <para>Fijian ISO-639-3: fij</para>
+          </listitem>
+          <listitem>
             <para>Finnish ISO-639-3: fin</para>
+          </listitem>
+          <listitem>
             <para>French ISO-639-3: fra</para>
+          </listitem>
+          <listitem>
             <para>Fulfulde Adamawa ISO-639-3: fub</para>
+          </listitem>
+          <listitem>
             <para>Georgian ISO-639-3: kat</para>
+          </listitem>
+          <listitem>
             <para>German ISO-639-3: deu</para>
+          </listitem>
+          <listitem>
             <para>Greek ISO-639-3: ell</para>
+          </listitem>
+          <listitem>
             <para>Guerrero Nahuatl ISO-639-3: ngu</para>
+          </listitem>
+          <listitem>
             <para>Gujarti ISO-639-3: guj</para>
+          </listitem>
+          <listitem>
             <para>Haitian Creole ISO-639-3: hat</para>
+          </listitem>
+          <listitem>
             <para>Hausa ISO-639-3: hau</para>
+          </listitem>
+          <listitem>
             <para>Hawaiian ISO-639-3: haw</para>
+          </listitem>
+          <listitem>
             <para>Hebrew ISO-639-3: heb</para>
+          </listitem>
+          <listitem>
             <para>Hiligaynon ISO-639-3: hil</para>
+          </listitem>
+          <listitem>
             <para>Hindi ISO-639-3: hin</para>
+          </listitem>
+          <listitem>
             <para>Hungarian ISO-639-3: hun</para>
+          </listitem>
+          <listitem>
             <para>Icelandic ISO-639-3: isl</para>
+          </listitem>
+          <listitem>
             <para>Indonesian ISO-639-3: ind</para>
+          </listitem>
+          <listitem>
             <para>Irish ISO-639-3: gle</para>
+          </listitem>
+          <listitem>
             <para>Italian ISO-639-3: ita</para>
+          </listitem>
+          <listitem>
             <para>Jacalteco ISO-639-3: jac</para>
+          </listitem>
+          <listitem>
             <para>Japanese ISO-639-3: jpn</para>
+          </listitem>
+          <listitem>
             <para>Kabyle ISO-639-3: kab</para>
+          </listitem>
+          <listitem>
             <para>Kaqchikel ISO-639-3: cak</para>
+          </listitem>
+          <listitem>
             <para>Kirghiz ISO-639-3: kir</para>
+          </listitem>
+          <listitem>
             <para>Kisongye ISO-639-3: sop</para>
+          </listitem>
+          <listitem>
             <para>Korean ISO-639-3: kor</para>
+          </listitem>
+          <listitem>
             <para>Latin ISO-639-3: lat</para>
+          </listitem>
+          <listitem>
             <para>Latvian ISO-639-3: lav</para>
+          </listitem>
+          <listitem>
             <para>Lithuanian ISO-639-3: lit</para>
+          </listitem>
+          <listitem>
             <para>Low Saxon ISO-639-3: nds</para>
+          </listitem>
+          <listitem>
             <para>Macedonian ISO-639-3: mkd</para>
+          </listitem>
+          <listitem>
             <para>Malay ISO-639-3: msa</para>
+          </listitem>
+          <listitem>
             <para>Maltese ISO-639-3: mlt</para>
+          </listitem>
+          <listitem>
             <para>Maori ISO-639-3: mri</para>
+          </listitem>
+          <listitem>
             <para>Micmac ISO-639-3: mic</para>
+          </listitem>
+          <listitem>
             <para>Mòoré ISO-639-3: mos</para>
+          </listitem>
+          <listitem>
             <para>Ndebele ISO-639-3: nde</para>
+          </listitem>
+          <listitem>
             <para>Nepali ISO-639-3: nep</para>
+          </listitem>
+          <listitem>
             <para>Norwegian ISO-639-3: nor</para>
+          </listitem>
+          <listitem>
             <para>Ojibwa ISO-639-3: oji</para>
+          </listitem>
+          <listitem>
             <para>Pashto ISO-639-3: pus</para>
+          </listitem>
+          <listitem>
             <para>Persian ISO-639-3: fas</para>
+          </listitem>
+          <listitem>
             <para>Polish ISO-639-3: pol</para>
+          </listitem>
+          <listitem>
             <para>Portuguese ISO-639-3: por</para>
+          </listitem>
+          <listitem>
             <para>Q'eqchi' ISO-639-3: kek</para>
+          </listitem>
+          <listitem>
             <para>Romanian ISO-639-3: ron</para>
+          </listitem>
+          <listitem>
             <para>Romani ISO-639-3: rom</para>
+          </listitem>
+          <listitem>
             <para>Russian ISO-639-3: rus</para>
+          </listitem>
+          <listitem>
             <para>Serbian ISO-639-3: srp</para>
+          </listitem>
+          <listitem>
             <para>Shona ISO-639-3: sna</para>
+          </listitem>
+          <listitem>
             <para>Shuar ISO-639-3: jiv</para>
+          </listitem>
+          <listitem>
             <para>Slovak ISO-639-3: slk</para>
+          </listitem>
+          <listitem>
             <para>Slovenian ISO-639-3: slv</para>
+          </listitem>
+          <listitem>
             <para>Spanish ISO-639-3: spa</para>
+          </listitem>
+          <listitem>
             <para>Swahili ISO-639-3: swa</para>
+          </listitem>
+          <listitem>
             <para>Swedish ISO-639-3: swe</para>
+          </listitem>
+          <listitem>
             <para>Tagalog ISO-639-3: tgl</para>
+          </listitem>
+          <listitem>
             <para>Thai ISO-639-3: tha</para>
+          </listitem>
+          <listitem>
             <para>Todos Santos Cuchumatan Mám ISO-639-3: mvj</para>
+          </listitem>
+          <listitem>
             <para>Turkish ISO-639-3: tur</para>
+          </listitem>
+          <listitem>
             <para>Ukrainian ISO-639-3: ukr</para>
+          </listitem>
+          <listitem>
             <para>Urdu ISO-639-3: urd</para>
+          </listitem>
+          <listitem>
             <para>Uspanteco ISO-639-3: usp</para>
+          </listitem>
+          <listitem>
             <para>Vietnamese ISO-639-3: vie</para>
+          </listitem>
+          <listitem>
             <para>Welsh ISO-639-3: cym</para>
+          </listitem>
+          <listitem>
             <para>Wolof ISO-639-3: wol</para>
+          </listitem>
+          <listitem>
             <para>Xhosa ISO-639-3: xho</para>
+          </listitem>
+          <listitem>
             <para>Zarma ISO-639-3: ssa</para>
           </listitem>
         </itemizedlist>

@@ -90,7 +90,7 @@
 			<para>
 				<inlinemediaobject>
 					<imageobject>
-						<imagedata fileref="&imgroot;/CFE_UG-1.jpg" />
+						<imagedata fileref="&imgroot;/CFE_UG-1.jpg" width="93%"/>
 					</imageobject>
 				</inlinemediaobject>
 			</para>
@@ -1024,7 +1024,7 @@
               	<para>
 					<inlinemediaobject>
 						<imageobject>
-							<imagedata fileref="&imgroot;/CFE_UG-14.jpg" align="center"/>
+							<imagedata fileref="&imgroot;/CFE_UG-14.jpg" align="center" width="93%"/>
 						</imageobject>
 					</inlinemediaobject>
               	</para>
