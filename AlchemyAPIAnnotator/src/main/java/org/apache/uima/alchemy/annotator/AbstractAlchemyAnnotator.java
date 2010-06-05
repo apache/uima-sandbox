@@ -54,12 +54,12 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
 
   @Override
   public void initialize(UimaContext aContext) throws ResourceInitializationException {
-
+    super.initialize(aContext);
     digesterProvider = createDigester();
 
     try {
-      this.digester = digesterProvider.getDigester(String.valueOf(aContext
-              .getConfigParameterValue("outputMode")));
+      Object configParameterValue = aContext.getConfigParameterValue("outputMode");
+      this.digester = digesterProvider.getDigester(String.valueOf(configParameterValue));
     } catch (UnsupportedResultFormatException e1) {
       throw new ResourceInitializationException(e1);
     }
@@ -103,7 +103,7 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
       if (connection instanceof HttpURLConnection) {
         connection.setDoOutput(true);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection
-              .getOutputStream(), "UTF-8"));
+                .getOutputStream(), "UTF-8"));
         writer.write(this.serviceParams);
 
         writer.flush();
