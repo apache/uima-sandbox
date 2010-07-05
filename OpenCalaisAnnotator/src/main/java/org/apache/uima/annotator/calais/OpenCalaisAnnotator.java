@@ -22,7 +22,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -118,30 +120,20 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
   public void process(CAS aCas) throws AnalysisEngineProcessException {
 
     try {
-      // open connection and send data
-      URLConnection connection = this.calaisService.openConnection();
-      connection.setDoOutput(true);
-      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection
-              .getOutputStream(), "UTF-8"));
-      writer.write(this.serviceParams);
       String modifiedText = aCas.getDocumentText();
-      for(int i = 0; i < this.charsToReplace.length; i++) {
-        modifiedText = modifiedText.replaceAll(this.charsToReplace[i], "");
-      }
-      modifiedText = modifiedText.replaceAll("\n", " ");
-      modifiedText = modifiedText.replaceAll("\r", " ");
-     
-      writer.write(modifiedText);
-      writer.flush();
-      writer.close();
+      
+      // open connection and send data
+      InputStream serviceInputStream = callServiceOnText(modifiedText);
 
       // result is an XML that contains the RDF XML result
       // first get the RDF XML result out of the returned XML
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
+      BufferedInputStream in = new BufferedInputStream(serviceInputStream);
       Document feedDoc = docBuilder.parse(in);
+
+      in.close();
       String RdfXmlContent = feedDoc.getDocumentElement().getTextContent();
-      //System.out.println(RdfXmlContent);
+//      System.out.println(RdfXmlContent);
 
       // create new InputStream for the RDF XML content
       BufferedInputStream bufByteIn = new BufferedInputStream(new ByteArrayInputStream(
@@ -188,8 +180,10 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
         //if mapping is available, create an annotation
         if (currentType != null) {
           // get reference element that contains the annotation span
-
-          int begin = element.getOffset() - offset.getOffset() -1;
+          int begin = 0;
+          if (element.getOffset()>0) {
+            begin = element.getOffset() - offset.getOffset() - 1;
+          }
           
           //make begin offset correction
           for(int i = 0; i < positions.length; i++) {
@@ -201,9 +195,11 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
                   
           int end = begin + element.getLength();
           // create annotation
-          AnnotationFS annotFs = aCas.createAnnotation(currentType, begin, end);
-          annotFs.setStringValue(this.calaisTypeFeat, element.getTypeURL().intern());
-          aCas.addFsToIndexes(annotFs);
+          if (end - begin > 0) {
+            AnnotationFS annotFs = aCas.createAnnotation(currentType, begin, end);
+            annotFs.setStringValue(this.calaisTypeFeat, element.getTypeURL().intern());
+            aCas.addFsToIndexes(annotFs);
+          }
         }
       }
     } catch (IOException ex) {
@@ -214,6 +210,28 @@ public class OpenCalaisAnnotator extends CasAnnotator_ImplBase {
       throw new AnalysisEngineProcessException(ex);
     }
 
+  }
+
+  protected InputStream callServiceOnText(String modifiedText) throws IOException,
+          UnsupportedEncodingException {
+    URLConnection connection = this.calaisService.openConnection();
+    connection.setDoOutput(true);
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection
+            .getOutputStream(), "UTF-8"));
+    writer.write(this.serviceParams);
+    for(int i = 0; i < this.charsToReplace.length; i++) {
+      modifiedText = modifiedText.replaceAll(this.charsToReplace[i], "");
+    }
+    modifiedText = modifiedText.replaceAll("\n", " ");
+    modifiedText = modifiedText.replaceAll("\r", " ");
+
+    if (this.getContext().getLogger().isLoggable(Level.INFO))
+      this.getContext().getLogger().log(Level.FINER,new StringBuilder(this.calaisService.toString()).
+              append(this.serviceParams).append(modifiedText).toString());     
+    writer.write(modifiedText);
+    writer.flush();
+    writer.close();
+    return connection.getInputStream();
   }
 
   /*
