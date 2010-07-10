@@ -49,5 +49,14 @@ public class Results {
   public void setUrl(String url) {
     this.url = url;
   }
+  
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("status: ").append(status).append("\n");
+    builder.append("language: ").append(language).append("\n");
+    builder.append("url: ").append(url).append("\n");
+    return builder.toString();
+  }
 
 }

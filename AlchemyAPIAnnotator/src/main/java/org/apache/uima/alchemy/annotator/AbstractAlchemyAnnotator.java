@@ -31,6 +31,7 @@ import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.util.Level;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -120,6 +121,8 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
         Validate.notNull(results);
         Validate.notNull(results.getStatus());
         if (results.getStatus().equalsIgnoreCase(STATUS_OK)) {
+          if (this.getContext().getLogger().isLoggable(Level.FINER))
+            this.getContext().getLogger().log(Level.FINER, results.toString());
           mapResultsToTypeSystem(results, aJCas); // annotations from results
         } else {
           throw new AlchemyCallFailedException(results.getStatus());

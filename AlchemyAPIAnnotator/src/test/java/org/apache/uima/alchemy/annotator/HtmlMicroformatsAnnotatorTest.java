@@ -39,6 +39,7 @@ public class HtmlMicroformatsAnnotatorTest {
           + "<span class=\"postal-code\">55439</span> </div> <div class=\"tel\">(952) 921-9368</div>/div> </body></html>";
   private static final String XML_PATH = "desc/HtmlMicroformatsAEDescriptor.xml";
 
+  @SuppressWarnings("unchecked")
   @Test
   public void annotatorIntegrationTest() {
     try {
@@ -53,6 +54,7 @@ public class HtmlMicroformatsAnnotatorTest {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void mockedAnnotatorTest() {
     try {

@@ -18,9 +18,12 @@
  */
 package org.apache.uima.alchemy.utils;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.uima.alchemy.digester.domain.*;
 import org.apache.uima.alchemy.ts.categorization.Category;
+import org.apache.uima.alchemy.ts.concept.ConceptFS;
 import org.apache.uima.alchemy.ts.entity.AlchemyAnnotation;
 import org.apache.uima.alchemy.ts.keywords.KeywordFS;
 import org.apache.uima.alchemy.ts.language.LanguageFS;
@@ -196,6 +199,39 @@ public class Alchemy2TypeSystemMapper {
     languageFS.setFeatureValueFromString(type.getFeatureByBaseName("wikipedia"), results
             .getWikipedia());
     languageFS.addToIndexes();
+  }
+
+  public static void mapConceptTagging(ConceptResults results, JCas aJCas) {
+    setLanaguage(results, aJCas);
+    if (results.getConcepts() != null) {
+      List<Concept> concepts = results.getConcepts().getConcepts();
+      for (Concept concept : concepts) {
+        ConceptFS conceptFS = new ConceptFS(aJCas);
+        Type type = conceptFS.getType();
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("text"), concept.getText());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("relevance"), concept
+                .getRelevance());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("website"), concept
+                .getWebsite());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("geo"), concept.getGeo());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("dbpedia"), concept
+                .getDbpedia());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("yago"), concept.getYago());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("opencyc"), concept
+                .getOpencyc());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("ciaFactbook"), concept
+                .getCiaFactbook());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("geonames"), concept
+                .getGeonames());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("crunchbase"), concept
+                .getCrunchbase());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("semanticCrunchbase"),
+                concept.getSemanticCrunchbase());
+        conceptFS.setFeatureValueFromString(type.getFeatureByBaseName("musicBrainz"), concept
+                .getMusicBrainz());
+        conceptFS.addToIndexes();
+      }
+    }
   }
 
 }

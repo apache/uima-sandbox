@@ -35,6 +35,7 @@ public class URLMicroformatsAnnotatorTest {
   private static final String URL = "http://microformats.org/wiki/hcard";
   private static final String XML_PATH = "desc/URLMicroformatsAEDescriptor.xml";
 
+  @SuppressWarnings("unchecked")
   @Test
   public void annotatorIntegrationTest() {
     try {
@@ -50,6 +51,7 @@ public class URLMicroformatsAnnotatorTest {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void mockedAnnotatorTest() {
     try {

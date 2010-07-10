@@ -35,6 +35,7 @@ public class TextCategorizationAnnotatorTest {
   private static final String XML_PATH = "desc/TextCategorizationAEDescriptor.xml";
   private static final String DOC = "Eight US soldiers die in attacks in south Afghanistan, making October the deadliest month for the US in the war there";
 
+  @SuppressWarnings("unchecked")
   @Test
   public void annotatorIntegrationTest() {
     try {
@@ -50,6 +51,7 @@ public class TextCategorizationAnnotatorTest {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void mockedAnnotatorTest() {
     try {

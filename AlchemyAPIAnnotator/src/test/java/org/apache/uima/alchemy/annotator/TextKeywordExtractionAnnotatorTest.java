@@ -35,6 +35,7 @@ public class TextKeywordExtractionAnnotatorTest {
   private static final String XML_PATH = "desc/TextKeywordExtractionAEDescriptor.xml";
   private static final String DOC = "In an effort to centralize developer resources and help newcomers to open source, the Apache Software Foundation recently launched the Community Developer project.  So far, the project includes plans for a mentoring program, a \"Newbie FAQ\", and resources for educators.  To find out how the project started and where it's going, DZone conducted an exclusive interview with Bertrand Delacretaz, an Apache member who has been with the project since the beginning.  He says some of the major goals for the project include mentoring for student developers and an entry point to the foundation at-large.";
 
+  @SuppressWarnings("unchecked")
   @Test
   public void annotatorIntegrationTest() {
     try {
@@ -49,6 +50,7 @@ public class TextKeywordExtractionAnnotatorTest {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void mockedAnnotatorTest() {
     try {

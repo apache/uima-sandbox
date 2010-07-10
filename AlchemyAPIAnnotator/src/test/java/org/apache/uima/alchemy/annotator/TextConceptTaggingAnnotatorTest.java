@@ -26,20 +26,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.uima.alchemy.annotator.mocked.MockedTextRankedEntityAnnotator;
-import org.apache.uima.alchemy.ts.entity.Country;
-import org.apache.uima.alchemy.ts.entity.RadioStation;
+import org.apache.uima.alchemy.annotator.mocked.MockedTextConceptTaggingAnnotator;
+import org.apache.uima.alchemy.ts.concept.ConceptFS;
 import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.FileUtils;
 import org.junit.Test;
 
-public class TextRankedEntityExtractionAnnotatorTest {
+public class TextConceptTaggingAnnotatorTest {
   private static final String DOC = "Eight US soldiers die in attacks in south Afghanistan, making October the deadliest month for the US in the war there";
 
   private static final String DOCPATH = "src/test/resources/rankedTestText.txt";
 
-  private static final String XML_PATH = "desc/TextRankedEntityExtractionAEDescriptor.xml";
+  private static final String XML_PATH = "desc/TextConceptTaggingAEDescriptor.xml";
 
   @SuppressWarnings("unchecked")
   @Test
@@ -50,10 +49,10 @@ public class TextRankedEntityExtractionAnnotatorTest {
       String documentText = FileUtils.file2String(new File(DOCPATH));
       JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(XML_PATH, parameterSettings),
               documentText);
-      List<RadioStation> entities = (List<RadioStation>) TestUtils.getAllFSofType(
-              RadioStation.type, resultingCAS);
-      assertTrue(entities != null);
-      assertTrue(entities.size() == 1);
+      List<ConceptFS> concepts = (List<ConceptFS>) TestUtils.getAllFSofType(ConceptFS.type,
+              resultingCAS);
+      assertTrue(concepts != null);
+      assertTrue(concepts.size() == 8);
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.toString());
@@ -64,12 +63,13 @@ public class TextRankedEntityExtractionAnnotatorTest {
   @Test
   public void mockedAnnotatorTest() {
     try {
-      String mockedAnnotatorName = MockedTextRankedEntityAnnotator.class.getName();
+      String mockedAnnotatorName = MockedTextConceptTaggingAnnotator.class.getName();
       JCas resultingCAS = TestUtils.executeAE(TestUtils.getAEWithMockedImplementation(XML_PATH,
               mockedAnnotatorName), DOC);
-      List<Country> entities = (List<Country>) TestUtils.getAllFSofType(Country.type, resultingCAS);
-      assertTrue(entities != null);
-      assertTrue(entities.size() == 1);
+      List<ConceptFS> concepts = (List<ConceptFS>) TestUtils.getAllFSofType(ConceptFS.type,
+              resultingCAS);
+      assertTrue(concepts != null);
+      assertTrue(concepts.size() == 1);
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.toString());

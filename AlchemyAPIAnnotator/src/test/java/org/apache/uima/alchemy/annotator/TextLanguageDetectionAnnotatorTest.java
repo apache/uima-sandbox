@@ -35,6 +35,7 @@ public class TextLanguageDetectionAnnotatorTest {
   private static final String DOC = "Eight US soldiers die in attacks in south Afghanistan, making October the deadliest month for the US in the war there";
   private static final String XML_PATH = "desc/TextLanguageDetectionAEDescriptor.xml";
 
+  @SuppressWarnings("unchecked")
   @Test
   public void annotatorIntegrationTest() {
     try {
@@ -50,6 +51,7 @@ public class TextLanguageDetectionAnnotatorTest {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void mockedAnnotatorTest() {
     try {
