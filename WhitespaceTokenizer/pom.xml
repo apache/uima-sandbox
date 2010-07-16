@@ -95,6 +95,7 @@
             <id>default-cli</id>
             <configuration>
               <excludes>
+                <exclude>release.properties</exclude> <!-- release generated artifact -->
                 <exclude>src/test/resources/tabs*.txt</exclude> <!-- test data -->
                 <exclude>src/test/resources/testdoc*.txt</exclude> <!-- test data -->
               </excludes>              

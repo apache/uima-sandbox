@@ -107,6 +107,7 @@
             <id>default-cli</id>
             <configuration>
               <excludes>
+                <exclude>release.properties</exclude> <!-- release generated artifact -->
                 <exclude>src/main/java/org/apache/uima/tika/AttributeFS.java</exclude> <!-- generated -->
                 <exclude>src/main/java/org/apache/uima/tika/AttributeFS_Type.java</exclude> <!-- generated -->
                 <exclude>src/main/java/org/apache/uima/tika/FeatureValue.java</exclude> <!-- generated -->

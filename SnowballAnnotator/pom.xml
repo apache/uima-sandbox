@@ -105,6 +105,7 @@
             <id>default-cli</id>
             <configuration>
               <excludes>
+                <exclude>release.properties</exclude> <!-- release generated artifact -->
                 <exclude>src/main/java/org/tartarus/snowball/*.java</exclude> <!-- copied from Snowball source under license -->
                 <exclude>src/main/java/org/tartarus/snowball/ext/*.java</exclude> <!-- copied from Snowball source under license -->
                 <exclude>src/test/resources/englishRef.txt</exclude> <!-- test data -->

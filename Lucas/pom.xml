@@ -167,6 +167,7 @@
             <id>default-cli</id>
             <configuration>
               <excludes>
+                <exclude>release.properties</exclude> <!-- release generated artifact -->
                 <exclude>src/test/java/org/apache/uima/lucas/indexer/types/test/*.java</exclude> <!-- generated -->
                 <exclude>src/test/resources/hypernyms.txt</exclude> <!-- test data -->
                 <exclude>src/test/resources/stopwords.txt</exclude> <!-- test data -->

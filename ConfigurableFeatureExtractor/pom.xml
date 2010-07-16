@@ -255,6 +255,7 @@
             <id>default-cli</id>
             <configuration>
               <excludes>
+                <exclude>release.properties</exclude> <!-- release generated artifact -->
                 <exclude>cfeModelGen/*</exclude> <!-- generated EMF model files -->
                 <exclude>src/test/resources/testData*.txt*</exclude> <!-- test data -->
                 <exclude>src/test/java/example/PersonTitle*.java</exclude> <!-- generated -->
