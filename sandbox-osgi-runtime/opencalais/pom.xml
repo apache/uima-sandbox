@@ -34,19 +34,19 @@
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>OpenCalaisAnnotator</artifactId>
-      <version>2.3.1-SNAPSHOT</version>
+      <version>${uimaDependencyVersion}</version>
     </dependency>
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.opencalais_${parsedVersion.osgiVersion}</finalName>
+    <finalName>org.apache.uima.opencalais_${osgiVersion}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Export-Package>org.apache.uima.annotator.calais.*</Export-Package>
+            <Export-Package>org.apache.uima.annotator.calais.*,org.apache.uima.calais.*</Export-Package>
             <Bundle-SymbolicName>org.apache.uima.opencalais;${singleton}</Bundle-SymbolicName>
           </instructions>
         </configuration>

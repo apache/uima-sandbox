@@ -35,12 +35,12 @@
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>Lucas</artifactId>
-      <version>2.3.1-SNAPSHOT</version>
+      <version>${uimaDependencyVersion}</version>
     </dependency>
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.lucas_${parsedVersion.osgiVersion}</finalName>
+    <finalName>org.apache.uima.lucas_${osgiVersion}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
