@@ -22,19 +22,15 @@ package org.apache.uima.annotator;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import org.apache.uima.analysis_engine.ResultSpecification;
-import org.apache.uima.analysis_engine.annotator.AnnotatorConfigurationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorContext;
-import org.apache.uima.analysis_engine.annotator.AnnotatorInitializationException;
-import org.apache.uima.analysis_engine.annotator.AnnotatorProcessException;
-import org.apache.uima.analysis_engine.annotator.JTextAnnotator_ImplBase;
+import org.apache.uima.TokenAnnotation;
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
-import org.apache.uima.cas.Feature;
-import org.apache.uima.cas.Type;
-import org.apache.uima.cas.TypeSystem;
-import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.cas.text.Language;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 import org.tartarus.snowball.SnowballProgram;
@@ -52,35 +48,21 @@ import org.tartarus.snowball.ext.russianStemmer;
 import org.tartarus.snowball.ext.spanishStemmer;
 import org.tartarus.snowball.ext.swedishStemmer;
 
-public class SnowballAnnotator extends JTextAnnotator_ImplBase {
-
-  private static final String TOKEN_ANNOTATION_NAME = "org.apache.uima.TokenAnnotation";
-
-  private static final String TOKEN_ANNOTATION_STEM_FEATURE_NAME = "stem";
-
-  private Type tokenAnnotation;
-
-  private Feature tokenAnnotationStemmFeature;
+public class SnowballAnnotator extends JCasAnnotator_ImplBase {
 
   private Logger logger;
 
-  private HashMap stemmers;
+  private HashMap<String,SnowballProgram> stemmers;
 
   private static final Object[] emptyArgs = new Object[0];
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.uima.analysis_engine.annotator.JTextAnnotator#process(org.apache.uima.jcas.impl.JCas,
-   *      org.apache.uima.analysis_engine.ResultSpecification)
-   */
-  public void process(JCas aJCas, ResultSpecification aResultSpec) throws AnnotatorProcessException {
+  public void process(JCas aJCas) throws AnalysisEngineProcessException {
 
     this.logger.log(Level.INFO, "Snowball annotator starts processing");
 
     // get get stemmer for the document language
     String language = new Language(aJCas.getDocumentLanguage()).getLanguagePart();
-    SnowballProgram stemmer = (SnowballProgram) this.stemmers.get(language);
+    SnowballProgram stemmer = this.stemmers.get(language);
 
     // create stemms if stemmer for the current document language is available
     if (stemmer != null) {
@@ -90,14 +72,14 @@ public class SnowballAnnotator extends JTextAnnotator_ImplBase {
       try {
         stemmerStemMethod = stemmer.getClass().getMethod("stem", new Class[0]);
       } catch (Exception ex) {
-        throw new AnnotatorProcessException(ex);
+        throw new AnalysisEngineProcessException(ex);
       }
 
       // iterate over all token annotations and add stem if available
-      FSIterator tokenIterator = aJCas.getCas().getAnnotationIndex(this.tokenAnnotation).iterator();
+      FSIterator<Annotation> tokenIterator = aJCas.getAnnotationIndex(TokenAnnotation.type).iterator();
       while (tokenIterator.hasNext()) {
         // get token content
-        AnnotationFS annot = (AnnotationFS) tokenIterator.next();
+        TokenAnnotation annot = (TokenAnnotation) tokenIterator.next();
         String span = annot.getCoveredText();
 
         // set annotation content and call stemmer
@@ -105,28 +87,25 @@ public class SnowballAnnotator extends JTextAnnotator_ImplBase {
           stemmer.setCurrent(span);
           stemmerStemMethod.invoke(stemmer, emptyArgs);
         } catch (Exception ex) {
-          throw new AnnotatorProcessException(ex);
+          throw new AnalysisEngineProcessException(ex);
         }
 
         // get stemmer result and set annotation feature
-        annot.setStringValue(this.tokenAnnotationStemmFeature, stemmer.getCurrent());
+        annot.setStem(stemmer.getCurrent());
       }
     }
     this.logger.log(Level.INFO, "Snowball annotator processing finished");
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#initialize(org.apache.uima.analysis_engine.annotator.AnnotatorContext)
-   */
-  public void initialize(AnnotatorContext aContext) throws AnnotatorInitializationException,
-          AnnotatorConfigurationException {
-
+  @Override
+  public void initialize(UimaContext aContext) throws ResourceInitializationException {
+    super.initialize(aContext);
     // initialize logger
     try {
       this.logger = aContext.getLogger();
 
       // initialize stemmers
-      this.stemmers = new HashMap();
+      this.stemmers = new HashMap<String, SnowballProgram>();
       this.stemmers.put("da", new danishStemmer());
       this.stemmers.put("nl", new dutchStemmer());
       this.stemmers.put("en", new englishStemmer());
@@ -141,25 +120,9 @@ public class SnowballAnnotator extends JTextAnnotator_ImplBase {
       this.stemmers.put("es", new spanishStemmer());
       this.stemmers.put("sw", new swedishStemmer());
     } catch (Exception ex) {
-      throw new AnnotatorInitializationException(ex);
+      throw new ResourceInitializationException(ex);
     }
 
     this.logger.log(Level.INFO, "Snowball annotator successfully initialized");
   }
-
-  /* (non-Javadoc)
-   * @see org.apache.uima.analysis_engine.annotator.Annotator_ImplBase#typeSystemInit(org.apache.uima.cas.TypeSystem)
-   */
-  public void typeSystemInit(TypeSystem aTypeSystem) throws AnnotatorInitializationException,
-          AnnotatorConfigurationException {
-
-    // initialize cas token type
-    this.tokenAnnotation = aTypeSystem.getType(TOKEN_ANNOTATION_NAME);
-
-    this.tokenAnnotationStemmFeature = aTypeSystem.getFeatureByFullName(TOKEN_ANNOTATION_NAME
-            + TypeSystem.FEATURE_SEPARATOR + TOKEN_ANNOTATION_STEM_FEATURE_NAME);
-
-    this.logger.log(Level.INFO, "Snowball annotator typesystem initialized");
-  }
-
 }

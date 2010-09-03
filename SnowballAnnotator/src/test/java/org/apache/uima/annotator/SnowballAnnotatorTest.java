@@ -23,50 +23,69 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.apache.uima.UIMAFramework;
+import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.test.junit_extension.AnnotatorTester;
 import org.apache.uima.test.junit_extension.JUnitExtension;
-
+import org.apache.uima.util.XMLInputSource;
 
 /**
  * Testclass for the SnowballAnnotator.
  */
-public class SnowballAnnotatorTest extends TestCase
-{
-	private AnnotatorTester annotTester;
-	
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception
-	{
-		this.annotTester = new AnnotatorTester(JUnitExtension.getFile("SnowballAnnotator.xml"));
-	}
+public class SnowballAnnotatorTest extends TestCase {
+  private AnnotatorTester annotTester;
 
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception
-    {
-      super.tearDown();
-      this.annotTester = null;
-    }
-    
-
-  public void testAnnotatorEnglish() throws Exception
-  {
-    //get cas from xcas file
-    CAS cas = AnnotatorTester.getCASfromXCAS(JUnitExtension.getFile("typesystem.xml"), JUnitExtension.getFile("englishXCAS.xml"));
-    
-    //execute sample text
-    this.annotTester.performTest(cas);
-    
-    //define result interested in
-    String[] tofs = {"org.apache.uima.TokenAnnotation", "org.apache.uima.TokenAnnotation:stem"};
-    
-    //compare results
-    File outputFile = new File(JUnitExtension.getFile("englishRef.txt").getParent(), "englishRef_testoutput.txt") ;
-    AnnotatorTester.checkResult(cas, tofs, JUnitExtension.getFile("englishRef.txt"), outputFile);   
+  /**
+   * @see junit.framework.TestCase#setUp()
+   */
+  protected void setUp() throws Exception {
+    this.annotTester = new AnnotatorTester(JUnitExtension.getFile("SnowballAnnotator.xml"));
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see junit.framework.TestCase#tearDown()
+   */
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    this.annotTester = null;
+  }
+
+  public void testAnnotatorEnglish() throws Exception {
+    // get cas from xcas file
+    CAS cas = AnnotatorTester.getCASfromXCAS(JUnitExtension.getFile("typesystem.xml"),
+            JUnitExtension.getFile("englishXCAS.xml"));
+
+    // execute sample text
+    this.annotTester.performTest(cas);
+
+    // define result interested in
+    String[] tofs = { "org.apache.uima.TokenAnnotation", "org.apache.uima.TokenAnnotation:stem" };
+
+    // compare results
+    File outputFile = new File(JUnitExtension.getFile("englishRef.txt").getParent(),
+            "englishRef_testoutput.txt");
+    AnnotatorTester.checkResult(cas, tofs, JUnitExtension.getFile("englishRef.txt"), outputFile);
+  }
+
+  public void testReconfigure() {
+    try {
+      XMLInputSource in = new XMLInputSource("desc/SnowballAnnotator.xml");
+      ResourceSpecifier specifier = UIMAFramework.getXMLParser().parseResourceSpecifier(in);
+
+      AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(specifier);
+
+      CAS cas = AnnotatorTester.getCASfromXCAS(JUnitExtension.getFile("typesystem.xml"),
+              JUnitExtension.getFile("englishXCAS.xml"));
+
+      ae.process(cas);
+
+      ae.reconfigure();
+    } catch (Exception e) {
+      fail();
+    }
+  }
 }
