@@ -23,11 +23,7 @@ import java.net.URI;
 import java.net.URL;
 
 import org.apache.uima.alchemy.digester.DigesterProvider;
-import org.apache.uima.alchemy.digester.domain.LanguageDetectionResults;
-import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.digester.language.LanguageDetectionDigesterProvider;
-import org.apache.uima.alchemy.utils.Alchemy2TypeSystemMapper;
-import org.apache.uima.alchemy.utils.exception.MappingException;
 import org.apache.uima.jcas.JCas;
 
 public class TextLanguageDetectionAnnotator extends AbstractAlchemyAnnotator {
@@ -38,10 +34,6 @@ public class TextLanguageDetectionAnnotator extends AbstractAlchemyAnnotator {
 
   protected String[] getServiceParameters() {
     return new String[] { "outputMode", "url" };
-  }
-
-  protected void mapResultsToTypeSystem(Results results, JCas aJCas) throws MappingException {
-    Alchemy2TypeSystemMapper.mapLanguageDetection((LanguageDetectionResults) results, aJCas);
   }
 
   protected DigesterProvider createDigester() {

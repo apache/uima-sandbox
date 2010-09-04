@@ -25,11 +25,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.apache.uima.alchemy.digester.DigesterProvider;
-import org.apache.uima.alchemy.digester.domain.MicroformatsResults;
-import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.digester.microformats.MicroformatsDigesterProvider;
-import org.apache.uima.alchemy.utils.Alchemy2TypeSystemMapper;
-import org.apache.uima.alchemy.utils.exception.MappingException;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
@@ -41,10 +37,6 @@ public class URLMicroformatsAnnotator extends AbstractAlchemyAnnotator {
 
   protected String[] getServiceParameters() {
     return new String[] { "outputMode" };
-  }
-
-  protected void mapResultsToTypeSystem(Results results, JCas aJCas) throws MappingException {
-    Alchemy2TypeSystemMapper.mapMicroformats((MicroformatsResults) results, aJCas);
   }
 
   protected DigesterProvider createDigester() {

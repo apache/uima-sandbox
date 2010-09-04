@@ -23,11 +23,7 @@ import java.net.URI;
 import java.net.URL;
 
 import org.apache.uima.alchemy.digester.DigesterProvider;
-import org.apache.uima.alchemy.digester.domain.KeywordResults;
-import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.digester.keyword.KeywordDigesterProvider;
-import org.apache.uima.alchemy.utils.Alchemy2TypeSystemMapper;
-import org.apache.uima.alchemy.utils.exception.MappingException;
 import org.apache.uima.jcas.JCas;
 
 public class TextKeywordExtractionAnnotator extends AbstractAlchemyAnnotator {
@@ -37,12 +33,7 @@ public class TextKeywordExtractionAnnotator extends AbstractAlchemyAnnotator {
   }
 
   protected String[] getServiceParameters() {
-    return new String[] { "outputMode", "baseUrl", "url", "maxRetrieve",
-        "showSourceText" };
-  }
-
-  protected void mapResultsToTypeSystem(Results results, JCas aJCas) throws MappingException {
-    Alchemy2TypeSystemMapper.mapKeywordEntity((KeywordResults) results, aJCas);
+    return new String[] { "outputMode", "baseUrl", "url", "maxRetrieve", "showSourceText" };
   }
 
   protected DigesterProvider createDigester() {

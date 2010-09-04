@@ -16,7 +16,7 @@
  * 	specific language governing permissions and limitations
  * 	under the License.
  */
-package org.apache.uima.alchemy.utils.exception;
+package org.apache.uima.alchemy.mapper.exception;
 
 public class MappingException extends Exception {
 

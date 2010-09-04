@@ -18,18 +18,14 @@
  */
 package org.apache.uima.alchemy.annotator;
 
-import org.apache.uima.alchemy.digester.concept.ConceptTaggingDigesterProvider;
-import org.apache.uima.alchemy.digester.DigesterProvider;
-import org.apache.uima.alchemy.digester.domain.ConceptResults;
-import org.apache.uima.alchemy.digester.domain.Results;
-import org.apache.uima.alchemy.utils.Alchemy2TypeSystemMapper;
-import org.apache.uima.alchemy.utils.exception.MappingException;
-import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.jcas.JCas;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+
+import org.apache.uima.alchemy.digester.DigesterProvider;
+import org.apache.uima.alchemy.digester.concept.ConceptTaggingDigesterProvider;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.jcas.JCas;
 
 public class TextConceptTaggingAnnotator extends AbstractAlchemyAnnotator {
   @Override
@@ -45,11 +41,6 @@ public class TextConceptTaggingAnnotator extends AbstractAlchemyAnnotator {
   @Override
   protected String[] getServiceParameters() {
     return new String[] { "url", "maxRetrieve", "outputMode", "linkedData", "showSourceText" };
-  }
-
-  @Override
-  protected void mapResultsToTypeSystem(Results results, JCas aJCas) throws MappingException {
-    Alchemy2TypeSystemMapper.mapConceptTagging((ConceptResults) results, aJCas);
   }
 
   @Override

@@ -26,7 +26,8 @@ import org.apache.uima.alchemy.digester.OutputDigester;
 import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.digester.exception.ResultDigestingException;
 import org.apache.uima.alchemy.digester.exception.UnsupportedResultFormatException;
-import org.apache.uima.alchemy.utils.exception.MappingException;
+import org.apache.uima.alchemy.mapper.Alchemy2TypeSystemMapper;
+import org.apache.uima.alchemy.mapper.exception.MappingException;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
@@ -146,6 +147,10 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
   private InputStream parseOutput(URLConnection connection) throws IOException {
     return new BufferedInputStream(connection.getInputStream());
   }
+  
+  private void mapResultsToTypeSystem(Results results, JCas aJCas) throws MappingException {
+    Alchemy2TypeSystemMapper.mapResultsToTypeSystem(results, aJCas);
+  }
 
   public void setDigesterProvider(DigesterProvider digesterProvider) {
     this.digesterProvider = digesterProvider;
@@ -160,9 +165,6 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
   protected abstract URL createServiceURI() throws MalformedURLException;
 
   protected abstract String[] getServiceParameters();
-
-  protected abstract void mapResultsToTypeSystem(Results results, JCas aJCas)
-          throws MappingException;
 
   protected abstract void initializeRuntimeParameters(JCas aJCas)
           throws AnalysisEngineProcessException;

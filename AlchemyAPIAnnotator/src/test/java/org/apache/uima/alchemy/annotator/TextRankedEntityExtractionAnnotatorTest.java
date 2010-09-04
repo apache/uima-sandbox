@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.uima.alchemy.annotator.mocked.MockedTextRankedEntityAnnotator;
+import org.apache.uima.alchemy.annotator.mocked.MockedNotSyncTextRankedEntityAnnotator;
 import org.apache.uima.alchemy.ts.entity.Country;
 import org.apache.uima.alchemy.ts.entity.RadioStation;
 import org.apache.uima.alchemy.utils.TestUtils;
@@ -70,6 +71,19 @@ public class TextRankedEntityExtractionAnnotatorTest {
       List<Country> entities = (List<Country>) TestUtils.getAllFSofType(Country.type, resultingCAS);
       assertTrue(entities != null);
       assertTrue(entities.size() == 1);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.toString());
+    }
+  }
+
+  @Test
+  public void mockedNotSyncAnnotatorTest() {
+    try {
+      String mockedAnnotatorName = MockedNotSyncTextRankedEntityAnnotator.class.getName();
+      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAEWithMockedImplementation(XML_PATH,
+              mockedAnnotatorName), DOC);
+      assertTrue(resultingCAS != null);
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.toString());

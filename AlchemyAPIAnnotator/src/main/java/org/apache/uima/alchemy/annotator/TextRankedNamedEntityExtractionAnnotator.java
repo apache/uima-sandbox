@@ -23,11 +23,7 @@ import java.net.URI;
 import java.net.URL;
 
 import org.apache.uima.alchemy.digester.DigesterProvider;
-import org.apache.uima.alchemy.digester.domain.EntitiesResults;
-import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.digester.entity.ranked.RankedEntityDigesterProvider;
-import org.apache.uima.alchemy.utils.Alchemy2TypeSystemMapper;
-import org.apache.uima.alchemy.utils.exception.MappingException;
 import org.apache.uima.jcas.JCas;
 
 public class TextRankedNamedEntityExtractionAnnotator extends AbstractAlchemyAnnotator {
@@ -39,10 +35,6 @@ public class TextRankedNamedEntityExtractionAnnotator extends AbstractAlchemyAnn
   protected String[] getServiceParameters() {
     return new String[] { "outputMode", "baseUrl", "disambiguate", "linkedData",
         "showSourceText", "quotations", "coreference" };
-  }
-
-  protected void mapResultsToTypeSystem(Results results, JCas aJCas) throws MappingException {
-    Alchemy2TypeSystemMapper.mapRankedEntities((EntitiesResults) results, aJCas); // create
   }
 
   protected DigesterProvider createDigester() {
