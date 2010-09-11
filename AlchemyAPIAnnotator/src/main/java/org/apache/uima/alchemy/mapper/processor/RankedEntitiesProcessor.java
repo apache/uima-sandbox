@@ -21,9 +21,12 @@ package org.apache.uima.alchemy.mapper.processor;
 import org.apache.uima.alchemy.digester.domain.EntitiesResults;
 import org.apache.uima.alchemy.digester.domain.Entity;
 import org.apache.uima.alchemy.digester.domain.Results;
+import org.apache.uima.alchemy.ts.entity.AlchemyAnnotation;
+import org.apache.uima.alchemy.ts.entity.BaseEntity;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.NonEmptyFSList;
 import org.apache.uima.jcas.cas.StringArray;
 
 public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
@@ -86,22 +89,50 @@ public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
           fs.setFeatureValue(type.getFeatureByBaseName("quotations"), quotationsFeatureStructure);
         }
         cas.addFsToIndexes(fs);
+        /* build annotations on this fs */
+        buildAnnotations(cas, (BaseEntity) fs);
       }
     }
   }
 
-  private static FeatureStructure getFeatureStructure(String type, JCas aJCas) {
-    FeatureStructure fsObject = null;
+  /* reverse build annotations from entities */
+  private void buildAnnotations(JCas cas, BaseEntity fs) {
+    Type type = fs.getType();
+    String entityText = fs.getStringValue(type.getFeatureByBaseName("text"));
+    int annotationStart = cas.getDocumentText().indexOf(entityText);
+    if (annotationStart > 0) {
+      // create annotation
+      AlchemyAnnotation alchemyAnnotation = new AlchemyAnnotation(cas, annotationStart, entityText
+              .length());
+      alchemyAnnotation.setAlchemyType(fs.getType().toString());
+      alchemyAnnotation.addToIndexes();
+      // update entity occurrences
+      NonEmptyFSList list = (NonEmptyFSList) fs.getOccurrences();
+      if (list!=null) {
+        NonEmptyFSList newTail = new NonEmptyFSList(cas);
+        newTail.setHead(list.getHead());
+        newTail.setTail(list.getTail());
+      }
+      else {
+        list = new NonEmptyFSList(cas);
+      }
+      list.setHead(alchemyAnnotation);
+    }
+
+  }
+
+  private BaseEntity getFeatureStructure(String type, JCas aJCas) {
+    BaseEntity fsObject = null;
     String typeName = new StringBuilder(ENTITY_PACKAGE_NAME).append(type).toString();
     Class<?> typeClass = getClassFromName(typeName);
     if (typeClass != null) {
       try {
         /* usually jcas gen creates the constructor with jcas argument as the second one */
-        fsObject = (FeatureStructure) typeClass.getConstructors()[1].newInstance(aJCas);
+        fsObject = (BaseEntity) typeClass.getConstructors()[1].newInstance(aJCas);
       } catch (Exception e) {
         /* for exceptional cases in which jcas parameter constructor is the first */
         try {
-          fsObject = (FeatureStructure) typeClass.getConstructors()[0].newInstance(aJCas);
+          fsObject = (BaseEntity) typeClass.getConstructors()[0].newInstance(aJCas);
         } catch (Exception inner) {
           /* could not instantiate a FS via reflection */
           inner.printStackTrace();
@@ -111,7 +142,7 @@ public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
     return fsObject;
   }
 
-  private static Class<?> getClassFromName(String typeName) {
+  private Class<?> getClassFromName(String typeName) {
     Class<?> toReturn = null;
     try {
       toReturn = Class.forName(typeName);

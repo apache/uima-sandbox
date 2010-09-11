@@ -45,8 +45,8 @@ public class Alchemy2TypeSystemMapper {
   private static Map<Class<? extends Results>, AlchemyOutputProcessor> processors = new HashMap<Class<? extends Results>, AlchemyOutputProcessor>();
 
   public static void mapResultsToTypeSystem(Results results, JCas aJCas) throws MappingException {
-    setLanaguage(results, aJCas);
     try {
+      setLanaguage(results, aJCas);
       if (processors.isEmpty())
         initializeProcessors();
       processors.get(results.getClass()).process(aJCas, results);
