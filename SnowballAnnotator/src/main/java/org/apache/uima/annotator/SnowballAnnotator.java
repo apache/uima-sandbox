@@ -62,6 +62,7 @@ public class SnowballAnnotator extends JCasAnnotator_ImplBase {
 
     // get get stemmer for the document language
     String language = new Language(aJCas.getDocumentLanguage()).getLanguagePart();
+
     SnowballProgram stemmer = this.stemmers.get(language);
 
     // create stemms if stemmer for the current document language is available
@@ -92,6 +93,10 @@ public class SnowballAnnotator extends JCasAnnotator_ImplBase {
 
         // get stemmer result and set annotation feature
         annot.setStem(stemmer.getCurrent());
+      }
+    } else {
+      if (language.equals("x")) {
+        this.logger.log(Level.WARNING, "Language of the CAS is set to 'x', SnowballAnnotator skipped processing.");
       }
     }
     this.logger.log(Level.INFO, "Snowball annotator processing finished");
