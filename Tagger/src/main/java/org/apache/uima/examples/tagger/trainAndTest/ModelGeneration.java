@@ -90,7 +90,7 @@ public class ModelGeneration implements java.io.Serializable{
   }
   
   
-  private void init(){
+  public void init(){
     
       List<Map<String, Map<String,Double>>> l = get_word_probs(get_lexicon(corpus));
       

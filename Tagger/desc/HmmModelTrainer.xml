@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>true</primitive>
+  <annotatorImplementationName>org.apache.uima.examples.tagger.HMMModelTrainer</annotatorImplementationName>
+  <analysisEngineMetaData>
+    <name>HMMModelTrainer</name>
+    <description>This analysis engine trains an N-gram model for the HMM tagger. It uses a training corpus as reference. This corpus must contain annotations on words with an attribute corresponding of the POS value to be learned.
+
+The configuration of this analysis engine is done through several parameters:
+&lt;ul&gt;
+&lt;li&gt;View: - the view from which the tokens will be extracted&lt;/li&gt;
+&lt;li&gt;ModelExportFile: - the path where the model will be written&lt;/li&gt;
+&lt;li&gt;FeaturePathPOS: - feature path to the value of the POS to be learned. The annotation should exactly cover a "word".&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;b&gt;BEWARE: this analysis engine does not allow multiple deployment !&lt;/b&gt;
+
+&lt;i&gt;NB. At the moment: both bi and trigram statistics are saved in one model file.&lt;/i&gt;</description>
+    <version>1.0</version>
+    <vendor/>
+    <configurationParameters>
+      <configurationParameter>
+        <name>View</name>
+        <description>The view from which the tokens will be extracted.</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>ModelExportFile</name>
+        <description>The path where the model will be written.</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>FeaturePathPOS</name>
+        <description>Feature path to the value of the POS to be learnt. The annotation should exactly cover a "word".</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>View</name>
+        <value>
+          <string>_InitialView</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>ModelExportFile</name>
+        <value>
+          <string>hmmtagger_model.dat</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>FeaturePathPOS</name>
+        <value>
+          <string>org.apache.uima.TokenAnnotation:posTag</string>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+    <typeSystemDescription/>
+    <typePriorities/>
+    <fsIndexCollection/>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs/>
+        <languagesSupported/>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>false</modifiesCas>
+      <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </analysisEngineMetaData>
+  <resourceManagerConfiguration/>
+</analysisEngineDescription>
