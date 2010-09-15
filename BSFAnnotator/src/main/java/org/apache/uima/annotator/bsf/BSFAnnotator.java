@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -187,21 +189,29 @@ public class BSFAnnotator extends JCasAnnotator_ImplBase {
 		URL url;
 		// try to use the class loader to load the file resource
 		if ((url = this.getClass().getClassLoader().getResource(fileName)) != null) {
-			return new File(url.getFile());
-		} else {
-			if (datapathElements == null || datapathElements.size() == 0) {
-				return null;
-			}
-			// try to use the datapath to load the file resource
-			for (File dataPathDir : datapathElements) {
-				File testFile = new File(dataPathDir, fileName);
-				if (testFile.exists()) {
-					return testFile;
-				}
+		  URI uri;
+		  try {
+		    // handle urls with embedded blanks, coded as %20 
+		    // https://issues.apache.org/jira/browse/UIMA-1748
+        uri = url.toURI();
+      } catch (URISyntaxException e) {
+        uri = null;
+      }
+      if (uri != null) {
+			  return new File(uri);
+      }
+		} 
+		if (datapathElements == null || datapathElements.size() == 0) {
+			return null;
+		}
+		// try to use the datapath to load the file resource
+		for (File dataPathDir : datapathElements) {
+			File testFile = new File(dataPathDir, fileName);
+			if (testFile.exists()) {
+				return testFile;
 			}
 		}
 		return null;
-
 	}
 	/**
 	 * @param urls
