@@ -18,28 +18,27 @@
  */
 package org.apache.uima.alchemy.mapper.processor;
 
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.alchemy.digester.domain.EntitiesResults;
 import org.apache.uima.alchemy.digester.domain.Entity;
 import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.ts.entity.AlchemyAnnotation;
 import org.apache.uima.alchemy.ts.entity.BaseEntity;
-import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.NonEmptyFSList;
 import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.util.Level;
 
 public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
 
   private static final String ENTITY_PACKAGE_NAME = "org.apache.uima.alchemy.ts.entity.";
 
   public void process(JCas cas, Results results) throws Exception {
-
     for (Entity entity : ((EntitiesResults) results).getEntities().getEntities()) {
 
-      FeatureStructure fs = null;
       // get feature structure for the entity
-      fs = getFeatureStructure(entity.getType(), cas);
+      BaseEntity fs = getFeatureStructure(entity.getType(), cas);
 
       if (fs != null) {
 
@@ -90,7 +89,7 @@ public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
         }
         cas.addFsToIndexes(fs);
         /* build annotations on this fs */
-        buildAnnotations(cas, (BaseEntity) fs);
+        buildAnnotations(cas, fs);
       }
     }
   }
@@ -102,18 +101,18 @@ public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
     int annotationStart = cas.getDocumentText().indexOf(entityText);
     if (annotationStart > 0) {
       // create annotation
-      AlchemyAnnotation alchemyAnnotation = new AlchemyAnnotation(cas, annotationStart, entityText
+      AlchemyAnnotation alchemyAnnotation = new AlchemyAnnotation(cas, annotationStart, annotationStart + entityText
               .length());
-      alchemyAnnotation.setAlchemyType(fs.getType().toString());
+      alchemyAnnotation.setAlchemyType(type.toString());
       alchemyAnnotation.addToIndexes();
+      UIMAFramework.getLogger().log(Level.INFO, new StringBuilder("added AlchemyAnnotation for ").append(alchemyAnnotation.getCoveredText()).append(" of type ").append(type.toString()).toString());
       // update entity occurrences
       NonEmptyFSList list = (NonEmptyFSList) fs.getOccurrences();
-      if (list!=null) {
+      if (list != null) {
         NonEmptyFSList newTail = new NonEmptyFSList(cas);
         newTail.setHead(list.getHead());
         newTail.setTail(list.getTail());
-      }
-      else {
+      } else {
         list = new NonEmptyFSList(cas);
       }
       list.setHead(alchemyAnnotation);
