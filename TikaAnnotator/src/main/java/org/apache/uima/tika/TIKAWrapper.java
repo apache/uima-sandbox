@@ -22,7 +22,7 @@ package org.apache.uima.tika;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
@@ -33,6 +33,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
+import org.apache.uima.util.Level;
 
 
 public class TIKAWrapper {
@@ -54,16 +55,16 @@ public class TIKAWrapper {
 	}
 	
 	
-	public void populateCASfromURL(CAS cas, URL url, String language) throws CASException{
-		populateCASfromURL(cas, url, null, language);
+	public void populateCASfromURI(CAS cas, URI uri, String language) throws CASException{
+		populateCASfromURI(cas, uri, null, language);
 	}
 	
-	public void populateCASfromURL(CAS cas, URL url, String mime, String language) throws CASException{
+	public void populateCASfromURI(CAS cas, URI uri, String mime, String language) throws CASException{
 	
 		InputStream originalStream=null;
 		try {
-			originalStream = new BufferedInputStream(url
-					.openStream());
+			originalStream = new BufferedInputStream(
+					uri.toURL().openStream());
 		} catch (IOException e1) {
 			new CASException(e1);
 		}
@@ -86,8 +87,8 @@ public class TIKAWrapper {
 	    catch (Exception e){
 	    	// if we have a problem just dump the message and continue
 	    	// getLogger().log(Level.WARNING,"Problem converting file : "+URI+"\t"+e.getMessage());
-	    	cas.setDocumentText("");
-	    	return;
+	    	// cas.setDocumentText(""); return;
+	    	throw new CASException(e);
 	    }
 	    finally {
 			// set language if it was explicitly specified as a configuration
@@ -126,7 +127,7 @@ public class TIKAWrapper {
 	    
 	    FeatureValue fv = new FeatureValue(jcas);
     	fv.setName("uri");
-    	fv.setValue(url.toString());
+    	fv.setValue(uri.toString());
     	docAnnotation.setFeatures(i,fv);
 	    
 	    docAnnotation.addToIndexes();
