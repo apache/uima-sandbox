@@ -126,16 +126,10 @@ public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
     Class<?> typeClass = getClassFromName(typeName);
     if (typeClass != null) {
       try {
-        /* usually jcas gen creates the constructor with jcas argument as the second one */
-        fsObject = (BaseEntity) typeClass.getConstructors()[1].newInstance(aJCas);
+        /* use reflection to build a BaseEntity object */
+        fsObject = (BaseEntity) typeClass.getConstructor(JCas.class).newInstance(aJCas);
       } catch (Exception e) {
-        /* for exceptional cases in which jcas parameter constructor is the first */
-        try {
-          fsObject = (BaseEntity) typeClass.getConstructors()[0].newInstance(aJCas);
-        } catch (Exception inner) {
-          /* could not instantiate a FS via reflection */
-          inner.printStackTrace();
-        }
+        // fsObject remains null
       }
     }
     return fsObject;
