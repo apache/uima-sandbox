@@ -22,7 +22,7 @@ package org.apache.uima.tika;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.URL;
 
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
@@ -33,7 +33,6 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
-import org.apache.uima.util.Level;
 
 
 public class TIKAWrapper {
@@ -55,16 +54,16 @@ public class TIKAWrapper {
 	}
 	
 	
-	public void populateCASfromURI(CAS cas, URI uri, String language) throws CASException{
-		populateCASfromURI(cas, uri, null, language);
+	public void populateCASfromURL(CAS cas, URL uri, String language) throws CASException{
+		populateCASfromURL(cas, uri, null, language);
 	}
 	
-	public void populateCASfromURI(CAS cas, URI uri, String mime, String language) throws CASException{
+	public void populateCASfromURL(CAS cas, URL url, String mime, String language) throws CASException{
 	
 		InputStream originalStream=null;
 		try {
 			originalStream = new BufferedInputStream(
-					uri.toURL().openStream());
+					url.openStream());
 		} catch (IOException e1) {
 			new CASException(e1);
 		}
@@ -126,8 +125,8 @@ public class TIKAWrapper {
 	    }
 	    
 	    FeatureValue fv = new FeatureValue(jcas);
-    	fv.setName("uri");
-    	fv.setValue(uri.toString());
+    	fv.setName("url");
+    	fv.setValue(url.toString());
     	docAnnotation.setFeatures(i,fv);
 	    
 	    docAnnotation.addToIndexes();

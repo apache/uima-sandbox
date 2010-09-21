@@ -96,9 +96,9 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
 
 		// call Tika wrapper 
 		try {
-			tika.populateCASfromURI(aCAS, file.toURI(), this.mMIME, this.mLanguage);
+			tika.populateCASfromURL(aCAS, file.toURI().toURL(), this.mMIME, this.mLanguage);
 		} catch (CASException e) {
-			getLogger().log(Level.WARNING,"Problem converting file : "+file.toURL()+"\t"+e.getMessage());
+			getLogger().log(Level.WARNING,"Problem converting file : "+file.toURI().toURL()+"\t"+e.getMessage());
 			throw new IOException(e);
 	    	//jcas.setDocumentText(" "); return;
 		}
