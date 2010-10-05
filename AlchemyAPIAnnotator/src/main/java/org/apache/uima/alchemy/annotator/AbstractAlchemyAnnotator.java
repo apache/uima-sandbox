@@ -40,6 +40,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+/**
+ * Base class for annotators which wrap AlchemyAPI web services
+ */
 public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
 
   private static final String STATUS_OK = "OK";
@@ -121,10 +124,10 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
         Results results = this.digester.parseAlchemyXML(bufByteIn);
         Validate.notNull(results);
         Validate.notNull(results.getStatus());
-        if (results.getStatus().equalsIgnoreCase(STATUS_OK)) {
-          if (this.getContext().getLogger().isLoggable(Level.FINER))
+        if (this.getContext().getLogger().isLoggable(Level.FINER))
             this.getContext().getLogger().log(Level.FINER, results.toString());
-          mapResultsToTypeSystem(results, aJCas); // annotations from results
+        if (results.getStatus().equalsIgnoreCase(STATUS_OK)) {
+          mapResultsToTypeSystem(results, aJCas);
         } else {
           throw new AlchemyCallFailedException(results.getStatus());
         }
