@@ -116,6 +116,7 @@ public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
         list = new NonEmptyFSList(cas);
       }
       list.setHead(alchemyAnnotation);
+      fs.setOccurrences(list);
     }
 
   }
