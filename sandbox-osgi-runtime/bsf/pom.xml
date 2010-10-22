@@ -61,6 +61,16 @@
       <artifactId>commons-logging-api</artifactId>
       <version>1.0.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>xml-resolver</groupId>
+      <artifactId>xml-resolver</artifactId>
+      <version>1.2</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -71,6 +81,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Import-Package>org.python.*;tcl.lang.*;org.apache.xpath.*;COM.*;com.sun.*;javax.jms.*;netrexx.lang.*;org.apache.tools.ant.*;resolution:=optional,*</Import-Package>
             <Export-Package>org.apache.uima.annotator.bsf.*</Export-Package>
             <Bundle-SymbolicName>org.apache.uima.bsf;${singleton}</Bundle-SymbolicName>
           </instructions>

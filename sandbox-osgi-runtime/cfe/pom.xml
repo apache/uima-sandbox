@@ -132,7 +132,6 @@
           <instructions>
             <Import-Package>sun.*;org.jaxen.*;oracle.*;com.sun.*;javax.servlet.*;org.apache.log4j;org.apache.log;org.apache.tools.ant.*;org.eclipse.*;resolution:=optional,*</Import-Package>
             <Export-Package>org.apache.uima.tools.cfe*</Export-Package>
-            <Embed-Transitive>false</Embed-Transitive>
             <Embed-Dependency>*;scope=compile</Embed-Dependency>
             <Bundle-SymbolicName>org.apache.uima.tools.cfe;${singleton}</Bundle-SymbolicName>
           </instructions>
