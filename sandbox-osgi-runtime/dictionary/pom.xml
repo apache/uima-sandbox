@@ -36,6 +36,16 @@
       <artifactId>DictionaryAnnotator</artifactId>
       <version>2.3.1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>xml-resolver</groupId>
+      <artifactId>xml-resolver</artifactId>
+      <version>1.2</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -46,6 +56,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Import-Package>org.apache.tools.ant.*;com.sun.*;javax.xml.stream.*;resolution:=optional,*</Import-Package>
             <Export-Package>org.apache.uima.annotator.dict_annot.*</Export-Package>
             <Bundle-SymbolicName>org.apache.uima.dictionary;${singleton}</Bundle-SymbolicName>
           </instructions>
