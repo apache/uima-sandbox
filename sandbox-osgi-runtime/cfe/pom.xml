@@ -1,6 +1,6 @@
 <project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
@@ -79,7 +79,16 @@
       <artifactId>geronimo-stax-api_1.0_spec</artifactId>
       <version>1.0.1</version>
     </dependency>
-
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.8.1</version>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.emf.ecore</groupId>
       <artifactId>xmi</artifactId>
@@ -121,7 +130,10 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Export-Package>org.apache.uima.tools.cfe.*</Export-Package>
+            <Import-Package>sun.*;org.jaxen.*;oracle.*;com.sun.*;javax.servlet.*;org.apache.log4j;org.apache.log;org.apache.tools.ant.*;org.eclipse.*;resolution:=optional,*</Import-Package>
+            <Export-Package>org.apache.uima.tools.cfe*</Export-Package>
+            <Embed-Transitive>false</Embed-Transitive>
+            <Embed-Dependency>*;scope=compile</Embed-Dependency>
             <Bundle-SymbolicName>org.apache.uima.tools.cfe;${singleton}</Bundle-SymbolicName>
           </instructions>
         </configuration>
