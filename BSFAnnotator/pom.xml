@@ -29,8 +29,8 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom-single-project</artifactId>
-    <version>6-SNAPSHOT</version>
+    <artifactId>parent-pom</artifactId>
+    <version>1-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
@@ -134,6 +134,7 @@
                 <exclude>src/test/resources/NicknamesRef.txt</exclude>
                 <exclude>src/test/resources/testdoc.txt</exclude>
                 <exclude>src/test/resources/testdocRef.txt</exclude>
+                <exclude>marker-file-identifying-*</exclude>
               </excludes>
             </configuration>
           </execution>

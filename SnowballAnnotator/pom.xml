@@ -24,8 +24,8 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom-annotator</artifactId>
-    <version>6-SNAPSHOT</version>
+    <artifactId>parent-pom</artifactId>
+    <version>1-SNAPSHOT</version>
     <relativePath/>
   </parent>
   
@@ -109,6 +109,7 @@
                 <exclude>src/main/java/org/tartarus/snowball/*.java</exclude> <!-- copied from Snowball source under license -->
                 <exclude>src/main/java/org/tartarus/snowball/ext/*.java</exclude> <!-- copied from Snowball source under license -->
                 <exclude>src/test/resources/englishRef.txt</exclude> <!-- test data -->
+                <exclude>marker-file-identifying-*</exclude>
               </excludes>
             </configuration>
           </execution>

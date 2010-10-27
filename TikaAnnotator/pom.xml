@@ -24,8 +24,8 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom-single-project</artifactId>
-    <version>6-SNAPSHOT</version>
+    <artifactId>parent-pom</artifactId>
+    <version>1-SNAPSHOT</version>
     <relativePath/>
   </parent>
   
@@ -116,6 +116,7 @@
                 <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation_Type.java</exclude> <!-- generated -->
                 <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation.java</exclude> <!-- generated -->
                 <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation_Type.java</exclude> <!-- generated -->
+                <exclude>marker-file-identifying-*</exclude>
               </excludes>
             </configuration>
           </execution>

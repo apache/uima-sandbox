@@ -23,8 +23,8 @@
 
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom-annotator</artifactId>
-    <version>6-SNAPSHOT</version>
+    <artifactId>parent-pom</artifactId>
+    <version>1-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
@@ -172,6 +172,7 @@
                 <exclude>src/test/resources/hypernyms.txt</exclude> <!-- test data -->
                 <exclude>src/test/resources/stopwords.txt</exclude> <!-- test data -->
                 <exclude>src/test/resources/tokenMapping.txt</exclude> <!-- test data -->
+                <exclude>marker-file-identifying-*</exclude>
               </excludes>
             </configuration>
           </execution>
