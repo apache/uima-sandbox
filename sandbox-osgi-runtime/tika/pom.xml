@@ -39,12 +39,12 @@
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>0.4</version>
+      <version>0.7</version>
     </dependency>
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
-      <version>0.4</version>
+      <version>0.7</version>
     </dependency>
     <dependency>
       <groupId>xml-resolver</groupId>
@@ -146,7 +146,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>                                         
-            <Import-Package>sun.io.*;schemasMicrosoftCom*;org.xmlpull.*;org.relaxng.*;org.openxmlformats.*;org.bouncycastle.*;org.apache.lucene.demo.*;junit.*;org.gjt.*;org.jaxen.*;com.sun.*;org.apache.tools.ant.*;resolution:=optional,*</Import-Package>
+            <Import-Package>org.ccil.*;javax.xml.stream.*;com.drew.*;sun.io.*;schemasMicrosoftCom*;org.xmlpull.*;org.relaxng.*;org.openxmlformats.*;org.bouncycastle.*;org.apache.lucene.demo.*;junit.*;org.gjt.*;org.jaxen.*;com.sun.*;org.apache.tools.ant.*;resolution:=optional,*</Import-Package>
             <Export-Package>org.apache.uima.tika.*</Export-Package>
             <Bundle-SymbolicName>org.apache.uima.tika;${singleton}</Bundle-SymbolicName>
           </instructions>
