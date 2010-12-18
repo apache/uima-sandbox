@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--
+   ***************************************************************
+   * Licensed to the Apache Software Foundation (ASF) under one
+   * or more contributor license agreements.  See the NOTICE file
+   * distributed with this work for additional information
+   * regarding copyright ownership.  The ASF licenses this file
+   * to you under the Apache License, Version 2.0 (the
+   * "License"); you may not use this file except in compliance
+   * with the License.  You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing,
+   * software distributed under the License is distributed on an
+   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   * KIND, either express or implied.  See the License for the
+   * specific language governing permissions and limitations
+   * under the License.
+   ***************************************************************
+   -->
+
+
+<!-- ================================================================
+Conventions: 
+
+Features that contain dates will use the following iso-8601 encoding of UTC,
+as in the unix date command
+> date -u +"%Y-%m-%dT%TZ"
+2006-03-07T15:47:17Z
+
+================================================================ -->
+
+<typeSystemDescription  xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>GTS</name>
+  <description>Component of GALE Type System:  types which are global to a document, like document ID.</description>
+  <version>1.4</version>
+  <types>
+
+    <!-- ================================================================
+    Global
+    ================================================================ -->
+    <typeDescription>
+      <name>org.gale.Global</name>
+      <description>Base for types that are shared across all
+      sofas.  These objects get stored in the GlobalIndex of a
+      sofa named "Global".
+      </description>
+      <supertypeName>uima.cas.TOP</supertypeName>
+      <features>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    DocID
+    ================================================================ -->
+    <typeDescription>
+      <name>org.gale.DocID</name>
+      <description>Unique ID for the input document
+      </description>
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>value</name>
+          <description>The actual document identifier that
+          will be used by downstream annotators (e.g. to
+          generate a filename).  This is expected to be
+          unique.  As an example, a video docid value could be
+          video/ar/2006/09/16/ar-Al_Arabiya-News-120-20060916-000000.010.mp4 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>origin</name>
+          <description>The originating source of this document.  For
+          example, a video document would store the channel
+          name here.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>language</name>
+          <description>The expected source language of this document.  This
+          is the 2- or 5-char ISO language code.  The document may be
+          multilingual, but this stores the most probable language.
+          For example, a video show captured from an Arabic broadcast would
+          put "ar" here.  Leave empty if no source language is known.
+
+          This attribute is used instead of the uima.tcas.DocumentAnnotation
+          since it is a global attribute rather than a view-specific value.
+          For automatically detected language on input spans, use TextLanguageID.   
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    WebDocID
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.WebDocID</name>
+      <description>DocID for web documents
+      </description>
+      <supertypeName>org.gale.DocID</supertypeName>
+      <features>
+        <featureDescription>
+          <name>crawlUrl</name>
+          <description>Actual on-the-internet URL.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>cacheUrl</name>
+          <description>A partial URL showing where the
+          cached file resides on disk relative to a base.
+          It is expected that a file accessible through both
+          web and file system share this value as a path.  A
+          server and base must be added to access the file.
+          </description> 
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>crawlDate</name>
+          <description>When the web page was crawled ("%Y-%m-%dT%TZ").  For example, 2006-09-25T025400Z
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>encoding</name>
+          <description>Original encoding of the source web document,
+          e.g.  cp1252 or utf8 (what are the spacing/casing conventions here)?
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    AudioDocID
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.AudioDocID</name>
+      <description>DocID for audio segments.
+      </description>
+      <supertypeName>org.gale.DocID</supertypeName>
+      <features>
+        <featureDescription>
+          <name>cacheUrl</name>
+          <description>A partial URL where this audio can be
+          found.  It will be combined with configured server
+          info to generate the absolute URL.  For example,
+          2006/09/16/ar-Al_Arabiya-News-120-20060916-000000.010.mp4.
+          Here the server and base path must be added to
+          access the file. 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>title</name>
+          <description>The title of the show.  Must be
+          alphanumeric and underscore characters only.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>absoluteStartTime</name>
+          <description>When the show was recorded (ISO 8601 "%Y-%m-%dT%TZ").  For example, 2006-09-27T13:05:02Z.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>showLength</name>
+          <description>Duration of the complete show in
+          seconds.  Set to -1 if unknown.
+          </description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>segmentNumber</name>
+          <description>For ordering capture segments within a show (1,2,...)
+          </description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>segmentCount</name>
+          <description>Total number of segments in the
+          show.  Set to -1 if unknown.
+          </description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>segmentStartTime</name>
+          <description>Seconds since show start
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>segmentDuration</name>
+          <description>Length of segment in seconds (0 if unknown)
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    VideoDocID
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.VideoDocID</name>
+      <description> DocID for video segments.
+      </description>
+      <supertypeName>org.gale.AudioDocID</supertypeName>
+      <features>
+      </features>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    Parameter
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Parameter</name>
+      <description>Operational parameter
+      </description>
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>name</name>
+          <description>The name of the parameter.  May start with the name of
+          the analytic that uses it, e.g. "StoryBoundary.threshold"
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>value</name>
+          <description>The value of the parameter.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>usage</name>
+          <description>The usage property, e.g. "once" or on "all" CASes (default is "all")
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    DocError
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.DocError</name>
+      <description>Records any error found processing the document.
+      Other components may ignore any documents so marked.
+      </description>
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>error</name>
+          <description>A description of the error found
+          e.g. Invalid URL, Failed to fetch audio, ...
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>componentId</name>
+          <description> ID of the component reporting the error.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    DocErrorOverride
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.DocErrorOverride</name>
+      <description>Hides a DocError that has been overriden by a later component.
+      e.g. FinalizeSTT may override an error from one STT engine if another succeeds.
+      </description>
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>docError</name>
+          <description>Overridden DocError. Also must be removed from the indexes.
+          </description>
+          <rangeTypeName>org.gale.DocError</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>reason</name>
+          <description>The reason for overriding the DocError.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>componentId</name>
+          <description>ID of the component that created this override.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+  </types>
+</typeSystemDescription>

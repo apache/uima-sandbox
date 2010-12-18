@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--
+   ***************************************************************
+   * Licensed to the Apache Software Foundation (ASF) under one
+   * or more contributor license agreements.  See the NOTICE file
+   * distributed with this work for additional information
+   * regarding copyright ownership.  The ASF licenses this file
+   * to you under the Apache License, Version 2.0 (the
+   * "License"); you may not use this file except in compliance
+   * with the License.  You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing,
+   * software distributed under the License is distributed on an
+   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   * KIND, either express or implied.  See the License for the
+   * specific language governing permissions and limitations
+   * under the License.
+   ***************************************************************
+   -->
+
+<typeSystemDescription  xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>GTS</name>
+  <description>Component of GALE Type System:  types for information extraction, such as entities and events.</description>
+  <version>1.4</version>
+  <types>
+
+
+    <!-- ================================================================
+    EntityMention
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.EntityMention</name>
+      <description>A span of text containing a reference (mention) of an entity. 
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>entity</name>
+          <description>A reference (backpointer) to the Entity object to which this EntityMention belongs.
+          </description>
+          <rangeTypeName>org.gale.Entity</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>entityType</name>
+          <description>The entity type of this mention (e.g. PERSON, ORGANIZATION, LOCATION, etc.).
+              Mentions within an entity may not all have the same type.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>specificity</name>
+          <description>The type of mention. Possible values are NAMED, NOMINAL, and PRONOMINAL.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>uid</name>
+          <description>Unique identifier 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>componentId</name>
+          <description>Unique identifier of the Entity Detector module that
+            created this annotation.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this mention, such as
+            the probability that the annotated text is a mention.
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    Entity
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Entity</name>
+      <description>Abstraction corresponding to the real world entity that is
+        referenced several times within a document. Contains the set of all EntityMentions 
+        within a document that are references to it. 
+      </description>
+      <supertypeName>uima.cas.TOP</supertypeName>
+      <features>
+        <featureDescription>
+          <name>entityType</name>
+          <description>The type of entity (e.g. PERSON, ORGANIZATION, LOCATION, etc.).
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>uid</name>
+          <description>Unique identifier 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>mentions</name>
+          <description>An FSArray of org.gale.EntityMentions that are references to this Entity.
+          </description>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>maxSpecificity</name>
+          <description>The maximum specificity of any of the supporting mentions:
+            NAMED > NOMINAL > PRONOMINAL.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+      </features>
+    </typeDescription>
+
+
+
+    <!-- ================================================================
+    RelationMention
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.RelationMention</name>
+      <description>A span of text where a 'relation mention' (mention of a
+      relation) is detected between two EntityMentions referenced in arg1 and
+      arg2.
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>relation</name>
+          <description>Reference (backpointer) to the Relation object to which this RelationMention belongs.
+          </description>
+          <rangeTypeName>org.gale.Relation</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>arg1</name>
+          <description>First argument of the relation mention
+          </description>
+          <rangeTypeName>org.gale.EntityMention</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>arg2</name>
+          <description>Second argument of the relation mention
+          </description>
+          <rangeTypeName>org.gale.EntityMention</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>uid</name>
+          <description>Unique identifier 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>componentId</name>
+          <description>Unique identifier of the relation-determining module
+            that created this annotation.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this mention, such as
+            the probability that the annotated text is a mention.
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    Relation
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Relation</name>
+      <description>Abstraction corresponding to a relation between two Entities mentioned in the document. Contains
+        a list of all RelationMentions referencing this relation.
+      </description>
+      <supertypeName>uima.cas.TOP</supertypeName>
+      <features>
+        <featureDescription>
+          <name>relationType</name>
+          <description>The type of relation (e.g. partOf, locatedAt, etc.). 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>uid</name>
+          <description>Unique identifier 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>mentions</name>
+          <description>An FSArray of org.gale.RelationMentions that support this relation.
+          </description>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+        </featureDescription>
+
+      </features>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    EventMention
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.EventMention</name>
+      <description>A span of text containing a reference (mention) to an event. 
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+
+        <featureDescription>
+          <name>specificity</name>
+          <description>The type of mention. Possible values are NAMED, NOMINAL, and PRONOMINAL.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>event</name>
+          <description>A reference (backpointer) to the Event object to which this EventMention belongs.
+          </description>
+          <rangeTypeName>org.gale.Event</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>eventType</name>
+          <description>The event type of this mention (e.g. LEGAL, VIOLENCE, etc.).
+              Mentions within an event may not all have the same type.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>uid</name>
+          <description>Unique identifier 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>componentId</name>
+          <description>Unique identifier of the Event Detector module that
+            created this annotation.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this mention, such as
+            the probability that the annotated text is a mention.
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    Event
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Event</name>
+      <description>Abstraction corresponding to the real-world event that is
+        referenced possibly more than once in the document as EventMentions.
+      </description>
+      <supertypeName>uima.cas.TOP</supertypeName>
+      <features>
+        <featureDescription>
+          <name>eventType</name>
+          <description>The type of the event (e.g. LEGAL, VIOLENCE, etc.). 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>uid</name>
+          <description>Unique identifier 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>mentions</name>
+          <description>An FSArray of org.gale.EventMentions that are references to this Event.
+          </description>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>maxSpecificity</name>
+          <description>The maximum specificity of any of the supporting mentions:
+            NAMED > NOMINAL > PRONOMINAL.
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+      </features>
+    </typeDescription>
+
+  </types>
+</typeSystemDescription>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--
+   ***************************************************************
+   * Licensed to the Apache Software Foundation (ASF) under one
+   * or more contributor license agreements.  See the NOTICE file
+   * distributed with this work for additional information
+   * regarding copyright ownership.  The ASF licenses this file
+   * to you under the Apache License, Version 2.0 (the
+   * "License"); you may not use this file except in compliance
+   * with the License.  You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing,
+   * software distributed under the License is distributed on an
+   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   * KIND, either express or implied.  See the License for the
+   * specific language governing permissions and limitations
+   * under the License.
+   ***************************************************************
+   -->
+
+<typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>GTS</name>
+  <description>Component of GALE Type System:  types for story-boundary detection, topic-clustering of stories, and summarization.</description>
+  <version>1.4</version>
+  <imports>
+    <import location="GaleDocTypes.xml"/>
+  </imports>
+  <types>
+
+    <!-- ================================================================
+    Story Boundary
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.StoryBoundary</name>
+      <description>Likelihood that a story boundary occurs at the annotated
+        index in the text.  "Begin" can equal "end" because this annotates a
+        single point in the text, or begin and end can bound non-story-text,
+        such as white space, between stories.  In any case, begin marks the
+        end of one story, and end marks the beginning of the next story,
+        because this annotation marks not a story but rather a story boundary.</description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this story boundary,
+            such as the probability that this point in the text actually
+            is a story boundary, if the story segmentation module provides
+            such a score.</description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>componentId</name>
+          <description>ID of the story segmentation component that created this result</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    Topic
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Topic</name>
+      <description>Identifies the current document as belonging
+      to a cluster of documents identified by a story-clustering
+      module as being part of the same topic.  Current plans
+      have a whole document required to be associated with a
+      story, so this is a sub-type of Global rather than being an
+      Annotation.  For example, if a story clustering module
+      clusters documents as belong to story A, B or C then the
+      ID would be e.g. "A".</description>
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>identifier</name>
+          <description>A label the story-clustering module uses as an identifier for a topic.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" for associating this
+            story with this topic, such as the probability that this topic
+            label is correct for this story, if the clustering module provides
+            such a score.</description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>componentId</name>
+          <description>ID of the clustering component that created this entry</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    Summary
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Summary</name>
+      <description>A summary of all stories labelled with the same Topic ID.</description>
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>value</name>
+          <description>A summary of the stories identified with this topic.
+            Intended to be added by a multi-document summarization module.
+            Successive story-CASes associated with a topic may have summaries
+            representing increments toward the cumulative summary.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>topic</name>
+          <description>A reference to the Topic summarized here.</description>
+          <rangeTypeName>org.gale.Topic</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" associated with this summary</description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>componentId</name>
+          <description>ID of the summarizing component that created this entry</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>storySentences</name>
+          <description>An array of StorySentence alignments mapping summary
+          sentences to their origin.</description>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+        </featureDescription>
+
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    StorySentence
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.StorySentence</name>
+      <description>Aligns a sentence in a summary with the story it was derived
+      from, and possibly which part of the story. 
+      Each org.gale.Summary contains an array of these types.</description> 
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>begin</name>
+          <description>Offset in summary of start of the sentence.</description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>end</name>
+          <description>Offset in summary of end of the sentence.</description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>storyID</name>
+          <description>DocID of story-CAS from which this sentence originated.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>originalBegin</name>
+          <description>Offset in story-CAS of the start of the region used in
+          generating this sentence.</description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>originalEnd</name>
+          <description>Offset in story-CAS of the end of the region used in
+          generating this sentence.</description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    Headline
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Headline</name>
+      <description>A headline for a story or summary of stories.</description>
+      <supertypeName>org.gale.Global</supertypeName>
+      <features>
+        <featureDescription>
+          <name>value</name>
+          <description>A headline for a story or summary.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" associated with this headline</description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>componentId</name>
+          <description>ID of the headline component that created this entry</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    SummaryHeadline
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.SummaryHeadline</name>
+      <description>A headline for a summary.</description>
+      <supertypeName>org.gale.Headline</supertypeName>
+      <features>
+        <featureDescription>
+          <name>summary</name>
+          <description>A reference to the summary from which this headline is derived.</description>
+          <rangeTypeName>org.gale.Summary</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <!-- ================================================================
+    StoryHeadline
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.StoryHeadline</name>
+      <description>A headline for the story in a CAS.</description>
+      <supertypeName>org.gale.Headline</supertypeName>
+      <features/>
+    </typeDescription>
+
+  </types>
+</typeSystemDescription>

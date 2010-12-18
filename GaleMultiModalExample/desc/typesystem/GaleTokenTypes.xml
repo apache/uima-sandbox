@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--
+   ***************************************************************
+   * Licensed to the Apache Software Foundation (ASF) under one
+   * or more contributor license agreements.  See the NOTICE file
+   * distributed with this work for additional information
+   * regarding copyright ownership.  The ASF licenses this file
+   * to you under the Apache License, Version 2.0 (the
+   * "License"); you may not use this file except in compliance
+   * with the License.  You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing,
+   * software distributed under the License is distributed on an
+   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   * KIND, either express or implied.  See the License for the
+   * specific language governing permissions and limitations
+   * under the License.
+   ***************************************************************
+   -->
+
+<typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier"> 
+  <name>GTS</name>
+  <description>Component of GALE Type System:  types for text tokens.</description>
+  <version>1.4</version>
+  <types>
+
+    <!-- ================================================================
+    Token
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Token</name>
+      <description>Tokenizer output - these should be non-overlapping
+        Frequently the set of Tokens will cover the entire document, but this
+        is not required.  The type hierarchy derived from Token is used purely
+        for constructing specific iterators, not for data inheritance.
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    WhiteSpaceToken
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.WhiteSpaceToken</name>
+      <description>A span of characters that meet the 
+        Unicode definition of whitespace.
+      </description>
+      <supertypeName>org.gale.Token</supertypeName>
+    </typeDescription>
+
+    <!-- ================================================================
+    NonWhiteSpaceToken
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.NonWhiteSpaceToken</name>
+      <description>A span of characters that meet the Unicode
+        definition of non-whitespace.
+      </description>
+      <supertypeName>org.gale.Token</supertypeName>
+    </typeDescription>
+
+    <!-- ================================================================
+    PunctuationToken
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.PunctuationToken</name>
+      <description>A span of characters (often just one character) that meet the Unicode definition
+        of punctuation. 
+      </description>
+      <supertypeName>org.gale.NonWhiteSpaceToken</supertypeName>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    WordToken
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.WordToken</name>
+      <description>A basic unanalyzed word
+      </description>
+      <supertypeName>org.gale.NonWhiteSpaceToken</supertypeName>
+    </typeDescription>
+
+
+    <!-- ================================================================
+    Sentence
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Sentence</name>
+      <description>A Sentence is not derived from Token, but covers one
+        or more Tokens (It should not cross brackets with a Token.)  Sentences
+        are non-overlapping.  Sentences are not required to collectively
+        cover the entire document text, but often do.
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+    </typeDescription>
+
+    <!-- ================================================================
+    Paragraph
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Paragraph</name>
+      <description>A Paragraph is not derived from Sentence, but covers one
+        or more Sentences (It should not cross brackets with a Sentence.)  Paragraphs
+        are non-overlapping.  Paragraphs are not required to collectively
+        cover the entire document text, but often do.
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+    </typeDescription>
+
+
+
+    <!-- ================================================================
+    SubWordUnit
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.SubWordUnit</name>
+      <description>Subword units represent morphemes or stems.  If the analysis is 
+        produced on the same sofa as the input text, then begin and end should come from the 
+        token that is analyzed.  So a 1-character prefix in a WordToken from 0 to 3
+              should go from 0 to 1.
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>index</name>
+          <description>Used to represent the position in a sequence of
+            morphemes derived from a WordToken.  The first
+          SubWordUnit is numbered 0, and following units increment from there.
+          </description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>affixType</name>
+          <description>This enum can be one of prefix, suffix, or stem.
+            (Should infix be another valid value?)
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>token</name>
+          <description>The WordToken that was analyzed to produce the subword unit
+          </description>
+          <rangeTypeName>org.gale.WordToken</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>value</name>
+          <description>The value of the subword unit produced by the analysis, for example
+            if "running" is stemmed to "run" then value = "run"
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    
+
+    <!-- ================================================================
+    TextLanguageID
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.TextLanguageID</name>
+      <description> Value containing automatically identified language of
+        a span in the document.  Since documents may be multilingual,
+        there may be multiple TextLanguageID annotations in a view.  Also,
+        there may be more than one annotation covering the same text if
+        an automatic language detection engine is unsure of its output.
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>language</name>
+          <description>the language, iso639 two letter code, lowercase
+            should the optional extension (en_us) be here or a separate field?
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of the language
+            identification, such as the probability that the span is actually
+            in this language.  If multiple LanguageIDs are annotated, the
+            primary sorting key will be by score, with largest score first
+           (top-n lists).
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    
+
+  </types>
+</typeSystemDescription>

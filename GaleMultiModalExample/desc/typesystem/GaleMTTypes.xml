@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--
+   ***************************************************************
+   * Licensed to the Apache Software Foundation (ASF) under one
+   * or more contributor license agreements.  See the NOTICE file
+   * distributed with this work for additional information
+   * regarding copyright ownership.  The ASF licenses this file
+   * to you under the Apache License, Version 2.0 (the
+   * "License"); you may not use this file except in compliance
+   * with the License.  You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing,
+   * software distributed under the License is distributed on an
+   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   * KIND, either express or implied.  See the License for the
+   * specific language governing permissions and limitations
+   * under the License.
+   ***************************************************************
+   -->
+
+<typeSystemDescription  xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>GTS</name>
+  <description>Component of GALE Type System:  machine-translation-related types.</description>
+  <version>1.4</version>
+  <types>
+
+    <!-- ================================================================
+    Translatable
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Translatable</name>
+      <description> These are the features structures to be translated - a "dumb"
+        translation engine will translate all Translatables.   A "smart"
+        translation engine will select those Translatables whose preferredComponent feature matches its capabilities
+        or other constraints.  This allows different subsets of a document to be scheduled for
+        multiple downstream translation engines. The same section of a document could be translated
+        by multiple engines by creating multiple overlapping Translatables. 
+        Prefix matching may be supported if the names ends with "*".
+
+        Typical creation usage:
+          while (isent.hasNext()) {
+          Sentence sent = (Sentence) isent.next();
+          Translatable t = new Translatable( jcas, sent.getBegin(), sent.getEnd() );
+          t.addToIndexes();
+          }
+
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>preferredComponent</name>
+          <description> ID of the preferred MT component that should process this interval.
+                Allows selection of multiple translation engines 
+                e.g. "IBMAr*" for any engine whose ID starts with "IBMAr" 
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+
+
+    <!-- ================================================================
+    TranslationResult
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.TranslationResult</name>
+      <description> Output of a translation engine - these are produced in 1-1 correspondence
+        with the Translatable's that were selected for input by the translation
+      engine, and annotate the same span of source text.
+        Contains an array of Alignments each holding a target word or phrase and
+    an array of zero or more corresponding Tokens in the source language.
+    Alignments may be omitted for a single phrase-to-phrase aligment.
+      </description>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>componentId</name>
+          <description> ID of the MT component that created this result
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>value</name>
+          <description> The actual translation output for the source phrase
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>alignments</name>
+          <description>An array of Alignments holding the target->source
+            alignments.
+          </description>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this translation,
+            e.g. Prob(target|source).
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+
+
+    <!-- ================================================================
+    Alignment
+    ================================================================ -->
+
+    <typeDescription>
+      <name>org.gale.Alignment</name>
+      <description> Associates a target phrase (a span in the value feature of
+      the TranslationResult) with the source phrase(s) that generated it.
+      </description>
+      <supertypeName>uima.cas.TOP</supertypeName>
+      <features>
+        <featureDescription>
+          <name>targetBegin</name>
+          <description>Offset within the TranslationResult value to the first
+            character of the target.
+          </description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>targetEnd</name>
+          <description>Offset within the TranslationResult value to the
+          character after the last character of the target.
+          </description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>target</name>
+          <description> Word or words generated in the target language (DEPRECATED)
+          </description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+
+        <featureDescription>
+          <name>source</name>
+          <description> An array of Tokens in the source language that generated this target
+          </description>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+  </types>
+</typeSystemDescription>

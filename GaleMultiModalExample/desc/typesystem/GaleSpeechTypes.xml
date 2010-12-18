@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--
+   ***************************************************************
+   * Licensed to the Apache Software Foundation (ASF) under one
+   * or more contributor license agreements.  See the NOTICE file
+   * distributed with this work for additional information
+   * regarding copyright ownership.  The ASF licenses this file
+   * to you under the Apache License, Version 2.0 (the
+   * "License"); you may not use this file except in compliance
+   * with the License.  You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing,
+   * software distributed under the License is distributed on an
+   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   * KIND, either express or implied.  See the License for the
+   * specific language governing permissions and limitations
+   * under the License.
+   ***************************************************************
+   -->
+
+<typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>GTS</name>
+  <description>Component of GALE Type System:  types for speech processing.</description>
+  <version>1.4</version>
+  <vendor></vendor>
+  <types>
+
+    <typeDescription>
+      <name>org.gale.AudioSpan</name>
+      <description>The basic unit of a time duration (similar to an Annotation). This is a base
+    class that should not be instantiated.</description>
+      <supertypeName>uima.cas.AnnotationBase</supertypeName>
+      <features>
+        <featureDescription>
+          <name>begin</name>
+          <description>Begin time in seconds from the beginning of the segment</description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>end</name>
+          <description>End time in seconds from the beginning of the segment</description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>componentId</name>
+          <description>ID of the STT component that created this annotation</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.AudioTypeEnum</name>
+      <description>Allowed values of AudioFragment.className</description>
+      <supertypeName>uima.cas.String</supertypeName>
+      <allowedValues>
+        <value>
+          <string>speech</string>
+          <description>A speech segment. Speech segments are processed by the Speech-to-Text annotator.</description>
+        </value>
+        <value>
+          <string>non-speech</string>
+          <description>Non-speech audio segment. Non-speech segments may not be processed by the Speech-to-text annotator.</description>
+        </value>
+        <value>
+          <string>missing</string>
+          <description>Missing fragment</description>
+        </value>
+      </allowedValues>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.AudioFragment</name>
+      <description>Large subdivisions, such as speech or non-speech regions.
+Non-speech regions can be music, noise, etc. and may not be processed by the speech-to-text annotator.</description>
+      <supertypeName>org.gale.AudioSpan</supertypeName>
+      <features>
+        <featureDescription>
+          <name>className</name>
+          <description>Speech, Non-Speech, etc.</description>
+          <rangeTypeName>org.gale.AudioTypeEnum</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>subClassName</name>
+          <description>Sub-classes of AudioType, such as "speech+music", "speech+noise", etc.</description>
+          <rangeTypeName>org.gale.AudioSubTypeEnum</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>quality</name>
+          <description>Audio quality (e.g. wideband, telephone)</description>
+          <rangeTypeName>org.gale.AudioQualityEnum</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>channel</name>
+          <description>Audio channel, if available, starting at 0</description>
+          <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>detail</name>
+          <description>Optional text details describing the fragment</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.SpeakerID</name>
+      <description>A duration of speech with no speaker change</description>
+      <supertypeName>org.gale.AudioSpan</supertypeName>
+      <features>
+        <featureDescription>
+          <name>localSpeakerId</name>
+          <description>Within-document label for the speaker</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>globalSpeakerLabel</name>
+          <description>Actual name of speaker.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this mention, such
+	    as the probability that the span is actually spoken by this
+            speaker.
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>gender</name>
+          <description>Speaker gender, either male, female or unknown</description>
+          <rangeTypeName>org.gale.GenderEnum</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.SU</name>
+      <description>Sentence-like units.  An SU spans one or more AudioTokens.</description>
+      <supertypeName>org.gale.AudioSpan</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>org.gale.PU</name>
+      <description>Paragraph-like units.  This spans a cluster of one or more SU's. </description>
+      <supertypeName>org.gale.AudioSpan</supertypeName>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.AudioToken</name>
+      <description>Word-like units</description>
+      <supertypeName>org.gale.AudioSpan</supertypeName>
+      <features>
+        <featureDescription>
+          <name>spelling</name>
+          <description>Spelling of the word; typically does not include capitalization, optional diacritics, or punctuation</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this AudioToken, such
+	    as the probability that the span actually contains the annotated
+            word spoken within.
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.AudioPrintToken</name>
+      <description>Word-like units with both print- and base-form spellings</description>
+      <supertypeName>org.gale.AudioToken</supertypeName>
+      <features>
+        <featureDescription>
+          <name>printForm</name>
+          <description>The representation of the token that is designed for rendering in graphical displays.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.AudioLanguageID</name>
+      <description>Automatically-identified primary language of document.
+       The LanguageID annotation supercedes the Language feature of uima.tcas.DocumentAnnotation.
+       uima.tcas.DocumentAnnotation:language could be set to the "expected" language 
+       of the document, based on its source.  This should not be relied upon, as documents
+       may be multilingual, or sources may publish documents in an unexpected language.  Any
+       application that relies upon Language should look for the LanguageID annotation to
+       ensure that the document is "well-behaved".
+       
+       If the LanguageID annotator cannot identify a language with sufficient confidence it 
+       may omit the LanguageID annotation (and downstream annotators that rely on Language)
+       should skip that document.
+       The LanguageID annotator may assign its annotation to only part of a document.</description>
+      <supertypeName>org.gale.AudioSpan</supertypeName>
+      <features>
+        <featureDescription>
+          <name>language</name>
+          <description>The language, iso639 two-letter code, lowercase
+             should the optional extension (en_us) be here or a separate field?</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>confidence</name>
+          <description>Value representing the "score" of this mention, such
+	    as the probability that the span is actually spoken in this
+            language.  If multiple LanguageID's are annotated, the primary
+            sorting key will be by score, with largest score first (top-n
+            lists).
+          </description>
+          <rangeTypeName>uima.cas.Float</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.AudioQualityEnum</name>
+      <description>Describes the audio signal quality, such as "wideband", "telephone"</description>
+      <supertypeName>uima.cas.String</supertypeName>
+      <allowedValues>
+        <value>
+          <string>wideband</string>
+          <description>Wideband audio</description>
+        </value>
+        <value>
+          <string>telephone</string>
+          <description>Telephone quality audio</description>
+        </value>
+        <value>
+          <string>unknown</string>
+          <description>Unknown audio quality</description>
+        </value>
+      </allowedValues>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.GenderEnum</name>
+      <description>Speaker gender, either male, female or unknown</description>
+      <supertypeName>uima.cas.String</supertypeName>
+      <allowedValues>
+        <value>
+          <string>male</string>
+          <description>Male speaker</description>
+        </value>
+        <value>
+          <string>female</string>
+          <description>Female speaker</description>
+        </value>
+        <value>
+          <string>unknown</string>
+          <description>Unknown gender</description>
+        </value>
+      </allowedValues>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.AudioSubTypeEnum</name>
+      <description>Audio type subcategories, such as "speech+music", "speech+noise", "noise", "music"</description>
+      <supertypeName>uima.cas.String</supertypeName>
+      <allowedValues>
+        <value>
+          <string>cleanspeech</string>
+          <description>A subclass of "speech", clean-speech</description>
+        </value>
+        <value>
+          <string>speech+music</string>
+          <description>A subclass of "speech", speech in presence of music</description>
+        </value>
+        <value>
+          <string>speech+noise</string>
+          <description>A subclass of speech, speech in presence of noise</description>
+        </value>
+        <value>
+          <string>music</string>
+          <description>A subclass of "non-speech", pure music</description>
+        </value>
+        <value>
+          <string>noise</string>
+          <description>A sublcass of "non-speech", noise</description>
+        </value>
+        <value>
+          <string>silence</string>
+          <description>A subclass of "non-speech", representing silence audio segments.</description>
+        </value>
+        <value>
+          <string>unknown</string>
+          <description>Unspecified audio sub-type</description>
+        </value>
+      </allowedValues>
+    </typeDescription>
+
+    <typeDescription>
+      <name>org.gale.VideoShotTransition</name>
+      <description>Marks a transition period between video shots (a shot being
+a continuous span of video from one camera).  Useful in story segmentation.
+Usually spans just the transition, but when NONE can span the entire audio to
+indicate that shot transitions have not been computed.  The shot itself may
+span multiple audio segments.
+      </description>
+      <supertypeName>org.gale.AudioSpan</supertypeName>
+      <features>
+        <featureDescription>
+          <name>transitionType</name>
+          <description>Type of transition, e.g. cut, fade, dissolve, NONE.</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+
+  </types>
+</typeSystemDescription>
