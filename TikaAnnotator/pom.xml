@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>2-SNAPSHOT</version>
+    <version>1</version>
     <relativePath/>
   </parent>
 
@@ -57,7 +57,7 @@ element, and just changing the following two properties -->
   <properties>
     <uimaScmRoot>sandbox</uimaScmRoot>
     <uimaScmProject>${project.artifactId}</uimaScmProject>
-    <uimaDependencyVersion>2.3.1-SNAPSHOT</uimaDependencyVersion>
+    <uimaDependencyVersion>2.3.1</uimaDependencyVersion>
   </properties>
 
   <dependencies>
@@ -94,7 +94,7 @@ element, and just changing the following two properties -->
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-component-test-util</artifactId>
-      <version>2.3.1-SNAPSHOT</version>
+      <version>${uimaDependencyVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
