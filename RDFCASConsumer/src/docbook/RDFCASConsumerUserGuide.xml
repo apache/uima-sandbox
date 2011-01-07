@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements. See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to you under the Apache License, Version
+  2.0 (the "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+  applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+  OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+        "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<book lang="en">
+
+  <title>
+    Apache UIMA RDF CAS Consumer documentation
+  </title>
+
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
+              href="../../target/docbook-shared/common_book_info.xml"/>
+
+  <preface>
+    <title>Introduction</title>
+    <para>
+      The RDF CAS Consumer is a component to create RDF files from
+      CAS objects.
+    </para>
+    <para>
+      RDF CAS Consumer uses Apache Clerezza RDF serializing
+      capabilities and its integration modules with UIMA to create
+      files in various RDF formats from the CAS object.
+    </para>
+  </preface>
+
+  <chapter id="sandbox.rdfcas.services">
+    <title>Configuration</title>
+    <para>
+      To configure the RDFCASConsumer there are 3 parameters that can be set.
+      The parameters 'file' and 'format' are mandatory while 'view' is optional.
+      With the 'file' parameter the output file has to be specified using the file
+      protocol (i.e.: file://pathto/file.rdf).
+    </para>
+    <para>
+      The 'format' parameter handles the output format as there are different options
+      provided by the Serializer specified. Since RDFCASConsumer takes advantage of the
+      Apache Clerezza serializing facilities it depends on which serializer is enabled;
+      by default only the org.apache.clerezza.rdf.jena.serializer artifact is used but,
+      as Clerezza offers different serializing options, it can be extended to handle more
+      file formats. With org.apache.clerezza.rdf.jena.serializer the following formats are
+      supported: application/rdf+xml, text/turtle, application/x-turtle, text/rdf+nt and
+      text/rdf+n3.
+    </para>
+    <para>
+      Finally with the 'view' parameter the particular CAS View to serialize can be specified.
+      If no view is defined then the current default CAS view is serialized as RDF.
+    </para>
+
+
+  </chapter>
+
+</book>
