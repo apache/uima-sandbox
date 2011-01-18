@@ -25,15 +25,14 @@
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1</version>
-    <relativePath/>
+    <version>2</version>
   </parent>
   
-	<artifactId>RegularExpressionAnnotator</artifactId>
-	<version>2.3.1-SNAPSHOT</version>
+  <artifactId>RegularExpressionAnnotator</artifactId>
+  <version>2.3.1-SNAPSHOT</version>
   <name>UIMA Annotator: ${project.artifactId}</name>
   <description>Finds annotations using regular expressions</description>
-<url>${uimaWebsiteUrl}</url>
+  <url>${uimaWebsiteUrl}</url>
 
   <!-- Special inheritance note
        even though the <scm> element that follows is exactly the 
@@ -118,7 +117,7 @@
 	<build>
 		<finalName>uima-an-regex</finalName>
      
-		<plugins>
+	  <plugins>
       
       <!-- generate XML parser from .xsd file -->
       <plugin>
@@ -135,115 +134,7 @@
         </executions>
       </plugin>
       
-      <!-- build pear plugin, most settings inherited from parent POM -->      
-      <plugin>
-        <groupId>org.apache.uima</groupId>
-        <artifactId>PearPackagingMavenPlugin</artifactId>
-        <version>${uimaDependencyVersion}</version>
-        <executions><execution>
-          <id>buildPear</id>
-          <configuration>
-            <mainComponentDesc>desc/RegExAnnotator.xml</mainComponentDesc> 
-          </configuration>
-        </execution></executions>
-      </plugin>              
-      
-      <!-- Release Audit Tool checks -->
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-cli</id>
-            <configuration>
-              <excludes>
-                <exclude>release.properties</exclude> <!-- release generated artifact -->
-                <exclude>src/test/resources/*/*Ref.txt</exclude>
-                <exclude>src/test/resources/conceptSyntax/syntaxCheckRefOutput.txt</exclude>
-                <exclude>src/test/resources/setFeatureValues/featureValuesRef?.txt</exclude>
-                <exclude>marker-file-identifying-*</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- use the dependency:unpack goal to get the shared resource
-          that has the docbook-shared directory
-          Unpack into spot relative to project - because
-          these are referred to in docbook sources using
-          relative references -->
-            <id>copyDocbookInfo</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <overWriteIfNewer>true</overWriteIfNewer>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.uima</groupId>
-                  <artifactId>uima-build-resources</artifactId>
-                  <version>1</version>
-                  <includes>docbook-shared/**</includes>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- also unpack next to docbook-olink in
-       repository location for olink info, because
-       the site.xml files use relative location to
-       get at the uima entities -->
-            <id>copyDocbookInfoNextToOlink</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <overWriteIfNewer>true</overWriteIfNewer>
-              <markersDirectory>${dolRepo}/dependency-maven-plugin-markers</markersDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.uima</groupId>
-                  <artifactId>uima-build-resources</artifactId>
-                  <version>1</version>
-                  <includes>docbook-shared/**</includes>
-                  <outputDirectory>${dolRepo}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <!-- use the dependency:unpack goal to get the
-       olink databases  -->
-          <execution>
-            <id>getOlink</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <overWriteIfNewer>true</overWriteIfNewer>
-              <markersDirectory>${dolRepo}/dependency-maven-plugin-markers</markersDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.uima</groupId>
-                  <artifactId>${dolArtifactId}</artifactId>
-                  <version>1-SNAPSHOT</version>
-                  <type>zip</type>
-                  <classifier>${dolClassifier}</classifier>
-                  <outputDirectory>${dolUnzipped}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-		</plugins>
+
+      </plugins>
 	</build>
 </project>

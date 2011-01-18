@@ -25,8 +25,7 @@
   <parent>
     <groupId>org.apache.uima</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1</version>
-    <relativePath/>
+    <version>2</version>
   </parent>
 
   <artifactId>aggregate-addons</artifactId>
@@ -77,6 +76,8 @@
     <module>../Tagger</module>
     <module>../TikaAnnotator</module>
     <module>../WhitespaceTokenizer</module>
+    <module>../Solrcas</module>
+    <module>../RDFCASConsumer</module>
   </modules>
 
   <profiles>
