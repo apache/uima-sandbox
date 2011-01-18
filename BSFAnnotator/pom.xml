@@ -31,7 +31,6 @@
     <groupId>org.apache.uima</groupId>
     <artifactId>parent-pom</artifactId>
     <version>2</version>
-    <relativePath/>
   </parent>
 
   <artifactId>BSFAnnotator</artifactId>
@@ -117,6 +116,30 @@
 	</dependencies>
   
 	<build>
-		<finalName>uimaj-an-bsf</finalName> 
+		<finalName>uimaj-an-bsf</finalName>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>src/main/java/org/apache/uima/annotator/bsf/types/*.java</exclude>
+                  <exclude>src/test/resources/Nicknames.txt</exclude>
+                  <exclude>src/test/resources/NicknamesRef.txt</exclude>
+                  <exclude>src/test/resources/testdoc.txt</exclude>
+                  <exclude>src/test/resources/testdocRef.txt</exclude>
+                  <exclude>marker-file-identifying-*</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
 	</build>
 </project>

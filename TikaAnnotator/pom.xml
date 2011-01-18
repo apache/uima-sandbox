@@ -113,5 +113,41 @@ element, and just changing the following two properties -->
        <directory>desc</directory>
      </resource>
    </resources>
+   <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude>
+                  <!-- release generated artifact -->
+                  <exclude>src/main/java/org/apache/uima/tika/AttributeFS.java</exclude>
+                  <!-- generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/AttributeFS_Type.java</exclude>
+                  <!-- generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/FeatureValue.java</exclude>
+                  <!-- generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/FeatureValue_Type.java</exclude>
+                  <!-- generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation.java</exclude>
+                  <!-- generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation_Type.java</exclude>
+                  <!-- generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation.java</exclude>
+                  <!-- generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation_Type.java</exclude>
+                  <!-- generated -->
+                  <exclude>marker-file-identifying-*</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

@@ -145,8 +145,28 @@
           </execution>
         </executions>
       </plugin>
-      
 
 	  </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>src/test/resources/expected/*.xml</exclude> <!-- test data -->
+                  <exclude>src/test/resources/test.txt</exclude> <!-- test data -->
+                  <exclude>marker-file-identifying-*</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
 	</build>
 </project>

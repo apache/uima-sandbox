@@ -220,5 +220,28 @@
       </plugin>
  
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>cfeModelGen/*</exclude> <!-- generated EMF model files -->
+                  <exclude>src/test/resources/testData*.txt*</exclude> <!-- test data -->
+                  <exclude>src/test/java/example/PersonTitle*.java</exclude> <!-- generated -->
+                  <exclude>src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated -->
+                  <exclude>marker-file-identifying-*</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
 	</build>
 </project>

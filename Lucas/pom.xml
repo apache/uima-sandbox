@@ -114,20 +114,43 @@
   </dependencies>
            
 	<build>
-      <plugins>
+    <plugins>
 
-      <!-- disable some tests -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/TestableLuceneCASIndexer.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      
+    <!-- disable some tests -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <configuration>
+        <excludes>
+          <exclude>**/TestableLuceneCASIndexer.java</exclude>
+        </excludes>
+      </configuration>
+    </plugin>
+
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>src/test/java/org/apache/uima/lucas/indexer/types/test/*.java</exclude> <!-- generated -->
+                  <exclude>src/test/resources/hypernyms.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/stopwords.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/tokenMapping.txt</exclude> <!-- test data -->
+                  <exclude>marker-file-identifying-*</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
+    </pluginManagement>
 	</build>
   
 	<!--properties> 

@@ -135,6 +135,28 @@
       </plugin>
       
 
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>src/test/resources/*/*Ref.txt</exclude>
+                  <exclude>src/test/resources/conceptSyntax/syntaxCheckRefOutput.txt</exclude>
+                  <exclude>src/test/resources/setFeatureValues/featureValuesRef?.txt</exclude>
+                  <exclude>marker-file-identifying-*</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
+    </pluginManagement>
 	</build>
 </project>
