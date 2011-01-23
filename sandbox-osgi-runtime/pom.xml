@@ -41,6 +41,7 @@
     <module>snowball</module>
     <module>tika</module>
     <module>whitespacetokenizer</module>
+    <module>solrcas</module>
   </modules>
   <description>OSGi version of UIMA Sandbox components (mainly Annotators)</description>
   <properties>
