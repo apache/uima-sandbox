@@ -89,12 +89,12 @@
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>fontbox</artifactId>
-      <version>0.8.0-incubator.bundle</version>
+      <version>0.8.0-incubator</version>
     </dependency>
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>jempbox</artifactId>
-      <version>0.8.0-incubator.bundle</version>
+      <version>0.8.0-incubator</version>
     </dependency>
     <dependency>
       <groupId>pdfbox</groupId>
