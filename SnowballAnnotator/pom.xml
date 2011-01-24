@@ -24,8 +24,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>2</version>
+    <artifactId>uima-addons-parent</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+    <relativePath>../uima-addons-parent</relativePath>
   </parent>
   
   <artifactId>SnowballAnnotator</artifactId>
@@ -84,15 +85,7 @@
   
 	<build>
 		<finalName>uima-an-snowball</finalName>
-    <!-- add desc to test resources -->
-		<testResources>
-			<testResource>
-				<directory>desc</directory>
-			</testResource>
-      <testResource>
-        <directory>src/test/resources</directory>
-      </testResource>
-		</testResources>
+    
     <pluginManagement>
       <plugins>
         <plugin>
@@ -104,17 +97,34 @@
               <configuration>
                 <excludes>
                   <exclude>release.properties</exclude> <!-- release generated artifact -->
-                  <exclude>src/main/java/org/tartarus/snowball/*.java</exclude> <!-- copied from Snowball source under license -->
-                  <exclude>src/main/java/org/tartarus/snowball/ext/*.java</exclude> <!-- copied from Snowball source under license -->
+                  <exclude>README*</exclude>
+                  <exclude>RELEASE_NOTES*</exclude>
+                  <exclude>issuesFixed/**</exclude> <!-- generated file -->
+                  <exclude>marker-file-identifying-*</exclude> <!-- empty file -->
+                  <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
+                  
+                  <exclude>src/main/java/org/tartarus/snowball/ext/*Stemmer.java</exclude> <!-- generated files -->
+                  <exclude>src/main/java/org/tartarus/snowball/Among.java</exclude> <!-- generated files -->
+                  <exclude>src/main/java/org/tartarus/snowball/SnowballProgram.java</exclude> <!-- generated files -->
+                  <exclude>src/main/java/org/tartarus/snowball/TestApp.java</exclude> <!-- generated files -->
                   <exclude>src/test/resources/englishRef.txt</exclude> <!-- test data -->
-                  <exclude>marker-file-identifying-*</exclude>
-                </excludes>
+                </excludes>              
               </configuration>
             </execution>
           </executions>
-      </plugin>
+        </plugin>         
       </plugins>
-    </pluginManagement>
+    </pluginManagement> 
+
+    <!-- add desc to test resources -->
+		<testResources>
+			<testResource>
+				<directory>desc</directory>
+			</testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+		</testResources>
 	</build>
 	
 </project>

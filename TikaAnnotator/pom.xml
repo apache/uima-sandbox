@@ -24,8 +24,9 @@
 
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>2</version>
+    <artifactId>uima-addons-parent</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+    <relativePath>../uima-addons-parent</relativePath>
   </parent>
 
   <artifactId>TikaAnnotator</artifactId>
@@ -108,12 +109,13 @@ element, and just changing the following two properties -->
   <build>
     <finalName>uima-an-tika</finalName>
 
-   <resources>
-     <resource>
-       <directory>desc</directory>
-     </resource>
-   </resources>
-   <pluginManagement>
+    <resources>
+      <resource>
+        <directory>desc</directory>
+      </resource>
+    </resources>
+    
+    <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.rat</groupId>
@@ -123,31 +125,24 @@ element, and just changing the following two properties -->
               <id>default-cli</id>
               <configuration>
                 <excludes>
-                  <exclude>release.properties</exclude>
-                  <!-- release generated artifact -->
-                  <exclude>src/main/java/org/apache/uima/tika/AttributeFS.java</exclude>
-                  <!-- generated -->
-                  <exclude>src/main/java/org/apache/uima/tika/AttributeFS_Type.java</exclude>
-                  <!-- generated -->
-                  <exclude>src/main/java/org/apache/uima/tika/FeatureValue.java</exclude>
-                  <!-- generated -->
-                  <exclude>src/main/java/org/apache/uima/tika/FeatureValue_Type.java</exclude>
-                  <!-- generated -->
-                  <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation.java</exclude>
-                  <!-- generated -->
-                  <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation_Type.java</exclude>
-                  <!-- generated -->
-                  <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation.java</exclude>
-                  <!-- generated -->
-                  <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation_Type.java</exclude>
-                  <!-- generated -->
-                  <exclude>marker-file-identifying-*</exclude>
-                </excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>README*</exclude>
+                  <exclude>RELEASE_NOTES*</exclude>
+                  <exclude>issuesFixed/**</exclude> <!-- generated file -->
+                  <exclude>marker-file-identifying-*</exclude> <!-- empty file -->
+                  <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
+                  
+                  <exclude>src/main/java/org/apache/uima/tika/AttributeFS*.java</exclude> <!-- JCasgen generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/FeatureValue*.java</exclude> <!-- JCasgen generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/MarkupAnnotation*.java</exclude> <!-- JCasgen generated -->
+                  <exclude>src/main/java/org/apache/uima/tika/SourceDocumentAnnotation*.java</exclude> <!-- JCasgen generated -->
+                </excludes>              
               </configuration>
             </execution>
           </executions>
-        </plugin>
+        </plugin>         
       </plugins>
-    </pluginManagement>
+    </pluginManagement>    
+    
   </build>
 </project>

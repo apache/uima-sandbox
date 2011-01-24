@@ -24,8 +24,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>2</version>
+    <artifactId>uima-addons-parent</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+    <relativePath>../uima-addons-parent</relativePath>
   </parent>
   
   <artifactId>WhitespaceTokenizer</artifactId>
@@ -85,6 +86,7 @@
   
 	<build>
 		<finalName>uima-an-wst</finalName>
+
     <pluginManagement>
       <plugins>
         <plugin>
@@ -96,15 +98,21 @@
               <configuration>
                 <excludes>
                   <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>README*</exclude>
+                  <exclude>RELEASE_NOTES*</exclude>
+                  <exclude>issuesFixed/**</exclude> <!-- generated file -->
+                  <exclude>marker-file-identifying-*</exclude> <!-- empty file -->
+                  <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
+                  
                   <exclude>src/test/resources/tabs*.txt</exclude> <!-- test data -->
                   <exclude>src/test/resources/testdoc*.txt</exclude> <!-- test data -->
-                  <exclude>marker-file-identifying-*</exclude>
-                </excludes>
+                </excludes>              
               </configuration>
             </execution>
           </executions>
-        </plugin>
+        </plugin>         
       </plugins>
-    </pluginManagement>
+    </pluginManagement> 
+    
 	</build>
 </project>

@@ -29,8 +29,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>2</version>
+    <artifactId>uima-addons-parent</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+    <relativePath>../uima-addons-parent</relativePath>
   </parent>
 
   <artifactId>BSFAnnotator</artifactId>
@@ -128,18 +129,23 @@
               <configuration>
                 <excludes>
                   <exclude>release.properties</exclude> <!-- release generated artifact -->
-                  <exclude>src/main/java/org/apache/uima/annotator/bsf/types/*.java</exclude>
-                  <exclude>src/test/resources/Nicknames.txt</exclude>
-                  <exclude>src/test/resources/NicknamesRef.txt</exclude>
-                  <exclude>src/test/resources/testdoc.txt</exclude>
-                  <exclude>src/test/resources/testdocRef.txt</exclude>
-                  <exclude>marker-file-identifying-*</exclude>
-                </excludes>
+                  <exclude>README*</exclude>
+                  <exclude>RELEASE_NOTES*</exclude>
+                  <exclude>issuesFixed/**</exclude> <!-- generated file -->
+                  <exclude>marker-file-identifying-*</exclude> <!-- empty file -->
+                  <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
+                  
+                  <exclude>src/main/java/org/apache/uima/annotator/bsf/types/Firstname*.java</exclude> <!-- JCasgen generated file -->
+                  <exclude>src/main/java/org/apache/uima/annotator/bsf/types/Nickname*.java</exclude> <!-- JCasgen generated file -->
+                  <exclude>src/main/java/org/apache/uima/annotator/bsf/types/Token*.java</exclude> <!-- JCasgen generated file -->
+                  <exclude>src/test/resources/Nicknames*.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/testdoc*.txt</exclude> <!-- test data -->
+                </excludes>              
               </configuration>
             </execution>
           </executions>
-        </plugin>
+        </plugin>         
       </plugins>
-    </pluginManagement>
+    </pluginManagement> 
 	</build>
 </project>

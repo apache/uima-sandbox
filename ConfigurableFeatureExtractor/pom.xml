@@ -24,9 +24,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>2</version>
-    <relativePath/>
+    <artifactId>uima-addons-parent</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+    <relativePath>../uima-addons-parent</relativePath>
   </parent>
   <artifactId>ConfigurableFeatureExtractor</artifactId>
   <version>2.3.1-SNAPSHOT</version>
@@ -156,6 +156,34 @@
 	<build>
 		<finalName>uima-tool-configurableFeatureExtractor</finalName>
 
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>README*</exclude>
+                  <exclude>RELEASE_NOTES*</exclude>
+                  <exclude>issuesFixed/**</exclude> <!-- generated file -->
+                  <exclude>marker-file-identifying-*</exclude> <!-- empty file -->
+                  <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
+                  
+                  <exclude>cfeModelGen/*</exclude> <!-- generated model -->
+                  <exclude>src/test/java/example/PersonTitle*.java</exclude> <!-- JCasgen generated file -->
+                  <exclude>src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- JCasgen generated file -->
+                  <exclude>src/test/resources/testData*.txt*</exclude> <!-- test data -->
+                </excludes>              
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>         
+      </plugins>
+    </pluginManagement> 
     <!-- next causes failure in eclipse:eclipse goal, so is
          commented out and replaced with the maven-resources-plugin -->
     <!--resources>
@@ -220,28 +248,5 @@
       </plugin>
  
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>default-cli</id>
-              <configuration>
-                <excludes>
-                  <exclude>release.properties</exclude> <!-- release generated artifact -->
-                  <exclude>cfeModelGen/*</exclude> <!-- generated EMF model files -->
-                  <exclude>src/test/resources/testData*.txt*</exclude> <!-- test data -->
-                  <exclude>src/test/java/example/PersonTitle*.java</exclude> <!-- generated -->
-                  <exclude>src/test/java/org/apache/uima/examples/SourceDocumentInformation*.java</exclude> <!-- generated -->
-                  <exclude>marker-file-identifying-*</exclude>
-                </excludes>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
 	</build>
 </project>

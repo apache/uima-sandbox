@@ -24,8 +24,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>2</version>
+    <artifactId>uima-addons-parent</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+    <relativePath>../uima-addons-parent</relativePath>
   </parent>
   
   <artifactId>RegularExpressionAnnotator</artifactId>
@@ -116,7 +117,34 @@
   
 	<build>
 		<finalName>uima-an-regex</finalName>
-     
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>README*</exclude>
+                  <exclude>RELEASE_NOTES*</exclude>
+                  <exclude>issuesFixed/**</exclude> <!-- generated file -->
+                  <exclude>marker-file-identifying-*</exclude> <!-- empty file -->
+                  <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
+                  
+                  <exclude>src/test/resources/**/*Ref.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/**/*Ref2.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/**/*Ref3.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/**/*RefOutput.txt</exclude> <!-- test data -->
+                </excludes>              
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>         
+      </plugins>
+    </pluginManagement>      
 	  <plugins>
       
       <!-- generate XML parser from .xsd file -->
@@ -134,29 +162,6 @@
         </executions>
       </plugin>
       
-
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>default-cli</id>
-              <configuration>
-                <excludes>
-                  <exclude>release.properties</exclude> <!-- release generated artifact -->
-                  <exclude>src/test/resources/*/*Ref.txt</exclude>
-                  <exclude>src/test/resources/conceptSyntax/syntaxCheckRefOutput.txt</exclude>
-                  <exclude>src/test/resources/setFeatureValues/featureValuesRef?.txt</exclude>
-                  <exclude>marker-file-identifying-*</exclude>
-                </excludes>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-	</build>
+ 	</build>
 </project>

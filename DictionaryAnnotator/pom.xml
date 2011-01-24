@@ -24,8 +24,9 @@
   
   <parent>
     <groupId>org.apache.uima</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>2</version>
+    <artifactId>uima-addons-parent</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+    <relativePath>../uima-addons-parent</relativePath>
   </parent>
   
   <artifactId>DictionaryAnnotator</artifactId>
@@ -104,6 +105,38 @@
   <build>
 		<finalName>uima-an-dictionary</finalName>
 
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <excludes>
+                  <exclude>release.properties</exclude> <!-- release generated artifact -->
+                  <exclude>README*</exclude>
+                  <exclude>RELEASE_NOTES*</exclude>
+                  <exclude>issuesFixed/**</exclude> <!-- generated file -->
+                  <exclude>marker-file-identifying-*</exclude> <!-- empty file -->
+                  <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
+                  
+                  <exclude>src/test/resources/DictionaryAnnotatorTestFilterFeaturePath/dictionaryAnnotFeaturePathTestRef.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/DictionaryAnnotatorTests/dictionaryAnnot*.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/DictionaryBuilderTests/DictionaryPrintingRef.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/DictionaryCreatorTest/dictInput.txt</exclude> <!-- test data -->
+                  <exclude>src/test/resources/DictionaryCreatorTest/*Ref.xml</exclude> <!-- test data -->
+                  <exclude>src/test/resources/DictionaryCreatorTest/WhitespaceTokenizer.pear</exclude> <!-- binary test data -->
+                  <exclude>src/test/resources/DictionaryCreatorTest/WhitespaceTokenizer/**</exclude> <!-- unzipped binary data -->
+                </excludes>              
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>         
+      </plugins>
+    </pluginManagement> 
+    
     <plugins>
        
       <!-- generate XML parser from .xsd file -->
@@ -122,28 +155,6 @@
       </plugin>
       
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>default-cli</id>
-              <configuration>
-                <excludes>
-                  <exclude>release.properties</exclude> <!-- release generated artifact -->
-                  <exclude>src/test/resources/*/*Ref.txt</exclude> <!-- test data -->
-                  <exclude>src/test/resources/DictionaryCreatorTest/dictInput.txt</exclude> <!-- test data -->
-                  <exclude>src/test/resources/DictionaryCreatorTest/*.pear</exclude> <!-- archive file -->
-                  <exclude>src/test/resources/DictionaryCreatorTest/*Ref.xml</exclude> <!-- test data -->
-                  <exclude>marker-file-identifying-*</exclude>
-                </excludes>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+
 	</build> 
 </project>
