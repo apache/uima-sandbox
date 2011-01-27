@@ -104,9 +104,9 @@
                   <exclude>DEPENDENCIES</exclude>  <!-- generated file -->
                   
                   <exclude>src/main/java/org/tartarus/snowball/ext/*Stemmer.java</exclude> <!-- generated files -->
-                  <exclude>src/main/java/org/tartarus/snowball/Among.java</exclude> <!-- generated files -->
-                  <exclude>src/main/java/org/tartarus/snowball/SnowballProgram.java</exclude> <!-- generated files -->
-                  <exclude>src/main/java/org/tartarus/snowball/TestApp.java</exclude> <!-- generated files -->
+                  <exclude>src/main/java/org/tartarus/snowball/Among.java</exclude> <!-- Under Snowball license -->
+                  <exclude>src/main/java/org/tartarus/snowball/SnowballProgram.java</exclude> <!-- Under Snowball license -->
+                  <exclude>src/main/java/org/tartarus/snowball/TestApp.java</exclude> <!-- Under Snowball license -->
                   <exclude>src/test/resources/englishRef.txt</exclude> <!-- test data -->
                 </excludes>              
               </configuration>
