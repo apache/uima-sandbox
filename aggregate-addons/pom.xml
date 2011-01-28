@@ -78,7 +78,7 @@
     <module>../TikaAnnotator</module>
     <module>../WhitespaceTokenizer</module>
     <module>../Solrcas</module>
-    <!--module>../RDFCASConsumer</module-->
+    <module>../addons-osgi-runtime</module>
   </modules>
 
   <profiles>
