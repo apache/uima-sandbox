@@ -1,0 +1,126 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<assembly>
+  <id>bin</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <baseDirectory>apache-uima/addons</baseDirectory> <!-- so it is unzippable over base - needs same name -->
+
+
+  <fileSets>
+  <!-- copy license, notice, disclaimer, readme, release notes files -->
+    <fileSet>
+      <directory>src/main/readme</directory>
+      <outputDirectory/>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+
+    <!-- Add files for all the Sandbox components being released -->
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../BSFAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../ConceptMapper/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../ConfigurableFeatureExtractor/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../DictionaryAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory/>
+      <directory>../../FsVariables/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../Lucas/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../OpenCalaisAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory/>
+      <directory>../../PearPackagingAntTask/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../RegularExpressionAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory/>
+      <directory>../../SimpleServer/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../SnowballAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../Tagger/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../TikaAnnotator/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator</outputDirectory>
+      <directory>../../WhitespaceTokenizer/target/assembly-bin</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+  </fileSets>
+</assembly>
