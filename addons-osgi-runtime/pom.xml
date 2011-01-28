@@ -25,23 +25,23 @@
     <version>2</version>
   </parent>
   <groupId>org.apache.uima</groupId>
-  <artifactId>sandbox-osgi-runtime</artifactId>
+  <artifactId>addons-osgi-runtime</artifactId>
   <packaging>pom</packaging>
   <version>2.3.1-SNAPSHOT</version>
-  <name>OSGi version of Apache UIMA Sandbox</name>
+  <name>OSGi version of Apache UIMA Addons</name>
   <modules>
-    <module>opencalais</module>
-    <module>alchemyapi</module>
-    <module>bsf</module>
-    <module>cfe</module>
-    <module>conceptmapper</module>
-    <module>dictionary</module>
-    <module>hmmtagger</module>
-    <module>lucas</module>
-    <module>snowball</module>
-    <module>tika</module>
-    <module>whitespacetokenizer</module>
-    <module>solrcas</module>
+    <module>OpenCalaisAnnotator-osgi</module>
+    <module>alchemy-annotator-osgi</module>
+    <module>BSFAnnotator-osgi</module>
+    <module>ConfigurableFeatureExtractor-osgi</module>
+    <module>ConceptMapper-osgi</module>
+    <module>DictionaryAnnotator-osgi</module>
+    <module>Tagger-osgi</module>
+    <module>Lucas-osgi</module>
+    <module>SnowballAnnotator-osgi</module>
+    <module>TikaAnnotator-osgi</module>
+    <module>WhitespaceTokenizer-osgi</module>
+    <module>Solrcas-osgi</module>
   </modules>
   <description>OSGi version of UIMA Sandbox components (mainly Annotators)</description>
   <properties>
