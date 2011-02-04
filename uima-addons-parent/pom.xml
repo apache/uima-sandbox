@@ -99,8 +99,10 @@
       </snapshots>
 
     </repository>
-
-    <repository>
+  </repositories>
+  
+  <pluginRepositories>
+    <pluginRepository>
       <id>apache.snapshots.plugins</id>
       <name>Apache Snapshot Repository - Maven plugins</name>
       <url>http://repository.apache.org/snapshots</url>
@@ -113,8 +115,9 @@
         <checksumPolicy>fail</checksumPolicy>
         <updatePolicy>never</updatePolicy>
       </snapshots>
-    </repository>
-  </repositories>
+    </pluginRepository>
+  
+  </pluginRepositories>
 
   <properties>
     <uimaScmRoot>sandbox</uimaScmRoot>
