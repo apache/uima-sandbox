@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,16 +38,18 @@ public class FieldMappingReaderTest {
     try {
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
       SolrMappingConfiguration mapping = fieldMappingReader.getConf("/solrmapping.xml");
-      assertTrue(mapping != null);
+      assertNotNull(mapping);
+      
       Map<String, Map<String, String>> featureStructuresMapping = mapping.getFeatureStructuresMapping();
       assertTrue(featureStructuresMapping != null);
       assertTrue(featureStructuresMapping.size()>0);
       for (String type : featureStructuresMapping.keySet()) {
         assertTrue(featureStructuresMapping.get(type)!=null && featureStructuresMapping.get(type).size()>0);
       }
-      assertTrue(mapping.getDocumentLanguageMapping()!=null && mapping.getDocumentLanguageMapping().length()>0);
-      assertTrue(mapping.getDocumentTextMapping()!=null && mapping.getDocumentTextMapping().length()>0);
-      assertTrue(mapping.getCasMapping()!=null && mapping.getCasMapping().length()>0);
+      
+      assertEquals("language", mapping.getDocumentLanguageMapping());
+      assertEquals("text", mapping.getDocumentTextMapping());
+      assertEquals("id", mapping.getCasMapping());
     } catch (Exception e) {
       fail(e.getLocalizedMessage());
     }

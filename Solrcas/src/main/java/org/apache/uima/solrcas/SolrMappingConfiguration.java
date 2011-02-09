@@ -36,11 +36,10 @@ public class SolrMappingConfiguration {
 
   public SolrMappingConfiguration(String casMapping, String documentTextMapping, String documentLanguageMapping, Map<String, Map<String, String>> featureStructureMapping) {
     this.casMapping = casMapping;
-    this.documentLanguageMapping = documentTextMapping;
-    this.documentTextMapping = documentLanguageMapping;
+    this.documentLanguageMapping = documentLanguageMapping;
+    this.documentTextMapping = documentTextMapping;
     this.featureStructuresMapping = featureStructureMapping;
   }
-
 
   public String getDocumentLanguageMapping() {
     return documentLanguageMapping;
