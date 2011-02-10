@@ -45,7 +45,7 @@ import org.apache.uima.util.Level;
  */
 public class SolrCASConsumer extends CasAnnotator_ImplBase {
 
-  private SolrServer solrServer;
+  protected SolrServer solrServer;
 
   private SolrMappingConfiguration mappingConfig;
 
