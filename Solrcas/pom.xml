@@ -82,6 +82,7 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <version>1.4.1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>

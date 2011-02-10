@@ -24,10 +24,8 @@ import java.net.URL;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.core.CoreContainer;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -84,19 +82,8 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
     if (solrInstanceTypeParam.equalsIgnoreCase("http")) {
       URL solrURL = URI.create(solrPathParam).toURL();
       solrServer = new CommonsHttpSolrServer(solrURL);
-    } else if (solrInstanceTypeParam.equals("embedded")) {
-      URL solrURL;
-      if (solrPathParam.startsWith("classpath:")) {
-        solrPathParam = solrPathParam.replaceFirst("classpath:", "");
-        solrURL = this.getClass().getResource(solrPathParam);
-      } else {
-        solrURL = URI.create(solrPathParam).toURL();
-      }
-      System.setProperty("solr.solr.home", solrURL.getFile());
-      CoreContainer.Initializer initializer = new CoreContainer.Initializer();
-      CoreContainer coreContainer = initializer.initialize();
-      solrServer = new EmbeddedSolrServer(coreContainer, "");
-    }
+    } 
+    
     return solrServer;
   }
 

@@ -22,7 +22,7 @@
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
   <primitive>true</primitive>
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-  <annotatorImplementationName>org.apache.uima.solrcas.SolrCASConsumer</annotatorImplementationName>
+  <annotatorImplementationName>org.apache.uima.solrcas.EmbeddedSolrCASConsumer</annotatorImplementationName>
   <processingResourceMetaData>
     <name>SolrcasAE</name>
     <description/>
