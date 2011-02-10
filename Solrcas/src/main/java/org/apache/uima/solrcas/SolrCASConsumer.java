@@ -79,7 +79,7 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
     super.initialize(context);
   }
 
-  private SolrServer createServer(String solrInstanceTypeParam, String solrPathParam) throws Exception {
+  protected SolrServer createServer(String solrInstanceTypeParam, String solrPathParam) throws Exception {
     SolrServer solrServer = null;
     if (solrInstanceTypeParam.equalsIgnoreCase("http")) {
       URL solrURL = URI.create(solrPathParam).toURL();
