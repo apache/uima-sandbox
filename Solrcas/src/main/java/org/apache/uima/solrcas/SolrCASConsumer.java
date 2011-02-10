@@ -1,5 +1,3 @@
-package org.apache.uima.solrcas;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,8 @@ package org.apache.uima.solrcas;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package org.apache.uima.solrcas;
 
 import java.net.URI;
 import java.net.URL;
