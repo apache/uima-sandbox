@@ -24,7 +24,7 @@
   <documentText>text</documentText>
   <documentLanguage>language</documentLanguage>
   <fsMapping>
-    <type name="org.apache.uima.jcas.tcas.Annotation">
+    <type name="uima.tcas.Annotation">
       <map feature="coveredText" field="annotation"/>
     </type>
   </fsMapping>

@@ -26,6 +26,7 @@ import org.apache.uima.cas.admin.CASMgr;
 import org.apache.uima.cas.admin.FSIndexRepositoryMgr;
 import org.apache.uima.cas.admin.TypeSystemMgr;
 import org.apache.uima.cas.impl.CASImpl;
+import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.test.junit_extension.AnnotatorTester;
@@ -47,11 +48,9 @@ public class SolrCasConsumerIntegrationTest {
 
       cas.setDocumentText("Francesco Totti is the best football player");
       cas.setDocumentLanguage("en");
-
-      Annotation first = new Annotation(cas.getJCas());
-      first.setBegin(0);
-      first.setEnd(9);
-      first.addToIndexes();
+      
+      AnnotationFS annotation = cas.createAnnotation(cas.getAnnotationType(), 0, 9);
+      cas.addFsToIndexes(annotation);
 
       annotatorTester.performTest(cas);
     } catch (Exception e) {
