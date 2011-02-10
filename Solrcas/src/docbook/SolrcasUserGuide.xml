@@ -51,15 +51,12 @@
         </listitem>
         <listitem>
           <para>
-            solrInstanceType : this has to be one of http (for remote Solr instance) or embedded (for local Solr
-            instances.
+            solrInstanceType : this has to be  http.
           </para>
         </listitem>
         <listitem>
           <para>
-            solrPath : If the solrInstance value is 'http' this represents the URL to the remote Solr instance
-            otherwise if solrInstance value is 'embedded' this parameter represents the Solr home
-            directory.
+            solrPath : If the solrInstance value is 'http' this represents the URL to the remote Solr instance.
           </para>
         </listitem>
       </itemizedlist>
