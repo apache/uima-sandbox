@@ -19,30 +19,31 @@ package org.apache.uima.solrcas;
  * under the License.
  */
 
+import java.net.URI;
+import java.net.URL;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.uima.UimaContext;
-import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
+import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
+import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
-import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.tcas.Annotation;
+import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
-
-import java.net.URI;
-import java.net.URL;
-import java.util.Map;
 
 /**
  * CAS Consumer to write on a Solr instance
  */
-public class SolrCASConsumer extends JCasAnnotator_ImplBase {
+public class SolrCASConsumer extends CasAnnotator_ImplBase {
 
   private SolrServer solrServer;
 
@@ -99,41 +100,46 @@ public class SolrCASConsumer extends JCasAnnotator_ImplBase {
     return solrServer;
   }
 
-  public void process(JCas jCas) throws AnalysisEngineProcessException {
-    try {
+  public void process(CAS cas) throws AnalysisEngineProcessException {
+	  
       SolrInputDocument document = new SolrInputDocument();
       if (mappingConfig.getCasMapping()!=null && mappingConfig.getCasMapping().length()>0)
-        document.addField(mappingConfig.getCasMapping(), jCas.toString());
+        document.addField(mappingConfig.getCasMapping(), cas.toString());
       if (mappingConfig.getDocumentTextMapping()!=null && mappingConfig.getDocumentTextMapping().length()>0)
-        document.addField(mappingConfig.getDocumentTextMapping(), jCas.getDocumentText());
+        document.addField(mappingConfig.getDocumentTextMapping(), cas.getDocumentText());
       if (mappingConfig.getDocumentLanguageMapping()!=null && mappingConfig.getDocumentLanguageMapping().length()>0)
-        document.addField(mappingConfig.getDocumentLanguageMapping(), jCas.getDocumentLanguage());
+        document.addField(mappingConfig.getDocumentLanguageMapping(), cas.getDocumentLanguage());
       for (String key : mappingConfig.getFeatureStructuresMapping().keySet()) {
-        FeatureStructure fsMock = (FeatureStructure) Class.forName(key).getConstructor(
-                JCas.class).newInstance(jCas);
-        Type type = fsMock.getType();
-        for (FSIterator<FeatureStructure> iterator = jCas.getFSIndexRepository().getAllIndexedFS(type); iterator
+        Type type = cas.getTypeSystem().getType(key);
+        
+        for (FSIterator<FeatureStructure> iterator = cas.getIndexRepository().getAllIndexedFS(type); iterator
                 .hasNext();) {
           FeatureStructure fs = iterator.next();
           Map<String, String> stringStringMap = mappingConfig.getFeatureStructuresMapping().get(key);
+          
           for (String featureName : stringStringMap.keySet()) {
+        	  
             String fieldName = stringStringMap.get(featureName);
 
-            String featureValue = null;
-            if (fs instanceof Annotation && "coveredText".equals(featureName)) {
-              featureValue = ((Annotation) fs).getCoveredText();
+            String featureValue;
+            
+            if (fs instanceof AnnotationFS && "coveredText".equals(featureName)) {
+              featureValue = ((AnnotationFS) fs).getCoveredText();
             } else {
-              featureValue = fs.getFeatureValueAsString(type.getFeatureByBaseName(featureName));
+              Feature feature = type.getFeatureByBaseName(featureName);
+              featureValue = fs.getFeatureValueAsString(feature);
             }
+            
             document.addField(fieldName, featureValue);
           }
         }
       }
-      solrServer.add(document);
-      solrServer.commit();
-
-    } catch (Exception e) {
-      throw new AnalysisEngineProcessException(e);
-    }
+      
+      try {
+        solrServer.add(document);
+        solrServer.commit();
+	  } catch (Exception e) {
+	    throw new AnalysisEngineProcessException(e);
+	  }
   }
 }
