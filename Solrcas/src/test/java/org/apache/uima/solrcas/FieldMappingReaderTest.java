@@ -23,10 +23,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * TestCase for FieldMappingReader object
@@ -37,7 +34,7 @@ public class FieldMappingReaderTest {
   public void testConfReader() {
     try {
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
-      SolrMappingConfiguration mapping = fieldMappingReader.getConf("/solrmapping.xml");
+      SolrMappingConfiguration mapping = fieldMappingReader.getConf("classpath:/solrmapping.xml");
       assertNotNull(mapping);
       
       Map<String, Map<String, String>> featureStructuresMapping = mapping.getFeatureStructuresMapping();

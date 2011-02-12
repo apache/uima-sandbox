@@ -19,28 +19,21 @@
 
 package org.apache.uima.solrcas;
 
-import java.net.URI;
-import java.net.URL;
-
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
+
+import java.net.URL;
 
 public class EmbeddedSolrCASConsumer extends SolrCASConsumer {
 
   @Override
   protected SolrServer createServer(String solrInstanceTypeParam,
-      String solrPathParam) throws Exception {
+                                    String solrPathParam) throws Exception {
     SolrServer solrServer = null;
-    
+
     if (solrInstanceTypeParam.equals("embedded")) {
-      URL solrURL;
-      if (solrPathParam.startsWith("classpath:")) {
-        solrPathParam = solrPathParam.replaceFirst("classpath:", "");
-        solrURL = this.getClass().getResource(solrPathParam);
-      } else {
-        solrURL = URI.create(solrPathParam).toURL();
-      }
+      URL solrURL = FileUtils.getURL(solrPathParam);
       System.setProperty("solr.solr.home", solrURL.getFile());
       CoreContainer.Initializer initializer = new CoreContainer.Initializer();
       CoreContainer coreContainer = initializer.initialize();

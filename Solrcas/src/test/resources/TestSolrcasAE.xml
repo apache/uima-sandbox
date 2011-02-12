@@ -56,7 +56,7 @@
       <nameValuePair>
         <name>mappingFile</name>
         <value>
-          <string>/solrmapping.xml</string>
+          <string>classpath:/solrmapping.xml</string>
         </value>
       </nameValuePair>
       <nameValuePair>
