@@ -19,24 +19,20 @@
 
 package org.apache.uima.solrcas;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.Map;
-
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.FSIterator;
-import org.apache.uima.cas.Feature;
-import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.Type;
+import org.apache.uima.cas.*;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
+
+import java.net.URI;
+import java.net.URL;
+import java.util.Map;
 
 /**
  * CAS Consumer to write on a Solr instance
@@ -53,17 +49,10 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       /* get Solr type*/
       String solrInstanceTypeParam = String.valueOf(context.getConfigParameterValue("solrInstanceType"));
 
-      assert solrInstanceTypeParam != null;
-
-
       /* get Solr Path */
       String solrPathParam = String.valueOf(context.getConfigParameterValue("solrPath"));
 
-      assert solrPathParam != null;
-
       this.solrServer = createServer(solrInstanceTypeParam, solrPathParam);
-
-      assert solrServer != null;
 
       /* read configuration */
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
