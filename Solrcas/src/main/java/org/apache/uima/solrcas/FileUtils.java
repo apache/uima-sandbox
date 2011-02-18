@@ -19,35 +19,22 @@
 
 package org.apache.uima.solrcas;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
 /**
- * Utility class to retrieve resources both from classpath and URIs
+ * Utility class to retrieve resources both from classpath and URLs
  */
 public class FileUtils {
 
   private static final String CLASSPATH = "classpath:";
   private static final String EMPTY_STRING = "";
 
-  public static InputStream getStream(String path) throws IOException {
-    InputStream input;
-    if (path.startsWith(CLASSPATH)) {
-      input = System.class.getResourceAsStream(path.replaceFirst(CLASSPATH, EMPTY_STRING));
-    } else {
-      input = URI.create(path).toURL().openStream();
-    }
-    return input;
-  }
-
   public static URL getURL(String path) throws MalformedURLException {
     URL solrURL;
     if (path.startsWith(CLASSPATH)) {
-      path = path.replaceFirst(CLASSPATH, EMPTY_STRING);
-      solrURL = System.class.getResource(path);
+      solrURL = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING));
     } else {
       solrURL = URI.create(path).toURL();
     }

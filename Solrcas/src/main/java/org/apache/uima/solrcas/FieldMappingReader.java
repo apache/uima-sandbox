@@ -36,7 +36,7 @@ public class FieldMappingReader {
 
   public SolrMappingConfiguration getConf(String path) throws Exception {
 
-    InputStream input = FileUtils.getStream(path);
+    InputStream input = FileUtils.getURL(path).openStream();
 
     SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 
