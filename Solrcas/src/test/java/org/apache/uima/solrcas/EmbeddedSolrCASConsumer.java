@@ -28,9 +28,13 @@ import java.net.URL;
 public class EmbeddedSolrCASConsumer extends SolrCASConsumer {
 
   @Override
-  protected SolrServer createServer(String solrInstanceTypeParam,
-                                    String solrPathParam) throws Exception {
+  protected SolrServer createServer() throws Exception {
     SolrServer solrServer = null;
+    String solrInstanceTypeParam = String.valueOf(getContext().
+            getConfigParameterValue("solrInstanceType"));
+
+    String solrPathParam = String.valueOf(getContext().
+            getConfigParameterValue("solrPath"));
 
     if (solrInstanceTypeParam.equals("embedded")) {
       URL solrURL = FileUtils.getURL(solrPathParam);

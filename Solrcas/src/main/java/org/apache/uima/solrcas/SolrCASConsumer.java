@@ -45,14 +45,10 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
 
   @Override
   public void initialize(UimaContext context) throws ResourceInitializationException {
+    super.initialize(context);
     try {
-      /* get Solr type*/
-      String solrInstanceTypeParam = String.valueOf(context.getConfigParameterValue("solrInstanceType"));
-
-      /* get Solr Path */
-      String solrPathParam = String.valueOf(context.getConfigParameterValue("solrPath"));
-
-      this.solrServer = createServer(solrInstanceTypeParam, solrPathParam);
+      /* create the SolrServer*/
+      this.solrServer = createServer();
 
       /* read configuration */
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
@@ -63,59 +59,66 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       context.getLogger().log(Level.SEVERE, e.toString());
       throw new ResourceInitializationException(e);
     }
-    super.initialize(context);
   }
 
-  protected SolrServer createServer(String solrInstanceTypeParam, String solrPathParam) throws Exception {
+  protected SolrServer createServer() throws Exception {
+    /* get Solr type*/
+    String solrInstanceTypeParam = String.valueOf(getContext().
+            getConfigParameterValue("solrInstanceType"));
+
+    /* get Solr Path */
+    String solrPathParam = String.valueOf(getContext().
+            getConfigParameterValue("solrPath"));
+
     SolrServer solrServer = null;
     if (solrInstanceTypeParam.equalsIgnoreCase("http")) {
       URL solrURL = URI.create(solrPathParam).toURL();
       solrServer = new CommonsHttpSolrServer(solrURL);
-    } 
-    
+    }
+
     return solrServer;
   }
 
   public void process(CAS cas) throws AnalysisEngineProcessException {
-	  
-      SolrInputDocument document = new SolrInputDocument();
-      if (mappingConfig.getCasMapping()!=null && mappingConfig.getCasMapping().length()>0)
-        document.addField(mappingConfig.getCasMapping(), cas.toString());
-      if (mappingConfig.getDocumentTextMapping()!=null && mappingConfig.getDocumentTextMapping().length()>0)
-        document.addField(mappingConfig.getDocumentTextMapping(), cas.getDocumentText());
-      if (mappingConfig.getDocumentLanguageMapping()!=null && mappingConfig.getDocumentLanguageMapping().length()>0)
-        document.addField(mappingConfig.getDocumentLanguageMapping(), cas.getDocumentLanguage());
-      for (String key : mappingConfig.getFeatureStructuresMapping().keySet()) {
-        Type type = cas.getTypeSystem().getType(key);
-        
-        for (FSIterator<FeatureStructure> iterator = cas.getIndexRepository().getAllIndexedFS(type); iterator
-                .hasNext();) {
-          FeatureStructure fs = iterator.next();
-          Map<String, String> stringStringMap = mappingConfig.getFeatureStructuresMapping().get(key);
-          
-          for (String featureName : stringStringMap.keySet()) {
-        	  
-            String fieldName = stringStringMap.get(featureName);
 
-            String featureValue;
-            
-            if (fs instanceof AnnotationFS && "coveredText".equals(featureName)) {
-              featureValue = ((AnnotationFS) fs).getCoveredText();
-            } else {
-              Feature feature = type.getFeatureByBaseName(featureName);
-              featureValue = fs.getFeatureValueAsString(feature);
-            }
-            
-            document.addField(fieldName, featureValue);
+    SolrInputDocument document = new SolrInputDocument();
+    if (mappingConfig.getCasMapping() != null && mappingConfig.getCasMapping().length() > 0)
+      document.addField(mappingConfig.getCasMapping(), cas.toString());
+    if (mappingConfig.getDocumentTextMapping() != null && mappingConfig.getDocumentTextMapping().length() > 0)
+      document.addField(mappingConfig.getDocumentTextMapping(), cas.getDocumentText());
+    if (mappingConfig.getDocumentLanguageMapping() != null && mappingConfig.getDocumentLanguageMapping().length() > 0)
+      document.addField(mappingConfig.getDocumentLanguageMapping(), cas.getDocumentLanguage());
+    for (String key : mappingConfig.getFeatureStructuresMapping().keySet()) {
+      Type type = cas.getTypeSystem().getType(key);
+
+      for (FSIterator<FeatureStructure> iterator = cas.getIndexRepository().getAllIndexedFS(type); iterator
+              .hasNext();) {
+        FeatureStructure fs = iterator.next();
+        Map<String, String> stringStringMap = mappingConfig.getFeatureStructuresMapping().get(key);
+
+        for (String featureName : stringStringMap.keySet()) {
+
+          String fieldName = stringStringMap.get(featureName);
+
+          String featureValue;
+
+          if (fs instanceof AnnotationFS && "coveredText".equals(featureName)) {
+            featureValue = ((AnnotationFS) fs).getCoveredText();
+          } else {
+            Feature feature = type.getFeatureByBaseName(featureName);
+            featureValue = fs.getFeatureValueAsString(feature);
           }
+
+          document.addField(fieldName, featureValue);
         }
       }
-      
-      try {
-        solrServer.add(document);
-        solrServer.commit();
-	  } catch (Exception e) {
-	    throw new AnalysisEngineProcessException(e);
-	  }
+    }
+
+    try {
+      solrServer.add(document);
+      solrServer.commit();
+    } catch (Exception e) {
+      throw new AnalysisEngineProcessException(e);
+    }
   }
 }
