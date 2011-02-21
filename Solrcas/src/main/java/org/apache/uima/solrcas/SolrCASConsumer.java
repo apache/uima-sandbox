@@ -43,6 +43,8 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
 
   private SolrMappingConfiguration mappingConfig;
 
+  private boolean autoCommit;
+
   @Override
   public void initialize(UimaContext context) throws ResourceInitializationException {
     super.initialize(context);
@@ -54,6 +56,13 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
       String mappingFileParam = String.valueOf(context.getConfigParameterValue("mappingFile"));
       this.mappingConfig = fieldMappingReader.getConf(mappingFileParam);
+
+      /* set Solr autoCommit parameter */
+      Object autoCommitParam = context.getConfigParameterValue("autoCommit");
+      if (autoCommitParam != null && autoCommitParam.toString().length() > 0)
+        this.autoCommit = Boolean.valueOf(autoCommitParam.toString());
+      else
+        this.autoCommit = false; // default to false
 
     } catch (Exception e) {
       context.getLogger().log(Level.SEVERE, e.toString());
@@ -116,7 +125,8 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
 
     try {
       solrServer.add(document);
-      solrServer.commit();
+      if (!autoCommit)
+        solrServer.commit();
     } catch (Exception e) {
       throw new AnalysisEngineProcessException(e);
     }

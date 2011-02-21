@@ -51,6 +51,13 @@
         <multiValued>false</multiValued>
         <mandatory>true</mandatory>
       </configurationParameter>
+      <configurationParameter>
+        <name>autoCommit</name>
+        <description>true if Solr autocommit is enabled</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
     </configurationParameters>
     <configurationParameterSettings>
       <nameValuePair>
@@ -69,6 +76,12 @@
         <name>solrPath</name>
         <value>
           <string>classpath:/org/apache/uima/solrcas/</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>autoCommit</name>
+        <value>
+          <string>false</string>
         </value>
       </nameValuePair>
     </configurationParameterSettings>
