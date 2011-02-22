@@ -76,6 +76,7 @@ public class FieldMappingReader {
     private static final String TEXT = "documentText";
     private static final String LANGUAGE = "documentLanguage";
     private static final String CAS = "cas";
+    private static final String MAPPING = "solrMapping";
 
 
     public Map<String, Map<String, String>> getFieldMapping() {
@@ -95,18 +96,10 @@ public class FieldMappingReader {
     }
 
     @Override
-    public void startDocument() throws SAXException {
-      fieldMapping = new HashMap<String, Map<String, String>>();
-    }
-
-    @Override
-    public void endDocument() throws SAXException {
-//      super.endDocument();
-    }
-
-    @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
-      if (TYPE.equals(name)) {
+      if (MAPPING.equals(name)) {
+        fieldMapping = new HashMap<String, Map<String, String>>();
+      } else if (TYPE.equals(name)) {
         type = attributes.getValue("name");
         mapping = new HashMap<String, String>();
       } else if (MAP.equals(name)) {
