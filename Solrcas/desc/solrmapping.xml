@@ -19,8 +19,12 @@
    under the License.
 -->
 
-<fieldMapping>
-  <type name="uima.tcas.Annotation">
-    <map feature="coveredText" field="annotation"/>
-  </type>
-</fieldMapping>
+<solrMapping>
+  <documentText>text</documentText>
+  <documentLanguage>language</documentLanguage>
+  <fsMapping>
+    <type name="uima.tcas.Annotation">
+      <map feature="coveredText" field="annotation"/>
+    </type>
+  </fsMapping>
+</solrMapping>
