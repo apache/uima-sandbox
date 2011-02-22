@@ -20,7 +20,7 @@
 -->
 
 <fieldMapping>
-  <type name="org.apache.uima.jcas.tcas.Annotation">
+  <type name="uima.tcas.Annotation">
     <map feature="coveredText" field="annotation"/>
   </type>
 </fieldMapping>
