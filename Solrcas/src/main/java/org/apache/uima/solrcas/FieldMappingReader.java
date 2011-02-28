@@ -61,7 +61,6 @@ public class FieldMappingReader {
     private Map<String, String> mapping;
     private String documentText;
     private String documentLanguage;
-    private String cas;
 
     private boolean inLang = false;
     private boolean inText = false;
@@ -70,7 +69,6 @@ public class FieldMappingReader {
     private static final String MAP = "map";
     private static final String TEXT = "documentText";
     private static final String LANGUAGE = "documentLanguage";
-    private static final String CAS = "cas";
     private static final String MAPPING = "solrMapping";
 
 
