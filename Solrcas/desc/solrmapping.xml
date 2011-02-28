@@ -19,12 +19,29 @@
    under the License.
 -->
 
+<!-- The mapping file defines how the CAS structure is transformed
+     into solr fields -->
 <solrMapping>
-  <documentText>text</documentText>
+  <!-- The document language is written into the language field -->
   <documentLanguage>language</documentLanguage>
+  
+  <!-- The whole text in the CAS is written into the text field -->
+  <documentText>text</documentText>
+  
+  <!-- Each document has a unique id inside the DocumentId FS, the if field of that
+       FS is written into the solr id field -->
   <fsMapping>
-    <type name="uima.tcas.Annotation">
-      <map feature="coveredText" field="annotation"/>
-    </type>
+    <type name="com.apache.uima.solrcas.DocumentId">
+      <map feature="id" field="id"/>
+    </type>    
+  </fsMapping>
+  
+  <!-- The document contains organization entity mentions, these
+       the text covered by these annotations is written into the
+       organization field -->
+  <fsMapping>
+    <type name="com.apache.uima.solrcas.Organization">
+      <map feature="coveredText" field="organization"/>
+    </type>    
   </fsMapping>
 </solrMapping>
