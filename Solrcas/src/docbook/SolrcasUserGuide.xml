@@ -73,11 +73,10 @@
       <programlisting>
       <![CDATA[
       <solrMapping>
-        <cas>id</cas>
         <documentText>text</documentText>
         <documentLanguage>language</documentLanguage>
         <fsMapping>
-          <type name="org.apache.uima.jcas.tcas.Annotation">
+          <type name="uima.jcas.tcas.Annotation">
             <map feature="coveredText" field="annotation"/>
           </type>
         </fsMapping>
@@ -86,15 +85,11 @@
       </programlisting>
     </para>
     <para>
-      The <emphasis>cas</emphasis> element holds information about which Solr field will be used to
-      store the JCas.toString() value.
-    </para>
-    <para>
-      The <emphasis>documentText</emphasis> element holds the field name in which the JCas.getDocumentText()
+      The <emphasis>documentText</emphasis> element holds the field name in which the Cas.getDocumentText()
       value will be indexed.
     </para>
     <para>
-      The <emphasis>documentLanguage</emphasis> element holds the field name in which the JCas.getDocumentLanguage()
+      The <emphasis>documentLanguage</emphasis> element holds the field name in which the Cas.getDocumentLanguage()
       value will be indexed.
     </para>
     <para>
@@ -105,13 +100,12 @@
       feature).
     </para>
     <para>
-      In the sample above the JCas.toString() will be written in the id field, the JCas.getDocumentText() will
-      be written inside the text field, the JCas.getDocumentLanguage() will be written inside the language
-      field and the Annotation.getCoveredText() of each org.apache.uima.jcas.tcas.Annotation object will be
-      written inside an annotation field in Solr.
+      In the sample above the Cas.getDocumentText() will be written inside the text field, the Cas.getDocumentLanguage() 
+      will be written inside the language field and the Annotation.getCoveredText() of each uima.jcas.tcas.Annotation object
+      will be written inside an annotation field in Solr.
     </para>
     <para>
-      Note that cas, documentText, documentLanguage are all optional.                     
+      Note that documentText and documentLanguage are all optional.
     </para>
 
   </chapter>
