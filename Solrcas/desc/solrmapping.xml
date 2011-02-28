@@ -31,7 +31,7 @@
   <!-- Each document has a unique id inside the DocumentId FS, the if field of that
        FS is written into the solr id field -->
   <fsMapping>
-    <type name="com.apache.uima.solrcas.DocumentId">
+    <type name="org.apache.uima.solrcas.DocumentId">
       <map feature="id" field="id"/>
     </type>    
   </fsMapping>
@@ -40,7 +40,7 @@
        the text covered by these annotations is written into the
        organization field -->
   <fsMapping>
-    <type name="com.apache.uima.solrcas.Organization">
+    <type name="org.apache.uima.solrcas.Organization">
       <map feature="coveredText" field="organization"/>
     </type>    
   </fsMapping>
