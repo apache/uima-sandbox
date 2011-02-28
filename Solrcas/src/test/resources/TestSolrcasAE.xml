@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
@@ -18,10 +17,9 @@
    specific language governing permissions and limitations
    under the License.    
 -->
-
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
-  <primitive>true</primitive>
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>true</primitive>
   <annotatorImplementationName>org.apache.uima.solrcas.EmbeddedSolrCASConsumer</annotatorImplementationName>
   <processingResourceMetaData>
     <name>SolrcasAE</name>
@@ -54,7 +52,7 @@
       <configurationParameter>
         <name>autoCommit</name>
         <description>true if Solr autocommit is enabled</description>
-        <type>String</type>
+        <type>Boolean</type>
         <multiValued>false</multiValued>
         <mandatory>true</mandatory>
       </configurationParameter>
@@ -81,7 +79,7 @@
       <nameValuePair>
         <name>autoCommit</name>
         <value>
-          <string>false</string>
+          <boolean>false</boolean>
         </value>
       </nameValuePair>
     </configurationParameterSettings>

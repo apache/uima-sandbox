@@ -54,7 +54,7 @@
       <configurationParameter>
         <name>autoCommit</name>
         <description>true if Solr autocommit is enabled</description>
-        <type>String</type>
+        <type>Boolean</type>
         <multiValued>false</multiValued>
         <mandatory>true</mandatory>
       </configurationParameter>
@@ -81,7 +81,7 @@
       <nameValuePair>
         <name>autoCommit</name>
         <value>
-          <string>false</string>
+          <boolean>false</boolean>
         </value>
       </nameValuePair>
     </configurationParameterSettings>
