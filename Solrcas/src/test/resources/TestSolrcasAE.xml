@@ -63,7 +63,7 @@
       <nameValuePair>
         <name>mappingFile</name>
         <value>
-          <string>classpath:/solrmapping.xml</string>
+          <string>file://solrmapping.xml</string>
         </value>
       </nameValuePair>
       <nameValuePair>
@@ -75,7 +75,7 @@
       <nameValuePair>
         <name>solrPath</name>
         <value>
-          <string>classpath:/org/apache/uima/solrcas/</string>
+          <string>file://org/apache/uima/solrcas/</string>
         </value>
       </nameValuePair>
       <nameValuePair>

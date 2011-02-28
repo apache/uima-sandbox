@@ -27,9 +27,12 @@ import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.*;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -38,6 +41,10 @@ import java.util.Map;
  * CAS Consumer to write on a Solr instance
  */
 public class SolrCASConsumer extends CasAnnotator_ImplBase {
+
+  private static final String CLASSPATH = "classpath:";
+  private static final String FILEPATH = "file://";
+  private static final String EMPTY_STRING = "";
 
   protected SolrServer solrServer;
 
@@ -55,7 +62,10 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       /* read configuration */
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
       String mappingFileParam = String.valueOf(context.getConfigParameterValue("mappingFile"));
-      this.mappingConfig = fieldMappingReader.getConf(mappingFileParam);
+
+      InputStream input = getInputStream(mappingFileParam);
+
+      this.mappingConfig = fieldMappingReader.getConf(input);
 
       /* set Solr autoCommit parameter */
       Object autoCommitParam = context.getConfigParameterValue("autoCommit");
@@ -68,6 +78,21 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       context.getLogger().log(Level.SEVERE, e.toString());
       throw new ResourceInitializationException(e);
     }
+  }
+
+  /* allows retrieve of input stream from a path specifying both file:// absolute or relative
+   *  paths, classpath: path or http:// and other URL protocols
+   */
+  private InputStream getInputStream(String path) throws ResourceAccessException, IOException {
+    InputStream input;
+    if (path.startsWith(CLASSPATH)) {
+      input = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING)).openStream();
+    } else if (path.startsWith(FILEPATH)) {
+      input = getContext().getResourceAsStream(path.replace(FILEPATH, EMPTY_STRING));
+    } else {
+      input = URI.create(path).toURL().openStream();
+    }
+    return input;
   }
 
   protected SolrServer createServer() throws Exception {
@@ -91,8 +116,6 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
   public void process(CAS cas) throws AnalysisEngineProcessException {
 
     SolrInputDocument document = new SolrInputDocument();
-    if (mappingConfig.getCasMapping() != null && mappingConfig.getCasMapping().length() > 0)
-      document.addField(mappingConfig.getCasMapping(), cas.toString());
     if (mappingConfig.getDocumentTextMapping() != null && mappingConfig.getDocumentTextMapping().length() > 0)
       document.addField(mappingConfig.getDocumentTextMapping(), cas.getDocumentText());
     if (mappingConfig.getDocumentLanguageMapping() != null && mappingConfig.getDocumentLanguageMapping().length() > 0)

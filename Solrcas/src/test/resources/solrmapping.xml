@@ -20,7 +20,6 @@
 -->
 
 <solrMapping>
-  <cas>id</cas>
   <documentText>text</documentText>
   <documentLanguage>language</documentLanguage>
   <fsMapping>

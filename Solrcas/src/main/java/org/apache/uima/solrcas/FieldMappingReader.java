@@ -34,9 +34,7 @@ import java.util.Map;
  */
 public class FieldMappingReader {
 
-  public SolrMappingConfiguration getConf(String path) throws Exception {
-
-    InputStream input = FileUtils.getURL(path).openStream();
+  public SolrMappingConfiguration getConf(InputStream input) throws Exception {
 
     SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 
@@ -49,11 +47,9 @@ public class FieldMappingReader {
 
     String documentLanguage = handler.getDocumentLanguage();
 
-    String cas = handler.getCas();
-
     input.close();
 
-    SolrMappingConfiguration solrMappingConfiguration = new SolrMappingConfiguration(cas, documentText, documentLanguage, fieldMapping);
+    SolrMappingConfiguration solrMappingConfiguration = new SolrMappingConfiguration(documentText, documentLanguage, fieldMapping);
 
     return solrMappingConfiguration;
   }
@@ -69,7 +65,6 @@ public class FieldMappingReader {
 
     private boolean inLang = false;
     private boolean inText = false;
-    private boolean inCas = false;
 
     private static final String TYPE = "type";
     private static final String MAP = "map";
@@ -91,10 +86,6 @@ public class FieldMappingReader {
       return documentLanguage;
     }
 
-    public String getCas() {
-      return cas;
-    }
-
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
       if (MAPPING.equals(name)) {
@@ -110,8 +101,6 @@ public class FieldMappingReader {
         inLang = true;
       } else if (TEXT.equals(name)) {
         inText = true;
-      } else if (CAS.equals(name)) {
-        inCas = true;
       }
     }
 
@@ -121,8 +110,6 @@ public class FieldMappingReader {
         documentText = String.valueOf(chars, start, length);
       } else if (inLang) {
         documentLanguage = String.valueOf(chars, start, length);
-      } else if (inCas) {
-        cas = String.valueOf(chars, start, length);
       }
     }
 
@@ -135,8 +122,6 @@ public class FieldMappingReader {
         inLang = false;
       } else if (TEXT.equals(name)) {
         inText = false;
-      } else if (CAS.equals(name)) {
-        inCas = false;
       }
     }
 

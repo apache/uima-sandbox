@@ -69,7 +69,7 @@ public class SolrCasConsumerIntegrationTest {
       annotatorTester.performTest(cas);
 
       /* create a Solr instance to check document has been indexed as expected */
-      URL solrURL = FileUtils.getURL("classpath:/org/apache/uima/solrcas/");
+      URL solrURL = this.getClass().getResource("/org/apache/uima/solrcas/");
       System.setProperty("solr.solr.home", solrURL.getFile());
       CoreContainer.Initializer initializer = new CoreContainer.Initializer();
       CoreContainer coreContainer = initializer.initialize();

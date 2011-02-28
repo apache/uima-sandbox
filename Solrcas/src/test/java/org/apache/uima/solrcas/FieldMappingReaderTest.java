@@ -34,7 +34,8 @@ public class FieldMappingReaderTest {
   public void testConfReader() {
     try {
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
-      SolrMappingConfiguration mapping = fieldMappingReader.getConf("classpath:/solrmapping.xml");
+      SolrMappingConfiguration mapping = fieldMappingReader.getConf(this.getClass().
+              getResourceAsStream("/solrmapping.xml"));
       assertNotNull(mapping);
       
       Map<String, Map<String, String>> featureStructuresMapping = mapping.getFeatureStructuresMapping();
@@ -46,7 +47,6 @@ public class FieldMappingReaderTest {
       
       assertEquals("language", mapping.getDocumentLanguageMapping());
       assertEquals("text", mapping.getDocumentTextMapping());
-      assertEquals("id", mapping.getCasMapping());
     } catch (Exception e) {
       fail(e.getLocalizedMessage());
     }
