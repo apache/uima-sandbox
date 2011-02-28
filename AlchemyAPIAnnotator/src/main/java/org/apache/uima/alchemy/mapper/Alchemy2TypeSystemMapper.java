@@ -29,6 +29,7 @@ import org.apache.uima.alchemy.digester.domain.KeywordResults;
 import org.apache.uima.alchemy.digester.domain.LanguageDetectionResults;
 import org.apache.uima.alchemy.digester.domain.MicroformatsResults;
 import org.apache.uima.alchemy.digester.domain.Results;
+import org.apache.uima.alchemy.digester.domain.SentimentAnalysisResults;
 import org.apache.uima.alchemy.mapper.exception.MappingException;
 import org.apache.uima.alchemy.mapper.processor.AlchemyOutputProcessor;
 import org.apache.uima.alchemy.mapper.processor.AnnotatedEntitiesProcessor;
@@ -38,6 +39,7 @@ import org.apache.uima.alchemy.mapper.processor.KeywordProcessor;
 import org.apache.uima.alchemy.mapper.processor.LanguageProcessor;
 import org.apache.uima.alchemy.mapper.processor.MicroformatsProcessor;
 import org.apache.uima.alchemy.mapper.processor.RankedEntitiesProcessor;
+import org.apache.uima.alchemy.mapper.processor.SentimentAnalysisProcessor;
 import org.apache.uima.jcas.JCas;
 
 public class Alchemy2TypeSystemMapper {
@@ -63,6 +65,7 @@ public class Alchemy2TypeSystemMapper {
     processors.put(KeywordResults.class, new KeywordProcessor());
     processors.put(LanguageDetectionResults.class, new LanguageProcessor());
     processors.put(MicroformatsResults.class, new MicroformatsProcessor());
+    processors.put(SentimentAnalysisResults.class, new SentimentAnalysisProcessor());
   }
 
   private static void setLanaguage(Results results, JCas aJCas) {
