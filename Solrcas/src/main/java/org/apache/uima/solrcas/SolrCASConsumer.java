@@ -19,23 +19,28 @@
 
 package org.apache.uima.solrcas;
 
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.uima.UimaContext;
-import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
-import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.cas.*;
-import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.resource.ResourceAccessException;
-import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.util.Level;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
+
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.CasAnnotator_ImplBase;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.FSIterator;
+import org.apache.uima.cas.Feature;
+import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.resource.ResourceAccessException;
+import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.util.Level;
 
 /**
  * CAS Consumer to write on a Solr instance
@@ -59,20 +64,11 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       /* create the SolrServer*/
       this.solrServer = createServer();
 
-      /* read configuration */
-      FieldMappingReader fieldMappingReader = new FieldMappingReader();
-      String mappingFileParam = String.valueOf(context.getConfigParameterValue("mappingFile"));
-
-      InputStream input = getURL(mappingFileParam).openStream();
-
-      this.mappingConfig = fieldMappingReader.getConf(input);
+      /* create the mapping configuration */
+      this.mappingConfig = createSolrMappingConfiguration();
 
       /* set Solr autoCommit parameter */
-      Object autoCommitParam = context.getConfigParameterValue("autoCommit");
-      if (autoCommitParam != null && autoCommitParam.toString().length() > 0)
-        this.autoCommit = Boolean.valueOf(autoCommitParam.toString());
-      else
-        this.autoCommit = false; // default to false
+      this.autoCommit = getAutoCommitValue();
 
     } catch (Exception e) {
       context.getLogger().log(Level.SEVERE, e.toString());
@@ -102,26 +98,74 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
     return url;
   }
 
-  protected SolrServer createServer() throws Exception {
-    /* get Solr type*/
-    String solrInstanceTypeParam = String.valueOf(getContext().
-            getConfigParameterValue("solrInstanceType"));
+  private boolean getAutoCommitValue() {
+    boolean autoCommitValue = false;
+    Object autoCommitParam = getContext().getConfigParameterValue("autoCommit");
+    if (autoCommitParam != null && autoCommitParam.toString().length() > 0)
+      autoCommitValue = Boolean.valueOf(autoCommitParam.toString());
+    return autoCommitValue;
+  }
 
-    /* get Solr Path */
-    String solrPathParam = String.valueOf(getContext().
-            getConfigParameterValue("solrPath"));
+  private SolrMappingConfiguration createSolrMappingConfiguration()
+          throws IOException, ResourceAccessException, Exception {
+    FieldMappingReader fieldMappingReader = new FieldMappingReader();
+    String mappingFileParam = String.valueOf(getContext().getConfigParameterValue("mappingFile"));
 
+    InputStream input = getURL(mappingFileParam).openStream();
+
+    SolrMappingConfiguration solrMappingConfiguration = fieldMappingReader.getConf(input);
+    return solrMappingConfiguration;
+  }
+
+  protected SolrServer createServer() throws SolrServerException {
     SolrServer solrServer = null;
-    if (solrInstanceTypeParam.equalsIgnoreCase("http")) {
-      URL solrURL = URI.create(solrPathParam).toURL();
-      solrServer = new CommonsHttpSolrServer(solrURL);
+    try {
+      /* get Solr type*/
+      String solrInstanceTypeParam = String.valueOf(getContext().
+              getConfigParameterValue("solrInstanceType"));
+  
+      /* get Solr Path */
+      String solrPathParam = String.valueOf(getContext().
+              getConfigParameterValue("solrPath"));
+  
+      if (solrInstanceTypeParam.equalsIgnoreCase("http")) {
+        URL solrURL = URI.create(solrPathParam).toURL();
+        solrServer = new CommonsHttpSolrServer(solrURL);
+      }
+    } catch (Exception e) {
+      throw new SolrServerException("Error creating SolrServer", e);
     }
 
     return solrServer;
   }
 
   public void process(CAS cas) throws AnalysisEngineProcessException {
+    // create the SolrDocument from the CAS object basing on the mapping configuration
+    SolrInputDocument document = createDocument(cas);
 
+    // send the SolrDocument to SolrServer
+    try {
+      solrServer.add(document);
+    } catch (Exception e) {
+      getContext().getLogger().log(Level.SEVERE, new StringBuilder("Error while adding document").
+              append(document.toString()).toString());
+      throw new AnalysisEngineProcessException(e);
+    }
+
+    // if AutoCommit is enabled send the commit message to the SolrServer
+    if (!autoCommit) {
+      try {
+        solrServer.commit();
+      } catch (Exception e) {
+        getContext().getLogger().log(Level.SEVERE, new StringBuilder("Error while committing document").
+                append(document.toString()).toString());
+        throw new AnalysisEngineProcessException(e);
+      }
+    }
+  }
+
+  /* create a SolrDocument from the current CAS object and the mapping configuration */
+  private SolrInputDocument createDocument(CAS cas) {
     SolrInputDocument document = new SolrInputDocument();
     if (mappingConfig.getDocumentTextMapping() != null && mappingConfig.getDocumentTextMapping().length() > 0)
       document.addField(mappingConfig.getDocumentTextMapping(), cas.getDocumentText());
@@ -136,29 +180,18 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
         Map<String, String> stringStringMap = mappingConfig.getFeatureStructuresMapping().get(key);
 
         for (String featureName : stringStringMap.keySet()) {
-
           String fieldName = stringStringMap.get(featureName);
-
           String featureValue;
-
           if (fs instanceof AnnotationFS && "coveredText".equals(featureName)) {
             featureValue = ((AnnotationFS) fs).getCoveredText();
           } else {
             Feature feature = type.getFeatureByBaseName(featureName);
             featureValue = fs.getFeatureValueAsString(feature);
           }
-
           document.addField(fieldName, featureValue);
         }
       }
     }
-
-    try {
-      solrServer.add(document);
-      if (!autoCommit)
-        solrServer.commit();
-    } catch (Exception e) {
-      throw new AnalysisEngineProcessException(e);
-    }
+    return document;
   }
 }
