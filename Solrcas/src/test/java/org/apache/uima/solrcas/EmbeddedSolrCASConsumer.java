@@ -37,7 +37,7 @@ public class EmbeddedSolrCASConsumer extends SolrCASConsumer {
             getConfigParameterValue("solrPath"));
 
     if (solrInstanceTypeParam.equals("embedded")) {
-      URL solrURL = getContext().getResourceURL(solrPathParam.replace("file://",""));
+      URL solrURL = getURL(solrPathParam);
       System.setProperty("solr.solr.home", solrURL.getFile());
       CoreContainer.Initializer initializer = new CoreContainer.Initializer();
       CoreContainer coreContainer = initializer.initialize();

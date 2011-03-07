@@ -63,7 +63,7 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       FieldMappingReader fieldMappingReader = new FieldMappingReader();
       String mappingFileParam = String.valueOf(context.getConfigParameterValue("mappingFile"));
 
-      InputStream input = getInputStream(mappingFileParam);
+      InputStream input = getURL(mappingFileParam).openStream();
 
       this.mappingConfig = fieldMappingReader.getConf(input);
 
@@ -80,19 +80,26 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
     }
   }
 
-  /* allows retrieve of input stream from a path specifying both file:// absolute or relative
-   *  paths, classpath: path or http:// and other URL protocols
+  /* allows retrieve of input stream from a path specifying one of:
+   * file://absolute/path
+   * http://something.com/res.ext
+   * classpath:/path/to/something.xml
+   * data/path/relative/file.ext
    */
-  private InputStream getInputStream(String path) throws ResourceAccessException, IOException {
-    InputStream input;
+  protected URL getURL(String path) throws ResourceAccessException, IOException {
+    URL url;
     if (path.startsWith(CLASSPATH)) {
-      input = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING)).openStream();
-    } else if (path.startsWith(FILEPATH)) {
-      input = getContext().getResourceAsStream(path.replace(FILEPATH, EMPTY_STRING));
+      url = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING));
     } else {
-      input = URI.create(path).toURL().openStream();
+        URI uriPath = URI.create(path);
+        if (uriPath.isAbsolute()) // this supports file://ABSOLUTE_PATH and http://URL
+          url = uriPath.toURL();
+        else // path is not absolute
+          url = URI.create(new StringBuilder(FILEPATH).append(getContext().getDataPath()).
+                  append("/").append(path.replace(FILEPATH, EMPTY_STRING)).toString()).
+                  toURL(); // this supports relative file paths
     }
-    return input;
+    return url;
   }
 
   protected SolrServer createServer() throws Exception {
