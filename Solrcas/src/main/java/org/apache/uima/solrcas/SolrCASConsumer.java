@@ -25,6 +25,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
@@ -41,6 +43,7 @@ import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
+import org.xml.sax.SAXException;
 
 /**
  * CAS Consumer to write on a Solr instance
@@ -60,20 +63,31 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
   @Override
   public void initialize(UimaContext context) throws ResourceInitializationException {
     super.initialize(context);
+
+    /* create the SolrServer*/
     try {
-      /* create the SolrServer*/
       this.solrServer = createServer();
-
-      /* create the mapping configuration */
-      this.mappingConfig = createSolrMappingConfiguration();
-
-      /* set Solr autoCommit parameter */
-      this.autoCommit = getAutoCommitValue();
-
     } catch (Exception e) {
-      context.getLogger().log(Level.SEVERE, e.toString());
+      context.getLogger().log(Level.SEVERE, "Unable to initialize SolrServer properly");
       throw new ResourceInitializationException(e);
     }
+
+    /* create the mapping configuration */
+    try{
+      this.mappingConfig = createSolrMappingConfiguration();
+    } catch (Exception e) {
+      context.getLogger().log(Level.SEVERE, "Unable to initialize Solr mapping configuration properly");
+      throw new ResourceInitializationException(e);
+    }
+
+      /* set Solr autoCommit parameter */
+    try {
+      this.autoCommit = getAutoCommitValue();
+    } catch (Exception e) {
+      context.getLogger().log(Level.SEVERE, "Unable to initialize Solr autoCommit parameter properly");
+      throw new ResourceInitializationException(e);
+    }
+
   }
 
   /* allows retrieve of input stream from a path specifying one of:
@@ -107,7 +121,7 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
   }
 
   private SolrMappingConfiguration createSolrMappingConfiguration()
-          throws IOException, ResourceAccessException, Exception {
+          throws IOException, ResourceAccessException, ParserConfigurationException, SAXException {
     FieldMappingReader fieldMappingReader = new FieldMappingReader();
     String mappingFileParam = String.valueOf(getContext().getConfigParameterValue("mappingFile"));
 
