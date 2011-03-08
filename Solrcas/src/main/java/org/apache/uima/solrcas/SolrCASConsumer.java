@@ -39,7 +39,10 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.TypeSystem;
+import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.jcas.tcas.Annotation_Type;
 import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
@@ -80,7 +83,7 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       throw new ResourceInitializationException(e);
     }
 
-      /* set Solr autoCommit parameter */
+    /* set Solr autoCommit parameter */
     try {
       this.autoCommit = getAutoCommitValue();
     } catch (Exception e) {
@@ -90,7 +93,53 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
 
   }
 
-  /* allows retrieve of input stream from a path specifying one of:
+  @Override
+  public void typeSystemInit(TypeSystem typeSystem) throws AnalysisEngineProcessException {
+    super.typeSystemInit(typeSystem);
+    for (String key : mappingConfig.getFeatureStructuresMapping().keySet()) {
+      Type type = typeSystem.getType(key);
+      if (type==null) {
+        throw new AnalysisEngineProcessException("required_feature_structure_missing_from_cas",
+                new Object[]{key});
+      }
+      Map<String, String> stringStringMap = mappingConfig.getFeatureStructuresMapping().get(key);
+      for (String featureName : stringStringMap.keySet()) {
+        if (!"coveredText".equals(featureName) && type.getFeatureByBaseName(featureName)==null) {
+          throw new AnalysisEngineProcessException("required_attribute_missing", 
+                  new Object[]{featureName,type});
+        }
+      }
+    }
+  }
+
+
+  public void process(CAS cas) throws AnalysisEngineProcessException {
+    // create the SolrDocument from the CAS object basing on the mapping configuration
+    SolrInputDocument document = createDocument(cas);
+
+    // send the SolrDocument to SolrServer
+    try {
+      solrServer.add(document);
+    } catch (Exception e) {
+      getContext().getLogger().log(Level.SEVERE, new StringBuilder("Error while adding document").
+              append(document.toString()).toString());
+      throw new AnalysisEngineProcessException(e);
+    }
+
+    // if AutoCommit is enabled send the commit message to the SolrServer
+    if (!autoCommit) {
+      try {
+        solrServer.commit();
+      } catch (Exception e) {
+        getContext().getLogger().log(Level.SEVERE, new StringBuilder("Error while committing document").
+                append(document.toString()).toString());
+        throw new AnalysisEngineProcessException(e);
+      }
+    }
+  }
+
+
+  /* allows retrieving of input stream from a path specifying one of:
    * file://absolute/path
    * http://something.com/res.ext
    * classpath:/path/to/something.xml
@@ -151,31 +200,6 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
     }
 
     return solrServer;
-  }
-
-  public void process(CAS cas) throws AnalysisEngineProcessException {
-    // create the SolrDocument from the CAS object basing on the mapping configuration
-    SolrInputDocument document = createDocument(cas);
-
-    // send the SolrDocument to SolrServer
-    try {
-      solrServer.add(document);
-    } catch (Exception e) {
-      getContext().getLogger().log(Level.SEVERE, new StringBuilder("Error while adding document").
-              append(document.toString()).toString());
-      throw new AnalysisEngineProcessException(e);
-    }
-
-    // if AutoCommit is enabled send the commit message to the SolrServer
-    if (!autoCommit) {
-      try {
-        solrServer.commit();
-      } catch (Exception e) {
-        getContext().getLogger().log(Level.SEVERE, new StringBuilder("Error while committing document").
-                append(document.toString()).toString());
-        throw new AnalysisEngineProcessException(e);
-      }
-    }
   }
 
   /* create a SolrDocument from the current CAS object and the mapping configuration */
