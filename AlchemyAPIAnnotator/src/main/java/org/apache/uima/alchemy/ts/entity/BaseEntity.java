@@ -25,12 +25,13 @@ import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
+import org.apache.uima.alchemy.ts.sentiment.SentimentFS;
 import org.apache.uima.jcas.cas.TOP_Type;
 
 
 /** 
- * Updated by JCasGen Sat Sep 04 11:45:19 CEST 2010
- * XML source: /Users/tommaso/Documents/workspaces/uima_ws/sandbox/AlchemyAPIAnnotator/desc/TextRankedEntityExtractionAEDescriptor.xml
+ * Updated by JCasGen Fri Mar 11 17:40:07 CET 2011
+ * XML source: /Users/tommasoteofili/Documents/workspaces/uima_workspace/uima/sandbox/AlchemyAPIAnnotator/desc/TextRankedEntityExtractionAEDescriptor.xml
  * @generated */
 public class BaseEntity extends TOP {
   /** @generated
@@ -407,6 +408,24 @@ public class BaseEntity extends TOP {
     if (BaseEntity_Type.featOkTst && ((BaseEntity_Type)jcasType).casFeat_occurrences == null)
       jcasType.jcas.throwFeatMissing("occurrences", "org.apache.uima.alchemy.ts.entity.BaseEntity");
     jcasType.ll_cas.ll_setRefValue(addr, ((BaseEntity_Type)jcasType).casFeatCode_occurrences, jcasType.ll_cas.ll_getFSRef(v));}    
+   
+    
+  //*--------------*
+  //* Feature: sentiment
+
+  /** getter for sentiment - gets 
+   * @generated */
+  public SentimentFS getSentiment() {
+    if (BaseEntity_Type.featOkTst && ((BaseEntity_Type)jcasType).casFeat_sentiment == null)
+      jcasType.jcas.throwFeatMissing("sentiment", "org.apache.uima.alchemy.ts.entity.BaseEntity");
+    return (SentimentFS)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((BaseEntity_Type)jcasType).casFeatCode_sentiment)));}
+    
+  /** setter for sentiment - sets  
+   * @generated */
+  public void setSentiment(SentimentFS v) {
+    if (BaseEntity_Type.featOkTst && ((BaseEntity_Type)jcasType).casFeat_sentiment == null)
+      jcasType.jcas.throwFeatMissing("sentiment", "org.apache.uima.alchemy.ts.entity.BaseEntity");
+    jcasType.ll_cas.ll_setRefValue(addr, ((BaseEntity_Type)jcasType).casFeatCode_sentiment, jcasType.ll_cas.ll_getFSRef(v));}    
   }
 
     

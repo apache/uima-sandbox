@@ -29,7 +29,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JCasRegistry;
 
 /** 
- * Updated by JCasGen Sat Sep 04 11:45:19 CEST 2010
+ * Updated by JCasGen Fri Mar 11 17:40:07 CET 2011
  * @generated */
 public class OperatingSystem_Type extends BaseEntity_Type {
   /** @generated */

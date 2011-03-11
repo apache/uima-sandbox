@@ -24,8 +24,8 @@ import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.TOP_Type;
 
 /** 
- * Updated by JCasGen Sat Sep 04 11:45:19 CEST 2010
- * XML source: /Users/tommaso/Documents/workspaces/uima_ws/sandbox/AlchemyAPIAnnotator/desc/TextRankedEntityExtractionAEDescriptor.xml
+ * Updated by JCasGen Fri Mar 11 17:40:07 CET 2011
+ * XML source: /Users/tommasoteofili/Documents/workspaces/uima_workspace/uima/sandbox/AlchemyAPIAnnotator/desc/TextRankedEntityExtractionAEDescriptor.xml
  * @generated */
 public class Company extends BaseEntity {
   /**

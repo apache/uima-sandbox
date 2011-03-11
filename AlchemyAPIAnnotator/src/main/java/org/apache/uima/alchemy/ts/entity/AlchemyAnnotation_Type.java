@@ -31,33 +31,28 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
-/**
- * Updated by JCasGen Sat Jan 09 18:51:22 CET 2010
- * 
- * @generated
- */
+/** 
+ * Updated by JCasGen Fri Mar 11 17:40:07 CET 2011
+ * @generated */
 public class AlchemyAnnotation_Type extends Annotation_Type {
   /** @generated */
-  protected FSGenerator getFSGenerator() {
-    return fsGenerator;
-  }
-
+  protected FSGenerator getFSGenerator() {return fsGenerator;}
   /** @generated */
-  private final FSGenerator fsGenerator = new FSGenerator() {
-    public FeatureStructure createFS(int addr, CASImpl cas) {
-      if (AlchemyAnnotation_Type.this.useExistingInstance) {
-        // Return eq fs instance if already created
-        FeatureStructure fs = AlchemyAnnotation_Type.this.jcas.getJfsFromCaddr(addr);
-        if (null == fs) {
-          fs = new AlchemyAnnotation(addr, AlchemyAnnotation_Type.this);
-          AlchemyAnnotation_Type.this.jcas.putJfsFromCaddr(addr, fs);
-          return fs;
-        }
-        return fs;
-      } else
-        return new AlchemyAnnotation(addr, AlchemyAnnotation_Type.this);
-    }
-  };
+  private final FSGenerator fsGenerator = 
+    new FSGenerator() {
+      public FeatureStructure createFS(int addr, CASImpl cas) {
+  			 if (AlchemyAnnotation_Type.this.useExistingInstance) {
+  			   // Return eq fs instance if already created
+  		     FeatureStructure fs = AlchemyAnnotation_Type.this.jcas.getJfsFromCaddr(addr);
+  		     if (null == fs) {
+  		       fs = new AlchemyAnnotation(addr, AlchemyAnnotation_Type.this);
+  			   AlchemyAnnotation_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  			   return fs;
+  		     }
+  		     return fs;
+        } else return new AlchemyAnnotation(addr, AlchemyAnnotation_Type.this);
+  	  }
+    };
 
   /** @generated */
   public final static int typeIndexID = AlchemyAnnotation.typeIndexID;
@@ -66,8 +61,7 @@ public class AlchemyAnnotation_Type extends Annotation_Type {
    * @generated
    * @modifiable
    */
-  public final static boolean featOkTst = JCasRegistry
-          .getFeatOkTst("org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
 
   /** @generated */
   final Feature casFeat_alchemyType;
@@ -77,17 +71,19 @@ public class AlchemyAnnotation_Type extends Annotation_Type {
 
   /** @generated */
   public String getAlchemyType(int addr) {
-    if (featOkTst && casFeat_alchemyType == null)
+        if (featOkTst && casFeat_alchemyType == null)
       jcas.throwFeatMissing("alchemyType", "org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
     return ll_cas.ll_getStringValue(addr, casFeatCode_alchemyType);
   }
-
   /** @generated */
   public void setAlchemyType(int addr, String v) {
-    if (featOkTst && casFeat_alchemyType == null)
+        if (featOkTst && casFeat_alchemyType == null)
       jcas.throwFeatMissing("alchemyType", "org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
-    ll_cas.ll_setStringValue(addr, casFeatCode_alchemyType, v);
-  }
+    ll_cas.ll_setStringValue(addr, casFeatCode_alchemyType, v);}
+    
+  
+
+
 
   /**
    * initialize variables to correspond with Cas Type and Features
@@ -96,12 +92,11 @@ public class AlchemyAnnotation_Type extends Annotation_Type {
    */
   public AlchemyAnnotation_Type(JCas jcas, Type casType) {
     super(jcas, casType);
-    casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl) this.casType, getFSGenerator());
+    casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
-    casFeat_alchemyType = jcas.getRequiredFeatureDE(casType, "alchemyType", "uima.cas.String",
-            featOkTst);
-    casFeatCode_alchemyType = (null == casFeat_alchemyType) ? JCas.INVALID_FEATURE_CODE
-            : ((FeatureImpl) casFeat_alchemyType).getCode();
+ 
+    casFeat_alchemyType = jcas.getRequiredFeatureDE(casType, "alchemyType", "uima.cas.String", featOkTst);
+    casFeatCode_alchemyType  = (null == casFeat_alchemyType) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_alchemyType).getCode();
 
   }
 }

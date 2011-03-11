@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import org.apache.commons.digester.Digester;
 import org.apache.uima.alchemy.digester.OutputDigester;
 import org.apache.uima.alchemy.digester.domain.Disambiguated;
+import org.apache.uima.alchemy.digester.domain.DocumentSentiment;
 import org.apache.uima.alchemy.digester.domain.Entities;
 import org.apache.uima.alchemy.digester.domain.EntitiesResults;
 import org.apache.uima.alchemy.digester.domain.Entity;
@@ -69,6 +70,10 @@ public class XMLRankedEntityExtractionDigester implements OutputDigester {
     digester.addObjectCreate("results/entities/entity/quotations", Quotations.class);
     digester.addBeanPropertySetter("results/entities/entity/quotations/quotation", "quotation");
     digester.addSetNext("results/entities/entity/quotations", "setQuotations");
+    digester.addObjectCreate("results/entities/entity/sentiment", DocumentSentiment.class);
+    digester.addBeanPropertySetter("results/entities/entity/sentiment/type", "type");
+    digester.addBeanPropertySetter("results/entities/entity/sentiment/score", "score");
+    digester.addSetNext("results/entities/entity/sentiment", "setSentiment");
     digester.addSetNext("results/entities/entity", "addEntity");
     digester.addSetNext("results/entities", "setEntities");
 

@@ -32,7 +32,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Mon Feb 28 10:31:26 CET 2011
+ * Updated by JCasGen Fri Mar 11 17:40:07 CET 2011
  * @generated */
 public class SentimentFS_Type extends Annotation_Type {
   /** @generated */

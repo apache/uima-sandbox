@@ -34,7 +34,7 @@ public class TextRankedNamedEntityExtractionAnnotator extends AbstractAlchemyAnn
 
   protected String[] getServiceParameters() {
     return new String[] { "outputMode", "baseUrl", "disambiguate", "linkedData",
-        "showSourceText", "quotations", "coreference" };
+        "showSourceText", "quotations", "coreference", "sentiment" };
   }
 
   protected DigesterProvider createDigester() {

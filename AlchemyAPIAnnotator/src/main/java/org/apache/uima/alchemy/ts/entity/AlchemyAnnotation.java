@@ -25,11 +25,10 @@ import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.TOP_Type;
 import org.apache.uima.jcas.tcas.Annotation;
 
-/**
- * Updated by JCasGen Sat Jan 09 18:51:22 CET 2010 XML source:
- * 
- * @generated
- */
+/** 
+ * Updated by JCasGen Fri Mar 11 17:40:06 CET 2011
+ * XML source: /Users/tommasoteofili/Documents/workspaces/uima_workspace/uima/sandbox/AlchemyAPIAnnotator/desc/TextRankedEntityExtractionAEDescriptor.xml
+ * @generated */
 public class AlchemyAnnotation extends Annotation {
   /**
    * @generated
@@ -44,18 +43,15 @@ public class AlchemyAnnotation extends Annotation {
   public final static int type = typeIndexID;
 
   /** @generated */
-  public int getTypeIndexID() {
-    return typeIndexID;
-  }
-
+  public int getTypeIndexID() {return typeIndexID;}
+ 
   /**
    * Never called. Disable default constructor
    * 
    * @generated
    */
-  protected AlchemyAnnotation() {
-  }
-
+  protected AlchemyAnnotation() {}
+    
   /**
    * Internal - constructor used by generator
    * 
@@ -65,12 +61,12 @@ public class AlchemyAnnotation extends Annotation {
     super(addr, type);
     readObject();
   }
-
+  
   /** @generated */
   public AlchemyAnnotation(JCas jcas) {
     super(jcas);
-    readObject();
-  }
+    readObject();   
+  } 
 
   /** @generated */
   public AlchemyAnnotation(JCas jcas, int begin, int end) {
@@ -78,13 +74,10 @@ public class AlchemyAnnotation extends Annotation {
     setBegin(begin);
     setEnd(end);
     readObject();
-  }
+  }   
 
-  /**
-   * <!-- begin-user-doc --> Write your own initialization here <!-- end-user-doc -->
-   * 
-   * @generated modifiable
-   */
+  /** <!-- begin-user-doc --> Write your own initialization here <!-- end-user-doc -->
+  @generated modifiable */
   private void readObject() {
   }
 
@@ -97,25 +90,17 @@ public class AlchemyAnnotation extends Annotation {
    * @generated
    */
   public String getAlchemyType() {
-    if (AlchemyAnnotation_Type.featOkTst
-            && ((AlchemyAnnotation_Type) jcasType).casFeat_alchemyType == null)
-      jcasType.jcas.throwFeatMissing("alchemyType",
-              "org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
-    return jcasType.ll_cas.ll_getStringValue(addr,
-            ((AlchemyAnnotation_Type) jcasType).casFeatCode_alchemyType);
-  }
-
+    if (AlchemyAnnotation_Type.featOkTst && ((AlchemyAnnotation_Type)jcasType).casFeat_alchemyType == null)
+      jcasType.jcas.throwFeatMissing("alchemyType", "org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
+    return jcasType.ll_cas.ll_getStringValue(addr, ((AlchemyAnnotation_Type)jcasType).casFeatCode_alchemyType);}
+    
   /**
    * setter for alchemyType - sets
    * 
    * @generated
    */
   public void setAlchemyType(String v) {
-    if (AlchemyAnnotation_Type.featOkTst
-            && ((AlchemyAnnotation_Type) jcasType).casFeat_alchemyType == null)
-      jcasType.jcas.throwFeatMissing("alchemyType",
-              "org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
-    jcasType.ll_cas.ll_setStringValue(addr,
-            ((AlchemyAnnotation_Type) jcasType).casFeatCode_alchemyType, v);
+    if (AlchemyAnnotation_Type.featOkTst && ((AlchemyAnnotation_Type)jcasType).casFeat_alchemyType == null)
+      jcasType.jcas.throwFeatMissing("alchemyType", "org.apache.uima.alchemy.ts.entity.AlchemyAnnotation");
+    jcasType.ll_cas.ll_setStringValue(addr, ((AlchemyAnnotation_Type)jcasType).casFeatCode_alchemyType, v);}    
   }
-}

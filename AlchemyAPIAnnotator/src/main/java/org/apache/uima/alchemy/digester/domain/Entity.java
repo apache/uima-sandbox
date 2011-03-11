@@ -31,6 +31,8 @@ public class Entity {
   private Disambiguated disambiguated;
 
   private Quotations quotations;
+  
+  private DocumentSentiment sentiment;
 
   public String getType() {
     return type;
@@ -80,4 +82,11 @@ public class Entity {
     return quotations;
   }
 
+  public void setSentiment(DocumentSentiment sentiment) {
+    this.sentiment = sentiment;
+  }
+
+  public DocumentSentiment getSentiment() {
+    return sentiment;
+  }
 }

@@ -28,8 +28,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Mon Feb 28 10:31:26 CET 2011
- * XML source: /Users/tommasoteofili/Documents/workspaces/uima_workspace/uima/sandbox/AlchemyAPIAnnotator/desc/TextSentimentAnalysisAEDescriptor.xml
+ * Updated by JCasGen Fri Mar 11 17:40:07 CET 2011
+ * XML source: /Users/tommasoteofili/Documents/workspaces/uima_workspace/uima/sandbox/AlchemyAPIAnnotator/desc/TextRankedEntityExtractionAEDescriptor.xml
  * @generated */
 public class SentimentFS extends Annotation {
   /** @generated

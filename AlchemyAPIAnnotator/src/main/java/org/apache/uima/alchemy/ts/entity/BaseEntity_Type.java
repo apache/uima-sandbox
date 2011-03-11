@@ -32,7 +32,7 @@ import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.TOP_Type;
 
 /** 
- * Updated by JCasGen Sat Sep 04 11:45:19 CEST 2010
+ * Updated by JCasGen Fri Mar 11 17:40:07 CET 2011
  * @generated */
 public class BaseEntity_Type extends TOP_Type {
   /** @generated */
@@ -401,6 +401,24 @@ public class BaseEntity_Type extends TOP_Type {
     ll_cas.ll_setRefValue(addr, casFeatCode_occurrences, v);}
     
   
+ 
+  /** @generated */
+  final Feature casFeat_sentiment;
+  /** @generated */
+  final int     casFeatCode_sentiment;
+  /** @generated */ 
+  public int getSentiment(int addr) {
+        if (featOkTst && casFeat_sentiment == null)
+      jcas.throwFeatMissing("sentiment", "org.apache.uima.alchemy.ts.entity.BaseEntity");
+    return ll_cas.ll_getRefValue(addr, casFeatCode_sentiment);
+  }
+  /** @generated */    
+  public void setSentiment(int addr, int v) {
+        if (featOkTst && casFeat_sentiment == null)
+      jcas.throwFeatMissing("sentiment", "org.apache.uima.alchemy.ts.entity.BaseEntity");
+    ll_cas.ll_setRefValue(addr, casFeatCode_sentiment, v);}
+    
+  
 
 
 
@@ -481,6 +499,10 @@ public class BaseEntity_Type extends TOP_Type {
  
     casFeat_occurrences = jcas.getRequiredFeatureDE(casType, "occurrences", "uima.cas.FSList", featOkTst);
     casFeatCode_occurrences  = (null == casFeat_occurrences) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_occurrences).getCode();
+
+ 
+    casFeat_sentiment = jcas.getRequiredFeatureDE(casType, "sentiment", "org.apache.uima.alchemy.ts.sentiment.SentimentFS", featOkTst);
+    casFeatCode_sentiment  = (null == casFeat_sentiment) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_sentiment).getCode();
 
   }
 }

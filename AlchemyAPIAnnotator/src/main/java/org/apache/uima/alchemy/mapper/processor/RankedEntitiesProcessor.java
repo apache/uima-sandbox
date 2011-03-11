@@ -24,6 +24,7 @@ import org.apache.uima.alchemy.digester.domain.Entity;
 import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.ts.entity.AlchemyAnnotation;
 import org.apache.uima.alchemy.ts.entity.BaseEntity;
+import org.apache.uima.alchemy.ts.sentiment.SentimentFS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.NonEmptyFSList;
@@ -86,6 +87,13 @@ public class RankedEntitiesProcessor implements AlchemyOutputProcessor {
             i++;
           }
           fs.setFeatureValue(type.getFeatureByBaseName("quotations"), quotationsFeatureStructure);
+        }
+        if (entity.getSentiment() != null) {
+          SentimentFS sentimentFS = new SentimentFS(cas);
+          sentimentFS.setScore(entity.getSentiment().getScore());
+          sentimentFS.setSentimentType(entity.getSentiment().getType());
+          sentimentFS.addToIndexes();
+          fs.setFeatureValue(type.getFeatureByBaseName("sentiment"), sentimentFS);
         }
         cas.addFsToIndexes(fs);
         /* build annotations on this fs */
