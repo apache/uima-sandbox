@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -237,18 +236,6 @@ public class CFEConfigFromXML_XMLBeans
       
       // assume s already has all otherwise illegal chars properly quoted
       return new URI(s);
-    }
-
-    /**
-     * Create a URI from a URL, with proper quoting.
-     * Already quoted things in the input string are not re-quoted.
-     * @param u
-     * @return URI with proper quoting
-     * @throws URISyntaxException 
-     */
-
-    private static URI quote(URL u) throws URISyntaxException {
-      return quote(u.toString());
     }
 
 }
