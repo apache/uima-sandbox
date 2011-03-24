@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class CFEConfigFromXML_XMLBeans
         List<String> vals = efvs_xml.getValuesList();
 
         if ((1 == vals.size()) && (vals.get(0).startsWith("file://"))) {
-            return new EnumFeatureValues(new URI(vals.get(0)).getPath(), efvs_xml.getCaseSensitive());
+            return new EnumFeatureValues(quote(vals.get(0)).getPath(), efvs_xml.getCaseSensitive());
         }
         return new EnumFeatureValues(vals, efvs_xml.getCaseSensitive());
     }
@@ -211,4 +212,43 @@ public class CFEConfigFromXML_XMLBeans
     {
         return m_CFEDescriptor.getNullValueImage();  
     }
+    
+    // Maintainer note: remove these methods once base sdk 2.3.2 is released, and switch
+    // to using these methods from there
+    /**
+     * Create a URI from a string, with proper quoting.
+     * Already quoted things in the input string are not re-quoted.
+     * There are several cases:
+     *   String has no characters needing quoting
+     *   String has chars needing quoting, but no chars are currently quoted (e.g. %20)
+     *   String has quoted (e.g. %20) characters but no other chars needing quoting
+     *   String has quoted (e.g. %20) characters and chars needing quoting, not currently quoted
+     *     -- this case will throw an exception
+     * @param s
+     * @return URI with proper quoting
+     * @throws URISyntaxException 
+     */
+    private static URI quote (String s) throws URISyntaxException {
+      if (-1 == s.indexOf('%')) {
+        // 3 argument constructor does any needed quoting of otherwise illegal chars
+        // https://issues.apache.org/jira/browse/UIMA-2097
+        return new URI(null, s, null);  
+      }
+      
+      // assume s already has all otherwise illegal chars properly quoted
+      return new URI(s);
+    }
+
+    /**
+     * Create a URI from a URL, with proper quoting.
+     * Already quoted things in the input string are not re-quoted.
+     * @param u
+     * @return URI with proper quoting
+     * @throws URISyntaxException 
+     */
+
+    private static URI quote(URL u) throws URISyntaxException {
+      return quote(u.toString());
+    }
+
 }
