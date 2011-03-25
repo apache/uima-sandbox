@@ -115,6 +115,7 @@
   </dependencies>
            
 	<build>
+    <finalName>uima-lucas</finalName>
     <pluginManagement>
       <plugins>
         <plugin>
