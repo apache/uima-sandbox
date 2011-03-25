@@ -76,10 +76,91 @@
     <assemblyFinalName>uima-addons-${project.version}</assemblyFinalName>
   </properties>
 
-  <!-- dependencies used during assembly -->
   <dependencies>
-
-
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>alchemy-annotator</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>BSFAnnotator</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>ConceptMapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>ConfigurableFeatureExtractor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>DictionaryAnnotator</artifactId>
+      <version>${project.version}</version>
+    </dependency><dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>FsVariables</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>Lucas</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>OpenCalaisAnnotator</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>PearPackagingAntTask</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>RegularExpressionAnnotator</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>SimpleServer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>SnowballAnnotator</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>Solrcas</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>Tagger</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>TikaAnnotator</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>WhitespaceTokenizer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.uima</groupId>-->
+      <!--<artifactId>addons-osgi-runtime</artifactId>-->
+      <!--<version>${project.version}</version>-->
+    <!--</dependency>-->
   </dependencies>
 
   <build>

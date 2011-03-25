@@ -1,20 +1,20 @@
 <!--
-  Licensed to the Apache Software Foundation (ASF) under one
-  or more contributor license agreements.  See the NOTICE file
-  distributed with this work for additional information
-  regarding copyright ownership.  The ASF licenses this file
-  to you under the Apache License, Version 2.0 (the
-  "License"); you may not use this file except in compliance
-  with the License.  You may obtain a copy of the License at
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing,
-  software distributed under the License is distributed on an
-  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  KIND, either express or implied.  See the License for the
-  specific language governing permissions and limitations
-  under the License.
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.    
 -->
 
 <assembly>
@@ -23,104 +23,262 @@
     <format>tar.gz</format>
     <format>zip</format>
   </formats>
-
+  
   <includeBaseDirectory>true</includeBaseDirectory>
-  <baseDirectory>apache-uima/addons</baseDirectory> <!-- so it is unzippable over base - needs same name -->
-
-
+  
+  <baseDirectory>apache-uima/addons</baseDirectory>
+  
+  
+  <dependencySets>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:BSFAnnotator</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uimaj-an-bsf.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode> 
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:ConceptMapper</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uima-an-conceptMapper.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:ConfigurableFeatureExtractor</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uima-tool-configurableFeatureExtractor.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:DictionaryAnnotator</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uima-an-dictionary.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:FsVariables</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uimaj-fsvars.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:Lucas</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-lucas.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:OpenCalaisAnnotator</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-calais.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:PearPackagingAntTask</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-pear-ant-task.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:RegularExpressionAnnotator</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-regex.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:SimpleServer</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-simple-server.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:SnowballAnnotator</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-snowball.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:Solrcas</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-solrcas.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:Tagger</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-tagger.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:TikaAnnotator</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-tika.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:WhitespaceTokenizer</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-wst.jar</outputFileNameMapping>
+      <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+    
+    
+    <!-- addons-osgi-runtime go in a separate dir -->
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:addons-osgi-runtime</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputDirectory>osgi-runtime</outputDirectory>
+      <outputFileNameMapping>${artifact.build.finalName}.jar</outputFileNameMapping>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode> 
+      <directoryMode>755</directoryMode>        
+    </dependencySet>
+  </dependencySets>
+  
+  <!-- Add other files - scripts, documentation, examples -->
   <fileSets>
-  <!-- copy license, notice, disclaimer, readme, release notes files -->
+    <fileSet>
+      <directory>src/main/scripts</directory>
+      <outputDirectory>bin</outputDirectory>
+      <includes><include>*.sh</include></includes>
+      <fileMode>755</fileMode>
+      <directoryMode>755</directoryMode>        
+    </fileSet>
+    <fileSet>
+      <directory>src/main/scripts</directory>
+      <outputDirectory>bin</outputDirectory>
+      <excludes><exclude>*.sh</exclude></excludes>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
+    </fileSet>
+    <fileSet>
+      <directory>src/main/properties</directory>
+      <outputDirectory>config</outputDirectory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>        
+    </fileSet>
+    
+    <!-- copy bin distr license and notice -->
     <fileSet>
       <directory>src/main/readme</directory>
-      <outputDirectory/>
+      <outputDirectory></outputDirectory>
       <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
+      <directoryMode>755</directoryMode>      
     </fileSet>
-
-    <!-- Add files for all the Sandbox components being released -->
+    
+    <!-- copy standard top level files -->        
     <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../BSFAnnotator/target/assembly-bin</directory>
+      <directory>.</directory>
+      <outputDirectory></outputDirectory>
       <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
+      <directoryMode>755</directoryMode> 
+      <includes>
+        <include>README*</include>
+        <include>readme*</include>
+        <include>RELEASE_NOTES*</include>
+        <include>Release-Notes*</include>
+        <include>issuesFixed/**</include>      
+      </includes>       
     </fileSet>
+    
     <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../ConceptMapper/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../ConfigurableFeatureExtractor/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../DictionaryAnnotator/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory/>
-      <directory>../../FsVariables/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../Lucas/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../OpenCalaisAnnotator/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory/>
-      <directory>../../PearPackagingAntTask/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../RegularExpressionAnnotator/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory/>
-      <directory>../../SimpleServer/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../SnowballAnnotator/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../Tagger/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../TikaAnnotator/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>annotator</outputDirectory>
-      <directory>../../WhitespaceTokenizer/target/assembly-bin</directory>
-      <fileMode>644</fileMode>
-      <directoryMode>755</directoryMode>
+      <directory>target/site/apidocs</directory>
+      <outputDirectory>docs/d/api</outputDirectory>
+      <excludes>
+        <exclude>options</exclude>
+        <exclude>packages</exclude>
+        <exclude>files</exclude>
+        <exclude>argfile</exclude>        
+      </excludes>
+      <fileMode>444</fileMode>
+      <directoryMode>755</directoryMode>        
     </fileSet>
   </fileSets>
 </assembly>
