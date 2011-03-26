@@ -1,0 +1,265 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.    
+-->
+
+<!-- NOTE: This is no longer used as of 2.3.1 10/2010
+     Instead, source distributions are built using the 
+     standard source-release assembly mechanism of 
+     Apache common super pom -->
+
+<assembly>
+  <id>src</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  
+  <includeBaseDirectory>true</includeBaseDirectory>
+
+         
+  <fileSets>
+    <fileSet>
+      <directory>.</directory>
+      <outputDirectory>/addons-distr</outputDirectory>
+      <includes>
+        <include>src/**</include>
+        <include>pom.xml</include>
+      </includes>
+      <excludes>
+        <exclude>src/**/*.bat</exclude>
+        <exclude>src/**/*.cmd</exclude>
+        <exclude>src/**/*.sh</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    <!-- Copy .sh files as executable -->
+    <fileSet>
+      <fileMode>755</fileMode>
+      <directory>.</directory>
+      <outputDirectory>/addons-distr</outputDirectory>
+      <includes>
+        <include>src/**/*.sh</include>
+      </includes>
+    </fileSet>
+    <!-- Copy .bat and cmd files as not-executable -->
+    <fileSet>
+      <fileMode>644</fileMode>
+      <directory>.</directory>
+      <outputDirectory>/addons-distr</outputDirectory>
+      <includes>
+        <include>src/**/*.bat</include>
+        <include>src/**/*.cmd</include>
+      </includes>
+    </fileSet>
+    
+    <!-- ===================================== -->
+    <!-- copy top level files to the top level -->    
+    <!-- ===================================== -->
+    <fileSet>
+      <directory>src/main/readme</directory>
+      <outputDirectory/>
+      <excludes>
+        <!-- exclude bin distr README -->
+        <exclude>README</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    
+    <!-- Copy .sh files as executable -->
+    <fileSet>
+      <fileMode>755</fileMode>
+      <directory>src/main/readme_src</directory>
+      <includes>
+        <include>*.sh</include>
+      </includes>
+      <outputDirectory/>
+    </fileSet>
+    <!-- Copy everything else as non-executable -->
+    <fileSet>
+      <directory>src/main/readme_src</directory>
+      <excludes>
+        <exclude>*.sh</exclude>
+      </excludes>
+      <outputDirectory/>
+      <fileMode>644</fileMode>
+    </fileSet>
+
+    <!-- for every other source, use relative paths to locate
+         the project's root, and include the whole thing except for 
+         target/ 
+         .*  (.settings/, .project, .classpath)
+         
+         There must be one entry here for each entry in 
+         the <modules> section (recursively)
+         
+         Parent poms in the build/ section of svn are not included.
+         Aggregator poms used in this build are included. 
+    -->    
+    
+    <!-- aggregator poms -->
+    <fileSet>
+      <directory>../aggregate-addons</directory>
+      <outputDirectory>/aggregate-addons</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    
+    <!-- from aggregate-addons -->
+    <fileSet>
+      <directory>../BSFAnnotator</directory>
+      <outputDirectory>/BSFAnnotator</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../ConceptMapper</directory>
+      <outputDirectory>/ConceptMapper</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../ConfigurableFeatureExtractor</directory>
+      <outputDirectory>/ConfigurableFeatureExtractor</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>  
+    <fileSet>
+      <directory>../DictionaryAnnotator</directory>
+      <outputDirectory>/DictionaryAnnotator</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>          
+    <fileSet>
+      <directory>../FsVariables</directory>
+      <outputDirectory>/FsVariables</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>  
+    <fileSet>
+      <directory>../Lucas</directory>
+      <outputDirectory>/Lucas</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>  
+    <fileSet>
+      <directory>../OpenCalaisAnnotator</directory>
+      <outputDirectory>/OpenCalaisAnnotator</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>      
+    <fileSet>
+      <directory>../PearPackagingAntTask</directory>
+      <outputDirectory>/PearPackagingAntTask</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>   
+    <fileSet>
+      <directory>../RegularExpressionAnnotator</directory>
+      <outputDirectory>/RegularExpressionAnnotator</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>      
+    <fileSet>
+      <directory>../SimpleServer</directory>
+      <outputDirectory>/SimpleServer</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>     
+    <fileSet>
+      <directory>../SnowballAnnotator</directory>
+      <outputDirectory>/SnowballAnnotator</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../Solrcas</directory>
+      <outputDirectory>/Solrcas</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../Tagger</directory>
+      <outputDirectory>/Tagger</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../TikaAnnotator</directory>
+      <outputDirectory>/TikaAnnotator</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../WhitespaceTokenizer</directory>
+      <outputDirectory>/WhitespaceTokenizer</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>.*/**</exclude>
+      </excludes>
+      <fileMode>644</fileMode>
+    </fileSet>
+
+          
+  </fileSets>
+  
+</assembly>
