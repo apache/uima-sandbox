@@ -73,7 +73,7 @@
       <nameValuePair>
         <name>solrPath</name>
         <value>
-          <string>classpath:/org/apache/uima/solrcas/</string>
+          <string>src/test/resources/org/apache/uima/solrcas/</string>
         </value>
       </nameValuePair>
       <nameValuePair>
