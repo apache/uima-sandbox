@@ -74,6 +74,7 @@
     <module>../RegularExpressionAnnotator</module>
     <module>../SimpleServer</module>
     <module>../SnowballAnnotator</module>
+    <module>../Solrcas</module>
     <module>../Tagger</module>
     <module>../TikaAnnotator</module>
     <module>../WhitespaceTokenizer</module>
