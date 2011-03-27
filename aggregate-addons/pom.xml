@@ -74,9 +74,9 @@
     <module>../RegularExpressionAnnotator</module>
     <module>../SimpleServer</module>
     <module>../SnowballAnnotator</module>
+    <module>../WhitespaceTokenizer</module>
     <module>../Tagger</module>
     <module>../TikaAnnotator</module>
-    <module>../WhitespaceTokenizer</module>
     <module>../Solrcas</module>
     <module>../addons-osgi-runtime</module>
   </modules>
