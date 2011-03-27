@@ -38,6 +38,7 @@
     <module>DictionaryAnnotator-osgi</module>
     <module>Tagger-osgi</module>
     <module>Lucas-osgi</module>
+    <module>RegularExpressionAnnotator-osgi</module>
     <module>SnowballAnnotator-osgi</module>
     <module>TikaAnnotator-osgi</module>
     <module>WhitespaceTokenizer-osgi</module>

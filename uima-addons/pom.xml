@@ -156,11 +156,73 @@
       <artifactId>WhitespaceTokenizer</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.apache.uima</groupId>-->
-      <!--<artifactId>addons-osgi-runtime</artifactId>-->
-      <!--<version>${project.version}</version>-->
-    <!--</dependency>-->
+
+    <!-- addons-osgi-runtime dependencies -->
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>alchemy-annotator-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>BSFAnnotator-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>ConceptMapper-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>ConfigurableFeatureExtractor-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>DictionaryAnnotator-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>Lucas-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>OpenCalaisAnnotator-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>RegularExpressionAnnotator-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>SnowballAnnotator-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>Solrcas-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>Tagger-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>TikaAnnotator-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>WhitespaceTokenizer-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

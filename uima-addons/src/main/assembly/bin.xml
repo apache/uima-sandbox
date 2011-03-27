@@ -210,11 +210,11 @@ under the License.
     <!-- addons-osgi-runtime go in a separate dir -->
     <dependencySet>
       <includes>
-        <include>org.apache.uima:addons-osgi-runtime</include>
+        <include>org.apache.uima:*-osgi</include>
       </includes>
       <unpack>false</unpack>
       <scope>runtime</scope>
-      <outputDirectory>osgi-runtime</outputDirectory>
+      <outputDirectory>lib-osgi</outputDirectory>
       <outputFileNameMapping>${artifact.build.finalName}.jar</outputFileNameMapping>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
