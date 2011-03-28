@@ -148,11 +148,11 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
     if (path.startsWith(CLASSPATH)) {
       url = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING));
     } else {
-        URI uriPath = URI.create(path);
+        URI uriPath = UriUtils.create(path);
         if (uriPath.isAbsolute()) // this supports file://ABSOLUTE_PATH and http://URL
           url = uriPath.toURL();
         else // path is not absolute
-          url = URI.create(new StringBuilder(FILEPATH).append(getContext().getDataPath()).
+          url = UriUtils.create(new StringBuilder(FILEPATH).append(getContext().getDataPath()).
                   append("/").append(path.replace(FILEPATH, EMPTY_STRING)).toString()).
                   toURL(); // this supports relative file paths
     }
@@ -190,7 +190,7 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
               getConfigParameterValue("solrPath"));
   
       if (solrInstanceTypeParam.equalsIgnoreCase("http")) {
-        URL solrURL = URI.create(solrPathParam).toURL();
+        URL solrURL = UriUtils.create(solrPathParam).toURL();
         solrServer = new CommonsHttpSolrServer(solrURL);
       }
     } catch (Exception e) {

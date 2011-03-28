@@ -18,6 +18,14 @@
  */
 package org.apache.uima.rdf;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
@@ -33,14 +41,6 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -109,12 +109,11 @@ public class RDFCASConsumer extends JCasAnnotator_ImplBase {
 
     OutputStream outputStream = null;
     try {
-      URI uri = URI.create(file);
-
+      URI uri = UriUtils.create(file);
       File f = new File(uri);
-      if (!f.exists())
+      if (!f.exists()) {
         f.createNewFile();
-
+      }
       outputStream = new FileOutputStream(f);
       Serializer serializer = Serializer.getInstance();
       serializer.serialize(outputStream, node.getGraph(), format);
