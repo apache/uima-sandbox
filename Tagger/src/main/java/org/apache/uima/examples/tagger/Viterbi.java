@@ -183,7 +183,7 @@ public class Viterbi {
             }
             // 
             else if (j == unknown.length - 1) {
-              available_pos = word_probs.get("(");
+              if (word_probs.containsKey("(")) {available_pos = word_probs.get("(");} else {available_pos.put("(", Double.MIN_VALUE);}
             }
           }
         }
@@ -270,7 +270,7 @@ public class Viterbi {
             break;
           } // for unexpected cases which are neither in the dictionary nor in the suffix analysis
           else if (j == unknown.length - 1) {
-            possible_pos_next = word_probs.get("(");
+            if (possible_pos_next.containsKey("(")) {possible_pos_next = word_probs.get("(");} else {possible_pos_next.put("(", Double.MIN_VALUE);}
           }
         }
       }
