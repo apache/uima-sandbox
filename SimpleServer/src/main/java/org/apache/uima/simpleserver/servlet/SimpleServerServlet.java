@@ -19,6 +19,17 @@
 
 package org.apache.uima.simpleserver.servlet;
 
+import org.apache.uima.simpleserver.Service;
+import org.apache.uima.simpleserver.config.Output;
+import org.apache.uima.simpleserver.config.ServerSpec;
+import org.apache.uima.simpleserver.config.TypeMap;
+import org.apache.uima.simpleserver.output.Result;
+import org.apache.uima.simpleserver.output.ResultConverter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,18 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.uima.simpleserver.Service;
-import org.apache.uima.simpleserver.config.Output;
-import org.apache.uima.simpleserver.config.ServerSpec;
-import org.apache.uima.simpleserver.config.TypeMap;
-import org.apache.uima.simpleserver.output.Result;
-import org.apache.uima.simpleserver.output.ResultConverter;
 
 /*
  * a base class that implements the specification of a UIMA Servlet
@@ -152,21 +151,26 @@ public class SimpleServerServlet extends HttpServlet {
     try {
       if ("xsd".equals(mode)) {
         // just give out the XSD definition provided by the server
+        response.setHeader("content-type","text/xml");
         writer.println(this.server.getXMLResultXSD());
         writer.close();
       } else if ("description".equals(mode)) {
         // output a service description in HTML format
+        response.setHeader("content-type","text/html");
         writer.print(this.constructHtmlDescription(request.getRequestURL().toString()));
         writer.close();
       } else if ("form".equals(mode)) {
         // create a tryout HTML form and give it out
+        response.setHeader("content-type","text/html");
         writer.print(this.getHtmlForm(request.getRequestURL().toString()));
         writer.close();
       } else if ("xmldesc".equals(mode)) {
+        response.setHeader("content-type","text/xml");
         writer.print(this.server.getServiceDescription());
         writer.close();
       } else {
         // interpret this as a request for actual analysis
+        response.setHeader("content-type","text/xml");
         analyze(request, response);
       }
     } catch (IOException e) {
@@ -182,6 +186,7 @@ public class SimpleServerServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
           throws IOException {
+    response.setHeader("content-type","text/xml");
     analyze(request, response);
   }
 
