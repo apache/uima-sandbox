@@ -22,6 +22,7 @@ package org.apache.uima.solrcas;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
@@ -137,26 +138,23 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
   }
 
 
-  /* allows retrieving of input stream from a path specifying one of:
+  /* allows retrieving of a URI from a path specifying one of:
    * file://absolute/path
    * http://something.com/res.ext
    * classpath:/path/to/something.xml
    * data/path/relative/file.ext
    */
-  protected URL getURL(String path) throws ResourceAccessException, IOException {
-    URL url;
+  protected URI getURI(String path) throws ResourceAccessException, IOException, URISyntaxException {
+    URI uri;
     if (path.startsWith(CLASSPATH)) {
-      url = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING));
+      uri = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING)).toURI();
     } else {
-        URI uriPath = UriUtils.create(path);
-        if (uriPath.isAbsolute()) // this supports file://ABSOLUTE_PATH and http://URL
-          url = uriPath.toURL();
-        else // path is not absolute
-          url = UriUtils.create(new StringBuilder(FILEPATH).append(getContext().getDataPath()).
-                  append("/").append(path.replace(FILEPATH, EMPTY_STRING)).toString()).
-                  toURL(); // this supports relative file paths
+      uri = UriUtils.create(path); // this supports file://ABSOLUTE_PATH and http://URL
+      if (!uri.isAbsolute())
+         uri = UriUtils.create(new StringBuilder(FILEPATH).append(getContext().getDataPath()).
+                append("/").append(path.replace(FILEPATH, EMPTY_STRING)).toString()); // this supports relative file paths
     }
-    return url;
+    return uri;
   }
 
   private boolean getAutoCommitValue() {
@@ -168,11 +166,11 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
   }
 
   private SolrMappingConfiguration createSolrMappingConfiguration()
-          throws IOException, ResourceAccessException, ParserConfigurationException, SAXException {
+          throws IOException, ResourceAccessException, ParserConfigurationException, SAXException, URISyntaxException {
     FieldMappingReader fieldMappingReader = new FieldMappingReader();
     String mappingFileParam = String.valueOf(getContext().getConfigParameterValue("mappingFile"));
 
-    InputStream input = getURL(mappingFileParam).openStream();
+    InputStream input = getURI(mappingFileParam).toURL().openStream();
 
     SolrMappingConfiguration solrMappingConfiguration = fieldMappingReader.getConf(input);
     return solrMappingConfiguration;

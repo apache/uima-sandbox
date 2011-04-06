@@ -39,6 +39,7 @@ import org.apache.uima.test.junit_extension.AnnotatorTester;
 import org.apache.uima.util.CasCreationUtils;
 import org.junit.Test;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 
@@ -70,7 +71,7 @@ public class SolrCasConsumerIntegrationTest {
 
       /* create a Solr instance to check document has been indexed as expected */
       URL solrURL = this.getClass().getResource("/org/apache/uima/solrcas/");
-      System.setProperty("solr.solr.home", solrURL.getFile());
+      System.setProperty("solr.solr.home", new File(solrURL.toURI()).getAbsolutePath());
       CoreContainer.Initializer initializer = new CoreContainer.Initializer();
       CoreContainer coreContainer = initializer.initialize();
       SolrServer solrServer = new EmbeddedSolrServer(coreContainer, "");

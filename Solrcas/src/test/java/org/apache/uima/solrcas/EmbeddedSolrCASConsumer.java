@@ -19,12 +19,14 @@
 
 package org.apache.uima.solrcas;
 
-import java.net.URL;
-
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
 
 public class EmbeddedSolrCASConsumer extends SolrCASConsumer {
 
@@ -39,8 +41,8 @@ public class EmbeddedSolrCASConsumer extends SolrCASConsumer {
               getConfigParameterValue("solrPath"));
   
       if (solrInstanceTypeParam.equals("embedded")) {
-        URL solrURL = getURL(solrPathParam);
-        System.setProperty("solr.solr.home", solrURL.getFile());
+        URI solrURI = getURI(solrPathParam);
+        System.setProperty("solr.solr.home", new File(solrURI).getAbsolutePath());
         CoreContainer.Initializer initializer = new CoreContainer.Initializer();
         CoreContainer coreContainer = initializer.initialize();
         solrServer = new EmbeddedSolrServer(coreContainer, "");
