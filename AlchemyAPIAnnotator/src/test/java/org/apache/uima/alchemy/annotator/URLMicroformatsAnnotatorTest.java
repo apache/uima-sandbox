@@ -24,6 +24,7 @@ import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +40,25 @@ public class URLMicroformatsAnnotatorTest {
   @Test
   public void annotatorIntegrationTest() {
     try {
-      Map<String,Object> parameterSettings = new HashMap<String, Object>();
-      parameterSettings.put("apikey","04490000a72fe7ec5cb3497f14e77f338c86f2fe");
-      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(XML_PATH,parameterSettings), URL);
-      List<MicroformatFS> microformats = (List<MicroformatFS>) TestUtils.getAllFSofType(MicroformatFS.type, resultingCAS);
-      assertTrue(microformats!=null);
-      assertTrue(microformats.size()==7);
+      if (isURLreachable()) {
+        Map<String,Object> parameterSettings = new HashMap<String, Object>();
+        parameterSettings.put("apikey","04490000a72fe7ec5cb3497f14e77f338c86f2fe");
+        JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(XML_PATH,parameterSettings), URL);
+        List<MicroformatFS> microformats = (List<MicroformatFS>) TestUtils.getAllFSofType(MicroformatFS.type, resultingCAS);
+        assertTrue(microformats!=null);
+        assertTrue(microformats.size()==7);
+      }
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.toString());
+    }
+  }
+
+  private boolean isURLreachable() {
+    try {
+      return new URI(URL).toURL().getContent() != null;
+    } catch (Exception e) {
+      return false;
     }
   }
 
