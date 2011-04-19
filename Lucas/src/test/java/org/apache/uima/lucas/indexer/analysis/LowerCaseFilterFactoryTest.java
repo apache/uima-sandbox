@@ -19,15 +19,15 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import static org.junit.Assert.*;
+import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.junit.Before;
-import org.junit.Test;
-import static org.easymock.classextension.EasyMock.*;
+import static org.junit.Assert.assertNotNull;
 
 public class LowerCaseFilterFactoryTest {
 
@@ -37,7 +37,7 @@ public class LowerCaseFilterFactoryTest {
   @Before
   public void setUp() throws Exception {
     this.lowercaseFilterFactory = new LowerCaseFilterFactory();
-    this.tokenStream = createMock(TokenStream.class);
+    this.tokenStream = new DummyTokenStream("dummy", 1, 1, 0);
   }
 
   @Test

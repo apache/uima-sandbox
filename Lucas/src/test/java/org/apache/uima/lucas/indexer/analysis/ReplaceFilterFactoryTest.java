@@ -19,23 +19,21 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.reset;
-import static org.easymock.classextension.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
+import org.apache.uima.lucas.indexer.util.MapFileReader;
+import org.apache.uima.lucas.indexer.util.MapFileReaderFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.uima.lucas.indexer.util.MapFileReader;
-import org.apache.uima.lucas.indexer.util.MapFileReaderFactory;
-import org.junit.Before;
-import org.junit.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.*;
+import static org.junit.Assert.assertEquals;
 
 public class ReplaceFilterFactoryTest {
 
@@ -51,7 +49,7 @@ public class ReplaceFilterFactoryTest {
 	mapFileReaderFactory = createMock(MapFileReaderFactory.class);
 	mapFileReader= createMock(MapFileReader.class);
     replaceFilterFactory = new ReplaceFilterFactory(mapFileReaderFactory);
-    tokenStream = createMock(TokenStream.class);
+    tokenStream = new DummyTokenStream("dummy", 1, 1, 0);
     mapping = new HashMap<String, String>();
   }
   

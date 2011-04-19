@@ -19,29 +19,21 @@
 
 package org.apache.uima.lucas;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.cas.ArrayFS;
-import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.FSIterator;
-import org.apache.uima.cas.Feature;
-import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.Type;
-import org.apache.uima.cas.TypeSystem;
+import org.apache.uima.cas.*;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.InvalidXMLException;
 import org.apache.uima.util.XMLInputSource;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 public class ProspectiveSearchAETest {
 	
@@ -86,6 +78,8 @@ public class ProspectiveSearchAETest {
 		
 		// Test if highlighting is correct
 		ArrayFS matchingTextArray = (ArrayFS) result.getFeatureValue(searchResultMatchingTextFeature);
+		
+		assertEquals(2, matchingTextArray.size());
 		
 		for (int i = 0; i < matchingTextArray.size(); i++) {
 			AnnotationFS annotation = (AnnotationFS) matchingTextArray.get(i);

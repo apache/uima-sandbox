@@ -19,17 +19,16 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
+import junit.framework.TestCase;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import junit.framework.TestCase;
-
-import org.apache.lucene.analysis.Token;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.uima.lucas.indexer.analysis.TokenStreamMerger;
-import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
 
 public class TokenStreamMergerTest extends TestCase {
 	private TokenStreamMerger merger;
@@ -44,48 +43,53 @@ public class TokenStreamMergerTest extends TestCase {
 	
 	public void testNext() throws IOException {
 		
-		Token currentToken = merger.next();
 		
-		assertEquals("1111", currentToken.term());
-		assertEquals(0, currentToken.startOffset());
-		assertEquals(4, currentToken.endOffset());
-		assertEquals(1, currentToken.getPositionIncrement());
+		TermAttribute termAtt = (TermAttribute)merger.getAttribute(TermAttribute.class);
+		OffsetAttribute offsetAtt = (OffsetAttribute)merger.getAttribute(OffsetAttribute.class);
+		PositionIncrementAttribute posIncAtt = (PositionIncrementAttribute)merger.getAttribute(PositionIncrementAttribute.class);
 		
-		currentToken = merger.next();		
-		assertEquals("1111", currentToken.term());
-		assertEquals(5, currentToken.startOffset());
-		assertEquals(9, currentToken.endOffset());
-		assertEquals(1, currentToken.getPositionIncrement());
+		merger.incrementToken();
+		
+		assertEquals("1111", termAtt.term());
+		assertEquals(0, offsetAtt.startOffset());
+		assertEquals(4, offsetAtt.endOffset());
+		assertEquals(1, posIncAtt.getPositionIncrement());
+		
+		merger.incrementToken();		
+		assertEquals("1111",  termAtt.term());
+		assertEquals(5,  offsetAtt.startOffset());
+		assertEquals(9,  offsetAtt.endOffset());
+		assertEquals(1,  posIncAtt.getPositionIncrement());
 
-		currentToken = merger.next();		
-		assertEquals("2222", currentToken.term());
-		assertEquals(5, currentToken.startOffset());
-		assertEquals(9, currentToken.endOffset());
-		assertEquals(0, currentToken.getPositionIncrement());
+		merger.incrementToken();
+		assertEquals("2222",  termAtt.term());
+		assertEquals(5,  offsetAtt.startOffset());
+		assertEquals(9,  offsetAtt.endOffset());
+		assertEquals(0,  posIncAtt.getPositionIncrement());
 
-		currentToken = merger.next();		
-		assertEquals("1111", currentToken.term());
-		assertEquals(10, currentToken.startOffset());
-		assertEquals(14, currentToken.endOffset());
-		assertEquals(1, currentToken.getPositionIncrement());
+		merger.incrementToken();
+		assertEquals("1111",  termAtt.term());
+		assertEquals(10,  offsetAtt.startOffset());
+		assertEquals(14,  offsetAtt.endOffset());
+		assertEquals(1,  posIncAtt.getPositionIncrement());
 
-		currentToken = merger.next();		
-		assertEquals("3333", currentToken.term());
-		assertEquals(10, currentToken.startOffset());
-		assertEquals(14, currentToken.endOffset());
-		assertEquals(0, currentToken.getPositionIncrement());
+		merger.incrementToken();
+		assertEquals("3333",  termAtt.term());
+		assertEquals(10,  offsetAtt.startOffset());
+		assertEquals(14,  offsetAtt.endOffset());
+		assertEquals(0,  posIncAtt.getPositionIncrement());
 
-		currentToken = merger.next();		
-		assertEquals("1111", currentToken.term());
-		assertEquals(15, currentToken.startOffset());
-		assertEquals(19, currentToken.endOffset());
-		assertEquals(1, currentToken.getPositionIncrement());
+		merger.incrementToken();
+		assertEquals("1111",  termAtt.term());
+		assertEquals(15, offsetAtt.startOffset());
+		assertEquals(19, offsetAtt.endOffset());
+		assertEquals(1,  posIncAtt.getPositionIncrement());
 
-		currentToken = merger.next();		
-		assertEquals("2222", currentToken.term());
-		assertEquals(15, currentToken.startOffset());
-		assertEquals(19, currentToken.endOffset());
-		assertEquals(0, currentToken.getPositionIncrement());
+		merger.incrementToken();
+		assertEquals("2222",  termAtt.term());
+		assertEquals(15,  offsetAtt.startOffset());
+		assertEquals(19, offsetAtt.endOffset());
+		assertEquals(0, posIncAtt.getPositionIncrement());
 	}
 
 }

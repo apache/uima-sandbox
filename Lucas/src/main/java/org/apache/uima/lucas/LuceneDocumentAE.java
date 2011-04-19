@@ -19,17 +19,6 @@
 
 package org.apache.uima.lucas;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
@@ -40,27 +29,22 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.lucas.indexer.AnnotationTokenStreamBuilder;
-import org.apache.uima.lucas.indexer.AnnotationTokenStreamBuildingException;
-import org.apache.uima.lucas.indexer.DocumentBuilder;
-import org.apache.uima.lucas.indexer.FieldBuilder;
-import org.apache.uima.lucas.indexer.FieldBuildingException;
-import org.apache.uima.lucas.indexer.FilterBuilder;
-import org.apache.uima.lucas.indexer.FilterBuildingException;
-import org.apache.uima.lucas.indexer.Tokenizer;
+import org.apache.uima.lucas.indexer.*;
 import org.apache.uima.lucas.indexer.analysis.DefaultFilterFactoryRegistry;
 import org.apache.uima.lucas.indexer.analysis.TokenFilterFactory;
-import org.apache.uima.lucas.indexer.mapping.AnnotationDescription;
-import org.apache.uima.lucas.indexer.mapping.AnnotationMapper;
-import org.apache.uima.lucas.indexer.mapping.ElementMapper;
-import org.apache.uima.lucas.indexer.mapping.FeatureMapper;
-import org.apache.uima.lucas.indexer.mapping.FieldDescription;
-import org.apache.uima.lucas.indexer.mapping.FieldMapper;
-import org.apache.uima.lucas.indexer.mapping.FilterDescription;
-import org.apache.uima.lucas.indexer.mapping.FilterMapper;
-import org.apache.uima.lucas.indexer.mapping.MappingFileReader;
+import org.apache.uima.lucas.indexer.mapping.*;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Abstract base class for AEs which need to process Lucene {@link Document}
@@ -68,7 +52,7 @@ import org.xml.sax.SAXException;
  */
 public abstract class LuceneDocumentAE extends CasAnnotator_ImplBase {
 
-	private static final Logger logger = Logger
+	private static final Logger log = Logger
 			.getLogger(LuceneDocumentAE.class);
 
 	public final static String PARAM_MAPPINGFILE = "mappingFile";
@@ -77,13 +61,13 @@ public abstract class LuceneDocumentAE extends CasAnnotator_ImplBase {
 
 	private DocumentBuilder documentBuilder;
 
-	private FieldBuilder fieldBuilder;
+	protected FieldBuilder fieldBuilder;
 
 	protected FilterBuilder filterBuilder;
 
-	private AnnotationTokenStreamBuilder annotationTokenStreamBuilder;
+	protected AnnotationTokenStreamBuilder annotationTokenStreamBuilder;
 
-	private Tokenizer tokenizer;
+	protected Tokenizer tokenizer;
 
 	private Map<String, TokenFilterFactory> defaultFilterFactoryRegistry;
 
@@ -214,19 +198,19 @@ public abstract class LuceneDocumentAE extends CasAnnotator_ImplBase {
 			return document;
 			
 		} catch (AnnotationTokenStreamBuildingException e) {
-			logger.error("processCas(CAS)", e);
+			log.error("processCas(CAS)", e);
 			throw new AnalysisEngineProcessException(e);
 		} catch (IOException e) {
-			logger.error("processCas(CAS)", e);
+			log.error("processCas(CAS)", e);
 			throw new AnalysisEngineProcessException(e);
 		} catch (FieldBuildingException e) {
-			logger.error("processCas(CAS)", e);
+			log.error("processCas(CAS)", e);
 			throw new AnalysisEngineProcessException(e);
 		} catch (FilterBuildingException e) {
-			logger.error("processCas(CAS)", e);
+			log.error("processCas(CAS)", e);
 			throw new AnalysisEngineProcessException(e);
 		} catch (CASException e) {
-			logger.error("processCas(CAS)", e);
+			log.error("processCas(CAS)", e);
 			throw new AnalysisEngineProcessException(e);
 		}
 	}

@@ -19,25 +19,21 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.reset;
-import static org.easymock.classextension.EasyMock.verify;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.Properties;
-
+import junit.framework.TestCase;
 import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
 import org.apache.uima.lucas.indexer.util.PlainFileReader;
 import org.apache.uima.lucas.indexer.util.PlainFileReaderFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-public class StopwordFilterFactoryTest {
+import java.util.Properties;
+import java.util.Set;
+
+import static org.easymock.EasyMock.*;
+
+public class StopwordFilterFactoryTest extends TestCase {
 	  private static final String TRUE = "true";
     private static final String TEST_FILE_1 = "src/test/resources/ReplaceFilterFactoryTest1.txt";
 	  private StopwordFilterFactory stopwordFilterFactory;
@@ -52,7 +48,7 @@ public class StopwordFilterFactoryTest {
 		plainFileReaderFactory = createMock(PlainFileReaderFactory.class);
 		plainFileReader= createMock(PlainFileReader.class);
 	    stopwordFilterFactory = new StopwordFilterFactory(plainFileReaderFactory);
-	    tokenStream = createMock(TokenStream.class);
+	    tokenStream = new DummyTokenStream("dummy", 1, 1, 0);
 	    lines = new String[]{"WORD"};
 	    properties = new Properties();
         properties.setProperty(StopwordFilterFactory.FILE_PATH_PARAMETER, TEST_FILE_1);
@@ -90,16 +86,12 @@ public class StopwordFilterFactoryTest {
 	        replay(plainFileReaderFactory);
 	        replay(plainFileReader);
 	        
-	        StopFilter stopFilter = (StopFilter) stopwordFilterFactory.createTokenFilter(tokenStream, properties);
-	        Token reusableToken = new Token(0, 5);
-	        reusableToken.setTermBuffer("word");
-	        expect(tokenStream.next(reusableToken)).andReturn(reusableToken);
-	        expect(tokenStream.next(reusableToken)).andReturn(null);
-	        replay(tokenStream);
-
-	        Token resultToken = stopFilter.next(reusableToken);
-	        assertNull(resultToken);
-	        verify(tokenStream);
+	        
+	        String[] stopWords = {"sTOp", "STop"};
+	        
+	        Set<String> stopSet = StopFilter.makeStopSet(stopWords, true);
+	        
+	        assertEquals(1, stopSet.size());
 	  }
 	  
 	  @Test

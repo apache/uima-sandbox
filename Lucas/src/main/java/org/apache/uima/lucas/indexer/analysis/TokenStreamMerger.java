@@ -19,112 +19,115 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Stack;
-
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.util.Attribute;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * A TokenStreamMerger merges a {@link java.util.List list} of
- * {@link org.apache.lucene.analysis.TokenStream token streams} by the means of their token offsets.
- * Adapts positionIncrement of tokens if their startOffset is exactly the same.
+ * {@link org.apache.lucene.analysis.TokenStream token streams} by the means of
+ * their token offsets. Adapts positionIncrement of tokens if their startOffset
+ * is exactly the same.
  */
 public class TokenStreamMerger extends TokenStream {
 
-  private class TokenComparator implements Comparator<Token> {
+	private class TokenStreamComparator implements Comparator<TokenStream> {
 
-    public int compare(Token token1, Token token2) {
+		public int compare(TokenStream stream1, TokenStream stream2) {
+			OffsetAttribute attr1 = (OffsetAttribute) stream1
+					.getAttribute(OffsetAttribute.class);
+			OffsetAttribute attr2 = (OffsetAttribute) stream2
+					.getAttribute(OffsetAttribute.class);
+			return attr2.startOffset() - attr1.startOffset();
 
-      return token2.startOffset() - token1.startOffset();
+		}
+	}
 
-    }
-  }
+	private Collection<TokenStream> streams;
+	
+	private int currentOffset;
 
-  private Collection<TokenStream> streams;
+	private TokenStreamComparator comparator;
 
-  private int currentOffset;
+	private Stack<TokenStream> sortedStreams;
 
-  private TokenComparator comparator;
+	private boolean initialized;
+	
+    private PositionIncrementAttribute posIncAtt;
+    
+	public TokenStreamMerger(Collection<TokenStream> streams)
+			throws IOException {
+		super();
+		this.streams = streams;
+		this.comparator = new TokenStreamComparator();
+		currentOffset = -1;
+		sortedStreams = new Stack<TokenStream>();
+		
+		// add all attributes which are contained in any input token stream
+		for (TokenStream stream : streams) {
+			Iterator<Class<? extends Attribute>> attIt = stream.getAttributeClassesIterator();
+			while (attIt.hasNext()) {
+				Class<? extends Attribute> attClass = attIt.next();
+				addAttribute(attClass);
+			}
+		}
+		// we need a PositionIncrementAttribute in any case
+		posIncAtt = (PositionIncrementAttribute)addAttribute(PositionIncrementAttribute.class);
+	}
 
-  private Map<Token, TokenStream> currentTokens;
+	private void init() throws IOException {
+		for (TokenStream stream : streams) {
+			stream.reset();
+			stream.incrementToken();
+			sortedStreams.add(stream);
+		}
+		rebuildSortedTokens();
+		initialized = true;
+	}
 
-  private Stack<Token> sortedTokens;
+	public void reset() throws IOException {
+		for (TokenStream stream : streams)
+			stream.reset();
 
-  private boolean initialized;
+		currentOffset = -1;
+		sortedStreams.clear();
+		initialized = false;
+	}
 
-  public TokenStreamMerger(Collection<TokenStream> streams) throws IOException {
-    super();
-    this.streams = streams;
-    this.comparator = new TokenComparator();
-    currentTokens = new LinkedHashMap<Token, TokenStream>();
-    currentOffset = -1;
-    sortedTokens = new Stack<Token>();
+	@Override
+	public boolean incrementToken() throws IOException {
+		if (!initialized)
+			init();
 
-  }
+		if (sortedStreams.size() == 0)
+			return false;
 
-  private void init() throws IOException {
-    Token token = new Token();
-	for (TokenStream stream : streams) {
-      token = stream.next(token);
-      if (token != null)
-        currentTokens.put(token, stream);
-    }
-    rebuildSortedTokens();
-    initialized = true;
-  }
+		TokenStream currentTokenStream = sortedStreams.pop();
 
-  public void reset() throws IOException {
-    currentTokens.clear();
-    for (TokenStream stream : streams)
-      stream.reset();
+		restoreState(currentTokenStream.captureState());
+		
+		OffsetAttribute offsetAttr = (OffsetAttribute)currentTokenStream.getAttribute(OffsetAttribute.class);
+		if (offsetAttr.startOffset() == currentOffset)
+			posIncAtt.setPositionIncrement(0);
+		else
+			posIncAtt.setPositionIncrement(1);
 
-    currentOffset = -1;
-    sortedTokens.clear();
-    initialized = false;
-  }
+		currentOffset = offsetAttr.startOffset();
+		
+		// proceed the token stream to its next token and resort the stack
+		if(currentTokenStream.incrementToken())
+			sortedStreams.add(currentTokenStream);
+		rebuildSortedTokens();
 
-  @Override
-  public Token next() throws IOException {
-    if (!initialized)
-      init();
+		return true;
+	}
 
-    if (sortedTokens.size() == 0)
-      return null;
-
-    Token currentToken = sortedTokens.pop();
-    currentTokens.remove(currentToken);
-    rebuildSortedTokens();
-
-    if (currentToken.startOffset() == currentOffset)
-      currentToken.setPositionIncrement(0);
-    else
-      currentToken.setPositionIncrement(1);
-
-    currentOffset = currentToken.startOffset();
-
-    return currentToken;
-  }
-
-  private void rebuildSortedTokens() throws IOException {
-    Token token = new Token();
-	for (TokenStream stream : streams)
-      if (!currentTokens.values().contains(stream)) {
-        token = stream.next(token);
-        if (token != null)
-          currentTokens.put(token, stream);
-        else
-            break;
-      }
-
-    sortedTokens.clear();
-    sortedTokens.addAll(currentTokens.keySet());
-    Collections.sort(sortedTokens, comparator);
-  }
+	private void rebuildSortedTokens() throws IOException {
+		Collections.sort(sortedStreams, comparator);
+	}
 
 }

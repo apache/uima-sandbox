@@ -19,29 +19,24 @@
 
 package org.apache.uima.lucas;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.memory.MemoryIndex;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.TextFragment;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.cas.ArrayFS;
-import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.Feature;
-import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.Type;
-import org.apache.uima.cas.TypeSystem;
+import org.apache.uima.cas.*;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The <code>ProspectiveSearchAE<code> monitors if one of the defined
@@ -177,25 +172,29 @@ public class ProspectiveSearchAE extends LuceneDocumentAE {
 					fields = createDocument(aCAS).getFields();
 					
 					for (Iterator it = fields.iterator(); it.hasNext(); ) {
-						Field field = (Field) it.next();
 						
+						Field field = (Field) it.next();
+
 						if (field.isIndexed() && field.tokenStreamValue() != null) {
 							
 							TokenStream tokenStream = field.tokenStreamValue();
 							
+							Collection<AnnotationFS> matchingTextAnnotations = new LinkedList<AnnotationFS>();
+
 							QueryScorer scorer = new QueryScorer(query.query(), field.name());
 							scorer.startFragment(new TextFragment(
 									new StringBuffer(aCAS.getDocumentText()), 0, 0));
 							
-							Collection<AnnotationFS> matchingTextAnnotations = new LinkedList<AnnotationFS>();
-							
 							try {
-								Token token = new Token();
-								while ((token = tokenStream.next(token)) != null) {
-									float tokenScore = scorer.getTokenScore(token);
+								scorer.init(tokenStream);
+								
+								OffsetAttribute offsetAttr = null;
+								while (tokenStream.incrementToken()) {
+									offsetAttr = (OffsetAttribute)tokenStream.getAttribute(OffsetAttribute.class);
+									float tokenScore = scorer.getTokenScore();
 									if (tokenScore > 0) {
 										AnnotationFS annotation = aCAS.createAnnotation(matchingTextType,
-												token.startOffset(), token.endOffset());
+												offsetAttr.startOffset(), offsetAttr.endOffset());
 										
 										matchingTextAnnotations.add(annotation);
 									}

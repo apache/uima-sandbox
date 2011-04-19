@@ -23,7 +23,6 @@
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
 <!ENTITY imgroot "images/" >
 ]>
-
 <book lang="en">
 
 	<title>
@@ -52,12 +51,12 @@
 			be further processed by token filters
 			before they are stored into a
 			certain
-			field of a index document.
+			field of an index document.
 
 			The
 			mapping between UIMA annotations and Lucene tokens and token
 			filtering is configurable
-			by a xml file, whereas the index writer is
+			by an XML file, whereas the index writer is
 			configured by a properties
 			file.   
 		</para>
@@ -92,7 +91,8 @@
 	<chapter id="sandbox.luceneCasConsumer.mapping">
 		<title>Mapping Configuration</title>
 		<para>
-			This chapter discusses the mapping between UIMA annotations and Lucene tokens in detail.
+			This chapter discusses the mapping between UIMA annotations and
+			Lucene tokens in detail.
 		</para>
 		<section id="sandbox.luceneCasConsumer.mapping.tokenSources">
 			<title>Token Sources</title>
@@ -112,7 +112,7 @@
 				created by an entity mapper
 				marks a text area and may
 				additionally
-				contain a identifier for the mapped entity.
+				contain an identifier for the mapped entity.
 				For this reason Lucas
 				knows
 				three different
@@ -157,10 +157,11 @@
 			<section id="sandbox.luceneCasConsumer.mapping.types.coveredText">
 				<title>Covered Text</title>
 				<para>
-					As mentioned before represents the covered text of annotation
-					objects one
-					possible source for Lucene token values. The following
-					example creates a
+					As mentioned above, the text covered by annotation objects
+					represents one possible source for Lucene token values.
+					The
+					following
+					example creates an
 					index with one
 					<emphasis>title</emphasis>
 					field which contains
@@ -174,7 +175,7 @@
      <annotations>
          <annotation sofa=“title” type=“de.julielab.types.Token”/>
      </annotations>
-   <field>
+   </field>
 </fields>]]></programlisting>
 				</para>
 			</section>
@@ -193,7 +194,7 @@
              </features>             
          </annotation>         
      </annotations>
-   <field>
+   </field>
 </fields>]]></programlisting>
 					The field
 					<emphasis>cells</emphasis>
@@ -210,11 +211,10 @@
 				<para>
 					The next example illustrates how multiple feature values can be
 					combined by using a
-					<emphasis>featureValueDelimiterString
-					</emphasis>
-					. If no
-					<emphasis>featureValueDelimiterString
-					</emphasis>
+					<emphasis>featureValueDelimiterString</emphasis>
+					.
+					If no
+					<emphasis>featureValueDelimiterString</emphasis>
 					is provided,
 					a single token is generated from
 					each feature value.
@@ -224,12 +224,12 @@
          <annotation sofa=“text” type=“de.julielab.types.Author” 
                                  featureValueDelimiterString=", ">
               <features>
-                <feature name=“forename”/>
-                <feature name=“surename”/>
+                <feature name=“firstname”/>
+                <feature name=“lastname”/>
              </features>             
          </annotation>         
      </annotations>
-   <field>
+   </field>
 </fields>]]></programlisting>
 				</para>
 			</section>
@@ -261,7 +261,7 @@
              </features>             
          </annotation>         
      </annotations>
-   <field>
+   </field>
 </fields>]]></programlisting>
 				</para>
 				<para>
@@ -277,7 +277,7 @@
 					<emphasis>affiliation</emphasis>
 					feature structure in turn has a feature
 					<emphasis>address</emphasis>
-					which references a
+					which points to an
 					<emphasis>address</emphasis>
 					feature structure. This
 					path of
@@ -287,7 +287,8 @@
 					<emphasis>affiliation.address</emphasis>
 					.
 					A feature path consists of feature names
-					separated by a ".". Please
+					separated by colons (".").
+					Please
 					consider that the
 					<emphasis>city</emphasis>
 					feature is a feature of
@@ -303,9 +304,8 @@
 				<title>Supported feature types
 				</title>
 				<para>
-					At the moment not all feature types are supported. Only this
-					feature types are
-					currently supported:
+					Currently, not all feature types are supported. Supported
+					feature types are the following:
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -336,25 +336,29 @@
 				token stream. There are a couple of reasons for the
 				fact that the simple mapping
 				of each annotation index to separate
-				Lucene fields is not a optimal
+				Lucene fields is not an optimal
 				strategy.
 				One practical reason is that
-				the lucene highlighting will not work for
+				the Lucene highlighting will not work for
 				scenarios
 				where more than
-				one annotation type are involved.
-				Additionally, the tf-idf weighting
-				of terms does not work probably
+				one annotation type is involved.
+				Additionally, the TF-IDF weighting
+				of terms does not work properly
 				if
-				annotations are separated from real
-				text.
-				Lucas is able to merge token streams and align them according
+				annotations are separated from
+				their corresponding
+				text fragments.
+				Lucas is able to merge token
+				streams and align them according
 				to their
 				token offsets.
-				The resulting merged token stream is then
+				The resulting
+				merged token stream is then
 				stored in a
 				field.
-				The next example demonstrates this merging feature.
+				The next example
+				demonstrates this merging feature.
 				<programlisting><![CDATA[<fields>
   <field name=“text” index=“yes” merge=“true”>
      <annotations>
@@ -365,7 +369,7 @@
              </features>
          </annotation>
      </annotations>
-  <field>
+  </field>
 </fields>]]></programlisting>
 				Consider the merge attribute of the field tag. It causes the
 				alignment of the two
@@ -376,10 +380,9 @@
 				annotations. If
 				this
 				attribute is set
-				to false or it is left, then the
-				annotation
-				token
-				streams were concatenated.
+				to false or is left out, the
+				annotation token
+				streams are concatenated.
 			</para>
 		</section>
 		<section id="sandbox.luceneCasConsumer.mapping.tokenfilters">
@@ -417,22 +420,28 @@
 			</features>
 		</annotation>
 	</annotations>
-  <field>
+  </field>
 </fields>]]></programlisting>
 			<para>
 				The lowercase token filter is applied to the complete field
-				content and
+				content
+				and
 				the stopword
 				filter is only applied to the annotation
-				token stream which is
+				token stream
+				which is
 				generated from the de.julielab.types.Token
-				annotation index. Both filters are
+				annotation index.
+				Both filters are
 				predefined filters which are
-				included in the Lucas distribution. A
+				included in the Lucas
+				distribution. A
 				reference of all
 				predefined
-				token filters is covered in <xref linkend="sandbox.luceneCasConsumer.mapping.reference"/>. 			
-		</para>
+				token filters is covered in
+				<xref linkend="sandbox.luceneCasConsumer.mapping.reference" />
+				.
+			</para>
 			<section id="sandbox.luceneCasConsumer.mapping.tokenfilters.selfdefined">
 				<title>
 					Deploying your own Token Filters 
@@ -442,8 +451,9 @@
 					sufficient,
 					you can
 					provide your own token filters. Simple token
-					filters which don't need
-					any further parameterization, need to have
+					filters which do not need
+					any further parameterization, are required
+					to define
 					a public constructor, which
 					takes a
 					token stream as the only
@@ -464,7 +474,7 @@
 			</features>
 		</annotation>
 	</annotations>
-  <field>
+  </field>
 </fields>]]></programlisting>
 				<para>
 					The attribute
@@ -506,7 +516,7 @@
 			</features>
 		</annotation>
 	</annotations>
-  <field>
+  </field>
 </fields>]]></programlisting>
 				<para>
 					In the example above the token filter factory is new
@@ -537,7 +547,7 @@
 			</features>
 		</annotation>
      </annotations>
-  <field>
+  </field>
 </fields>]]></programlisting>
 			</section>
 		</section>
@@ -575,7 +585,7 @@
 		</annotation>
 		...
 	</annotations>
-  <field>
+  </field>
   ...
 </fields>]]></programlisting>
 		</section>
@@ -698,6 +708,18 @@
 												of
 												overlapping.</entry>
 										</row>
+										<row>
+											<entry>unique</entry>
+											<entry>boolean</entry>
+											<entry>false</entry>
+											<entry>no</entry>
+											<entry>If this attribute is set to true, there will be only
+												one field instance with this field's name be added to
+												resulting Lucene documents. This is required e.g. by Apache
+												Solr for primary key fields. You must not define multiple
+												fields with the same name to be unique, this would break the
+												unique property.</entry>
+										</row>
 									</tbody>
 								</tgroup>
 							</table>
@@ -782,12 +804,14 @@
 											<entry>
 												The canonical class name of a token filter factory.
 												the
-												token filter factory class must
+												token
+												filter factory class must
 												implement the
 												org.apache.uima.indexer.analysis.TokenFilterFactory. See
-												<xref linkend="sandbox.luceneCasConsumer.mapping.tokenfilters"/> for
-												a example. 
-							</entry>
+												<xref linkend="sandbox.luceneCasConsumer.mapping.tokenfilters" />
+												for
+												a example.
+											</entry>
 										</row>
 										<row>
 											<entry>reuse</entry>
@@ -796,13 +820,14 @@
 											<entry>false</entry>
 											<entry>
 												Enables token filter factory reuse. This makes sense
-												if a
+												when a
 												token
-												filter use resources which should be cached.
+												filter uses resources which should be cached.
 												Because token
 												filters
-												where referenced by their names, you
-												need also to provide
+												are referenced by their names, you
+												also
+												need to provide
 												a name.  
 							</entry>
 										</row>
@@ -815,8 +840,10 @@
 												Filters may have their own parameter attributes which
 												are
 												explained
-												in the <xref linkend="sandbox.luceneCasConsumer.mapping.reference"/>..    
-							</entry>
+												in the
+												<xref linkend="sandbox.luceneCasConsumer.mapping.reference" />
+												..
+											</entry>
 										</row>
 									</tbody>
 								</tgroup>
@@ -1019,8 +1046,9 @@
 				Filters Reference
 			</title>
 			<para>Lucas comes with a couple of predefined token filters.
-				This section provides a complete
-				reference for this filters.</para>
+				This
+				section provides a complete
+				reference for these filters.</para>
 			<section
 				id="sandbox.luceneCasConsumer.mapping.reference.filters.addition">
 				<title>
@@ -1049,7 +1077,7 @@
 									<entry>no</entry>
 									<entry>
 										A pefix which is added to the front of each token.
-											</entry>
+									</entry>
 								</row>
 								<row>
 									<entry>postfix</entry>
@@ -1071,7 +1099,8 @@
 					Hypernyms Filter
 				</title>
 				<para>Adds hypernyms of a token with the same offset and
-					position increment 0.</para>
+					position
+					increment 0.</para>
 				<programlisting><![CDATA[<filter name="hypernyms" filePath="/path/to/myFile.txt"/>]]></programlisting>
 				<para>
 					<table>
@@ -1096,7 +1125,8 @@
 										The hypernym file path. Each line of the file contains one
 										token
 										with its hypernyms.
-										The file must have the following format:
+										The file must have the following
+										format:
 										<code>TOKEN_TEXT=HYPERNYM1|HYPERNYM2|..
 										</code>
 										.
@@ -1113,7 +1143,8 @@
 					Position Filter
 				</title>
 				<para>Allows to select only the first or the last token of a
-					token stream, all other tokens are discarded.</para>
+					token
+					stream, all other tokens are discarded.</para>
 				<programlisting><![CDATA[<filter name="position" position="last"/>]]></programlisting>
 				<para>
 					<table>
@@ -1137,8 +1168,10 @@
 									<entry>
 										If position is set to first the only the the first token
 										of the underlying token stream is returned,
-										all other tokens are
-										discarded. Otherwise, if position is set to last, only the last
+										all other tokens
+										are
+										discarded. Otherwise, if position is set to last, only the
+										last
 										token is returned.
 							</entry>
 								</row>
@@ -1272,7 +1305,8 @@
 					Concatenate Filter
 				</title>
 				<para>Concatenates token texts with a certain delimiter
-					string.</para>
+					string.
+				</para>
 				<programlisting><![CDATA[<filter name="concatenate" concatString=";"/>]]></programlisting>
 				<para>
 					<table>
@@ -1295,7 +1329,7 @@
 									<entry>yes</entry>
 									<entry>
 										The string with which token texts are concatenated.
-							</entry>
+									</entry>
 								</row>
 							</tbody>
 						</tgroup>
@@ -1343,9 +1377,10 @@
 									<entry>false</entry>
 									<entry>no</entry>
 									<entry>
-										Defines if the stop filter ignores the case of stop words.
+										Defines if the stop filter ignores the case of stop
+										words.
 							</entry>
-								</row>								
+								</row>
 							</tbody>
 						</tgroup>
 					</table>
@@ -1356,7 +1391,8 @@
 					Unique Filter
 				</title>
 				<para>Filters tokens with the same token text. The resulting
-					token stream contains only tokens with unique texts.</para>
+					token
+					stream contains only tokens with unique texts.</para>
 				<programlisting><![CDATA[<filter name="unique"/>]]></programlisting>
 			</section>
 			<section
@@ -1380,53 +1416,82 @@
 	<chapter id="sandbox.luceneCasConsumer.indexwriter">
 		<title>Index Writer Configuration</title>
 		<para>
-			The index writer used by Lucas can be configured separately. To allow Lucas to run in
-			multiple deployment scenarios, different Lucas instances can share one index writer
-			instance. This is handled by the resource manager. To configure the resource manager and
-			the index writer properly, the Lucas descriptor contains a resource binding <code>
-			indexWriterProvider</code>. A IndexWriterProvider creates a index writer from a properties
-			file. The file path and name of this properties file must be set in the <code>LucasIndexWriterProvider</code> resource
-			section of the descriptor.   
+			The index writer used by Lucas can be configured separately. To allow
+			Lucas to run in
+			multiple deployment scenarios, different Lucas
+			instances can share one index writer
+			instance. This is handled by the
+			resource manager. To configure the resource manager and
+			the index
+			writer properly, the Lucas descriptor contains a resource binding
+			<code>IndexWriterProvider</code>
+			.
+			An
+			<code>IndexWriterProvider</code>
+			creates an index writer from a properties
+			file. The file path and the
+			name of this properties file must be set in the
+			<code>LucasIndexWriterProvider</code>
+			resource
+			section of the descriptor.
 		</para>
 		<para>
 			The properties file can contain the following properties.
 			<itemizedlist>
 				<listitem>
 					<para>
-						<code>indexPath</code> - the path to the index directory
+						<code>indexPath</code>
+						- the path to the index directory
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						<code>RAMBufferSize</code> - (number value), see <ulink url="http://lucene.apache.org/java/2_4_1/api/org/apache/lucene/index/IndexWriter.html#setRAMBufferSizeMB(double)">IndexWriter.ramBufferSize</ulink>
+						<code>RAMBufferSize</code>
+						- (number value), see
+						<ulink
+							url="http://lucene.apache.org/java/2_4_1/api/org/apache/lucene/index/IndexWriter.html#setRAMBufferSizeMB(double)">IndexWriter.ramBufferSize</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						<code>useCompoundFileFormat</code> - (boolean value), see <ulink url="http://lucene.apache.org/java/2_4_1/api/org/apache/lucene/index/IndexWriter.html#setUseCompoundFile(boolean)">IndexWriter.useCompoundFormat</ulink>
+						<code>useCompoundFileFormat</code>
+						- (boolean value), see
+						<ulink
+							url="http://lucene.apache.org/java/2_4_1/api/org/apache/lucene/index/IndexWriter.html#setUseCompoundFile(boolean)">IndexWriter.useCompoundFormat</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						<code>maxFieldLength</code> - (boolean value), see <ulink url="http://lucene.apache.org/java/2_4_1/api/org/apache/lucene/index/IndexWriter.html#setMaxFieldLength(int)">IndexWriter.maxFieldLength</ulink>
+						<code>maxFieldLength</code>
+						- (boolean value), see
+						<ulink
+							url="http://lucene.apache.org/java/2_4_1/api/org/apache/lucene/index/IndexWriter.html#setMaxFieldLength(int)">IndexWriter.maxFieldLength</ulink>
 					</para>
-				</listitem>	
+				</listitem>
 				<listitem>
 					<para>
-						<code>uniqueIndex</code> - (boolean value), if set to <code>true</code>, host name and process identifier are added to the index name. (Only tested on linux systems)  
+						<code>uniqueIndex</code>
+						- (boolean value), if set to
+						<code>true</code>
+						, host name and process identifier are added to the index name.
+						(Only tested on linux systems)
 					</para>
-				</listitem>								
-			</itemizedlist> 
+				</listitem>
+			</itemizedlist>
 		</para>
 	</chapter>
 	<chapter id="sandbox.luceneCasConsumer.descriptor">
 		<title>Descriptor Parameters
 		</title>
 		<para>
-			Because Lucas is configured by the mapping file, the descriptor has only one parameter:
+			Because Lucas is configured by the mapping file, the descriptor has
+			only one parameter:
 			<itemizedlist>
 				<listitem>
-					<para><code>mappingFile</code> - the file path to the mapping file.</para>
+					<para>
+						<code>mappingFile</code>
+						- the file path to the mapping file.
+					</para>
 				</listitem>
 			</itemizedlist>
 		</para>
@@ -1434,72 +1499,100 @@
 	<chapter id="sandbox.luceneCasConsumer.prospectiveSearch">
 		<title>Prospective Search</title>
 		<para>
-		Prospective search is a search method where a set of search queries are given first
-		and then searched against a stream of documents. A search query divides the document
-		stream into a sub-stream which only contains these document which match the query.
-		Users usually define a number of search queries and then subscribe to the resulting
-		sub-streams. An example for prospective search is a news feed which is monitored for certain terms,
-		each time a term occurs a mail notification is send.
+			Prospective search is a search method where a set of search queries are given
+			first
+			and then searched against a stream of documents. A search query divides
+			the document
+			stream into a sub-stream which only contains these document which match the
+			query.
+			Users usually define a number of search queries and then subscribe to the
+			resulting
+			sub-streams. An example for prospective search is a news feed which is monitored
+			for certain terms,
+			each time a term occurs a mail notification is send.
 		</para>
 		<para>
-		The user must provide a set of search queries via a <code>SearchQueryProvider</code>,
-		these search queries are then search against the processed CAS as defined in the mapping file,
-		if a match occurs a feature structure is inserted into the CAS. Optionally highlighting is 
-		supported, annotations for the matchtng text areas are created and linked to the
-		feature structure.
+			The user must provide a set of search queries via a
+			<code>SearchQueryProvider</code>
+			,
+			these search queries are then search against the processed CAS as defined
+			in the mapping file,
+			if a match occurs a feature structure is inserted into the CAS.
+			Optionally highlighting is
+			supported, annotations for the matchtng text areas are created and linked to
+			the
+			feature structure.
 		</para>
 		<para>
-		The implementation uses the Lucene
-		<ulink url="http://lucene.apache.org/java/2_4_1/api/contrib-memory/org/apache/lucene/index/memory/MemoryIndex.html">MemoryIndex</ulink>
-		which is a fast one document in memory index. For performance notes please consult the javadoc
-		of the <code>MemoryIndex</code> class.
+			The implementation uses the Lucene
+			<ulink
+				url="http://lucene.apache.org/java/2_4_1/api/contrib-memory/org/apache/lucene/index/memory/MemoryIndex.html">MemoryIndex</ulink>
+			which is a fast one document in memory index. For performance notes
+			please consult the javadoc
+			of the
+			<code>MemoryIndex</code>
+			class.
 		</para>
-		<section id="sandbox.luceneCasConsumer.prospectiveSearch.searchQueryProvider">
+		<section
+			id="sandbox.luceneCasConsumer.prospectiveSearch.searchQueryProvider">
 			<title>Search Query Provider</title>
 			<para>
-			The Search Query Provider provides the Perspective Search Analysis Engine
-			with a set of search queries which should be monitored. A search
-			query is a combination of a Lucene query and an id. The id is later needed
-			to map a match to a specific search query. A user usually has a set of
-			search queries which should be monitored, since there is no standardized
-			way to access the search queries the user must implement the <code>SearchQueryProvider</code>
-			interface and configure the thread-safe implementation as shared resource object.
-			An example for such an implementation could be a search query provider which reads
-			search queries form a database or a web service.
+				The Search Query Provider provides the Perspective Search Analysis
+				Engine
+				with a set of search queries which should be monitored. A search
+				query is a combination of a Lucene query and an id. The id is later
+				needed
+				to map a match to a specific search query. A user usually has a set of
+				search queries which should be monitored, since there is no
+				standardized
+				way to access the search queries the user must implement the
+				<code>SearchQueryProvider</code>
+				interface and configure the thread-safe implementation as shared
+				resource object.
+				An example for such an implementation could be a search query provider
+				which reads
+				search queries form a database or a web service.
 			</para>
 		</section>
 		<section id="sandbox.luceneCasConsumer.prospectiveSearch.searchResults">
 			<title>Search Results</title>
 			<para>
-			The search results are written to the CAS, for each match one Search Result
-			feature structure is inserted into the CAS. The Search Result feature structure contains
-			the id and optionally links to an array of annotations which mark the matching
-			text in the CAS.
+				The search results are written to the CAS, for each match one Search
+				Result
+				feature structure is inserted into the CAS. The Search Result feature
+				structure contains
+				the id and optionally links to an array of annotations which mark the
+				matching
+				text in the CAS.
 			</para>
 			<para>
-			The Search Result type must be mapped to a defined type 
-			in the analysis engine descriptor with the following configuration
-			parameters:
-			<itemizedlist>
-				<listitem>
-					<para>
-					<code>String org.apache.uima.lucas.SearchResult</code> 
-					- Maps the search result type to an actual type in the type system.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-					<code>String org.apache.uima.lucas.SearchResultIdFeature</code> 
-					- A long id feature, identifies the matching search query.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<code>String org.apache.uima.lucas.SearchResulMatchingTextFeature</code>
-						- An optional <code>ArrayFS</code> feature, links to annotations which mark the matching text.
-					</para>
-				</listitem>
-			</itemizedlist>
+				The Search Result type must be mapped to a defined type
+				in the analysis engine descriptor with the following configuration
+				parameters:
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>String org.apache.uima.lucas.SearchResult</code>
+							- Maps the search result type to an actual type in the type
+							system.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>String org.apache.uima.lucas.SearchResultIdFeature</code>
+							- A long id feature, identifies the matching search query.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<code>String org.apache.uima.lucas.SearchResulMatchingTextFeature
+							</code>
+							- An optional
+							<code>ArrayFS</code>
+							feature, links to annotations which mark the matching text.
+						</para>
+					</listitem>
+				</itemizedlist>
 			</para>
 		</section>
 	</chapter>

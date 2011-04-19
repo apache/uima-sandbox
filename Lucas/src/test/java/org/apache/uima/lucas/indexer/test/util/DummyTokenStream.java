@@ -19,11 +19,11 @@
 
 package org.apache.uima.lucas.indexer.test.util;
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.uima.lucas.indexer.util.TokenFactory;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+
+import java.io.IOException;
 
 public class DummyTokenStream extends TokenStream{
 	private int count = 0;
@@ -32,13 +32,18 @@ public class DummyTokenStream extends TokenStream{
 	private int number;
 	private int begin;
 	private int end;
+	private int offset;
+	private boolean firstToken = true;
+	private OffsetAttribute offsetAtt;
+	private TermAttribute termAtt;
 	
 	
 	public DummyTokenStream(String tokenValue, int distance, int number, int offset) {
 		this.tokenValue = tokenValue;
 		this.distance = distance;
 		this.number = number;
-	
+		this.offset = offset;
+		
 		
 		if( offset > 0 ){
 			count = offset;
@@ -48,20 +53,38 @@ public class DummyTokenStream extends TokenStream{
 		else{
 			begin = 0; 
 			end = tokenValue.length();
-		}			
+		}
+		// set initial attributes
+		offsetAtt = (OffsetAttribute)addAttribute(OffsetAttribute.class);
+		offsetAtt.setOffset(begin, end);
+		termAtt = (TermAttribute)addAttribute(TermAttribute.class);
+		termAtt.setTermBuffer(tokenValue);
 	}
 	
-	public Token next() throws IOException {
+	
+	
+	@Override
+	public boolean incrementToken() throws IOException {
 		if( number <= count / distance )
-			return null;
-										
-		Token token = TokenFactory.newToken(tokenValue, begin, end);			
-
+			return false;
+		// for the first token just return the initial values
+		if (firstToken) {
+			firstToken = false;
+			return true;
+		}
+		
 		count += distance;
+		
 		begin+= distance* (tokenValue.length() + 1);
 		end+= distance* (tokenValue.length() + 1);
-		
-		System.out.println(token);
-		return token;
-	}		
+		offsetAtt.setOffset(begin, end);
+
+		return begin < (offset * (tokenValue.length() + 1) + (number - 1) * distance * (tokenValue.length() + 1) + tokenValue.length());
+	}
+
+	
+	public String toString() {
+		return "tokenValue: " + tokenValue + ", distance: " + distance + ", number: " + number + ", offset: " + offset;
+	}
+	
 }

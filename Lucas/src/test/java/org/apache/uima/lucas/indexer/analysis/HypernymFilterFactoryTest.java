@@ -19,21 +19,21 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import com.google.common.collect.Lists;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
 import org.apache.uima.lucas.indexer.util.MultimapFileReader;
 import org.apache.uima.lucas.indexer.util.MultimapFileReaderFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import static org.easymock.classextension.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.assertEquals;
 
 public class HypernymFilterFactoryTest {
 
@@ -47,7 +47,7 @@ public class HypernymFilterFactoryTest {
 	
 	@Before
 	public void setUp(){
-		tokenStream = createMock(TokenStream.class);
+		tokenStream = new DummyTokenStream("dummy", 1, 1, 0);
 		hypernyms = new HashMap<String, List<String>>();
 		hypernyms.put("token1", Lists.newArrayList("id1", "id2", "id3"));
 		

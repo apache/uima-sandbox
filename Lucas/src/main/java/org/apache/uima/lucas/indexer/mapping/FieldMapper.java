@@ -37,6 +37,8 @@ public class FieldMapper implements ElementMapper<FieldDescription> {
 	private final String FIELD_DELIMITER = "delimiter"; // use special
 														// characters to limit
 														// the tokens
+	
+	private final String FIELD_UNIQUE = "unique";
 
 	// and build one string
 
@@ -50,7 +52,7 @@ public class FieldMapper implements ElementMapper<FieldDescription> {
 	
 			if (name.equals(FIELD_INDEX))
 				fieldDescription.setIndex(value);
-			else if (name.equals(FIELD_MERGE)){
+			else if (name.equals(FIELD_MERGE)) {
 				if (value != null && value.equals(TRUE))
 					fieldDescription.setMerge(true);
 			}
@@ -62,6 +64,10 @@ public class FieldMapper implements ElementMapper<FieldDescription> {
 				fieldDescription.setStored(value);
 			else if (name.equals(FIELD_TERM_VECTOR))
 				fieldDescription.setTermVector(value);
+			else if (name.equals(FIELD_UNIQUE)) {
+				if (value != null && value.equals(TRUE))
+					fieldDescription.setUnique(true);
+			}
 		}
 		return fieldDescription;
 	}

@@ -19,53 +19,68 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import java.io.IOException;
-
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.classextension.EasyMock.*;
-import static org.junit.Assert.*;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ConcatFilterTest {
 
 	private ConcatFilter concatFilter;
 	private TokenStream tokenStream;
-	private Token token1;
-	private Token token2;
-	private Token token3;
-	private Token token;
 	
 	@Before
 	public void setUp() throws IOException{
-		tokenStream = createMock(TokenStream.class);
+		tokenStream = new TestTokenStream();
 		concatFilter = new ConcatFilter(tokenStream, "|");
-		token1 = new Token("token1".toCharArray(), 0 , 6, 0, 5);
-		token2 = new Token("token2".toCharArray(), 0 , 6, 6, 11);
-		token3 = new Token("token3".toCharArray(), 0 , 6, 12, 17);
-		token = new Token();
-		
-		setUpInputTokenStream();
 	}
+		
 	
 	@Test
 	public void testNext() throws IOException{
-		Token concatenatedToken = concatFilter.next(token);
-		verify(tokenStream);
+		assertTrue(concatFilter.incrementToken());
+		TermAttribute termAtt = (TermAttribute)concatFilter.getAttribute(TermAttribute.class);
+		OffsetAttribute offsetAtt = (OffsetAttribute)concatFilter.getAttribute(OffsetAttribute.class);
 		
-		assertEquals(token, concatenatedToken);
-		assertEquals(0, concatenatedToken.startOffset());
-		assertEquals(17, concatenatedToken.endOffset());
-		assertEquals("token1|token2|token3", concatenatedToken.term());
+		assertEquals(0, offsetAtt.startOffset());
+		assertEquals(17, offsetAtt.endOffset());
+		assertEquals("token1|token2|token3", termAtt.term());
 	}
 
-	private void setUpInputTokenStream() throws IOException {
-		expect(tokenStream.next(token)).andReturn(token1);
-		expect(tokenStream.next(token)).andReturn(token2);
-		expect(tokenStream.next(token)).andReturn(token3);
-		expect(tokenStream.next(token)).andReturn(null);
-		replay(tokenStream);
+	private class TestTokenStream extends TokenStream {
+		
+		private TermAttribute termAtt;
+		private OffsetAttribute offsetAtt;
+		private int offset = 0;
+
+		private String[] tokens = {"token1", "token2", "token3"};
+		
+		private int tokenIndex = 0;
+		
+		public TestTokenStream() {
+			termAtt = (TermAttribute) addAttribute(TermAttribute.class);
+			offsetAtt = (OffsetAttribute) addAttribute(OffsetAttribute.class);
+		}
+		
+		@Override
+		public boolean incrementToken() throws IOException {
+			if (tokenIndex < tokens.length) {
+				String currentToken = tokens[tokenIndex++];
+				termAtt.setTermBuffer(currentToken);
+				offsetAtt.setOffset(offset, offset + currentToken.length() - 1);
+				offset += currentToken.length();
+				return true;
+			}
+			return false;
+		}
+		
+		
+		
 	}
 }

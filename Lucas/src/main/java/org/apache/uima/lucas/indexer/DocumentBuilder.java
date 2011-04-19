@@ -19,10 +19,10 @@
 
 package org.apache.uima.lucas.indexer;
 
-import java.util.Collection;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+
+import java.util.Collection;
 
 public class DocumentBuilder {
 
@@ -33,8 +33,9 @@ public class DocumentBuilder {
   public Document createDocument(Collection<Field> fields) {
     Document document = new Document();
 
-    for (Field field : fields)
+    for (Field field : fields) {
       document.add(field);
+    }
 
     return document;
   }

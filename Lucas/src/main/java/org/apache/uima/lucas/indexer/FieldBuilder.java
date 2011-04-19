@@ -19,10 +19,6 @@
 
 package org.apache.uima.lucas.indexer;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Field;
@@ -34,6 +30,10 @@ import org.apache.uima.lucas.indexer.analysis.TokenStreamMerger;
 import org.apache.uima.lucas.indexer.mapping.FieldDescription;
 import org.apache.uima.lucas.indexer.mapping.FilterDescription;
 import org.apache.uima.lucas.indexer.util.TokenStreamStringConcatenator;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class FieldBuilder {
 
@@ -63,10 +63,10 @@ public class FieldBuilder {
 
 	public static final String FIELD_STORE_COMPRESS = "compress";
 
-	private TokenStreamStringConcatenator tokenStreamStringConcatenator;
+	protected TokenStreamStringConcatenator tokenStreamStringConcatenator;
 	private FilterBuilder filterBuilder;
-	private FieldDescription fieldDescription;
-	
+	protected FieldDescription fieldDescription;
+
 	public FieldBuilder(FilterBuilder filterBuilder) {
 		tokenStreamStringConcatenator = new TokenStreamStringConcatenator();
 		this.filterBuilder = filterBuilder;
@@ -77,7 +77,7 @@ public class FieldBuilder {
 
 		TokenStream tokenStream = createFieldTokenStream(tokenStreams,
 				fieldDescription);
-		
+
 		this.fieldDescription = fieldDescription;
 		String fieldName = fieldDescription.getName();
 		String delimiter = fieldDescription.getDelimiter();
@@ -88,29 +88,39 @@ public class FieldBuilder {
 		tokenStream = getFilteredTokenStream(fieldName, tokenStream,
 				filterDescriptions);
 
+		// The unique flag means we only want ONE field instance with the
+		// name fieldName.
+		Boolean unique = fieldDescription.getUnique();
 		Field.Store fieldStore = getFieldStore(fieldDescription.getStored());
 		Field.Index fieldIndex = getFieldIndex(fieldDescription.getIndex());
 		Field.TermVector fieldTermVector = getFieldTermVector(fieldDescription
 				.getTermVector());
-
-		if (fieldStore == Field.Store.YES || fieldStore == Field.Store.COMPRESS)
-			fields.addAll(createStoredFields(fieldName, tokenStream,
-					fieldStore, delimiter));
-
 		boolean omitTF = fieldDescription.getIndex().equals(FIELD_INDEX_NO_TF)
 				|| fieldDescription.getIndex().equals(FIELD_INDEX_NO_NORMS_TF);
+		boolean store = fieldStore == Field.Store.YES || fieldStore == Field.Store.COMPRESS;
 
-		if (fieldIndex != Field.Index.NO)
+		// Created stored fields. The parameters unique, fieldIndex and omitTF
+		// are only necessary in case of a stored and indexed unique field. Then,
+		// the field is instanced stored and indexed, thus only one instance
+		// of the field is necessary. This only works with TokenStreams which
+		// contain exactly one token (if a TokenStream emits more tokens,
+		// several fields will be instanced).
+		if (store)
+			fields.addAll(createStoredFields(fieldName, tokenStream,
+					fieldStore, delimiter, unique, fieldIndex, omitTF));
+
+		// Create indexed fields. If the field is unique and has been stored,
+		// there already is an instance of the field and we don't create another.
+		if (fieldIndex != Field.Index.NO && (!unique || !store))
 			fields.add(createIndexedField(fieldName, tokenStream, fieldIndex,
 					fieldTermVector, omitTF));
 
 		return fields;
 	}
 
-	private TokenStream createFieldTokenStream(
+	protected TokenStream createFieldTokenStream(
 			Collection<TokenStream> tokenStreams,
-			FieldDescription fieldDescription) throws FieldBuildingException 
-	{
+			FieldDescription fieldDescription) throws FieldBuildingException {
 		TokenStream tokenStream = null;
 		if (fieldDescription.getMerge())
 			tokenStream = getTokenStreamMerger(tokenStreams);
@@ -121,10 +131,10 @@ public class FieldBuilder {
 		return tokenStream;
 	}
 
-	private TokenStream getFilteredTokenStream(String fieldName,
-											   TokenStream tokenStream,
-											   Collection<FilterDescription> filterDescriptions)
-											   throws FieldBuildingException {
+	protected TokenStream getFilteredTokenStream(String fieldName,
+			TokenStream tokenStream,
+			Collection<FilterDescription> filterDescriptions)
+			throws FieldBuildingException {
 		try {
 			return filterBuilder.filter(tokenStream, filterDescriptions);
 		} catch (FilterBuildingException e) {
@@ -132,9 +142,9 @@ public class FieldBuilder {
 		}
 	}
 
-	private FieldBuildingException createException(Exception e) {
-		String message = "Can't build field " +  fieldDescription.getName()+
-						 " at line " + fieldDescription.getLineNumber();
+	protected FieldBuildingException createException(Exception e) {
+		String message = "Can't build field " + fieldDescription.getName()
+				+ " at line " + fieldDescription.getLineNumber();
 		return new FieldBuildingException(message, e);
 	}
 
@@ -148,35 +158,43 @@ public class FieldBuilder {
 
 	}
 
-	private Field createIndexedField(String fieldName, TokenStream tokenStream,
+	protected Field createIndexedField(String fieldName, TokenStream tokenStream,
 			Index fieldIndex, TermVector fieldTermVector, boolean omitTF) {
 
 		Field field = new Field(fieldName, tokenStream, fieldTermVector);
 		if (fieldIndex == Field.Index.NOT_ANALYZED_NO_NORMS)
 			field.setOmitNorms(true);
-		field.setOmitTf(omitTF);
+		field.setOmitTermFreqAndPositions(omitTF);
 
 		return field;
 	}
 
 	protected Collection<Field> createStoredFields(String fieldName,
-			TokenStream tokenStream, Store fieldStore, String delimiter)
+			TokenStream tokenStream, Store fieldStore, String delimiter,
+			Boolean unique, Index fieldIndex, Boolean omitTF)
 			throws FieldBuildingException {
 		Collection<Field> fields = new ArrayList<Field>();
+		// Only do indexing if we need a unique, indexed AND stored field.
+		Index index = unique ? fieldIndex : Field.Index.NO;
 		try {
+			Field field;
 			if (delimiter != null) {
 				String value = tokenStreamStringConcatenator
 						.tokenStreamToStringWithDelimiter(tokenStream,
 								delimiter);
-				fields.add(new Field(fieldName, value, fieldStore,
-						Field.Index.NO));
+				field = new Field(fieldName, value, fieldStore, index);
+				if (unique)
+					field.setOmitTermFreqAndPositions(omitTF);
+				fields.add(field);
 			} else {
 				Token nextToken = tokenStream.next(new Token());
 				while (nextToken != null) {
 					String value = new String(nextToken.termBuffer(), 0,
 							nextToken.termLength());
-					fields.add(new Field(fieldName, value, fieldStore,
-							Field.Index.NO));
+					field = new Field(fieldName, value, fieldStore, index);
+					if (unique)
+						field.setOmitTermFreqAndPositions(omitTF);
+					fields.add(field);
 					nextToken = tokenStream.next(nextToken);
 				}
 			}
@@ -187,7 +205,8 @@ public class FieldBuilder {
 		return fields;
 	}
 
-	protected Field.Index getFieldIndex(String index) throws FieldBuildingException {
+	protected Field.Index getFieldIndex(String index)
+			throws FieldBuildingException {
 		if (index.equals(FIELD_INDEX_NO))
 			return Field.Index.NO;
 		else if (index.equals(FIELD_INDEX_YES))
@@ -199,11 +218,13 @@ public class FieldBuilder {
 		else if (index.equals(FIELD_INDEX_NO_TF))
 			return Field.Index.NOT_ANALYZED;
 
-		throw createException(new IllegalArgumentException("unknown index parameter: " + index)); 
-		
+		throw createException(new IllegalArgumentException(
+				"unknown index parameter: " + index));
+
 	}
 
-	protected Field.TermVector getFieldTermVector(String termVector) throws FieldBuildingException {
+	protected Field.TermVector getFieldTermVector(String termVector)
+			throws FieldBuildingException {
 		if (termVector.equals(FIELD_TERM_VECTOR_NO))
 			return Field.TermVector.NO;
 		else if (termVector.equals(FIELD_TERM_VECTOR_YES))
@@ -215,11 +236,12 @@ public class FieldBuilder {
 		else if (termVector.equals(FIELD_TERM_VECTOR_WITH_POSITIONS_OFFSETS))
 			return Field.TermVector.WITH_POSITIONS_OFFSETS;
 
-		throw createException(new IllegalArgumentException("unknown termVector parameter: "
-				+ termVector));
+		throw createException(new IllegalArgumentException(
+				"unknown termVector parameter: " + termVector));
 	}
 
-	protected Field.Store getFieldStore(String store) throws FieldBuildingException {
+	protected Field.Store getFieldStore(String store)
+			throws FieldBuildingException {
 		if (store.equals(FIELD_STORE_NO))
 			return Field.Store.NO;
 		else if (store.equals(FIELD_STORE_YES))
@@ -227,7 +249,8 @@ public class FieldBuilder {
 		else if (store.equals(FIELD_STORE_COMPRESS))
 			return Field.Store.COMPRESS;
 
-		throw createException(new IllegalArgumentException("unknown stored parameter: " + store));
+		throw createException(new IllegalArgumentException(
+				"unknown stored parameter: " + store));
 	}
 
 }

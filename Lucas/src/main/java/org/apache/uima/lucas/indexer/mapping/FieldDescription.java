@@ -40,6 +40,8 @@ public class FieldDescription implements Locateable{
 
 	private String termVector = "no";// limited to no, offsets, positions,
 										// positions_offset and yes
+	
+	private Boolean unique = false;
 
 	private Collection<AnnotationDescription> annotationDescriptions;
 
@@ -139,5 +141,13 @@ public class FieldDescription implements Locateable{
 
 	public void setLineNumber(int lineNumber) {
 		line = lineNumber;
+	}
+
+	public Boolean getUnique() {
+		return unique;
+	}
+	
+	public void setUnique(Boolean unique) {
+		this.unique = unique;
 	}
 }

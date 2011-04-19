@@ -19,14 +19,14 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import java.util.Properties;
-
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.classextension.EasyMock.*;
-import static org.junit.Assert.*;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
 
 public class AdditionFilterFactoryTest {
 
@@ -36,7 +36,7 @@ public class AdditionFilterFactoryTest {
 	
 	@Before
 	public void setUp(){
-		tokenStream = createMock(TokenStream.class);
+		tokenStream = new DummyTokenStream("dummy", 1, 1, 0);
 		additionFilterFactory = new AdditionFilterFactory();
 	}
 	

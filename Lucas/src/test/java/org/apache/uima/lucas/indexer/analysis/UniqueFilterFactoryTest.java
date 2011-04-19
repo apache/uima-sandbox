@@ -19,12 +19,12 @@
 
 package org.apache.uima.lucas.indexer.analysis;
 
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.junit.Assert.*;
-
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.uima.lucas.indexer.test.util.DummyTokenStream;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class UniqueFilterFactoryTest {
 
@@ -33,7 +33,7 @@ public class UniqueFilterFactoryTest {
 	
 	@Before
 	public void setUp(){
-		tokenStream = createMock(TokenStream.class);
+		tokenStream = new DummyTokenStream("dummy", 1, 1, 0);
 		uniqueFilterFactory = new UniqueFilterFactory();
 	}
 	
