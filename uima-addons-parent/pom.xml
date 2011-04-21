@@ -176,6 +176,7 @@
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <mavenExecutorId>forked-path</mavenExecutorId>
+            <tagBase>http://svn.apache.org/repos/asf/uima/sandbox/tags/</tagBase>
           </configuration>
         </plugin>
       </plugins>
