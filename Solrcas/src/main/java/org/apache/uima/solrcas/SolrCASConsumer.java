@@ -150,9 +150,14 @@ public class SolrCASConsumer extends CasAnnotator_ImplBase {
       uri = System.class.getResource(path.replaceFirst(CLASSPATH, EMPTY_STRING)).toURI();
     } else {
       uri = UriUtils.create(path); // this supports file://ABSOLUTE_PATH and http://URL
-      if (!uri.isAbsolute())
-         uri = UriUtils.create(new StringBuilder(FILEPATH).append(getContext().getDataPath()).
+      if (!uri.isAbsolute()) {
+        String dataPath = getContext().getDataPath().replace('\\', '/');
+        if (dataPath.matches("[a-zA-Z]\\:.*")) {
+          dataPath = "/" + dataPath;
+        }
+         uri = UriUtils.create(new StringBuilder(FILEPATH).append(dataPath).
                 append("/").append(path.replace(FILEPATH, EMPTY_STRING)).toString()); // this supports relative file paths
+      }
     }
     return uri;
   }
