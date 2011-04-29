@@ -282,6 +282,7 @@
                 <id>default-cli</id>
                 <configuration>
                   <fixVersionIds>${jiraVersion}</fixVersionIds>
+                  <sortColumnNames>Status, Key, Type</sortColumnNames>
                 </configuration>
               </execution>
             </executions>
