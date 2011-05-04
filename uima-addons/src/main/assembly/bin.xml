@@ -32,11 +32,22 @@ under the License.
   <dependencySets>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:alchemy-annotator</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uima-an-alchemy.jar</outputFileNameMapping>
+      <outputDirectory>AlchemyAnnotator</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:BSFAnnotator</include>
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uimaj-an-bsf.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>BSFAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode> 
@@ -47,7 +58,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-conceptMapper.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>ConceptMapper</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>        
@@ -58,7 +69,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-tool-configurableFeatureExtractor.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>ConfigurableFeatureExtractor</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -69,7 +80,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-dictionary.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>DictionaryAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -80,7 +91,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uimaj-fsvars.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>FsVariables</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -92,7 +103,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-lucas.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>Lucas</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -104,7 +115,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-calais.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>OpenCalaisAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -116,7 +127,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-pear-ant-task.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>PearPackagingAntTask</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -128,7 +139,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-regex.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>RegularExpressionAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -140,7 +151,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-simple-server.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>SimpleServer</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -152,7 +163,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-snowball.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>SnowballAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -164,7 +175,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-solrcas.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>Solrcas</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -176,7 +187,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-tagger.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>Tagger</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -188,7 +199,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-tika.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>TikaAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -200,7 +211,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-wst.jar</outputFileNameMapping>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>WhitespaceTokenizer</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -214,7 +225,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <scope>runtime</scope>
-      <outputDirectory>lib-osgi</outputDirectory>
+      <outputDirectory>lib-osgi/</outputDirectory>
       <outputFileNameMapping>${artifact.build.finalName}.jar</outputFileNameMapping>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
@@ -267,7 +278,7 @@ under the License.
         <include>issuesFixed/**</include>      
       </includes>       
     </fileSet>
-    
+
     <fileSet>
       <directory>target/site/apidocs</directory>
       <outputDirectory>docs/d/api</outputDirectory>
@@ -280,5 +291,6 @@ under the License.
       <fileMode>444</fileMode>
       <directoryMode>755</directoryMode>        
     </fileSet>
+
   </fileSets>
 </assembly>
