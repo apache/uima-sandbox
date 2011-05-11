@@ -64,6 +64,7 @@ public class Results {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("status: ").append(status).append("\n");
+    builder.append("statusInfo: ").append(statusInfo).append("\n");
     builder.append("language: ").append(language).append("\n");
     builder.append("url: ").append(url).append("\n");
     return builder.toString();
