@@ -129,7 +129,8 @@ public abstract class AbstractAlchemyAnnotator extends JCasAnnotator_ImplBase {
         if (results.getStatus().equalsIgnoreCase(STATUS_OK)) {
           mapResultsToTypeSystem(results, aJCas);
         } else {
-          throw new AlchemyCallFailedException(results.getStatus());
+          throw new AlchemyCallFailedException(new StringBuilder(results.getStatus()).append(" - ").
+                  append(results.getStatusInfo()).toString());
         }
 
       } catch (Exception e) {

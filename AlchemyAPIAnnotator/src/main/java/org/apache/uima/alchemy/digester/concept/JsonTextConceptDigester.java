@@ -18,10 +18,6 @@
  */
 package org.apache.uima.alchemy.digester.concept;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-
 import org.apache.commons.digester.Digester;
 import org.apache.uima.alchemy.digester.OutputDigester;
 import org.apache.uima.alchemy.digester.domain.Concept;
@@ -29,6 +25,10 @@ import org.apache.uima.alchemy.digester.domain.ConceptResults;
 import org.apache.uima.alchemy.digester.domain.Results;
 import org.apache.uima.alchemy.digester.json.JsonDigester;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 
 public class JsonTextConceptDigester implements OutputDigester {
   public Results parseAlchemyXML(InputStream xmlReader) throws IOException, SAXException,
@@ -38,6 +38,7 @@ public class JsonTextConceptDigester implements OutputDigester {
 
     digester.addObjectCreate("$", ConceptResults.class);
     digester.addBeanPropertySetter("$/status", "status");
+    digester.addBeanPropertySetter("$/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("$/url", "url");
     digester.addBeanPropertySetter("$/language", "language");
     digester.addObjectCreate("$/concepts/concept", Concept.class);

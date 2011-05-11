@@ -18,20 +18,15 @@
  */
 package org.apache.uima.alchemy.digester.entity.ranked;
 
+import org.apache.commons.digester.Digester;
+import org.apache.uima.alchemy.digester.OutputDigester;
+import org.apache.uima.alchemy.digester.domain.*;
+import org.apache.uima.alchemy.digester.json.JsonDigester;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-
-import org.apache.commons.digester.Digester;
-import org.apache.uima.alchemy.digester.OutputDigester;
-import org.apache.uima.alchemy.digester.domain.Disambiguated;
-import org.apache.uima.alchemy.digester.domain.EntitiesResults;
-import org.apache.uima.alchemy.digester.domain.Entity;
-import org.apache.uima.alchemy.digester.domain.Quotations;
-import org.apache.uima.alchemy.digester.domain.Results;
-import org.xml.sax.SAXException;
-
-import org.apache.uima.alchemy.digester.json.JsonDigester;
 
 public class JsonTextRankedEntityExtractionDigester implements OutputDigester {
 
@@ -42,6 +37,7 @@ public class JsonTextRankedEntityExtractionDigester implements OutputDigester {
     digester.setValidating(false);
     digester.addObjectCreate("$", EntitiesResults.class);
     digester.addBeanPropertySetter("$/status");
+    digester.addBeanPropertySetter("$/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("$/url");
     digester.addBeanPropertySetter("$/language");
     digester.addObjectCreate("$/entities", Entity.class);

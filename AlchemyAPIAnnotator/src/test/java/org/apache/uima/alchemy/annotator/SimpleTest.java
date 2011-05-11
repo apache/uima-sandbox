@@ -18,16 +18,21 @@
  */
 package org.apache.uima.alchemy.annotator;
 
-import static org.junit.Assert.fail;
-
 import org.apache.uima.alchemy.utils.TestUtils;
 import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 /**
- * 
  * Test case for simple actions
- *
  */
 public class SimpleTest {
 
@@ -42,6 +47,21 @@ public class SimpleTest {
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getLocalizedMessage());
+    }
+  }
+
+  @Test
+  public void testAnalysisEngineError() {
+    try {
+      Map<String, Object> parameterSettings = new HashMap<String, Object>();
+      parameterSettings.put("apikey", "asdasdas12131");
+      JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE("desc/TextCategorizationAEDescriptor.xml", parameterSettings), "the big brown fox jumped on the table");
+      fail("it should've failed with AnalysisEngineProcessException but it worked flawlessly");
+    } catch (ResourceInitializationException e) {
+      fail("it should've failed with AnalysisEngineProcessException - "+e.getLocalizedMessage());
+    } catch (AnalysisEngineProcessException e) {
+      assertEquals("org.apache.uima.alchemy.annotator.exception.AlchemyCallFailedException: ERROR - invalid-api-key",
+              e.getCause().getLocalizedMessage());
     }
   }
 

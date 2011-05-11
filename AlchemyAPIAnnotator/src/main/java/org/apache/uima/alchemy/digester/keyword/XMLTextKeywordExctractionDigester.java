@@ -18,16 +18,16 @@
  */
 package org.apache.uima.alchemy.digester.keyword;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-
 import org.apache.commons.digester.Digester;
 import org.apache.uima.alchemy.digester.OutputDigester;
 import org.apache.uima.alchemy.digester.domain.Keyword;
 import org.apache.uima.alchemy.digester.domain.KeywordResults;
 import org.apache.uima.alchemy.digester.domain.Results;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 
 public class XMLTextKeywordExctractionDigester implements OutputDigester {
 
@@ -38,6 +38,7 @@ public class XMLTextKeywordExctractionDigester implements OutputDigester {
 
     digester.addObjectCreate("results", KeywordResults.class);
     digester.addBeanPropertySetter("results/status", "status");
+    digester.addBeanPropertySetter("results/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("results/url", "url");
     digester.addBeanPropertySetter("results/language", "language");
     digester.addObjectCreate("results/keywords/keyword", Keyword.class);

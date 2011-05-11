@@ -18,20 +18,14 @@
  */
 package org.apache.uima.alchemy.digester.entity.ranked;
 
+import org.apache.commons.digester.Digester;
+import org.apache.uima.alchemy.digester.OutputDigester;
+import org.apache.uima.alchemy.digester.domain.*;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-
-import org.apache.commons.digester.Digester;
-import org.apache.uima.alchemy.digester.OutputDigester;
-import org.apache.uima.alchemy.digester.domain.Disambiguated;
-import org.apache.uima.alchemy.digester.domain.DocumentSentiment;
-import org.apache.uima.alchemy.digester.domain.Entities;
-import org.apache.uima.alchemy.digester.domain.EntitiesResults;
-import org.apache.uima.alchemy.digester.domain.Entity;
-import org.apache.uima.alchemy.digester.domain.Quotations;
-import org.apache.uima.alchemy.digester.domain.Results;
-import org.xml.sax.SAXException;
 
 public class XMLRankedEntityExtractionDigester implements OutputDigester {
 
@@ -42,6 +36,7 @@ public class XMLRankedEntityExtractionDigester implements OutputDigester {
 
     digester.addObjectCreate("results", EntitiesResults.class);
     digester.addBeanPropertySetter("results/status", "status");
+    digester.addBeanPropertySetter("results/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("results/language", "language");
     digester.addBeanPropertySetter("results/url", "url");
     digester.addObjectCreate("results/entities", Entities.class);

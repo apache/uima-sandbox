@@ -39,6 +39,7 @@ public class XMLTextConceptDigester implements OutputDigester {
 
     digester.addObjectCreate("results", ConceptResults.class);
     digester.addBeanPropertySetter("results/status", "status");
+    digester.addBeanPropertySetter("results/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("results/url", "url");
     digester.addBeanPropertySetter("results/language", "language");
     digester.addObjectCreate("results/concepts", Concepts.class);

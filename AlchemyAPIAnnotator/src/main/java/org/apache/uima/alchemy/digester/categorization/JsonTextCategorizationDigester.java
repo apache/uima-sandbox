@@ -18,17 +18,16 @@
  */
 package org.apache.uima.alchemy.digester.categorization;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-
 import org.apache.commons.digester.Digester;
 import org.apache.uima.alchemy.digester.OutputDigester;
 import org.apache.uima.alchemy.digester.domain.CategorizationResults;
 import org.apache.uima.alchemy.digester.domain.Results;
+import org.apache.uima.alchemy.digester.json.JsonDigester;
 import org.xml.sax.SAXException;
 
-import org.apache.uima.alchemy.digester.json.JsonDigester;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 
 public class JsonTextCategorizationDigester implements OutputDigester {
 
@@ -39,6 +38,7 @@ public class JsonTextCategorizationDigester implements OutputDigester {
     digester.setValidating(false);
     digester.addObjectCreate("$", CategorizationResults.class);
     digester.addBeanPropertySetter("$/status", "status");
+    digester.addBeanPropertySetter("$/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("$/url", "url");
     digester.addBeanPropertySetter("$/language", "language");
     digester.addBeanPropertySetter("$/category", "category");

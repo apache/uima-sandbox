@@ -18,15 +18,15 @@
  */
 package org.apache.uima.alchemy.digester.language;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-
 import org.apache.commons.digester.Digester;
 import org.apache.uima.alchemy.digester.OutputDigester;
 import org.apache.uima.alchemy.digester.domain.LanguageDetectionResults;
 import org.apache.uima.alchemy.digester.domain.Results;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 
 public class XMLLanguageDigester implements OutputDigester {
 
@@ -37,6 +37,7 @@ public class XMLLanguageDigester implements OutputDigester {
 
     digester.addObjectCreate("results", LanguageDetectionResults.class);
     digester.addBeanPropertySetter("results/status", "status");
+    digester.addBeanPropertySetter("results/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("results/url", "url");
     digester.addBeanPropertySetter("results/language", "language");
     digester.addBeanPropertySetter("results/iso-639-1", "iso6391");

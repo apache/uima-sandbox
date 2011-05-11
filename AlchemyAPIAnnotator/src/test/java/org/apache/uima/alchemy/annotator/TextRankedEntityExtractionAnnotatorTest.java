@@ -18,22 +18,22 @@
  */
 package org.apache.uima.alchemy.annotator;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.apache.uima.alchemy.annotator.mocked.MockedNotSyncTextRankedEntityAnnotator;
+import org.apache.uima.alchemy.annotator.mocked.MockedTextRankedEntityAnnotator;
+import org.apache.uima.alchemy.ts.entity.Country;
+import org.apache.uima.alchemy.ts.entity.TelevisionStation;
+import org.apache.uima.alchemy.utils.TestUtils;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.util.FileUtils;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.uima.alchemy.annotator.mocked.MockedTextRankedEntityAnnotator;
-import org.apache.uima.alchemy.annotator.mocked.MockedNotSyncTextRankedEntityAnnotator;
-import org.apache.uima.alchemy.ts.entity.Country;
-import org.apache.uima.alchemy.ts.entity.RadioStation;
-import org.apache.uima.alchemy.utils.TestUtils;
-import org.apache.uima.jcas.JCas;
-import org.apache.uima.util.FileUtils;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class TextRankedEntityExtractionAnnotatorTest {
   private static final String DOC = "Eight US soldiers die in attacks in south Afghanistan, making October the deadliest month for the US in the war there";
@@ -51,8 +51,8 @@ public class TextRankedEntityExtractionAnnotatorTest {
       String documentText = FileUtils.file2String(new File(DOCPATH));
       JCas resultingCAS = TestUtils.executeAE(TestUtils.getAE(XML_PATH, parameterSettings),
               documentText);
-      List<RadioStation> entities = (List<RadioStation>) TestUtils.getAllFSofType(
-              RadioStation.type, resultingCAS);
+      List<TelevisionStation> entities = (List<TelevisionStation>) TestUtils.getAllFSofType(
+              TelevisionStation.type, resultingCAS);
       assertTrue(entities != null);
       assertTrue(entities.size() == 1);
     } catch (Exception e) {

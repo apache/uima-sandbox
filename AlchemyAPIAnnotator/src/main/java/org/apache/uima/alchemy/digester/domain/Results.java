@@ -22,6 +22,8 @@ public class Results {
 
   private String status;
 
+  private String statusInfo;
+
   private String language;
 
   private String url;
@@ -49,7 +51,15 @@ public class Results {
   public void setUrl(String url) {
     this.url = url;
   }
-  
+
+  public String getStatusInfo() {
+    return statusInfo;
+  }
+
+  public void setStatusInfo(String statusInfo) {
+    this.statusInfo = statusInfo;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();

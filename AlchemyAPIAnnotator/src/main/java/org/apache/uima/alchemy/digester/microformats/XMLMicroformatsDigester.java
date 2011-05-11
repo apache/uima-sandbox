@@ -18,16 +18,16 @@
  */
 package org.apache.uima.alchemy.digester.microformats;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-
 import org.apache.commons.digester.Digester;
 import org.apache.uima.alchemy.digester.OutputDigester;
 import org.apache.uima.alchemy.digester.domain.Microformat;
 import org.apache.uima.alchemy.digester.domain.MicroformatsResults;
 import org.apache.uima.alchemy.digester.domain.Results;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 
 public class XMLMicroformatsDigester implements OutputDigester {
 
@@ -38,6 +38,7 @@ public class XMLMicroformatsDigester implements OutputDigester {
 
     digester.addObjectCreate("results", MicroformatsResults.class);
     digester.addBeanPropertySetter("results/status", "status");
+    digester.addBeanPropertySetter("results/statusInfo", "statusInfo");
     digester.addBeanPropertySetter("results/url", "url");
     digester.addObjectCreate("results/microformats/microformat", Microformat.class);
     digester.addBeanPropertySetter("results/microformats/microformat/field", "fieldName");
