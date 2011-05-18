@@ -46,12 +46,11 @@
   </modules>
   <properties>
     <singleton>singleton:=true</singleton>
-    <osgiVersion>2.3.1.SNAPSHOT</osgiVersion>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.uima</groupId>
-      <artifactId>uimaj-core</artifactId>
+      <artifactId>uimaj-ep-runtime</artifactId>
       <version>2.3.1</version>
     </dependency>
   </dependencies>
@@ -61,17 +60,53 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>2.3.4</version>
-          <extensions>true</extensions>
-          <configuration>
-            <manifestLocation>META-INF</manifestLocation>
-            <instructions>
-              <Embed-Dependency>*;inline=true</Embed-Dependency>
-              <Bundle-RequiredExecutionEnvironment>J2SE-1.5</Bundle-RequiredExecutionEnvironment>
-            </instructions>
-          </configuration>
+          <executions>
+            <execution>
+              <id>uima-bundle</id>
+              <configuration>
+                <instructions>
+                  <Import-Package>org.apache.log.*;resolution:=optional</Import-Package>
+                  <Embed-Dependency>*;scope=compile;inline=true</Embed-Dependency>
+                  <Bundle-RequiredExecutionEnvironment>J2SE-1.5</Bundle-RequiredExecutionEnvironment>
+                  <Eclipse-ExtensibleAPI>true</Eclipse-ExtensibleAPI>
+                  <Eclipse-BuddyPolicy>registered</Eclipse-BuddyPolicy>
+                  <Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
+                </instructions>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpackDependentJars</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <excludes>**\/*.MF,**\/*.txt,**\/DEPENDENCIES,**\/NOTICE,**\/eclipse.inf,**\/ECLIPSE.RSA,**\/ECLIPSE.SF,
+                **\/ECLIPSEF.RSA,**\/ECLIPSEF.SF,**\/INDEX.LIST,**\/info.xml,**/BCKEY.DSA,**/BCKEY.SF
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.directory}/classes/META-INF/MANIFEST.MF
+            </manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+    <!--</pluginManagement>-->
   </build>
 </project>

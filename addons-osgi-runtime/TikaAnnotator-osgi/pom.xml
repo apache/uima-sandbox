@@ -1,6 +1,6 @@
 <project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
@@ -28,7 +28,7 @@
   <artifactId>TikaAnnotator-osgi</artifactId>
   <name>TikaAnnotator bundle</name>
   <description>TikaAnnotator OSGi bundle</description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -139,18 +139,23 @@
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.tika_${osgiVersion}</finalName>
+    <finalName>org.apache.uima.tika_${parsedVersion.osgiVersion}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>                                         
-            <Import-Package>org.ccil.*;javax.xml.stream.*;com.drew.*;sun.io.*;schemasMicrosoftCom*;org.xmlpull.*;org.relaxng.*;org.openxmlformats.*;org.bouncycastle.*;org.apache.lucene.demo.*;junit.*;org.gjt.*;org.jaxen.*;com.sun.*;org.apache.tools.ant.*;resolution:=optional,*</Import-Package>
-            <Export-Package>org.apache.uima.tika.*</Export-Package>
-            <Bundle-SymbolicName>org.apache.uima.tika;${singleton}</Bundle-SymbolicName>
-          </instructions>
-        </configuration>
+        <executions>
+          <execution>
+            <id>uima-bundle</id>
+            <configuration>
+              <instructions>
+                <Import-Package>org.apache.log.*;org.ccil.*;javax.jms.*;javax.xml.stream.*;com.drew.*;sun.io.*;schemasMicrosoftCom*;org.xmlpull.*;org.relaxng.*;org.openxmlformats.*;org.bouncycastle.*;org.apache.lucene.demo.*;junit.*;org.gjt.*;org.jaxen.*;com.sun.*;org.apache.tools.ant.*;resolution:=optional,*</Import-Package>
+                <Export-Package>org.apache.uima.tika.*</Export-Package>
+                <Bundle-SymbolicName>org.apache.uima.tika;${singleton}</Bundle-SymbolicName>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

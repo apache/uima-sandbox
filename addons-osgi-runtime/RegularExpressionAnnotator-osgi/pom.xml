@@ -1,6 +1,6 @@
 <project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
@@ -28,7 +28,7 @@
   <artifactId>RegularExpressionAnnotator-osgi</artifactId>
   <name>RegularExpressionAnnotator bundle</name>
   <description>RegularExpressionAnnotator OSGi bundle</description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -39,17 +39,22 @@
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.opencalais_${osgiVersion}</finalName>
+    <finalName>org.apache.uima.regexann_${parsedVersion.osgiVersion}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Export-Package>org.apache.uima.annotator.regex.*</Export-Package>
-            <Bundle-SymbolicName>org.apache.uima.annotator.regex;${singleton}</Bundle-SymbolicName>
-          </instructions>
-        </configuration>
+        <executions>
+          <execution>
+            <id>uima-bundle</id>
+            <configuration>
+              <instructions>
+                <Export-Package>org.apache.uima.annotator.regex.*</Export-Package>
+                <Bundle-SymbolicName>org.apache.uima.annotator.regex;${singleton}</Bundle-SymbolicName>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

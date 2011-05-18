@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
@@ -29,7 +29,7 @@
   <artifactId>Lucas-osgi</artifactId>
   <name>Lucas bundle</name>
   <description>Lucas OSGi bundle</description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -58,9 +58,9 @@
       <version>2.9.3</version>
     </dependency>
     <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-highlighter</artifactId>
-        <version>2.9.3</version>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-highlighter</artifactId>
+      <version>2.9.3</version>
     </dependency>
     <dependency>
       <groupId>com.google.collections</groupId>
@@ -69,18 +69,23 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>org.apache.uima.lucas_${osgiVersion}</finalName>
+    <finalName>org.apache.uima.lucas_${parsedVersion.osgiVersion}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Import-Package>javax.jms.*;com.sun.*;resolution:=optional,*</Import-Package>
-            <Export-Package>org.apache.uima.lucas.*</Export-Package>
-            <Bundle-SymbolicName>org.apache.uima.lucas;${singleton}</Bundle-SymbolicName>
-          </instructions>
-        </configuration>
+        <executions>
+          <execution>
+            <id>uima-bundle</id>
+            <configuration>
+              <instructions>
+                <Import-Package>javax.jms.*;com.sun.*;resolution:=optional,*</Import-Package>
+                <Export-Package>org.apache.uima.lucas.*</Export-Package>
+                <Bundle-SymbolicName>org.apache.uima.lucas;${singleton}</Bundle-SymbolicName>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

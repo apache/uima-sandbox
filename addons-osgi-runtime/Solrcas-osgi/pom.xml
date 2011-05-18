@@ -29,7 +29,7 @@
   <artifactId>Solrcas-osgi</artifactId>
   <name>Solrcas bundle</name>
   <description>Solrcas OSGi bundle</description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -119,18 +119,23 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>org.apache.uima.solrcas_${osgiVersion}</finalName>
+    <finalName>org.apache.uima.solrcas_${parsedVersion.osgiVersion}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Import-Package>junit.*;javax.xml.stream.*;resolution:=optional,*</Import-Package>
-            <Export-Package>org.apache.uima.solrcas.*</Export-Package>
-            <Bundle-SymbolicName>org.apache.uima.solrcas;${singleton}</Bundle-SymbolicName>
-          </instructions>
-        </configuration>
+        <executions>
+          <execution>
+            <id>uima-bundle</id>
+            <configuration>
+              <instructions>
+                <Import-Package>org.relaxng.*;org.apache.log.*;com.sun.*;junit.*;javax.xml.stream.*;resolution:=optional,*</Import-Package>
+                <Export-Package>org.apache.uima.solrcas.*</Export-Package>
+                <Bundle-SymbolicName>org.apache.uima.solrcas;${singleton}</Bundle-SymbolicName>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
