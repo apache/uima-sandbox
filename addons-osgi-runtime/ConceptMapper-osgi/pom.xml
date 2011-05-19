@@ -39,7 +39,7 @@
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.conceptmapper_${parsedVersion.osgiVersion}</finalName>
+    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -50,7 +50,6 @@
             <configuration>
               <instructions>
                 <Export-Package>org.apache.uima.conceptMapper.*</Export-Package>
-                <Bundle-SymbolicName>org.apache.uima.conceptmapper;${singleton}</Bundle-SymbolicName>
               </instructions>
             </configuration>
           </execution>

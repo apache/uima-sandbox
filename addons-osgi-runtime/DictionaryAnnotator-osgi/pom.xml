@@ -49,7 +49,7 @@
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.dictionary_${parsedVersion.osgiVersion}</finalName>
+    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -61,7 +61,6 @@
               <instructions>
                 <Import-Package>org.apache.tools.ant.*;com.sun.*;javax.xml.stream.*;resolution:=optional,*</Import-Package>
                 <Export-Package>org.apache.uima.annotator.dict_annot.*</Export-Package>
-                <Bundle-SymbolicName>org.apache.uima.dictionary;${singleton}</Bundle-SymbolicName>
               </instructions>
             </configuration>
           </execution>

@@ -39,8 +39,7 @@
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.snowball_${parsedVersion.osgiVersion}
-    </finalName>
+    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -51,7 +50,6 @@
             <configuration>
               <instructions>
                 <Export-Package>org.apache.uima.annotator.*</Export-Package>
-                <Bundle-SymbolicName>org.apache.uima.snowball;${singleton}</Bundle-SymbolicName>
               </instructions>
             </configuration>
           </execution>

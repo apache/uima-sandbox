@@ -139,7 +139,7 @@
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.tika_${parsedVersion.osgiVersion}</finalName>
+    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -151,7 +151,6 @@
               <instructions>
                 <Import-Package>org.apache.log.*;org.ccil.*;javax.jms.*;javax.xml.stream.*;com.drew.*;sun.io.*;schemasMicrosoftCom*;org.xmlpull.*;org.relaxng.*;org.openxmlformats.*;org.bouncycastle.*;org.apache.lucene.demo.*;junit.*;org.gjt.*;org.jaxen.*;com.sun.*;org.apache.tools.ant.*;resolution:=optional,*</Import-Package>
                 <Export-Package>org.apache.uima.tika.*</Export-Package>
-                <Bundle-SymbolicName>org.apache.uima.tika;${singleton}</Bundle-SymbolicName>
               </instructions>
             </configuration>
           </execution>

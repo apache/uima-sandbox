@@ -119,7 +119,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>org.apache.uima.solrcas_${parsedVersion.osgiVersion}</finalName>
+    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -131,7 +131,6 @@
               <instructions>
                 <Import-Package>org.relaxng.*;org.apache.log.*;com.sun.*;junit.*;javax.xml.stream.*;resolution:=optional,*</Import-Package>
                 <Export-Package>org.apache.uima.solrcas.*</Export-Package>
-                <Bundle-SymbolicName>org.apache.uima.solrcas;${singleton}</Bundle-SymbolicName>
               </instructions>
             </configuration>
           </execution>

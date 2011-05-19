@@ -46,6 +46,7 @@
   </modules>
   <properties>
     <singleton>singleton:=true</singleton>
+    <nameTemplate>${project.groupId}.${project.artifactId}.${parsedVersion.osgiVersion}</nameTemplate>
   </properties>
   <dependencies>
     <dependency>
@@ -71,6 +72,7 @@
                   <Eclipse-ExtensibleAPI>true</Eclipse-ExtensibleAPI>
                   <Eclipse-BuddyPolicy>registered</Eclipse-BuddyPolicy>
                   <Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
+                  <Bundle-SymbolicName>>${project.groupId}.${project.artifactId};${singleton}</Bundle-SymbolicName>
                 </instructions>
               </configuration>
             </execution>
@@ -90,8 +92,7 @@
             <configuration>
               <outputDirectory>${project.build.outputDirectory}</outputDirectory>
               <excludes>**\/*.MF,**\/*.txt,**\/DEPENDENCIES,**\/NOTICE,**\/eclipse.inf,**\/ECLIPSE.RSA,**\/ECLIPSE.SF,
-                **\/ECLIPSEF.RSA,**\/ECLIPSEF.SF,**\/INDEX.LIST,**\/info.xml,**/BCKEY.DSA,**/BCKEY.SF
-              </excludes>
+                **\/ECLIPSEF.RSA,**\/ECLIPSEF.SF,**\/INDEX.LIST,**\/info.xml,**/BCKEY.DSA,**/BCKEY.SF</excludes>
             </configuration>
           </execution>
         </executions>
@@ -101,12 +102,10 @@
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
-            <manifestFile>${project.build.directory}/classes/META-INF/MANIFEST.MF
-            </manifestFile>
+            <manifestFile>${project.build.directory}/classes/META-INF/MANIFEST.MF</manifestFile>
           </archive>
         </configuration>
       </plugin>
     </plugins>
-    <!--</pluginManagement>-->
   </build>
 </project>

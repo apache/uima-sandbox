@@ -69,7 +69,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>org.apache.uima.lucas_${parsedVersion.osgiVersion}</finalName>
+    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -81,7 +81,6 @@
               <instructions>
                 <Import-Package>javax.jms.*;com.sun.*;resolution:=optional,*</Import-Package>
                 <Export-Package>org.apache.uima.lucas.*</Export-Package>
-                <Bundle-SymbolicName>org.apache.uima.lucas;${singleton}</Bundle-SymbolicName>
               </instructions>
             </configuration>
           </execution>

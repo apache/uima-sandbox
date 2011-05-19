@@ -59,7 +59,7 @@
   </dependencies>
 
   <build>
-    <finalName>org.apache.uima.alchemyapi_${parsedVersion.osgiVersion}</finalName>
+    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -70,7 +70,6 @@
             <configuration>
               <instructions>
                 <Export-Package>org.apache.uima.alchemy.*</Export-Package>
-                <Bundle-SymbolicName>org.apache.uima.alchemyapi;${singleton}</Bundle-SymbolicName>
               </instructions>
             </configuration>
           </execution>
