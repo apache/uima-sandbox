@@ -39,7 +39,6 @@
   </dependencies>
 
   <build>
-    <finalName>${nameTemplate}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>

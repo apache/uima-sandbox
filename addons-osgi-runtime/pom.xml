@@ -46,7 +46,6 @@
   </modules>
   <properties>
     <singleton>singleton:=true</singleton>
-    <nameTemplate>${project.groupId}.${project.artifactId}.${parsedVersion.osgiVersion}</nameTemplate>
   </properties>
   <dependencies>
     <dependency>
@@ -56,6 +55,7 @@
     </dependency>
   </dependencies>
   <build>
+    <finalName>${project.groupId}.${project.artifactId}.${parsedVersion.osgiVersion}</finalName>
     <pluginManagement>
       <plugins>
         <plugin>
