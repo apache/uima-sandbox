@@ -43,6 +43,18 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:alchemy-annotator-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputDirectory>AlchemyAnnotator/osgi</outputDirectory>
+      <outputFileNameMapping>uima-an-alchemy-osgi.jar</outputFileNameMapping>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:BSFAnnotator</include>
       </includes>
       <unpack>false</unpack>
@@ -52,6 +64,18 @@ under the License.
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode> 
     </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:BSFAnnotator-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uimaj-an-bsf-osgi.jar</outputFileNameMapping>
+      <outputDirectory>BSFAnnotator/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
     <dependencySet>
       <includes>
         <include>org.apache.uima:ConceptMapper</include>
@@ -65,6 +89,18 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:ConceptMapper-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uima-an-conceptMapper-osgi.jar</outputFileNameMapping>
+      <outputDirectory>ConceptMapper/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:ConfigurableFeatureExtractor</include>
       </includes>
       <unpack>false</unpack>
@@ -74,6 +110,18 @@ under the License.
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
     </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:ConfigurableFeatureExtractor-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uima-tool-configurableFeatureExtractor-osgi.jar</outputFileNameMapping>
+      <outputDirectory>ConfigurableFeatureExtractor/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
     <dependencySet>
       <includes>
         <include>org.apache.uima:DictionaryAnnotator</include>
@@ -87,6 +135,18 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:DictionaryAnnotator-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <outputFileNameMapping>uima-an-dictionary-osgi.jar</outputFileNameMapping>
+      <outputDirectory>DictionaryAnnotator/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:FsVariables</include>
       </includes>
       <unpack>false</unpack>
@@ -96,6 +156,7 @@ under the License.
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
     </dependencySet>
+
     <dependencySet>
       <includes>
         <include>org.apache.uima:Lucas</include>
@@ -110,6 +171,19 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:Lucas-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-lucas-osgi.jar</outputFileNameMapping>
+      <outputDirectory>Lucas/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:OpenCalaisAnnotator</include>
       </includes>
       <unpack>false</unpack>
@@ -122,6 +196,19 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:OpenCalaisAnnotator-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-calais-osgi.jar</outputFileNameMapping>
+      <outputDirectory>OpenCalaisAnnotator/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:PearPackagingAntTask</include>
       </includes>
       <unpack>false</unpack>
@@ -132,6 +219,7 @@ under the License.
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
     </dependencySet>
+
     <dependencySet>
       <includes>
         <include>org.apache.uima:RegularExpressionAnnotator</include>
@@ -146,6 +234,19 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:RegularExpressionAnnotator-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-regex-osgi.jar</outputFileNameMapping>
+      <outputDirectory>RegularExpressionAnnotator/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:SimpleServer</include>
       </includes>
       <unpack>false</unpack>
@@ -156,6 +257,7 @@ under the License.
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
     </dependencySet>
+
     <dependencySet>
       <includes>
         <include>org.apache.uima:SnowballAnnotator</include>
@@ -170,6 +272,19 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:SnowballAnnotator-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-snowball-osgi.jar</outputFileNameMapping>
+      <outputDirectory>SnowballAnnotator/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:Solrcas</include>
       </includes>
       <unpack>false</unpack>
@@ -180,6 +295,19 @@ under the License.
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
     </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.apache.uima:Solrcas-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-solrcas-osgi.jar</outputFileNameMapping>
+      <outputDirectory>Solrcas/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
     <dependencySet>
       <includes>
         <include>org.apache.uima:Tagger</include>
@@ -194,6 +322,19 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:Tagger-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-tagger-osgi.jar</outputFileNameMapping>
+      <outputDirectory>Tagger/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:TikaAnnotator</include>
       </includes>
       <unpack>false</unpack>
@@ -206,6 +347,19 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
+        <include>org.apache.uima:TikaAnnotator-osgi</include>
+      </includes>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <outputFileNameMapping>uima-an-tika-osgi.jar</outputFileNameMapping>
+      <outputDirectory>TikaAnnotator/osgi</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
         <include>org.apache.uima:WhitespaceTokenizer</include>
       </includes>
       <unpack>false</unpack>
@@ -216,21 +370,19 @@ under the License.
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
     </dependencySet>
-    
-    
-    <!-- addons-osgi-runtime go in a separate dir -->
     <dependencySet>
       <includes>
-        <include>org.apache.uima:*-osgi</include>
+        <include>org.apache.uima:WhitespaceTokenizer-osgi</include>
       </includes>
       <unpack>false</unpack>
       <scope>runtime</scope>
-      <outputDirectory>lib-osgi/</outputDirectory>
-      <outputFileNameMapping>${artifact.build.finalName}.jar</outputFileNameMapping>
+      <outputFileNameMapping>uima-an-wst-osgi.jar</outputFileNameMapping>
+      <outputDirectory>WhitespaceTokenizer/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
-      <fileMode>644</fileMode> 
-      <directoryMode>755</directoryMode>        
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
     </dependencySet>
+
   </dependencySets>
   
   <!-- Add other files - scripts, documentation, examples -->
