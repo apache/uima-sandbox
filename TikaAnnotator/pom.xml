@@ -58,6 +58,7 @@ element, and just changing the following two properties -->
     <uimaScmRoot>sandbox</uimaScmRoot>
     <uimaScmProject>${project.artifactId}</uimaScmProject>
     <uimaDependencyVersion>2.3.1</uimaDependencyVersion>
+    <pearMainDescriptor>desc/MarkupAnnotator.xml</pearMainDescriptor>
   </properties>
 
   <dependencies>

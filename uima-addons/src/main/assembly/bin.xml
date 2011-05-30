@@ -36,7 +36,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-alchemy.jar</outputFileNameMapping>
-      <outputDirectory>AlchemyAnnotator</outputDirectory>
+      <outputDirectory>annotator/AlchemyAPIAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -46,7 +46,7 @@ under the License.
         <include>org.apache.uima:alchemy-annotator-osgi</include>
       </includes>
       <unpack>false</unpack>
-      <outputDirectory>AlchemyAnnotator/osgi</outputDirectory>
+      <outputDirectory>annotator/AlchemyAPIAnnotator/osgi</outputDirectory>
       <outputFileNameMapping>uima-an-alchemy-osgi.jar</outputFileNameMapping>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
@@ -59,7 +59,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uimaj-an-bsf.jar</outputFileNameMapping>
-      <outputDirectory>BSFAnnotator</outputDirectory>
+      <outputDirectory>annotator/BSFAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode> 
@@ -70,7 +70,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uimaj-an-bsf-osgi.jar</outputFileNameMapping>
-      <outputDirectory>BSFAnnotator/osgi</outputDirectory>
+      <outputDirectory>annotator/BSFAnnotator/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -82,7 +82,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-conceptMapper.jar</outputFileNameMapping>
-      <outputDirectory>ConceptMapper</outputDirectory>
+      <outputDirectory>annotator/ConceptMapper</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>        
@@ -93,7 +93,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-conceptMapper-osgi.jar</outputFileNameMapping>
-      <outputDirectory>ConceptMapper/osgi</outputDirectory>
+      <outputDirectory>annotator/ConceptMapper/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -105,7 +105,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-tool-configurableFeatureExtractor.jar</outputFileNameMapping>
-      <outputDirectory>ConfigurableFeatureExtractor</outputDirectory>
+      <outputDirectory>annotator/ConfigurableFeatureExtractor</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -116,7 +116,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-tool-configurableFeatureExtractor-osgi.jar</outputFileNameMapping>
-      <outputDirectory>ConfigurableFeatureExtractor/osgi</outputDirectory>
+      <outputDirectory>annotator/ConfigurableFeatureExtractor/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -128,7 +128,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-dictionary.jar</outputFileNameMapping>
-      <outputDirectory>DictionaryAnnotator</outputDirectory>
+      <outputDirectory>annotator/DictionaryAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -139,7 +139,7 @@ under the License.
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-dictionary-osgi.jar</outputFileNameMapping>
-      <outputDirectory>DictionaryAnnotator/osgi</outputDirectory>
+      <outputDirectory>annotator/DictionaryAnnotator/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -164,7 +164,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-lucas.jar</outputFileNameMapping>
-      <outputDirectory>Lucas</outputDirectory>
+      <outputDirectory>annotator/Lucas</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -176,7 +176,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-lucas-osgi.jar</outputFileNameMapping>
-      <outputDirectory>Lucas/osgi</outputDirectory>
+      <outputDirectory>annotator/Lucas/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -189,7 +189,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-calais.jar</outputFileNameMapping>
-      <outputDirectory>OpenCalaisAnnotator</outputDirectory>
+      <outputDirectory>annotator/OpenCalaisAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -201,7 +201,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-calais-osgi.jar</outputFileNameMapping>
-      <outputDirectory>OpenCalaisAnnotator/osgi</outputDirectory>
+      <outputDirectory>annotator/OpenCalaisAnnotator/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -227,7 +227,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-regex.jar</outputFileNameMapping>
-      <outputDirectory>RegularExpressionAnnotator</outputDirectory>
+      <outputDirectory>annotator/RegularExpressionAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode> 
       <directoryMode>755</directoryMode>        
@@ -239,7 +239,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-regex-osgi.jar</outputFileNameMapping>
-      <outputDirectory>RegularExpressionAnnotator/osgi</outputDirectory>
+      <outputDirectory>annotator/RegularExpressionAnnotator/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -265,7 +265,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-snowball.jar</outputFileNameMapping>
-      <outputDirectory>SnowballAnnotator</outputDirectory>
+      <outputDirectory>annotator/SnowballAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -277,7 +277,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-snowball-osgi.jar</outputFileNameMapping>
-      <outputDirectory>SnowballAnnotator/osgi</outputDirectory>
+      <outputDirectory>annotator/SnowballAnnotator/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -290,7 +290,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-solrcas.jar</outputFileNameMapping>
-      <outputDirectory>Solrcas</outputDirectory>
+      <outputDirectory>annotator/Solrcas</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -302,7 +302,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-solrcas-osgi.jar</outputFileNameMapping>
-      <outputDirectory>Solrcas/osgi</outputDirectory>
+      <outputDirectory>annotator/Solrcas/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -315,7 +315,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-tagger.jar</outputFileNameMapping>
-      <outputDirectory>Tagger</outputDirectory>
+      <outputDirectory>annotator/Tagger</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -327,7 +327,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-tagger-osgi.jar</outputFileNameMapping>
-      <outputDirectory>Tagger/osgi</outputDirectory>
+      <outputDirectory>annotator/Tagger/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -340,7 +340,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-tika.jar</outputFileNameMapping>
-      <outputDirectory>TikaAnnotator</outputDirectory>
+      <outputDirectory>annotator/TikaAnnotator</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -352,7 +352,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-tika-osgi.jar</outputFileNameMapping>
-      <outputDirectory>TikaAnnotator/osgi</outputDirectory>
+      <outputDirectory>annotator/TikaAnnotator/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -365,7 +365,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-wst.jar</outputFileNameMapping>
-      <outputDirectory>WhitespaceTokenizer</outputDirectory>
+      <outputDirectory>annotator/WhitespaceTokenizer</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -377,7 +377,7 @@ under the License.
       <unpack>false</unpack>
       <scope>runtime</scope>
       <outputFileNameMapping>uima-an-wst-osgi.jar</outputFileNameMapping>
-      <outputDirectory>WhitespaceTokenizer/osgi</outputDirectory>
+      <outputDirectory>annotator/WhitespaceTokenizer/osgi</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
@@ -387,6 +387,106 @@ under the License.
   
   <!-- Add other files - scripts, documentation, examples -->
   <fileSets>
+    <fileSet>
+      <outputDirectory>annotator/AlchemyAPIAnnotator/</outputDirectory>
+      <directory>../AlchemyAPIAnnotator/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/BSFAnnotator</outputDirectory>
+      <directory>../BSFAnnotator/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/ConceptMapper/</outputDirectory>
+      <directory>../ConceptMapper/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/ConfigurableFeatureExtractor</outputDirectory>
+      <directory>../ConfigurableFeatureExtractor/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/DictionaryAnnotator</outputDirectory>
+      <directory>../DictionaryAnnotator/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>FsVariables</outputDirectory>
+      <directory>../FsVariables/</directory>
+      <includes>
+        <include>*.txt</include>
+      </includes>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/Lucas</outputDirectory>
+      <directory>../Lucas/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/OpenCalaisAnnotator</outputDirectory>
+      <directory>../OpenCalaisAnnotator/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>PearPackagingAntTask</outputDirectory>
+      <directory>../PearPackagingAntTask/</directory>
+      <includes>
+        <include>*.txt</include>
+      </includes>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/RegularExpressionAnnotator</outputDirectory>
+      <directory>../RegularExpressionAnnotator/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>SimpleServer</outputDirectory>
+      <directory>../SimpleServer/</directory>
+      <includes>
+        <include>*.txt</include>
+      </includes>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/SnowballAnnotator</outputDirectory>
+      <directory>../SnowballAnnotator/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/Tagger</outputDirectory>
+      <directory>../Tagger/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/TikaAnnotator</outputDirectory>
+      <directory>../TikaAnnotator/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/WhitespaceTokenizer</outputDirectory>
+      <directory>../WhitespaceTokenizer/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+
     <fileSet>
       <directory>src/main/scripts</directory>
       <outputDirectory>bin</outputDirectory>
