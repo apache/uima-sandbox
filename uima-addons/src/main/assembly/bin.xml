@@ -419,10 +419,7 @@ under the License.
     </fileSet>
     <fileSet>
       <outputDirectory>FsVariables</outputDirectory>
-      <directory>../FsVariables/</directory>
-      <includes>
-        <include>*.txt</include>
-      </includes>
+      <directory>../FsVariables/target/pearPackaging</directory>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
     </fileSet>
@@ -440,10 +437,7 @@ under the License.
     </fileSet>
     <fileSet>
       <outputDirectory>PearPackagingAntTask</outputDirectory>
-      <directory>../PearPackagingAntTask/</directory>
-      <includes>
-        <include>*.txt</include>
-      </includes>
+      <directory>../PearPackagingAntTask/target/assembly-bin</directory>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
     </fileSet>
@@ -455,10 +449,7 @@ under the License.
     </fileSet>
     <fileSet>
       <outputDirectory>SimpleServer</outputDirectory>
-      <directory>../SimpleServer/</directory>
-      <includes>
-        <include>*.txt</include>
-      </includes>
+      <directory>../SimpleServer/target/assembly-bin</directory>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
     </fileSet>
@@ -483,6 +474,12 @@ under the License.
     <fileSet>
       <outputDirectory>annotator/WhitespaceTokenizer</outputDirectory>
       <directory>../WhitespaceTokenizer/target/pearPackaging</directory>
+      <fileMode>644</fileMode>
+      <directoryMode>755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>annotator/Solrcas</outputDirectory>
+      <directory>../Solrcas/target/pearPackaging</directory>
       <fileMode>644</fileMode>
       <directoryMode>755</directoryMode>
     </fileSet>

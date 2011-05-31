@@ -235,5 +235,130 @@
         </plugins>                    
       </build>
     </profile>
+    <profile>
+      <id>build simple project binary assembly</id>
+      <activation>
+        <file>
+          <exists>marker-file-identifying-single-project</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <!--
+              Copy the dependencies to the target/assembly-bin folder for the PEAR to copy
+              -->
+              <execution>
+                <id>copy dependencies to lib</id>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <phase>process-resources</phase>
+                <configuration>
+                  <outputDirectory>target/assembly-bin/lib</outputDirectory>
+                  <includeScope>runtime</includeScope>
+                  <excludeTransitive>true</excludeTransitive>
+                  <excludeGroupIds>org.apache.uima</excludeGroupIds>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <!--
+              copy the License/notice/readme/release/keys notes files into the component assembly-bin at the top level
+              -->
+              <execution>
+                <id>Copy Component Lic/Not/Readme/Relnotes</id>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <phase>process-resources</phase>
+                <configuration>
+                  <outputDirectory>target/assembly-bin</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>.</directory>
+                      <includes>
+                        <include>LICENSE*</include>
+                        <include>NOTICE*</include>
+                        <include>README*</include>
+                        <include>readme*</include>
+                        <include>RELEASE_NOTES*</include>
+                        <include>ReleaseNotes*</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <!-- copy generated Jar to target/assembly-bin/lib spot -->
+              <execution>
+                <id>
+                  copy standard sandbox target jar to target/assembly-bin/lib
+                </id>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <phase>pre-integration-test</phase>
+                <!-- a phase after jar -->
+                <configuration>
+                  <outputDirectory>target/assembly-bin/lib</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}</directory>
+                      <includes>
+                        <include>*.jar</include>
+                      </includes>
+                      <excludes>
+                        <exclude>*-sources.jar</exclude>
+                      </excludes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <!--
+              copy generated docbook artifacts to pearPackaging/doc folder
+              -->
+              <execution>
+                <id>
+                  copy generated docbook artifacts to target/assembly-bin/doc folder
+                </id>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <phase>pre-integration-test</phase>
+                <!-- a phase after docbkx (package) phase -->
+                <configuration>
+                  <outputDirectory>target/assembly-bin/doc</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}/docbkx</directory>
+                      <excludes>
+                        <exclude>**/*.fo</exclude>
+                      </excludes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <!-- turn on javadoc build for each module -->
+                <phase>package</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
