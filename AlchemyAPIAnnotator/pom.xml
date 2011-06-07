@@ -28,7 +28,7 @@
     <relativePath>../uima-addons-parent</relativePath>
   </parent>
 
-  <artifactId>alchemy-annotator</artifactId>
+  <artifactId>AlchemyAPIAnnotator</artifactId>
   <version>2.3.1-SNAPSHOT</version>
   <name>UIMA Annotator: ${project.artifactId}</name>
   <description>A UIMA set of AEs that wrap Alchemy API services from Orchestr8</description>

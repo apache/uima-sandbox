@@ -32,7 +32,7 @@ under the License.
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>org.apache.uima:alchemy-annotator</include>
+        <include>org.apache.uima:AlchemyAPIAnnotator</include>
       </includes>
       <unpack>false</unpack>
       <outputFileNameMapping>uima-an-alchemy.jar</outputFileNameMapping>
@@ -43,7 +43,7 @@ under the License.
     </dependencySet>
     <dependencySet>
       <includes>
-        <include>org.apache.uima:alchemy-annotator-osgi</include>
+        <include>org.apache.uima:AlchemyAPIAnnotator-osgi</include>
       </includes>
       <unpack>false</unpack>
       <outputDirectory>annotator/AlchemyAPIAnnotator/osgi</outputDirectory>

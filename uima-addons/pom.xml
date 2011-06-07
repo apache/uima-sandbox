@@ -79,7 +79,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.uima</groupId>
-      <artifactId>alchemy-annotator</artifactId>
+      <artifactId>AlchemyAPIAnnotator</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -160,7 +160,7 @@
     <!-- addons-osgi-runtime dependencies -->
     <dependency>
       <groupId>org.apache.uima</groupId>
-      <artifactId>alchemy-annotator-osgi</artifactId>
+      <artifactId>AlchemyAPIAnnotator-osgi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

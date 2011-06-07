@@ -31,7 +31,7 @@
   <name>OSGi version of Apache UIMA Addons</name>
   <modules>
     <module>OpenCalaisAnnotator-osgi</module>
-    <module>alchemy-annotator-osgi</module>
+    <module>AlchemyAPIAnnotator-osgi</module>
     <module>BSFAnnotator-osgi</module>
     <module>ConfigurableFeatureExtractor-osgi</module>
     <module>ConceptMapper-osgi</module>
