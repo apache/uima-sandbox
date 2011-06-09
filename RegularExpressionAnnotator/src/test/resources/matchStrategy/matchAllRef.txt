@@ -1,3 +1,0 @@
-TestAnnot(10,18): matchALL
-TestAnnot(19,27): matchALL
-TestAnnot(28,36): matchALL

@@ -1,1 +1,0 @@
-DocumentAnnotation:   { language=en-us }

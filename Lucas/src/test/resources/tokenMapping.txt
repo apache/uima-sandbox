@@ -1,2 +1,0 @@
-token1=id1
-token2=id2

@@ -1,2 +1,0 @@
-DocumentAnnotation:   { language=en }
-TestAnnot(0,11): SimpleRegex
