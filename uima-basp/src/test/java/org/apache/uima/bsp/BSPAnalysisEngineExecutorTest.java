@@ -10,7 +10,7 @@ public class BSPAnalysisEngineExecutorTest {
   @Test
   public void simpleTest() throws Exception {
     BSPAnalysisEngineExecutor bspAnalysisEngineExecutor = new BSPAnalysisEngineExecutor();
-    bspAnalysisEngineExecutor.executeAE("src/test/resources/uima/SampleAE.xml", "src/test/resources/data/dev", "target/analysis-results.txt", 3);
+    bspAnalysisEngineExecutor.executeAE("src/test/resources/uima/SampleAE.xml", "src/test/resources/data/", "target/analysis-results.txt", 3);
   }
 
 }

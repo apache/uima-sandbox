@@ -17,10 +17,7 @@ import org.apache.uima.util.InvalidXMLException;
 import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.XMLInputSource;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
@@ -66,7 +63,12 @@ public class AEProcessingBSPJob<KI, VI, KO, VO, M extends ByteMessage> extends B
       if (isMaster(bspPeer)) {
         String dirPath = configuration.get("collection.path");
         int i = 0;
-        for (File f : new File(dirPath).listFiles()) {
+        for (File f : new File(dirPath).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+              return file.getAbsolutePath().endsWith(".txt");
+            }
+          })) {
           FileReader fileReader = new FileReader(f);
           ByteMessage byteMessage = new ByteMessage(UUID.randomUUID().toString().getBytes("UTF-8"), fileReader.toString().getBytes("UTF-8"));
           fileReader.close();
