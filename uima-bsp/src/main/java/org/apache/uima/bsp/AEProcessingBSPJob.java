@@ -38,7 +38,6 @@ import org.apache.uima.util.XMLInputSource;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * A {@link BSP} which gets files from a directory and pass them to an {@link AnalysisEngine} for processing.
@@ -80,7 +79,6 @@ public class AEProcessingBSPJob<KI, VI, KO, VO, M extends ByteMessage> extends B
       // collection distribution
       if (isMaster(bspPeer)) {
         String dirPath = configuration.get("collection.path");
-        int i = 0;
         for (File f : new File(dirPath).listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
@@ -88,11 +86,12 @@ public class AEProcessingBSPJob<KI, VI, KO, VO, M extends ByteMessage> extends B
             }
           })) {
           FileReader fileReader = new FileReader(f);
-          ByteMessage byteMessage = new ByteMessage(UUID.randomUUID().toString().getBytes("UTF-8"), fileReader.toString().getBytes("UTF-8"));
+          byte[] tag = new byte[2];
+          r.nextBytes(tag);
+          ByteMessage byteMessage = new ByteMessage(tag, fileReader.toString().getBytes("UTF-8"));
           fileReader.close();
           String toPeer = bspPeer.getAllPeerNames()[r.nextInt(bspPeer.getAllPeerNames().length)];
           bspPeer.send(toPeer, byteMessage);
-          i++;
         }
       }
       bspPeer.sync();
@@ -110,8 +109,11 @@ public class AEProcessingBSPJob<KI, VI, KO, VO, M extends ByteMessage> extends B
         ProcessTrace pt = analysisEngine.process(cas);
         // release CAS
         casPool.releaseCas(cas);
-        // send results
-        bspPeer.send(master, new ByteMessage(UUID.randomUUID().toString().getBytes("UTF-8"), pt.toString().getBytes("UTF-8")));
+        // send results to the (master) collector
+        byte[] tag = new byte[2];
+        r.nextBytes(tag);
+        String message = bspPeer.getPeerName() + "\n" + pt.toString();
+        bspPeer.send(master, new ByteMessage(tag, message.getBytes("UTF-8")));
       }
       bspPeer.sync();
 
