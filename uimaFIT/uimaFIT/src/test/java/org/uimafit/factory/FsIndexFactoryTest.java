@@ -18,9 +18,9 @@
  */
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitive;
+import static org.apache.uima.fit.factory.FsIndexFactory.createFsIndexCollection;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitive;
-import static org.uimafit.factory.FsIndexFactory.createFsIndexCollection;
 
 import java.io.FileOutputStream;
 
@@ -28,15 +28,15 @@ import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIndex;
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.descriptor.FsIndex;
+import org.apache.uima.fit.descriptor.FsIndexCollection;
+import org.apache.uima.fit.descriptor.FsIndexKey;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.metadata.FsIndexDescription;
 import org.apache.uima.resource.metadata.FsIndexKeyDescription;
 import org.junit.Test;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.descriptor.FsIndex;
-import org.uimafit.descriptor.FsIndexCollection;
-import org.uimafit.descriptor.FsIndexKey;
 import org.uimafit.type.Sentence;
 import org.uimafit.type.Token;
 

@@ -19,10 +19,11 @@
 
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.factory.TypePrioritiesFactory.createTypePriorities;
+import static org.apache.uima.fit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.factory.TypePrioritiesFactory.createTypePriorities;
-import static org.uimafit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
 
+import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.metadata.TypePriorities;
 import org.apache.uima.util.CasCreationUtils;

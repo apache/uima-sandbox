@@ -17,6 +17,6 @@
  ******************************************************************************/
 
 /**
- * Example for using the {@link org.uimafit.descriptor.ExternalResource} annotation.
+ * Example for using the {@link org.apache.uima.fit.descriptor.ExternalResource} annotation.
  */
 package org.uimafit.examples.tutorial.ex6;

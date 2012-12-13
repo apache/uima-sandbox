@@ -19,6 +19,7 @@ package org.uimafit.factory;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.uima.UimaContext;
+import org.apache.uima.fit.factory.UimaContextFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Test;
 

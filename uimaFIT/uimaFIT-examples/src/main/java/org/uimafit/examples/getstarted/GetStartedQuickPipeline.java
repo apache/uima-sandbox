@@ -18,9 +18,9 @@ package org.uimafit.examples.getstarted;
 
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
-import org.uimafit.factory.AnalysisEngineFactory;
-import org.uimafit.factory.JCasFactory;
 
 /**
  * 

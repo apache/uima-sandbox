@@ -16,9 +16,9 @@
  */
 package org.uimafit.examples.tutorial;
 
-import static org.uimafit.factory.JCasFactory.createJCas;
-import static org.uimafit.factory.TypePrioritiesFactory.createTypePriorities;
-import static org.uimafit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
+import static org.apache.uima.fit.factory.JCasFactory.createJCas;
+import static org.apache.uima.fit.factory.TypePrioritiesFactory.createTypePriorities;
+import static org.apache.uima.fit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
 
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.metadata.TypePriorities;

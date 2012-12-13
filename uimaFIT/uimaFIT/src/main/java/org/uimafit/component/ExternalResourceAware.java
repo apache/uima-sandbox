@@ -18,8 +18,8 @@
  */
 package org.uimafit.component;
 
-import org.uimafit.descriptor.ExternalResource;
-import org.uimafit.factory.ExternalResourceFactory;
+import org.apache.uima.fit.descriptor.ExternalResource;
+import org.apache.uima.fit.factory.ExternalResourceFactory;
 
 /**
  * Allows an external resource to use the {@link ExternalResource} annotation on member variables

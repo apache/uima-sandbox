@@ -24,10 +24,10 @@ import java.util.List;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
+import org.apache.uima.fit.descriptor.SofaCapability;
 import org.apache.uima.jcas.JCas;
 import org.uimafit.component.JCasAnnotator_ImplBase;
 import org.uimafit.component.ViewCreatorAnnotator;
-import org.uimafit.descriptor.SofaCapability;
 import org.uimafit.examples.type.Sentence;
 import org.uimafit.examples.type.Token;
 

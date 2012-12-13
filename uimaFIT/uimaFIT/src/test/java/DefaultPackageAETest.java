@@ -17,12 +17,12 @@
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.factory.AnalysisEngineFactory;
-import org.uimafit.pipeline.SimplePipeline;
 
 /**
  * @author Philip Ogren

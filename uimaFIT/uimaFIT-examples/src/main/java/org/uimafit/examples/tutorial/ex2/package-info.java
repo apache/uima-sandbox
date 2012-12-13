@@ -17,6 +17,6 @@
  ******************************************************************************/
 
 /**
- * Example for using the {@link org.uimafit.descriptor.ConfigurationParameter} annotation.
+ * Example for using the {@link org.apache.uima.fit.descriptor.ConfigurationParameter} annotation.
  */
 package org.uimafit.examples.tutorial.ex2;

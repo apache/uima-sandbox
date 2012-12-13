@@ -19,14 +19,15 @@
 
 package org.uimafit.spring;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitiveDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.*;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitiveDescription;
-import static org.uimafit.factory.ExternalResourceFactory.*;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -34,7 +35,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.descriptor.ExternalResource;
 
 /**
  * Test making Spring beans available to a UIMA component via the resource manager.

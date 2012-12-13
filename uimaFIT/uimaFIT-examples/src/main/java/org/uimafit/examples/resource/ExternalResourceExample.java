@@ -19,18 +19,19 @@
 
 package org.uimafit.examples.resource;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createAggregate;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createAggregateDescription;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitiveDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.bindResource;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
 import static org.junit.Assert.assertTrue;
-import static org.uimafit.factory.AnalysisEngineFactory.createAggregate;
-import static org.uimafit.factory.AnalysisEngineFactory.createAggregateDescription;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitiveDescription;
-import static org.uimafit.factory.ExternalResourceFactory.bindResource;
-import static org.uimafit.factory.ExternalResourceFactory.createExternalResourceDescription;
 
 import java.io.File;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.DataResource;
 import org.apache.uima.resource.ExternalResourceDescription;
@@ -38,7 +39,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.SharedResourceObject;
 import org.junit.Test;
 import org.uimafit.component.Resource_ImplBase;
-import org.uimafit.descriptor.ExternalResource;
 
 /**
  * Example for the use of external resources with uimaFIT.

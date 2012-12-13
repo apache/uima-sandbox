@@ -37,9 +37,9 @@
 
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.factory.CollectionReaderFactory.createCollectionReader;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
 import static org.junit.Assert.assertNotNull;
-import static org.uimafit.factory.CollectionReaderFactory.createCollectionReader;
-import static org.uimafit.factory.ExternalResourceFactory.createExternalResourceDescription;
 
 import java.io.IOException;
 
@@ -47,10 +47,10 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.collection.CollectionReader;
+import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.util.Progress;
 import org.junit.Test;
 import org.uimafit.component.CasCollectionReader_ImplBase;
-import org.uimafit.descriptor.ExternalResource;
 import org.uimafit.factory.testRes.TestExternalResource;
 
 /**

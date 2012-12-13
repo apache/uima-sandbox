@@ -19,18 +19,18 @@
 
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.component.initialize.ExternalResourceInitializer.getResourceDeclarations;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitiveDescription;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.component.initialize.ExternalResourceInitializer.getResourceDeclarations;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitiveDescription;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.component.initialize.ExternalResourceInitializer;
 import org.apache.uima.resource.ExternalResourceDependency;
 import org.junit.Test;
-import org.uimafit.ComponentTestBase;
-import org.uimafit.component.initialize.ExternalResourceInitializer;
 import org.uimafit.factory.testAes.ParameterizedAE2;
 
 /**

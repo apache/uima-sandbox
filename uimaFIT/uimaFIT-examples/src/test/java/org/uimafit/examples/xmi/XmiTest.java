@@ -16,12 +16,16 @@
  */
 package org.uimafit.examples.xmi;
 
+import static org.apache.uima.fit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
+import static org.apache.uima.fit.util.JCasUtil.select;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
-import static org.uimafit.util.JCasUtil.select;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.pipeline.SimplePipeline;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.junit.Test;
@@ -30,10 +34,6 @@ import org.uimafit.component.xwriter.XWriter;
 import org.uimafit.examples.tutorial.ExamplesTestBase;
 import org.uimafit.examples.type.Sentence;
 import org.uimafit.examples.type.Token;
-import org.uimafit.factory.AnalysisEngineFactory;
-import org.uimafit.factory.JCasFactory;
-import org.uimafit.pipeline.SimplePipeline;
-import org.uimafit.util.JCasUtil;
 
 /**
  * This test demonstrates testing a "downstream" AnalysisEngine by means of an

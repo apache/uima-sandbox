@@ -19,9 +19,9 @@ package org.uimafit.factory.testAes;
 import java.util.Arrays;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.util.TypeSystemUtil;
 import org.apache.uima.jcas.JCas;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.util.TypeSystemUtil;
 
 /**
  * @author Philip Ogren

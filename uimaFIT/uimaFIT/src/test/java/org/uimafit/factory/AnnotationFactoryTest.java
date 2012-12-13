@@ -20,8 +20,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.uima.UIMAException;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.factory.AnnotationFactory;
 import org.junit.Test;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.type.Sentence;
 import org.uimafit.type.Token;
 

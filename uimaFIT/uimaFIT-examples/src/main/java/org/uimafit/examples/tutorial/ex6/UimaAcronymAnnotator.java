@@ -19,24 +19,24 @@
 
 package org.uimafit.examples.tutorial.ex6;
 
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitiveDescription;
-import static org.uimafit.factory.ExternalResourceFactory.bindResource;
-import static org.uimafit.factory.ExternalResourceFactory.createExternalResourceDescription;
-import static org.uimafit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitiveDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.bindResource;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
+import static org.apache.uima.fit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.StringTokenizer;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.fit.descriptor.ExternalResource;
+import org.apache.uima.fit.descriptor.TypeCapability;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ExternalResourceDescription;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.util.InvalidXMLException;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.descriptor.ExternalResource;
-import org.uimafit.descriptor.TypeCapability;
 import org.uimafit.examples.tutorial.type.UimaAcronym;
 
 /**

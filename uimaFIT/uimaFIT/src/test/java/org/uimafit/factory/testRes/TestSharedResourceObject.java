@@ -20,11 +20,11 @@ package org.uimafit.factory.testRes;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.uima.fit.component.initialize.ConfigurationParameterInitializer;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.resource.DataResource;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.SharedResourceObject;
-import org.uimafit.component.initialize.ConfigurationParameterInitializer;
-import org.uimafit.descriptor.ConfigurationParameter;
 
 /**
  * @author Richard Eckart de Castilho

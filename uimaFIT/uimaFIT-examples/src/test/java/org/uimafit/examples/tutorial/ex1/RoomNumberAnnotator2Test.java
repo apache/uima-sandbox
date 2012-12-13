@@ -20,11 +20,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.junit.Test;
 import org.uimafit.examples.tutorial.ExamplesTestBase;
 import org.uimafit.examples.tutorial.type.RoomNumber;
-import org.uimafit.factory.AnalysisEngineFactory;
-import org.uimafit.util.JCasUtil;
 
 /**
  * This class demonstrates some simple tests using uimaFIT using the

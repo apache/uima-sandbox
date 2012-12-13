@@ -20,8 +20,8 @@ package org.uimafit.factory.testRes;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.uimafit.component.Resource_ImplBase;
-import org.uimafit.descriptor.ConfigurationParameter;
 
 /**
  * @author Richard Eckart de Castilho

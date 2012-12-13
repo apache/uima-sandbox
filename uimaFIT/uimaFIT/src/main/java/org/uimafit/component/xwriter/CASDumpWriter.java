@@ -38,10 +38,10 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.springframework.util.DigestUtils;
 import org.uimafit.component.CasConsumer_ImplBase;
-import org.uimafit.descriptor.ConfigurationParameter;
 
 /**
  * Dumps CAS content to a text file. This is useful when setting up test cases which contain a

@@ -28,8 +28,9 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.ConfigurationParameterFactory;
 import org.junit.Test;
-import org.uimafit.descriptor.ConfigurationParameter;
 
 /**
  * @author Philip Ogren

@@ -21,10 +21,12 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 
 import org.apache.uima.UIMAException;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.factory.AnnotationFactory;
+import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.junit.Test;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.type.Token;
-import org.uimafit.util.JCasUtil;
 
 /**
  * @author Steven Bethard, Philip Ogren

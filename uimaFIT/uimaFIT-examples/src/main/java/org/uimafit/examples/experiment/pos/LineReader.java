@@ -21,14 +21,14 @@ import java.io.IOException;
 
 import org.apache.uima.UimaContext;
 import org.apache.uima.collection.CollectionException;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.ConfigurationParameterFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.pear.util.FileUtil;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
 import org.uimafit.component.JCasCollectionReader_ImplBase;
-import org.uimafit.descriptor.ConfigurationParameter;
-import org.uimafit.factory.ConfigurationParameterFactory;
 
 /**
  * This collection reader is meant for example purposes only. For a much more

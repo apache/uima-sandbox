@@ -16,13 +16,15 @@
  */
 package org.uimafit.factory;
 
-import static org.uimafit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
 
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.junit.Test;
 import org.uimafit.type.AnalyzedText;
 import org.uimafit.type.Sentence;
 import org.uimafit.type.Token;
+
+import static org.apache.uima.fit.factory.TypeSystemDescriptionFactory.createTypeSystemDescription;
 import static org.junit.Assert.*;
 
 /**

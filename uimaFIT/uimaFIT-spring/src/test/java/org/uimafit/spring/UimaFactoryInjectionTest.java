@@ -19,8 +19,8 @@
 
 package org.uimafit.spring;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitive;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitive;
 
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngine;

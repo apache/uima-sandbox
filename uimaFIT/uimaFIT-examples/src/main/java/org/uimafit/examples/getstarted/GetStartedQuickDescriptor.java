@@ -21,8 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.uimafit.factory.AnalysisEngineFactory;
 import org.xml.sax.SAXException;
 
 /**

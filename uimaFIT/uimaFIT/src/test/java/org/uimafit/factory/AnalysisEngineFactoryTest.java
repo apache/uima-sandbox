@@ -38,6 +38,13 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.analysis_engine.metadata.SofaMapping;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.descriptor.OperationalProperties;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.factory.SofaMappingFactory;
+import org.apache.uima.fit.pipeline.SimplePipeline;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -48,20 +55,16 @@ import org.apache.uima.resource.metadata.ConfigurationParameterSettings;
 import org.apache.uima.resource.metadata.TypePriorities;
 import org.apache.uima.resource.metadata.TypePriorityList;
 import org.junit.Test;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.component.NoOpAnnotator;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.descriptor.OperationalProperties;
 import org.uimafit.factory.testAes.Annotator1;
 import org.uimafit.factory.testAes.Annotator2;
 import org.uimafit.factory.testAes.Annotator3;
 import org.uimafit.factory.testAes.Annotator4;
 import org.uimafit.factory.testAes.ParameterizedAE;
 import org.uimafit.factory.testAes.ViewNames;
-import org.uimafit.pipeline.SimplePipeline;
 import org.uimafit.type.Sentence;
 import org.uimafit.type.Token;
-import org.uimafit.util.JCasUtil;
 
 /**
  * @author Steven Bethard, Philip Ogren
@@ -470,7 +473,7 @@ public class AnalysisEngineFactoryTest extends ComponentTestBase {
 		}
 	}
 
-	@org.uimafit.descriptor.OperationalProperties(multipleDeploymentAllowed = false)
+	@org.apache.uima.fit.descriptor.OperationalProperties(multipleDeploymentAllowed = false)
 	public static class AncestorClass extends JCasAnnotator_ImplBase {
 		@Override
 		public void process(JCas aJCas) throws AnalysisEngineProcessException {
@@ -482,7 +485,7 @@ public class AnalysisEngineFactoryTest extends ComponentTestBase {
 		// Dummy
 	}
 
-	@org.uimafit.descriptor.OperationalProperties(multipleDeploymentAllowed = true)
+	@org.apache.uima.fit.descriptor.OperationalProperties(multipleDeploymentAllowed = true)
 	public static class AnnotatedAnnotatorClass extends UnannotatedAnnotatorClass {
 		// Vessel for the annotation
 	}

@@ -19,6 +19,7 @@ package org.uimafit.factory;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.uima.analysis_engine.metadata.SofaMapping;
+import org.apache.uima.fit.factory.SofaMappingFactory;
 import org.junit.Test;
 import org.uimafit.component.NoOpAnnotator;
 

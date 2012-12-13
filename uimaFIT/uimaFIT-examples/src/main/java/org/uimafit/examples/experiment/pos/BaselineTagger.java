@@ -17,7 +17,7 @@
 
 package org.uimafit.examples.experiment.pos;
 
-import static org.uimafit.util.JCasUtil.select;
+import static org.apache.uima.fit.util.JCasUtil.select;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;

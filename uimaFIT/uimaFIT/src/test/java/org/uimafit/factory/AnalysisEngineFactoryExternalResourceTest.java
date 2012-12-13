@@ -19,13 +19,13 @@
 
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createAggregate;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createAggregateDescription;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitive;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitiveDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.bindExternalResource;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
 import static org.junit.Assert.assertNotNull;
-import static org.uimafit.factory.AnalysisEngineFactory.createAggregate;
-import static org.uimafit.factory.AnalysisEngineFactory.createAggregateDescription;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitive;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitiveDescription;
-import static org.uimafit.factory.ExternalResourceFactory.bindExternalResource;
-import static org.uimafit.factory.ExternalResourceFactory.createExternalResourceDescription;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,6 +36,9 @@ import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.descriptor.ExternalResource;
+import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.resource.CustomResourceSpecifier;
 import org.apache.uima.resource.ExternalResourceDescription;
 import org.apache.uima.resource.ResourceCreationSpecifier;
@@ -48,8 +51,6 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.uimafit.component.CasAnnotator_ImplBase;
 import org.uimafit.component.ExternalResourceAware;
-import org.uimafit.descriptor.ConfigurationParameter;
-import org.uimafit.descriptor.ExternalResource;
 import org.uimafit.factory.testRes.TestExternalResource;
 import org.uimafit.factory.testRes.TestSharedResourceObject;
 import org.xml.sax.SAXException;

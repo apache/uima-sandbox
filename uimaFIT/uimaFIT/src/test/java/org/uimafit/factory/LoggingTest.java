@@ -18,9 +18,9 @@
  */
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitive;
+import static org.apache.uima.fit.factory.CollectionReaderFactory.createCollectionReader;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitive;
-import static org.uimafit.factory.CollectionReaderFactory.createCollectionReader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.AbstractCas;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionException;
+import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.flow.Flow;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;

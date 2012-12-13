@@ -25,6 +25,8 @@ import java.util.Map;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.ConfigurationParameterFactory;
 import org.apache.uima.flow.FinalStep;
 import org.apache.uima.flow.Flow;
 import org.apache.uima.flow.FlowControllerContext;
@@ -32,8 +34,6 @@ import org.apache.uima.flow.JCasFlow_ImplBase;
 import org.apache.uima.flow.SimpleStep;
 import org.apache.uima.flow.Step;
 import org.apache.uima.jcas.JCas;
-import org.uimafit.descriptor.ConfigurationParameter;
-import org.uimafit.factory.ConfigurationParameterFactory;
 
 /**
  * @author Philip Ogren, Fabio Mancinelli

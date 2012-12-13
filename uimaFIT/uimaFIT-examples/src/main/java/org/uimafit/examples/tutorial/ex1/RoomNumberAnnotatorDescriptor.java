@@ -20,10 +20,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
-import org.uimafit.factory.AnalysisEngineFactory;
-import org.uimafit.factory.TypeSystemDescriptionFactory;
 
 /**
  * This class provides a main method which shows how to generate an xml descriptor file using the

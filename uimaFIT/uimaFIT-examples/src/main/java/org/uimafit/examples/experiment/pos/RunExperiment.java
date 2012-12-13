@@ -22,14 +22,14 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReader;
+import org.apache.uima.fit.factory.AggregateBuilder;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.CollectionReaderFactory;
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
+import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.uimafit.component.ViewTextCopierAnnotator;
 import org.uimafit.component.xwriter.XWriter;
-import org.uimafit.factory.AggregateBuilder;
-import org.uimafit.factory.AnalysisEngineFactory;
-import org.uimafit.factory.CollectionReaderFactory;
-import org.uimafit.factory.TypeSystemDescriptionFactory;
-import org.uimafit.pipeline.SimplePipeline;
 
 /**
  * This class demonstrates a very common (though simplified) experimental setup in which gold

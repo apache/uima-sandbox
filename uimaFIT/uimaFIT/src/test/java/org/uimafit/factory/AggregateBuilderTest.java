@@ -24,10 +24,16 @@ import java.io.IOException;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.factory.AggregateBuilder;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.FlowControllerFactory;
+import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.pipeline.SimplePipeline;
+import org.apache.uima.fit.util.TypeSystemUtil;
 import org.apache.uima.flow.FlowControllerDescription;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Test;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.component.NoOpAnnotator;
 import org.uimafit.factory.testAes.Annotator1;
 import org.uimafit.factory.testAes.Annotator2;
@@ -37,8 +43,6 @@ import org.uimafit.factory.testAes.FlowAE2;
 import org.uimafit.factory.testAes.FlowAE3;
 import org.uimafit.factory.testAes.ReversableTestFlowController;
 import org.uimafit.factory.testAes.ViewNames;
-import org.uimafit.pipeline.SimplePipeline;
-import org.uimafit.util.TypeSystemUtil;
 
 /**
  * @author Philip Ogren

@@ -16,19 +16,19 @@
  */
 package org.uimafit.examples.experiment.pos;
 
+import static org.apache.uima.fit.util.JCasUtil.select;
+import static org.apache.uima.fit.util.JCasUtil.selectCovered;
 import static org.uimafit.examples.experiment.pos.ViewNames.GOLD_VIEW;
 import static org.uimafit.examples.experiment.pos.ViewNames.SYSTEM_VIEW;
-import static org.uimafit.util.JCasUtil.select;
-import static org.uimafit.util.JCasUtil.selectCovered;
 
 import java.text.NumberFormat;
 import java.util.List;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASException;
+import org.apache.uima.fit.descriptor.SofaCapability;
 import org.apache.uima.jcas.JCas;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.descriptor.SofaCapability;
 import org.uimafit.examples.type.Sentence;
 import org.uimafit.examples.type.Token;
 

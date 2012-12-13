@@ -19,9 +19,9 @@ package org.uimafit.component;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.CASRuntimeException;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.ConfigurationParameterFactory;
 import org.apache.uima.jcas.JCas;
-import org.uimafit.descriptor.ConfigurationParameter;
-import org.uimafit.factory.ConfigurationParameterFactory;
 
 /**
  * This annotator can be placed at/near the beginning of a pipeline to ensure that a particular view

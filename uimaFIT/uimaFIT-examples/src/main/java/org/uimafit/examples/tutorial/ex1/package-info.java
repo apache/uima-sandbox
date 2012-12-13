@@ -17,6 +17,6 @@
  ******************************************************************************/
 
 /**
- * Example for using the {@link org.uimafit.descriptor.TypeCapability} annotation.
+ * Example for using the {@link org.apache.uima.fit.descriptor.TypeCapability} annotation.
  */
 package org.uimafit.examples.tutorial.ex1;

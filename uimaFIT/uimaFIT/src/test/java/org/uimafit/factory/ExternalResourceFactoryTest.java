@@ -19,17 +19,17 @@
 
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createAggregate;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createAggregateDescription;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitiveDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.bindExternalResource;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.bindResource;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createDependencyAndBind;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.uimafit.factory.AnalysisEngineFactory.createAggregate;
-import static org.uimafit.factory.AnalysisEngineFactory.createAggregateDescription;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitiveDescription;
-import static org.uimafit.factory.ExternalResourceFactory.bindExternalResource;
-import static org.uimafit.factory.ExternalResourceFactory.bindResource;
-import static org.uimafit.factory.ExternalResourceFactory.createDependencyAndBind;
-import static org.uimafit.factory.ExternalResourceFactory.createExternalResourceDescription;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +48,14 @@ import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.component.initialize.ConfigurationParameterInitializer;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.descriptor.ExternalResource;
+import org.apache.uima.fit.factory.ExternalResourceFactory;
+import org.apache.uima.fit.factory.locator.JndiResourceLocator;
+import org.apache.uima.fit.pipeline.SimplePipeline;
+import org.apache.uima.fit.util.SimpleNamedResourceManager;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.DataResource;
 import org.apache.uima.resource.ExternalResourceDescription;
@@ -59,15 +67,8 @@ import org.apache.uima.util.CasCreationUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.component.JCasAnnotator_ImplBase;
 import org.uimafit.component.Resource_ImplBase;
-import org.uimafit.component.initialize.ConfigurationParameterInitializer;
-import org.uimafit.descriptor.ConfigurationParameter;
-import org.uimafit.descriptor.ExternalResource;
-import org.uimafit.factory.locator.JndiResourceLocator;
-import org.uimafit.pipeline.SimplePipeline;
-import org.uimafit.util.SimpleNamedResourceManager;
 
 /**
  * Test case for {@link ExternalResource} annotations.

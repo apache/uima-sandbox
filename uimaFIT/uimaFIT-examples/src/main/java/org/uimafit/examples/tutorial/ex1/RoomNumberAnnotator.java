@@ -22,9 +22,9 @@ package org.uimafit.examples.tutorial.ex1;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.uima.fit.descriptor.TypeCapability;
 import org.apache.uima.jcas.JCas;
 import org.uimafit.component.JCasAnnotator_ImplBase;
-import org.uimafit.descriptor.TypeCapability;
 import org.uimafit.examples.tutorial.type.RoomNumber;
 
 /**

@@ -26,13 +26,13 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XCASSerializer;
 import org.apache.uima.cas.impl.XmiCasSerializer;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.ConfigurationParameterFactory;
+import org.apache.uima.fit.factory.initializable.InitializableFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.XMLSerializer;
 import org.uimafit.component.JCasConsumer_ImplBase;
-import org.uimafit.descriptor.ConfigurationParameter;
-import org.uimafit.factory.ConfigurationParameterFactory;
-import org.uimafit.factory.initializable.InitializableFactory;
 import org.xml.sax.SAXException;
 
 /**

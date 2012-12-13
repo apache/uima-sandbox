@@ -37,13 +37,16 @@
 
 package org.uimafit.factory;
 
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
+import static org.apache.uima.fit.factory.FlowControllerFactory.createFlowControllerDescription;
 import static org.junit.Assert.assertNotNull;
-import static org.uimafit.factory.ExternalResourceFactory.createExternalResourceDescription;
-import static org.uimafit.factory.FlowControllerFactory.createFlowControllerDescription;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.fit.descriptor.ExternalResource;
+import org.apache.uima.fit.factory.AggregateBuilder;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.flow.CasFlow_ImplBase;
 import org.apache.uima.flow.FinalStep;
 import org.apache.uima.flow.Flow;
@@ -51,7 +54,6 @@ import org.apache.uima.flow.Step;
 import org.junit.Test;
 import org.uimafit.component.CasFlowController_ImplBase;
 import org.uimafit.component.NoOpAnnotator;
-import org.uimafit.descriptor.ExternalResource;
 import org.uimafit.factory.testRes.TestExternalResource;
 
 /**

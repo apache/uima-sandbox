@@ -17,6 +17,9 @@
 package org.uimafit.factory;
 
 import java.awt.Point;
+
+import org.apache.uima.fit.factory.ResourceCreationSpecifierFactory;
+import org.apache.uima.fit.factory.UimaContextFactory;
 import org.apache.uima.resource.ResourceCreationSpecifier;
 import org.junit.Test;
 import org.uimafit.factory.testAes.ParameterizedAE;

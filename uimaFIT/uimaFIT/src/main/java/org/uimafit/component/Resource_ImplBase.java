@@ -20,12 +20,12 @@ package org.uimafit.component;
 
 import java.util.Map;
 
+import org.apache.uima.fit.component.initialize.ConfigurationParameterInitializer;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.ExternalResourceFactory;
+import org.apache.uima.fit.util.ExtendedLogger;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceSpecifier;
-import org.uimafit.component.initialize.ConfigurationParameterInitializer;
-import org.uimafit.descriptor.ConfigurationParameter;
-import org.uimafit.factory.ExternalResourceFactory;
-import org.uimafit.util.ExtendedLogger;
 
 /**
  * Base class for external resources which initializes itself based on annotations.

@@ -19,16 +19,17 @@
 package org.uimafit.factory;
 
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createPrimitive;
 import static org.junit.Assert.assertEquals;
-import static org.uimafit.factory.AnalysisEngineFactory.createPrimitive;
 
 import java.io.File;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.fit.ComponentTestBase;
+import org.apache.uima.fit.factory.JCasBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.uimafit.ComponentTestBase;
 import org.uimafit.component.xwriter.CASDumpWriter;
 import org.uimafit.type.Sentence;
 import org.uimafit.type.Token;
