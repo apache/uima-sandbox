@@ -43,7 +43,7 @@ import java.util.Random;
  * A {@link BSP} which gets files from a directory and pass them to an {@link AnalysisEngine} for processing.
  * Finally a file is written which collects all the {@link ProcessTrace}s from the different nodes.
  */
-public class AEProcessingBSPJob<KI, VI, KO, VO, M extends ByteMessage> extends BSP<KI, VI, KO, VO, BSPMessage> {
+public class BasicAEProcessingBSPJob<KI, VI, KO, VO, M extends ByteMessage> extends BSP<KI, VI, KO, VO, BSPMessage> {
 
   private CasPool casPool;
 

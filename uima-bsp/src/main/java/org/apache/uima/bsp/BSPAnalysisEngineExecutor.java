@@ -23,7 +23,7 @@ import org.apache.hama.HamaConfiguration;
 import org.apache.hama.bsp.BSPJob;
 
 /**
- * Convenience class to execute a {@link AEProcessingBSPJob}
+ * Convenience class to execute a {@link BasicAEProcessingBSPJob}
  */
 public class BSPAnalysisEngineExecutor {
 
@@ -37,9 +37,9 @@ public class BSPAnalysisEngineExecutor {
 
     BSPJob job = new BSPJob(conf);
     // set the BSP class which shall be executed
-    job.setBspClass(AEProcessingBSPJob.class);
+    job.setBspClass(BasicAEProcessingBSPJob.class);
     // help Hama to locale the jar to be distributed
-    job.setJarByClass(AEProcessingBSPJob.class);
+    job.setJarByClass(BasicAEProcessingBSPJob.class);
     // give it a name
     job.setJobName("BSP based UIMA AE executor");
     // use 4 tasks
